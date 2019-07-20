@@ -7,6 +7,6 @@
   remote = git@github.com:swimos/swim-ux-js.git
   branch = master
 	commit = daa1347086be7c5c1f938d4ec28ad24ea4a0fb02
-	parent = 1f888a1e0c4738830d9017ca96b1f954e20c3c2a
+	parent = 1ba9b215798aaf278338cb0f6d2eae669fd87886
 	method = merge
 	cmdver = 0.4.0
