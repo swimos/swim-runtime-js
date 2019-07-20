@@ -47,6 +47,10 @@
     {"path": "./swim-ux-js/@swim/mapbox"},
     {"path": "./swim-ux-js/@swim/ux"},
 
+    {"path": "./swim-web-js/@swim/site"},
+    {"path": "./swim-web-js/@swim/app"},
+    {"path": "./swim-web-js/@swim/web"},
+
     {"path": "./@swim/system"}
   ]
 }

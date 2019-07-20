@@ -1,13 +1,13 @@
 {
-  "name": "@swim/system",
+  "name": "@swim/web",
   "version": "3.9.0",
-  "description": "Swim TypeScript System",
+  "description": "Swim Web Application Framework",
   "homepage": "https://github.com/swimos/swim",
   "author": "Chris Sachs <chris@swim.ai>",
   "copyright": "2015-2019 SWIM.AI inc.",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
-  "main": "dist/main/swim-system.js",
+  "main": "dist/main/swim-web.js",
   "module": "lib/main/index.js",
   "types": "lib/main/index.d.ts",
   "dependencies": {
@@ -16,15 +16,9 @@
     "@swim/collections": "3.9.0",
     "@swim/structure": "3.9.0",
     "@swim/streamlet": "3.9.0",
-    "@swim/dataflow": "3.9.0",
-    "@swim/recon": "3.9.0",
     "@swim/math": "3.9.0",
     "@swim/time": "3.9.0",
     "@swim/uri": "3.9.0",
-
-    "@swim/warp": "3.9.0",
-    "@swim/client": "3.9.0",
-
     "@swim/angle": "3.9.0",
     "@swim/length": "3.9.0",
     "@swim/color": "3.9.0",
@@ -41,14 +35,6 @@
     "@swim/view": "3.9.0",
     "@swim/shape": "3.9.0",
     "@swim/typeset": "3.9.0",
-    "@swim/gesture": "3.9.0",
-
-    "@swim/gauge": "3.9.0",
-    "@swim/pie": "3.9.0",
-    "@swim/chart": "3.9.0",
-    "@swim/map": "3.9.0",
-    "@swim/mapbox": "3.9.0",
-
     "@swim/site": "3.9.0",
     "@swim/app": "3.9.0"
   }

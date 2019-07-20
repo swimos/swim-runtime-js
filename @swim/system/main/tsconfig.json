@@ -40,7 +40,10 @@
       "@swim/pie": ["swim-ux-js/@swim/pie/main"],
       "@swim/chart": ["swim-ux-js/@swim/chart/main"],
       "@swim/map": ["swim-ux-js/@swim/map/main"],
-      "@swim/mapbox": ["swim-ux-js/@swim/mapbox/main"]
+      "@swim/mapbox": ["swim-ux-js/@swim/mapbox/main"],
+
+      "@swim/site": ["swim-web-js/@swim/site/main"],
+      "@swim/app": ["swim-web-js/@swim/app/main"]
     }
   },
   "references": [
@@ -80,6 +83,9 @@
     {"path": "../../swim-ux-js/@swim/pie/main"},
     {"path": "../../swim-ux-js/@swim/chart/main"},
     {"path": "../../swim-ux-js/@swim/map/main"},
-    {"path": "../../swim-ux-js/@swim/mapbox/main"}
+    {"path": "../../swim-ux-js/@swim/mapbox/main"},
+
+    {"path": "../../swim-web-js/@swim/site/main"},
+    {"path": "../../swim-web-js/@swim/app/main"}
   ]
 }
