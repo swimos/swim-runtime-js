@@ -1,7 +1,7 @@
 import nodeResolve from "rollup-plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 
-const script = "swim-vis";
+const script = "swim-ux";
 const namespace = "swim";
 
 const main = {

@@ -496,11 +496,11 @@ const ui = [
   },
 ];
 
-const vis = [
+const ux = [
   {
     id: "gauge",
     name: "@swim/gauge",
-    path: "swim-vis-js/@swim/gauge",
+    path: "swim-ux-js/@swim/gauge",
     targets: [
       {
         id: "main",
@@ -511,7 +511,7 @@ const vis = [
   {
     id: "pie",
     name: "@swim/pie",
-    path: "swim-vis-js/@swim/pie",
+    path: "swim-ux-js/@swim/pie",
     targets: [
       {
         id: "main",
@@ -522,7 +522,7 @@ const vis = [
   {
     id: "chart",
     name: "@swim/chart",
-    path: "swim-vis-js/@swim/chart",
+    path: "swim-ux-js/@swim/chart",
     targets: [
       {
         id: "main",
@@ -533,7 +533,7 @@ const vis = [
   {
     id: "map",
     name: "@swim/map",
-    path: "swim-vis-js/@swim/map",
+    path: "swim-ux-js/@swim/map",
     targets: [
       {
         id: "main",
@@ -544,7 +544,7 @@ const vis = [
   {
     id: "mapbox",
     name: "@swim/mapbox",
-    path: "swim-vis-js/@swim/mapbox",
+    path: "swim-ux-js/@swim/mapbox",
     targets: [
       {
         id: "main",
@@ -553,9 +553,9 @@ const vis = [
     ],
   },
   {
-    id: "vis",
-    name: "@swim/vis",
-    path: "swim-vis-js/@swim/vis",
+    id: "ux",
+    name: "@swim/ux",
+    path: "swim-ux-js/@swim/ux",
     umbrella: true,
     targets: [
       {
@@ -582,7 +582,7 @@ const system = [
 
 export default {
   version: "3.9.0",
-  projects: core.concat(mesh).concat(ui).concat(vis).concat(system),
+  projects: core.concat(mesh).concat(ui).concat(ux).concat(system),
   umbrella: true,
   gaID: "UA-79441805-2",
 };

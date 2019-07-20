@@ -1,7 +1,7 @@
 {
-  "name": "@swim/vis",
+  "name": "@swim/ux",
   "version": "3.9.0",
-  "description": "Swim Real-Time Data Visualization Toolkit",
+  "description": "Swim Real-Time User eXperience Toolkit",
   "homepage": "https://github.com/swimos/swim",
   "author": "Chris Sachs <chris@swim.ai>",
   "copyright": "2015-2019 SWIM.AI inc.",

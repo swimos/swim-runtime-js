@@ -1,4 +1,4 @@
-const vis = [
+const ux = [
   {
     id: "gauge",
     name: "@swim/gauge",
@@ -46,8 +46,8 @@ const vis = [
     ],
   },
   {
-    id: "vis",
-    name: "@swim/vis",
+    id: "ux",
+    name: "@swim/ux",
     umbrella: true,
     targets: [
       {
@@ -60,5 +60,5 @@ const vis = [
 
 export default {
   version: "3.9.0",
-  projects: vis,
+  projects: ux,
 };
