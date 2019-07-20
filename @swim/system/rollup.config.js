@@ -26,9 +26,7 @@ const main = {
     nodeResolve({customResolveOptions: {paths: ["../../swim-core-js",
                                                 "../../swim-mesh-js",
                                                 "../../swim-ui-js",
-                                                "../../swim-ux-js",
-                                                "../../swim-vis-js",
-                                                "../../swim-web-js"]}}),
+                                                "../../swim-vis-js"]}}),
     sourcemaps(),
   ],
   onwarn(warning, warn) {

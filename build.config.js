@@ -496,32 +496,6 @@ const ui = [
   },
 ];
 
-const ux = [
-  {
-    id: "navigation",
-    name: "@swim/navigation",
-    path: "swim-ux-js/@swim/navigation",
-    targets: [
-      {
-        id: "main",
-        deps: ["util", "codec", "collections", "structure", "streamlet", "math", "time", "uri", "angle", "length", "color", "font", "transform", "interpolate", "scale", "transition", "animate", "dom", "style", "render", "constraint", "view", "shape", "typeset"],
-      },
-    ],
-  },
-  {
-    id: "ux",
-    name: "@swim/ux",
-    path: "swim-ux-js/@swim/ux",
-    umbrella: true,
-    targets: [
-      {
-        id: "main",
-        deps: ["util", "codec", "collections", "structure", "streamlet", "math", "time", "uri", "angle", "length", "color", "font", "transform", "interpolate", "scale", "transition", "animate", "dom", "style", "render", "constraint", "view", "shape", "typeset", "navigation"],
-      },
-    ],
-  },
-];
-
 const vis = [
   {
     id: "gauge",
@@ -592,43 +566,6 @@ const vis = [
   },
 ];
 
-const web = [
-  {
-    id: "site",
-    name: "@swim/site",
-    path: "swim-web-js/@swim/site",
-    targets: [
-      {
-        id: "main",
-        deps: ["util", "codec", "collections", "structure", "streamlet", "math", "time", "uri", "angle", "length", "color", "font", "transform", "interpolate", "scale", "transition", "animate", "dom", "style", "render", "constraint", "view", "shape", "typeset"],
-      },
-    ],
-  },
-  {
-    id: "app",
-    name: "@swim/app",
-    path: "swim-web-js/@swim/app",
-    targets: [
-      {
-        id: "main",
-        deps: ["util", "codec", "collections", "structure", "streamlet", "math", "time", "uri", "angle", "length", "color", "font", "transform", "interpolate", "scale", "transition", "animate", "dom", "style", "render", "constraint", "view", "shape", "typeset"],
-      },
-    ],
-  },
-  {
-    id: "web",
-    name: "@swim/web",
-    path: "swim-web-js/@swim/web",
-    umbrella: true,
-    targets: [
-      {
-        id: "main",
-        deps: ["util", "codec", "collections", "structure", "streamlet", "math", "time", "uri", "angle", "length", "color", "font", "transform", "interpolate", "scale", "transition", "animate", "dom", "style", "render", "constraint", "view", "shape", "typeset", "site", "app"],
-      },
-    ],
-  },
-];
-
 const system = [
   {
     id: "system",
@@ -637,7 +574,7 @@ const system = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "collections", "structure", "streamlet", "dataflow", "recon", "math", "time", "uri", "warp", "client", "angle", "length", "color", "font", "transform", "interpolate", "scale", "transition", "animate", "dom", "style", "render", "constraint", "view", "shape", "typeset", "gesture", "navigation", "gauge", "pie", "chart", "map", "mapbox", "site", "app"],
+        deps: ["util", "codec", "collections", "structure", "streamlet", "dataflow", "recon", "math", "time", "uri", "warp", "client", "angle", "length", "color", "font", "transform", "interpolate", "scale", "transition", "animate", "dom", "style", "render", "constraint", "view", "shape", "typeset", "gesture", "gauge", "pie", "chart", "map", "mapbox"],
       },
     ],
   },
@@ -645,7 +582,7 @@ const system = [
 
 export default {
   version: "3.9.0",
-  projects: core.concat(mesh).concat(ui).concat(ux).concat(vis).concat(web).concat(system),
+  projects: core.concat(mesh).concat(ui).concat(vis).concat(system),
   umbrella: true,
   gaID: "UA-79441805-2",
 };

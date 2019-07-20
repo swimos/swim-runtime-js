@@ -43,15 +43,10 @@
     "@swim/typeset": "3.9.0",
     "@swim/gesture": "3.9.0",
 
-    "@swim/navigation": "3.9.0",
-
     "@swim/gauge": "3.9.0",
     "@swim/pie": "3.9.0",
     "@swim/chart": "3.9.0",
     "@swim/map": "3.9.0",
-    "@swim/mapbox": "3.9.0",
-
-    "@swim/site": "3.9.0",
-    "@swim/app": "3.9.0"
+    "@swim/mapbox": "3.9.0"
   }
 }
