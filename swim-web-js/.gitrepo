@@ -7,6 +7,6 @@
   remote = git@github.com:swimos/swim-web-js.git
   branch = master
 	commit = 89e103e8c86ad8a779c60b4021f48b20d681e5b8
-	parent = 7f2ac1957a4633c7189817ef3c9e93dd4555e141
+	parent = d5cf077b3df6a5711acd3db08847e3e18bce7a47
 	method = merge
 	cmdver = 0.4.0

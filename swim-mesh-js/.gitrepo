@@ -7,6 +7,6 @@
   remote = git@github.com:swimos/swim-mesh-js.git
   branch = master
 	commit = 4d823e97098b017bca15b5512cf49f4928247c6b
-	parent = 78d5ac77dcbf03785c80d4b64a257e1cd2e371b9
+	parent = d5cf077b3df6a5711acd3db08847e3e18bce7a47
 	method = merge
 	cmdver = 0.4.0
