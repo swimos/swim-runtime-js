@@ -46,8 +46,8 @@
       "@swim/mapbox": ["swim-ux-js/@swim/mapbox/main"],
       "@swim/ux": ["swim-ux-js/@swim/ux/main"],
 
-      "@swim/site": ["swim-web-js/@swim/site/main"],
-      "@swim/app": ["swim-web-js/@swim/app/main"],
+      "@swim/website": ["swim-web-js/@swim/website/main"],
+      "@swim/webapp": ["swim-web-js/@swim/webapp/main"],
       "@swim/web": ["swim-web-js/@swim/web/main"]
     },
     "tsBuildInfoFile": "../lib/main/.tsbuildinfo"
@@ -95,8 +95,8 @@
     {"path": "../../swim-ux-js/@swim/mapbox/main"},
     {"path": "../../swim-ux-js/@swim/ux/main"},
 
-    {"path": "../../swim-web-js/@swim/site/main"},
-    {"path": "../../swim-web-js/@swim/app/main"},
+    {"path": "../../swim-web-js/@swim/website/main"},
+    {"path": "../../swim-web-js/@swim/webapp/main"},
     {"path": "../../swim-web-js/@swim/web/main"}
   ]
 }
