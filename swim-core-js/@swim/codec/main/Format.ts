@@ -374,5 +374,66 @@ export class Format {
     }
     return s;
   }
+
+  /**
+   * Returns a string representation of the duration represented by the given
+   * number of milliseconds.
+   */
+  static duration(millis: number, separator: string = " "): string {
+    if (isFinite(millis)) {
+      const SECOND = 1000;
+      const MINUTE = 60 * SECOND;
+      const HOUR = 60 * MINUTE;
+      const DAY = 24 * HOUR;
+      const WEEK = 7 * DAY;
+      let weeks: number | undefined;
+      if (millis > WEEK) {
+        weeks = Math.floor(millis / WEEK);
+        millis %= WEEK;
+      }
+      let days: number | undefined;
+      if (millis > DAY) {
+        days = Math.floor(millis / DAY);
+        millis %= DAY;
+      }
+      let hours: number | undefined;
+      if (millis > HOUR) {
+        hours = Math.floor(millis / HOUR);
+        millis %= HOUR;
+      }
+      let minutes: number | undefined;
+      if (millis > MINUTE) {
+        minutes = Math.floor(millis / MINUTE);
+        millis %= MINUTE;
+      }
+      let seconds: number | undefined;
+      if (millis > SECOND) {
+        seconds = Math.floor(millis / SECOND);
+        millis %= SECOND;
+      }
+      let s = "";
+      if (weeks !== void 0) {
+        s += weeks + "w";
+      }
+      if (days !== void 0) {
+        s += (s ? separator : "") + days + "d";
+      }
+      if (hours !== void 0) {
+        s += (s ? separator : "") + hours + "h";
+      }
+      if (minutes !== void 0) {
+        s += (s ? separator : "") + minutes + "m";
+      }
+      if (seconds !== void 0 || !millis) {
+        s += (s ? separator : "") + (seconds || 0) + "s";
+      }
+      if (millis && !s) {
+        s += millis + "ms";
+      }
+      return s;
+    } else {
+      return "" + millis;
+    }
+  }
 }
 Tag.Format = Format;
