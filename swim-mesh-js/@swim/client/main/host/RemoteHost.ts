@@ -80,9 +80,6 @@ export abstract class RemoteHost extends Host {
     this._reconnectTimer = 0;
     this._reconnectTimeout = 0;
     this._idleTimer = 0;
-
-    this.open = this.open.bind(this);
-    this.checkIdle = this.checkIdle.bind(this);
   }
 
   hostUri(): Uri {
@@ -366,7 +363,7 @@ export abstract class RemoteHost extends Host {
       } else {
         this._reconnectTimeout = Math.min(Math.floor(1.8 * this._reconnectTimeout), this.maxReconnectTimeout());
       }
-      this._reconnectTimer = setTimeout(this.open, this._reconnectTimeout) as any;
+      this._reconnectTimer = setTimeout(this.open.bind(this), this._reconnectTimeout) as any;
     }
   }
 
@@ -379,7 +376,7 @@ export abstract class RemoteHost extends Host {
 
   protected watchIdle(): void {
     if (!this._idleTimer && this.isConnected() && this.isIdle()) {
-      this._idleTimer = setTimeout(this.checkIdle, this.idleTimeout()) as any;
+      this._idleTimer = setTimeout(this.checkIdle.bind(this), this.idleTimeout()) as any;
     }
   }
 
