@@ -82,10 +82,10 @@ export class WebSocketHost extends RemoteHost {
     this.clearReconnect();
     this.clearIdle();
     if (this._socket) {
-      this._socket.close();
       if (!this._context.isOnline()) {
         this.onWebSocketClose(); // force close event
       }
+      this._socket.close();
     } else {
       super.close();
     }
