@@ -160,7 +160,7 @@ export class NodeView extends View implements AnimatedView {
   }
 
   setChildView(key: string, newChildView: View | null): View | null {
-    if (!(newChildView instanceof NodeView)) {
+    if (newChildView !== null && !(newChildView instanceof NodeView)) {
       throw new TypeError("" + newChildView);
     }
     let oldChildView: View | null = null;
