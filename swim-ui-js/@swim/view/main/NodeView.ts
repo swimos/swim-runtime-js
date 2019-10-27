@@ -570,13 +570,13 @@ export class NodeView extends View implements AnimatedView {
   }
 
   animate(force: boolean = false): void {
-    if (!this._animationFrame && !force) {
-      this._animationFrame = requestAnimationFrame(this.onAnimationFrame);
-    } else if (force) {
+    if (force) {
       if (this._animationFrame) {
         cancelAnimationFrame(this._animationFrame);
       }
       this.onAnimationFrame(performance.now());
+    } else if (!this._animationFrame) {
+      this._animationFrame = requestAnimationFrame(this.onAnimationFrame);
     }
   }
 
@@ -617,12 +617,9 @@ export class NodeView extends View implements AnimatedView {
   }
 
   setDirty(dirty: boolean): void {
-    if (dirty && !this._dirty) {
-      this._dirty = true;
-      this.didSetDirty(true);
-    } else if (!dirty && this._dirty) {
-      this._dirty = false;
-      this.didSetDirty(false);
+    if (dirty !== this._dirty) {
+      this._dirty = dirty;
+      this.didSetDirty(dirty);
     }
   }
 
