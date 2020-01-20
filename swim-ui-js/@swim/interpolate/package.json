@@ -4,7 +4,7 @@
   "description": "Interpolator types for blending between values, including numbers, dates, angles, lengths, colors, transforms, shapes, arrays, structures, and other interpolators",
   "homepage": "https://github.com/swimos/swim/tree/master/swim-system-js/swim-ui-js/@swim/interpolate",
   "author": "Chris Sachs <chris@swimos.org>",
-  "copyright": "2015-2019 SWIM.AI inc.",
+  "copyright": "2015-2020 SWIM.AI inc.",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
   "main": "dist/main/swim-interpolate.js",
