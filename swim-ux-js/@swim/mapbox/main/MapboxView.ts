@@ -29,6 +29,10 @@ export class MapboxView extends MapGraphicView {
   _projection: MapboxProjection;
   /** @hidden */
   _zoom: number;
+  /** @hidden */
+  _bearing: number;
+  /** @hidden */
+  _pitch: number;
 
   constructor(map: mapboxgl.Map, key: string | null = null) {
     super(key);
@@ -38,6 +42,8 @@ export class MapboxView extends MapGraphicView {
     this._map = map;
     this._projection = new MapboxProjection(this._map);
     this._zoom = map.getZoom();
+    this._bearing = map.getBearing();
+    this._pitch = map.getPitch();
     this.initMap(this._map);
   }
 
@@ -133,6 +139,14 @@ export class MapboxView extends MapGraphicView {
     });
   }
 
+  get bearing(): number {
+    return this._bearing;
+  }
+
+  get pitch(): number {
+    return this._pitch;
+  }
+
   /** @hidden */
   doUpdate(updateFlags: number, viewContext: RenderViewContext): void {
     const mapViewContext = this.mapViewContext(viewContext);
@@ -179,17 +193,20 @@ export class MapboxView extends MapGraphicView {
       pixelRatio: viewContext.pixelRatio,
       projection: this._projection,
       zoom: this._zoom,
+      bearing: this._bearing,
+      pitch: this._pitch,
     };
   }
 
   protected onMapLoad(): void {
     const map = this._map;
     map.off("load", this.onMapLoad);
-    // hook
   }
 
   protected onMapRender(): void {
     this.setProjection(this._projection);
+    this._bearing = this._map.getBearing();
+    this._pitch = this._map.getPitch();
   }
 
   protected onMapZoom(): void {

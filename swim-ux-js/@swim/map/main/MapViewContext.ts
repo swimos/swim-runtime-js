@@ -19,4 +19,8 @@ export interface MapViewContext extends RenderViewContext {
   readonly projection: MapProjection;
 
   readonly zoom: number;
+
+  readonly bearing: number;
+
+  readonly pitch: number;
 }

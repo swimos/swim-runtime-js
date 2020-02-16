@@ -43,7 +43,7 @@ export class Arc implements Graphic, Equals, Debug {
   /** @hidden */
   readonly _startAngle: Angle;
   /** @hidden */
-  readonly _deltaAngle: Angle;
+  readonly _sweepAngle: Angle;
   /** @hidden */
   readonly _padAngle: Angle;
   /** @hidden */
@@ -56,7 +56,7 @@ export class Arc implements Graphic, Equals, Debug {
     this._innerRadius = innerRadius;
     this._outerRadius = outerRadius;
     this._startAngle = startAngle;
-    this._deltaAngle = sweepAngle;
+    this._sweepAngle = sweepAngle;
     this._padAngle = padAngle;
     this._padRadius = padRadius;
     this._cornerRadius = cornerRadius;
@@ -72,7 +72,7 @@ export class Arc implements Graphic, Equals, Debug {
       if (this._innerRadius.equals(innerRadius)) {
         return this;
       } else {
-        return this.copy(innerRadius, this._outerRadius, this._startAngle, this._deltaAngle,
+        return this.copy(innerRadius, this._outerRadius, this._startAngle, this._sweepAngle,
                          this._padAngle, this._padRadius, this._cornerRadius);
       }
     }
@@ -88,7 +88,7 @@ export class Arc implements Graphic, Equals, Debug {
       if (this._outerRadius.equals(outerRadius)) {
         return this;
       } else {
-        return this.copy(this._innerRadius, outerRadius, this._startAngle, this._deltaAngle,
+        return this.copy(this._innerRadius, outerRadius, this._startAngle, this._sweepAngle,
                          this._padAngle, this._padRadius, this._cornerRadius);
       }
     }
@@ -104,7 +104,7 @@ export class Arc implements Graphic, Equals, Debug {
       if (this._startAngle.equals(startAngle)) {
         return this;
       } else {
-        return this.copy(this._innerRadius, this._outerRadius, startAngle, this._deltaAngle,
+        return this.copy(this._innerRadius, this._outerRadius, startAngle, this._sweepAngle,
                          this._padAngle, this._padRadius, this._cornerRadius);
       }
     }
@@ -114,10 +114,10 @@ export class Arc implements Graphic, Equals, Debug {
   sweepAngle(sweepAngle: AnyAngle): Arc;
   sweepAngle(sweepAngle?: AnyAngle): Angle | Arc {
     if (sweepAngle === void 0) {
-      return this._deltaAngle;
+      return this._sweepAngle;
     } else {
       sweepAngle = Angle.fromAny(sweepAngle);
-      if (this._deltaAngle.equals(sweepAngle)) {
+      if (this._sweepAngle.equals(sweepAngle)) {
         return this;
       } else {
         return this.copy(this._innerRadius, this._outerRadius, this._startAngle, sweepAngle,
@@ -136,7 +136,7 @@ export class Arc implements Graphic, Equals, Debug {
       if (this._padAngle.equals(padAngle)) {
         return this;
       } else {
-        return this.copy(this._innerRadius, this._outerRadius, this._startAngle, this._deltaAngle,
+        return this.copy(this._innerRadius, this._outerRadius, this._startAngle, this._sweepAngle,
                          padAngle, this._padRadius, this._cornerRadius);
       }
     }
@@ -152,7 +152,7 @@ export class Arc implements Graphic, Equals, Debug {
       if (Objects.equal(this._padRadius, padRadius)) {
         return this;
       } else {
-        return this.copy(this._innerRadius, this._outerRadius, this._startAngle, this._deltaAngle,
+        return this.copy(this._innerRadius, this._outerRadius, this._startAngle, this._sweepAngle,
                          this._padAngle, padRadius, this._cornerRadius);
       }
     }
@@ -168,7 +168,7 @@ export class Arc implements Graphic, Equals, Debug {
       if (this._cornerRadius.equals(cornerRadius)) {
         return this;
       } else {
-        return this.copy(this._innerRadius, this._outerRadius, this._startAngle, this._deltaAngle,
+        return this.copy(this._innerRadius, this._outerRadius, this._startAngle, this._sweepAngle,
                          this._padAngle, this._padRadius, cornerRadius);
       }
     }
@@ -197,7 +197,7 @@ export class Arc implements Graphic, Equals, Debug {
     let r0 = this._innerRadius.pxValue(size);
     let r1 = this._outerRadius.pxValue(size);
     const a0 = this._startAngle.radValue();
-    const da = this._deltaAngle.radValue();
+    const da = this._sweepAngle.radValue();
     const a1 = a0 + da;
     const cw = da >= 0;
 
@@ -356,7 +356,7 @@ export class Arc implements Graphic, Equals, Debug {
       innerRadius: this._innerRadius,
       outerRadius: this._outerRadius,
       startAngle: this._startAngle,
-      sweepAngle: this._deltaAngle,
+      sweepAngle: this._sweepAngle,
       padAngle: this._padAngle,
       padRadius: this._padRadius,
       cornerRadius: this._cornerRadius,
@@ -370,7 +370,7 @@ export class Arc implements Graphic, Equals, Debug {
       return this._innerRadius.equals(that._innerRadius)
           && this._outerRadius.equals(that._outerRadius)
           && this._startAngle.equals(that._startAngle)
-          && this._deltaAngle.equals(that._deltaAngle)
+          && this._sweepAngle.equals(that._sweepAngle)
           && this._padAngle.equals(that._padAngle)
           && Objects.equal(this._padRadius, that._padRadius)
           && this._cornerRadius.equals(that._cornerRadius);
@@ -389,8 +389,8 @@ export class Arc implements Graphic, Equals, Debug {
     if (this._startAngle.isDefined()) {
       output = output.write(46/*'.'*/).write("startAngle").write(40/*'('*/).debug(this._startAngle).write(41/*')'*/);
     }
-    if (this._deltaAngle.isDefined()) {
-      output = output.write(46/*'.'*/).write("sweepAngle").write(40/*'('*/).debug(this._deltaAngle).write(41/*')'*/);
+    if (this._sweepAngle.isDefined()) {
+      output = output.write(46/*'.'*/).write("sweepAngle").write(40/*'('*/).debug(this._sweepAngle).write(41/*')'*/);
     }
     if (this._padAngle.isDefined()) {
       output = output.write(46/*'.'*/).write("padAngle").write(40/*'('*/).debug(this._padAngle).write(41/*')'*/);

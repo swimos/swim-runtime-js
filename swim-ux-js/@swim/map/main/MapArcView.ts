@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {BoxR2, CircleR2} from "@swim/math";
+import {PointR2, BoxR2, CircleR2} from "@swim/math";
 import {AnyAngle, Angle} from "@swim/angle";
 import {AnyLength, Length} from "@swim/length";
 import {AnyColor, Color} from "@swim/color";
@@ -210,16 +210,19 @@ export class MapArcView extends MapGraphicView implements FillView, StrokeView {
   }
 
   get popoverBounds(): BoxR2 {
-    const inversePageTransform = this.pageTransform.inverse();
-    const hitBounds = this._hitBounds;
-    if (hitBounds !== null) {
-      return hitBounds.transform(inversePageTransform);
-    } else {
-      const pageAnchor = this.anchor.transform(inversePageTransform);
-      const pageX = Math.round(pageAnchor.x);
-      const pageY = Math.round(pageAnchor.y);
-      return new BoxR2(pageX, pageY, pageX, pageY);
+    const bounds = this._bounds;
+    const anchor = this._anchor;
+    let size: number | undefined;
+    if (bounds) {
+      size = Math.min(bounds.width, bounds.height);
     }
+    const inversePageTransform = this.pageTransform.inverse();
+    const c = anchor.transform(inversePageTransform);
+    const r = (this.innerRadius.value!.pxValue(size) + this.outerRadius.value!.pxValue(size)) / 2;
+    const a = this.startAngle.value!.radValue() + this.sweepAngle.value!.radValue() / 2;
+    const x = c.x + r * Math.cos(a);
+    const y = c.y + r * Math.sin(a);
+    return new BoxR2(x, y, x, y);
   }
 
   hitTest(x: number, y: number, context: RenderingContext): RenderView | null {
@@ -229,25 +232,33 @@ export class MapArcView extends MapGraphicView implements FillView, StrokeView {
       const pixelRatio = this.pixelRatio;
       x *= pixelRatio;
       y *= pixelRatio;
-      context.beginPath();
       const bounds = this._bounds;
-      const arc = this.value;
-      arc.render(context, bounds, this._anchor);
-      if (this.fill.value && context.isPointInPath(x, y)) {
-        hit = this;
-      } else if (this.stroke.value) {
-        const strokeWidth = this.strokeWidth.value;
-        if (strokeWidth) {
-          const size = Math.min(bounds.width, bounds.height);
-          context.lineWidth = strokeWidth.pxValue(size);
-          if (context.isPointInStroke(x, y)) {
-            hit = this;
-          }
-        }
-      }
+      const anchor = this._anchor;
+      hit = this.hitTestArc(x, y, context, bounds, anchor);
       context.restore();
     }
     return hit;
+  }
+
+  protected hitTestArc(x: number, y: number, context: RenderingContext,
+                       bounds: BoxR2, anchor: PointR2): RenderView | null {
+    const arc = this.value;
+    context.beginPath();
+    arc.render(context, bounds, anchor);
+    if (this.fill.value && context.isPointInPath(x, y)) {
+      return this;
+    }
+    if (this.stroke.value) {
+      const strokeWidth = this.strokeWidth.value;
+      if (strokeWidth) {
+        const size = Math.min(bounds.width, bounds.height);
+        context.lineWidth = strokeWidth.pxValue(size);
+        if (context.isPointInStroke(x, y)) {
+          return this;
+        }
+      }
+    }
+    return null;
   }
 
   static from(center: AnyLngLat = LngLat.origin(),

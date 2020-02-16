@@ -117,6 +117,8 @@ export class MapLayerView extends MapGraphicView {
       pixelRatio: this.pixelRatio,
       projection: viewContext.projection,
       zoom: viewContext.zoom,
+      bearing: viewContext.bearing,
+      pitch: viewContext.pitch,
     };
   }
 

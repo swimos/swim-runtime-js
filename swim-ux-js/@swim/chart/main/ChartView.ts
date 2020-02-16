@@ -1128,7 +1128,7 @@ export class ChartView<X = any, Y = any> extends GraphicView {
   }
 
   autoscaleTop(tween?: Tween<any>): void {
-    if (this._trackTopDomain) {
+    if (this._fitTopDomain && this._trackTopDomain) {
       const topAxis = this.topAxis();
       if (topAxis) {
         if (tween === void 0) {
@@ -1143,7 +1143,7 @@ export class ChartView<X = any, Y = any> extends GraphicView {
   }
 
   autoscaleRight(tween?: Tween<any>): void {
-    if (this._trackRightDomain) {
+    if (this._fitRightDomain && this._trackRightDomain) {
       const rightAxis = this.rightAxis();
       if (rightAxis) {
         if (tween === void 0) {
@@ -1158,7 +1158,7 @@ export class ChartView<X = any, Y = any> extends GraphicView {
   }
 
   autoscaleBottom(tween?: Tween<any>): void {
-    if (this._trackBottomDomain) {
+    if (this._fitBottomDomain && this._trackBottomDomain) {
       const bottomAxis = this.bottomAxis();
       if (bottomAxis) {
         if (tween === void 0) {
@@ -1173,7 +1173,7 @@ export class ChartView<X = any, Y = any> extends GraphicView {
   }
 
   autoscaleLeft(tween?: Tween<any>): void {
-    if (this._trackLeftDomain) {
+    if (this._fitLeftDomain && this._trackLeftDomain) {
       const leftAxis = this.leftAxis();
       if (leftAxis) {
         if (tween === void 0) {

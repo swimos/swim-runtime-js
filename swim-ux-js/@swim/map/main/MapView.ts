@@ -24,6 +24,10 @@ export interface MapView extends RenderView {
 
   readonly zoom: number;
 
+  readonly bearing: number;
+
+  readonly pitch: number;
+
   needsUpdate(updateFlags: number, viewContext: MapViewContext): number;
 
   /** @hidden */

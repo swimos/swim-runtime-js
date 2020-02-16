@@ -45,6 +45,16 @@ export class MapGraphicView extends GraphicView implements MapView {
     return MapView.is(parentView) ? parentView.zoom : 0;
   }
 
+  get bearing(): number {
+    const parentView = this.parentView;
+    return MapView.is(parentView) ? parentView.bearing : 0;
+  }
+
+  get pitch(): number {
+    const parentView = this.parentView;
+    return MapView.is(parentView) ? parentView.pitch : 0;
+  }
+
   needsUpdate(updateFlags: number, viewContext: MapViewContext): number {
     if ((updateFlags & MapView.NeedsProject) !== 0) {
       updateFlags = updateFlags | View.NeedsAnimate | View.NeedsLayout;
