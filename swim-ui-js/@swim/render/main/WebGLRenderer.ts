@@ -12,8 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {RenderViewObserver} from "./RenderViewObserver";
-import {GraphicView} from "./GraphicView";
+import {Renderer} from "./Renderer";
+import {WebGLContext} from "./WebGLContext";
 
-export interface GraphicViewObserver<V extends GraphicView = GraphicView> extends RenderViewObserver<V> {
+export class WebGLRenderer extends Renderer {
+  /** @hidden */
+  readonly _context: WebGLContext;
+  /** @hidden */
+  readonly _pixelRatio: number;
+
+  constructor(context: WebGLContext, pixelRatio: number = window.devicePixelRatio || 1) {
+    super();
+    this._context = context;
+    this._pixelRatio = pixelRatio;
+  }
+
+  get context(): WebGLContext {
+    return this._context;
+  }
+
+  get pixelRatio(): number {
+    return this._pixelRatio;
+  }
 }

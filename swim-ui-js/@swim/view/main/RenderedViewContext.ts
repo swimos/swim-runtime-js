@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {GraphicViewObserver} from "@swim/view";
-import {MapViewObserver} from "./MapViewObserver";
-import {MapGraphicView} from "./MapGraphicView";
+import {Renderer} from "@swim/render";
+import {AnimatedViewContext} from "./AnimatedViewContext";
 
-export interface MapGraphicViewObserver<V extends MapGraphicView = MapGraphicView> extends GraphicViewObserver<V>, MapViewObserver<V> {
+export interface RenderedViewContext extends AnimatedViewContext {
+  readonly renderer: Renderer | null;
 }

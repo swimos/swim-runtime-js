@@ -15,11 +15,11 @@
 import {PointR2, BoxR2, CircleR2} from "@swim/math";
 import {AnyLength, Length} from "@swim/length";
 import {AnyColor, Color} from "@swim/color";
-import {RenderingContext} from "@swim/render";
+import {CanvasContext, CanvasRenderer} from "@swim/render";
 import {
   MemberAnimator,
   ViewInit,
-  RenderView,
+  RenderedView,
   FillViewInit,
   FillView,
   StrokeViewInit,
@@ -28,8 +28,8 @@ import {
 import {AnyLngLat, LngLat} from "./LngLat";
 import {MapViewContext} from "./MapViewContext";
 import {MapView} from "./MapView";
-import {MapGraphicView} from "./MapGraphicView";
-import {MapGraphicViewController} from "./MapGraphicViewController";
+import {MapGraphicsView} from "./MapGraphicsView";
+import {MapGraphicsViewController} from "./MapGraphicsViewController";
 
 export type AnyMapCircleView = MapCircleView | MapCircleViewInit;
 
@@ -39,9 +39,9 @@ export interface MapCircleViewInit extends ViewInit, FillViewInit, StrokeViewIni
   hitRadius?: number;
 }
 
-export class MapCircleView extends MapGraphicView implements FillView, StrokeView {
+export class MapCircleView extends MapGraphicsView implements FillView, StrokeView {
   /** @hidden */
-  _viewController: MapGraphicViewController<MapCircleView> | null;
+  _viewController: MapGraphicsViewController<MapCircleView> | null;
   /** @hidden */
   _hitRadius: number;
 
@@ -52,7 +52,7 @@ export class MapCircleView extends MapGraphicView implements FillView, StrokeVie
     this._hitRadius = 0;
   }
 
-  get viewController(): MapGraphicViewController<MapCircleView> | null {
+  get viewController(): MapGraphicsViewController<MapCircleView> | null {
     return this._viewController;
   }
 
@@ -121,15 +121,16 @@ export class MapCircleView extends MapGraphicView implements FillView, StrokeVie
   }
 
   protected onRender(viewContext: MapViewContext): void {
-    const context = viewContext.renderingContext;
-    context.save();
-    const bounds = this._bounds;
-    const anchor = this._anchor;
-    this.renderCircle(context, bounds, anchor);
-    context.restore();
+    const renderer = viewContext.renderer;
+    if (renderer instanceof CanvasRenderer) {
+      const context = renderer.context;
+      context.save();
+      this.renderCircle(context, this._bounds, this._anchor);
+      context.restore();
+    }
   }
 
-  protected renderCircle(context: RenderingContext, bounds: BoxR2, anchor: PointR2): void {
+  protected renderCircle(context: CanvasContext, bounds: BoxR2, anchor: PointR2): void {
     const size = Math.min(bounds.width, bounds.height);
 
     context.beginPath();
@@ -166,18 +167,21 @@ export class MapCircleView extends MapGraphicView implements FillView, StrokeVie
     }
   }
 
-  hitTest(x: number, y: number, context: RenderingContext): RenderView | null {
-    let hit = super.hitTest(x, y, context);
+  hitTest(x: number, y: number, viewContext: MapViewContext): RenderedView | null {
+    let hit = super.hitTest(x, y, viewContext);
     if (hit === null) {
-      const bounds = this._bounds;
-      const anchor = this._anchor;
-      hit = this.hitTestCircle(x, y, context, bounds, anchor);
+      const renderer = viewContext.renderer;
+      if (renderer instanceof CanvasRenderer) {
+        const context = renderer.context;
+        hit = this.hitTestCircle(x, y, context, this._bounds, this._anchor, renderer.pixelRatio);
+      }
     }
     return hit;
   }
 
-  protected hitTestCircle(x: number, y: number, context: RenderingContext,
-                          bounds: BoxR2, anchor: PointR2): RenderView | null {
+  protected hitTestCircle(x: number, y: number, context: CanvasContext,
+                          bounds: BoxR2, anchor: PointR2,
+                          pixelRatio: number): RenderedView | null {
     const size = Math.min(bounds.width, bounds.height);
     const radius = this.radius.value!.pxValue(size);
 
@@ -192,7 +196,6 @@ export class MapCircleView extends MapGraphicView implements FillView, StrokeVie
 
     const strokeWidth = this.strokeWidth.value;
     if (this.stroke.value && strokeWidth) {
-      const pixelRatio = this.pixelRatio;
       x *= pixelRatio;
       y *= pixelRatio;
 

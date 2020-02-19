@@ -12,8 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {GraphicsViewObserver} from "@swim/view";
-import {PlotView} from "./PlotView";
+import {Renderer} from "./Renderer";
+import {CanvasContext} from "./CanvasContext";
 
-export interface PlotViewObserver<X = any, Y = any, V extends PlotView<X, Y> = PlotView<X, Y>> extends GraphicsViewObserver<V> {
+export class CanvasRenderer extends Renderer {
+  /** @hidden */
+  readonly _context: CanvasContext;
+  /** @hidden */
+  readonly _pixelRatio: number;
+
+  constructor(context: CanvasContext, pixelRatio: number = window.devicePixelRatio || 1) {
+    super();
+    this._context = context;
+    this._pixelRatio = pixelRatio;
+  }
+
+  get context(): CanvasContext {
+    return this._context;
+  }
+
+  get pixelRatio(): number {
+    return this._pixelRatio;
+  }
 }

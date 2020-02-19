@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {GraphicsViewObserver} from "@swim/view";
-import {PlotView} from "./PlotView";
+import {PointR2, BoxR2} from "@swim/math";
+import {Renderer} from "./Renderer";
 
-export interface PlotViewObserver<X = any, Y = any, V extends PlotView<X, Y> = PlotView<X, Y>> extends GraphicsViewObserver<V> {
+export interface Graphics {
+  render(renderer: Renderer, bounds: BoxR2, anchor: PointR2): void;
 }

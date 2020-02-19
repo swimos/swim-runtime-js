@@ -14,13 +14,13 @@
 
 import * as mapboxgl from "mapbox-gl";
 import {AnyPointR2, PointR2} from "@swim/math";
-import {View, RenderViewContext, CanvasView} from "@swim/view";
-import {AnyLngLat, LngLat, MapViewContext, MapView, MapGraphicView} from "@swim/map";
+import {View, RenderedViewContext, CanvasView} from "@swim/view";
+import {AnyLngLat, LngLat, MapViewContext, MapView, MapGraphicsView} from "@swim/map";
 import {MapboxProjection} from "./MapboxProjection";
 import {MapboxViewObserver} from "./MapboxViewObserver";
 import {MapboxViewController} from "./MapboxViewController";
 
-export class MapboxView extends MapGraphicView {
+export class MapboxView extends MapGraphicsView {
   /** @hidden */
   readonly _map: mapboxgl.Map;
   /** @hidden */
@@ -148,7 +148,7 @@ export class MapboxView extends MapGraphicView {
   }
 
   /** @hidden */
-  doUpdate(updateFlags: number, viewContext: RenderViewContext): void {
+  doUpdate(updateFlags: number, viewContext: RenderedViewContext): void {
     const mapViewContext = this.mapViewContext(viewContext);
     this.willUpdate(mapViewContext);
     if (((updateFlags | this._updateFlags) & View.NeedsCompute) !== 0) {
@@ -184,18 +184,13 @@ export class MapboxView extends MapGraphicView {
     return viewContext;
   }
 
-  mapViewContext(viewContext: RenderViewContext): MapViewContext {
-    return {
-      updateTime: viewContext.updateTime,
-      viewport: viewContext.viewport,
-      viewIdiom: viewContext.viewIdiom,
-      renderingContext: viewContext.renderingContext,
-      pixelRatio: viewContext.pixelRatio,
-      projection: this._projection,
-      zoom: this._zoom,
-      bearing: this._bearing,
-      pitch: this._pitch,
-    };
+  mapViewContext(viewContext: RenderedViewContext): MapViewContext {
+    const mapViewContext = Object.create(viewContext);
+    mapViewContext.projection = this._projection;
+    mapViewContext.zoom = this._zoom;
+    mapViewContext.bearing = this._bearing;
+    mapViewContext.pitch = this._pitch;
+    return mapViewContext;
   }
 
   protected onMapLoad(): void {
