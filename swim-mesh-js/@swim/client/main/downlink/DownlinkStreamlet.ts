@@ -85,7 +85,7 @@ export class DownlinkStreamlet extends AbstractRecordStreamlet {
     return void 0;
   }
 
-  protected onReconcile(version: number): void {
+  protected onRecohere(version: number): void {
     const hostUri = this.castInput(this.hostUri, Form.forString());
     const nodeUri = this.castInput(this.nodeUri, Form.forString());
     const laneUri = this.castInput(this.laneUri, Form.forString());

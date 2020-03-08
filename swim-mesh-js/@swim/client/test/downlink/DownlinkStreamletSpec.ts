@@ -53,11 +53,11 @@ export class DownlinkStreamletSpec extends Spec {
       streamlet.bindInput("nodeUri", nodeUri);
       streamlet.bindInput("laneUri", laneUri);
       streamlet.bindInput("type", type);
-      streamlet.reconcile(0);
+      streamlet.recohere(0);
       streamlet.downlink!.keepLinked(false);
 
       class StateOutput extends AbstractInlet<Value> {
-        didReconcileOutput(version: number): void {
+        didRecohereOutput(version: number): void {
           const state = this._input!.get()!;
           exam.equal(state, Text.from("on"));
           resolve();
@@ -90,11 +90,11 @@ export class DownlinkStreamletSpec extends Spec {
       streamlet.bindInput("nodeUri", nodeUri);
       streamlet.bindInput("laneUri", laneUri);
       streamlet.bindInput("type", type);
-      streamlet.reconcile(0);
+      streamlet.recohere(0);
       streamlet.downlink!.keepLinked(false);
 
       class StateOutput extends AbstractInlet<Map<Value, Value>> {
-        didReconcileOutput(version: number): void {
+        didRecohereOutput(version: number): void {
           const state = this._input!.get()!;
           exam.equal(state.get(Text.from("the")), Text.from("definite article"));
           resolve();
@@ -122,11 +122,11 @@ export class DownlinkStreamletSpec extends Spec {
                                     Slot.of("laneUri", "light"),
                                     Slot.of("type", "value"),
                                     Slot.of("data", streamlet));
-      record.reconcileInput(0);
+      record.recohereInput(0);
       streamlet.downlink!.keepLinked(false);
 
       class StateOutput extends AbstractInlet<Value> {
-        didReconcileOutput(version: number): void {
+        didRecohereOutput(version: number): void {
           const state = this._input!.get()!;
           exam.equal(state, Text.from("on"));
           resolve();
@@ -156,11 +156,11 @@ export class DownlinkStreamletSpec extends Spec {
                                     Slot.of("laneUri", "definitions"),
                                     Slot.of("type", "map"),
                                     Slot.of("data", streamlet));
-      record.reconcileInput(0);
+      record.recohereInput(0);
       streamlet.downlink!.keepLinked(false);
 
       class StateOutput extends AbstractInlet<Map<Value, Value>> {
-        didReconcileOutput(version: number): void {
+        didRecohereOutput(version: number): void {
           const state = this._input!.get()!;
           exam.equal(state.get(Text.from("the")), Text.from("definite article"));
           resolve();
@@ -187,12 +187,12 @@ export class DownlinkStreamletSpec extends Spec {
                                                               Slot.of("laneUri", "light"),
                                                               Slot.of("type", "value"))));
       record.transmute(DownlinkStreamlet.transmuter(client));
-      record.reconcileInput(0);
+      record.recohereInput(0);
       const streamlet = record.get("data") as DownlinkStreamlet;
       streamlet.downlink!.keepLinked(false);
 
       class StateOutput extends AbstractInlet<Value> {
-        didReconcileOutput(version: number): void {
+        didRecohereOutput(version: number): void {
           const state = this._input!.get()!;
           exam.equal(state, Text.from("on"));
           resolve();
@@ -221,12 +221,12 @@ export class DownlinkStreamletSpec extends Spec {
                                                               Slot.of("laneUri", "definitions"),
                                                               Slot.of("type", "map"))));
       record.transmute(DownlinkStreamlet.transmuter(client));
-      record.reconcileInput(0);
+      record.recohereInput(0);
       const streamlet = record.get("data") as DownlinkStreamlet;
       streamlet.downlink!.keepLinked(false);
 
       class StateOutput extends AbstractInlet<Map<Value, Value>> {
-        didReconcileOutput(version: number): void {
+        didRecohereOutput(version: number): void {
           const state = this._input!.get()!;
           exam.equal(state.get(Text.from("the")), Text.from("definite article"));
           resolve();
