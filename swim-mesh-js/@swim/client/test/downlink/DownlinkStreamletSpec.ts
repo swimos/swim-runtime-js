@@ -172,7 +172,7 @@ export class DownlinkStreamletSpec extends Spec {
   }
 
   @Test
-  transmuteValueDownlinkStreamlet(exam: ClientExam): Promise<void> {
+  reifyValueDownlinkStreamlet(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
@@ -186,7 +186,7 @@ export class DownlinkStreamletSpec extends Spec {
                                     Slot.of("data", Record.of(Attr.of("link"),
                                                               Slot.of("laneUri", "light"),
                                                               Slot.of("type", "value"))));
-      record.transmute(DownlinkStreamlet.transmuter(client));
+      record.reify(DownlinkStreamlet.reifier(client));
       record.recohereInput(0);
       const streamlet = record.get("data") as DownlinkStreamlet;
       streamlet.downlink!.keepLinked(false);
@@ -204,7 +204,7 @@ export class DownlinkStreamletSpec extends Spec {
   }
 
   @Test
-  transmuteMapDownlinkStreamlet(exam: ClientExam): Promise<void> {
+  reifyMapDownlinkStreamlet(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
@@ -220,7 +220,7 @@ export class DownlinkStreamletSpec extends Spec {
                                     Slot.of("data", Record.of(Attr.of("link"),
                                                               Slot.of("laneUri", "definitions"),
                                                               Slot.of("type", "map"))));
-      record.transmute(DownlinkStreamlet.transmuter(client));
+      record.reify(DownlinkStreamlet.reifier(client));
       record.recohereInput(0);
       const streamlet = record.get("data") as DownlinkStreamlet;
       streamlet.downlink!.keepLinked(false);

@@ -15,10 +15,10 @@
 import {Record} from "@swim/structure";
 import {RecordModel} from "./RecordModel";
 
-export abstract class Transmuter {
-  abstract transmute(model: RecordModel): Record;
+export abstract class Reifier {
+  abstract reify(model: RecordModel): Record;
 
-  static system(): Transmuter {
-    return null as unknown as Transmuter;
+  static system(): Reifier {
+    return null as unknown as Reifier;
   }
 }

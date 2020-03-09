@@ -20,7 +20,7 @@ import {RecordOutlet} from "./RecordOutlet";
 import {RecordStreamlet} from "./RecordStreamlet";
 import {AbstractRecordOutlet} from "./AbstractRecordOutlet";
 import {RecordFieldUpdater} from "./RecordFieldUpdater";
-import {Transmuter} from "./Transmuter";
+import {Reifier} from "./Reifier";
 
 export class RecordModel extends AbstractRecordOutlet {
   /** @hidden */
@@ -389,26 +389,26 @@ export class RecordModel extends AbstractRecordOutlet {
     }
   }
 
-  transmute(transmuter: Transmuter | null = Transmuter.system()): void {
+  reify(reifier: Reifier | null = Reifier.system()): void {
     this.forEach(function (oldItem: Item, index: number): void {
-      const newItem = this.transmuteItem(oldItem, transmuter);
+      const newItem = this.reifyItem(oldItem, reifier);
       if (oldItem !== newItem) {
         this.setItem(index, newItem);
       }
     }, this);
   }
 
-  transmuteItem(item: Item, transmuter: Transmuter | null): Item {
+  reifyItem(item: Item, reifier: Reifier | null): Item {
     if (item instanceof Field) {
-      return this.transmuteField(item, transmuter);
+      return this.reifyField(item, reifier);
     } else {
-      return this.transmuteValue(item, transmuter);
+      return this.reifyValue(item, reifier);
     }
   }
 
-  transmuteField(field: Field, transmuter: Transmuter | null): Field {
+  reifyField(field: Field, reifier: Reifier | null): Field {
     const oldValue = field.value;
-    const newValue = this.transmuteValue(oldValue, transmuter);
+    const newValue = this.reifyValue(oldValue, reifier);
     if (oldValue !== newValue) {
       return field.updatedValue(newValue);
     } else {
@@ -416,11 +416,11 @@ export class RecordModel extends AbstractRecordOutlet {
     }
   }
 
-  transmuteValue(oldValue: Value, transmuter: Transmuter | null): Value {
+  reifyValue(oldValue: Value, reifier: Reifier | null): Value {
     if (oldValue instanceof RecordModel) {
-      let newValue = this.transmuteModel(oldValue);
-      if (oldValue === newValue && transmuter) {
-        newValue = transmuter.transmute(oldValue);
+      let newValue = this.reifyModel(oldValue);
+      if (oldValue === newValue && reifier) {
+        newValue = reifier.reify(oldValue);
       }
       return newValue;
     } else {
@@ -428,10 +428,10 @@ export class RecordModel extends AbstractRecordOutlet {
     }
   }
 
-  transmuteModel(model: RecordModel): Record {
+  reifyModel(model: RecordModel): Record {
     const scope = this.streamletScope();
     if (scope instanceof RecordModel) {
-      return scope.transmuteModel(model);
+      return scope.reifyModel(model);
     } else {
       return model;
     }

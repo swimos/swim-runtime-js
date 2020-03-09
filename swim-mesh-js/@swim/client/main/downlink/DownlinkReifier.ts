@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import {Record} from "@swim/structure";
-import {RecordModel, Transmuter} from "@swim/dataflow";
+import {RecordModel, Reifier} from "@swim/dataflow";
 import {DownlinkStreamlet} from "./DownlinkStreamlet";
 import {WarpRef} from "../WarpRef";
 
 /** @hidden */
-export class DownlinkTransmuter extends Transmuter {
+export class DownlinkReifier extends Reifier {
   warp: WarpRef | undefined;
 
   constructor(warp?: WarpRef) {
@@ -26,7 +26,7 @@ export class DownlinkTransmuter extends Transmuter {
     this.warp = warp;
   }
 
-  transmute(model: RecordModel): Record {
+  reify(model: RecordModel): Record {
     if (model.tag() === "link") {
       const streamlet = new DownlinkStreamlet(this.warp, model);
       streamlet.compile();
