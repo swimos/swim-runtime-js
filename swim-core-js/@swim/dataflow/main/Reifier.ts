@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Record} from "@swim/structure";
-import {RecordModel} from "./RecordModel";
+import {Item} from "@swim/structure";
 
 export abstract class Reifier {
-  abstract reify(model: RecordModel): Record;
+  abstract reify(item: Item): Item;
 
   static system(): Reifier {
     return null as unknown as Reifier;

@@ -399,41 +399,11 @@ export class RecordModel extends AbstractRecordOutlet {
   }
 
   reifyItem(item: Item, reifier: Reifier | null): Item {
-    if (item instanceof Field) {
-      return this.reifyField(item, reifier);
-    } else {
-      return this.reifyValue(item, reifier);
-    }
-  }
-
-  reifyField(field: Field, reifier: Reifier | null): Field {
-    const oldValue = field.value;
-    const newValue = this.reifyValue(oldValue, reifier);
-    if (oldValue !== newValue) {
-      return field.updatedValue(newValue);
-    } else {
-      return field;
-    }
-  }
-
-  reifyValue(oldValue: Value, reifier: Reifier | null): Value {
-    if (oldValue instanceof RecordModel) {
-      let newValue = this.reifyModel(oldValue);
-      if (oldValue === newValue && reifier) {
-        newValue = reifier.reify(oldValue);
-      }
-      return newValue;
-    } else {
-      return oldValue;
-    }
-  }
-
-  reifyModel(model: RecordModel): Record {
     const scope = this.streamletScope();
     if (scope instanceof RecordModel) {
-      return scope.reifyModel(model);
+      return scope.reifyItem(item, reifier);
     } else {
-      return model;
+      return item;
     }
   }
 

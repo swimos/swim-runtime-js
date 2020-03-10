@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Record} from "@swim/structure";
+import {Item, Field, Value, Record} from "@swim/structure";
 import {RecordModel, Reifier} from "@swim/dataflow";
 import {DownlinkStreamlet} from "./DownlinkStreamlet";
 import {WarpRef} from "../WarpRef";
@@ -26,7 +26,36 @@ export class DownlinkReifier extends Reifier {
     this.warp = warp;
   }
 
-  reify(model: RecordModel): Record {
+  reify(item: Item): Item {
+    if (item instanceof Field) {
+      return this.reifyField(item);
+    } else {
+      return this.reifyValue(item);
+    }
+  }
+
+  /** @hidden */
+  reifyField(field: Field): Field {
+    const oldValue = field.value;
+    const newValue = this.reifyValue(oldValue);
+    if (oldValue !== newValue) {
+      return field.updatedValue(newValue);
+    } else {
+      return field;
+    }
+  }
+
+  /** @hidden */
+  reifyValue(value: Value): Value {
+    if (value instanceof RecordModel) {
+      return this.reifyModel(value);
+    } else {
+      return value;
+    }
+  }
+
+  /** @hidden */
+  reifyModel(model: RecordModel): Record {
     if (model.tag() === "link") {
       const streamlet = new DownlinkStreamlet(this.warp, model);
       streamlet.compile();
