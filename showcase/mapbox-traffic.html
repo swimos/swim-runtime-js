@@ -186,6 +186,7 @@ function linkIntersection(intersectionId, node, intersection) {
     const tween = swim.Transition.duration(2000);
     ripple.stroke(RIPPLE_COLOR.alpha(0), tween)
           .radius(radius, tween.onEnd(function () { ripple.remove(); }));
+    ripple.requireUpdate(swim.View.NeedsAnimate | swim.MapView.NeedsProject);
   }
 }
 

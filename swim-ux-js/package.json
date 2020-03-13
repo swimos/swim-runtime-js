@@ -42,6 +42,7 @@
     "@swim/typeset": "3.10.2",
     "@swim/gesture": "3.10.2",
 
+    "@types/arcgis-js-api": "4.14",
     "@types/mapbox-gl": "1.6",
     "@types/node": "13",
     "rollup": "1.29",

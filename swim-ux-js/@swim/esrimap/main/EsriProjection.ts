@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "@swim/gauge";
-export * from "@swim/pie";
-export * from "@swim/chart";
-export * from "@swim/map";
-export * from "@swim/mapbox";
-export * from "@swim/esrimap";
+import * as EsriViewsView from "esri/views/View";
+import {MapProjection} from "@swim/map";
+
+export interface EsriProjection extends MapProjection {
+  readonly map: EsriViewsView;
+}

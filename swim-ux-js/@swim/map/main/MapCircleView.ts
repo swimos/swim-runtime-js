@@ -43,12 +43,15 @@ export class MapCircleView extends MapGraphicsView implements FillView, StrokeVi
   /** @hidden */
   _viewController: MapGraphicsViewController<MapCircleView> | null;
   /** @hidden */
+  _point: PointR2;
+  /** @hidden */
   _hitRadius: number;
 
   constructor(center: LngLat = LngLat.origin(), radius: Length = Length.zero()) {
     super();
     this.center.setState(center);
     this.radius.setState(radius);
+    this._point = PointR2.origin();
     this._hitRadius = 0;
   }
 
@@ -100,22 +103,22 @@ export class MapCircleView extends MapGraphicsView implements FillView, StrokeVi
   protected onProject(viewContext: MapViewContext): void {
     const projection = viewContext.projection;
     const bounds = this._bounds;
-    const anchor = projection.project(this.center.value!);
+    const point = projection.project(this.center.value!);
+    this._point = point;
     const size = Math.min(bounds.width, bounds.height);
     const radius = this.radius.value!.pxValue(size);
     const hitRadius = Math.max(this._hitRadius, radius);
-    this._hitBounds = new BoxR2(anchor.x - hitRadius, anchor.y - hitRadius,
-                                anchor.x + hitRadius, anchor.y + hitRadius);
-    this.setAnchor(anchor);
+    this._hitBounds = new BoxR2(point.x - hitRadius, point.y - hitRadius,
+                                point.x + hitRadius, point.y + hitRadius);
   }
 
   protected onLayout(viewContext: MapViewContext): void {
     const bounds = this._bounds;
-    const anchor = this._anchor;
+    const point = this._point;
     const size = Math.min(bounds.width, bounds.height);
     const radius = this.radius.value!.pxValue(size);
-    const invalid = !isFinite(anchor.x) || !isFinite(anchor.y) || !isFinite(radius);
-    const culled = invalid || !bounds.intersectsCircle(new CircleR2(anchor.x, anchor.y, radius));
+    const invalid = !isFinite(point.x) || !isFinite(point.y) || !isFinite(radius);
+    const culled = invalid || !bounds.intersectsCircle(new CircleR2(point.x, point.y, radius));
     this.setCulled(culled);
     this.layoutChildViews(viewContext);
   }
@@ -135,7 +138,7 @@ export class MapCircleView extends MapGraphicsView implements FillView, StrokeVi
 
     context.beginPath();
     const radius = this.radius.value!.pxValue(size);
-    context.arc(anchor.x, anchor.y, radius, 0, 2 * Math.PI);
+    context.arc(this._point.x, this._point.y, radius, 0, 2 * Math.PI);
 
     const fill = this.fill.value;
     if (fill) {
@@ -160,10 +163,10 @@ export class MapCircleView extends MapGraphicsView implements FillView, StrokeVi
     if (hitBounds !== null) {
       return hitBounds.transform(inversePageTransform);
     } else {
-      const pageAnchor = this.anchor.transform(inversePageTransform);
-      const pageX = Math.round(pageAnchor.x);
-      const pageY = Math.round(pageAnchor.y);
-      return new BoxR2(pageX, pageY, pageX, pageY);
+      const point = this._point.transform(inversePageTransform);
+      const pointX = Math.round(point.x);
+      const pointY = Math.round(point.y);
+      return new BoxR2(pointX, pointY, pointX, pointY);
     }
   }
 
@@ -187,8 +190,8 @@ export class MapCircleView extends MapGraphicsView implements FillView, StrokeVi
 
     if (this.fill.value) {
       const hitRadius = Math.max(this._hitRadius, radius);
-      const dx = anchor.x - x;
-      const dy = anchor.y - y;
+      const dx = this._point.x - x;
+      const dy = this._point.y - y;
       if (dx * dx + dy * dy < hitRadius * hitRadius) {
         return this;
       }
@@ -201,7 +204,7 @@ export class MapCircleView extends MapGraphicsView implements FillView, StrokeVi
 
       context.save();
       context.beginPath();
-      context.arc(anchor.x, anchor.y, radius, 0, 2 * Math.PI);
+      context.arc(this._point.x, this._point.y, radius, 0, 2 * Math.PI);
       context.lineWidth = strokeWidth.pxValue(size);
       if (context.isPointInStroke(x, y)) {
         context.restore();

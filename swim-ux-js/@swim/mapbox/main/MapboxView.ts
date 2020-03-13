@@ -53,8 +53,8 @@ export class MapboxView extends MapGraphicsView {
 
   protected initMap(map: mapboxgl.Map): void {
     map.on("load", this.onMapLoad);
-    map.on("zoom", this.onMapZoom);
     map.on("render", this.onMapRender);
+    map.on("zoom", this.onMapZoom);
   }
 
   get viewController(): MapboxViewController | null {
@@ -78,16 +78,13 @@ export class MapboxView extends MapGraphicsView {
   }
 
   setProjection(projection: MapboxProjection): void {
-    const newProjection = this.willSetProjection(projection);
-    if (newProjection !== void 0) {
-      projection = newProjection;
-    }
+    this.willSetProjection(projection);
     this._projection = projection;
     this.onSetProjection(projection);
     this.didSetProjection(projection);
   }
 
-  protected willSetProjection(projection: MapboxProjection): MapboxProjection | void {
+  protected willSetProjection(projection: MapboxProjection): void {
     this.willObserve(function (viewObserver: MapboxViewObserver): void {
       if (viewObserver.viewWillSetProjection) {
         viewObserver.viewWillSetProjection(projection, this);

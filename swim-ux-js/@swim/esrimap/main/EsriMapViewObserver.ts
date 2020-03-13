@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "@swim/gauge";
-export * from "@swim/pie";
-export * from "@swim/chart";
-export * from "@swim/map";
-export * from "@swim/mapbox";
-export * from "@swim/esrimap";
+import {EsriViewObserver} from "./EsriViewObserver";
+import {EsriMapViewProjection} from "./EsriMapViewProjection";
+import {EsriMapView} from "./EsriMapView";
+
+export interface EsriMapViewObserver<V extends EsriMapView = EsriMapView> extends EsriViewObserver<V> {
+  viewWillSetProjection?(projection: EsriMapViewProjection, view: V): void;
+
+  viewDidSetProjection?(projection: EsriMapViewProjection, view: V): void;
+}

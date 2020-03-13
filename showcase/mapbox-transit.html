@@ -40,7 +40,6 @@ const vehiclesLink = swim.downlinkMap()
       key = key.stringValue();
       const lng = value.get("longitude").numberValue(0);
       const lat = value.get("latitude").numberValue(0);
-
       const tween = swim.Transition.duration(10000);
 
       let vehicle = mapView.getChildView(key);
@@ -59,15 +58,16 @@ const vehiclesLink = swim.downlinkMap()
 function ripple(lng, lat) {
   const ripple = new swim.MapCircleView()
       .center([lng, lat])
-       .radius(0)
-       .fill(null)
-       .stroke(RIPPLE_COLOR)
-       .strokeWidth(1);
+      .radius(0)
+      .fill(null)
+      .stroke(RIPPLE_COLOR)
+      .strokeWidth(1);
   mapView.append(ripple);
   const radius = Math.min(mapView.bounds.width, mapView.bounds.height) / 8;
   const tween = swim.Transition.duration(2000);
   ripple.stroke(RIPPLE_COLOR.alpha(0), tween)
         .radius(radius, tween.onEnd(function () { ripple.remove(); }));
+  ripple.requireUpdate(swim.View.NeedsAnimate | swim.MapView.NeedsProject);
 }
 
     </script>
