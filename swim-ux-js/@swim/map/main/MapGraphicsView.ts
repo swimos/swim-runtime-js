@@ -45,14 +45,14 @@ export class MapGraphicsView extends GraphicsView implements MapView {
     return MapView.is(parentView) ? parentView.zoom : 0;
   }
 
-  get bearing(): number {
+  get heading(): number {
     const parentView = this.parentView;
-    return MapView.is(parentView) ? parentView.bearing : 0;
+    return MapView.is(parentView) ? parentView.heading : 0;
   }
 
-  get pitch(): number {
+  get tilt(): number {
     const parentView = this.parentView;
-    return MapView.is(parentView) ? parentView.pitch : 0;
+    return MapView.is(parentView) ? parentView.tilt : 0;
   }
 
   needsUpdate(updateFlags: number, viewContext: MapViewContext): number {

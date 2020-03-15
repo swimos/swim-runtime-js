@@ -84,9 +84,9 @@ export abstract class EsriView extends MapGraphicsView {
     });
   }
 
-  abstract get bearing(): number;
+  abstract get heading(): number;
 
-  abstract get pitch(): number;
+  abstract get tilt(): number;
 
   /** @hidden */
   doUpdate(updateFlags: number, viewContext: RenderedViewContext): void {
@@ -129,8 +129,8 @@ export abstract class EsriView extends MapGraphicsView {
     const mapViewContext = Object.create(viewContext);
     mapViewContext.projection = this.projection;
     mapViewContext.zoom = this.zoom;
-    mapViewContext.bearing = this.bearing;
-    mapViewContext.pitch = this.pitch;
+    mapViewContext.heading = this.heading;
+    mapViewContext.tilt = this.tilt;
     return mapViewContext;
   }
 

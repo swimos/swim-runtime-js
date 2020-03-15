@@ -556,6 +556,17 @@ const ux = [
     ],
   },
   {
+    id: "googlemap",
+    name: "@swim/googlemap",
+    path: "swim-ux-js/@swim/googlemap",
+    targets: [
+      {
+        id: "main",
+        deps: ["util", "codec", "collections", "structure", "streamlet", "math", "time", "angle", "length", "color", "font", "transform", "interpolate", "scale", "transition", "animate", "dom", "style", "render", "constraint", "view", "shape", "typeset", "map"],
+      },
+    ],
+  },
+  {
     id: "esrimap",
     name: "@swim/esrimap",
     path: "swim-ux-js/@swim/esrimap",
@@ -575,7 +586,7 @@ const ux = [
     targets: [
       {
         id: "main",
-        deps: ["gauge", "pie", "chart", "map", "mapbox", "esrimap"],
+        deps: ["gauge", "pie", "chart", "map", "mapbox", "googlemap", "esrimap"],
       },
     ],
   },

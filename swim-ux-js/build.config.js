@@ -46,6 +46,16 @@ const ux = [
     ],
   },
   {
+    id: "googlemap",
+    name: "@swim/googlemap",
+    targets: [
+      {
+        id: "main",
+        deps: ["map"],
+      },
+    ],
+  },
+  {
     id: "esrimap",
     name: "@swim/esrimap",
     targets: [
@@ -63,7 +73,7 @@ const ux = [
     targets: [
       {
         id: "main",
-        deps: ["gauge", "pie", "chart", "map", "mapbox", "esrimap"],
+        deps: ["gauge", "pie", "chart", "map", "mapbox", "googlemap", "esrimap"],
       },
     ],
   },

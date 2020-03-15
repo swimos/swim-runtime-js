@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "@swim/gauge";
-export * from "@swim/pie";
-export * from "@swim/chart";
-export * from "@swim/map";
-export * from "@swim/mapbox";
-export * from "@swim/googlemap";
-export * from "@swim/esrimap";
+/// <reference types="googlemaps"/>
+
+export {GoogleMapProjection} from "./GoogleMapProjection";
+export {GoogleMapView} from "./GoogleMapView";
+export {GoogleMapViewObserver} from "./GoogleMapViewObserver";
+export {GoogleMapViewController} from "./GoogleMapViewController";

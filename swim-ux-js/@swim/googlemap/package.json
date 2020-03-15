@@ -1,19 +1,17 @@
 {
-  "name": "@swim/ux",
+  "name": "@swim/googlemap",
   "version": "3.10.2",
-  "description": "Seamlessly animated user interface widgets, including gauges, pie charts, line, area, and bubble charts, and geospatial map overlays",
-  "homepage": "https://github.com/swimos/swim/tree/master/swim-system-js/swim-ux-js/@swim/ux",
+  "description": "Support for overlaying @swim/map views on Google maps",
+  "homepage": "https://github.com/swimos/swim/tree/master/swim-system-js/swim-ux-js/@swim/googlemap",
   "author": "Chris Sachs <chris@swimos.org>",
   "copyright": "2015-2020 SWIM.AI inc.",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
-  "main": "dist/main/swim-ux.js",
+  "main": "dist/main/swim-googlemap.js",
   "module": "lib/main/index.js",
   "types": "lib/main/index.d.ts",
   "devDependencies": {
-    "@types/arcgis-js-api": "4.14",
-    "@types/googlemaps": "3.39",
-    "@types/mapbox-gl": "1.6"
+    "@types/googlemaps": "3.39"
   },
   "dependencies": {
     "@swim/util": "3.10.2",
@@ -39,11 +37,6 @@
     "@swim/view": "3.10.2",
     "@swim/shape": "3.10.2",
     "@swim/typeset": "3.10.2",
-    "@swim/gesture": "3.10.2",
-    "@swim/gauge": "3.10.2",
-    "@swim/pie": "3.10.2",
-    "@swim/chart": "3.10.2",
-    "@swim/map": "3.10.2",
-    "@swim/mapbox": "3.10.2"
+    "@swim/map": "3.10.2"
   }
 }

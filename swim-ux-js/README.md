@@ -32,6 +32,8 @@ The **Swim UX** framework consists of the following component libraries:
   including fully animatable views for lines, circles, and polygons.
 - [**@swim/mapbox**](@swim/mapbox) –
   support for overlaying **@swim/map** views on Mapbox maps.
+- [**@swim/googlemap**](@swim/googlemap) –
+  support for overlaying **@swim/map** views on Google maps.
 - [**@swim/esrimap**](@swim/esrimap) –
   support for overlaying **@swim/map** views on ArcGIS maps.
 

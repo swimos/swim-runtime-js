@@ -30,7 +30,7 @@ export class EsriMapView extends EsriView {
   /** @hidden */
   _zoom: number;
   /** @hidden */
-  _bearing: number;
+  _heading: number;
 
   constructor(map: EsriViewsMapView, key: string | null = null) {
     super(key);
@@ -38,7 +38,7 @@ export class EsriMapView extends EsriView {
     this._map = map;
     this._projection = new EsriMapViewProjection(this._map);
     this._zoom = map.zoom;
-    this._bearing = map.rotation;
+    this._heading = map.rotation;
     this.initMap(this._map);
   }
 
@@ -91,18 +91,18 @@ export class EsriMapView extends EsriView {
     }
   }
 
-  get bearing(): number {
-    return this._bearing;
+  get heading(): number {
+    return this._heading;
   }
 
-  get pitch(): number {
+  get tilt(): number {
     return 0;
   }
 
   protected onMapRender(): void {
+    this._heading = this._map.rotation;
     this.setZoom(this._map.zoom);
     this.setProjection(this._projection);
-    this._bearing = this._map.rotation;
   }
 
   overlayCanvas(): CanvasView | null {

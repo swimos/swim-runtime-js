@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as mapboxgl from "mapbox-gl";
 import {AnyPointR2, PointR2} from "@swim/math";
-import {View, RenderedViewContext, CanvasView} from "@swim/view";
+import {View, RenderedViewContext, ViewHtml, HtmlView, CanvasView} from "@swim/view";
 import {AnyLngLat, LngLat, MapViewContext, MapView, MapGraphicsView} from "@swim/map";
-import {MapboxProjection} from "./MapboxProjection";
-import {MapboxViewObserver} from "./MapboxViewObserver";
-import {MapboxViewController} from "./MapboxViewController";
+import {GoogleMapProjection} from "./GoogleMapProjection";
+import {GoogleMapViewObserver} from "./GoogleMapViewObserver";
+import {GoogleMapViewController} from "./GoogleMapViewController";
 
-export class MapboxView extends MapGraphicsView {
+export class GoogleMapView extends MapGraphicsView {
   /** @hidden */
-  readonly _map: mapboxgl.Map;
+  readonly _map: google.maps.Map;
   /** @hidden */
-  _viewController: MapboxViewController | null;
+  _viewController: GoogleMapViewController | null;
   /** @hidden */
-  _projection: MapboxProjection;
+  _projection: GoogleMapProjection;
+  /** @hidden */
+  _overlay: google.maps.OverlayView | null;
   /** @hidden */
   _zoom: number;
   /** @hidden */
@@ -34,26 +35,27 @@ export class MapboxView extends MapGraphicsView {
   /** @hidden */
   _tilt: number;
 
-  constructor(map: mapboxgl.Map, key: string | null = null) {
+  constructor(map: google.maps.Map, key: string | null = null) {
     super(key);
     this.onMapRender = this.onMapRender.bind(this);
     this._map = map;
-    this._projection = new MapboxProjection(this._map);
+    this._projection = new GoogleMapProjection(this);
+    this._overlay = null;
     this._zoom = map.getZoom();
-    this._heading = map.getBearing();
-    this._tilt = map.getPitch();
-    this.initMap(this._map);
+    this._heading = map.getHeading();
+    this._tilt = map.getTilt();
+    this.initMap(map);
   }
 
-  get map(): mapboxgl.Map {
+  get map(): google.maps.Map {
     return this._map;
   }
 
-  protected initMap(map: mapboxgl.Map): void {
-    map.on("render", this.onMapRender);
+  protected initMap(map: google.maps.Map): void {
+    // nop
   }
 
-  get viewController(): MapboxViewController | null {
+  get viewController(): GoogleMapViewController | null {
     return this._viewController;
   }
 
@@ -69,35 +71,39 @@ export class MapboxView extends MapGraphicsView {
     return this._projection.unproject.apply(this._projection, arguments);
   }
 
-  get projection(): MapboxProjection {
+  get projection(): GoogleMapProjection {
     return this._projection;
   }
 
-  setProjection(projection: MapboxProjection): void {
+  setProjection(projection: GoogleMapProjection): void {
     this.willSetProjection(projection);
     this._projection = projection;
     this.onSetProjection(projection);
     this.didSetProjection(projection);
   }
 
-  protected willSetProjection(projection: MapboxProjection): void {
-    this.willObserve(function (viewObserver: MapboxViewObserver): void {
+  protected willSetProjection(projection: GoogleMapProjection): void {
+    this.willObserve(function (viewObserver: GoogleMapViewObserver): void {
       if (viewObserver.viewWillSetProjection) {
         viewObserver.viewWillSetProjection(projection, this);
       }
     });
   }
 
-  protected onSetProjection(projection: MapboxProjection): void {
+  protected onSetProjection(projection: GoogleMapProjection): void {
     this.requireUpdate(MapView.NeedsProject, true);
   }
 
-  protected didSetProjection(projection: MapboxProjection): void {
-    this.didObserve(function (viewObserver: MapboxViewObserver): void {
+  protected didSetProjection(projection: GoogleMapProjection): void {
+    this.didObserve(function (viewObserver: GoogleMapViewObserver): void {
       if (viewObserver.viewDidSetProjection) {
         viewObserver.viewDidSetProjection(projection, this);
       }
     });
+  }
+
+  get overlay(): google.maps.OverlayView | null {
+    return this._overlay;
   }
 
   get zoom(): number {
@@ -108,7 +114,6 @@ export class MapboxView extends MapGraphicsView {
     const oldZoom = this._zoom;
     if (oldZoom !== newZoom) {
       this.willSetZoom(newZoom);
-      const oldZoom = this._zoom;
       this._zoom = newZoom;
       this.onSetZoom(newZoom, oldZoom);
       this.didSetZoom(newZoom, oldZoom);
@@ -116,7 +121,7 @@ export class MapboxView extends MapGraphicsView {
   }
 
   protected willSetZoom(zoom: number): void {
-    this.didObserve(function (viewObserver: MapboxViewObserver): void {
+    this.didObserve(function (viewObserver: GoogleMapViewObserver): void {
       if (viewObserver.viewWillSetZoom) {
         viewObserver.viewWillSetZoom(zoom, this);
       }
@@ -128,7 +133,7 @@ export class MapboxView extends MapGraphicsView {
   }
 
   protected didSetZoom(newZoom: number, oldZoom: number): void {
-    this.didObserve(function (viewObserver: MapboxViewObserver): void {
+    this.didObserve(function (viewObserver: GoogleMapViewObserver): void {
       if (viewObserver.viewDidSetZoom) {
         viewObserver.viewDidSetZoom(newZoom, oldZoom, this);
       }
@@ -190,8 +195,8 @@ export class MapboxView extends MapGraphicsView {
   }
 
   protected onMapRender(): void {
-    this._heading = this._map.getBearing();
-    this._tilt = this._map.getPitch();
+    this._heading = this._map.getHeading();
+    this._tilt = this._map.getTilt();
     this.setZoom(this._map.getZoom());
     this.setProjection(this._projection);
   }
@@ -200,12 +205,44 @@ export class MapboxView extends MapGraphicsView {
     if (this._parentView) {
       return this.canvasView;
     } else {
-      const map = this._map;
-      View.fromNode(map.getContainer());
-      const canvasContainer = View.fromNode(map.getCanvasContainer());
-      const canvas = canvasContainer.append("canvas");
-      canvas.append(this);
-      return canvas;
+      class GoogleMapOverlayView extends google.maps.OverlayView {
+        readonly _mapView: GoogleMapView;
+        _canvasView: CanvasView | null;
+        constructor(mapView: GoogleMapView) {
+          super();
+          this._mapView = mapView;
+          this._canvasView = null;
+        }
+        onAdd(): void {
+          const panes = this.getPanes();
+          const overlayMouseTarget = GoogleMapView.materializeAncestors(panes.overlayMouseTarget as HTMLElement);
+          const overlayContainer = overlayMouseTarget.parentView as HtmlView;
+          const container = overlayContainer.parentView as HtmlView;
+          this._canvasView = container.append("canvas");
+          this._canvasView.append(this._mapView);
+        }
+        onRemove(): void {
+          if (this._canvasView) {
+            this._canvasView.remove();
+            this._canvasView = null;
+          }
+        }
+        draw(): void {
+          this._mapView.onMapRender();
+        }
+      }
+      const overlay = new GoogleMapOverlayView(this);
+      overlay.setMap(this._map);
+      this._overlay = overlay;
+      return overlay._canvasView;
     }
+  }
+
+  private static materializeAncestors(node: HTMLElement): HtmlView {
+    const parentNode = node.parentNode;
+    if (parentNode instanceof HTMLElement && !(parentNode as ViewHtml).view) {
+      GoogleMapView.materializeAncestors(parentNode);
+    }
+    return View.fromNode(node);
   }
 }

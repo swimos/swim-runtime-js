@@ -20,7 +20,7 @@ export interface MapViewContext extends RenderedViewContext {
 
   readonly zoom: number;
 
-  readonly bearing: number;
+  readonly heading: number;
 
-  readonly pitch: number;
+  readonly tilt: number;
 }

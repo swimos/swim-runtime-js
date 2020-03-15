@@ -29,14 +29,14 @@ export class MapGraphicsViewController<V extends MapGraphicsView = MapGraphicsVi
     return view ? view.zoom : 0;
   }
 
-  get bearing(): number {
+  get heading(): number {
     const view = this._view;
-    return view ? view.bearing : 0;
+    return view ? view.heading : 0;
   }
 
-  get pitch(): number {
+  get tilt(): number {
     const view = this._view;
-    return view ? view.pitch : 0;
+    return view ? view.tilt : 0;
   }
 
   viewWillUpdate(viewContext: MapViewContext, view: V): void {

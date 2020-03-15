@@ -30,9 +30,9 @@ export class EsriSceneView extends EsriView {
   /** @hidden */
   _zoom: number;
   /** @hidden */
-  _bearing: number;
+  _heading: number;
   /** @hidden */
-  _pitch: number;
+  _tilt: number;
 
   constructor(map: EsriViewsSceneView, key: string | null = null) {
     super(key);
@@ -40,8 +40,8 @@ export class EsriSceneView extends EsriView {
     this._map = map;
     this._projection = new EsriSceneViewProjection(this._map);
     this._zoom = map.zoom;
-    this._bearing = map.camera.heading;
-    this._pitch = map.camera.tilt;
+    this._heading = map.camera.heading;
+    this._tilt = map.camera.tilt;
     this.initMap(this._map);
   }
 
@@ -94,19 +94,19 @@ export class EsriSceneView extends EsriView {
     }
   }
 
-  get bearing(): number {
-    return this._bearing;
+  get heading(): number {
+    return this._heading;
   }
 
-  get pitch(): number {
-    return this._pitch;
+  get tilt(): number {
+    return this._tilt;
   }
 
   protected onMapRender(): void {
+    this._heading = this._map.camera.heading;
+    this._tilt = this._map.camera.tilt;
     this.setZoom(this._map.zoom);
     this.setProjection(this._projection);
-    this._bearing = this._map.camera.heading;
-    this._pitch = this._map.camera.tilt;
   }
 
   overlayCanvas(): CanvasView | null {
