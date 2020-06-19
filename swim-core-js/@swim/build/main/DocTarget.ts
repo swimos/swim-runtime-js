@@ -60,7 +60,7 @@ export class DocTarget extends ConverterComponent {
 
     const targetReflections: {[uid: string]: TargetReflection | undefined} = {};
 
-    const targets = this.target.transitiveDeps();
+    const targets = this.target.transitiveTargets();
     for (let i = 0; i < targets.length; i += 1) {
       const target = targets[i];
       const indexPath = path.resolve(target.baseDir, "index.ts");
