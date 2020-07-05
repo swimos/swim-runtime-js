@@ -585,10 +585,11 @@ export class Target {
           imports: inputChunk.imports,
           dynamicImports: inputChunk.dynamicImports,
           exports: inputChunk.exports,
+          referencedFiles: inputChunk.referencedFiles,
           isEntry: inputChunk.isEntry,
           isDynamicEntry: inputChunk.isDynamicEntry,
-          isImplicitEntry: false,
-          implicitlyLoadedBefore: [],
+          isImplicitEntry: inputChunk.isImplicitEntry,
+          implicitlyLoadedBefore: inputChunk.implicitlyLoadedBefore,
         };
         bundle.output.push(outputChunk);
       } else {

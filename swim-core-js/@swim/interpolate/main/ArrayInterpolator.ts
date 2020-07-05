@@ -47,13 +47,13 @@ export class ArrayInterpolator<T> extends Interpolator<T[]> {
   range(a0: readonly T[], a1: readonly T[]): ArrayInterpolator<T>;
   range(a0?: readonly [readonly T[], readonly T[]] | readonly T[],
         a1?: readonly T[]): readonly[T[], T[]] | ArrayInterpolator<T> {
-    if (a0 === void 0) {
+    if (arguments.length === 0) {
       return [this.interpolate(0), this.interpolate(1)];
-    } else if (a1 === void 0) {
+    } else if (arguments.length === 1) {
       a0 = a0 as readonly [readonly T[], readonly T[]];
       return ArrayInterpolator.between(a0[0], a0[1]);
     } else {
-      return ArrayInterpolator.between(a0 as ReadonlyArray<T>, a1);
+      return ArrayInterpolator.between(a0 as readonly T[], a1 as readonly T[]);
     }
   }
 
