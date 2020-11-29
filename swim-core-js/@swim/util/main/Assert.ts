@@ -34,6 +34,20 @@ export interface Assert {
   notOk(condition: unknown, message?: string): void;
 
   /**
+   * Asserts that `lhs` is identical (`===`) to `rhs`.
+   *
+   * @throws [[AssertException]] with `message` if `lhs` is not identical (`!==`) to `rhs`.
+   */
+  identity(lhs: unknown, rhs: unknown, message?: string): void;
+
+  /**
+   * Asserts that `lhs` is not identical (`!==`) to `rhs`.
+   *
+   * @throws [[AssertException]] with `message` if `lhs` is identical (`===`) to `rhs`.
+   */
+  notIdentity(lhs: unknown, rhs: unknown, message?: string): void;
+
+  /**
    * Asserts that `lhs` is [[Objects.equal structurally equal]] to `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` is not structurally equal to `rhs`.
@@ -48,18 +62,18 @@ export interface Assert {
   notEqual(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` is identical (`===`) to `rhs`.
+   * Asserts that `lhs` is [[Objects.equivalent structurally equivalent]] to `rhs`.
    *
-   * @throws [[AssertException]] with `message` if `lhs` is not identical (`!==`) to `rhs`.
+   * @throws [[AssertException]] with `message` if `lhs` is not structurally equivalent to `rhs`.
    */
-  identity(lhs: unknown, rhs: unknown, message?: string): void;
+  equivalent(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` is not identical (`!==`) to `rhs`.
+   * Asserts that `lhs` is not [[Objects.equivalent structurally equivalent]] to `rhs`.
    *
-   * @throws [[AssertException]] with `message` if `lhs` is identical (`===`) to `rhs`.
+   * @throws [[AssertException]] with `message` if `lhs` is structurally equivalent to `rhs`.
    */
-  notIdentity(lhs: unknown, rhs: unknown, message?: string): void;
+  notEquivalent(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
    * Asserts that `lhs` [[Objects.compare structurally orders before]] `rhs`.

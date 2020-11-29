@@ -22,6 +22,7 @@ declare global {
 import "./String";
 
 export {Comparable} from "./Comparable";
+export {Equivalent} from "./Equivalent";
 export {Equals} from "./Equals";
 export {HashCode} from "./HashCode";
 

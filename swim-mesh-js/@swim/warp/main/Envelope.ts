@@ -14,9 +14,9 @@
 
 import {HashCode} from "@swim/util";
 import {Output, Debug, Format} from "@swim/codec";
-import {AnyUri, Uri} from "@swim/uri";
 import {AnyValue, Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
+import {AnyUri, Uri} from "@swim/uri";
 import {EventMessage} from "./EventMessage";
 import {CommandMessage} from "./CommandMessage";
 import {LinkRequest} from "./LinkRequest";

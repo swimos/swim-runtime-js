@@ -12,21 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+export {NumberInterpolatorSpec} from "./NumberInterpolatorSpec";
+export {InterpolateSuite} from "./InterpolateSuite";
 
-import {NumberInterpolatorSpec} from "./NumberInterpolatorSpec";
-
-@Unit
-class InterpolatorSpec extends Spec {
-  @Unit
-  numberInterpolatorSpec(): Spec {
-    return new NumberInterpolatorSpec();
-  }
-}
-
-export {
-  NumberInterpolatorSpec,
-  InterpolatorSpec,
-};
-
-InterpolatorSpec.run();
+import {InterpolateSuite} from "./InterpolateSuite";
+InterpolateSuite.run();

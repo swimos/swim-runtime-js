@@ -141,6 +141,15 @@ export class GetItemSelector extends Selector {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof GetItemSelector) {
+      return this._index.equals(that._index) && this._then.equivalentTo(that._then, epsilon);
+    }
+    return false;
+  }
+
   equals(that: unknown): boolean {
     if (this === that) {
       return true;

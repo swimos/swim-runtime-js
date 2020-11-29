@@ -68,6 +68,12 @@ component libraries:
   [doc](https://docs.swimos.org/js/latest/modules/_swim_time.html)) –
   date-time, time zone, and time interval data types,
   with `strptime`/`strftime`-style parsers and formatters.
+- [**@swim/scale**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/scale)
+  ([npm](https://www.npmjs.com/package/@swim/scale),
+  [doc](https://docs.swimos.org/js/latest/modules/_swim_scale.html)) –
+  mappings from numeric and temporal input domains to interpolated output
+  ranges, with support for continuous domain clamping, domain solving,
+  range unscaling, and interpolation between scales.
 - [**@swim/uri**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/uri)
   ([npm](https://www.npmjs.com/package/@swim/uri),
   [doc](https://docs.swimos.org/js/latest/modules/_swim_uri.html)) –

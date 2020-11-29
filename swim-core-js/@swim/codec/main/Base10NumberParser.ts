@@ -47,6 +47,9 @@ export class Base10NumberParser extends Parser<number> {
         if (c === 45/*'-'*/) {
           input = input.step();
           sign = -1;
+        } else if (c === 43/*'+'*/) {
+          input = input.step();
+          sign = 1;
         }
         step = 2;
       } else if (input.isDone()) {

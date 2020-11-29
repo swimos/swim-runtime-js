@@ -19,8 +19,9 @@
     "@swim/streamlet": "3.11.0-dev.20201021",
     "@swim/dataflow": "3.11.0-dev.20201021",
     "@swim/recon": "3.11.0-dev.20201021",
+    "@swim/uri": "3.11.0-dev.20201021",
     "@swim/math": "3.11.0-dev.20201021",
     "@swim/time": "3.11.0-dev.20201021",
-    "@swim/uri": "3.11.0-dev.20201021"
+    "@swim/scale": "3.11.0-dev.20201021"
   }
 }

@@ -12,9 +12,10 @@
       "@swim/streamlet": ["@swim/streamlet/main"],
       "@swim/dataflow": ["@swim/dataflow/main"],
       "@swim/recon": ["@swim/recon/main"],
+      "@swim/uri": ["@swim/uri/main"],
       "@swim/math": ["@swim/math/main"],
       "@swim/time": ["@swim/time/main"],
-      "@swim/uri": ["@swim/uri/main"]
+      "@swim/scale": ["@swim/scale/main"]
     },
     "tsBuildInfoFile": "../lib/main/.tsbuildinfo"
   },
@@ -27,8 +28,9 @@
     {"path": "../../streamlet/main"},
     {"path": "../../dataflow/main"},
     {"path": "../../recon/main"},
+    {"path": "../../uri/main"},
     {"path": "../../math/main"},
     {"path": "../../time/main"},
-    {"path": "../../uri/main"}
+    {"path": "../../scale/main"}
   ]
 }

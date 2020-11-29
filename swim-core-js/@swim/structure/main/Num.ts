@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects, HashGenCacheSet} from "@swim/util";
+import {Equivalent, Murmur3, Objects, HashGenCacheSet} from "@swim/util";
 import {Output, Format} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
@@ -225,6 +225,17 @@ export class Num extends Value {
       return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
     }
     return Objects.compare(this.typeOrder(), that.typeOrder());
+  }
+
+  equivalentTo(that: Item, epsilon: number = Equivalent.Epsilon): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof Num) {
+      const x = this._value;
+      const y = that._value;
+      return x === y || isNaN(x) && isNaN(y) || Math.abs(y - x) < epsilon;
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

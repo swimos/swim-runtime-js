@@ -99,9 +99,17 @@ export class Target {
       for (let i = 0; i < config.deps.length; i += 1) {
         const dep = config.deps[i];
         const [projectId, targetId] = dep.split(":");
-        const project = this.project.build.projects[projectId]!;
-        const target = project.targets[targetId || "main"]!;
-        this.deps.push(target);
+        const project = this.project.build.projects[projectId];
+        if (project !== void 0) {
+          const target = project.targets[targetId || "main"];
+          if (target !== void 0) {
+            this.deps.push(target);
+          } else {
+            throw new Error(this.uid + " depends on unknown target " + targetId + " of project " + projectId);
+          }
+        } else {
+          throw new Error(this.uid + " depends on unknown project " + projectId);
+        }
       }
     }
   }

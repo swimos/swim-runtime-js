@@ -68,6 +68,16 @@ export class AndOperator extends BinaryOperator {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof AndOperator) {
+      return this._operand1.equivalentTo(that._operand1, epsilon)
+          && this._operand2.equivalentTo(that._operand2, epsilon);
+    }
+    return false;
+  }
+
   equals(that: unknown): boolean {
     if (this === that) {
       return true;

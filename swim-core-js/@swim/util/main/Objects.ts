@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {Comparable} from "./Comparable";
+import {Equivalent} from "./Equivalent";
 import {Equals} from "./Equals";
 import {HashCode} from "./HashCode";
 import {Murmur3} from "./Murmur3";
@@ -23,6 +24,145 @@ import {Murmur3} from "./Murmur3";
  */
 export class Objects {
   private constructor() {
+  }
+
+  /**
+   * Compares two structural values for equality.  Returns `true` if `x` and
+   * `y` are structurally equal, otherwise returns `false`.
+   */
+  static equal(x: unknown, y: unknown): boolean {
+    if (x instanceof Date) {
+      x = x.getTime();
+    }
+    if (y instanceof Date) {
+      y = y.getTime();
+    }
+
+    if (x === y) {
+      return true;
+    } else if (typeof x === "number") {
+      if (typeof y === "number") {
+        return isNaN(x) && isNaN(y);
+      }
+    } else if (typeof x === "object" && x !== null && typeof (x as any).equals === "function") {
+      return (x as Equals).equals(y);
+    } else if (Array.isArray(x)) {
+      if (Array.isArray(y)) {
+        return Objects.equalArray(x, y);
+      }
+    } else if (typeof x === "object" && x !== null) {
+      if (typeof y === "object" && y !== null) {
+        return Objects.equalObject(x, y);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Compares two arrays of structural values for equality.  Returns `true` if
+   * `x` and `y` are structurally equal, otherwise returns `false`.
+   */
+  static equalArray(x: ReadonlyArray<any>, y: ReadonlyArray<any>): boolean {
+    const n = x.length;
+    if (n !== y.length) {
+      return false;
+    }
+    for (let i = 0; i < n; i += 1) {
+      if (!Objects.equal(x[i], y[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Compares two structural objects for equality.  Returns `true` if `x` and
+   * `y` are structurally equal, otherwise returns `false`.
+   */
+  static equalObject(x: Object, y: Object): boolean {
+    const xKeys = Object.keys(x);
+    const yKeys = Object.keys(y);
+    const n = xKeys.length;
+    if (n !== yKeys.length) {
+      return false;
+    }
+    for (let i = 0; i < n; i += 1) {
+      const key = xKeys[i];
+      if (key !== yKeys[i] || !Objects.equal((x as any)[key], (y as any)[key])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Compares two structural values for equivalence.  Returns `true` if `x` and
+   * `y` are structurally equivalent, otherwise returns `false`.
+   */
+  static equivalent(x: unknown, y: unknown, epsilon: number = Equivalent.Epsilon): boolean {
+    if (x instanceof Date) {
+      x = x.getTime();
+    }
+    if (y instanceof Date) {
+      y = y.getTime();
+    }
+
+    if (x === y) {
+      return true;
+    } else if (typeof x === "number") {
+      if (typeof y === "number") {
+        return isNaN(x) && isNaN(y) || Math.abs(y - x) < epsilon;
+      }
+    } else if (typeof x === "object" && x !== null && typeof (x as any).equivalentTo === "function") {
+      return (x as Equivalent<any>).equivalentTo(y, epsilon);
+    } else if (Array.isArray(x)) {
+      if (Array.isArray(y)) {
+        return Objects.equivalentArray(x, y, epsilon);
+      }
+    } else if (typeof x === "object" && x !== null) {
+      if (typeof y === "object" && y !== null) {
+        return Objects.equivalentObject(x, y, epsilon);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Compares two arrays of structural values for equivalence.  Returns `true`
+   * if `x` and `y` are structurally equivalent, otherwise returns `false`.
+   */
+  static equivalentArray(x: ReadonlyArray<any>, y: ReadonlyArray<any>,
+                         epsilon: number = Equivalent.Epsilon): boolean {
+    const n = x.length;
+    if (n !== y.length) {
+      return false;
+    }
+    for (let i = 0; i < n; i += 1) {
+      if (!Objects.equivalent(x[i], y[i], epsilon)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Compares two structural objects for equivalence.  Returns `true` if `x`
+   * and `y` are structurally equivalent, otherwise returns `false`.
+   */
+  static equivalentObject(x: Object, y: Object, epsilon: number = Equivalent.Epsilon): boolean {
+    const xKeys = Object.keys(x);
+    const yKeys = Object.keys(y);
+    const n = xKeys.length;
+    if (n !== yKeys.length) {
+      return false;
+    }
+    for (let i = 0; i < n; i += 1) {
+      const key = xKeys[i];
+      if (key !== yKeys[i] || !Objects.equivalent((x as any)[key], (y as any)[key], epsilon)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -125,75 +265,6 @@ export class Objects {
       }
     }
     return order !== 0 ? order : p > q ? 1 : p < q ? -1 : 0;
-  }
-
-  /**
-   * Compares two structural values for equality.  Returns `true` if `x` and
-   * `y` are structurally equal, otherwise returns `false`.
-   */
-  static equal(x: unknown, y: unknown): boolean {
-    if (x instanceof Date) {
-      x = x.getTime();
-    }
-    if (y instanceof Date) {
-      y = y.getTime();
-    }
-
-    if (x === y) {
-      return true;
-    } else if (typeof x === "number") {
-      if (typeof y === "number") {
-        return isNaN(x) && isNaN(y);
-      }
-    } else if (typeof x === "object" && x !== null && typeof (x as any).equals === "function") {
-      return (x as Equals).equals(y);
-    } else if (Array.isArray(x)) {
-      if (Array.isArray(y)) {
-        return Objects.equalArray(x, y);
-      }
-    } else if (typeof x === "object" && x !== null) {
-      if (typeof y === "object" && y !== null) {
-        return Objects.equalObject(x, y);
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Compares two arrays of structural values for equality.  Returns `true` if
-   * `x` and `y` are structurally equal, otherwise returns `false`.
-   */
-  static equalArray(x: ReadonlyArray<any>, y: ReadonlyArray<any>): boolean {
-    const n = x.length;
-    if (n !== y.length) {
-      return false;
-    }
-    for (let i = 0; i < n; i += 1) {
-      if (!Objects.equal(x[i], y[i])) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Compares two structural objects for equality.  Returns `true` if `x` and
-   * `y` are structurally equal, otherwise returns `false`.
-   */
-  static equalObject(x: Object, y: Object): boolean {
-    const xKeys = Object.keys(x);
-    const yKeys = Object.keys(y);
-    const n = xKeys.length;
-    if (n !== yKeys.length) {
-      return false;
-    }
-    for (let i = 0; i < n; i += 1) {
-      const key = xKeys[i];
-      if (key !== yKeys[i] || !Objects.equal((x as any)[key], (y as any)[key])) {
-        return false;
-      }
-    }
-    return true;
   }
 
   /**

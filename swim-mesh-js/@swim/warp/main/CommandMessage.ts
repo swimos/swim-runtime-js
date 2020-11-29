@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyUri, Uri} from "@swim/uri";
 import {AnyValue, Value} from "@swim/structure";
+import {AnyUri, Uri} from "@swim/uri";
 import {Envelope} from "./Envelope";
 import {LaneAddressed} from "./LaneAddressed";
 

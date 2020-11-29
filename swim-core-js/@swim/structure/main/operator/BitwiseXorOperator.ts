@@ -52,6 +52,16 @@ export class BitwiseXorOperator extends BinaryOperator {
     return 24;
   }
 
+  equivalentTo(that: Item, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof BitwiseXorOperator) {
+      return this._operand1.equivalentTo(that._operand1, epsilon)
+          && this._operand2.equivalentTo(that._operand2, epsilon);
+    }
+    return false;
+  }
+
   compareTo(that: Item): 0 | 1 | -1 {
     if (that instanceof BitwiseXorOperator) {
       let order = this._operand1.compareTo(that._operand1);

@@ -86,6 +86,16 @@ export class LambdaFunc extends Func {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof LambdaFunc) {
+      return this._bindings.equivalentTo(that._bindings, epsilon)
+          && this._template.equivalentTo(that._template, epsilon);
+    }
+    return false;
+  }
+
   equals(that: unknown): boolean {
     if (this === that) {
       return true;

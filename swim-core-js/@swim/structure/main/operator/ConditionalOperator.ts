@@ -96,6 +96,17 @@ export class ConditionalOperator extends Operator {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof ConditionalOperator) {
+      return this._ifTerm.equivalentTo(that._ifTerm, epsilon)
+          && this._thenTerm.equivalentTo(that._thenTerm, epsilon)
+          && this._elseTerm.equivalentTo(that._elseTerm, epsilon);
+    }
+    return false;
+  }
+
   equals(that: unknown): boolean {
     if (this === that) {
       return true;

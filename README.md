@@ -62,6 +62,10 @@ and strongly typed baseline on which to build higher level libraries.
 - [**@swim/time**](swim-core-js/@swim/time) –
   date-time, time zone, and time interval data types,
   with `strptime`/`strftime`-style parsers and formatters.
+- [**@swim/scale**](swim-core-js/@swim/scale) –
+  mappings from numeric and temporal input domains to interpolated output
+  ranges, with support for continuous domain clamping, domain solving,
+  range unscaling, and interpolation between scales.
 - [**@swim/uri**](swim-core-js/@swim/uri) –
   rich object model for working with Uniform Resource Identifiers and URI
   subcomponents, including an efficient and safe codec for parsing and

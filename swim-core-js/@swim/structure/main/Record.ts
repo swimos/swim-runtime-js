@@ -748,6 +748,24 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof Record) {
+      const xs = this.iterator();
+      const ys = that.iterator();
+      while (!xs.isEmpty() && !ys.isEmpty()) {
+        if (!xs.head().equivalentTo(ys.head(), epsilon)) {
+          return false;
+        }
+        xs.step();
+        ys.step();
+      }
+      return xs.isEmpty() && ys.isEmpty();
+    }
+    return false;
+  }
+
   equals(that: unknown): boolean {
     if (this === that) {
       return true;

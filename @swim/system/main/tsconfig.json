@@ -12,9 +12,10 @@
       "@swim/streamlet": ["swim-core-js/@swim/streamlet/main"],
       "@swim/dataflow": ["swim-core-js/@swim/dataflow/main"],
       "@swim/recon": ["swim-core-js/@swim/recon/main"],
+      "@swim/uri": ["swim-core-js/@swim/uri/main"],
       "@swim/math": ["swim-core-js/@swim/math/main"],
       "@swim/time": ["swim-core-js/@swim/time/main"],
-      "@swim/uri": ["swim-core-js/@swim/uri/main"],
+      "@swim/scale": ["swim-core-js/@swim/scale/main"],
       "@swim/core": ["swim-core-js/@swim/core/main"],
 
       "@swim/warp": ["swim-mesh-js/@swim/warp/main"],
@@ -32,9 +33,10 @@
     {"path": "../../../swim-core-js/@swim/streamlet/main"},
     {"path": "../../../swim-core-js/@swim/dataflow/main"},
     {"path": "../../../swim-core-js/@swim/recon/main"},
+    {"path": "../../../swim-core-js/@swim/uri/main"},
     {"path": "../../../swim-core-js/@swim/math/main"},
     {"path": "../../../swim-core-js/@swim/time/main"},
-    {"path": "../../../swim-core-js/@swim/uri/main"},
+    {"path": "../../../swim-core-js/@swim/scale/main"},
     {"path": "../../../swim-core-js/@swim/core/main"},
 
     {"path": "../../../swim-mesh-js/@swim/warp/main"},

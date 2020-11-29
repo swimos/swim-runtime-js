@@ -14,6 +14,7 @@
 
 import {TestOptions, Test, Spec, Report} from "@swim/unit";
 import {Attr, Slot, Value, Record, Text} from "@swim/structure";
+import {Uri} from "@swim/uri";
 import {
   Envelope,
   EventMessage,
@@ -26,7 +27,6 @@ import {
   AuthedResponse,
   DeauthedResponse,
 } from "@swim/warp";
-import {Uri} from "@swim/uri";
 import {Host, Downlink, WarpClient} from "@swim/client";
 import {MockServer} from "./MockServer";
 import {ClientExam} from "./ClientExam";

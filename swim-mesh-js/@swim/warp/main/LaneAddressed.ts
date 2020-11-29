@@ -14,8 +14,8 @@
 
 import {Murmur3} from "@swim/util";
 import {Output} from "@swim/codec";
-import {AnyUri, Uri} from "@swim/uri";
 import {Item, Attr, AnyValue, Value, Record} from "@swim/structure";
+import {AnyUri, Uri} from "@swim/uri";
 import {Envelope} from "./Envelope";
 
 export abstract class LaneAddressed extends Envelope {

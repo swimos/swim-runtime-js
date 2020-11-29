@@ -96,6 +96,10 @@ export class Extant extends Value {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item): boolean {
+    return this === that;
+  }
+
   equals(that: unknown): boolean {
     return this === that;
   }

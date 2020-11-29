@@ -156,6 +156,21 @@ const core = [
     ],
   },
   {
+    id: "uri",
+    name: "@swim/uri",
+    path: "swim-core-js/@swim/uri",
+    targets: [
+      {
+        id: "main",
+        deps: ["util", "codec", "interpolate", "structure"],
+      },
+      {
+        id: "test",
+        deps: ["util", "codec", "unit", "interpolate", "structure", "uri"],
+      },
+    ],
+  },
+  {
     id: "math",
     name: "@swim/math",
     path: "swim-core-js/@swim/math",
@@ -186,17 +201,17 @@ const core = [
     ],
   },
   {
-    id: "uri",
-    name: "@swim/uri",
-    path: "swim-core-js/@swim/uri",
+    id: "scale",
+    name: "@swim/scale",
+    path: "swim-core-js/@swim/scale",
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "interpolate", "structure"],
+        deps: ["util", "codec", "interpolate", "structure", "time"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "interpolate", "structure", "uri"],
+        deps: ["util", "codec", "unit", "interpolate", "structure", "time", "scale"],
       },
     ],
   },
@@ -209,7 +224,7 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "collections", "interpolate", "structure", "streamlet", "dataflow", "recon", "math", "time", "uri"],
+        deps: ["util", "codec", "collections", "interpolate", "structure", "streamlet", "dataflow", "recon", "uri", "math", "time", "scale"],
       },
     ],
   },

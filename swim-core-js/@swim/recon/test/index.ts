@@ -12,70 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+export {ReconParserSpec} from "./ReconParserSpec";
+export {ReconOperatorParserSpec} from "./ReconOperatorParserSpec";
+export {ReconSelectorParserSpec} from "./ReconSelectorParserSpec";
+export {ReconFuncParserSpec} from "./ReconFuncParserSpec";
+export {ReconWriterSpec} from "./ReconWriterSpec";
+export {ReconOperatorWriterSpec} from "./ReconOperatorWriterSpec";
+export {ReconSelectorWriterSpec} from "./ReconSelectorWriterSpec";
+export {ReconFuncWriterSpec} from "./ReconFuncWriterSpec";
+export {ReconSuite} from "./ReconSuite";
 
-import {ReconParserSpec} from "./ReconParserSpec";
-import {ReconOperatorParserSpec} from "./ReconOperatorParserSpec";
-import {ReconSelectorParserSpec} from "./ReconSelectorParserSpec";
-import {ReconFuncParserSpec} from "./ReconFuncParserSpec";
-import {ReconWriterSpec} from "./ReconWriterSpec";
-import {ReconOperatorWriterSpec} from "./ReconOperatorWriterSpec";
-import {ReconSelectorWriterSpec} from "./ReconSelectorWriterSpec";
-import {ReconFuncWriterSpec} from "./ReconFuncWriterSpec";
-
-@Unit
-class ReconSpec extends Spec {
-  @Unit
-  reconParserSpec(): Spec {
-    return new ReconParserSpec();
-  }
-
-  @Unit
-  reconOperatorParserSpec(): Spec {
-    return new ReconOperatorParserSpec();
-  }
-
-  @Unit
-  reconSelectorParserSpec(): Spec {
-    return new ReconSelectorParserSpec();
-  }
-
-  @Unit
-  reconFuncParserSpec(): Spec {
-    return new ReconFuncParserSpec();
-  }
-
-  @Unit
-  reconWriterSpec(): Spec {
-    return new ReconWriterSpec();
-  }
-
-  @Unit
-  reconOperatorWriterSpec(): Spec {
-    return new ReconOperatorWriterSpec();
-  }
-
-  @Unit
-  reconSelectorWriterSpec(): Spec {
-    return new ReconSelectorWriterSpec();
-  }
-
-  @Unit
-  reconFuncWriterSpec(): Spec {
-    return new ReconFuncWriterSpec();
-  }
-}
-
-export {
-  ReconParserSpec,
-  ReconOperatorParserSpec,
-  ReconSelectorParserSpec,
-  ReconFuncParserSpec,
-  ReconWriterSpec,
-  ReconOperatorWriterSpec,
-  ReconSelectorWriterSpec,
-  ReconFuncWriterSpec,
-  ReconSpec,
-};
-
-ReconSpec.run();
+import {ReconSuite} from "./ReconSuite";
+ReconSuite.run();

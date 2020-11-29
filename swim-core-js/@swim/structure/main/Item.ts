@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Cursor} from "@swim/util";
+import {Comparable, Equivalent, HashCode, Cursor} from "@swim/util";
 import {Debug, Display, Format, Output} from "@swim/codec";
 import {Field} from "./Field";
 import {Attr} from "./Attr";
@@ -82,7 +82,7 @@ export type AnyItem = Item
                     | null
                     | undefined;
 
-export abstract class Item implements Comparable<Item>, HashCode, Debug, Display {
+export abstract class Item implements Comparable<Item>, Equivalent<Item>, HashCode, Debug, Display {
   /** @hidden */
   constructor() {
     // stub
@@ -500,6 +500,8 @@ export abstract class Item implements Comparable<Item>, HashCode, Debug, Display
   abstract typeOrder(): number;
 
   abstract compareTo(that: Item): 0 | 1 | -1;
+
+  abstract equivalentTo(that: Item, epsilon?: number): boolean;
 
   abstract keyEquals(key: unknown): boolean;
 

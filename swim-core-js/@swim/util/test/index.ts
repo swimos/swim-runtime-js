@@ -12,21 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+export {Murmur3Spec} from "./Murmur3Spec";
+export {UtilSuite} from "./UtilSuite";
 
-import {Murmur3Spec} from "./Murmur3Spec";
-
-@Unit
-class UtilSpec extends Spec {
-  @Unit
-  murmur3Spec(): Spec {
-    return new Murmur3Spec();
-  }
-}
-
-export {
-  Murmur3Spec,
-  UtilSpec,
-};
-
-UtilSpec.run();
+import {UtilSuite} from "./UtilSuite";
+UtilSuite.run();

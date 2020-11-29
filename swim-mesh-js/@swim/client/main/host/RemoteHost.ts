@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {BTree} from "@swim/collections";
-import {AnyUri, Uri, UriCache} from "@swim/uri";
 import {AnyValue, Value} from "@swim/structure";
+import {AnyUri, Uri, UriCache} from "@swim/uri";
 import {
   Envelope,
   EventMessage,

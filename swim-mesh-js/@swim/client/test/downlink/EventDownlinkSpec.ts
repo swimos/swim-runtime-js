@@ -14,13 +14,13 @@
 
 import {TestOptions, Test, Spec, Report} from "@swim/unit";
 import {Text} from "@swim/structure";
+import {Uri} from "@swim/uri";
 import {
   Envelope,
   CommandMessage,
   LinkRequest,
   LinkedResponse,
 } from "@swim/warp";
-import {Uri} from "@swim/uri";
 import {Downlink, WarpClient} from "@swim/client";
 import {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";

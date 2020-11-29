@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+export * from "./length";
+export * from "./angle";
+export * from "./transform";
+export * from "./curve";
+export * from "./spline";
+export * from "./path";
+export {MathSuite} from "./MathSuite";
 
-@Unit
-class MathSpec extends Spec {
-
-}
-
-export {
-  MathSpec,
-};
-
-MathSpec.run();
+import {MathSuite} from "./MathSuite";
+MathSuite.run();

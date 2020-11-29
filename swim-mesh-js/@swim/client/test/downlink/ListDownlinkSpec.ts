@@ -15,6 +15,7 @@
 import {TestOptions, Test, Spec, Report} from "@swim/unit";
 import {STree} from "@swim/collections";
 import {Attr, Slot, AnyValue, Value, Record, Data, Text} from "@swim/structure";
+import {Uri} from "@swim/uri";
 import {
   Envelope,
   EventMessage,
@@ -23,7 +24,6 @@ import {
   SyncRequest,
   SyncedResponse,
 } from "@swim/warp";
-import {Uri} from "@swim/uri";
 import {ListDownlink, WarpClient} from "@swim/client";
 import {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";

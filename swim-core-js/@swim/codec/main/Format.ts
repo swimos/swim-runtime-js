@@ -209,7 +209,16 @@ export class Format {
         }
       }
     } else {
-      output = output.write("" + value);
+      const precision = output.settings().precision();
+      if (precision >= 0) {
+        let s = Format.trimTrailingZeros(Math.abs(value).toFixed(precision));
+        if (value < 0 && +s !== 0) {
+          s = "-" + s;
+        }
+        output = output.write(s);
+      } else {
+        output = output.write("" + value);
+      }
     }
   }
 

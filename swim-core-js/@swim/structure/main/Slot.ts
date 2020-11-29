@@ -333,6 +333,15 @@ export class Slot extends Field {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof Slot) {
+      return this._key.equals(that._key) && this._value.equivalentTo(that._value, epsilon);
+    }
+    return false;
+  }
+
   keyEquals(key: unknown): boolean {
     if (typeof key === "string" && this._key instanceof Item.Text) {
       return this._key.value === key;

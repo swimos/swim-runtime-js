@@ -219,6 +219,24 @@ export class Exam implements Assert {
     }
   }
 
+  identity(lhs: unknown, rhs: unknown, message?: string): void {
+    if (lhs === rhs) {
+      this.proove(Proof.valid("identity", message));
+    } else {
+      this.proove(Proof.refuted(lhs, "===", rhs, message));
+      throw new TestException(message);
+    }
+  }
+
+  notIdentity(lhs: unknown, rhs: unknown, message?: string): void {
+    if (lhs !== rhs) {
+      this.proove(Proof.valid("not identity", message));
+    } else {
+      this.proove(Proof.refuted(lhs, "!==", rhs, message));
+      throw new TestException(message);
+    }
+  }
+
   equal(lhs: unknown, rhs: unknown, message?: string): void {
     if (Objects.equal(lhs, rhs)) {
       this.proove(Proof.valid("equal", message));
@@ -237,20 +255,20 @@ export class Exam implements Assert {
     }
   }
 
-  identity(lhs: unknown, rhs: unknown, message?: string): void {
-    if (lhs === rhs) {
-      this.proove(Proof.valid("identity", message));
+  equivalent(lhs: unknown, rhs: unknown, message?: string): void {
+    if (Objects.equivalent(lhs, rhs)) {
+      this.proove(Proof.valid("equivalent", message));
     } else {
-      this.proove(Proof.refuted(lhs, "===", rhs, message));
+      this.proove(Proof.refuted(lhs, "equivalent", rhs, message));
       throw new TestException(message);
     }
   }
 
-  notIdentity(lhs: unknown, rhs: unknown, message?: string): void {
-    if (lhs !== rhs) {
-      this.proove(Proof.valid("not identity", message));
+  notEquivalent(lhs: unknown, rhs: unknown, message?: string): void {
+    if (!Objects.equivalent(lhs, rhs)) {
+      this.proove(Proof.valid("not equivalent"));
     } else {
-      this.proove(Proof.refuted(lhs, "!==", rhs, message));
+      this.proove(Proof.refuted(lhs, "not equivalent", rhs, message));
       throw new TestException(message);
     }
   }

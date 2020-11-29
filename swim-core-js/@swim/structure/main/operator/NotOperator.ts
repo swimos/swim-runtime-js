@@ -54,6 +54,15 @@ export class NotOperator extends UnaryOperator {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof NotOperator) {
+      return this._operand.equivalentTo(that._operand, epsilon);
+    }
+    return false;
+  }
+
   equals(that: unknown): boolean {
     if (this === that) {
       return true;

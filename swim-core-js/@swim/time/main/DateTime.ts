@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Murmur3} from "@swim/util";
+import {Comparable, Equivalent, HashCode, Murmur3} from "@swim/util";
 import {Display, Output} from "@swim/codec";
 import {Item, Value, Form} from "@swim/structure";
 import {AnyTimeZone, TimeZone} from "./TimeZone";
@@ -33,7 +33,7 @@ export interface DateTimeInit {
   zone?: AnyTimeZone;
 }
 
-export class DateTime implements Comparable<AnyDateTime>, HashCode, Display {
+export class DateTime implements Comparable<AnyDateTime>, Equivalent<AnyDateTime>, HashCode, Display {
   /** @hidden */
   readonly _time: number;
   /** @hidden */
@@ -245,6 +245,12 @@ export class DateTime implements Comparable<AnyDateTime>, HashCode, Display {
     const x = this._time;
     const y = DateTime.time(that);
     return x < y ? -1 : x > y ? 1 : x === y ? 0 : NaN;
+  }
+
+  equivalentTo(that: AnyDateTime, epsilon: number = Equivalent.Epsilon): boolean {
+    const x = this._time;
+    const y = DateTime.time(that);
+    return x === y || isNaN(x) && isNaN(y) || Math.abs(y - x) < epsilon;
   }
 
   equals(that: unknown): boolean {

@@ -53,6 +53,10 @@ The **Swim Core** framework consists of the following component libraries:
 - [**@swim/time**](@swim/time) –
   date-time, time zone, and time interval data types,
   with `strptime`/`strftime`-style parsers and formatters.
+- [**@swim/scale**](@swim/scale) –
+  mappings from numeric and temporal input domains to interpolated output
+  ranges, with support for continuous domain clamping, domain solving,
+  range unscaling, and interpolation between scales.
 - [**@swim/uri**](@swim/uri) –
   rich object model for working with Uniform Resource Identifiers and URI
   subcomponents, including an efficient and safe codec for parsing and

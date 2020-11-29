@@ -325,6 +325,10 @@ export class Data extends Value {
     return Objects.compare(this.typeOrder(), that.typeOrder());
   }
 
+  equivalentTo(that: Item): boolean {
+    return this.equals(that);
+  }
+
   equals(that: unknown): boolean {
     if (this === that) {
       return true;

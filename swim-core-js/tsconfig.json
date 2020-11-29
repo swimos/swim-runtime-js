@@ -14,6 +14,7 @@
     {"path": "./@swim/recon"},
     {"path": "./@swim/math"},
     {"path": "./@swim/time"},
+    {"path": "./@swim/scale"},
     {"path": "./@swim/uri"},
     {"path": "./@swim/core"}
   ]
