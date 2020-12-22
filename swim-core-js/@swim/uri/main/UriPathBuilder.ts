@@ -72,11 +72,18 @@ export class UriPathBuilder implements Builder<string, UriPath> {
 
   addSegment(segment: string): void {
     const tail = Uri.Path.segment(segment, Uri.Path.empty());
-    const size = this._size;
+    let size = this._size;
     if (size === 0) {
       this._first = tail;
     } else {
-      this.dealias(size - 1).setTail(tail);
+      const last = this.dealias(size - 1);
+      if (last.isAbsolute()) {
+        last.setTail(tail);
+      } else {
+        last.setTail(Uri.Path.slash(tail));
+        size += 1;
+        this._aliased += 1;
+      }
     }
     this._last = tail;
     this._size = size + 1;
@@ -89,7 +96,14 @@ export class UriPathBuilder implements Builder<string, UriPath> {
       if (size === 0) {
         this._first = path;
       } else {
-        this.dealias(size - 1).setTail(path);
+        const last = this.dealias(size - 1);
+        if (last.isAbsolute() || path.isAbsolute()) {
+          last.setTail(path);
+        } else {
+          last.setTail(Uri.Path.slash(path));
+          size += 1;
+          this._aliased += 1;
+        }
       }
       size += 1;
       do {

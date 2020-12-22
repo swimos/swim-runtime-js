@@ -17,7 +17,7 @@ import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
 import {Value, Form} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {AnyAngle} from "../angle/Angle";
-import {R2Operator} from "../vector/R2Operator";
+import {R2Operator} from "../r2/R2Operator";
 import {IdentityTransform} from "./IdentityTransform";
 import {TranslateTransform} from "./TranslateTransform";
 import {ScaleTransform} from "./ScaleTransform";

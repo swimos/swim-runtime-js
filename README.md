@@ -57,8 +57,14 @@ and strongly typed baseline on which to build higher level libraries.
   compiler from **@swim/structure** expressions to live-updated data models.
 - [**@swim/recon**](swim-core-js/@swim/recon) –
   object notation with attributes, like if JSON and XML had a baby.
+- [**@swim/uri**](swim-core-js/@swim/uri) –
+  rich object model for working with Uniform Resource Identifiers and URI
+  subcomponents, including an efficient and safe codec for parsing and
+  writing compliant URI strings.
 - [**@swim/math**](swim-core-js/@swim/math) –
   mathematical and geometric structures and operators.
+- [**@swim/geo**](swim-core-js/@swim/geo) –
+  geospatial coordinate, projection, and geometry types.
 - [**@swim/time**](swim-core-js/@swim/time) –
   date-time, time zone, and time interval data types,
   with `strptime`/`strftime`-style parsers and formatters.
@@ -66,10 +72,6 @@ and strongly typed baseline on which to build higher level libraries.
   mappings from numeric and temporal input domains to interpolated output
   ranges, with support for continuous domain clamping, domain solving,
   range unscaling, and interpolation between scales.
-- [**@swim/uri**](swim-core-js/@swim/uri) –
-  rich object model for working with Uniform Resource Identifiers and URI
-  subcomponents, including an efficient and safe codec for parsing and
-  writing compliant URI strings.
 
 ### [**Swim Mesh** Framework](swim-mesh-js)
 

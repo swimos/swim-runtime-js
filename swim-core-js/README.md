@@ -48,8 +48,14 @@ The **Swim Core** framework consists of the following component libraries:
   compiler from **@swim/structure** expressions to live-updated data models.
 - [**@swim/recon**](@swim/recon) –
   object notation with attributes, like if JSON and XML had a baby.
+- [**@swim/uri**](@swim/uri) –
+  rich object model for working with Uniform Resource Identifiers and URI
+  subcomponents, including an efficient and safe codec for parsing and
+  writing compliant URI strings.
 - [**@swim/math**](@swim/math) –
   mathematical and geometric structures and operators.
+- [**@swim/geo**](@swim/geo) –
+  geospatial coordinate, projection, and geometry types.
 - [**@swim/time**](@swim/time) –
   date-time, time zone, and time interval data types,
   with `strptime`/`strftime`-style parsers and formatters.
@@ -57,10 +63,6 @@ The **Swim Core** framework consists of the following component libraries:
   mappings from numeric and temporal input domains to interpolated output
   ranges, with support for continuous domain clamping, domain solving,
   range unscaling, and interpolation between scales.
-- [**@swim/uri**](@swim/uri) –
-  rich object model for working with Uniform Resource Identifiers and URI
-  subcomponents, including an efficient and safe codec for parsing and
-  writing compliant URI strings.
 
 **Swim Core** has no external dependencies.
 

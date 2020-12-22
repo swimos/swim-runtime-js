@@ -58,10 +58,10 @@ export class UriPathSegment extends UriPath {
 
   /** @hidden */
   setTail(tail: UriPath): void {
-    if (tail.isAbsolute()) {
-      this._tail = tail;
+    if (tail instanceof UriPathSegment) {
+      throw new Error("Adjacent UriPathSegment");
     } else {
-      this._tail = UriPath.slash(tail);
+      this._tail = tail;
     }
   }
 

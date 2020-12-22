@@ -22,5 +22,6 @@ export * from "@swim/dataflow";
 export * from "@swim/recon";
 export * from "@swim/uri";
 export * from "@swim/math";
+export * from "@swim/geo";
 export * from "@swim/time";
 export * from "@swim/scale";

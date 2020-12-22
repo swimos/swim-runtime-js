@@ -173,6 +173,20 @@ const core = [
     ],
   },
   {
+    id: "geo",
+    name: "@swim/geo",
+    targets: [
+      {
+        id: "main",
+        deps: ["util", "codec", "interpolate", "structure", "math"],
+      },
+      {
+        id: "test",
+        deps: ["util", "codec", "unit", "interpolate", "structure", "math", "geo"],
+      },
+    ],
+  },
+  {
     id: "time",
     name: "@swim/time",
     targets: [
@@ -208,7 +222,7 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "collections", "interpolate", "structure", "streamlet", "dataflow", "recon", "uri", "math", "time", "scale"],
+        deps: ["util", "codec", "collections", "interpolate", "structure", "streamlet", "dataflow", "recon", "uri", "math", "geo", "time", "scale"],
       },
     ],
   },

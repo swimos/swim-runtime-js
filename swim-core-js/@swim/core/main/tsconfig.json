@@ -14,6 +14,7 @@
       "@swim/recon": ["@swim/recon/main"],
       "@swim/uri": ["@swim/uri/main"],
       "@swim/math": ["@swim/math/main"],
+      "@swim/geo": ["@swim/geo/main"],
       "@swim/time": ["@swim/time/main"],
       "@swim/scale": ["@swim/scale/main"]
     },
@@ -30,6 +31,7 @@
     {"path": "../../recon/main"},
     {"path": "../../uri/main"},
     {"path": "../../math/main"},
+    {"path": "../../geo/main"},
     {"path": "../../time/main"},
     {"path": "../../scale/main"}
   ]

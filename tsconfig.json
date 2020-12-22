@@ -12,9 +12,11 @@
     {"path": "./swim-core-js/@swim/streamlet"},
     {"path": "./swim-core-js/@swim/dataflow"},
     {"path": "./swim-core-js/@swim/recon"},
-    {"path": "./swim-core-js/@swim/math"},
-    {"path": "./swim-core-js/@swim/time"},
     {"path": "./swim-core-js/@swim/uri"},
+    {"path": "./swim-core-js/@swim/math"},
+    {"path": "./swim-core-js/@swim/geo"},
+    {"path": "./swim-core-js/@swim/time"},
+    {"path": "./swim-core-js/@swim/scale"},
     {"path": "./swim-core-js/@swim/core"},
 
     {"path": "./swim-mesh-js/@swim/warp"},

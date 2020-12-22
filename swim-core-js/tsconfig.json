@@ -12,10 +12,11 @@
     {"path": "./@swim/streamlet"},
     {"path": "./@swim/dataflow"},
     {"path": "./@swim/recon"},
+    {"path": "./@swim/uri"},
     {"path": "./@swim/math"},
+    {"path": "./@swim/geo"},
     {"path": "./@swim/time"},
     {"path": "./@swim/scale"},
-    {"path": "./@swim/uri"},
     {"path": "./@swim/core"}
   ]
 }

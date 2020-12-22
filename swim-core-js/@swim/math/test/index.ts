@@ -14,10 +14,8 @@
 
 export * from "./length";
 export * from "./angle";
+export * from "./r2";
 export * from "./transform";
-export * from "./curve";
-export * from "./spline";
-export * from "./path";
 export {MathSuite} from "./MathSuite";
 
 import {MathSuite} from "./MathSuite";

@@ -59,10 +59,20 @@ component libraries:
   ([npm](https://www.npmjs.com/package/@swim/recon),
   [doc](https://docs.swimos.org/js/latest/modules/_swim_recon.html)) –
   object notation with attributes, like if JSON and XML had a baby.
+- [**@swim/uri**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/uri)
+  ([npm](https://www.npmjs.com/package/@swim/uri),
+  [doc](https://docs.swimos.org/js/latest/modules/_swim_uri.html)) –
+  rich object model for working with Uniform Resource Identifiers and URI
+  subcomponents, including an efficient and safe codec for parsing and
+  writing compliant URI strings.
 - [**@swim/math**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/math)
   ([npm](https://www.npmjs.com/package/@swim/math),
   [doc](https://docs.swimos.org/js/latest/modules/_swim_math.html)) –
   mathematical and geometric structures and operators.
+- [**@swim/geo**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/geo)
+  ([npm](https://www.npmjs.com/package/@swim/geo),
+  [doc](https://docs.swimos.org/js/latest/modules/_swim_geo.html)) –
+  geospatial coordinate, projection, and geometry types.
 - [**@swim/time**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/time)
   ([npm](https://www.npmjs.com/package/@swim/time),
   [doc](https://docs.swimos.org/js/latest/modules/_swim_time.html)) –
@@ -74,12 +84,6 @@ component libraries:
   mappings from numeric and temporal input domains to interpolated output
   ranges, with support for continuous domain clamping, domain solving,
   range unscaling, and interpolation between scales.
-- [**@swim/uri**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/uri)
-  ([npm](https://www.npmjs.com/package/@swim/uri),
-  [doc](https://docs.swimos.org/js/latest/modules/_swim_uri.html)) –
-  rich object model for working with Uniform Resource Identifiers and URI
-  subcomponents, including an efficient and safe codec for parsing and
-  writing compliant URI strings.
 
 **@swim/core** has no external dependencies.
 

@@ -16,10 +16,8 @@ import {Spec, Unit} from "@swim/unit";
 
 import {LengthSuite} from "./length/LengthSuite";
 import {AngleSuite} from "./angle/AngleSuite";
+import {R2Suite} from "./r2/R2Suite";
 import {TransformSuite} from "./transform/TransformSuite";
-import {CurveSuite} from "./curve/CurveSuite";
-import {SplineSuite} from "./spline/SplineSuite";
-import {PathSuite} from "./path/PathSuite";
 
 @Unit
 export class MathSuite extends Spec {
@@ -34,22 +32,12 @@ export class MathSuite extends Spec {
   }
 
   @Unit
+  r2Suite(): Spec {
+    return new R2Suite();
+  }
+
+  @Unit
   transformSuite(): Spec {
     return new TransformSuite();
-  }
-
-  @Unit
-  curveSuite(): Spec {
-    return new CurveSuite();
-  }
-
-  @Unit
-  splineSuite(): Spec {
-    return new SplineSuite();
-  }
-
-  @Unit
-  pathSuite(): Spec {
-    return new PathSuite();
   }
 }
