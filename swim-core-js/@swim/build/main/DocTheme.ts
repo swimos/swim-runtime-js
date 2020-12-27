@@ -17,22 +17,28 @@ import * as typedoc from "typedoc";
 import {Target} from "./Target";
 
 export class DocTheme extends typedoc.DefaultTheme {
-  target: Target;
+  rootTargets: Target[];
   targetReflections: {[uid: string]: typedoc.ContainerReflection | undefined};
 
-  constructor(renderer: typedoc.Renderer, basePath: string, target: Target,
+  constructor(renderer: typedoc.Renderer, basePath: string, rootTargets: Target[],
               targetReflections: {[uid: string]: typedoc.ContainerReflection | undefined}) {
     super(renderer, basePath);
-    this.target = target;
+    this.rootTargets = rootTargets;
     this.targetReflections = targetReflections;
   }
 
   getUrls(project: typedoc.ProjectReflection): typedoc.UrlMapping[] {
     const urls: typedoc.UrlMapping[] = [];
-    const rootReflection = this.targetReflections[this.target.uid]!;
-    urls.push(new typedoc.UrlMapping("index.html", rootReflection, "reflection.hbs"));
-    if (this.target.project.umbrella) {
-      urls.push(new typedoc.UrlMapping("modules.html", project, "reflection.hbs"));
+
+    const rootTarget = this.rootTargets.length === 1 ? this.rootTargets[0] : null;
+    const rootReflection = rootTarget !== null ? this.targetReflections[rootTarget.uid]! : null;
+    if (rootTarget === null) {
+      urls.push(new typedoc.UrlMapping("index.html", project, "reflection.hbs"));
+    } else {
+      urls.push(new typedoc.UrlMapping("index.html", rootReflection, "reflection.hbs"));
+      if (rootTarget.project.framework) {
+        urls.push(new typedoc.UrlMapping("modules.html", project, "reflection.hbs"));
+      }
     }
 
     project.url = "index.html";
@@ -42,22 +48,26 @@ export class DocTheme extends typedoc.DefaultTheme {
       }
     });
 
-    rootReflection.url = "index.html";
+    if (rootReflection !== null) {
+      rootReflection.url = "index.html";
+    }
 
     return urls;
   }
 
   getNavigation(project: typedoc.ProjectReflection): typedoc.NavigationItem {
-    const rootReflection = this.targetReflections[this.target.uid]!;
-    const rootItem = new typedoc.NavigationItem(rootReflection.name, "index.html");
-
-    if (this.target.project.umbrella) {
+    const rootItem = new typedoc.NavigationItem("Index", "index.html");
+    const rootTarget = this.rootTargets.length === 1 ? this.rootTargets[0] : null;
+    if (rootTarget === null) {
+      const modulesItem = new typedoc.NavigationItem("Modules", "index.html", rootItem);
+      modulesItem.isModules = true;
+    } else if (rootTarget.project.framework) {
       const modulesItem = new typedoc.NavigationItem("Modules", "modules.html", rootItem);
       modulesItem.isModules = true;
     }
-
-    this.buildTargetNavigation(rootItem, this.target);
-
+    for (let i = 0; i < this.rootTargets.length; i += 1) {
+      this.buildTargetNavigation(rootItem, this.rootTargets[i]);
+    }
     return rootItem;
   }
 
@@ -65,7 +75,7 @@ export class DocTheme extends typedoc.DefaultTheme {
     const targetReflection = this.targetReflections[target.uid];
     if (targetReflection !== void 0) {
       const targetItem = typedoc.NavigationItem.create(targetReflection, parentItem);
-      if (target.project.umbrella) {
+      if (target.project.framework) {
         targetReflection.kindString = "Framework";
         const targetDeps = target.deps;
         for (let i = 0; i < targetDeps.length; i += 1) {

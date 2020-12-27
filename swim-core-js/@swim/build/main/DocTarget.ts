@@ -24,8 +24,8 @@ import {Target} from "./Target";
 
 @Component({name: "doc-target"})
 export class DocTarget extends ConverterComponent {
-  target: Target;
-  umbrellaTargets: Target[];
+  rootTargets: Target[];
+  frameworkTargets: Target[];
   targetReflections: {[uid: string]: typedoc.ContainerReflection | undefined};
 
   initialize() {
@@ -50,8 +50,8 @@ export class DocTarget extends ConverterComponent {
     const sources = reflection.sources;
     if (sources !== void 0 && sources.length !== 0) {
       const fileName = sources[0].fileName;
-      for (let i = 0; i < this.umbrellaTargets.length; i += 1) {
-        const target = this.umbrellaTargets[i];
+      for (let i = 0; i < this.frameworkTargets.length; i += 1) {
+        const target = this.frameworkTargets[i];
         if (fileName.startsWith(target.project.baseDir)) {
           this.onTargetDeclaration(target, context, reflection);
         }
@@ -70,8 +70,11 @@ export class DocTarget extends ConverterComponent {
   }
 
   onEnd(context: Context): void {
-    if (!this.target.project.umbrella) {
-      this.onTargetDeclaration(this.target, context, context.project);
+    if (this.rootTargets.length === 1) {
+      const rootTarget = this.rootTargets[0];
+      if (!rootTarget.project.framework) {
+        this.onTargetDeclaration(rootTarget, context, context.project);
+      }
     }
   }
 }

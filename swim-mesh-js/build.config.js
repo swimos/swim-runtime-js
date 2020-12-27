@@ -40,7 +40,7 @@ const mesh = [
     id: "mesh",
     name: "@swim/mesh",
     title: "Swim Mesh",
-    umbrella: true,
+    framework: true,
     targets: [
       {
         id: "main",

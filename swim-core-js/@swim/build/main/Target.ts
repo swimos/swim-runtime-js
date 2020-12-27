@@ -31,6 +31,7 @@ export interface TargetConfig {
   id: string;
   path?: string;
   deps?: string[];
+  peerDeps?: string[];
   compilerOptions?: ts.CompilerOptions;
   preamble?: string;
 }
@@ -44,6 +45,7 @@ export class Target {
   readonly baseDir: string;
 
   readonly deps: Target[];
+  readonly peerDeps: Target[];
 
   preamble: string | undefined;
 
@@ -70,6 +72,7 @@ export class Target {
     this.baseDir = Path.resolve(this.project.baseDir, this.path);
 
     this.deps = [];
+    this.peerDeps = [];
 
     this.preamble = config.preamble;
 
@@ -115,6 +118,26 @@ export class Target {
     }
   }
 
+  initPeerDeps(config: TargetConfig): void {
+    if (config.peerDeps !== void 0) {
+      for (let i = 0; i < config.peerDeps.length; i += 1) {
+        const peerDep = config.peerDeps[i];
+        const [projectId, targetId] = peerDep.split(":");
+        const project = this.project.build.projects[projectId];
+        if (project !== void 0) {
+          const target = project.targets[targetId || "main"];
+          if (target !== void 0) {
+            this.peerDeps.push(target);
+          } else {
+            throw new Error(this.uid + " has peer dependency on unknown target " + targetId + " of project " + projectId);
+          }
+        } else {
+          throw new Error(this.uid + " has peer dependency on unknown project " + projectId);
+        }
+      }
+    }
+  }
+
   initBundle(bundleConfig: rollup.RollupOptions): void {
     if (typeof bundleConfig.input === "string") {
       bundleConfig.input = Path.resolve(this.project.baseDir, bundleConfig.input);
@@ -139,6 +162,9 @@ export class Target {
   }
 
   transitiveProjects(projects: Project[] = []): Project[] {
+    for (let i = 0; i < this.peerDeps.length; i += 1) {
+      projects = this.peerDeps[i].transitiveProjects(projects);
+    }
     for (let i = 0; i < this.deps.length; i += 1) {
       projects = this.deps[i].transitiveProjects(projects);
     }
@@ -149,6 +175,9 @@ export class Target {
   }
 
   transitiveTargets(targets: Target[] = []): Target[] {
+    for (let i = 0; i < this.peerDeps.length; i += 1) {
+      targets = this.peerDeps[i].transitiveTargets(targets);
+    }
     for (let i = 0; i < this.deps.length; i += 1) {
       targets = this.deps[i].transitiveTargets(targets);
     }
@@ -158,10 +187,25 @@ export class Target {
     return targets;
   }
 
-  umbrellaTargets(targets: Target[] = []): Target[] {
-    if (this.project.umbrella) {
+  frameworkTargets(targets: Target[] = []): Target[] {
+    if (this.project.framework) {
+      for (let i = 0; i < this.peerDeps.length; i += 1) {
+        targets = this.peerDeps[i].frameworkTargets(targets);
+      }
       for (let i = 0; i < this.deps.length; i += 1) {
-        targets = this.deps[i].umbrellaTargets(targets);
+        targets = this.deps[i].frameworkTargets(targets);
+      }
+    }
+    if (targets.indexOf(this) < 0) {
+      targets.push(this);
+    }
+    return targets;
+  }
+
+  rootTargets(targets: Target[] = []): Target[] {
+    if (this.project.framework) {
+      for (let i = 0; i < this.peerDeps.length; i += 1) {
+        targets = this.peerDeps[i].rootTargets(targets);
       }
     }
     if (targets.indexOf(this) < 0) {
@@ -174,6 +218,9 @@ export class Target {
                                     compilerOptions?: ts.CompilerOptions): ts.ProjectReference[] {
     const newRefs: ts.ProjectReference[] = [];
     let targets: Target[] = [];
+    for (let i = 0; i < this.peerDeps.length; i += 1) {
+      targets = this.peerDeps[i].transitiveTargets(targets);
+    }
     for (let i = 0; i < this.deps.length; i += 1) {
       targets = this.deps[i].transitiveTargets(targets);
     }
@@ -839,45 +886,47 @@ export class Target {
       }
     }
 
-    const umbrellaTargets = this.umbrellaTargets();
-    for (let i = 0; i < umbrellaTargets.length; i += 1) {
-      docOptions.entryPoints.push(Path.resolve(umbrellaTargets[i].baseDir, "index.ts"));
+    const frameworkTargets = this.frameworkTargets();
+    for (let i = 0; i < frameworkTargets.length; i += 1) {
+      docOptions.entryPoints.push(Path.resolve(frameworkTargets[i].baseDir, "index.ts"));
     }
 
     const doc = new typedoc.Application();
     doc.bootstrap(docOptions);
     doc.options.setCompilerOptions(fileNames, commandLine.options, commandLine.projectReferences);
 
+    const rootTargets = this.rootTargets();
     const docTarget = doc.converter.getComponent("doc-target") as DocTarget | undefined;
     if (docTarget instanceof DocTarget) {
-      docTarget.target = this;
-      docTarget.umbrellaTargets = umbrellaTargets;
+      docTarget.rootTargets = rootTargets;
+      docTarget.frameworkTargets = frameworkTargets;
     }
 
     const t0 = Date.now();
     const project = doc.convert();
     if (project !== void 0) {
       const themeDir = Path.join(typedoc.Renderer.getThemeDirectory(), "default");
-      const theme = new DocTheme(doc.renderer, themeDir, this, docTarget!.targetReflections);
+      const theme = new DocTheme(doc.renderer, themeDir, rootTargets, docTarget!.targetReflections);
       doc.renderer.theme = theme;
 
-      doc.generateDocs(project, outDir);
-      const dt = Date.now() - t0;
-
-      output = Unicode.stringOutput(OutputSettings.styled());
-      OutputStyle.greenBold(output);
-      output.write("documented");
-      OutputStyle.reset(output);
-      output.write(" ");
-      OutputStyle.yellow(output);
-      output.write(this.uid);
-      OutputStyle.reset(output);
-      output.write(" in ");
-      output.debug(dt);
-      output.write("ms");
-      console.log(output.bind());
-      console.log();
-      return Promise.resolve();
+      return doc.generateDocs(project, outDir)
+        .then(() => {
+          const dt = Date.now() - t0;
+          output = Unicode.stringOutput(OutputSettings.styled());
+          OutputStyle.greenBold(output);
+          output.write("documented");
+          OutputStyle.reset(output);
+          output.write(" ");
+          OutputStyle.yellow(output);
+          output.write(this.uid);
+          OutputStyle.reset(output);
+          output.write(" in ");
+          output.debug(dt);
+          output.write("ms");
+          console.log(output.bind());
+          console.log();
+        })
+        .catch(this.onDocError);
     } else {
       const output = Unicode.stringOutput(OutputSettings.styled());
       OutputStyle.redBold(output);
@@ -891,6 +940,27 @@ export class Target {
       console.log();
       return Promise.reject();
     }
+  }
+
+  protected onDocError(error: Error): void {
+    let output = Unicode.stringOutput(OutputSettings.styled());
+    OutputStyle.redBold(output);
+    output.write("error:");
+    OutputStyle.reset(output);
+    output.write(" ");
+    output.write(error.message);
+    console.log(output.bind());
+    console.log();
+
+    output = Unicode.stringOutput(OutputSettings.styled());
+    OutputStyle.redBold(output);
+    output.write("failed to document");
+    OutputStyle.reset(output);
+    output.write(" ");
+    OutputStyle.yellow(output);
+    output.write(this.uid);
+    OutputStyle.reset(output);
+    console.log(output.bind());
   }
 
   clean(): void {

@@ -218,7 +218,7 @@ const core = [
     id: "core",
     name: "@swim/core",
     title: "Swim Core",
-    umbrella: true,
+    framework: true,
     targets: [
       {
         id: "main",

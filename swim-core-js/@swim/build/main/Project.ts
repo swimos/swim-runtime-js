@@ -27,12 +27,12 @@ export interface ProjectConfig {
   path?: string;
   title?: string;
   readme?: string;
+  framework?: boolean;
   targets: TargetConfig[];
   devel?: boolean;
   tests?: string;
   cleanDirs?: string[];
   compilerOptions?: ts.CompilerOptions;
-  umbrella?: boolean;
 }
 
 export class Project {
@@ -44,6 +44,7 @@ export class Project {
   readonly baseDir: string;
   readonly title: string | undefined;
   readonly readme: string | undefined;
+  readonly framework: boolean;
 
   readonly packagePath: string;
   readonly package: any;
@@ -58,8 +59,6 @@ export class Project {
   readonly compilerOptions: ts.CompilerOptions;
   bundleConfig: any;
 
-  readonly umbrella: boolean;
-
   constructor(build: Build, config: ProjectConfig) {
     this.build = build;
 
@@ -69,6 +68,7 @@ export class Project {
     this.baseDir = Path.resolve(this.build.baseDir, this.path);
     this.title = config.title;
     this.readme = config.readme;
+    this.framework = config.framework || false;
 
     this.packagePath = Path.join(this.baseDir, "package.json");
     try {
@@ -87,8 +87,6 @@ export class Project {
 
     this.compilerOptions = config.compilerOptions || this.build.compilerOptions;
     this.bundleConfig = {};
-
-    this.umbrella = config.umbrella || false;
   }
 
   initTargets(config: ProjectConfig): void {
@@ -105,6 +103,14 @@ export class Project {
       const targetConfig = config.targets[i];
       const target = this.targets[targetConfig.id]!;
       target.initDeps(targetConfig);
+    }
+  }
+
+  initPeerDeps(config: ProjectConfig): void {
+    for (let i = 0; i < config.targets.length; i += 1) {
+      const targetConfig = config.targets[i];
+      const target = this.targets[targetConfig.id]!;
+      target.initPeerDeps(targetConfig);
     }
   }
 
@@ -126,6 +132,11 @@ export class Project {
     } else {
       return Promise.resolve(void 0);
     }
+  }
+
+  getTarget(targetId: string): Target | null {
+    const target = this.targets[targetId];
+    return target !== void 0 ? target : null;
   }
 
   updatePackage(): void {

@@ -69,6 +69,12 @@ export class Build {
       const project = this.projects[projectConfig.id]!;
       project.initDeps(projectConfig);
     }
+
+    for (let i = 0; i < config.projects.length; i += 1) {
+      const projectConfig = config.projects[i];
+      const project = this.projects[projectConfig.id]!;
+      project.initPeerDeps(projectConfig);
+    }
   }
 
   initBundle(i: number = 0): Promise<unknown> {
@@ -84,6 +90,23 @@ export class Build {
     return this.initBundle().then(() => {
       return this;
     });
+  }
+
+  getProject(projectId: string): Project | null {
+    const project = this.projects[projectId];
+    return project !== void 0 ? project : null;
+  }
+
+  getTarget(specifier: string): Target | null {
+    const [projectId, targetId] = specifier.split(":");
+    const project = this.projects[projectId];
+    if (project !== void 0) {
+      const target = project.targets[targetId || "main"];
+      if (target !== void 0) {
+        return target;
+      }
+    }
+    return null;
   }
 
   transitiveProjects(specifiers: string[] | string | undefined, targetId: string | undefined): Project[] {
