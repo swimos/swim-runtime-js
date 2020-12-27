@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as child_process from "child_process";
-import * as fs from "fs";
-import * as path from "path";
+import * as ChildProcess from "child_process";
+import * as FS from "fs";
+import * as Path from "path";
 import * as ts from "typescript";
 import * as tslint from "tslint";
 import * as rollup from "rollup";
@@ -25,6 +25,7 @@ import {Severity} from "@swim/util";
 import {Tag, Mark, Span, OutputSettings, OutputStyle, Diagnostic, Unicode} from "@swim/codec";
 import {Project} from "./Project";
 import {DocTarget} from "./DocTarget";
+import {DocTheme} from "./DocTheme";
 
 export interface TargetConfig {
   id: string;
@@ -66,7 +67,7 @@ export class Target {
     this.id = config.id;
     this.uid = this.project.id + ":" + this.id;
     this.path = config.path !== void 0 ? config.path : this.id;
-    this.baseDir = path.resolve(this.project.baseDir, this.path);
+    this.baseDir = Path.resolve(this.project.baseDir, this.path);
 
     this.deps = [];
 
@@ -116,16 +117,16 @@ export class Target {
 
   initBundle(bundleConfig: rollup.RollupOptions): void {
     if (typeof bundleConfig.input === "string") {
-      bundleConfig.input = path.resolve(this.project.baseDir, bundleConfig.input);
+      bundleConfig.input = Path.resolve(this.project.baseDir, bundleConfig.input);
     }
     const bundleOutput = bundleConfig.output as rollup.OutputOptions;
     if (bundleOutput !== void 0 && typeof bundleOutput.file === "string") {
-      bundleOutput.file = path.resolve(this.project.baseDir, bundleOutput.file);
+      bundleOutput.file = Path.resolve(this.project.baseDir, bundleOutput.file);
       if (this.preamble === void 0) {
         if (typeof bundleOutput.banner === "string") {
           this.preamble = bundleOutput.banner;
         } else {
-          this.preamble = "// " + path.basename(bundleOutput.file, ".js") + "-" + this.project.package.version;
+          this.preamble = "// " + Path.basename(bundleOutput.file, ".js") + "-" + this.project.package.version;
           if (typeof this.project.package.copyright === "string") {
             this.preamble += "; copyright " + this.project.package.copyright;
           }
@@ -150,6 +151,18 @@ export class Target {
   transitiveTargets(targets: Target[] = []): Target[] {
     for (let i = 0; i < this.deps.length; i += 1) {
       targets = this.deps[i].transitiveTargets(targets);
+    }
+    if (targets.indexOf(this) < 0) {
+      targets.push(this);
+    }
+    return targets;
+  }
+
+  umbrellaTargets(targets: Target[] = []): Target[] {
+    if (this.project.umbrella) {
+      for (let i = 0; i < this.deps.length; i += 1) {
+        targets = this.deps[i].umbrellaTargets(targets);
+      }
     }
     if (targets.indexOf(this) < 0) {
       targets.push(this);
@@ -274,7 +287,9 @@ export class Target {
                                                                       configFileParsingDiagnostics, projectReferences);
     this.program = program.getProgram();
     const emit = this.program.emit;
-    this.program.emit = function (this: Target, targetSourceFile?: ts.SourceFile, writeFile?: ts.WriteFileCallback, cancellationToken?: ts.CancellationToken, emitOnlyDtsFiles?: boolean, customTransformers?: ts.CustomTransformers): ts.EmitResult {
+    this.program.emit = function (this: Target, targetSourceFile?: ts.SourceFile, writeFile?: ts.WriteFileCallback,
+                                  cancellationToken?: ts.CancellationToken, emitOnlyDtsFiles?: boolean,
+                                  customTransformers?: ts.CustomTransformers): ts.EmitResult {
       this.onEmitSourceFile(targetSourceFile!);
       return emit.call(this.program, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers);
     }.bind(this);
@@ -561,9 +576,9 @@ export class Target {
   minify(bundle: rollup.RollupOutput, options: rollup.OutputOptions): Promise<rollup.RollupOutput> {
     if (!this.project.devel) {
       const inputChunk = bundle.output[0] as rollup.OutputChunk;
-      const outputDir = path.dirname(inputChunk.fileName);
-      const scriptName = path.basename(inputChunk.fileName, ".js") + ".min.js";
-      const scriptPath = path.resolve(outputDir, scriptName);
+      const outputDir = Path.dirname(inputChunk.fileName);
+      const scriptName = Path.basename(inputChunk.fileName, ".js") + ".min.js";
+      const scriptPath = Path.resolve(outputDir, scriptName);
       const terserOptions: any = {
         output: {
           comments: false,
@@ -677,24 +692,24 @@ export class Target {
       const scriptPath = chunk.fileName!;
       const sourceMappingPath = scriptPath + ".map";
 
-      Target.mkdir(path.dirname(scriptPath));
+      Target.mkdir(Path.dirname(scriptPath));
       let code = chunk.code;
       if (options.sourcemap && i === 0) {
-        const sourceMappingURL = path.basename(sourceMappingPath);
+        const sourceMappingURL = Path.basename(sourceMappingPath);
         code += "//# sourceMappingURL=" + sourceMappingURL;
       }
-      fs.writeFileSync(scriptPath, code, "utf8");
+      FS.writeFileSync(scriptPath, code, "utf8");
 
       if (options.sourcemap) {
-        fs.writeFileSync(sourceMappingPath, chunk.map!.toString(), "utf8");
+        FS.writeFileSync(sourceMappingPath, chunk.map!.toString(), "utf8");
       }
     }
   }
 
   private static mkdir(dir: string) {
-    if (!fs.existsSync(dir)) {
-      Target.mkdir(path.dirname(dir));
-      fs.mkdirSync(dir);
+    if (!FS.existsSync(dir)) {
+      Target.mkdir(Path.dirname(dir));
+      FS.mkdirSync(dir);
     }
   }
 
@@ -712,13 +727,13 @@ export class Target {
     const bundleConfig = this.project.bundleConfig[this.id] as rollup.RollupOptions | undefined;
     const bundleOutput = bundleConfig !== void 0 ? bundleConfig.output as rollup.OutputOptions : void 0;
     const outputFile = bundleOutput !== void 0 ? bundleOutput.file : void 0;
-    const scriptPath = outputFile !== void 0 ? path.resolve(this.project.baseDir, outputFile) : void 0;
-    if (scriptPath !== void 0 && fs.existsSync(scriptPath)) {
-      return new Promise((resolve, reject): void => {
+    const scriptPath = outputFile !== void 0 ? Path.resolve(this.project.baseDir, outputFile) : void 0;
+    if (scriptPath !== void 0 && FS.existsSync(scriptPath)) {
+      return new Promise<void>((resolve, reject): void => {
         const args: string[] = [];
 
         const t0 = Date.now();
-        const proc = child_process.fork(scriptPath, args);
+        const proc = ChildProcess.fork(scriptPath, args);
         proc.on("exit", (code: number): void => {
           const dt = Date.now() - t0;
           if (code === 0) {
@@ -790,7 +805,7 @@ export class Target {
     OutputStyle.reset(output);
     console.log(output.bind());
 
-    const outDir = path.join(this.project.baseDir, "doc", "/");
+    const outDir = Path.join(this.project.baseDir, "doc", "/");
 
     const configPath = ts.findConfigFile(this.baseDir, ts.sys.fileExists, "tsconfig.json");
     const commandLine = ts.getParsedCommandLineOfConfigFile(configPath!, this.compilerOptions, ts.sys as any)!;
@@ -803,43 +818,49 @@ export class Target {
     delete commandLine.options.tsBuildInfoFile;
     delete commandLine.options.configFilePath;
 
-    const docOptions = commandLine.options as typedoc.TypeDocAndTSOptions;
+    const docOptions = {} as typedoc.TypeDocOptions;
     docOptions.name = this.project.title || this.project.name;
     docOptions.readme = "none";
-    docOptions.mode = "modules";
     docOptions.tsconfig = configPath!;
     if (this.project.build.gaID !== void 0) {
       docOptions.gaID = this.project.build.gaID;
     }
-    docOptions.excludeNotExported = true;
     docOptions.excludePrivate = true;
-    docOptions.hideGenerator = true;
+    docOptions.entryPoints = [];
 
     const fileNames: string[] = [];
-    const fileTargetMap: {[fileName: string]: {target: Target} | undefined} = {};
-    const targets = this.transitiveTargets();
-    for (let i = 0; i < targets.length; i += 1) {
-      const target = targets[i];
+    const transitiveTargets = this.transitiveTargets();
+    for (let i = 0; i < transitiveTargets.length; i += 1) {
+      const target = transitiveTargets[i];
       const targetFileNames = target.getRootFileNames();
       for (let j = 0; j < targetFileNames.length; j += 1) {
         const fileName = targetFileNames[j];
         fileNames.push(fileName);
-        fileTargetMap[fileName] = {target};
       }
+    }
+
+    const umbrellaTargets = this.umbrellaTargets();
+    for (let i = 0; i < umbrellaTargets.length; i += 1) {
+      docOptions.entryPoints.push(Path.resolve(umbrellaTargets[i].baseDir, "index.ts"));
     }
 
     const doc = new typedoc.Application();
     doc.bootstrap(docOptions);
+    doc.options.setCompilerOptions(fileNames, commandLine.options, commandLine.projectReferences);
 
-    const docTarget = doc.converter.getComponent("doc-target");
+    const docTarget = doc.converter.getComponent("doc-target") as DocTarget | undefined;
     if (docTarget instanceof DocTarget) {
       docTarget.target = this;
-      docTarget.fileTargetMap = fileTargetMap;
+      docTarget.umbrellaTargets = umbrellaTargets;
     }
 
     const t0 = Date.now();
-    const project = doc.convert(fileNames);
+    const project = doc.convert();
     if (project !== void 0) {
+      const themeDir = Path.join(typedoc.Renderer.getThemeDirectory(), "default");
+      const theme = new DocTheme(doc.renderer, themeDir, this, docTarget!.targetReflections);
+      doc.renderer.theme = theme;
+
       doc.generateDocs(project, outDir);
       const dt = Date.now() - t0;
 
@@ -877,7 +898,7 @@ export class Target {
       const configPath = ts.findConfigFile(this.baseDir, ts.sys.fileExists, "tsconfig.json");
       const commandLine = ts.getParsedCommandLineOfConfigFile(configPath!, this.compilerOptions, ts.sys as any)!;
       const tsBuildInfoFile = commandLine.options.tsBuildInfoFile;
-      if (tsBuildInfoFile !== void 0 && tsBuildInfoFile.length !== 0 && fs.existsSync(tsBuildInfoFile)) {
+      if (tsBuildInfoFile !== void 0 && tsBuildInfoFile.length !== 0 && FS.existsSync(tsBuildInfoFile)) {
         const output = Unicode.stringOutput(OutputSettings.styled());
         OutputStyle.greenBold(output);
         output.write("deleting");
@@ -885,7 +906,7 @@ export class Target {
         output.write(" ");
         output.write(tsBuildInfoFile);
         console.log(output.bind());
-        fs.unlinkSync(tsBuildInfoFile);
+        FS.unlinkSync(tsBuildInfoFile);
       }
     } catch (error) {
       console.error(error); // swallow

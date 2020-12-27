@@ -26,14 +26,13 @@ const main = {
     "typedoc/dist/lib/converter/components",
     "typedoc/dist/lib/converter/converter",
     "typedoc/dist/lib/converter/context",
-    "typedoc/dist/lib/converter/plugins/CommentPlugin",
     "typedoc/dist/lib/models/comments",
-    "typedoc/dist/lib/models/reflections/container",
-    "typedoc/dist/lib/models/reflections/declaration",
+    "typedoc/dist/lib/output/components",
+    "typedoc/dist/lib/output/events",
     "typescript",
   ],
   plugins: [
-    nodeResolve({customResolveOptions: {paths: "../.."}}),
+    nodeResolve({moduleDirectories: ["../..", "node_modules"]}),
     sourcemaps(),
   ],
   onwarn(warning, warn) {

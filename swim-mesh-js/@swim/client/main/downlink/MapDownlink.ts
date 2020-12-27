@@ -75,7 +75,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
   /** @hidden */
   protected _outlets: BTree<K, KeyOutlet<K, V>>; // TODO: unify with observers
   /** @hidden */
-  protected _outputs: ReadonlyArray<Inlet<MapDownlink<K, V>>> | null;
+  protected _outputs: ReadonlyArray<Inlet<MapDownlink<K, V, KU, VU>>> | null;
   /** @hidden */
   protected _version: number;
 
@@ -695,14 +695,14 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     return outlet;
   }
 
-  outputIterator(): Cursor<Inlet<MapDownlink<K, V>>> {
+  outputIterator(): Cursor<Inlet<MapDownlink<K, V, KU, VU>>> {
     return this._outputs !== null ? Cursor.array(this._outputs) : Cursor.empty();
   }
 
-  bindOutput(output: Inlet<MapDownlink<K, V>>): void {
+  bindOutput(output: Inlet<MapDownlink<K, V, KU, VU>>): void {
     const oldOutputs = this._outputs;
     const n = oldOutputs !== null ? oldOutputs.length : 0;
-    const newOutputs = new Array<Inlet<MapDownlink<K, V>>>(n + 1);
+    const newOutputs = new Array<Inlet<MapDownlink<K, V, KU, VU>>>(n + 1);
     for (let i = 0; i < n; i += 1) {
       newOutputs[i] = oldOutputs![i];
     }
@@ -710,13 +710,13 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     this._outputs = newOutputs;
   }
 
-  unbindOutput(output: Inlet<MapDownlink<K, V>>): void {
+  unbindOutput(output: Inlet<MapDownlink<K, V, KU, VU>>): void {
     const oldOutputs = this._outputs;
     const n = oldOutputs !== null ? oldOutputs.length : 0;
     for (let i = 0; i < n; i += 1) {
       if (oldOutputs![i] === output) {
         if (n > 1) {
-          const newOutputs = new Array<Inlet<MapDownlink<K, V>>>(n - 1);
+          const newOutputs = new Array<Inlet<MapDownlink<K, V, KU, VU>>>(n - 1);
           for (let j = 0; j < i; j += 1) {
             newOutputs[j] = oldOutputs![j];
           }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as path from "path";
+import * as Path from "path";
 import * as ts from "typescript";
 import * as rollup from "rollup";
 
@@ -367,7 +367,7 @@ export class Build {
       .rollup({
         input: scriptFile,
         external: function (id: string): boolean {
-          return id[0] !== "." && !path.isAbsolute(id) || id.slice(-5, id.length) === ".json";
+          return id[0] !== "." && !Path.isAbsolute(id) || id.slice(-5, id.length) === ".json";
         },
         onwarn(warning: rollup.RollupWarning, warn?: any): void {
           if (warning.code === "MIXED_EXPORTS") {
@@ -401,7 +401,7 @@ export class Build {
   }
 
   static load(configFile: string, devel?: boolean, tests?: string): Promise<Build> {
-    configFile = path.resolve(process.cwd(), configFile);
+    configFile = Path.resolve(process.cwd(), configFile);
     return Build.importScript(configFile)
       .then((config: any): Promise<Build> => {
         if (devel !== void 0) {

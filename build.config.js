@@ -234,7 +234,7 @@ const core = [
     id: "core",
     name: "@swim/core",
     path: "swim-core-js/@swim/core",
-    title: "Swim Core Framework",
+    title: "Swim Core",
     umbrella: true,
     targets: [
       {
@@ -291,7 +291,7 @@ const mesh = [
     id: "mesh",
     name: "@swim/mesh",
     path: "swim-mesh-js/@swim/mesh",
-    title: "Swim Mesh Framework",
+    title: "Swim Mesh",
     umbrella: true,
     targets: [
       {
@@ -306,7 +306,7 @@ const system = [
   {
     id: "system",
     name: "@swim/system",
-    title: "SwimOS",
+    title: "Swim System",
     umbrella: true,
     targets: [
       {

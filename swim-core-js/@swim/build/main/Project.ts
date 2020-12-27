@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as child_process from "child_process";
-import * as fs from "fs";
-import * as path from "path";
+import * as ChildProcess from "child_process";
+import * as FS from "fs";
+import * as Path from "path";
 import * as ts from "typescript";
 
 import {OutputSettings, OutputStyle, Unicode} from "@swim/codec";
@@ -66,13 +66,13 @@ export class Project {
     this.id = config.id;
     this.name = config.name;
     this.path = config.path !== void 0 ? config.path : this.name;
-    this.baseDir = path.resolve(this.build.baseDir, this.path);
+    this.baseDir = Path.resolve(this.build.baseDir, this.path);
     this.title = config.title;
     this.readme = config.readme;
 
-    this.packagePath = path.join(this.baseDir, "package.json");
+    this.packagePath = Path.join(this.baseDir, "package.json");
     try {
-      this.package = JSON.parse(fs.readFileSync(this.packagePath, "utf8"));
+      this.package = JSON.parse(FS.readFileSync(this.packagePath, "utf8"));
     } catch (error) {
       console.log(this.packagePath);
       throw error;
@@ -109,8 +109,8 @@ export class Project {
   }
 
   initBundle(): Promise<unknown> {
-    const bundleConfigPath = path.join(this.baseDir, "rollup.config.js");
-    if (fs.existsSync(bundleConfigPath)) {
+    const bundleConfigPath = Path.join(this.baseDir, "rollup.config.js");
+    if (FS.existsSync(bundleConfigPath)) {
       return Build.importScript(bundleConfigPath)
         .then((bundleConfig: any): void => {
           for (let i = 0; i < this.targetList.length; i += 1) {
@@ -151,7 +151,7 @@ export class Project {
     }
 
     if (modified) {
-      fs.writeFileSync(this.packagePath, JSON.stringify(pkg, null, 2) + "\n", "utf8");
+      FS.writeFileSync(this.packagePath, JSON.stringify(pkg, null, 2) + "\n", "utf8");
     }
   }
 
@@ -166,7 +166,7 @@ export class Project {
     OutputStyle.reset(output);
     console.log(output.bind());
 
-    return new Promise((resolve, reject): void => {
+    return new Promise<void>((resolve, reject): void => {
       const command = "npm";
       const args = ["publish"];
       if (options !== void 0) {
@@ -190,7 +190,7 @@ export class Project {
       console.log(output.bind());
 
       const t0 = Date.now();
-      const proc = child_process.spawn(command, args, {cwd: this.baseDir, stdio: "inherit"});
+      const proc = ChildProcess.spawn(command, args, {cwd: this.baseDir, stdio: "inherit"});
       proc.on("exit", (code: number): void => {
         const dt = Date.now() - t0;
         if (code === 0) {
@@ -228,7 +228,7 @@ export class Project {
   clean(): void {
     this.cleanTargets();
     for (let i = 0; i < this.cleanDirs.length; i += 1) {
-      const cleanDir = path.resolve(this.baseDir, this.cleanDirs[i]);
+      const cleanDir = Path.resolve(this.baseDir, this.cleanDirs[i]);
       const output = Unicode.stringOutput(OutputSettings.styled());
       OutputStyle.greenBold(output);
       output.write("deleting");
@@ -248,16 +248,16 @@ export class Project {
   }
 
   private static rmdir(dir: string): void {
-    if (fs.existsSync(dir)) {
-      fs.readdirSync(dir).forEach((fileName) => {
-        const file = path.join(dir, fileName);
-        if (fs.lstatSync(file).isDirectory()) {
+    if (FS.existsSync(dir)) {
+      FS.readdirSync(dir).forEach((fileName) => {
+        const file = Path.join(dir, fileName);
+        if (FS.lstatSync(file).isDirectory()) {
           Project.rmdir(file);
         } else {
-          fs.unlinkSync(file);
+          FS.unlinkSync(file);
         }
       });
-      fs.rmdirSync(dir);
+      FS.rmdirSync(dir);
     }
   }
 }

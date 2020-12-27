@@ -39,7 +39,7 @@ const main = {
     "ws",
   ],
   plugins: [
-    nodeResolve({customResolveOptions: {paths: "../.."}}),
+    nodeResolve({moduleDirectories: ["../..", "../../../swim-core-js", "node_modules"]}),
     sourcemaps(),
   ],
   onwarn(warning, warn) {
