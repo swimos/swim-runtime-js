@@ -29,6 +29,12 @@ export abstract class GeoCurve extends GeoShape implements Equivalent<GeoCurve>,
 
   abstract project(f: GeoProjection): CurveR2;
 
+  abstract forEachCoord<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
+                                        thisArg?: S): R | undefined;
+
+  abstract forEachCoordRest<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
+                                            thisArg?: S): R | undefined;
+
   abstract equivalentTo(that: GeoCurve, epsilon?: number): boolean;
 
   abstract equals(that: unknown): boolean;

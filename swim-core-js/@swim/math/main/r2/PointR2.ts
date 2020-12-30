@@ -157,6 +157,14 @@ export class PointR2 extends ShapeR2 implements Equivalent<PointR2>, HashCode, D
     return PointR2._origin;
   }
 
+  private static _undefined?: PointR2;
+  static undefined(): PointR2 {
+    if (PointR2._undefined === void 0) {
+      PointR2._undefined = new PointR2(NaN, NaN);
+    }
+    return PointR2._undefined;
+  }
+
   static of(x: number, y: number): PointR2 {
     return new PointR2(x, y);
   }

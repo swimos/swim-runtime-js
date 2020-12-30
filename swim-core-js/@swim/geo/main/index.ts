@@ -38,13 +38,21 @@ export {
 
 export {GeoSplineContext} from "./GeoSplineContext";
 
-export {GeoSpline} from "./GeoSpline";
+export {
+  AnyGeoSpline,
+  GeoSplinePoints,
+  GeoSpline,
+} from "./GeoSpline";
 
 export {GeoSplineBuilder} from "./GeoSplineBuilder";
 
 export {GeoPathContext} from "./GeoPathContext";
 
-export {GeoPath} from "./GeoPath";
+export {
+  AnyGeoPath,
+  GeoPathSplines,
+  GeoPath,
+} from "./GeoPath";
 
 export {GeoPathBuilder} from "./GeoPathBuilder";
 

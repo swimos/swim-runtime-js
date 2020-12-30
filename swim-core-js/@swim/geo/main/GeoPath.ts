@@ -19,9 +19,13 @@ import {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import {GeoCurve} from "./GeoCurve";
-import {GeoSpline} from "./GeoSpline";
+import {AnyGeoSpline, GeoSplinePoints, GeoSpline} from "./GeoSpline";
 import {GeoPathBuilder} from "./GeoPathBuilder";
 import {GeoBox} from "./GeoBox";
+
+export type AnyGeoPath = GeoPath | GeoPathSplines | AnyGeoSpline;
+
+export type GeoPathSplines = ReadonlyArray<AnyGeoSpline>;
 
 export class GeoPath extends GeoShape implements Equivalent<GeoPath>, Equals, Debug {
   /** @hidden */
@@ -187,6 +191,35 @@ export class GeoPath extends GeoShape implements Equivalent<GeoPath>, Equals, De
     return boundingBox;
   }
 
+  centroid(): GeoPoint {
+    let lngSum = 0;
+    let latSum = 0;
+    let n = 0;
+    this.forEachCoord(function (lng: number, lat: number): void {
+      lngSum += lng;
+      latSum += lat;
+      n += 1;
+    }, this);
+    if (n !== 0) {
+      return new GeoPoint(lngSum / n, latSum / n);
+    } else {
+      return GeoPoint.undefined();
+    }
+  }
+
+  forEachCoord<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
+                               thisArg?: S): R | undefined {
+    const splines = this._splines;
+    for (let i = 0, n = splines.length; i < n; i += 1) {
+      const spline = splines[i];
+      const result = spline.forEachCoord(callback, thisArg);
+      if (result !== void 0) {
+        return result;
+      }
+    }
+    return void 0;
+  }
+
   equivalentTo(that: GeoPath, epsilon?: number): boolean {
     return this === that || Objects.equivalent(this._splines, that._splines, epsilon);
   }
@@ -247,8 +280,48 @@ export class GeoPath extends GeoShape implements Equivalent<GeoPath>, Equals, De
     return new GeoPath([new GeoSpline(curves, true)]);
   }
 
+  static fromPoints(points: GeoSplinePoints): GeoPath {
+    return new GeoPath([GeoSpline.fromPoints(points)]);
+  }
+
+  static fromSplines(values: GeoPathSplines): GeoPath {
+    const n = values.length;
+    const splines = new Array<GeoSpline>(n);
+    for (let i = 0; i < n; i += 1) {
+      splines[i] = GeoSpline.fromAny(values[i]);
+    }
+    return new GeoPath(splines);
+  }
+
+  static fromAny(value: AnyGeoPath): GeoPath;
+  static fromAny(value: AnyGeoShape): GeoShape;
+  static fromAny(value: AnyGeoPath | AnyGeoShape): GeoShape {
+    if (value instanceof GeoPath) {
+      return value;
+    } else if (GeoPath.isSplines(value)) {
+      return GeoPath.fromSplines(value);
+    } else if (GeoSpline.isAnySpline(value)) {
+      return GeoPath.of(GeoSpline.fromAny(value));
+    } else {
+      return GeoShape.fromAny(value);
+    }
+  }
+
   static builder(): GeoPathBuilder {
     return new GeoPath.Builder();
+  }
+
+  /** @hidden */
+  static isSplines(value: unknown): value is GeoPathSplines {
+    return Array.isArray(value)
+        && value.length > 0
+        && GeoSpline.isAnySpline(value[0]);
+  }
+
+  /** @hidden */
+  static isAnyPath(value: unknown): value is AnyGeoPath {
+    return value instanceof GeoPath
+        || GeoPath.isSplines(value);
   }
 
   // Forward type declarations

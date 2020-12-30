@@ -164,6 +164,29 @@ export class GeoSegment extends GeoCurve implements HashCode, Debug {
     return new SegmentR2(p0.x, p0.y, p1.x, p1.y);
   }
 
+  forEachCoord<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
+                               thisArg?: S): R | undefined {
+    let result: R | undefined;
+    result = callback.call(thisArg, this._lng0, this._lat0);
+    if (result !== void 0) {
+      return result;
+    }
+    result = callback.call(thisArg, this._lng1, this._lat1);
+    if (result !== void 0) {
+      return result;
+    }
+    return void 0;
+  }
+
+  forEachCoordRest<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
+                                   thisArg?: S): R | undefined {
+    const result = callback.call(thisArg, this._lng1, this._lat1);
+    if (result !== void 0) {
+      return result;
+    }
+    return void 0;
+  }
+
   toAny(): GeoSegmentInit {
     return {
       lng0: this._lng0,

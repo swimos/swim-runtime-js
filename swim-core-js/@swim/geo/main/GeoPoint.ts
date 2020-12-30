@@ -144,6 +144,14 @@ export class GeoPoint extends GeoShape implements Equivalent<GeoPoint>, HashCode
     return GeoPoint._origin;
   }
 
+  private static _undefined?: GeoPoint;
+  static undefined(): GeoPoint {
+    if (GeoPoint._undefined === void 0) {
+      GeoPoint._undefined = new GeoPoint(NaN, NaN);
+    }
+    return GeoPoint._undefined;
+  }
+
   static of(lng: number, lat: number): GeoPoint {
     return new GeoPoint(lng, lat);
   }
