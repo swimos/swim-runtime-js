@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowUmdGlobalAccess": true,
     "alwaysStrict": true,
     "composite": true,
     "declaration": true,
