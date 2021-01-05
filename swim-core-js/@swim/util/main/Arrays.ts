@@ -20,6 +20,19 @@ import {Values} from "./Values";
  */
 export const Arrays = {} as {
   /**
+   * Returns a copy of an array with the given element inserted, if the element
+   * is not already present in the arrary; otherwise returns the input array if
+   * it already containts the specified element.
+   */
+  inserted<T>(newElement: T, oldArray: ReadonlyArray<T> | null | undefined): ReadonlyArray<T>;
+
+  /**
+   * Returns a copy of an array with the given element removed; returns the
+   * input array if it does not contain the specified element.
+   */
+  removed<T, E = undefined>(oldElement: T, oldArray: ReadonlyArray<T> | null | undefined, empty?: E): ReadonlyArray<T> | E;
+
+  /**
    * Returns `true` if `x` and `y` are structurally equal arrays; otherwise
    * returns `x === y` if either `x` or `y` is not an array.
    */
@@ -47,6 +60,45 @@ export const Arrays = {} as {
    * otherwise returns `0` or `1` if `x` is `undefined` or `null`, respectively.
    */
   hash(x: ArrayLike<unknown> | null | undefined): number;
+};
+
+Arrays.inserted = function <T>(newElement: T, oldArray: ReadonlyArray<T> | null | undefined): ReadonlyArray<T> {
+  const n = oldArray !== null && oldArray !== void 0 ? oldArray.length : 0;
+  const newArray = new Array<T>(n + 1);
+  for (let i = 0; i < n; i += 1) {
+    const element = oldArray![i];
+    if (element !== newElement) {
+      newArray[i] = element;
+    } else {
+      return oldArray!;
+    }
+  }
+  newArray[n] = newElement;
+  return newArray
+};
+
+Arrays.removed = function <T, E = undefined>(oldElement: T, oldArray: ReadonlyArray<T> | null | undefined, empty?: E): ReadonlyArray<T> | E {
+  const n = oldArray !== null && oldArray !== void 0 ? oldArray.length : 0;
+  if (n !== 0) {
+    const newArray = new Array<T>(n - 1);
+    let i = 0;
+    while (i < n) {
+      const element = oldArray![i];
+      if (element !== oldElement) {
+        newArray[i] = element;
+        i += 1;
+      } else {
+        i += 1;
+        while (i < n) {
+          newArray[i - 1] = oldArray![i];
+          i += 1
+        }
+        return n !== 1 ? newArray : empty!;
+      }
+    }
+    return oldArray!;
+  }
+  return empty!;
 };
 
 Arrays.equal = function (x: ArrayLike<unknown> | null | undefined, y: ArrayLike<unknown> | null | undefined): boolean {
