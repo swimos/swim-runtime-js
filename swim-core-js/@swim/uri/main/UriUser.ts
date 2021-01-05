@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3} from "@swim/util";
+import {HashCode, Strings} from "@swim/util";
 import {Output, Format, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 
@@ -92,11 +92,7 @@ export class UriUser implements HashCode, Debug, Display {
   }
 
   hashCode(): number {
-    if (UriUser._hashSeed === void 0) {
-      UriUser._hashSeed = Murmur3.seed(UriUser);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(UriUser._hashSeed,
-        Murmur3.hash(this._username)), Murmur3.hash(this._password)));
+    return Strings.hash(this.toString());
   }
 
   debug(output: Output): void {
@@ -121,8 +117,6 @@ export class UriUser implements HashCode, Debug, Display {
   toString(): string {
     return Format.display(this);
   }
-
-  private static _hashSeed?: number;
 
   private static _undefined?: UriUser;
 

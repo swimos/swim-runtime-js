@@ -30,15 +30,15 @@ export class UnlinkRequest extends LaneAddressed {
     return "unlink";
   }
 
-  static fromValue(value: Value): UnlinkRequest | undefined {
-    return LaneAddressed.fromValue(value, UnlinkRequest) as UnlinkRequest | undefined;
-  }
-
   static of(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): UnlinkRequest {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new UnlinkRequest(node, lane, body);
+  }
+
+  static fromValue(value: Value): UnlinkRequest | undefined {
+    return LaneAddressed.fromValue(value, UnlinkRequest) as UnlinkRequest | undefined;
   }
 }
 Envelope.UnlinkRequest = UnlinkRequest;

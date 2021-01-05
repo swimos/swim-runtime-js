@@ -17,6 +17,7 @@ import {AnyTransform} from "./Transform";
 import {AffineTransform} from "./AffineTransform";
 import {TransformInterpolator} from "./TransformInterpolator";
 
+/** @hidden */
 export class AffineTransformInterpolator extends TransformInterpolator<AffineTransform> {
   /** @hidden */
   readonly f0: AffineTransform;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Murmur3, HashGenCacheSet} from "@swim/util";
+import {Comparable, HashCode, Strings, HashGenCacheSet} from "@swim/util";
 import {Output, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 import {UriQueryBuilder} from "./UriQueryBuilder";
@@ -164,7 +164,7 @@ export abstract class UriQuery implements Comparable<UriQuery>, HashCode, Debug,
 
   hashCode(): number {
     if (this._hashCode === void 0) {
-      this._hashCode = Murmur3.hash(this.toString());
+      this._hashCode = Strings.hash(this.toString());
     }
     return this._hashCode;
   }

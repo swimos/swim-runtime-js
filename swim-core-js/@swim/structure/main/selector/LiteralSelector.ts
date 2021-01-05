@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Selector} from "../Selector";
@@ -103,7 +103,7 @@ export class LiteralSelector extends Selector {
     return 11;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof LiteralSelector) {
       let order = this._item.compareTo(that._item);
       if (order === 0) {
@@ -111,7 +111,7 @@ export class LiteralSelector extends Selector {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -134,10 +134,7 @@ export class LiteralSelector extends Selector {
   }
 
   hashCode(): number {
-    if (LiteralSelector._hashSeed === void 0) {
-      LiteralSelector._hashSeed = Murmur3.seed(LiteralSelector);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(LiteralSelector._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(LiteralSelector),
         this._item.hashCode()), this._then.hashCode()));
   }
 
@@ -154,7 +151,5 @@ export class LiteralSelector extends Selector {
   clone(): Selector {
     return new LiteralSelector(this._item.clone(), this._then.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.LiteralSelector = LiteralSelector;

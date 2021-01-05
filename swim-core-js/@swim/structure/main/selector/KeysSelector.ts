@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Selector} from "../Selector";
@@ -149,11 +149,11 @@ export class KeysSelector extends Selector {
     return 15;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof KeysSelector) {
       return this._then.compareTo(that._then);
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -175,10 +175,7 @@ export class KeysSelector extends Selector {
   }
 
   hashCode(): number {
-    if (KeysSelector._hashSeed === void 0) {
-      KeysSelector._hashSeed = Murmur3.seed(KeysSelector);
-    }
-    return Murmur3.mash(Murmur3.mix(KeysSelector._hashSeed, this._then.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(KeysSelector), this._then.hashCode()));
   }
 
   debugThen(output: Output): void {
@@ -189,7 +186,5 @@ export class KeysSelector extends Selector {
   clone(): Selector {
     return new KeysSelector(this._then.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.KeysSelector = KeysSelector;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Numbers, Strings} from "@swim/util";
 import {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
@@ -84,7 +84,7 @@ export class Bool extends Value {
     return 7;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof Bool) {
       if (this._value && !that._value) {
         return -1;
@@ -94,7 +94,7 @@ export class Bool extends Value {
         return 0;
       }
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item): boolean {
@@ -112,7 +112,7 @@ export class Bool extends Value {
 
   hashCode(): number {
     if (this._hashCode === void 0) {
-      this._hashCode = Murmur3.hash(this._value ? "true" : "false");
+      this._hashCode = Strings.hash(this._value ? "true" : "false");
     }
     return this._hashCode;
   }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects, Random} from "@swim/util";
+import {Random, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Input, OutputSettings, Output, Writer, Unicode, Base16, Base64} from "@swim/codec";
 import {Item} from "./Item";
 import {Value} from "./Value";
@@ -294,7 +294,7 @@ export class Data extends Value {
     return 4;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof Data) {
       const xs = this._array!;
       const ys = that._array!;
@@ -322,7 +322,7 @@ export class Data extends Value {
         return 0;
       }
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item): boolean {
@@ -350,10 +350,8 @@ export class Data extends Value {
   }
 
   hashCode(): number {
-    if (Data._hashSeed === void 0) {
-      Data._hashSeed = Murmur3.seed(Data);
-    }
-    return Murmur3.mash(Murmur3.mix(Data._hashSeed, this._array || new Uint8Array(0)));
+    return Murmur3.mash(Murmur3.mixUint8Array(Constructors.hash(Data),
+        this._array !== null ? this._array : new Uint8Array(0)));
   }
 
   debug(output: Output): void {
@@ -375,8 +373,6 @@ export class Data extends Value {
   static readonly ALIASED: number = 1 << 0;
   /** @hidden */
   static readonly IMMUTABLE: number = 1 << 1;
-
-  private static _hashSeed?: number;
 
   private static _empty?: Data;
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
@@ -227,9 +227,9 @@ export class CircleR2 extends ShapeR2 implements Equivalent<CircleR2>, HashCode,
   }
 
   equivalentTo(that: CircleR2, epsilon?: number): boolean {
-    return Objects.equivalent(that._cx, this._cx, epsilon)
-        && Objects.equivalent(that._cy, this._cy, epsilon)
-        && Objects.equivalent(that._r, this._r, epsilon);
+    return Numbers.equivalent(that._cx, this._cx, epsilon)
+        && Numbers.equivalent(that._cy, this._cy, epsilon)
+        && Numbers.equivalent(that._r, this._r, epsilon);
   }
 
   equals(that: unknown): boolean {
@@ -242,11 +242,8 @@ export class CircleR2 extends ShapeR2 implements Equivalent<CircleR2>, HashCode,
   }
 
   hashCode(): number {
-    if (CircleR2._hashSeed === void 0) {
-      CircleR2._hashSeed = Murmur3.seed(CircleR2);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(CircleR2._hashSeed,
-        Murmur3.hash(this._cx)), Murmur3.hash(this._cy)), Murmur3.hash(this._r)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(CircleR2),
+        Numbers.hash(this._cx)), Numbers.hash(this._cy)), Numbers.hash(this._r)));
   }
 
   debug(output: Output): void {
@@ -257,8 +254,6 @@ export class CircleR2 extends ShapeR2 implements Equivalent<CircleR2>, HashCode,
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   static of(cx: number, cy: number, r: number): CircleR2 {
     return new CircleR2(cx, cy, r);

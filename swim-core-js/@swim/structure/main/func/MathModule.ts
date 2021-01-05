@@ -20,113 +20,195 @@ import {Interpreter} from "../Interpreter";
 import {InvokeOperator} from "../operator/InvokeOperator";
 import {BridgeFunc} from "./BridgeFunc";
 
-export class MathModule {
-  private constructor() {
-    // stub
-  }
+export const MathModule = {} as {
+  readonly max: Func;
 
-  private static _max?: Func;
-  private static _min?: Func;
-  private static _abs?: Func;
-  private static _ceil?: Func;
-  private static _floor?: Func;
-  private static _round?: Func;
-  private static _sqrt?: Func;
-  private static _pow?: Func;
-  private static _rate?: Func;
-  private static _random?: Func;
+  readonly min: Func;
 
-  private static _scope?: Record;
+  readonly abs: Func;
 
-  static max(): Func {
-    if (MathModule._max === void 0) {
-      MathModule._max = new MaxFunc();
-    }
-    return MathModule._max;
-  }
+  readonly ceil: Func;
 
-  static min(): Func {
-    if (MathModule._min === void 0) {
-      MathModule._min = new MinFunc();
-    }
-    return MathModule._min;
-  }
+  readonly floor: Func;
 
-  static abs(): Func {
-    if (MathModule._abs === void 0) {
-      MathModule._abs = new AbsFunc();
-    }
-    return MathModule._abs;
-  }
+  readonly round: Func;
 
-  static ceil(): Func {
-    if (MathModule._ceil === void 0) {
-      MathModule._ceil = new CeilFunc();
-    }
-    return MathModule._ceil;
-  }
+  readonly sqrt: Func;
 
-  static floor(): Func {
-    if (MathModule._floor === void 0) {
-      MathModule._floor = new FloorFunc();
-    }
-    return MathModule._floor;
-  }
+  readonly pow: Func;
 
-  static round(): Func {
-    if (MathModule._round === void 0) {
-      MathModule._round = new RoundFunc();
-    }
-    return MathModule._round;
-  }
+  readonly rate: Func;
 
-  static sqrt(): Func {
-    if (MathModule._sqrt === void 0) {
-      MathModule._sqrt = new SqrtFunc();
-    }
-    return MathModule._sqrt;
-  }
+  readonly random: Func;
 
-  static pow(): Func {
-    if (MathModule._pow === void 0) {
-      MathModule._pow = new PowFunc();
-    }
-    return MathModule._pow;
-  }
-
-  static rate(): Func {
-    if (MathModule._rate === void 0) {
-      MathModule._rate = new RateFunc();
-    }
-    return MathModule._rate;
-  }
-
-  static random(): Func {
-    if (MathModule._random === void 0) {
-      MathModule._random = new RandomFunc();
-    }
-    return MathModule._random;
-  }
-
-  static scope(): Record {
-    if (MathModule._scope === void 0) {
-      MathModule._scope = Item.Record.create(10)
-          .slot("max", MathModule.max())
-          .slot("min", MathModule.min())
-          .slot("abs", MathModule.abs())
-          .slot("ceil", MathModule.ceil())
-          .slot("floor", MathModule.floor())
-          .slot("round", MathModule.round())
-          .slot("pow", MathModule.pow())
-          .slot("sqrt", MathModule.sqrt())
-          .slot("rate", MathModule.rate())
-          .slot("random", MathModule.random())
-          .commit();
-    }
-    return MathModule._scope;
-  }
-}
+  readonly scope: Record;
+};
 Item.MathModule = MathModule;
+
+Object.defineProperty(MathModule, "max", {
+  get(): Func {
+    const func = new MaxFunc();
+    Object.defineProperty(MathModule, "max", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "min", {
+  get(): Func {
+    const func = new MinFunc();
+    Object.defineProperty(MathModule, "min", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "abs", {
+  get(): Func {
+    const func = new AbsFunc();
+    Object.defineProperty(MathModule, "abs", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "ceil", {
+  get(): Func {
+    const func = new CeilFunc();
+    Object.defineProperty(MathModule, "ceil", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "floor", {
+  get(): Func {
+    const func = new FloorFunc();
+    Object.defineProperty(MathModule, "floor", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "round", {
+  get(): Func {
+    const func = new RoundFunc();
+    Object.defineProperty(MathModule, "round", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "sqrt", {
+  get(): Func {
+    const func = new SqrtFunc();
+    Object.defineProperty(MathModule, "sqrt", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "pow", {
+  get(): Func {
+    const func = new PowFunc();
+    Object.defineProperty(MathModule, "pow", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "rate", {
+  get(): Func {
+    const func = new RateFunc();
+    Object.defineProperty(MathModule, "rate", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "random", {
+  get(): Func {
+    const func = new RandomFunc();
+    Object.defineProperty(MathModule, "random", {
+      value: func,
+      configurable: true,
+      enumerable: true,
+    });
+    return func;
+  },
+  configurable: true,
+  enumerable: true,
+});
+
+Object.defineProperty(MathModule, "scope", {
+  get(): Record {
+    const scope = Item.Record.create(10)
+        .slot("max", MathModule.max)
+        .slot("min", MathModule.min)
+        .slot("abs", MathModule.abs)
+        .slot("ceil", MathModule.ceil)
+        .slot("floor", MathModule.floor)
+        .slot("round", MathModule.round)
+        .slot("pow", MathModule.pow)
+        .slot("sqrt", MathModule.sqrt)
+        .slot("rate", MathModule.rate)
+        .slot("random", MathModule.random)
+        .commit();
+    Object.defineProperty(MathModule, "scope", {
+      value: scope,
+      configurable: true,
+      enumerable: true,
+    });
+    return scope;
+  },
+  configurable: true,
+  enumerable: true,
+});
 
 /** @hidden */
 class MaxFunc extends BridgeFunc {

@@ -17,10 +17,7 @@ import {Output} from "./Output";
 /**
  * Stylized text output utility functions.
  */
-export class OutputStyle {
-  private constructor() {
-  }
-
+export const OutputStyle = {} as {
   /**
    * Writes the ASCII reset escape code to `output`,
    * if [[OutputSettings.isStyled output.settings().isStyled()]] is `true`.
@@ -28,11 +25,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static reset(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(109/*'m'*/);
-    }
-  }
+  reset(output: Output): void
 
   /**
    * Writes the ASCII bold (increased intensity) escape code to `output`,
@@ -41,11 +34,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static bold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(109/*'m'*/);
-    }
-  }
+  bold(output: Output): void;
 
   /**
    * Writes the ASCII faint (decreased intensity) escape code to `output`,
@@ -54,11 +43,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static faint(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(50/*'2'*/).write(109/*'m'*/);
-    }
-  }
+  faint(output: Output): void;
 
   /**
    * Writes the ASCII black foreground color escape code to `output`,
@@ -67,12 +52,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static black(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(48/*'0'*/).write(109/*'m'*/);
-    }
-  }
+  black(output: Output): void;
 
   /**
    * Writes the ASCII red foreground color escape code to `output`,
@@ -81,12 +61,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static red(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(49/*'1'*/).write(109/*'m'*/);
-    }
-  }
+  red(output: Output): void;
 
   /**
    * Writes the ASCII green foreground color escape code to `output`,
@@ -95,12 +70,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static green(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(50/*'2'*/).write(109/*'m'*/);
-    }
-  }
+  green(output: Output): void;
 
   /**
    * Writes the ASCII yellow foreground color escape code to `output`,
@@ -109,12 +79,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static yellow(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(51/*'3'*/).write(109/*'m'*/);
-    }
-  }
+  yellow(output: Output): void;
 
   /**
    * Writes the ASCII blue foreground color escape code to `output`,
@@ -123,12 +88,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static blue(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(52/*'4'*/).write(109/*'m'*/);
-    }
-  }
+  blue(output: Output): void;
 
   /**
    * Writes the ASCII magenta foreground color escape code to `output`,
@@ -137,12 +97,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static magenta(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(53/*'5'*/).write(109/*'m'*/);
-    }
-  }
+  magenta(output: Output): void;
 
   /**
    * Writes the ASCII cyan foreground color escape code to `output`,
@@ -151,12 +106,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static cyan(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(54/*'6'*/).write(109/*'m'*/);
-    }
-  }
+  cyan(output: Output): void;
 
   /**
    * Writes the ASCII gray foreground color escape code to `output`,
@@ -165,12 +115,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static gray(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(55/*'7'*/).write(109/*'m'*/);
-    }
-  }
+  gray(output: Output): void;
 
   /**
    * Writes the ASCII bold black foreground color escape code to `output`,
@@ -179,12 +124,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static blackBold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(48/*'0'*/).write(109/*'m'*/);
-    }
-  }
+  blackBold(output: Output): void;
 
   /**
    * Writes the ASCII bold red foreground color escape code to `output`,
@@ -193,12 +133,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static redBold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(49/*'1'*/).write(109/*'m'*/);
-    }
-  }
+  redBold(output: Output): void;
 
   /**
    * Writes the ASCII bold green foreground color escape code to `output`,
@@ -207,12 +142,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static greenBold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(50/*'2'*/).write(109/*'m'*/);
-    }
-  }
+  greenBold(output: Output): void;
 
   /**
    * Writes the ASCII bold yellow foreground color escape code to `output`,
@@ -221,12 +151,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static yellowBold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(51/*'3'*/).write(109/*'m'*/);
-    }
-  }
+  yellowBold(output: Output): void;
 
   /**
    * Writes the ASCII bold blue foreground color escape code to `output`,
@@ -235,12 +160,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static blueBold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(52/*'4'*/).write(109/*'m'*/);
-    }
-  }
+  blueBold(output: Output): void;
 
   /**
    * Writes the ASCII bold magenta foreground color escape code to `output`,
@@ -249,12 +169,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static magentaBold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(53/*'5'*/).write(109/*'m'*/);
-    }
-  }
+  magentaBold(output: Output): void;
 
   /**
    * Writes the ASCII bold cyan foreground color escape code to `output`,
@@ -263,12 +178,7 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static cyanBold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(54/*'6'*/).write(109/*'m'*/);
-    }
-  }
+  cyanBold(output: Output): void;
 
   /**
    * Writes the ASCII bold gray foreground color escape code to `output`,
@@ -277,10 +187,135 @@ export class OutputStyle {
    * @throws [[OutputException]] if `output` exits the _cont_ state before the
    *         full escape code has been written.
    */
-  static grayBold(output: Output) {
-    if (output.settings().isStyled()) {
-      output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
-          .write(51/*'3'*/).write(55/*'7'*/).write(109/*'m'*/);
-    }
+  grayBold(output: Output): void;
+};
+
+OutputStyle.reset = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(109/*'m'*/);
   }
-}
+};
+
+OutputStyle.bold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.faint = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(50/*'2'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.black = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(48/*'0'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.red = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(49/*'1'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.green = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(50/*'2'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.yellow = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(51/*'3'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.blue = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(52/*'4'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.magenta = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(53/*'5'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.cyan = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(54/*'6'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.gray = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(48/*'0'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(55/*'7'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.blackBold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(48/*'0'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.redBold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(49/*'1'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.greenBold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(50/*'2'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.yellowBold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(51/*'3'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.blueBold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(52/*'4'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.magentaBold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(53/*'5'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.cyanBold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(54/*'6'*/).write(109/*'m'*/);
+  }
+};
+
+OutputStyle.grayBold = function (output: Output): void {
+  if (output.settings().isStyled()) {
+    output = output.write(27).write(91/*'['*/).write(49/*'1'*/).write(59/*';'*/)
+        .write(51/*'3'*/).write(55/*'7'*/).write(109/*'m'*/);
+  }
+};

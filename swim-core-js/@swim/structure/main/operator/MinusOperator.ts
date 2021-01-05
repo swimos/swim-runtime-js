@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {BinaryOperator} from "./BinaryOperator";
@@ -52,7 +52,7 @@ export class MinusOperator extends BinaryOperator {
     return 33;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof MinusOperator) {
       let order = this._operand1.compareTo(that._operand1);
       if (order === 0) {
@@ -60,7 +60,7 @@ export class MinusOperator extends BinaryOperator {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -83,10 +83,7 @@ export class MinusOperator extends BinaryOperator {
   }
 
   hashCode(): number {
-    if (MinusOperator._hashSeed === void 0) {
-      MinusOperator._hashSeed = Murmur3.seed(MinusOperator);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(MinusOperator._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(MinusOperator),
         this._operand1.hashCode()), this._operand2.hashCode()));
   }
 
@@ -98,7 +95,5 @@ export class MinusOperator extends BinaryOperator {
   clone(): MinusOperator {
     return new MinusOperator(this._operand1.clone(), this._operand2.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.MinusOperator = MinusOperator;

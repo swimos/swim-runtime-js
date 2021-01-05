@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item, Attr, AnyValue, Value, Record} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
@@ -97,8 +97,7 @@ export abstract class LinkAddressed extends Envelope {
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
-    } else if (that instanceof LinkAddressed
-        && (this as any).__proto__.constructor === (that as any).__proto__.constructor) {
+    } else if (that instanceof LinkAddressed && this.constructor === that.constructor) {
       return this._node.equals(that._node) && this._lane.equals(that._lane)
           && this._prio === that._prio && this._rate === that._rate
           && this._body.equals(that._body);
@@ -108,12 +107,12 @@ export abstract class LinkAddressed extends Envelope {
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
-        Murmur3.seed((this as any).__proto__), this._node.hashCode()), this._lane.hashCode()),
-        Murmur3.hash(this._prio)), Murmur3.hash(this._rate)), this._body.hashCode()));
+        Constructors.hash(this.constructor), this._node.hashCode()), this._lane.hashCode()),
+        Numbers.hash(this._prio)), Numbers.hash(this._rate)), this._body.hashCode()));
   }
 
   debug(output: Output): void {
-    output = output.write((this as any).__proto__.constructor.name).write(46/*'.'*/).write("of").write(40/*'('*/)
+    output = output.write(this.constructor.name).write(46/*'.'*/).write("of").write(40/*'('*/)
         .debug(this._node.toString()).write(", ").debug(this._lane.toString());
     if (this._prio !== 0 || this._rate !== 0) {
       output = output.write(", ").debug(this._prio).write(", ").debug(this._rate);

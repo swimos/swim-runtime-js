@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import {Item, Attr, Slot, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
@@ -106,10 +106,7 @@ export class SkewTransform extends Transform {
   }
 
   hashCode(): number {
-    if (SkewTransform._hashSeed === void 0) {
-      SkewTransform._hashSeed = Murmur3.seed(SkewTransform);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(SkewTransform._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(SkewTransform),
         this._x.hashCode()), this._y.hashCode()));
   }
 
@@ -148,8 +145,6 @@ export class SkewTransform extends Transform {
       return "skew(" + this._x.degValue() + "," + this._y.degValue() + ")";
     }
   }
-
-  private static _hashSeed?: number;
 
   static from(x: AnyAngle, y: AnyAngle): SkewTransform {
     x = Angle.fromAny(x, "deg");

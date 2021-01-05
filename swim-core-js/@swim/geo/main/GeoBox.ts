@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {BoxR2} from "@swim/math";
 import {GeoProjection} from "./GeoProjection";
@@ -241,10 +241,10 @@ export class GeoBox extends GeoShape implements Equivalent<GeoBox>, HashCode, De
   }
 
   equivalentTo(that: GeoBox, epsilon?: number): boolean {
-    return Objects.equivalent(that._lngMin, this._lngMin, epsilon)
-        && Objects.equivalent(that._latMin, this._latMin, epsilon)
-        && Objects.equivalent(that._lngMax, this._lngMax, epsilon)
-        && Objects.equivalent(that._latMax, this._latMax, epsilon);
+    return Numbers.equivalent(that._lngMin, this._lngMin, epsilon)
+        && Numbers.equivalent(that._latMin, this._latMin, epsilon)
+        && Numbers.equivalent(that._lngMax, this._lngMax, epsilon)
+        && Numbers.equivalent(that._latMax, this._latMax, epsilon);
   }
 
   equals(that: unknown): boolean {
@@ -258,12 +258,9 @@ export class GeoBox extends GeoShape implements Equivalent<GeoBox>, HashCode, De
   }
 
   hashCode(): number {
-    if (GeoBox._hashSeed === void 0) {
-      GeoBox._hashSeed = Murmur3.seed(GeoBox);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(GeoBox._hashSeed,
-        Murmur3.hash(this._lngMin)), Murmur3.hash(this._latMin)),
-        Murmur3.hash(this._lngMax)), Murmur3.hash(this._latMax)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
+        Constructors.hash(GeoBox), Numbers.hash(this._lngMin)), Numbers.hash(this._latMin)),
+        Numbers.hash(this._lngMax)), Numbers.hash(this._latMax)));
   }
 
   debug(output: Output): void {
@@ -275,8 +272,6 @@ export class GeoBox extends GeoShape implements Equivalent<GeoBox>, HashCode, De
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   private static _undefined?: GeoBox;
   static undefined(): GeoBox {

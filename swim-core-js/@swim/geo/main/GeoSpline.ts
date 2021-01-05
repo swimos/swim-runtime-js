@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "@swim/util";
+import {Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {CurveR2, SegmentR2, SplineR2} from "@swim/math";
 import {GeoProjection} from "./GeoProjection";
@@ -263,7 +263,7 @@ export class GeoSpline extends GeoCurve implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof GeoSpline) {
-      return Objects.equivalent(this._curves, that._curves, epsilon)
+      return Arrays.equivalent(this._curves, that._curves, epsilon)
           && this._closed === that._closed;
     }
     return false;
@@ -273,7 +273,7 @@ export class GeoSpline extends GeoCurve implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof GeoSpline) {
-      return Objects.equal(this._curves, that._curves)
+      return Arrays.equal(this._curves, that._curves)
           && this._closed === that._closed;
     }
     return false;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects, Severity} from "@swim/util";
+import {Values, Severity} from "@swim/util";
 import {Tag} from "./Tag";
 import {Mark} from "./Mark";
 import {Input} from "./Input";
@@ -338,7 +338,7 @@ export class Diagnostic implements Display {
                                 lineDigits: number, output: Output): Diagnostic | null {
     let next = cause;
     const sameCause = cause !== null && cause._message === null
-                   && Objects.equal(input.id(), cause._input.id());
+                   && Values.equal(input.id(), cause._input.id());
     const causeOrder = sameCause ? (start._offset <= cause!._tag.start()._offset ? -1 : 1) : 0;
     if (causeOrder === 1) {
       next = Diagnostic.displayCause(cause!, contextLines, lineDigits, output);

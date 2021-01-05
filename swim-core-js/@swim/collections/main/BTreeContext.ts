@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "@swim/util";
+import {Values} from "@swim/util";
 import {BTreePage} from "./BTreePage";
 
 /** @hidden */
 export abstract class BTreeContext<K, V> {
-  pageSplitSize: number;
+  declare pageSplitSize: number;
 
   compare(x: K, y: K): number {
-    return Objects.compare(x, y);
+    return Values.compare(x, y);
   }
 
   pageShouldSplit(page: BTreePage<K, V, unknown>): boolean {

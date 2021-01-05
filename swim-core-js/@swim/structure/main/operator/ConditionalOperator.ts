@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Operator} from "../Operator";
@@ -82,7 +82,7 @@ export class ConditionalOperator extends Operator {
     return 20;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof ConditionalOperator) {
       let order = this._ifTerm.compareTo(that._ifTerm);
       if (order === 0) {
@@ -93,7 +93,7 @@ export class ConditionalOperator extends Operator {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -118,10 +118,7 @@ export class ConditionalOperator extends Operator {
   }
 
   hashCode(): number {
-    if (ConditionalOperator._hashSeed === void 0) {
-      ConditionalOperator._hashSeed = Murmur3.seed(ConditionalOperator);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(ConditionalOperator._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(ConditionalOperator),
         this._ifTerm.hashCode()), this._thenTerm.hashCode()), this._elseTerm.hashCode()));
   }
 
@@ -134,7 +131,5 @@ export class ConditionalOperator extends Operator {
   clone(): ConditionalOperator {
     return new ConditionalOperator(this._ifTerm.clone(), this._thenTerm.clone(), this._elseTerm.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.ConditionalOperator = ConditionalOperator;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {BinaryOperator} from "./BinaryOperator";
@@ -62,7 +62,7 @@ export class BitwiseXorOperator extends BinaryOperator {
     return false;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof BitwiseXorOperator) {
       let order = this._operand1.compareTo(that._operand1);
       if (order === 0) {
@@ -70,7 +70,7 @@ export class BitwiseXorOperator extends BinaryOperator {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equals(that: unknown): boolean {
@@ -83,10 +83,7 @@ export class BitwiseXorOperator extends BinaryOperator {
   }
 
   hashCode(): number {
-    if (BitwiseXorOperator._hashSeed === void 0) {
-      BitwiseXorOperator._hashSeed = Murmur3.seed(BitwiseXorOperator);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(BitwiseXorOperator._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(BitwiseXorOperator),
         this._operand1.hashCode()), this._operand2.hashCode()));
   }
 
@@ -98,7 +95,5 @@ export class BitwiseXorOperator extends BinaryOperator {
   clone(): BitwiseXorOperator {
     return new BitwiseXorOperator(this._operand1.clone(), this._operand2.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.BitwiseXorOperator = BitwiseXorOperator;

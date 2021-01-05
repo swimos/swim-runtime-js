@@ -18,6 +18,7 @@ import {AnyTransform, Transform} from "./Transform";
 import {SkewTransform} from "./SkewTransform";
 import {TransformInterpolator} from "./TransformInterpolator";
 
+/** @hidden */
 export class SkewTransformInterpolator extends TransformInterpolator<SkewTransform> {
   /** @hidden */
   readonly x0: number;

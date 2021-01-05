@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Attr, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
@@ -72,10 +72,7 @@ export class IdentityTransform extends Transform {
   }
 
   hashCode(): number {
-    if (IdentityTransform._hashSeed === void 0) {
-      IdentityTransform._hashSeed = Murmur3.seed(IdentityTransform);
-    }
-    return IdentityTransform._hashSeed;
+    return Constructors.hash(IdentityTransform);
   }
 
   debug(output: Output): void {
@@ -86,8 +83,6 @@ export class IdentityTransform extends Transform {
   toString(): string {
     return "none";
   }
-
-  private static _hashSeed?: number;
 
   static fromValue(value: Value): IdentityTransform | undefined {
     if (value.tag() === "identity") {

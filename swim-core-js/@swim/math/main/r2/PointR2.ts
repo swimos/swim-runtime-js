@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {R2Function} from "./R2Function";
 import {AnyVectorR2, VectorR2} from "./VectorR2";
@@ -117,8 +117,8 @@ export class PointR2 extends ShapeR2 implements Equivalent<PointR2>, HashCode, D
   }
 
   equivalentTo(that: PointR2, epsilon?: number): boolean {
-    return Objects.equivalent(that._x, this._x, epsilon)
-        && Objects.equivalent(that._y, this._y, epsilon)
+    return Numbers.equivalent(that._x, this._x, epsilon)
+        && Numbers.equivalent(that._y, this._y, epsilon)
   }
 
   equals(that: unknown): boolean {
@@ -131,11 +131,8 @@ export class PointR2 extends ShapeR2 implements Equivalent<PointR2>, HashCode, D
   }
 
   hashCode(): number {
-    if (PointR2._hashSeed === void 0) {
-      PointR2._hashSeed = Murmur3.seed(PointR2);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(PointR2._hashSeed,
-        Murmur3.hash(this._x)), Murmur3.hash(this._y)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(PointR2),
+        Numbers.hash(this._x)), Numbers.hash(this._y)));
   }
 
   debug(output: Output): void {
@@ -146,8 +143,6 @@ export class PointR2 extends ShapeR2 implements Equivalent<PointR2>, HashCode, D
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   private static _origin?: PointR2;
   static origin(): PointR2 {

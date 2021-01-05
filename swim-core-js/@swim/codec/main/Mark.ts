@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Numbers, Strings, Constructors} from "@swim/util";
 import {Tag} from "./Tag";
 import {Output} from "./Output";
 
@@ -145,11 +145,9 @@ export class Mark extends Tag {
   }
 
   hashCode(): number {
-    if (Mark._hashSeed === void 0) {
-      Mark._hashSeed = Murmur3.seed(Mark);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(Mark._hashSeed,
-        this._offset), this._line), this._column), Murmur3.hash(this._note)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(Mark),
+        Numbers.hash(this._offset)), Numbers.hash(this._line)), Numbers.hash(this._column)),
+        Strings.hash(this._note)));
   }
 
   display(output: Output): void {
@@ -179,7 +177,6 @@ export class Mark extends Tag {
     return Tag.Format.display(this);
   }
 
-  private static _hashSeed?: number;
   private static _zero?: Mark;
 
   /**

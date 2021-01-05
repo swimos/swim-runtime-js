@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "@swim/util";
+import {Numbers} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {R2Function} from "./R2Function";
 import {AnyShapeR2} from "./ShapeR2";
@@ -263,13 +263,13 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof EllipticCurveR2) {
-      return Objects.equivalent(this._cx, that._cx, epsilon)
-          && Objects.equivalent(this._cy, that._cy, epsilon)
-          && Objects.equivalent(this._rx, that._rx, epsilon)
-          && Objects.equivalent(this._ry, that._ry, epsilon)
-          && Objects.equivalent(this._phi, that._phi, epsilon)
-          && Objects.equivalent(this._a0, that._a0, epsilon)
-          && Objects.equivalent(this._da, that._da, epsilon);
+      return Numbers.equivalent(this._cx, that._cx, epsilon)
+          && Numbers.equivalent(this._cy, that._cy, epsilon)
+          && Numbers.equivalent(this._rx, that._rx, epsilon)
+          && Numbers.equivalent(this._ry, that._ry, epsilon)
+          && Numbers.equivalent(this._phi, that._phi, epsilon)
+          && Numbers.equivalent(this._a0, that._a0, epsilon)
+          && Numbers.equivalent(this._da, that._da, epsilon);
     }
     return false;
   }

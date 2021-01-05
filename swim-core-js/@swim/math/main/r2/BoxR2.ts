@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
@@ -251,10 +251,10 @@ export class BoxR2 extends ShapeR2 implements Equivalent<BoxR2>, HashCode, Debug
   }
 
   equivalentTo(that: BoxR2, epsilon?: number): boolean {
-    return Objects.equivalent(that._xMin, this._xMin, epsilon)
-        && Objects.equivalent(that._yMin, this._yMin, epsilon)
-        && Objects.equivalent(that._xMax, this._xMax, epsilon)
-        && Objects.equivalent(that._yMax, this._yMax, epsilon);
+    return Numbers.equivalent(that._xMin, this._xMin, epsilon)
+        && Numbers.equivalent(that._yMin, this._yMin, epsilon)
+        && Numbers.equivalent(that._xMax, this._xMax, epsilon)
+        && Numbers.equivalent(that._yMax, this._yMax, epsilon);
   }
 
   equals(that: unknown): boolean {
@@ -268,12 +268,9 @@ export class BoxR2 extends ShapeR2 implements Equivalent<BoxR2>, HashCode, Debug
   }
 
   hashCode(): number {
-    if (BoxR2._hashSeed === void 0) {
-      BoxR2._hashSeed = Murmur3.seed(BoxR2);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(BoxR2._hashSeed,
-        Murmur3.hash(this._xMin)), Murmur3.hash(this._yMin)),
-        Murmur3.hash(this._xMax)), Murmur3.hash(this._yMax)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
+        Constructors.hash(BoxR2), Numbers.hash(this._xMin)), Numbers.hash(this._yMin)),
+        Numbers.hash(this._xMax)), Numbers.hash(this._yMax)));
   }
 
   debug(output: Output): void {
@@ -285,8 +282,6 @@ export class BoxR2 extends ShapeR2 implements Equivalent<BoxR2>, HashCode, Debug
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   private static _undefined?: BoxR2;
   static undefined(): BoxR2 {

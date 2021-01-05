@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Selector} from "../Selector";
@@ -128,11 +128,11 @@ export class DescendantsSelector extends Selector {
     return 18;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof DescendantsSelector) {
       return this._then.compareTo(that._then);
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -154,10 +154,7 @@ export class DescendantsSelector extends Selector {
   }
 
   hashCode(): number {
-    if (DescendantsSelector._hashSeed === void 0) {
-      DescendantsSelector._hashSeed = Murmur3.seed(DescendantsSelector);
-    }
-    return Murmur3.mash(Murmur3.mix(DescendantsSelector._hashSeed, this._then.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(DescendantsSelector), this._then.hashCode()));
   }
 
   debugThen(output: Output): void {
@@ -168,7 +165,5 @@ export class DescendantsSelector extends Selector {
   clone(): Selector {
     return new DescendantsSelector(this._then.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.DescendantsSelector = DescendantsSelector;

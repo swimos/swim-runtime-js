@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {AnyItem, Item} from "../Item";
 import {AnyValue, Value} from "../Value";
@@ -106,8 +106,8 @@ export class IdentitySelector extends Selector {
     return 10;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+  compareTo(that: Item): number {
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item): boolean {
@@ -119,10 +119,7 @@ export class IdentitySelector extends Selector {
   }
 
   hashCode(): number {
-    if (IdentitySelector._hashSeed === void 0) {
-      IdentitySelector._hashSeed = Murmur3.seed(IdentitySelector);
-    }
-    return IdentitySelector._hashSeed;
+    return Constructors.hash(IdentitySelector);
   }
 
   debugThen(output: Output): void {
@@ -132,8 +129,6 @@ export class IdentitySelector extends Selector {
   clone(): Selector {
     return this;
   }
-
-  private static _hashSeed?: number;
 }
 Item.IdentitySelector = IdentitySelector;
 Selector._identity = new IdentitySelector();

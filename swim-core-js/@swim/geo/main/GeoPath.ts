@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals, Objects} from "@swim/util";
+import {Equivalent, Equals, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {SplineR2, PathR2} from "@swim/math";
 import {GeoProjection} from "./GeoProjection";
@@ -221,14 +221,14 @@ export class GeoPath extends GeoShape implements Equivalent<GeoPath>, Equals, De
   }
 
   equivalentTo(that: GeoPath, epsilon?: number): boolean {
-    return this === that || Objects.equivalent(this._splines, that._splines, epsilon);
+    return this === that || Arrays.equivalent(this._splines, that._splines, epsilon);
   }
 
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoPath) {
-      return Objects.equal(this._splines, that._splines);
+      return Arrays.equal(this._splines, that._splines);
     }
     return false;
   }

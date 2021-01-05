@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "./Item";
 import {Value} from "./Value";
@@ -92,8 +92,8 @@ export class Extant extends Value {
     return 98;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+  compareTo(that: Item): number {
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item): boolean {
@@ -105,10 +105,7 @@ export class Extant extends Value {
   }
 
   hashCode(): number {
-    if (Extant._hashSeed === void 0) {
-      Extant._hashSeed = Murmur3.seed(Extant);
-    }
-    return Extant._hashSeed;
+    return Constructors.hash(Extant);
   }
 
   debug(output: Output): void {
@@ -120,8 +117,6 @@ export class Extant extends Value {
   }
 
   private static readonly _extant: Extant = new Extant();
-
-  private static _hashSeed?: number;
 
   static extant(): Extant {
     return Extant._extant;

@@ -25,13 +25,6 @@ import {SecondInterval} from "./interval/SecondInterval";
 import {MillisecondInterval} from "./interval/MillisecondInterval";
 import {MillisecondsInterval} from "./interval/MillisecondsInterval";
 
-/** @hidden */
-export const MILLIS_PER_SECOND: number = 1000;
-/** @hidden */
-export const MILLIS_PER_MINUTE: number = 60 * MILLIS_PER_SECOND;
-/** @hidden */
-export const MILLIS_PER_HOUR: number = 60 * MILLIS_PER_MINUTE;
-
 export abstract class TimeInterval {
   abstract offset(d: AnyDateTime, k?: number): DateTime;
 
@@ -212,6 +205,13 @@ export abstract class TimeInterval {
   static milliseconds(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
     return TimeInterval.millisecond().range(d0, d1, step);
   }
+
+  /** @hidden */
+  static readonly MillisPerSecond: number = 1000;
+  /** @hidden */
+  static readonly MillisPerMinute: number = 60 * TimeInterval.MillisPerSecond;
+  /** @hidden */
+  static readonly MillisPerHour: number = 60 * TimeInterval.MillisPerMinute;
 
   // Forward type declarations
   /** @hidden */

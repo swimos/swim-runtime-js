@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "@swim/util";
+import {Values} from "@swim/util";
 import {Interpolator} from "./Interpolator";
 
 export class StepInterpolator<T> extends Interpolator<T> {
@@ -53,7 +53,7 @@ export class StepInterpolator<T> extends Interpolator<T> {
     if (this === that) {
       return true;
     } else if (that instanceof StepInterpolator) {
-      return Objects.equal(this.y0, that.y0) && Objects.equal(this.y1, that.y1);
+      return Values.equal(this.y0, that.y0) && Values.equal(this.y1, that.y1);
     }
     return false;
   }

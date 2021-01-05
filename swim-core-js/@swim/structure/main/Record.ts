@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects, Cursor, Builder} from "@swim/util";
+import {Murmur3, Numbers, Constructors, Cursor, Builder} from "@swim/util";
 import {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {Field} from "./Field";
@@ -721,11 +721,11 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return 3;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof Record) {
       const xs = this.iterator();
       const ys = that.iterator();
-      let order = 0 as 0 | 1 | -1;
+      let order = 0;
       do {
         if (!xs.isEmpty() && !ys.isEmpty()) {
           order = xs.head().compareTo(ys.head());
@@ -745,7 +745,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
         return 0;
       }
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -786,10 +786,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
 
   hashCode(): number {
     if (this._hashCode === void 0) {
-      if (Record._hashSeed === void 0) {
-        Record._hashSeed = Murmur3.seed(Record);
-      }
-      let code = Record._hashSeed;
+      let code = Constructors.hash(Record);
       this.forEach(function (item: Item): void {
         code = Murmur3.mix(code, item.hashCode());
       }, this);
@@ -822,8 +819,6 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   static readonly ALIASED: number = 1;
   /** @hidden */
   static readonly IMMUTABLE: number = 2;
-
-  private static _hashSeed?: number;
 
   static empty(): Record {
     return Record.RecordMap.empty();

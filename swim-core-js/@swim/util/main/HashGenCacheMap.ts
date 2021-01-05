@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "./Objects";
+import {Values} from "./Values";
 
 /**
  * A hashed generational cache map discards the least recently used value
@@ -52,14 +52,14 @@ export class HashGenCacheMap<K, V> {
     if (this._buckets.length === 0) {
       return void 0;
     }
-    const index = Math.abs(Objects.hash(key)) % this._buckets.length;
+    const index = Math.abs(Values.hash(key)) % this._buckets.length;
     const bucket = this._buckets[index];
     if (bucket === void 0) {
       return void 0;
     }
 
     const gen4Key = bucket._gen4Key;
-    if (gen4Key !== void 0 && Objects.equal(key, gen4Key)) {
+    if (gen4Key !== void 0 && Values.equal(key, gen4Key)) {
       const gen4Val = bucket._gen4Val;
       if (gen4Val !== void 0) {
         this._gen4Hits += 1;
@@ -71,7 +71,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     const gen3Key = bucket._gen3Key;
-    if (gen3Key !== void 0 && Objects.equal(key, gen3Key)) {
+    if (gen3Key !== void 0 && Values.equal(key, gen3Key)) {
       const gen3Val = bucket._gen3Val;
       if (gen3Val !== void 0) {
         this._gen3Hits += 1;
@@ -89,7 +89,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     const gen2Key = bucket._gen2Key;
-    if (gen2Key !== void 0 && Objects.equal(key, gen2Key)) {
+    if (gen2Key !== void 0 && Values.equal(key, gen2Key)) {
       const gen2Val = bucket._gen2Val;
       if (gen2Val !== void 0) {
         this._gen2Hits += 1;
@@ -107,7 +107,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     const gen1Key = bucket._gen1Key;
-    if (gen1Key !== void 0 && Objects.equal(key, gen1Key)) {
+    if (gen1Key !== void 0 && Values.equal(key, gen1Key)) {
       const gen1Val = bucket._gen1Val;
       if (gen1Val !== void 0) {
         this._gen1Hits += 1;
@@ -132,11 +132,11 @@ export class HashGenCacheMap<K, V> {
     if (this._buckets.length === 0) {
       return value;
     }
-    const index = Math.abs(Objects.hash(key)) % this._buckets.length;
+    const index = Math.abs(Values.hash(key)) % this._buckets.length;
     const bucket = this._buckets[index] || new HashGenCacheMapBucket();
 
     let gen4Key = bucket._gen4Key;
-    if (gen4Key !== void 0 && Objects.equal(key, gen4Key)) {
+    if (gen4Key !== void 0 && Values.equal(key, gen4Key)) {
       const gen4Val = bucket._gen4Val;
       if (gen4Val !== void 0) {
         this._gen4Hits += 1;
@@ -149,7 +149,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     let gen3Key = bucket._gen3Key;
-    if (gen3Key !== void 0 && Objects.equal(key, gen3Key)) {
+    if (gen3Key !== void 0 && Values.equal(key, gen3Key)) {
       const gen3Val = bucket._gen3Val;
       if (gen3Val !== void 0) {
         this._gen3Hits += 1;
@@ -168,7 +168,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     let gen2Key = bucket._gen2Key;
-    if (gen2Key !== void 0 && Objects.equal(key, gen2Key)) {
+    if (gen2Key !== void 0 && Values.equal(key, gen2Key)) {
       const gen2Val = bucket._gen2Val;
       if (gen2Val !== void 0) {
         this._gen2Hits += 1;
@@ -187,7 +187,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     let gen1Key = bucket._gen1Key;
-    if (gen1Key !== void 0 && Objects.equal(key, gen1Key)) {
+    if (gen1Key !== void 0 && Values.equal(key, gen1Key)) {
       const gen1Val = bucket._gen1Val;
       if (gen1Val !== void 0) {
         this._gen1Hits += 1;
@@ -248,14 +248,14 @@ export class HashGenCacheMap<K, V> {
     if (this._buckets.length === 0) {
       return void 0;
     }
-    const index = Math.abs(Objects.hash(key)) % this._buckets.length;
+    const index = Math.abs(Values.hash(key)) % this._buckets.length;
     const bucket = this._buckets[index];
     if (bucket === void 0) {
       return void 0;
     }
 
     const gen4Key = bucket._gen4Key;
-    if (gen4Key !== void 0 && Objects.equal(key, gen4Key)) {
+    if (gen4Key !== void 0 && Values.equal(key, gen4Key)) {
       const gen4Val = bucket._gen4Val;
       this._buckets[index] = new HashGenCacheMapBucket(
           bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
@@ -266,7 +266,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     const gen3Key = bucket._gen3Key;
-    if (gen3Key !== void 0 && Objects.equal(key, gen3Key)) {
+    if (gen3Key !== void 0 && Values.equal(key, gen3Key)) {
       const gen3Val = bucket._gen3Val;
       this._buckets[index] = new HashGenCacheMapBucket(
           bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
@@ -277,7 +277,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     const gen2Key = bucket._gen2Key;
-    if (gen2Key !== void 0 && Objects.equal(key, gen2Key)) {
+    if (gen2Key !== void 0 && Values.equal(key, gen2Key)) {
       const gen2Val = bucket._gen2Val;
       this._buckets[index] = new HashGenCacheMapBucket(
           bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
@@ -288,7 +288,7 @@ export class HashGenCacheMap<K, V> {
     }
 
     const gen1Key = bucket._gen1Key;
-    if (gen1Key !== void 0 && Objects.equal(key, gen1Key)) {
+    if (gen1Key !== void 0 && Values.equal(key, gen1Key)) {
       const gen1Val = bucket._gen1Val;
       this._buckets[index] = new HashGenCacheMapBucket(
           bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,

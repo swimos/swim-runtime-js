@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Num} from "../Num";
@@ -130,7 +130,7 @@ export class GetItemSelector extends Selector {
     return 14;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof GetItemSelector) {
       let order = this._index.compareTo(that._index);
       if (order === 0) {
@@ -138,7 +138,7 @@ export class GetItemSelector extends Selector {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -160,10 +160,7 @@ export class GetItemSelector extends Selector {
   }
 
   hashCode(): number {
-    if (GetItemSelector._hashSeed === void 0) {
-      GetItemSelector._hashSeed = Murmur3.seed(GetItemSelector);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(GetItemSelector._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(GetItemSelector),
         this._index.hashCode()), this._then.hashCode()));
   }
 
@@ -175,7 +172,5 @@ export class GetItemSelector extends Selector {
   clone(): Selector {
     return new GetItemSelector(this._index, this._then.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.GetItemSelector = GetItemSelector;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 
 export type AnyVectorR2 = VectorR2 | VectorR2Init;
@@ -69,8 +69,8 @@ export class VectorR2 implements Equivalent<VectorR2>, HashCode, Debug {
   }
 
   equivalentTo(that: VectorR2, epsilon?: number): boolean {
-    return Objects.equivalent(that._x, this._x, epsilon)
-        && Objects.equivalent(that._y, this._y, epsilon);
+    return Numbers.equivalent(that._x, this._x, epsilon)
+        && Numbers.equivalent(that._y, this._y, epsilon);
   }
 
   protected canEqual(that: VectorR2): boolean {
@@ -87,11 +87,8 @@ export class VectorR2 implements Equivalent<VectorR2>, HashCode, Debug {
   }
 
   hashCode(): number {
-    if (VectorR2._hashSeed === void 0) {
-      VectorR2._hashSeed = Murmur3.seed(VectorR2);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(VectorR2._hashSeed,
-        Murmur3.hash(this._x)), Murmur3.hash(this._y)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(VectorR2),
+        Numbers.hash(this._x)), Numbers.hash(this._y)));
   }
 
   debug(output: Output): void {
@@ -102,8 +99,6 @@ export class VectorR2 implements Equivalent<VectorR2>, HashCode, Debug {
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   private static _zero?: VectorR2;
 

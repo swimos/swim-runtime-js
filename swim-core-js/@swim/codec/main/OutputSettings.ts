@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3} from "@swim/util";
+import {Murmur3, HashCode, Booleans, Numbers, Strings, Constructors} from "@swim/util";
 import {Output} from "./Output";
 import {Format} from "./Format";
 import {Debug} from "./Debug";
@@ -155,12 +155,10 @@ export class OutputSettings implements Debug, HashCode {
   }
 
   hashCode(): number {
-    if (OutputSettings._hashSeed === void 0) {
-      OutputSettings._hashSeed = Murmur3.seed(OutputSettings);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(OutputSettings._hashSeed,
-        Murmur3.hash(this._lineSeparator)), Murmur3.hash(this._isPretty)),
-        Murmur3.hash(this._isStyled)), Murmur3.hash(this._precision)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
+        Constructors.hash(OutputSettings), Strings.hash(this._lineSeparator)),
+        Booleans.hash(this._isPretty)), Booleans.hash(this._isStyled)),
+        Numbers.hash(this._precision)));
   }
 
   debug(output: Output): void {
@@ -175,7 +173,7 @@ export class OutputSettings implements Debug, HashCode {
       output = output.write("prettyStyled");
     }
     output = output.write(40/*'('*/).write(41/*')'*/);
-    if (this._lineSeparator !== Format.lineSeparator()) {
+    if (this._lineSeparator !== Format.lineSeparator) {
       output = output.write(46/*'.'*/).write("lineSeparator").write(40/*'('*/)
           .display(this._lineSeparator).write(41/*')'*/);
     }
@@ -189,7 +187,6 @@ export class OutputSettings implements Debug, HashCode {
     return Format.debug(this);
   }
 
-  private static _hashSeed?: number;
   private static _standard?: OutputSettings;
   private static _pretty?: OutputSettings;
   private static _styled?: OutputSettings;
@@ -201,7 +198,7 @@ export class OutputSettings implements Debug, HashCode {
    */
   static standard(): OutputSettings {
     if (OutputSettings._standard === void 0) {
-      OutputSettings._standard = new OutputSettings(Format.lineSeparator(), false, false, -1);
+      OutputSettings._standard = new OutputSettings(Format.lineSeparator, false, false, -1);
     }
     return OutputSettings._standard;
   }
@@ -212,7 +209,7 @@ export class OutputSettings implements Debug, HashCode {
    */
   static pretty(): OutputSettings {
     if (OutputSettings._pretty === void 0) {
-      OutputSettings._pretty = new OutputSettings(Format.lineSeparator(), true, false, -1);
+      OutputSettings._pretty = new OutputSettings(Format.lineSeparator, true, false, -1);
     }
     return OutputSettings._pretty;
   }
@@ -223,7 +220,7 @@ export class OutputSettings implements Debug, HashCode {
    */
   static styled(): OutputSettings {
     if (OutputSettings._styled === void 0) {
-      OutputSettings._styled = new OutputSettings(Format.lineSeparator(), false, true, -1);
+      OutputSettings._styled = new OutputSettings(Format.lineSeparator, false, true, -1);
     }
     return OutputSettings._styled;
   }
@@ -234,7 +231,7 @@ export class OutputSettings implements Debug, HashCode {
    */
   static prettyStyled(): OutputSettings {
     if (OutputSettings._prettyStyled === void 0) {
-      OutputSettings._prettyStyled = new OutputSettings(Format.lineSeparator(), true, true, -1);
+      OutputSettings._prettyStyled = new OutputSettings(Format.lineSeparator, true, true, -1);
     }
     return OutputSettings._prettyStyled;
   }
@@ -247,7 +244,7 @@ export class OutputSettings implements Debug, HashCode {
   static create(lineSeparator?: string | null, isPretty?: boolean,
                 isStyled?: boolean, precision?: number): OutputSettings {
     if (typeof lineSeparator !== "string") {
-      lineSeparator = Format.lineSeparator();
+      lineSeparator = Format.lineSeparator;
     }
     if (typeof isPretty !== "boolean") {
       isPretty = false;
@@ -258,7 +255,7 @@ export class OutputSettings implements Debug, HashCode {
     if (typeof precision !== "number") {
       precision = -1;
     }
-    if (lineSeparator === Format.lineSeparator() && precision === -1) {
+    if (lineSeparator === Format.lineSeparator && precision === -1) {
       if (!isPretty && !isStyled) {
         return OutputSettings.standard();
       } else if (isPretty && !isStyled) {

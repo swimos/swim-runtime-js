@@ -107,14 +107,13 @@ export type GeoJsonProperties = {[name: string]: unknown};
 export type GeoJsonBbox = [number, number, number, number]
                         | [number, number, number, number, number, number];
 
-export interface GeoJsonFactory {
+export const GeoJson = {} as {
   is(value: unknown): value is GeoJson;
   toShape(geometry: GeoJsonGeometry): GeoShape;
   toShape(feature: GeoJsonFeature): GeoShape | null;
   toShape(collection: GeoJsonFeatureCollection): Array<GeoShape | null>;
   toShape(object: GeoJson): GeoShape | null | Array<GeoShape | null>;
-}
-export const GeoJson = {} as GeoJsonFactory;
+};
 
 GeoJson.is = function (value: unknown): value is GeoJson {
   return GeoJsonGeometry.is(value)
@@ -132,11 +131,10 @@ GeoJson.toShape = function (object: GeoJson): GeoShape | null | Array<GeoShape |
   }
 } as typeof GeoJson.toShape;
 
-export interface GeoJsonGeometryFactory {
+export const GeoJsonGeometry = {} as {
   is(value: unknown): value is GeoJsonGeometry;
   toShape(object: GeoJsonGeometry): GeoShape;
-}
-export const GeoJsonGeometry = {} as GeoJsonGeometryFactory;
+};
 
 GeoJsonGeometry.is = function (value: unknown): value is GeoJsonGeometry {
   if (typeof value === "object" && value !== null) {
@@ -174,11 +172,10 @@ GeoJsonGeometry.toShape = function (object: GeoJsonGeometry): GeoShape {
   }
 };
 
-export interface GeoJsonPointFactory {
+export const GeoJsonPoint = {} as {
   is(value: unknown): value is GeoJsonPoint;
   toShape(object: GeoJsonPoint): GeoPoint;
-}
-export const GeoJsonPoint = {} as GeoJsonPointFactory;
+};
 
 GeoJsonPoint.is = function (value: unknown): value is GeoJsonPoint {
   if (typeof value === "object" && value !== null) {
@@ -194,11 +191,10 @@ GeoJsonPoint.toShape = function (object: GeoJsonPoint): GeoPoint {
   return new GeoPoint(position[0], position[1]);
 };
 
-export interface GeoJsonMultiPointFactory {
+export const GeoJsonMultiPoint = {} as {
   is(value: unknown): value is GeoJsonMultiPoint;
   toShape(object: GeoJsonMultiPoint): GeoSet<GeoPoint>;
-}
-export const GeoJsonMultiPoint = {} as GeoJsonMultiPointFactory;
+};
 
 GeoJsonMultiPoint.is = function (value: unknown): value is GeoJsonMultiPoint {
   if (typeof value === "object" && value !== null) {
@@ -220,11 +216,10 @@ GeoJsonMultiPoint.toShape = function (object: GeoJsonMultiPoint): GeoSet<GeoPoin
   return new GeoSet(shapes);
 };
 
-export interface GeoJsonLineStringFactory {
+export const GeoJsonLineString = {} as {
   is(value: unknown): value is GeoJsonLineString;
   toShape(object: GeoJsonLineString): GeoSpline;
-}
-export const GeoJsonLineString = {} as GeoJsonLineStringFactory;
+};
 
 GeoJsonLineString.is = function (value: unknown): value is GeoJsonLineString {
   if (typeof value === "object" && value !== null) {
@@ -253,11 +248,10 @@ GeoJsonLineString.toShape = function (object: GeoJsonLineString): GeoSpline {
   }
 };
 
-export interface GeoJsonMultiLineStringFactory {
+export const GeoJsonMultiLineString = {} as {
   is(value: unknown): value is GeoJsonMultiLineString;
   toShape(object: GeoJsonMultiLineString): GeoSet<GeoSpline>;
-}
-export const GeoJsonMultiLineString = {} as GeoJsonMultiLineStringFactory;
+};
 
 GeoJsonMultiLineString.is = function (value: unknown): value is GeoJsonMultiLineString {
   if (typeof value === "object" && value !== null) {
@@ -292,11 +286,10 @@ GeoJsonMultiLineString.toShape = function (object: GeoJsonMultiLineString): GeoS
   return new GeoSet(shapes);
 };
 
-export interface GeoJsonPolygonFactory {
+export const GeoJsonPolygon = {} as {
   is(value: unknown): value is GeoJsonPolygon;
   toShape(object: GeoJsonPolygon): GeoPath;
-}
-export const GeoJsonPolygon = {} as GeoJsonPolygonFactory;
+};
 
 GeoJsonPolygon.is = function (value: unknown): value is GeoJsonPolygon {
   if (typeof value === "object" && value !== null) {
@@ -331,11 +324,10 @@ GeoJsonPolygon.toShape = function (object: GeoJsonPolygon): GeoPath {
   return new GeoPath(splines);
 };
 
-export interface GeoJsonMultiPolygonFactory {
+export const GeoJsonMultiPolygon = {} as {
   is(value: unknown): value is GeoJsonMultiPolygon;
   toShape(object: GeoJsonMultiPolygon): GeoSet<GeoPath>;
-}
-export const GeoJsonMultiPolygon = {} as GeoJsonMultiPolygonFactory;
+};
 
 GeoJsonMultiPolygon.is = function (value: unknown): value is GeoJsonMultiPolygon {
   if (typeof value === "object" && value !== null) {
@@ -376,11 +368,10 @@ GeoJsonMultiPolygon.toShape = function (object: GeoJsonMultiPolygon): GeoSet<Geo
   return new GeoSet(shapes);
 };
 
-export interface GeoJsonGeometryCollectionFactory {
+export const GeoJsonGeometryCollection = {} as {
   is(value: unknown): value is GeoJsonGeometryCollection;
   toShape(object: GeoJsonGeometryCollection): GeoSet;
-}
-export const GeoJsonGeometryCollection = {} as GeoJsonGeometryCollectionFactory;
+};
 
 GeoJsonGeometryCollection.is = function (value: unknown): value is GeoJsonGeometryCollection {
   if (typeof value === "object" && value !== null) {
@@ -401,11 +392,10 @@ GeoJsonGeometryCollection.toShape = function (object: GeoJsonGeometryCollection)
   return new GeoSet(shapes);
 };
 
-export interface GeoJsonFeatureFactory {
+export const GeoJsonFeature = {} as {
   is(value: unknown): value is GeoJsonFeature;
   toShape(feature: GeoJsonFeature): GeoShape | null;
-}
-export const GeoJsonFeature = {} as GeoJsonFeatureFactory;
+};
 
 GeoJsonFeature.is = function (value: unknown): value is GeoJsonFeature {
   if (typeof value === "object" && value !== null) {
@@ -422,11 +412,10 @@ GeoJsonFeature.toShape = function (feature: GeoJsonFeature): GeoShape | null {
   return geometry !== null ? GeoJsonGeometry.toShape(geometry) : null;
 };
 
-export interface GeoJsonFeatureCollectionFactory {
+export const GeoJsonFeatureCollection = {} as {
   is(value: unknown): value is GeoJsonFeatureCollection;
   toShapes(object: GeoJsonFeatureCollection): Array<GeoShape | null>;
-}
-export const GeoJsonFeatureCollection = {} as GeoJsonFeatureCollectionFactory;
+};
 
 GeoJsonFeatureCollection.is = function (value: unknown): value is GeoJsonFeatureCollection {
   if (typeof value === "object" && value !== null) {

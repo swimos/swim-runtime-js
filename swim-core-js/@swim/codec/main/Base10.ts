@@ -24,17 +24,11 @@ import {Base10IntegerWriter} from "./Base10IntegerWriter";
 /**
  * Base-10 (decimal) encoding [[Parser]]/[[Writer]] factory.
  */
-export class Base10 {
-  private constructor() {
-    // nop
-  }
-
+export const Base10 = {} as {
   /**
    * Returns `true` if the Unicode code point `c` is a valid base-10 digit.
    */
-  static isDigit(c: number): boolean {
-    return c >= 48/*'0'*/ && c <= 57/*'9'*/;
-  }
+  isDigit(c: number): boolean;
 
   /**
    * Returns the decimal quantity between `0` (inclusive) and `10` (exclusive)
@@ -42,95 +36,121 @@ export class Base10 {
    *
    * @throws `Error` if `c` is not a valid base-10 digit.
    */
-  static decodeDigit(c: number): number {
-    if (c >= 48/*'0'*/ && c <= 57/*'9'*/) {
-      return c - 48/*'0'*/;
-    } else {
-      const message = Unicode.stringOutput();
-      message.write("Invalid base-10 digit: ");
-      Format.debugChar(c, message);
-      throw new Error(message.bind());
-    }
-  }
+  decodeDigit(c: number): number;
 
   /**
    * Returns the Unicode code point of the base-10 digit that encodes the given
    * decimal quantity between `0` (inclusive) and `10` (exclusive).
    */
-  static encodeDigit(b: number): number {
-    if (b >= 0 && b <= 9) {
-      return 48/*'0'*/ + b;
-    } else {
-      throw new Error("" + b);
-    }
-  }
+  encodeDigit(b: number): number;
 
   /**
    * Returns the number of whole decimal digits in the given absolute `value`.
    */
-  static countDigits(value: number): number {
-    let size = 0;
-    do {
-      size += 1;
-      value = (value / 10) | 0;
-    } while (value !== 0);
-    return size;
-  }
+  countDigits(value: number): number;
 
-  static integerParser(): Parser<number> {
-    return new Base10.NumberParser(void 0, void 0, 0);
-  }
+  integerParser(): Parser<number>;
 
-  static parseInteger(input: Input): Parser<number> {
-    return Base10.NumberParser.parse(input, void 0, void 0, 0);
-  }
+  parseInteger(input: Input): Parser<number>;
 
-  static decimalParser(): Parser<number> {
-    return new Base10.NumberParser(void 0, void 0, 1);
-  }
+  decimalParser(): Parser<number>;
 
-  static parseDecimal(input: Input): Parser<number> {
-    return Base10.NumberParser.parse(input, void 0, void 0, 1);
-  }
+  parseDecimal(input: Input): Parser<number>;
 
-  static numberParser(): Parser<number> {
-    return new Base10.NumberParser();
-  }
+  numberParser(): Parser<number>;
 
-  static parseNumber(input: Input): Parser<number> {
-    return Base10.NumberParser.parse(input);
-  }
+  parseNumber(input: Input): Parser<number>;
 
   /**
    * Returns a `Writer` that, when fed an input `number` value, returns a
    * continuation that writes the base-10 (decimal) encoding of the input value.
    */
-  static integerWriter(): Writer<number, unknown>;
+  integerWriter(): Writer<number, unknown>;
+
   /**
    * Returns a `Writer` continuation that writes the base-10 (decimal) encoding
    * of the `input` value.
    */
-  static integerWriter(input: number): Writer<unknown, number>;
-  static integerWriter(input?: number): Writer<unknown, unknown> {
-    if (input === void 0) {
-      return new Base10.IntegerWriter(void 0, 0);
-    } else {
-      return new Base10.IntegerWriter(void 0, input);
-    }
-  }
+  integerWriter(input: number): Writer<unknown, number>;
 
   /**
    * Writes the base-10 (decimal) encoding of the `input` value to the `output`,
    * returning a `Writer` continuation that knows how to write any remaining
    * output that couldn't be immediately generated.
    */
-  static writeInteger(input: number, output: Output): Writer<unknown, unknown> {
-    return Base10.IntegerWriter.write(output, void 0, input);
-  }
+  writeInteger(input: number, output: Output): Writer<unknown, unknown>;
 
   // Forward type declarations
   /** @hidden */
-  static NumberParser: typeof Base10NumberParser; // defined by Base10NumberParser
+  NumberParser: typeof Base10NumberParser; // defined by Base10NumberParser
   /** @hidden */
-  static IntegerWriter: typeof Base10IntegerWriter; // defined by Base10IntegerWriter
-}
+  IntegerWriter: typeof Base10IntegerWriter; // defined by Base10IntegerWriter
+};
+
+Base10.isDigit = function (c: number): boolean {
+  return c >= 48/*'0'*/ && c <= 57/*'9'*/;
+};
+
+Base10.decodeDigit = function (c: number): number {
+  if (c >= 48/*'0'*/ && c <= 57/*'9'*/) {
+    return c - 48/*'0'*/;
+  } else {
+    const message = Unicode.stringOutput();
+    message.write("Invalid base-10 digit: ");
+    Format.debugChar(c, message);
+    throw new Error(message.bind());
+  }
+};
+
+Base10.encodeDigit = function (b: number): number {
+  if (b >= 0 && b <= 9) {
+    return 48/*'0'*/ + b;
+  } else {
+    throw new Error("" + b);
+  }
+};
+
+Base10.countDigits = function (value: number): number {
+  let size = 0;
+  do {
+    size += 1;
+    value = (value / 10) | 0;
+  } while (value !== 0);
+  return size;
+};
+
+Base10.integerParser = function (): Parser<number> {
+  return new Base10.NumberParser(void 0, void 0, 0);
+};
+
+Base10.parseInteger = function (input: Input): Parser<number> {
+  return Base10.NumberParser.parse(input, void 0, void 0, 0);
+};
+
+Base10.decimalParser = function (): Parser<number> {
+  return new Base10.NumberParser(void 0, void 0, 1);
+};
+
+Base10.parseDecimal = function (input: Input): Parser<number> {
+  return Base10.NumberParser.parse(input, void 0, void 0, 1);
+};
+
+Base10.numberParser = function (): Parser<number> {
+  return new Base10.NumberParser();
+};
+
+Base10.parseNumber = function (input: Input): Parser<number> {
+  return Base10.NumberParser.parse(input);
+};
+
+Base10.integerWriter = function (input?: number): Writer<unknown, unknown> {
+  if (input === void 0) {
+    return new Base10.IntegerWriter(void 0, 0);
+  } else {
+    return new Base10.IntegerWriter(void 0, input);
+  }
+} as typeof Base10.integerWriter;
+
+Base10.writeInteger = function (input: number, output: Output): Writer<unknown, unknown> {
+  return Base10.IntegerWriter.write(output, void 0, input);
+};

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "@swim/util";
+import {Arrays, Values} from "@swim/util";
 import {Input, ParserException, Parser, Unicode, Utf8, Binary} from "@swim/codec";
 import {TestException, TestOptions, Spec, Proof, Report, ExamStatus, Exam} from "@swim/unit";
 import {Item, Value} from "@swim/structure";
@@ -25,7 +25,7 @@ export class ReconExam extends Exam {
   }
 
   parsed<O>(actual: O, expected: O, a: string, b: string, part: number): void {
-    if (!Objects.equal(actual, expected)) {
+    if (!Values.equal(actual, expected)) {
       const message = Unicode.stringOutput();
       message.write("when parsing part ").debug(part)
           .write(" of ").debug(a).write(", ").debug(b);
@@ -110,7 +110,7 @@ export class ReconExam extends Exam {
       buffer = buffer.limit(buffer.capacity());
       writer = writer.pull(Utf8.decodedOutput(buffer).isPart(false));
       if (writer.isDone()) {
-        if (!Objects.equal(actual, expected)) {
+        if (!Arrays.equal(actual, expected)) {
           this.proove(Proof.refuted(actual, "writes", expected));
           throw new TestException();
         }
@@ -144,7 +144,7 @@ export class ReconExam extends Exam {
       buffer = buffer.limit(buffer.capacity());
       writer = writer.pull(Utf8.decodedOutput(buffer).isPart(false));
       if (writer.isDone()) {
-        if (!Objects.equal(actual, expected)) {
+        if (!Arrays.equal(actual, expected)) {
           this.proove(Proof.refuted(actual, "writes", expected));
           throw new TestException();
         }

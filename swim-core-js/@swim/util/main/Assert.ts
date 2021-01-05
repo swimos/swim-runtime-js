@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "./Objects";
+import {Values} from "./Values";
 import {AssertException} from "./AssertException";
+
+/**
+ * Callable assertion function.
+ *
+ * @throws [[AssertException]] if the assertion fails.
+ */
+export interface AssertFunction {
+  (condition: unknown, message?: string): void;
+}
 
 /**
  * Type that implements common assertion functions.
@@ -48,98 +57,98 @@ export interface Assert {
   notIdentity(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` is [[Objects.equal structurally equal]] to `rhs`.
+   * Asserts that `lhs` is [[Values.equal structurally equal]] to `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` is not structurally equal to `rhs`.
    */
   equal(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` is not [[Objects.equal structurally equal]] to `rhs`.
+   * Asserts that `lhs` is not [[Values.equal structurally equal]] to `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` is structurally equal to `rhs`.
    */
   notEqual(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` is [[Objects.equivalent structurally equivalent]] to `rhs`.
+   * Asserts that `lhs` is [[Values.equivalent structurally equivalent]] to `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` is not structurally equivalent to `rhs`.
    */
   equivalent(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` is not [[Objects.equivalent structurally equivalent]] to `rhs`.
+   * Asserts that `lhs` is not [[Values.equivalent structurally equivalent]] to `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` is structurally equivalent to `rhs`.
    */
   notEquivalent(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` [[Objects.compare structurally orders before]] `rhs`.
+   * Asserts that `lhs` [[Values.compare structurally orders before]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does not structurally order before `rhs`.
    */
   compareLessThan(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` does not [[Objects.compare structurally order before]] `rhs`.
+   * Asserts that `lhs` does not [[Values.compare structurally order before]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does structurally order before `rhs`.
    */
   compareNotLessThan(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` [[Objects.compare structurally orders before or the same as]] `rhs`.
+   * Asserts that `lhs` [[Values.compare structurally orders before or the same as]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does not structurally order before or the same as `rhs`.
    */
   compareLessThanOrEqual(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` does not [[Objects.compare structurally order before or the same as]] `rhs`.
+   * Asserts that `lhs` does not [[Values.compare structurally order before or the same as]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does structurally order before or the same as `rhs`.
    */
   compareNotLessThanOrEqual(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` [[Objects.compare structurally orders the same as]] `rhs`.
+   * Asserts that `lhs` [[Values.compare structurally orders the same as]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does not structurally order before or the same as `rhs`.
    */
   compareEqual(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` does not [[Objects.compare structurally order the same as]] `rhs`.
+   * Asserts that `lhs` does not [[Values.compare structurally order the same as]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does structurally order before or the same as `rhs`.
    */
   compareNotEqual(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` [[Objects.compare structurally orders after or the same as]] `rhs`.
+   * Asserts that `lhs` [[Values.compare structurally orders after or the same as]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does not structurally order after or the same as `rhs`.
    */
   compareGreaterThanOrEqual(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` does not [[Objects.compare structurally order after or the same as]] `rhs`.
+   * Asserts that `lhs` does not [[Values.compare structurally order after or the same as]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does structurally order after or the same as `rhs`.
    */
   compareNotGreaterThanOrEqual(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` [[Objects.compare structurally orders after]] `rhs`.
+   * Asserts that `lhs` [[Values.compare structurally orders after]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does not structurally order after `rhs`.
    */
   compareGreaterThan(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
-   * Asserts that `lhs` does not [[Objects.compare structurally order after]] `rhs`.
+   * Asserts that `lhs` does not [[Values.compare structurally order after]] `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` does structurally order after `rhs`.
    */
@@ -156,7 +165,7 @@ export const assert = function (condition: unknown, message?: string): void {
   if (!condition) {
     throw new AssertException(message);
   }
-} as Assert & ((condition: unknown, message?: string) => void);
+} as Assert & AssertFunction;
 
 assert.ok = function (condition: unknown, message?: string): void {
   if (!condition) {
@@ -171,13 +180,13 @@ assert.notOk = function (condition: unknown, message?: string): void {
 };
 
 assert.equal = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (!Objects.equal(lhs, rhs)) {
+  if (!Values.equal(lhs, rhs)) {
     throw new AssertException(message);
   }
 };
 
 assert.notEqual = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (Objects.equal(lhs, rhs)) {
+  if (Values.equal(lhs, rhs)) {
     throw new AssertException(message);
   }
 };
@@ -195,61 +204,61 @@ assert.notIdentity = function (lhs: unknown, rhs: unknown, message?: string): vo
 };
 
 assert.compareLessThan = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (!(Objects.compare(lhs, rhs) < 0)) {
+  if (!(Values.compare(lhs, rhs) < 0)) {
     throw new AssertException(message);
   }
 };
 
 assert.compareNotLessThan = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (Objects.compare(lhs, rhs) < 0) {
+  if (Values.compare(lhs, rhs) < 0) {
     throw new AssertException(message);
   }
 };
 
 assert.compareLessThanOrEqual = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (!(Objects.compare(lhs, rhs) <= 0)) {
+  if (!(Values.compare(lhs, rhs) <= 0)) {
     throw new AssertException(message);
   }
 };
 
 assert.compareNotLessThanOrEqual = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (Objects.compare(lhs, rhs) <= 0) {
+  if (Values.compare(lhs, rhs) <= 0) {
     throw new AssertException(message);
   }
 };
 
 assert.compareEqual = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (!(Objects.compare(lhs, rhs) === 0)) {
+  if (!(Values.compare(lhs, rhs) === 0)) {
     throw new AssertException(message);
   }
 };
 
 assert.compareNotEqual = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (Objects.compare(lhs, rhs) === 0) {
+  if (Values.compare(lhs, rhs) === 0) {
     throw new AssertException(message);
   }
 };
 
 assert.compareGreaterThanOrEqual = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (!(Objects.compare(lhs, rhs) >= 0)) {
+  if (!(Values.compare(lhs, rhs) >= 0)) {
     throw new AssertException(message);
   }
 };
 
 assert.compareNotGreaterThanOrEqual = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (Objects.compare(lhs, rhs) >= 0) {
+  if (Values.compare(lhs, rhs) >= 0) {
     throw new AssertException(message);
   }
 };
 
 assert.compareGreaterThan = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (!(Objects.compare(lhs, rhs) > 0)) {
+  if (!(Values.compare(lhs, rhs) > 0)) {
     throw new AssertException(message);
   }
 };
 
 assert.compareNotGreaterThan = function (lhs: unknown, rhs: unknown, message?: string): void {
-  if (Objects.compare(lhs, rhs) > 0) {
+  if (Values.compare(lhs, rhs) > 0) {
     throw new AssertException(message);
   }
 };

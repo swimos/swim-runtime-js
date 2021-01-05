@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import {Item, Attr, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
@@ -161,14 +161,11 @@ export class AffineTransform extends Transform {
   }
 
   hashCode(): number {
-    if (AffineTransform._hashSeed === void 0) {
-      AffineTransform._hashSeed = Murmur3.seed(AffineTransform);
-    }
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
-        Murmur3.mix(Murmur3.mix( AffineTransform._hashSeed,
-        Murmur3.hash(this._x0)), Murmur3.hash(this._y0)),
-        Murmur3.hash(this._x1)), Murmur3.hash(this._y1)),
-        Murmur3.hash(this._tx)), Murmur3.hash(this._ty)));
+        Murmur3.mix(Murmur3.mix(Constructors.hash(AffineTransform),
+        Numbers.hash(this._x0)), Numbers.hash(this._y0)),
+        Numbers.hash(this._x1)), Numbers.hash(this._y1)),
+        Numbers.hash(this._tx)), Numbers.hash(this._ty)));
   }
 
   debug(output: Output): void {
@@ -188,8 +185,6 @@ export class AffineTransform extends Transform {
     }
     return string;
   }
-
-  private static _hashSeed?: number;
 
   private static _identityMatrix?: AffineTransform;
   static identity(): AffineTransform {

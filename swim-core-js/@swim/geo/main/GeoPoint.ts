@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Output, Debug, Format} from "@swim/codec";
 import {PointR2} from "@swim/math";
 import {GeoProjection} from "./GeoProjection";
@@ -104,8 +104,8 @@ export class GeoPoint extends GeoShape implements Equivalent<GeoPoint>, HashCode
   }
 
   equivalentTo(that: GeoPoint, epsilon?: number): boolean {
-    return Objects.equivalent(that._lng, this._lng, epsilon)
-        && Objects.equivalent(that._lat, this._lat, epsilon);
+    return Numbers.equivalent(that._lng, this._lng, epsilon)
+        && Numbers.equivalent(that._lat, this._lat, epsilon);
   }
 
   equals(that: unknown): boolean {
@@ -118,11 +118,8 @@ export class GeoPoint extends GeoShape implements Equivalent<GeoPoint>, HashCode
   }
 
   hashCode(): number {
-    if (GeoPoint._hashSeed === void 0) {
-      GeoPoint._hashSeed = Murmur3.seed(GeoPoint);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(GeoPoint._hashSeed,
-        Murmur3.hash(this._lng)), Murmur3.hash(this._lat)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(GeoPoint),
+        Numbers.hash(this._lng)), Numbers.hash(this._lat)));
   }
 
   debug(output: Output): void {
@@ -133,8 +130,6 @@ export class GeoPoint extends GeoShape implements Equivalent<GeoPoint>, HashCode
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   private static _origin?: GeoPoint;
   static origin(): GeoPoint {

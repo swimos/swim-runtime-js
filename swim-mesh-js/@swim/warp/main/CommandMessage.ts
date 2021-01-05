@@ -30,15 +30,15 @@ export class CommandMessage extends LaneAddressed {
     return "command";
   }
 
-  static fromValue(value: Value): CommandMessage | undefined {
-    return LaneAddressed.fromValue(value, CommandMessage) as CommandMessage | undefined;
-  }
-
   static of(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): CommandMessage {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new CommandMessage(node, lane, body);
+  }
+
+  static fromValue(value: Value): CommandMessage | undefined {
+    return LaneAddressed.fromValue(value, CommandMessage) as CommandMessage | undefined;
   }
 }
 Envelope.CommandMessage = CommandMessage;

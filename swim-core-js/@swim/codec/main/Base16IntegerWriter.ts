@@ -17,6 +17,7 @@ import {WriterException} from "./WriterException";
 import {Writer} from "./Writer";
 import {Base16} from "./Base16";
 
+/** @hidden */
 export class Base16IntegerWriter extends Writer<unknown, unknown> {
   private readonly _value: unknown;
   private readonly _input: number;

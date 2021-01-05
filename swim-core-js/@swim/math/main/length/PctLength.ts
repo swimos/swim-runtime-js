@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Murmur3} from "@swim/util";
+import {Murmur3, Equivalent, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {LengthUnits, AnyLength, Length} from "./Length";
 
@@ -83,10 +83,7 @@ export class PctLength extends Length {
   }
 
   hashCode(): number {
-    if (PctLength._hashSeed === void 0) {
-      PctLength._hashSeed = Murmur3.seed(PctLength);
-    }
-    return Murmur3.mash(Murmur3.mix(PctLength._hashSeed, Murmur3.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(PctLength), Numbers.hash(this._value)));
   }
 
   debug(output: Output): void {
@@ -100,8 +97,6 @@ export class PctLength extends Length {
   toString(): string {
     return this._value + "%";
   }
-
-  private static _hashSeed?: number;
 
   private static _zero: PctLength;
   static zero(units?: "%", node?: Node | null): PctLength;

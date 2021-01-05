@@ -37,23 +37,24 @@ export interface RecordOutlet extends Outlet<Record>, MapOutlet<Value, Value, Re
   watch(func: WatchFieldsFunction<Value, Value>): this;
 }
 
-/** @hidden */
-export const RecordOutlet = {
-  is(object: unknown): object is RecordOutlet {
-    if (typeof object === "object" && object !== null) {
-      const outlet = object as RecordOutlet;
-      return MapOutlet.is(outlet) && StreamletScope.is(outlet);
-    }
-    return false;
-  },
+export const RecordOutlet = {} as {
+  is(object: unknown): object is RecordOutlet;
 
   // Forward type declarations
   /** @hidden */
-  Streamlet: void 0 as unknown as typeof RecordStreamlet, // defined by RecordStreamlet
+  Streamlet: typeof RecordStreamlet, // defined by RecordStreamlet
   /** @hidden */
-  Model: void 0 as unknown as typeof RecordModel, // defined by RecordModel
+  Model: typeof RecordModel, // defined by RecordModel
   /** @hidden */
-  Scope: void 0 as unknown as typeof RecordScope, // defined by RecordScope
+  Scope: typeof RecordScope, // defined by RecordScope
   /** @hidden */
-  Dataflow: void 0 as unknown as typeof Dataflow, // defined by Dataflow
+  Dataflow: typeof Dataflow, // defined by Dataflow
+};
+
+RecordOutlet.is = function (object: unknown): object is RecordOutlet {
+  if (typeof object === "object" && object !== null) {
+    const outlet = object as RecordOutlet;
+    return MapOutlet.is(outlet) && StreamletScope.is(outlet);
+  }
+  return false;
 };

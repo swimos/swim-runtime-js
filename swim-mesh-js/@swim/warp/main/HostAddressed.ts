@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {AnyValue, Value, Attr} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
@@ -61,19 +61,18 @@ export abstract class HostAddressed extends Envelope {
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
-    } else if (that instanceof HostAddressed
-        && (this as any).__proto__.constructor === (that as any).__proto__.constructor) {
+    } else if (that instanceof HostAddressed && this.constructor === that.constructor) {
       return this._body.equals(that._body);
     }
     return false;
   }
 
   hashCode() {
-    return Murmur3.mash(Murmur3.mix(Murmur3.seed((this as any).__proto__), this._body.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(this.constructor), this._body.hashCode()));
   }
 
   debug(output: Output): void {
-    output = output.write((this as any).__proto__.constructor.name).write(46/*'.'*/).write("of").write(40/*'('*/);
+    output = output.write(this.constructor.name).write(46/*'.'*/).write("of").write(40/*'('*/);
     if (this._body.isDefined()) {
       output = output.debug(this._body);
     }

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Random, Objects} from "@swim/util";
+import {Random, Values} from "@swim/util";
 import {STreePage} from "./STreePage";
 
 /** @hidden */
 export abstract class STreeContext<V, I> {
-  pageSplitSize: number;
+  declare pageSplitSize: number;
  
   identify(value: V): I {
     const id = new Uint8Array(6);
@@ -26,7 +26,7 @@ export abstract class STreeContext<V, I> {
   }
 
   compare(x: I, y: I): number {
-    return Objects.compare(x, y);
+    return Values.compare(x, y);
   }
 
   pageShouldSplit(page: STreePage<V, I>): boolean {

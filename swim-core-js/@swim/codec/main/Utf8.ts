@@ -21,11 +21,7 @@ import {Utf8EncodedOutput} from "./Utf8EncodedOutput";
 /**
  * UTF-8 [[Input]]/[[Output]] factory.
  */
-export class Utf8 {
-  private constructor() {
-    // nop
-  }
-
+export const Utf8 = {} as {
   /**
    * Returns the number of bytes in the UTF-8 encoding of the Unicode code
    * point `c`, handling invalid code unit sequences according to the
@@ -36,76 +32,41 @@ export class Utf8 {
    * encoding of the NUL character (`U+0000`), if [[UtfErrorMode.isNonZero]]
    * is `true`.
    */
-  static sizeOf(c: number | undefined, errorMode?: UtfErrorMode): number;
+  sizeOf(c: number | undefined, errorMode?: UtfErrorMode): number;
+
   /**
    * Returns the number of bytes in the UTF-8 encoding of the Unicode code
    * point `c`; returns the size of the Unicode replacement character (`U+FFFD`)
    * for surrogates and invalid code points.
    */
-  static sizeOf(c: number | undefined): number;
+  sizeOf(c: number | undefined): number;
+
   /**
    * Returns the number of bytes in the UTF-8 encoding the given `string`,
    * handling invalid code unit sequences according to the `errorMode` policy.
    */
-  static sizeOf(string: string, errorMode?: UtfErrorMode): number;
+  sizeOf(string: string, errorMode?: UtfErrorMode): number;
+
   /**
    * Returns the number of bytes in the UTF-8 encoding the given `string`,
    * assuming the Unicode replacement character (`U+FFFD`) replaces unpaired
    * surrogates and invalid code points.
    */
-  static sizeOf(string: string): number;
-  static sizeOf(u: string | number | undefined, errorMode?: UtfErrorMode): number {
-    if (typeof u === "number" || u === void 0) {
-      if (typeof u === "number") {
-        if (u === 0x0000 && errorMode !== void 0 && errorMode.isNonZero()) { // Modified UTF-8
-          return 2; // U+0000 encoded as 0xC0, 0x80
-        } else if (u >= 0x0000 && u <= 0x007F) { // U+0000..U+007F
-          return 1;
-        } else if (u >= 0x0080 && u <= 0x07FF) { // U+0080..U+07FF
-          return 2;
-        } else if (u >= 0x0800 && u <= 0xFFFF || // U+0800..U+D7FF
-                   u >= 0xE000 && u <= 0xFFFF) { // U+E000..U+FFFF
-          return 3;
-        } else if (u >= 0x10000 && u <= 0x10FFFF) { // U+10000..U+10FFFF
-          return 4;
-        }
-      }
-      // surrogate or invalid code point
-      if (errorMode === void 0) {
-        return 3;
-      } else if (errorMode.isReplacement()) {
-        return Utf8.sizeOf(errorMode.replacementChar());
-      } else {
-        return 0;
-      }
-    } else if (typeof u === "string") {
-      let size = 0;
-      for (let i = 0, n = u.length; i < n; i = u.offsetByCodePoints(i, 1)) {
-        size += Utf8.sizeOf(u.charCodeAt(i), errorMode);
-      }
-      return size;
-    } else {
-      throw new TypeError("" + u);
-    }
-  }
+  sizeOf(string: string): number;
 
   /**
    * Returns a new `Output` that accepts UTF-8 code unit sequences, and writes
    * writes decoded Unicode code points to the composed `output`, handling
    * invalid code unit sequences according to the `errorMode` policy.
    */
-  static decodedOutput<T>(output: Output<T>, errorMode: UtfErrorMode = UtfErrorMode.fatal()): Output<T> {
-    return new Utf8DecodedOutput<T>(output, errorMode);
-  }
+  decodedOutput<T>(output: Output<T>, errorMode?: UtfErrorMode): Output<T>;
 
   /**
    * Returns a new `Output` that accepts Unicode code points, and writes
    * encoded UTF-8 code unit sequences to the composed `output`, handling
    * invalid code unit sequences according to the `errorMode` policy.
    */
-  static encodedOutput<T>(output: Output<T>, errorMode: UtfErrorMode = UtfErrorMode.fatal()): Output<T> {
-    return new Utf8EncodedOutput<T>(output, errorMode);
-  }
+  encodedOutput<T>(output: Output<T>, errorMode?: UtfErrorMode): Output<T>;
 
   /**
    * Returns a new `Output` that accepts UTF-8 code unit sequences, and writes
@@ -115,7 +76,52 @@ export class Utf8 {
    * remaining permanently in the _cont_ state, and [[Output.bind binds]] a
    * `string` containing all decoded code points.
    */
-  static decodedString(): Output<string> {
-    return Utf8.decodedOutput(Unicode.stringOutput());
+  decodedString(): Output<string>;
+};
+
+Utf8.sizeOf = function (u: string | number | undefined, errorMode?: UtfErrorMode): number {
+  if (typeof u === "number" || u === void 0) {
+    if (typeof u === "number") {
+      if (u === 0x0000 && errorMode !== void 0 && errorMode.isNonZero()) { // Modified UTF-8
+        return 2; // U+0000 encoded as 0xC0, 0x80
+      } else if (u >= 0x0000 && u <= 0x007F) { // U+0000..U+007F
+        return 1;
+      } else if (u >= 0x0080 && u <= 0x07FF) { // U+0080..U+07FF
+        return 2;
+      } else if (u >= 0x0800 && u <= 0xFFFF || // U+0800..U+D7FF
+                 u >= 0xE000 && u <= 0xFFFF) { // U+E000..U+FFFF
+        return 3;
+      } else if (u >= 0x10000 && u <= 0x10FFFF) { // U+10000..U+10FFFF
+        return 4;
+      }
+    }
+    // surrogate or invalid code point
+    if (errorMode === void 0) {
+      return 3;
+    } else if (errorMode.isReplacement()) {
+      return Utf8.sizeOf(errorMode.replacementChar());
+    } else {
+      return 0;
+    }
+  } else if (typeof u === "string") {
+    let size = 0;
+    for (let i = 0, n = u.length; i < n; i = u.offsetByCodePoints(i, 1)) {
+      size += Utf8.sizeOf(u.charCodeAt(i), errorMode);
+    }
+    return size;
+  } else {
+    throw new TypeError("" + u);
   }
-}
+};
+
+Utf8.decodedOutput = function <T>(output: Output<T>, errorMode: UtfErrorMode = UtfErrorMode.fatal()): Output<T> {
+  return new Utf8DecodedOutput<T>(output, errorMode);
+};
+
+Utf8.encodedOutput = function <T>(output: Output<T>, errorMode: UtfErrorMode = UtfErrorMode.fatal()): Output<T> {
+  return new Utf8EncodedOutput<T>(output, errorMode);
+};
+
+Utf8.decodedString = function (): Output<string> {
+  return Utf8.decodedOutput(Unicode.stringOutput());
+};

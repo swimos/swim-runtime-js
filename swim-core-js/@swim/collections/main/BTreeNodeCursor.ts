@@ -17,6 +17,7 @@ import {NodeCursor} from "./NodeCursor";
 import {BTree} from "./BTree";
 import {BTreePage} from "./BTreePage";
 
+/** @hidden */
 export class BTreeNodeCursor<K, V, U> extends NodeCursor<[K, V], BTreePage<K, V, U>> {
   constructor(pages: BTreePage<K, V, U>[], index?: number, pageIndex?: number,
               subCursor?: Cursor<[K, V]>) {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Constructors} from "@swim/util";
 import {Tag} from "./Tag";
 import {Mark} from "./Mark";
 import {Output} from "./Output";
@@ -83,10 +83,7 @@ export class Span extends Tag {
   }
 
   hashCode(): number {
-    if (Span._hashSeed === void 0) {
-      Span._hashSeed = Murmur3.seed(Span);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Span._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(Span),
         this._start.hashCode()), this._end.hashCode()));
   }
 
@@ -117,8 +114,6 @@ export class Span extends Tag {
   toString(): string {
     return Tag.Format.display(this);
   }
-
-  private static _hashSeed?: number;
 
   /**
    * Returns a new `Span` representing the closed interval between the given

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {SegmentR2} from "@swim/math";
 import {GeoProjection} from "./GeoProjection";
@@ -197,10 +197,10 @@ export class GeoSegment extends GeoCurve implements HashCode, Debug {
   }
 
   equivalentTo(that: GeoSegment, epsilon?: number): boolean {
-    return Objects.equivalent(that._lng0, this._lng0, epsilon)
-        && Objects.equivalent(that._lat0, this._lat0, epsilon)
-        && Objects.equivalent(that._lng1, this._lng1, epsilon)
-        && Objects.equivalent(that._lat1, this._lat1, epsilon);
+    return Numbers.equivalent(that._lng0, this._lng0, epsilon)
+        && Numbers.equivalent(that._lat0, this._lat0, epsilon)
+        && Numbers.equivalent(that._lng1, this._lng1, epsilon)
+        && Numbers.equivalent(that._lat1, this._lat1, epsilon);
   }
 
   equals(that: unknown): boolean {
@@ -214,12 +214,9 @@ export class GeoSegment extends GeoCurve implements HashCode, Debug {
   }
 
   hashCode(): number {
-    if (GeoSegment._hashSeed === void 0) {
-      GeoSegment._hashSeed = Murmur3.seed(GeoSegment);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(GeoSegment._hashSeed,
-        Murmur3.hash(this._lng0)), Murmur3.hash(this._lat0)),
-        Murmur3.hash(this._lng1)), Murmur3.hash(this._lat1)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
+        Constructors.hash(GeoSegment), Numbers.hash(this._lng0)), Numbers.hash(this._lat0)),
+        Numbers.hash(this._lng1)), Numbers.hash(this._lat1)));
   }
 
   debug(output: Output): void {
@@ -231,8 +228,6 @@ export class GeoSegment extends GeoCurve implements HashCode, Debug {
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   static of(lng0: number, lat0: number, lng1: number, lat1: number): GeoSegment {
     return new GeoSegment(lng0, lat0, lng1, lat1);

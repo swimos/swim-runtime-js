@@ -32,34 +32,36 @@ export interface DateTimeSpecifiers {
   L: DateTimeFormat;
 }
 
-export const DateTimeSpecifiers = {
+export const DateTimeSpecifiers = {} as {
   /** @hidden */
-  _standard: void 0 as DateTimeSpecifiers | undefined,
-  standard(locale: DateTimeLocale = DateTimeLocale.standard()): DateTimeSpecifiers {
-    let specifiers: DateTimeSpecifiers | undefined;
+  _standard?: DateTimeSpecifiers,
+  standard(locale?: DateTimeLocale): DateTimeSpecifiers;
+};
+
+DateTimeSpecifiers.standard = function (locale: DateTimeLocale = DateTimeLocale.standard()): DateTimeSpecifiers {
+  let specifiers: DateTimeSpecifiers | undefined;
+  if (locale === DateTimeLocale.standard()) {
+    specifiers = DateTimeSpecifiers._standard;
+  }
+  if (specifiers === void 0) {
+    specifiers = {
+      Y: DateTimeFormat.year(),
+      m: DateTimeFormat.monthOfYear(),
+      B: DateTimeFormat.month(locale),
+      b: DateTimeFormat.shortMonth(locale),
+      d: DateTimeFormat.dayOfMonth(),
+      A: DateTimeFormat.weekday(locale),
+      a: DateTimeFormat.shortWeekday(locale),
+      H: DateTimeFormat.hour24(),
+      I: DateTimeFormat.hour12(),
+      p: DateTimeFormat.period(locale),
+      M: DateTimeFormat.minute(),
+      S: DateTimeFormat.second(),
+      L: DateTimeFormat.millisecond(),
+    };
     if (locale === DateTimeLocale.standard()) {
-      specifiers = DateTimeSpecifiers._standard;
+      DateTimeSpecifiers._standard = specifiers;
     }
-    if (specifiers === void 0) {
-      specifiers = {
-        Y: DateTimeFormat.year(),
-        m: DateTimeFormat.monthOfYear(),
-        B: DateTimeFormat.month(locale),
-        b: DateTimeFormat.shortMonth(locale),
-        d: DateTimeFormat.dayOfMonth(),
-        A: DateTimeFormat.weekday(locale),
-        a: DateTimeFormat.shortWeekday(locale),
-        H: DateTimeFormat.hour24(),
-        I: DateTimeFormat.hour12(),
-        p: DateTimeFormat.period(locale),
-        M: DateTimeFormat.minute(),
-        S: DateTimeFormat.second(),
-        L: DateTimeFormat.millisecond(),
-      };
-      if (locale === DateTimeLocale.standard()) {
-        DateTimeSpecifiers._standard = specifiers;
-      }
-    }
-    return specifiers;
-  },
+  }
+  return specifiers;
 };

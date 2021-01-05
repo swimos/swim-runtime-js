@@ -30,15 +30,15 @@ export class EventMessage extends LaneAddressed {
     return "event";
   }
 
-  static fromValue(value: Value): EventMessage | undefined {
-    return LaneAddressed.fromValue(value, EventMessage) as EventMessage | undefined;
-  }
-
   static of(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): EventMessage {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new EventMessage(node, lane, body);
+  }
+
+  static fromValue(value: Value): EventMessage | undefined {
+    return LaneAddressed.fromValue(value, EventMessage) as EventMessage | undefined;
   }
 }
 Envelope.EventMessage = EventMessage;

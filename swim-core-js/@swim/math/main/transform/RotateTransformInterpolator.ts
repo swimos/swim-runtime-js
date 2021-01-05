@@ -18,6 +18,7 @@ import {AnyTransform, Transform} from "./Transform";
 import {RotateTransform} from "./RotateTransform";
 import {TransformInterpolator} from "./TransformInterpolator";
 
+/** @hidden */
 export class RotateTransformInterpolator extends TransformInterpolator<RotateTransform> {
   /** @hidden */
   readonly v0: number;

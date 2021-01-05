@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {AnyItem, Item} from "../Item";
 import {Selector} from "../Selector";
@@ -112,7 +112,7 @@ export class FilterSelector extends Selector {
     return 19;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof FilterSelector) {
       let order = this._predicate.compareTo(that._predicate);
       if (order === 0) {
@@ -120,7 +120,7 @@ export class FilterSelector extends Selector {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -143,10 +143,7 @@ export class FilterSelector extends Selector {
   }
 
   hashCode(): number {
-    if (FilterSelector._hashSeed === void 0) {
-      FilterSelector._hashSeed = Murmur3.seed(FilterSelector);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(FilterSelector._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(FilterSelector),
         this._predicate.hashCode()), this._then.hashCode()));
   }
 
@@ -158,7 +155,5 @@ export class FilterSelector extends Selector {
   clone(): Selector {
     return new FilterSelector(this._predicate.clone(), this._then.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.FilterSelector = FilterSelector;

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Equals} from "@swim/util";
 import {ShapeR2} from "@swim/math";
 import {GeoPoint, GeoPointInit, GeoPointTuple} from "./GeoPoint";
 import {GeoProjection} from "./GeoProjection";
@@ -20,7 +21,7 @@ import {GeoBoxInit, GeoBox} from "./GeoBox";
 
 export type AnyGeoShape = GeoShape | GeoPointInit | GeoPointTuple | GeoSegmentInit | GeoBoxInit;
 
-export abstract class GeoShape {
+export abstract class GeoShape implements Equals {
   abstract get lngMin(): number;
 
   abstract get latMin(): number;
@@ -48,6 +49,8 @@ export abstract class GeoShape {
   boundingBox(): GeoBox {
     return new GeoShape.Box(this.lngMin, this.latMin, this.lngMax, this.latMax);
   }
+
+  abstract equals(that: unknown): boolean;
 
   static fromAny(value: AnyGeoShape): GeoShape {
     if (value instanceof GeoShape) {

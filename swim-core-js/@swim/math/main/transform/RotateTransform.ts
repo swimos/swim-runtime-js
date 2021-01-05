@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import {Item, Attr, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
@@ -102,10 +102,7 @@ export class RotateTransform extends Transform {
   }
 
   hashCode(): number {
-    if (RotateTransform._hashSeed === void 0) {
-      RotateTransform._hashSeed = Murmur3.seed(RotateTransform);
-    }
-    return Murmur3.mash(Murmur3.mix(RotateTransform._hashSeed, this._a.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(RotateTransform), this._a.hashCode()));
   }
 
   debug(output: Output): void {
@@ -125,8 +122,6 @@ export class RotateTransform extends Transform {
   toAttributeString(): string {
     return "rotate(" + this._a.degValue() + ")";
   }
-
-  private static _hashSeed?: number;
 
   static from(a: AnyAngle): RotateTransform {
     a = Angle.fromAny(a, "deg");

@@ -29,13 +29,13 @@ export class DeauthRequest extends HostAddressed {
     return "deauth";
   }
 
-  static fromValue(value: Value): DeauthRequest | undefined {
-    return HostAddressed.fromValue(value, DeauthRequest) as DeauthRequest | undefined;
-  }
-
   static of(body: AnyValue = Value.absent()): DeauthRequest {
     body = Value.fromAny(body);
     return new DeauthRequest(body);
+  }
+
+  static fromValue(value: Value): DeauthRequest | undefined {
+    return HostAddressed.fromValue(value, DeauthRequest) as DeauthRequest | undefined;
   }
 }
 Envelope.DeauthRequest = DeauthRequest;

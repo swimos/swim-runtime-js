@@ -26,14 +26,15 @@ export interface GeoProjection {
   unproject(x: number, y: number): GeoPoint;
 }
 
-/** @hidden */
-export const GeoProjection = {
-  is(object: unknown): object is GeoProjection {
-    if (typeof object === "object" && object !== null) {
-      const projection = object as GeoProjection;
-      return typeof projection.project === "function"
-          && typeof projection.unproject === "function";
-    }
-    return false;
-  },
+export const GeoProjection = {} as {
+  is(object: unknown): object is GeoProjection;
+};
+
+GeoProjection.is = function (object: unknown): object is GeoProjection {
+  if (typeof object === "object" && object !== null) {
+    const projection = object as GeoProjection;
+    return typeof projection.project === "function"
+        && typeof projection.unproject === "function";
+  }
+  return false;
 };

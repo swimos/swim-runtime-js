@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3} from "@swim/util";
+import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Output, Format, Debug} from "@swim/codec";
 
 /**
@@ -68,10 +68,8 @@ export class InterpreterSettings implements Debug, HashCode {
   }
 
   hashCode(): number {
-    if (InterpreterSettings._hashSeed === void 0) {
-      InterpreterSettings._hashSeed = Murmur3.seed(InterpreterSettings);
-    }
-    return Murmur3.mash(Murmur3.mix(InterpreterSettings._hashSeed, this._maxScopeDepth));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(InterpreterSettings),
+        Numbers.hash(this._maxScopeDepth)));
   }
 
   debug(output: Output): void {
@@ -83,7 +81,6 @@ export class InterpreterSettings implements Debug, HashCode {
     return Format.debug(this);
   }
 
-  private static _hashSeed?: number;
   private static _standard?: InterpreterSettings;
 
   static standard(): InterpreterSettings {

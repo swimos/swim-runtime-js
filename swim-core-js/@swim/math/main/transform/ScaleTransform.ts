@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import {Item, Attr, Slot, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
@@ -101,11 +101,8 @@ export class ScaleTransform extends Transform {
   }
 
   hashCode(): number {
-    if (ScaleTransform._hashSeed === void 0) {
-      ScaleTransform._hashSeed = Murmur3.seed(ScaleTransform);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(ScaleTransform._hashSeed,
-        Murmur3.hash(this._x)), Murmur3.hash(this._y)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(ScaleTransform),
+        Numbers.hash(this._x)), Numbers.hash(this._y)));
   }
 
   debug(output: Output): void {
@@ -133,8 +130,6 @@ export class ScaleTransform extends Transform {
     }
     return string;
   }
-
-  private static _hashSeed?: number;
 
   static from(x: string | number, y: string | number): ScaleTransform {
     x = +x;

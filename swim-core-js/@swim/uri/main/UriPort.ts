@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Murmur3, HashGenCacheMap} from "@swim/util";
+import {Comparable, HashCode, Strings, HashGenCacheMap} from "@swim/util";
 import {Output, Format, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 
@@ -57,10 +57,7 @@ export class UriPort implements Comparable<UriPort>, HashCode, Debug, Display {
   }
 
   hashCode(): number {
-    if (UriPort._hashSeed === void 0) {
-      UriPort._hashSeed = Murmur3.seed(UriPort);
-    }
-    return Murmur3.mash(Murmur3.mix(UriPort._hashSeed, this._number));
+    return Strings.hash(this.toString());
   }
 
   debug(output: Output): void {
@@ -81,8 +78,6 @@ export class UriPort implements Comparable<UriPort>, HashCode, Debug, Display {
   toString(): string {
     return "" + this._number;
   }
-
-  private static _hashSeed?: number;
 
   private static _undefined?: UriPort;
 

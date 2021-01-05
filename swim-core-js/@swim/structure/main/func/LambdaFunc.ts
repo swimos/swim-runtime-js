@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Value} from "../Value";
@@ -75,7 +75,7 @@ export class LambdaFunc extends Func {
     return 50;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof LambdaFunc) {
       let order = this._bindings.compareTo(that._bindings);
       if (order === 0) {
@@ -83,7 +83,7 @@ export class LambdaFunc extends Func {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -106,10 +106,7 @@ export class LambdaFunc extends Func {
   }
 
   hashCode() {
-    if (LambdaFunc._hashSeed === void 0) {
-      LambdaFunc._hashSeed = Murmur3.seed(LambdaFunc);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(LambdaFunc._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(LambdaFunc),
         this._bindings.hashCode()), this._template.hashCode()));
   }
 
@@ -117,7 +114,5 @@ export class LambdaFunc extends Func {
     output.debug(this.bindings).write(46/*'.'*/).write("lambda").write(40/*'('*/)
         .debug(this.template).write(41/*')'*/);
   }
-
-  private static _hashSeed?: number;
 }
 Item.LambdaFunc = LambdaFunc;

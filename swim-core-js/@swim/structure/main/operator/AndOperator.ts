@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {BinaryOperator} from "./BinaryOperator";
@@ -57,7 +57,7 @@ export class AndOperator extends BinaryOperator {
     return 22;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof AndOperator) {
       let order = this._operand1.compareTo(that._operand1);
       if (order === 0) {
@@ -65,7 +65,7 @@ export class AndOperator extends BinaryOperator {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -88,10 +88,7 @@ export class AndOperator extends BinaryOperator {
   }
 
   hashCode(): number {
-    if (AndOperator._hashSeed === void 0) {
-      AndOperator._hashSeed = Murmur3.seed(AndOperator);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(AndOperator._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(AndOperator),
         this._operand1.hashCode()), this._operand2.hashCode()));
   }
 
@@ -103,7 +100,5 @@ export class AndOperator extends BinaryOperator {
   clone(): AndOperator {
     return new AndOperator(this._operand1.clone(), this._operand2.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.AndOperator = AndOperator;

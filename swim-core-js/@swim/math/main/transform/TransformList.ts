@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
@@ -146,10 +146,7 @@ export class TransformList extends Transform {
   }
 
   hashCode(): number {
-    if (TransformList._hashSeed === void 0) {
-      TransformList._hashSeed = Murmur3.seed(TransformList);
-    }
-    let code = TransformList._hashSeed;
+    let code = Constructors.hash(TransformList);
     const transforms = this._transforms;
     for (let i = 0, n = transforms.length; i < n; i += 1) {
       code = Murmur3.mix(code, transforms[i].hashCode());
@@ -203,8 +200,6 @@ export class TransformList extends Transform {
       return "";
     }
   }
-
-  private static _hashSeed?: number;
 
   static from(transforms: ReadonlyArray<AnyTransform>): TransformList {
     const list: Transform[] = [];

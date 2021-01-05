@@ -29,13 +29,13 @@ export class AuthRequest extends HostAddressed {
     return "auth";
   }
 
-  static fromValue(value: Value): AuthRequest | undefined {
-    return HostAddressed.fromValue(value, AuthRequest) as AuthRequest | undefined;
-  }
-
   static of(body: AnyValue = Value.absent()): AuthRequest {
     body = Value.fromAny(body);
     return new AuthRequest(body);
+  }
+
+  static fromValue(value: Value): AuthRequest | undefined {
+    return HostAddressed.fromValue(value, AuthRequest) as AuthRequest | undefined;
   }
 }
 Envelope.AuthRequest = AuthRequest;

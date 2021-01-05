@@ -104,23 +104,24 @@ export interface Outlet<O = unknown> {
   watch(func: WatchValueFunction<O>): this;
 }
 
-/** @hidden */
-export const Outlet = {
-  is<O>(object: unknown): object is Outlet<O> {
-    if (typeof object === "object" && object !== null) {
-      const outlet = object as Outlet<O>;
-      return typeof outlet.outputIterator === "function"
-          && typeof outlet.bindOutput === "function"
-          && typeof outlet.unbindOutput === "function";
-    }
-    return false;
-  },
+export const Outlet = {} as {
+  is<O>(object: unknown): object is Outlet<O>;
 
   // Forward type declarations
   /** @hidden */
-  MemoizeValueCombinator: void 0 as unknown as typeof MemoizeValueCombinator, // defined by MemoizeValueCombinator
+  MemoizeValueCombinator: typeof MemoizeValueCombinator, // defined by MemoizeValueCombinator
   /** @hidden */
-  MapValueCombinator: void 0 as unknown as typeof MapValueCombinator, // defined by MapValueCombinator
+  MapValueCombinator: typeof MapValueCombinator, // defined by MapValueCombinator
   /** @hidden */
-  WatchValueCombinator: void 0 as unknown as typeof WatchValueCombinator, // defined by WatchValueCombinator
+  WatchValueCombinator: typeof WatchValueCombinator, // defined by WatchValueCombinator
+};
+
+Outlet.is = function <O>(object: unknown): object is Outlet<O> {
+  if (typeof object === "object" && object !== null) {
+    const outlet = object as Outlet<O>;
+    return typeof outlet.outputIterator === "function"
+        && typeof outlet.bindOutput === "function"
+        && typeof outlet.unbindOutput === "function";
+  }
+  return false;
 };

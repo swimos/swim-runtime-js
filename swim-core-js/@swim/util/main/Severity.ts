@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Murmur3} from "./Murmur3";
 import {Comparable} from "./Comparable";
 import {HashCode} from "./HashCode";
-import {Murmur3} from "./Murmur3";
+import {Numbers} from "./Numbers";
+import {Strings} from "./Strings";
+import {Constructors} from "./Constructors";
 
 /**
  * Level of importance.  Used for log levels and diagnostic classifications.
@@ -139,11 +142,8 @@ export class Severity implements Comparable<Severity>, HashCode {
   }
 
   hashCode(): number {
-    if (Severity._hashSeed === void 0) {
-      Severity._hashSeed = Murmur3.seed(Severity);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Severity._hashSeed,
-        this._level), Murmur3.hash(this._label)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(Severity),
+        Numbers.hash(this._level)), Strings.hash(this._label)));
   }
 
   toString(): string {
@@ -159,7 +159,6 @@ export class Severity implements Comparable<Severity>, HashCode {
   static readonly ALERT_LEVEL: number = 6;
   static readonly FATAL_LEVEL: number = 7;
 
-  private static _hashSeed?: number;
   private static _trace?: Severity;
   private static _debug?: Severity;
   private static _info?: Severity;

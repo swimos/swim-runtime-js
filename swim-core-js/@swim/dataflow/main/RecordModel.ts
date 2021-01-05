@@ -420,7 +420,7 @@ export class RecordModel extends AbstractRecordOutlet {
 
   static globalScope(): RecordModel {
     const model = new RecordModel();
-    model.materializeField(Slot.of("math", MathModule.scope().branch()));
+    model.materializeField(Slot.of("math", MathModule.scope.branch()));
     return model;
   }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyField, Field} from "./Field";
@@ -330,7 +330,7 @@ export class Attr extends Field {
     return 1;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof Attr) {
       let order = this._key.compareTo(that._key);
       if (order === 0) {
@@ -338,7 +338,7 @@ export class Attr extends Field {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -370,10 +370,7 @@ export class Attr extends Field {
   }
 
   hashCode(): number {
-    if (Attr._hashSeed === void 0) {
-      Attr._hashSeed = Murmur3.seed(Attr);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Attr._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(Attr),
         this._key.hashCode()), this._value.hashCode()));
   }
 
@@ -388,8 +385,6 @@ export class Attr extends Field {
   display(output: Output): void {
     this.debug(output);
   }
-
-  private static _hashSeed?: number;
 
   static of(key: AnyText, value?: AnyValue): Attr {
     key = Item.Text.fromAny(key);

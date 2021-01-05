@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
@@ -237,10 +237,10 @@ export class SegmentR2 extends BezierCurveR2 implements HashCode, Debug {
     if (this === that) {
       return true;
     } else if (that instanceof SegmentR2) {
-      return Objects.equivalent(that._x0, this._x0, epsilon)
-          && Objects.equivalent(that._y0, this._y0, epsilon)
-          && Objects.equivalent(that._x1, this._x1, epsilon)
-          && Objects.equivalent(that._y1, this._y1, epsilon);
+      return Numbers.equivalent(that._x0, this._x0, epsilon)
+          && Numbers.equivalent(that._y0, this._y0, epsilon)
+          && Numbers.equivalent(that._x1, this._x1, epsilon)
+          && Numbers.equivalent(that._y1, this._y1, epsilon);
     }
     return false;
   }
@@ -256,12 +256,9 @@ export class SegmentR2 extends BezierCurveR2 implements HashCode, Debug {
   }
 
   hashCode(): number {
-    if (SegmentR2._hashSeed === void 0) {
-      SegmentR2._hashSeed = Murmur3.seed(SegmentR2);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(SegmentR2._hashSeed,
-        Murmur3.hash(this._x0)), Murmur3.hash(this._y0)),
-        Murmur3.hash(this._x1)), Murmur3.hash(this._y1)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
+        Constructors.hash(SegmentR2), Numbers.hash(this._x0)), Numbers.hash(this._y0)),
+        Numbers.hash(this._x1)), Numbers.hash(this._y1)));
   }
 
   debug(output: Output): void {
@@ -273,8 +270,6 @@ export class SegmentR2 extends BezierCurveR2 implements HashCode, Debug {
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   static of(x0: number, y0: number, x1: number, y1: number): SegmentR2 {
     return new SegmentR2(x0, y0, x1, y1);

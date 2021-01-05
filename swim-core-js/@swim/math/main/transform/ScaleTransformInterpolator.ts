@@ -17,6 +17,7 @@ import {AnyTransform, Transform} from "./Transform";
 import {ScaleTransform} from "./ScaleTransform";
 import {TransformInterpolator} from "./TransformInterpolator";
 
+/** @hidden */
 export class ScaleTransformInterpolator extends TransformInterpolator<ScaleTransform> {
   /** @hidden */
   readonly x0: number;

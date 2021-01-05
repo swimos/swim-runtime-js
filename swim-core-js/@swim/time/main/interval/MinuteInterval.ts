@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {AnyDateTime, DateTime} from "../DateTime";
-import {MILLIS_PER_MINUTE, UnitTimeInterval, TimeInterval} from "../TimeInterval";
+import {UnitTimeInterval, TimeInterval} from "../TimeInterval";
 
 /** @hidden */
 export class MinuteInterval extends UnitTimeInterval {
@@ -21,7 +21,7 @@ export class MinuteInterval extends UnitTimeInterval {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
-    d += k * MILLIS_PER_MINUTE;
+    d += k * TimeInterval.MillisPerMinute;
     return new DateTime(d, z);
   }
 
@@ -29,21 +29,21 @@ export class MinuteInterval extends UnitTimeInterval {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
-    d = Math.floor((d + k * MILLIS_PER_MINUTE) / MILLIS_PER_MINUTE) * MILLIS_PER_MINUTE;
+    d = Math.floor((d + k * TimeInterval.MillisPerMinute) / TimeInterval.MillisPerMinute) * TimeInterval.MillisPerMinute;
     return new DateTime(d, z);
   }
 
   floor(d: AnyDateTime): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
-    d = Math.floor(d / MILLIS_PER_MINUTE) * MILLIS_PER_MINUTE;
+    d = Math.floor(d / TimeInterval.MillisPerMinute) * TimeInterval.MillisPerMinute;
     return new DateTime(d, z);
   }
 
   ceil(d: AnyDateTime): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
-    d = Math.floor(((Math.floor((d - 1) / MILLIS_PER_MINUTE) * MILLIS_PER_MINUTE) + MILLIS_PER_MINUTE) / MILLIS_PER_MINUTE) * MILLIS_PER_MINUTE;
+    d = Math.floor(((Math.floor((d - 1) / TimeInterval.MillisPerMinute) * TimeInterval.MillisPerMinute) + TimeInterval.MillisPerMinute) / TimeInterval.MillisPerMinute) * TimeInterval.MillisPerMinute;
     return new DateTime(d, z);
   }
 

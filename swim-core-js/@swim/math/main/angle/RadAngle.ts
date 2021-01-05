@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Murmur3} from "@swim/util";
+import {Murmur3, Equivalent, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {AngleUnits, AnyAngle, Angle} from "./Angle";
 
@@ -73,10 +73,7 @@ export class RadAngle extends Angle {
   }
 
   hashCode(): number {
-    if (RadAngle._hashSeed === void 0) {
-      RadAngle._hashSeed = Murmur3.seed(RadAngle);
-    }
-    return Murmur3.mash(Murmur3.mix(RadAngle._hashSeed, Murmur3.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(RadAngle), Numbers.hash(this._value)));
   }
 
   debug(output: Output): void {
@@ -87,8 +84,6 @@ export class RadAngle extends Angle {
   toString(): string {
     return this._value + "rad";
   }
-
-  private static _hashSeed?: number;
 
   private static _zero?: RadAngle;
   static zero(units?: "rad"): RadAngle {

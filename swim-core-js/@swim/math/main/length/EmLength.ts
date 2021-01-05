@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Murmur3} from "@swim/util";
+import {Murmur3, Equivalent, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {LengthUnits, AnyLength, Length} from "./Length";
 
@@ -83,10 +83,7 @@ export class EmLength extends Length {
   }
 
   hashCode(): number {
-    if (EmLength._hashSeed === void 0) {
-      EmLength._hashSeed = Murmur3.seed(EmLength);
-    }
-    return Murmur3.mash(Murmur3.mix(EmLength._hashSeed, Murmur3.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(EmLength), Numbers.hash(this._value)));
   }
 
   debug(output: Output): void {
@@ -100,8 +97,6 @@ export class EmLength extends Length {
   toString(): string {
     return this._value + "em";
   }
-
-  private static _hashSeed?: number;
 
   private static _zero: EmLength;
   static zero(units?: "em", node?: Node | null): EmLength;

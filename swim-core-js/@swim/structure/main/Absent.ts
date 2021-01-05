@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects, Cursor} from "@swim/util";
+import {Numbers, Constructors, Cursor} from "@swim/util";
 import {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
@@ -133,8 +133,8 @@ export class Absent extends Value {
     return 99;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+  compareTo(that: Item): number {
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item): boolean {
@@ -146,10 +146,7 @@ export class Absent extends Value {
   }
 
   hashCode(): number {
-    if (Absent._hashSeed === void 0) {
-      Absent._hashSeed = Murmur3.seed(Absent);
-    }
-    return Absent._hashSeed;
+    return Constructors.hash(Absent);
   }
 
   debug(output: Output): void {
@@ -161,8 +158,6 @@ export class Absent extends Value {
   }
 
   private static readonly _absent: Absent = new Absent();
-
-  private static _hashSeed?: number;
 
   static absent(): Absent {
     return Absent._absent;

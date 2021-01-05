@@ -17,6 +17,7 @@ import {AnyTransform, Transform} from "./Transform";
 import {TransformList} from "./TransformList";
 import {TransformInterpolator} from "./TransformInterpolator";
 
+/** @hidden */
 export class TransformListInterpolator extends TransformInterpolator<TransformList> {
   /** @hidden */
   readonly interpolators: ReadonlyArray<TransformInterpolator>;

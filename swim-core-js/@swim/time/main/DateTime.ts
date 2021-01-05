@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, Equivalent, HashCode, Murmur3} from "@swim/util";
+import {Murmur3, Comparable, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Display, Output} from "@swim/codec";
 import {Item, Value, Form} from "@swim/structure";
 import {AnyTimeZone, TimeZone} from "./TimeZone";
@@ -263,11 +263,8 @@ export class DateTime implements Comparable<AnyDateTime>, Equivalent<AnyDateTime
   }
 
   hashCode(): number {
-    if (DateTime._hashSeed === void 0) {
-      DateTime._hashSeed = Murmur3.seed(DateTime);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(DateTime._hashSeed,
-        Murmur3.hash(this._time)), this._zone.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(DateTime),
+        Numbers.hash(this._time)), this._zone.hashCode()));
   }
 
   display(output: Output, format: DateTimeFormat = DateTime.Format.iso8601()): void {
@@ -277,8 +274,6 @@ export class DateTime implements Comparable<AnyDateTime>, Equivalent<AnyDateTime
   toString(format: DateTimeFormat = DateTime.Format.iso8601()): string {
     return format.format(this);
   }
-
-  private static _hashSeed?: number;
 
   static current(zone?: AnyTimeZone): DateTime {
     zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.local();

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects, HashGenCacheSet} from "@swim/util";
+import {Numbers, Strings, HashGenCacheSet} from "@swim/util";
 import {OutputSettings, Output, Format} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
@@ -105,12 +105,11 @@ export class Text extends Value {
     return 5;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof Text) {
-      const order = this._value.localeCompare(that._value);
-      return order < 0 ? -1 : order > 0 ? 1 : 0;
+      return this._value.localeCompare(that._value);
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item): boolean {
@@ -128,7 +127,7 @@ export class Text extends Value {
 
   hashCode(): number {
     if (this._hashCode === void 0) {
-      this._hashCode = Murmur3.hash(this._value);
+      this._hashCode = Strings.hash(this._value);
     }
     return this._hashCode;
   }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {UnaryOperator} from "./UnaryOperator";
@@ -47,11 +47,11 @@ export class NegativeOperator extends UnaryOperator {
     return 39;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof NegativeOperator) {
       return this._operand.compareTo(that._operand);
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -73,10 +73,7 @@ export class NegativeOperator extends UnaryOperator {
   }
 
   hashCode(): number {
-    if (NegativeOperator._hashSeed === void 0) {
-      NegativeOperator._hashSeed = Murmur3.seed(NegativeOperator);
-    }
-    return Murmur3.mash(Murmur3.mix(NegativeOperator._hashSeed, this._operand.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(NegativeOperator), this._operand.hashCode()));
   }
 
   debug(output: Output): void {
@@ -86,7 +83,5 @@ export class NegativeOperator extends UnaryOperator {
   clone(): NegativeOperator {
     return new NegativeOperator(this._operand.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.NegativeOperator = NegativeOperator;

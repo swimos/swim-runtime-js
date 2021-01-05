@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Value} from "../Value";
@@ -83,7 +83,7 @@ export class InvokeOperator extends Operator {
     return 41;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof InvokeOperator) {
       let order = this._func.compareTo(that._func);
       if (order === 0) {
@@ -91,7 +91,7 @@ export class InvokeOperator extends Operator {
       }
       return order;
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -114,10 +114,7 @@ export class InvokeOperator extends Operator {
   }
 
   hashCode(): number {
-    if (InvokeOperator._hashSeed === void 0) {
-      InvokeOperator._hashSeed = Murmur3.seed(InvokeOperator);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(InvokeOperator._hashSeed,
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(InvokeOperator),
         this._func.hashCode()), this._args.hashCode()));
   }
 
@@ -129,7 +126,5 @@ export class InvokeOperator extends Operator {
   clone(): InvokeOperator {
     return new InvokeOperator(this._func.clone(), this._args.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.InvokeOperator = InvokeOperator;

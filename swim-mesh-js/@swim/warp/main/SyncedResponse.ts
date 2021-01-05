@@ -30,15 +30,15 @@ export class SyncedResponse extends LaneAddressed {
     return "synced";
   }
 
-  static fromValue(value: Value): SyncedResponse | undefined {
-    return LaneAddressed.fromValue(value, SyncedResponse) as SyncedResponse | undefined;
-  }
-
   static of(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): SyncedResponse {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new SyncedResponse(node, lane, body);
+  }
+
+  static fromValue(value: Value): SyncedResponse | undefined {
+    return LaneAddressed.fromValue(value, SyncedResponse) as SyncedResponse | undefined;
   }
 }
 Envelope.SyncedResponse = SyncedResponse;

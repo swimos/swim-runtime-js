@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import {Murmur3, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item, Attr, AnyValue, Value, Record} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
@@ -78,8 +78,7 @@ export abstract class LaneAddressed extends Envelope {
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
-    } else if (that instanceof LaneAddressed
-        && (this as any).__proto__.constructor === (that as any).__proto__.constructor) {
+    } else if (that instanceof LaneAddressed && this.constructor === that.constructor) {
       return this._node.equals(that._node) && this._lane.equals(that._lane)
           && this._body.equals(that._body);
     }
@@ -87,12 +86,12 @@ export abstract class LaneAddressed extends Envelope {
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.seed((this as any).__proto__),
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(this.constructor),
         this._node.hashCode()), this._lane.hashCode()), this._body.hashCode()));
   }
 
   debug(output: Output): void {
-    output = output.write((this as any).__proto__.constructor.name).write(46/*'.'*/).write("of").write(40/*'('*/)
+    output = output.write(this.constructor.name).write(46/*'.'*/).write("of").write(40/*'('*/)
         .debug(this._node.toString()).write(", ").debug(this._lane.toString());
     if (this._body.isDefined()) {
       output = output.write(", ").debug(this._body);

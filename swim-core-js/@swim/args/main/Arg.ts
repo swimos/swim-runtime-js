@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3, Objects} from "@swim/util";
+import {Murmur3, HashCode, Booleans, Strings, Constructors} from "@swim/util";
 import {Output, Debug, Format} from "@swim/codec";
 
 export type AnyArg = Arg | ArgInit | string;
@@ -67,15 +67,15 @@ export class Arg implements HashCode, Debug {
     if (this === that) {
       return true;
     } else if (that instanceof Arg) {
-      return this._name === that._name && Objects.equal(this._value, that._value)
+      return this._name === that._name && this._value === that._value
           && this._optional === that._optional;
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.seed(Arg),
-        Murmur3.hash(this._name)), Murmur3.hash(this._value as any)), Murmur3.hash(this._optional)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(Arg),
+        Strings.hash(this._name)), Strings.hash(this._value)), Booleans.hash(this._optional)));
   }
 
   debug(output: Output): void {

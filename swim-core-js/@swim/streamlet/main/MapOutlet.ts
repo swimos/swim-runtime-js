@@ -88,27 +88,28 @@ export interface MapOutlet<K, V, O> extends Outlet<O> {
   watch(func: WatchFieldsFunction<K, V>): this;
 }
 
-/** @hidden */
-export const MapOutlet = {
-  is<K, V, I>(object: unknown): object is MapOutlet<K, V, I> {
-    if (typeof object === "object" && object !== null) {
-      const outlet = object as MapOutlet<K, V, I>;
-      return Outlet.is(outlet)
-          && typeof outlet.keyIterator === "function"
-          && typeof outlet.outlet === "function";
-    }
-    return false;
-  },
+export const MapOutlet = {} as {
+  is<K, V, I>(object: unknown): object is MapOutlet<K, V, I>;
 
   // Forward type declarations
   /** @hidden */
-  MemoizeMapCombinator: void 0 as unknown as typeof MemoizeMapCombinator, // defined by MemoizeMapCombinator
+  MemoizeMapCombinator: typeof MemoizeMapCombinator, // defined by MemoizeMapCombinator
   /** @hidden */
-  FilterFieldsCombinator: void 0 as unknown as typeof FilterFieldsCombinator, // defined by FilterFieldsCombinator
+  FilterFieldsCombinator: typeof FilterFieldsCombinator, // defined by FilterFieldsCombinator
   /** @hidden */
-  MapFieldValuesCombinator: void 0 as unknown as typeof MapFieldValuesCombinator, // defined by MapFieldValuesCombinator
+  MapFieldValuesCombinator: typeof MapFieldValuesCombinator, // defined by MapFieldValuesCombinator
   /** @hidden */
-  ReduceFieldsCombinator: void 0 as unknown as typeof ReduceFieldsCombinator, // defined by ReduceFieldsCombinator
+  ReduceFieldsCombinator: typeof ReduceFieldsCombinator, // defined by ReduceFieldsCombinator
   /** @hidden */
-  WatchFieldsCombinator: void 0 as unknown as typeof WatchFieldsCombinator, // defined by WatchFieldsCombinator
+  WatchFieldsCombinator: typeof WatchFieldsCombinator, // defined by WatchFieldsCombinator
+};
+
+MapOutlet.is = function <K, V, I>(object: unknown): object is MapOutlet<K, V, I> {
+  if (typeof object === "object" && object !== null) {
+    const outlet = object as MapOutlet<K, V, I>;
+    return Outlet.is(outlet)
+        && typeof outlet.keyIterator === "function"
+        && typeof outlet.outlet === "function";
+  }
+  return false;
 };

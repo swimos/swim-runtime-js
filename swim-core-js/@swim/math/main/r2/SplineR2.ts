@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "@swim/util";
+import {Arrays} from "@swim/util";
 import {
   Debug,
   Format,
@@ -280,7 +280,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof SplineR2) {
-      return Objects.equivalent(this._curves, that._curves, epsilon)
+      return Arrays.equivalent(this._curves, that._curves, epsilon)
           && this._closed === that._closed;
     }
     return false;
@@ -290,7 +290,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof SplineR2) {
-      return Objects.equal(this._curves, that._curves)
+      return Arrays.equal(this._curves, that._curves)
           && this._closed === that._closed;
     }
     return false;

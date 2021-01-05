@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Murmur3} from "@swim/util";
+import {Murmur3, Equivalent, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {LengthUnits, AnyLength, Length} from "./Length";
 
@@ -79,10 +79,7 @@ export class PxLength extends Length {
   }
 
   hashCode(): number {
-    if (PxLength._hashSeed === void 0) {
-      PxLength._hashSeed = Murmur3.seed(PxLength);
-    }
-    return Murmur3.mash(Murmur3.mix(PxLength._hashSeed, Murmur3.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(PxLength), Numbers.hash(this._value)));
   }
 
   debug(output: Output): void {
@@ -96,8 +93,6 @@ export class PxLength extends Length {
   toString(): string {
     return this._value + "px";
   }
-
-  private static _hashSeed?: number;
 
   private static _zero: PxLength;
   static zero(units?: "px", node?: Node | null): PxLength;

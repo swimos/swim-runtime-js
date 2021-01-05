@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Selector} from "../Selector";
@@ -163,11 +163,11 @@ export class ValuesSelector extends Selector {
     return 16;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
+  compareTo(that: Item): number {
     if (that instanceof ValuesSelector) {
       return this._then.compareTo(that._then);
     }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -189,10 +189,7 @@ export class ValuesSelector extends Selector {
   }
 
   hashCode(): number {
-    if (ValuesSelector._hashSeed === void 0) {
-      ValuesSelector._hashSeed = Murmur3.seed(ValuesSelector);
-    }
-    return Murmur3.mash(Murmur3.mix(ValuesSelector._hashSeed, this._then.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(ValuesSelector), this._then.hashCode()));
   }
 
   debugThen(output: Output): void {
@@ -203,7 +200,5 @@ export class ValuesSelector extends Selector {
   clone(): Selector {
     return new ValuesSelector(this._then.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.ValuesSelector = ValuesSelector;

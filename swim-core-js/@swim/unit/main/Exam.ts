@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects, Assert} from "@swim/util";
+import {Values, Assert} from "@swim/util";
 import {Spec} from "./Spec";
 import {TestOptions} from "./Test";
 import {TestException} from "./TestException";
@@ -238,7 +238,7 @@ export class Exam implements Assert {
   }
 
   equal(lhs: unknown, rhs: unknown, message?: string): void {
-    if (Objects.equal(lhs, rhs)) {
+    if (Values.equal(lhs, rhs)) {
       this.proove(Proof.valid("equal", message));
     } else {
       this.proove(Proof.refuted(lhs, "equal", rhs, message));
@@ -247,7 +247,7 @@ export class Exam implements Assert {
   }
 
   notEqual(lhs: unknown, rhs: unknown, message?: string): void {
-    if (!Objects.equal(lhs, rhs)) {
+    if (!Values.equal(lhs, rhs)) {
       this.proove(Proof.valid("not equal"));
     } else {
       this.proove(Proof.refuted(lhs, "not equal", rhs, message));
@@ -256,7 +256,7 @@ export class Exam implements Assert {
   }
 
   equivalent(lhs: unknown, rhs: unknown, message?: string): void {
-    if (Objects.equivalent(lhs, rhs)) {
+    if (Values.equivalent(lhs, rhs)) {
       this.proove(Proof.valid("equivalent", message));
     } else {
       this.proove(Proof.refuted(lhs, "equivalent", rhs, message));
@@ -265,7 +265,7 @@ export class Exam implements Assert {
   }
 
   notEquivalent(lhs: unknown, rhs: unknown, message?: string): void {
-    if (!Objects.equivalent(lhs, rhs)) {
+    if (!Values.equivalent(lhs, rhs)) {
       this.proove(Proof.valid("not equivalent"));
     } else {
       this.proove(Proof.refuted(lhs, "not equivalent", rhs, message));
@@ -274,7 +274,7 @@ export class Exam implements Assert {
   }
 
   compareLessThan(lhs: unknown, rhs: unknown, message?: string): void {
-    if (Objects.compare(lhs, rhs) < 0) {
+    if (Values.compare(lhs, rhs) < 0) {
       this.proove(Proof.valid("compare less than", message));
     } else {
       this.proove(Proof.refuted(lhs, "<", rhs, message));
@@ -283,7 +283,7 @@ export class Exam implements Assert {
   }
 
   compareNotLessThan(lhs: unknown, rhs: unknown, message?: string): void {
-    if (!(Objects.compare(lhs, rhs) < 0)) {
+    if (!(Values.compare(lhs, rhs) < 0)) {
       this.proove(Proof.valid("compare not less than", message));
     } else {
       this.proove(Proof.refuted(lhs, "!<", rhs, message));
@@ -292,7 +292,7 @@ export class Exam implements Assert {
   }
 
   compareLessThanOrEqual(lhs: unknown, rhs: unknown, message?: string): void {
-    if (Objects.compare(lhs, rhs) <= 0) {
+    if (Values.compare(lhs, rhs) <= 0) {
       this.proove(Proof.valid("compare less than or equal", message));
     } else {
       this.proove(Proof.refuted(lhs, "<=", rhs, message));
@@ -301,7 +301,7 @@ export class Exam implements Assert {
   }
 
   compareNotLessThanOrEqual(lhs: unknown, rhs: unknown, message?: string): void {
-    if (!(Objects.compare(lhs, rhs) <= 0)) {
+    if (!(Values.compare(lhs, rhs) <= 0)) {
       this.proove(Proof.valid("compare not less than or equal", message));
     } else {
       this.proove(Proof.refuted(lhs, "!<=", rhs, message));
@@ -310,7 +310,7 @@ export class Exam implements Assert {
   }
 
   compareEqual(lhs: unknown, rhs: unknown, message?: string): void {
-    if (Objects.compare(lhs, rhs) === 0) {
+    if (Values.compare(lhs, rhs) === 0) {
       this.proove(Proof.valid("compare equal", message));
     } else {
       this.proove(Proof.refuted(lhs, "==", rhs, message));
@@ -319,7 +319,7 @@ export class Exam implements Assert {
   }
 
   compareNotEqual(lhs: unknown, rhs: unknown, message?: string): void {
-    if (!(Objects.compare(lhs, rhs) === 0)) {
+    if (!(Values.compare(lhs, rhs) === 0)) {
       this.proove(Proof.valid("compare not equal", message));
     } else {
       this.proove(Proof.refuted(lhs, "!=", rhs, message));
@@ -328,7 +328,7 @@ export class Exam implements Assert {
   }
 
   compareGreaterThanOrEqual(lhs: unknown, rhs: unknown, message?: string): void {
-    if (Objects.compare(lhs, rhs) >= 0) {
+    if (Values.compare(lhs, rhs) >= 0) {
       this.proove(Proof.valid("compare greater than or equal", message));
     } else {
       this.proove(Proof.refuted(lhs, ">=", rhs, message));
@@ -337,7 +337,7 @@ export class Exam implements Assert {
   }
 
   compareNotGreaterThanOrEqual(lhs: unknown, rhs: unknown, message?: string): void {
-    if (!(Objects.compare(lhs, rhs) >= 0)) {
+    if (!(Values.compare(lhs, rhs) >= 0)) {
       this.proove(Proof.valid("compare not greater than or equal", message));
     } else {
       this.proove(Proof.refuted(lhs, "!>=", rhs, message));
@@ -346,7 +346,7 @@ export class Exam implements Assert {
   }
 
   compareGreaterThan(lhs: unknown, rhs: unknown, message?: string): void {
-    if (Objects.compare(lhs, rhs) > 0) {
+    if (Values.compare(lhs, rhs) > 0) {
       this.proove(Proof.valid("compare greater than", message));
     } else {
       this.proove(Proof.refuted(lhs, ">", rhs, message));
@@ -355,7 +355,7 @@ export class Exam implements Assert {
   }
 
   compareNotGreaterThan(lhs: unknown, rhs: unknown, message?: string): void {
-    if (!(Objects.compare(lhs, rhs) > 0)) {
+    if (!(Values.compare(lhs, rhs) > 0)) {
       this.proove(Proof.valid("compare not greater than", message));
     } else {
       this.proove(Proof.refuted(lhs, "!>", rhs, message));

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals, Objects} from "@swim/util";
+import {Equivalent, Equals, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
@@ -99,14 +99,14 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equiv
   }
 
   equivalentTo(that: SetR2, epsilon?: number): boolean {
-    return this === that || Objects.equivalent(this._shapes, that._shapes, epsilon);
+    return this === that || Arrays.equivalent(this._shapes, that._shapes, epsilon);
   }
 
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof SetR2) {
-      return Objects.equal(this._shapes, that._shapes);
+      return Arrays.equal(this._shapes, that._shapes);
     }
     return false;
   }

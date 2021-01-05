@@ -30,15 +30,15 @@ export class UnlinkedResponse extends LaneAddressed {
     return "unlinked";
   }
 
-  static fromValue(value: Value): UnlinkedResponse | undefined {
-    return LaneAddressed.fromValue(value, UnlinkedResponse) as UnlinkedResponse | undefined;
-  }
-
   static of(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): UnlinkedResponse {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new UnlinkedResponse(node, lane, body);
+  }
+
+  static fromValue(value: Value): UnlinkedResponse | undefined {
+    return LaneAddressed.fromValue(value, UnlinkedResponse) as UnlinkedResponse | undefined;
   }
 }
 Envelope.UnlinkedResponse = UnlinkedResponse;

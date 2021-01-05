@@ -499,7 +499,7 @@ export abstract class Item implements Comparable<Item>, Equivalent<Item>, HashCo
    */
   abstract typeOrder(): number;
 
-  abstract compareTo(that: Item): 0 | 1 | -1;
+  abstract compareTo(that: Item): number;
 
   abstract equivalentTo(that: Item, epsilon?: number): boolean;
 
@@ -544,7 +544,7 @@ export abstract class Item implements Comparable<Item>, Equivalent<Item>, HashCo
   static globalScope(): Item {
     if (Item._globalScope === void 0) {
       Item._globalScope = Item.Record.create(1)
-          .slot("math", Item.MathModule.scope())
+          .slot("math", Item.MathModule.scope)
           .commit();
     }
     return Item._globalScope;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Objects} from "@swim/util";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {UnaryOperator} from "./UnaryOperator";
@@ -47,11 +47,8 @@ export class NotOperator extends UnaryOperator {
     return 37;
   }
 
-  compareTo(that: Item): 0 | 1 | -1 {
-    if (that instanceof NotOperator) {
-      return this._operand.compareTo(that._operand);
-    }
-    return Objects.compare(this.typeOrder(), that.typeOrder());
+  compareTo(that: Item): number {
+    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -73,10 +70,7 @@ export class NotOperator extends UnaryOperator {
   }
 
   hashCode(): number {
-    if (NotOperator._hashSeed === void 0) {
-      NotOperator._hashSeed = Murmur3.seed(NotOperator);
-    }
-    return Murmur3.mash(Murmur3.mix(NotOperator._hashSeed, this._operand.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(NotOperator), this._operand.hashCode()));
   }
 
   debug(output: Output): void {
@@ -86,7 +80,5 @@ export class NotOperator extends UnaryOperator {
   clone(): NotOperator {
     return new NotOperator(this._operand.clone());
   }
-
-  private static _hashSeed?: number;
 }
 Item.NotOperator = NotOperator;

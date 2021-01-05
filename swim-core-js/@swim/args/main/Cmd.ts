@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equals, Objects} from "@swim/util";
+import {Equals, Arrays} from "@swim/util";
 import {Output, Debug, Format, Unicode} from "@swim/codec";
 import {AnyOpt, Opt} from "./Opt";
 import {AnyArg, Arg} from "./Arg";
@@ -332,9 +332,9 @@ export class Cmd implements Equals, Debug {
       return true;
     } else if (that instanceof Cmd) {
       return this._id === that._id && this._name === that._name && this._desc === that._desc
-          && Objects.equal(this._opts, that._opts) && Objects.equal(this._args, that._args)
-          && Objects.equal(this._cmds, that._cmds) && Objects.equal(this._exec, that._exec)
-          && Objects.equal(this._base, that._base);
+          && Arrays.equal(this._opts, that._opts) && Arrays.equal(this._args, that._args)
+          && Arrays.equal(this._cmds, that._cmds) && Equals.equal(this._exec, that._exec)
+          && Equals.equal(this._base, that._base);
     }
     return false;
   }

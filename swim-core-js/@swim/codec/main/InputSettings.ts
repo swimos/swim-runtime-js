@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3} from "@swim/util";
+import {Murmur3, HashCode, Booleans, Constructors} from "@swim/util";
 import {Output} from "./Output";
 import {Format} from "./Format";
 import {Debug} from "./Debug";
@@ -76,11 +76,8 @@ export class InputSettings implements Debug, HashCode {
   }
 
   hashCode(): number {
-    if (InputSettings._hashSeed === void 0) {
-      InputSettings._hashSeed = Murmur3.seed(InputSettings);
-    }
-    return Murmur3.mash(Murmur3.mix(InputSettings._hashSeed,
-        Murmur3.hash(this._isStrict)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(InputSettings),
+        Booleans.hash(this._isStrict)));
   }
 
   debug(output: Output): void {
@@ -97,7 +94,6 @@ export class InputSettings implements Debug, HashCode {
     return Format.debug(this);
   }
 
-  private static _hashSeed?: number;
   private static _standard?: InputSettings;
   private static _stripped?: InputSettings;
 

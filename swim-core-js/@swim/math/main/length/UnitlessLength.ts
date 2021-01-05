@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Murmur3} from "@swim/util";
+import {Murmur3, Equivalent, Numbers, Constructors} from "@swim/util";
 import {Output} from "@swim/codec";
 import {LengthUnits, AnyLength, Length} from "./Length";
 
@@ -75,10 +75,7 @@ export class UnitlessLength extends Length {
   }
 
   hashCode(): number {
-    if (UnitlessLength._hashSeed === void 0) {
-      UnitlessLength._hashSeed = Murmur3.seed(UnitlessLength);
-    }
-    return Murmur3.mash(Murmur3.mix(UnitlessLength._hashSeed, Murmur3.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(UnitlessLength), Numbers.hash(this._value)));
   }
 
   debug(output: Output): void {
@@ -92,8 +89,6 @@ export class UnitlessLength extends Length {
   toString(): string {
     return this._value + "";
   }
-
-  private static _hashSeed?: number;
 
   private static _zero: UnitlessLength;
   static zero(units?: "", node?: Node | null): UnitlessLength;

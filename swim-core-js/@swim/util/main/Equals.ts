@@ -17,7 +17,35 @@
  */
 export interface Equals {
   /**
-   * Returns `true` if `this` is equivalent to `that`, otherwise returns `false`.
+   * Returns `true` if `this` is equal to `that`, otherwise returns `false`.
    */
   equals(that: unknown): boolean;
 }
+
+export const Equals = {} as {
+  /**
+   * Returns `true` if `x` is an object and is [[Equals.equals equal]] to `y`,
+   * otherwise returns `x === y`.
+   */
+  equal(x: Object | null | undefined, y: unknown): boolean;
+
+  /**
+   * Returns `true` if `object` conforms to the [[Equals]] interface.
+   */
+  is(object: unknown): object is Equals;
+};
+
+Equals.equal = function (x: Object | null | undefined, y: unknown): boolean {
+  if (typeof x === "object" && x !== null && typeof (x as Equals).equals === "function") {
+    return (x as Equals).equals(y);
+  } else {
+    return x === y;
+  }
+};
+
+Equals.is = function (object: unknown): object is Equals {
+  if (typeof object === "object" && object !== null || typeof object === "function") {
+    return typeof (object as Equals).equals === "function";
+  }
+  return false;
+};

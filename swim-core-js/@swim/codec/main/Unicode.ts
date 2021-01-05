@@ -30,14 +30,8 @@ import {StringWriter} from "./StringWriter";
  * Unicode code points to an internal buffer, and [[Output.bind binds]] a
  * `string` containing all written code points.
  */
-export class Unicode {
-  private constructor() {
-    // nop
-  }
-
-  static stringInput(string: string): Input {
-    return new StringInput(string);
-  }
+export const Unicode = {} as {
+  stringInput(string: string): Input;
 
   /**
    * Returns a new `Output` that appends Unicode code points to the given
@@ -46,57 +40,75 @@ export class Unicode {
    * _cont_ state, and [[Output.bind binds]] a `string` containing the given
    * `string`, and all appended code points.
    */
-  static stringOutput(string?: string, settings?: AnyOutputSettings): Output<string>;
+  stringOutput(string?: string, settings?: AnyOutputSettings): Output<string>;
+
   /**
    * Returns a new `Output` that buffers Unicode code points, using the given
    * output `settings`.  The returned `Output` accepts an unbounded number of
    * code points, remaining permanently in the _cont_ state, and [[Output.bind
    * binds]] a `string` containing all written code points.
    */
-  static stringOutput(settings?: AnyOutputSettings): Output<string>;
-  static stringOutput(string?: string | AnyOutputSettings, settings?: AnyOutputSettings): Output<string> {
-    if (settings === void 0 && typeof string !== "string") {
-      settings = string;
-      string = "";
-    } else if (typeof string !== "string") {
-      string = "";
-    }
-    settings = OutputSettings.fromAny(settings);
-    return new StringOutput(string, settings);
-  }
+  stringOutput(settings?: AnyOutputSettings): Output<string>;
 
-  static stringWriter<I>(): Writer<I, unknown>;
-  static stringWriter<I, O>(input: O): Writer<I, O>;
-  static stringWriter<I, O>(input?: O): Writer<I, unknown> {
-    if (input === void 0) {
-      return new StringWriter(void 0, "");
-    } else {
-      return new StringWriter(input, "" + input);
-    }
-  }
+  stringWriter<I>(): Writer<I, unknown>;
 
-  static writeString<I>(input: unknown, output: Output): Writer<I, unknown> {
-    return StringWriter.write(output, void 0, "" + input);
-  }
+  stringWriter<I, O>(input: O): Writer<I, O>;
+
+  writeString<I>(input: unknown, output: Output): Writer<I, unknown>;
 
   /** @hidden */
-  static isAlpha(c: number): boolean {
-    return c >= 65/*'A'*/ && c <= 90/*'Z'*/
-        || c >= 97/*'a'*/ && c <= 122/*'z'*/;
-  }
+  isAlpha(c: number): boolean;
 
   /** @hidden */
-  static isSpace(c: number): boolean {
-    return c === 0x20 || c === 0x9;
-  }
+  isSpace(c: number): boolean;
 
   /** @hidden */
-  static isNewline(c: number): boolean {
-    return c === 0xa || c === 0xd;
-  }
+  isNewline(c: number): boolean;
 
   /** @hidden */
-  static isWhitespace(c: number): boolean {
-    return Unicode.isSpace(c) || Unicode.isNewline(c);
+  isWhitespace(c: number): boolean;
+};
+
+Unicode.stringInput = function (string: string): Input {
+  return new StringInput(string);
+};
+
+Unicode.stringOutput = function (string?: string | AnyOutputSettings, settings?: AnyOutputSettings): Output<string> {
+  if (settings === void 0 && typeof string !== "string") {
+    settings = string;
+    string = "";
+  } else if (typeof string !== "string") {
+    string = "";
   }
-}
+  settings = OutputSettings.fromAny(settings);
+  return new StringOutput(string, settings);
+};
+
+Unicode.stringWriter = function <I, O>(input?: O): Writer<I, unknown> {
+  if (input === void 0) {
+    return new StringWriter(void 0, "");
+  } else {
+    return new StringWriter(input, "" + input);
+  }
+};
+
+Unicode.writeString = function <I>(input: unknown, output: Output): Writer<I, unknown> {
+  return StringWriter.write(output, void 0, "" + input);
+};
+
+Unicode.isAlpha = function (c: number): boolean {
+  return c >= 65/*'A'*/ && c <= 90/*'Z'*/
+      || c >= 97/*'a'*/ && c <= 122/*'z'*/;
+};
+
+Unicode.isSpace = function (c: number): boolean {
+  return c === 0x20 || c === 0x9;
+};
+
+Unicode.isNewline = function (c: number): boolean {
+  return c === 0xa || c === 0xd;
+};
+
+Unicode.isWhitespace = function (c: number): boolean {
+  return Unicode.isSpace(c) || Unicode.isNewline(c);
+};

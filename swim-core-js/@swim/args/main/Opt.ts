@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equals, Objects} from "@swim/util";
+import {Equals, Arrays} from "@swim/util";
 import {Output, Debug, Format} from "@swim/codec";
 import {AnyArg, Arg} from "./Arg";
 
@@ -120,7 +120,7 @@ export class Opt implements Equals, Debug {
       return true;
     } else if (that instanceof Opt) {
       return this._name === that._name && this._flag === that._flag
-          && this._desc === that._desc && Objects.equal(this._args, that._args)
+          && this._desc === that._desc && Arrays.equal(this._args, that._args)
           && this._defs === that._defs;
     }
     return false;

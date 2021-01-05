@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3} from "@swim/util";
+import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {Value, Form} from "@swim/structure";
 import {TimeZoneForm} from "./TimeZoneForm";
@@ -57,10 +57,7 @@ export class TimeZone implements HashCode, Debug {
   }
 
   hashCode(): number {
-    if (TimeZone._hashSeed === void 0) {
-      TimeZone._hashSeed = Murmur3.seed(TimeZone);
-    }
-    return Murmur3.mash(Murmur3.mix(TimeZone._hashSeed, Murmur3.hash(this._offset)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(TimeZone), Numbers.hash(this._offset)));
   }
 
   debug(output: Output): void {
@@ -79,8 +76,6 @@ export class TimeZone implements HashCode, Debug {
   toString(): string {
     return Format.debug(this);
   }
-
-  private static _hashSeed?: number;
 
   private static _utc?: TimeZone;
   static utc(): TimeZone {

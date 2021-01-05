@@ -29,13 +29,13 @@ export class AuthedResponse extends HostAddressed {
     return "authed";
   }
 
-  static fromValue(value: Value): AuthedResponse | undefined {
-    return HostAddressed.fromValue(value, AuthedResponse) as AuthedResponse | undefined;
-  }
-
   static of(body: AnyValue = Value.absent()): AuthedResponse {
     body = Value.fromAny(body);
     return new AuthedResponse(body);
+  }
+
+  static fromValue(value: Value): AuthedResponse | undefined {
+    return HostAddressed.fromValue(value, AuthedResponse) as AuthedResponse | undefined;
   }
 }
 Envelope.AuthedResponse = AuthedResponse;

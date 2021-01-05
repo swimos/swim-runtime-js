@@ -17,13 +17,43 @@
  */
 export interface Equivalent<T> {
   /**
-   * Returns `true` if `this` is equivalent to `that` within some optional
-   * error tolerance `epsilon`, otherwise returns `false`.
+   * Returns `true` if `this` is equivalent to `that` within some optionally
+   * specified error tolerance `epsilon`, otherwise returns `false`.
    */
   equivalentTo(that: T, epsilon?: number): boolean;
 }
 
-/** @hidden */
-export const Equivalent = {
-  Epsilon: 1.0e-8,
+export const Equivalent = {} as {
+  /**
+   * Default equivalence tolerance.
+   */
+  Epsilon: number;
+
+  /**
+   * Returns `true` if `x` and `y` are objects and `x` is
+   * [[Equivalent.equivalent equivalent]] to `y`, otherwise returns `x === y`.
+   */
+  equivalent<T>(x: Equivalent<T> | null | undefined, y: T | null | undefined, epsilon?: number): boolean;
+
+  /**
+   * Returns `true` if `object` conforms to the [[Equivalent]] interface.
+   */
+  is<T>(object: unknown): object is Equivalent<T>;
+};
+
+Equivalent.Epsilon = 1.0e-8;
+
+Equivalent.equivalent = function <T>(x: Equivalent<T> | null | undefined, y: T | null | undefined, epsilon?: number): boolean {
+  if (x !== null && x !== void 0 && y !== null && y !== void 0) {
+    return x.equivalentTo(y, epsilon);
+  } else {
+    return x === y;
+  }
+};
+
+Equivalent.is = function <T>(object: unknown): object is Equivalent<T> {
+  if (typeof object === "object" && object !== null || typeof object === "function") {
+    return typeof (object as Equivalent<T>).equivalentTo === "function";
+  }
+  return false;
 };

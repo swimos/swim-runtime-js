@@ -16,16 +16,6 @@ export * from "./length";
 
 export * from "./angle";
 
-//export * from "./vector";
-
-//export * from "./shape";
-
-//export * from "./curve";
-
-//export * from "./spline";
-
-//export * from "./path";
-
 export * from "./r2";
 
 export * from "./transform";

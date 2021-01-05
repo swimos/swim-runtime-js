@@ -30,16 +30,16 @@ export class SyncRequest extends LinkAddressed {
     return "sync";
   }
 
-  static fromValue(value: Value): SyncRequest | undefined {
-    return LinkAddressed.fromValue(value, SyncRequest) as SyncRequest | undefined;
-  }
-
   static of(node: AnyUri, lane: AnyUri, prio: number = 0, rate: number = 0,
             body: AnyValue = Value.absent()): SyncRequest {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new SyncRequest(node, lane, prio, rate, body);
+  }
+
+  static fromValue(value: Value): SyncRequest | undefined {
+    return LinkAddressed.fromValue(value, SyncRequest) as SyncRequest | undefined;
   }
 }
 Envelope.SyncRequest = SyncRequest;

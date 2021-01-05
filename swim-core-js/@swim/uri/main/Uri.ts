@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Murmur3} from "@swim/util";
+import {Comparable, HashCode, Strings} from "@swim/util";
 import {Output, Format, Debug, Display, Base16} from "@swim/codec";
 import {Form} from "@swim/structure";
 import {UriException} from "./UriException";
@@ -526,7 +526,7 @@ export class Uri implements Comparable<Uri>, HashCode, Debug, Display {
 
   hashCode(): number {
     if (this._hashCode === void 0) {
-      this._hashCode = Murmur3.hash(this.toString());
+      this._hashCode = Strings.hash(this.toString());
     }
     return this._hashCode;
   }

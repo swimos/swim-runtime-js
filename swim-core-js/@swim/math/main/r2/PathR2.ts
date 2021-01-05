@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals, Objects} from "@swim/util";
+import {Equivalent, Equals, Arrays} from "@swim/util";
 import {
   Debug,
   Format,
@@ -243,14 +243,14 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
   }
 
   equivalentTo(that: PathR2, epsilon?: number): boolean {
-    return this === that || Objects.equivalent(this._splines, that._splines, epsilon);
+    return this === that || Arrays.equivalent(this._splines, that._splines, epsilon);
   }
 
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof PathR2) {
-      return Objects.equal(this._splines, that._splines);
+      return Arrays.equal(this._splines, that._splines);
     }
     return false;
   }

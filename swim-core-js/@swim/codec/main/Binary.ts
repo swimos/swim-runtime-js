@@ -25,14 +25,8 @@ import {ByteOutputUint8Array} from "./ByteOutputUint8Array";
  * bytes to a growable array, and [[Output.bind binds]] a `Uint8Array`
  * containing all written bytes.
  */
-export class Binary {
-  private constructor() {
-    // nop
-  }
-
-  static outputBuffer(array: Uint8Array, offset: number = 0, length: number = array.length): OutputBuffer<Uint8Array> {
-    return new Uint8ArrayOutput(array, offset, offset + length);
-  }
+export const Binary = {} as {
+  outputBuffer(array: Uint8Array, offset?: number, length?: number): OutputBuffer<Uint8Array>;
 
   /**
    * Returns a new `Output` that appends bytes to a growable array,
@@ -42,29 +36,36 @@ export class Binary {
    * permanently in the _cont_ state, and can [[Output.bind bind]] a
    * `Uint8Array` with the current output state at any time.
    */
-  static uint8ArrayOutput(initialCapacity?: number, settings?: AnyOutputSettings): Output<Uint8Array>;
+  uint8ArrayOutput(initialCapacity?: number, settings?: AnyOutputSettings): Output<Uint8Array>;
+
   /**
    * Returns a new `Output` that appends bytes to a growable array, using the
    * given `settings`.  The returned `Output` accepts an unbounded number of
    * bytes, remaining permanently in the _cont_ state, and can [[Output.bind
    * bind]] a `Uint8Array` array with the current output state at any time.
    */
-  static uint8ArrayOutput(settings: AnyOutputSettings): Output<Uint8Array>;
-  static uint8ArrayOutput(initialCapacity?: number | AnyOutputSettings,
-                          settings?: AnyOutputSettings): Output<Uint8Array> {
-    if (settings === void 0 && typeof initialCapacity !== "number") {
-      settings = initialCapacity;
-      initialCapacity = void 0;
-    } else if (typeof initialCapacity !== "number") {
-      initialCapacity = void 0;
-    }
-    let array: Uint8Array | null;
-    if (typeof initialCapacity === "number") {
-      array = new Uint8Array(initialCapacity);
-    } else {
-      array = null;
-    }
-    settings = OutputSettings.fromAny(settings);
-    return new ByteOutputUint8Array(array, 0, settings);
+  uint8ArrayOutput(settings: AnyOutputSettings): Output<Uint8Array>;
+};
+
+Binary.outputBuffer = function (array: Uint8Array, offset: number = 0,
+                                length: number = array.length): OutputBuffer<Uint8Array> {
+  return new Uint8ArrayOutput(array, offset, offset + length);
+};
+
+Binary.uint8ArrayOutput = function (initialCapacity?: number | AnyOutputSettings,
+                                    settings?: AnyOutputSettings): Output<Uint8Array> {
+  if (settings === void 0 && typeof initialCapacity !== "number") {
+    settings = initialCapacity;
+    initialCapacity = void 0;
+  } else if (typeof initialCapacity !== "number") {
+    initialCapacity = void 0;
   }
-}
+  let array: Uint8Array | null;
+  if (typeof initialCapacity === "number") {
+    array = new Uint8Array(initialCapacity);
+  } else {
+    array = null;
+  }
+  settings = OutputSettings.fromAny(settings);
+  return new ByteOutputUint8Array(array, 0, settings);
+};

@@ -20,7 +20,37 @@ import {Equals} from "./Equals";
  */
 export interface HashCode extends Equals {
   /**
-   * Returns a 32-bit hash value for `this` object.
+   * Returns a 32-bit hash value for this object.
    */
   hashCode(): number;
 }
+
+export const HashCode = {} as {
+  /**
+   * Returns the [[HashCode.hashCode hash code]] of `x`, if `x` is an object;
+   * otherwise returns `0` or `1` if `x` is `undefined` or `null`, respectively.
+   */
+  hash(x: HashCode | null | undefined): number;
+
+  /**
+   * Returns `true` if `object` conforms to the [[HashCode]] interface.
+   */
+  is(object: unknown): object is HashCode;
+};
+
+HashCode.hash = function (x: HashCode | null | undefined): number {
+  if (x === void 0) {
+    return 0;
+  } else if (x === null) {
+    return 1;
+  } else {
+    return x.hashCode();
+  }
+};
+
+HashCode.is = function (object: unknown): object is HashCode {
+  if (typeof object === "object" && object !== null || typeof object === "function") {
+    return typeof (object as HashCode).hashCode === "function";
+  }
+  return false;
+};

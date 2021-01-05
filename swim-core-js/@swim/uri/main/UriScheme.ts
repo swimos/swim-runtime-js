@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Murmur3, HashGenCacheMap} from "@swim/util";
+import {Comparable, HashCode, Strings, HashGenCacheMap} from "@swim/util";
 import {Output, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 
@@ -54,7 +54,7 @@ export class UriScheme implements Comparable<UriScheme>, HashCode, Debug, Displa
   }
 
   hashCode(): number {
-    return Murmur3.hash(this._name);
+    return Strings.hash(this._name);
   }
 
   debug(output: Output): void {

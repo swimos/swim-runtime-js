@@ -30,16 +30,16 @@ export class LinkedResponse extends LinkAddressed {
     return "linked";
   }
 
-  static fromValue(value: Value): LinkedResponse | undefined {
-    return LinkAddressed.fromValue(value, LinkedResponse) as LinkedResponse | undefined;
-  }
-
   static of(node: AnyUri, lane: AnyUri, prio: number = 0, rate: number = 0,
             body: AnyValue = Value.absent()): LinkedResponse {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new LinkedResponse(node, lane, prio, rate, body);
+  }
+
+  static fromValue(value: Value): LinkedResponse | undefined {
+    return LinkAddressed.fromValue(value, LinkedResponse) as LinkedResponse | undefined;
   }
 }
 Envelope.LinkedResponse = LinkedResponse;

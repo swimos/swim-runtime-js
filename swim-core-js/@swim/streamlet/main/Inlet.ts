@@ -97,15 +97,16 @@ export interface Inlet<I = unknown> {
   recohereOutput(version: number): void;
 }
 
-/** @hidden */
-export const Inlet = {
-  is<I>(object: unknown): object is Inlet<I> {
-    if (typeof object === "object" && object !== null) {
-      const inlet = object as Inlet<I>;
-      return typeof inlet.input === "function"
-          && typeof inlet.bindInput === "function"
-          && typeof inlet.unbindInput === "function";
-    }
-    return false;
-  },
+export const Inlet = {} as {
+   is<I>(object: unknown): object is Inlet<I>;
+};
+
+Inlet.is = function <I>(object: unknown): object is Inlet<I> {
+  if (typeof object === "object" && object !== null) {
+    const inlet = object as Inlet<I>;
+    return typeof inlet.input === "function"
+        && typeof inlet.bindInput === "function"
+        && typeof inlet.unbindInput === "function";
+  }
+  return false;
 };

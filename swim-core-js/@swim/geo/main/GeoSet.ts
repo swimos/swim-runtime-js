@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals, Objects} from "@swim/util";
+import {Equivalent, Equals, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {ShapeR2, SetR2} from "@swim/math";
 import {GeoProjection} from "./GeoProjection";
@@ -100,14 +100,14 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
   }
 
   equivalentTo(that: GeoSet, epsilon?: number): boolean {
-    return this === that || Objects.equivalent(this._shapes, that._shapes, epsilon);
+    return this === that || Arrays.equivalent(this._shapes, that._shapes, epsilon);
   }
 
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoSet) {
-      return Objects.equal(this._shapes, that._shapes);
+      return Arrays.equal(this._shapes, that._shapes);
     }
     return false;
   }

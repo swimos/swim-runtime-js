@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Murmur3} from "@swim/util";
+import {Murmur3, HashCode, Booleans, Numbers, Constructors} from "@swim/util";
 import {Output} from "./Output";
 import {Format} from "./Format";
 import {Debug} from "./Debug";
@@ -179,11 +179,8 @@ class UtfFatalErrorMode extends UtfErrorMode {
   }
 
   hashCode(): number {
-    if (UtfFatalErrorMode._hashSeed === void 0) {
-      UtfFatalErrorMode._hashSeed = Murmur3.seed(UtfFatalErrorMode);
-    }
-    return Murmur3.mash(Murmur3.mix(UtfFatalErrorMode._hashSeed,
-        Murmur3.hash(this._isNonZero)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(UtfFatalErrorMode),
+        Booleans.hash(this._isNonZero)));
   }
 
   debug(output: Output): void {
@@ -191,8 +188,6 @@ class UtfFatalErrorMode extends UtfErrorMode {
         .write(this._isNonZero ? "fatalNonZero" : "fatal")
         .write(40/*'('*/).write(41/*')'*/);
   }
-
-  private static _hashSeed?: number;
 }
 
 /** @hidden */
@@ -242,11 +237,8 @@ class UtfReplacementErrorMode extends UtfErrorMode {
   }
 
   hashCode(): number {
-    if (UtfReplacementErrorMode._hashSeed === void 0) {
-      UtfReplacementErrorMode._hashSeed = Murmur3.seed(UtfReplacementErrorMode);
-    }
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(UtfReplacementErrorMode._hashSeed,
-        this._replacementChar), Murmur3.hash(this._isNonZero)));
+    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(UtfReplacementErrorMode),
+        Numbers.hash(this._replacementChar)), Booleans.hash(this._isNonZero)));
   }
 
   debug(output: Output): void {
@@ -258,6 +250,4 @@ class UtfReplacementErrorMode extends UtfErrorMode {
     }
     output = output.write(41/*')'*/);
   }
-
-  private static _hashSeed?: number;
 }

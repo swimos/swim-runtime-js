@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Objects} from "@swim/util";
+import {Numbers} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {R2Function} from "./R2Function";
 import {AnyShapeR2} from "./ShapeR2";
@@ -224,14 +224,14 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof CubicCurveR2) {
-      return Objects.equivalent(this._x0, that._x0, epsilon)
-          && Objects.equivalent(this._y0, that._y0, epsilon)
-          && Objects.equivalent(this._x1, that._x1, epsilon)
-          && Objects.equivalent(this._y1, that._y1, epsilon)
-          && Objects.equivalent(this._x2, that._x2, epsilon)
-          && Objects.equivalent(this._y2, that._y2, epsilon)
-          && Objects.equivalent(this._x3, that._x3, epsilon)
-          && Objects.equivalent(this._y3, that._y3, epsilon);
+      return Numbers.equivalent(this._x0, that._x0, epsilon)
+          && Numbers.equivalent(this._y0, that._y0, epsilon)
+          && Numbers.equivalent(this._x1, that._x1, epsilon)
+          && Numbers.equivalent(this._y1, that._y1, epsilon)
+          && Numbers.equivalent(this._x2, that._x2, epsilon)
+          && Numbers.equivalent(this._y2, that._y2, epsilon)
+          && Numbers.equivalent(this._x3, that._x3, epsilon)
+          && Numbers.equivalent(this._y3, that._y3, epsilon);
     }
     return false;
   }
