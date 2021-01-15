@@ -151,7 +151,19 @@ export class AffineTransform extends Transform {
     return that instanceof AffineTransform;
   }
 
-  equals(that: Transform): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (that instanceof AffineTransform) {
+      return Numbers.equivalent(this._x0, that._x0, epsilon)
+          && Numbers.equivalent(this._y0, that._y0, epsilon)
+          && Numbers.equivalent(this._x1, that._x1, epsilon)
+          && Numbers.equivalent(this._y1, that._y1, epsilon)
+          && Numbers.equivalent(this._tx, that._tx, epsilon)
+          && Numbers.equivalent(this._ty, that._ty, epsilon);
+    }
+    return false;
+  }
+
+  equals(that: unknown): boolean {
     if (that instanceof AffineTransform) {
       return this._x0 === that._x0 && this._y0 === that._y0 &&
              this._x1 === that._x1 && this._y1 === that._y1 &&

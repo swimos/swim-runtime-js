@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals} from "@swim/util";
+import type {Equivalent, Equals} from "@swim/util";
 import {AnyOutputSettings, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
-import {R2Function} from "./R2Function";
+import type {R2Function} from "./R2Function";
 import {ShapeR2} from "./ShapeR2";
-import {PointR2} from "./PointR2";
-import {CurveR2Context} from "./CurveR2Context";
-import {BezierCurveR2} from "./BezierCurveR2";
-import {SegmentR2} from "./SegmentR2";
-import {QuadraticCurveR2} from "./QuadraticCurveR2";
-import {CubicCurveR2} from "./CubicCurveR2";
-import {EllipticCurveR2} from "./EllipticCurveR2";
-import {CurveR2Parser} from "./CurveR2Parser";
+import type {PointR2} from "./PointR2";
+import type {CurveR2Context} from "./CurveR2Context";
+import type {BezierCurveR2} from "./BezierCurveR2";
+import type {SegmentR2} from "./SegmentR2";
+import type {QuadraticCurveR2} from "./QuadraticCurveR2";
+import type {CubicCurveR2} from "./CubicCurveR2";
+import type {EllipticCurveR2} from "./EllipticCurveR2";
+import type {CurveR2Parser} from "./CurveR2Parser";
 
-export abstract class CurveR2 extends ShapeR2 implements Equivalent<CurveR2>, Equals {
+export abstract class CurveR2 extends ShapeR2 implements Equals, Equivalent {
   abstract interpolateX(u: number): number;
 
   abstract interpolateY(u: number): number;
@@ -69,7 +69,7 @@ export abstract class CurveR2 extends ShapeR2 implements Equivalent<CurveR2>, Eq
     return output.toString();
   }
 
-  abstract equivalentTo(that: CurveR2, epsilon?: number): boolean;
+  abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
   abstract equals(that: unknown): boolean;
 

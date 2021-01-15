@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {Output, Writer, Unicode, Base10, Base16} from "@swim/codec";
 import {Recon} from "./Recon";
 import {AttrWriter} from "./AttrWriter";

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {Attr, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {Transform} from "./Transform";
-import {AffineTransform} from "./AffineTransform";
+import type {AffineTransform} from "./AffineTransform";
 
 export class IdentityTransform extends Transform {
   transform(that: Transform): Transform;
@@ -67,7 +67,11 @@ export class IdentityTransform extends Transform {
     return that instanceof IdentityTransform;
   }
 
-  equals(that: Transform): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    return that instanceof IdentityTransform;
+  }
+
+  equals(that: unknown): boolean {
     return that instanceof IdentityTransform;
   }
 

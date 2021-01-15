@@ -28,7 +28,7 @@ import {
   DeauthedResponse,
 } from "@swim/warp";
 import {Host, Downlink, WarpClient} from "@swim/client";
-import {MockServer} from "./MockServer";
+import type {MockServer} from "./MockServer";
 import {ClientExam} from "./ClientExam";
 
 export class WarpClientSpec extends Spec {

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyPointR2, PointR2} from "@swim/math";
-import {GeoBox} from "./GeoBox";
-import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
+import type {AnyPointR2, PointR2} from "@swim/math";
+import type {GeoBox} from "./GeoBox";
+import type {AnyGeoPoint, GeoPoint} from "./GeoPoint";
 
 export interface GeoProjection {
   readonly bounds: GeoBox;

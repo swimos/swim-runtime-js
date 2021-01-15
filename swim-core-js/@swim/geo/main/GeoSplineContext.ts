@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {GeoCurveContext} from "./GeoCurveContext";
+import type {GeoCurveContext} from "./GeoCurveContext";
 
 export interface GeoSplineContext extends GeoCurveContext {
   closePath(): void;

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem} from "../Item";
-import {Field} from "../Field";
+import type {AnyItem} from "../Item";
+import type {Field} from "../Field";
 import {Slot} from "../Slot";
-import {Value} from "../Value";
+import type {Value} from "../Value";
 import {ItemInterpolator} from "./ItemInterpolator";
 
 export class SlotInterpolator extends ItemInterpolator<Slot> {

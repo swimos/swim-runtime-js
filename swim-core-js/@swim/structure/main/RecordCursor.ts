@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {Cursor} from "@swim/util";
-import {Item} from "./Item";
-import {Record} from "./Record";
+import type {Item} from "./Item";
+import type {Record} from "./Record";
 
 /** @hidden */
 export class RecordCursor extends Cursor<Item> {

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {InletType, InletOptions, Inlet} from "./Inlet";
-import {OutletType, OutletOptions, Outlet} from "./Outlet";
-import {InoutletType, InoutletOptions, Inoutlet} from "./Inoutlet";
-import {StreamletContext} from "./StreamletContext";
-import {StreamletScope} from "./StreamletScope";
-import {Streamlet} from "./Streamlet";
-import {GenericStreamlet} from "./GenericStreamlet";
+import type {InletType, InletOptions, Inlet} from "./Inlet";
+import type {OutletType, OutletOptions, Outlet} from "./Outlet";
+import type {InoutletType, InoutletOptions, Inoutlet} from "./Inoutlet";
+import type {StreamletContext} from "./StreamletContext";
+import type {StreamletScope} from "./StreamletScope";
+import type {Streamlet} from "./Streamlet";
+import type {GenericStreamlet} from "./GenericStreamlet";
 import {StreamletInlet} from "./StreamletInlet";
 import {StreamletOutlet} from "./StreamletOutlet";
 import {StreamletInoutlet} from "./StreamletInoutlet";
@@ -77,11 +77,12 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
 
   constructor(scope: StreamletScope<O> | null = null) {
     this.scope = scope;
+    this.context = null;
     this._version = -1;
   }
 
-  protected streamletClass(): StreamletClass {
-    return (this as any).__proto__ as StreamletClass;
+  protected get streamletClass(): StreamletClass {
+    return Object.getPrototypeOf(this);
   }
 
   streamletScope(): StreamletScope<O> | null {
@@ -113,7 +114,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
     if (key === void 0) {
       return new StreamletInlet<I>(this);
     } else {
-      return AbstractStreamlet.reflectInletKey<I, O>(key, this, this.streamletClass());
+      return AbstractStreamlet.reflectInletKey<I, O>(key, this, this.streamletClass);
     }
   }
 
@@ -139,7 +140,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
     if (key === void 0) {
       return new StreamletOutlet<O>(this);
     } else if (typeof key === "string") {
-      return AbstractStreamlet.reflectOutletKey<I, O>(key, this, this.streamletClass());
+      return AbstractStreamlet.reflectOutletKey<I, O>(key, this, this.streamletClass);
     } else {
       return key;
     }
@@ -194,7 +195,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   disconnectInputs(): void {
-    AbstractStreamlet.disconnectInputs(this, this.streamletClass());
+    AbstractStreamlet.disconnectInputs(this, this.streamletClass);
   }
 
   /** @hidden */
@@ -212,12 +213,12 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           }
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
   }
 
   disconnectOutputs(): void {
-    AbstractStreamlet.disconnectOutputs(this, this.streamletClass());
+    AbstractStreamlet.disconnectOutputs(this, this.streamletClass);
   }
 
   /** @hidden */
@@ -235,7 +236,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           }
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
   }
 
@@ -280,7 +281,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   protected onDecohereOutlets(): void {
-    AbstractStreamlet.decohereOutlets(this, this.streamletClass());
+    AbstractStreamlet.decohereOutlets(this, this.streamletClass);
   }
 
   /** @hidden */
@@ -298,7 +299,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           }
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
   }
 
@@ -311,7 +312,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   protected onRecohereInlets(version: number): void {
-    AbstractStreamlet.recohereInlets(version, this, this.streamletClass());
+    AbstractStreamlet.recohereInlets(version, this, this.streamletClass);
   }
 
   /** @hidden */
@@ -329,7 +330,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           }
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
   }
 
@@ -338,7 +339,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   protected onRecohereOutlets(version: number): void {
-    AbstractStreamlet.recohereOutlets(version, this, this.streamletClass());
+    AbstractStreamlet.recohereOutlets(version, this, this.streamletClass);
   }
 
   /** @hidden */
@@ -356,7 +357,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           }
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
   }
 
@@ -365,8 +366,15 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   /** @hidden */
+  static reflectEachInlet<I, O, T>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null,
+                                   callback: (inlet: Inlet<I>, name: string, index: number) => T | void): T | undefined;
+  /** @hidden */
   static reflectEachInlet<I, O, T, S>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null,
                                       callback: (this: S, inlet: Inlet<I>, name: string, index: number) => T | void,
+                                      thisArg: S): T | undefined;
+  /** @hidden */
+  static reflectEachInlet<I, O, T, S>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null,
+                                      callback: (this: S | undefined, inlet: Inlet<I>, name: string, index: number) => T | void,
                                       thisArg?: S): T | undefined {
     let index = 0;
     while (streamletClass !== null) {
@@ -381,21 +389,30 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           } else {
             inlet = null;
           }
-          const result = callback.call(thisArg, inlet, inletDescriptor.name, index);
-          if (result !== void 0) {
-            return result;
+          if (inlet !== null) {
+            const result = callback.call(thisArg, inlet, inletDescriptor.name, index);
+            if (result !== void 0) {
+              return result;
+            }
+            index += 1;
           }
-          index += 1;
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
     return void 0;
   }
 
   /** @hidden */
+  static reflectEachOutlet<I, O, T>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null,
+                                       callback: (outlet: Outlet<O>, name: string, index: number) => T | void): T | undefined;
+  /** @hidden */
   static reflectEachOutlet<I, O, T, S>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null,
                                        callback: (this: S, outlet: Outlet<O>, name: string, index: number) => T | void,
+                                       thisArg: S): T | undefined;
+  /** @hidden */
+  static reflectEachOutlet<I, O, T, S>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null,
+                                       callback: (this: S | undefined, outlet: Outlet<O>, name: string, index: number) => T | void,
                                        thisArg?: S): T | undefined {
     let index = 0;
     while (streamletClass !== null) {
@@ -410,14 +427,16 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           } else {
             outlet = null;
           }
-          const result = callback.call(thisArg, outlet, outletDescriptor.name, index);
-          if (result !== void 0) {
-            return result;
+          if (outlet !== null) {
+            const result = callback.call(thisArg, outlet, outletDescriptor.name, index);
+            if (result !== void 0) {
+              return result;
+            }
+            index += 1;
           }
-          index += 1;
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
     return void 0;
   }
@@ -431,7 +450,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           count += 1;
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
     return count;
   }
@@ -445,7 +464,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           count += 1;
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
     return count;
   }
@@ -468,7 +487,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           index -= 1;
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
     return null;
   }
@@ -491,7 +510,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           index -= 1;
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
     return null;
   }
@@ -511,7 +530,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           }
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
     return null;
   }
@@ -531,7 +550,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
           }
         }
       }
-      streamletClass = (streamletClass as any).__proto__ as StreamletClass | null;
+      streamletClass = Object.getPrototypeOf(streamletClass);
     }
     return null;
   }
@@ -640,29 +659,29 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   /** @hidden */
-  static decorateInlet(options: InletOptions, target: StreamletClass, key: string): void {
+  static decorateInlet(options: InletOptions, target: StreamletClass, propertyKey: string | symbol): void {
     AbstractStreamlet.init(target);
-    const name = options.name !== void 0 ? options.name : key;
+    const name = options.name !== void 0 ? options.name : propertyKey.toString();
     const type = options.type !== void 0 ? options.type : "value";
-    const inletDescriptor = new InletDescriptor(key, name, type);
+    const inletDescriptor = new InletDescriptor(propertyKey.toString(), name, type);
     target._inlets![name] = inletDescriptor;
   }
 
   /** @hidden */
-  static decorateOutlet(options: OutletOptions, target: StreamletClass, key: string): void {
+  static decorateOutlet(options: OutletOptions, target: StreamletClass, propertyKey: string | symbol): void {
     AbstractStreamlet.init(target);
-    const name = options.name !== void 0 ? options.name : key;
+    const name = options.name !== void 0 ? options.name : propertyKey.toString();
     const type = options.type !== void 0 ? options.type : "value";
-    const outletDescriptor = new OutletDescriptor(key, name, type);
+    const outletDescriptor = new OutletDescriptor(propertyKey.toString(), name, type);
     target._outlets![name] = outletDescriptor;
   }
 
   /** @hidden */
-  static decorateInoutlet(options: InoutletOptions, target: StreamletClass, key: string): void {
+  static decorateInoutlet(options: InoutletOptions, target: StreamletClass, propertyKey: string | symbol): void {
     AbstractStreamlet.init(target);
-    const name = options.name !== void 0 ? options.name : key;
+    const name = options.name !== void 0 ? options.name : propertyKey.toString();
     const type = options.type !== void 0 ? options.type : "value";
-    const inoutletDescriptor = new InoutletDescriptor(key, name, type);
+    const inoutletDescriptor = new InoutletDescriptor(propertyKey.toString(), name, type);
     target._inlets![name] = inoutletDescriptor;
     target._outlets![name] = inoutletDescriptor;
     target._inoutlets![name] = inoutletDescriptor;

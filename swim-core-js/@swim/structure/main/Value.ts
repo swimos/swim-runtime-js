@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Builder} from "@swim/util";
 import {AnyItem, Item} from "./Item";
-import {Field} from "./Field";
+import type {Builder} from "@swim/util";
+import type {Field} from "./Field";
 import {ValueBuilder} from "./ValueBuilder";
-import {Record} from "./Record";
-import {AnyText} from "./Text";
-import {AnyNum} from "./Num";
+import type {Record} from "./Record";
+import type {AnyText} from "./Text";
+import type {AnyNum} from "./Num";
 
 export type AnyValue = Value
                      | {readonly [key: string]: AnyValue}

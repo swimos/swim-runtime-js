@@ -17,9 +17,9 @@ import {GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import {GeoSegment} from "./GeoSegment";
 import {GeoBox} from "./GeoBox";
-import {GeoPointInterpolator} from "./GeoPointInterpolator";
-import {GeoSegmentInterpolator} from "./GeoSegmentInterpolator";
-import {GeoBoxInterpolator} from "./GeoBoxInterpolator";
+import type {GeoPointInterpolator} from "./GeoPointInterpolator";
+import type {GeoSegmentInterpolator} from "./GeoSegmentInterpolator";
+import type {GeoBoxInterpolator} from "./GeoBoxInterpolator";
 
 export abstract class GeoShapeInterpolator<S extends GeoShape & AS, AS = S> extends Interpolator<S, AS> {
   static between<S extends GeoShape>(s0: S, s1: S): GeoShapeInterpolator<S>;

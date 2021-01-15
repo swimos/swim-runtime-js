@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Builder} from "@swim/util";
+import type {Builder} from "@swim/util";
 import {Input, Parser, Diagnostic} from "@swim/codec";
 import {Recon} from "./Recon";
-import {ReconParser} from "./ReconParser";
+import type {ReconParser} from "./ReconParser";
 
 /** @hidden */
 export class PrimaryParser<I, V> extends Parser<V> {

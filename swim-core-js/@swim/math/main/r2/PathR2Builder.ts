@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {SplineR2} from "./SplineR2";
+import type {SplineR2} from "./SplineR2";
 import {SplineR2Builder} from "./SplineR2Builder";
-import {PathR2Context} from "./PathR2Context";
+import type {PathR2Context} from "./PathR2Context";
 import {PathR2} from "./PathR2";
 
 export class PathR2Builder implements PathR2Context {

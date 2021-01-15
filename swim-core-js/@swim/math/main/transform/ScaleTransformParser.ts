@@ -14,7 +14,7 @@
 
 import {Input, Output, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
 import {Transform} from "./Transform";
-import {ScaleTransform} from "./ScaleTransform";
+import type {ScaleTransform} from "./ScaleTransform";
 
 /** @hidden */
 export class ScaleTransformParser extends Parser<ScaleTransform> {

@@ -14,12 +14,12 @@
 
 import {Iterator, Cursor} from "@swim/util";
 import {BTree} from "@swim/collections";
-import {Inlet} from "./Inlet";
+import type {Inlet} from "./Inlet";
 import {Outlet} from "./Outlet";
-import {KeyEffect} from "./KeyEffect";
+import type {KeyEffect} from "./KeyEffect";
 import {MapOutlet} from "./MapOutlet";
-import {MapInletOutlet} from "./MapInletOutlet";
-import {MapValueFunction, WatchValueFunction} from "./function";
+import type {MapInletOutlet} from "./MapInletOutlet";
+import type {MapValueFunction, WatchValueFunction} from "./function";
 
 export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutlet<K, V, I, O> {
   /** @hidden */
@@ -84,7 +84,7 @@ export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutl
     const n = oldOutputs !== null ? oldOutputs.length : 0;
     const newOutputs = new Array<Inlet<O>>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newOutputs[i] = oldOutputs![i];
+      newOutputs[i] = oldOutputs![i]!;
     }
     newOutputs[n] = output;
     this._outputs = newOutputs;
@@ -98,10 +98,10 @@ export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutl
         if (n > 1) {
           const newOutputs = new Array<Inlet<O>>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newOutputs[j] = oldOutputs![j];
+            newOutputs[j] = oldOutputs![j]!;
           }
           for (let j = i; j < n - 1; j += 1) {
-            newOutputs[j] = oldOutputs![j + 1];
+            newOutputs[j] = oldOutputs![j + 1]!;
           }
           this._outputs = newOutputs;
         } else {
@@ -117,7 +117,7 @@ export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutl
     if (outputs !== null) {
       this._outputs = null;
       for (let i = 0, n = outputs.length; i < n; i += 1) {
-        const output = outputs[i];
+        const output = outputs[i]!;
         output.unbindInput();
       }
     }
@@ -129,7 +129,7 @@ export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutl
       if (outputs !== null) {
         this._outputs = null;
         for (let i = 0, n = outputs.length; i < n; i += 1) {
-          const output = outputs[i];
+          const output = outputs[i]!;
           output.unbindInput();
           output.disconnectOutputs();
         }
@@ -146,7 +146,7 @@ export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutl
       this.onDecohereOutputKey(key, effect);
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        const output = this._outputs![i];
+        const output = this._outputs![i]!;
         output.decohereOutput();
       }
       this.didDecohereOutputKey(key, effect);
@@ -168,7 +168,7 @@ export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutl
       this.onDecohere();
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        this._outputs![i].decohereOutput();
+        this._outputs![i]!.decohereOutput();
       }
       this.didDecohere();
     }
@@ -207,7 +207,7 @@ export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutl
       this._version = version;
       this.onRecohere(version);
       for (let i = 0, n = this._outputs !== null ? this._outputs.length : 0; i < n; i += 1) {
-        this._outputs![i].recohereOutput(version);
+        this._outputs![i]!.recohereOutput(version);
       }
       this.didRecohere(version);
     }

@@ -14,7 +14,7 @@
 
 import {Input, Parser, Diagnostic} from "@swim/codec";
 import {Recon} from "./Recon";
-import {ReconParser} from "./ReconParser";
+import type {ReconParser} from "./ReconParser";
 
 /** @hidden */
 export class AttrParser<I, V> extends Parser<I> {

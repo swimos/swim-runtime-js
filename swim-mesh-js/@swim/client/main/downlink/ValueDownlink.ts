@@ -14,32 +14,32 @@
 
 import {Cursor} from "@swim/util";
 import {Value, Form} from "@swim/structure";
-import {Inlet, Outlet} from "@swim/streamlet";
+import type {Inlet, Outlet} from "@swim/streamlet";
 import {MapValueFunction, MapValueCombinator} from "@swim/streamlet";
 import {WatchValueFunction, WatchValueCombinator} from "@swim/streamlet";
-import {Uri} from "@swim/uri";
-import {DownlinkContext} from "./DownlinkContext";
-import {DownlinkOwner} from "./DownlinkOwner";
+import type {Uri} from "@swim/uri";
+import type {DownlinkContext} from "./DownlinkContext";
+import type {DownlinkOwner} from "./DownlinkOwner";
 import {DownlinkType, DownlinkObserver, DownlinkInit, DownlinkFlags, Downlink} from "./Downlink";
 import {ValueDownlinkModel} from "./ValueDownlinkModel";
 
-export type ValueDownlinkWillSet<V, VU = V> = (newValue: V, downlink: ValueDownlink<V, VU>) => V | void;
-export type VaueDownlinkDidSet<V, VU = V> = (newValue: V, oldValue: V, downlink: ValueDownlink<V, VU>) => void;
+export type ValueDownlinkWillSet<V, VU = never> = (newValue: V, downlink: ValueDownlink<V, VU>) => V | void;
+export type VaueDownlinkDidSet<V, VU = never> = (newValue: V, oldValue: V, downlink: ValueDownlink<V, VU>) => void;
 
-export interface ValueDownlinkObserver<V, VU = V> extends DownlinkObserver {
+export interface ValueDownlinkObserver<V, VU = never> extends DownlinkObserver {
   willSet?: ValueDownlinkWillSet<V, VU>;
   didSet?: VaueDownlinkDidSet<V, VU>;
 }
 
-export interface ValueDownlinkInit<V, VU = V> extends ValueDownlinkObserver<V, VU>, DownlinkInit {
+export interface ValueDownlinkInit<V, VU = never> extends ValueDownlinkObserver<V, VU>, DownlinkInit {
   valueForm?: Form<V, VU>;
 }
 
-export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outlet<V> {
+export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, Outlet<V> {
   /** @hidden */
-  _observers: ReadonlyArray<ValueDownlinkObserver<V, VU>> | null;
+  declare _observers: ReadonlyArray<ValueDownlinkObserver<V, VU>> | null;
   /** @hidden */
-  _model: ValueDownlinkModel | null;
+  declare _model: ValueDownlinkModel | null;
   /** @hidden */
   _valueForm: Form<V, VU>;
   /** @hidden */
@@ -59,7 +59,7 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
               valueForm?: Form<V, VU>, state0: Value = Value.absent()) {
     super(context, owner, init, hostUri, nodeUri, laneUri, prio, rate, body, flags, observers);
     if (init !== void 0) {
-      const observer = this._observers![this._observers!.length - 1];
+      const observer = this._observers![this._observers!.length - 1]!;
       observer.willSet = init.willSet || observer.willSet;
       observer.didSet = init.didSet || observer.didSet;
       valueForm = init.valueForm !== void 0 ? init.valueForm : valueForm;
@@ -88,8 +88,8 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
   }
 
   valueForm(): Form<V, VU>;
-  valueForm<V2, V2U = V2>(valueForm: Form<V2, V2U>): ValueDownlink<V2, V2U>;
-  valueForm<V2, V2U = V2>(valueForm?: Form<V2, V2U>): Form<V, VU> | ValueDownlink<V2, V2U> {
+  valueForm<V2, V2U = never>(valueForm: Form<V2, V2U>): ValueDownlink<V2, V2U>;
+  valueForm<V2, V2U = never>(valueForm?: Form<V2, V2U>): Form<V, VU> | ValueDownlink<V2, V2U> {
     if (valueForm === void 0) {
       return this._valueForm;
     } else {
@@ -132,7 +132,7 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
     const n = observers !== null ? observers.length : 0;
     let newObject: V | undefined;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willSet !== void 0) {
         if (newObject === void 0) {
           newObject = newValue.coerce(this._valueForm);
@@ -154,7 +154,7 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
     let newObject: V | undefined;
     let oldObject: V | undefined;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didSet !== void 0) {
         if (newObject === void 0) {
           newObject = newValue.coerce(this._valueForm);
@@ -262,7 +262,7 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
     const n = oldOutputs !== null ? oldOutputs.length : 0;
     const newOutputs = new Array<Inlet<V>>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newOutputs[i] = oldOutputs![i];
+      newOutputs[i] = oldOutputs![i]!;
     }
     newOutputs[n] = output;
     this._outputs = newOutputs;
@@ -276,10 +276,10 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
         if (n > 1) {
           const newOutputs = new Array<Inlet<V>>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newOutputs[j] = oldOutputs![j];
+            newOutputs[j] = oldOutputs![j]!;
           }
           for (let j = i; j < n - 1; j += 1) {
-            newOutputs[j] = oldOutputs![j + 1];
+            newOutputs[j] = oldOutputs![j + 1]!;
           }
           this._outputs = newOutputs;
         } else {
@@ -295,7 +295,7 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
     if (oldOutputs !== null) {
       this._outputs = null;
       for (let i = 0, n = oldOutputs.length; i < n; i += 1) {
-        oldOutputs[i].unbindInput();
+        oldOutputs[i]!.unbindInput();
       }
     }
   }
@@ -305,7 +305,7 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
     if (outputs !== null) {
       this._outputs = null;
       for (let i = 0, n = outputs.length; i < n; i += 1) {
-        const output = outputs[i];
+        const output = outputs[i]!;
         output.unbindInput();
         output.disconnectOutputs();
       }
@@ -327,7 +327,7 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
       this.onDecohere();
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        this._outputs![i].decohereOutput();
+        this._outputs![i]!.decohereOutput();
       }
       this.didDecohere();
     }
@@ -351,7 +351,7 @@ export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outl
       this.onRecohere(version);
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        this._outputs![i].recohereOutput(version);
+        this._outputs![i]!.recohereOutput(version);
       }
       this.didRecohere(version);
     }

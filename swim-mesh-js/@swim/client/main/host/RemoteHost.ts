@@ -30,8 +30,8 @@ import {
   DeauthRequest,
   DeauthedResponse,
 } from "@swim/warp";
-import {HostDownlink} from "./HostDownlink";
-import {HostContext} from "./HostContext";
+import type {HostDownlink} from "./HostDownlink";
+import type {HostContext} from "./HostContext";
 import {HostOptions, Host} from "./Host";
 
 const UNLINK_DELAY = 0;

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Input, Diagnostic, Parser} from "@swim/codec";
-import {UriAuthority} from "./UriAuthority";
-import {UriUser} from "./UriUser";
-import {UriHost} from "./UriHost";
-import {UriPort} from "./UriPort";
+import type {UriAuthority} from "./UriAuthority";
+import type {UriUser} from "./UriUser";
+import type {UriHost} from "./UriHost";
+import type {UriPort} from "./UriPort";
 import {UriParser} from "./UriParser";
 
 /** @hidden */

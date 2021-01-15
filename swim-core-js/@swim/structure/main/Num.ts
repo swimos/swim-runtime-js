@@ -218,22 +218,24 @@ export class Num extends Value {
     return 6;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof Num) {
       const x = this._value;
       const y = that._value;
       return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item, epsilon: number = Equivalent.Epsilon): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof Num) {
       const x = this._value;
       const y = that._value;
-      return x === y || isNaN(x) && isNaN(y) || Math.abs(y - x) < epsilon;
+      return x === y || isNaN(x) && isNaN(y) || Math.abs(y - x) < (epsilon !== void 0 ? epsilon : Equivalent.Epsilon);
     }
     return false;
   }

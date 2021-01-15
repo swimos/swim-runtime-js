@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {AnyItem, Item} from "../Item";
 import {AnyValue, Value} from "../Value";
-import {AnyText} from "../Text";
-import {AnyNum} from "../Num";
+import type {AnyText} from "../Text";
+import type {AnyNum} from "../Num";
 import {Selector} from "../Selector";
 import {AnyInterpreter, Interpreter} from "../Interpreter";
 
@@ -26,9 +26,14 @@ export class IdentitySelector extends Selector {
     return this;
   }
 
-  forSelected<T, S = unknown>(interpreter: Interpreter,
-                              callback: (this: S, interpreter: Interpreter) => T | undefined,
-                              thisArg?: S): T | undefined {
+  forSelected<T>(interpreter: Interpreter,
+                 callback: (interpreter: Interpreter) => T | undefined): T | undefined;
+  forSelected<T, S>(interpreter: Interpreter,
+                    callback: (this: S, interpreter: Interpreter) => T | undefined,
+                    thisArg: S): T | undefined;
+  forSelected<T, S>(interpreter: Interpreter,
+                    callback: (this: S | undefined, interpreter: Interpreter) => T | undefined,
+                    thisArg?: S): T | undefined {
     let selected: T | undefined;
     interpreter.willSelect(this);
     if (interpreter.scopeDepth() !== 0) {
@@ -47,9 +52,14 @@ export class IdentitySelector extends Selector {
     return selected;
   }
 
-  mapSelected<S = unknown>(interpreter: Interpreter,
-                           transform: (this: S, interpreter: Interpreter) => Item,
-                           thisArg?: S): Item {
+  mapSelected(interpreter: Interpreter,
+              transform: (interpreter: Interpreter) => Item): Item;
+  mapSelected<S>(interpreter: Interpreter,
+                 transform: (this: S, interpreter: Interpreter) => Item,
+                 thisArg: S): Item;
+  mapSelected<S>(interpreter: Interpreter,
+                 transform: (this: S | undefined, interpreter: Interpreter) => Item,
+                 thisArg?: S): Item {
     return transform.call(thisArg, interpreter);
   }
 
@@ -106,11 +116,14 @@ export class IdentitySelector extends Selector {
     return 10;
   }
 
-  compareTo(that: Item): number {
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+  compareTo(that: unknown): number {
+    if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
+    }
+    return NaN;
   }
 
-  equivalentTo(that: Item): boolean {
+  equivalentTo(that: unknown): boolean {
     return this === that;
   }
 

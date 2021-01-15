@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Value, AnyValue} from "@swim/structure";
+import type {Value, AnyValue} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
 import {EventDownlinkInit, EventDownlink} from "../downlink/EventDownlink";
 import {ListDownlinkInit, ListDownlink} from "../downlink/ListDownlink";
 import {MapDownlinkInit, MapDownlink} from "../downlink/MapDownlink";
 import {ValueDownlinkInit, ValueDownlink} from "../downlink/ValueDownlink";
-import {RefContext} from "./RefContext";
+import type {RefContext} from "./RefContext";
 import {BaseRef} from "./BaseRef";
 import {HostRef} from "./HostRef";
 import {NodeRef} from "./NodeRef";
@@ -70,20 +70,20 @@ export class LaneRef extends BaseRef {
   }
 
   downlinkList(init?: ListDownlinkInit<Value, AnyValue>): ListDownlink<Value, AnyValue>;
-  downlinkList<V extends VU, VU = V>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU>;
-  downlinkList<V extends VU, VU = V>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU> {
+  downlinkList<V extends VU, VU = never>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU>;
+  downlinkList<V extends VU, VU = never>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU> {
     return new ListDownlink(this._context, this, init, this._hostUri, this._nodeUri, this._laneUri);
   }
 
   downlinkMap(init?: MapDownlinkInit<Value, Value, AnyValue, AnyValue>): MapDownlink<Value, Value, AnyValue, AnyValue>;
-  downlinkMap<K extends KU, V extends VU, KU = K, VU = V>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU>;
-  downlinkMap<K extends KU, V extends VU, KU = K, VU = V>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU> {
+  downlinkMap<K extends KU, V extends VU, KU = never, VU = never>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU>;
+  downlinkMap<K extends KU, V extends VU, KU = never, VU = never>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU> {
     return new MapDownlink(this._context, this, init, this._hostUri, this._nodeUri, this._laneUri);
   }
 
   downlinkValue(init?: ValueDownlinkInit<Value, AnyValue>): ValueDownlink<Value, AnyValue>;
-  downlinkValue<V extends VU, VU = V>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU>;
-  downlinkValue<V extends VU, VU = V>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU> {
+  downlinkValue<V extends VU, VU = never>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU>;
+  downlinkValue<V extends VU, VU = never>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU> {
     return new ValueDownlink(this._context, this, init, this._hostUri, this._nodeUri, this._laneUri);
   }
 

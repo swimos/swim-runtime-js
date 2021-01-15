@@ -14,7 +14,7 @@
 
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {R2Function} from "./R2Function";
+import type {R2Function} from "./R2Function";
 import {AnyVectorR2, VectorR2} from "./VectorR2";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
 
@@ -27,7 +27,7 @@ export interface PointR2Init {
 
 export type PointR2Tuple = [number, number];
 
-export class PointR2 extends ShapeR2 implements Equivalent<PointR2>, HashCode, Debug {
+export class PointR2 extends ShapeR2 implements HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _x: number;
   /** @hidden */
@@ -116,9 +116,14 @@ export class PointR2 extends ShapeR2 implements Equivalent<PointR2>, HashCode, D
     };
   }
 
-  equivalentTo(that: PointR2, epsilon?: number): boolean {
-    return Numbers.equivalent(that._x, this._x, epsilon)
-        && Numbers.equivalent(that._y, this._y, epsilon)
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof PointR2) {
+      return Numbers.equivalent(that._x, this._x, epsilon)
+          && Numbers.equivalent(that._y, this._y, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

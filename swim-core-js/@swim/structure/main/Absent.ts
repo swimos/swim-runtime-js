@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {Numbers, Constructors, Cursor} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
-import {Record} from "./Record";
-import {AnyText} from "./Text";
+import type {Record} from "./Record";
+import type {AnyText} from "./Text";
 
 export type AnyAbsent = Absent | undefined;
 
@@ -120,8 +120,11 @@ export class Absent extends Value {
     return void 0;
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined {
     return void 0;
   }
 
@@ -133,11 +136,14 @@ export class Absent extends Value {
     return 99;
   }
 
-  compareTo(that: Item): number {
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+  compareTo(that: unknown): number {
+    if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
+    }
+    return NaN;
   }
 
-  equivalentTo(that: Item): boolean {
+  equivalentTo(that: unknown): boolean {
     return this === that;
   }
 

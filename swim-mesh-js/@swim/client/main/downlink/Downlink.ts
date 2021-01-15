@@ -14,7 +14,7 @@
 
 import {AnyUri, Uri} from "@swim/uri";
 import {Item, Attr, AnyValue, Value, Record, Form} from "@swim/structure";
-import {
+import type {
   EventMessage,
   LinkRequest,
   LinkedResponse,
@@ -23,10 +23,10 @@ import {
   UnlinkRequest,
   UnlinkedResponse,
 } from "@swim/warp";
-import {Host} from "../host/Host";
-import {DownlinkOwner} from "./DownlinkOwner";
-import {DownlinkContext} from "./DownlinkContext";
-import {DownlinkModel} from "./DownlinkModel";
+import type {Host} from "../host/Host";
+import type {DownlinkOwner} from "./DownlinkOwner";
+import type {DownlinkContext} from "./DownlinkContext";
+import type {DownlinkModel} from "./DownlinkModel";
 
 export type DownlinkType = "event" | "list" | "map" | "value";
 
@@ -250,7 +250,7 @@ export abstract class Downlink {
     const n = oldObservers !== null ? oldObservers.length : 0;
     const newObservers = new Array<DownlinkObserver>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newObservers[i] = oldObservers![i];
+      newObservers[i] = oldObservers![i]!;
     }
     newObservers[n] = observer;
     this._observers = newObservers;
@@ -261,7 +261,7 @@ export abstract class Downlink {
     const oldObservers = this._observers;
     const n = oldObservers !== null ? oldObservers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const oldObserver = oldObservers![i] as {[key: string]: unknown};
+      const oldObserver = oldObservers![i]! as {[key: string]: unknown};
       let found = oldObserver === observer; // check object identity
       if (!found) {
         for (const key in oldObserver) { // check property identity
@@ -275,10 +275,10 @@ export abstract class Downlink {
         if (n > 1) {
           const newObservers = new Array<DownlinkObserver>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newObservers[j] = oldObservers![j];
+            newObservers[j] = oldObservers![j]!;
           }
           for (let j = i + 1; j < n; j += 1) {
-            newObservers[j - 1] = oldObservers![j];
+            newObservers[j - 1] = oldObservers![j]!;
           }
           this._observers = newObservers;
         } else {
@@ -363,7 +363,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.onEvent !== void 0) {
         observer.onEvent(message.body(), this);
       }
@@ -375,7 +375,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.onCommand !== void 0) {
         observer.onCommand(body, this);
       }
@@ -387,7 +387,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willLink !== void 0) {
         observer.willLink(this);
       }
@@ -399,7 +399,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didLink !== void 0) {
         observer.didLink(this);
       }
@@ -411,7 +411,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willSync !== void 0) {
         observer.willSync(this);
       }
@@ -423,7 +423,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didSync !== void 0) {
         observer.didSync(this);
       }
@@ -435,7 +435,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willUnlink !== void 0) {
         observer.willUnlink(this);
       }
@@ -447,7 +447,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didUnlink !== void 0) {
         observer.didUnlink(this);
       }
@@ -459,7 +459,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didConnect !== void 0) {
         observer.didConnect(this);
       }
@@ -471,7 +471,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didDisconnect !== void 0) {
         observer.didDisconnect(this);
       }
@@ -483,7 +483,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didFail !== void 0) {
         observer.didFail(error, this);
       }
@@ -515,7 +515,7 @@ export abstract class Downlink {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didClose !== void 0) {
         observer.didClose(this);
       }

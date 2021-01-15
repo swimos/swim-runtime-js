@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {MapOutlet} from "../MapOutlet";
-import {WatchFieldsFunction} from "../function";
+import type {WatchFieldsFunction} from "../function";
 import {WatchFieldsOperator} from "./WatchFieldsOperator";
 
 export class WatchFieldsCombinator<K, V, O> extends WatchFieldsOperator<K, V, O> {

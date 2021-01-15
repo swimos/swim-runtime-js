@@ -23,7 +23,7 @@ import {
   SyncedResponse,
 } from "@swim/warp";
 import {ValueDownlinkRecord, WarpClient} from "@swim/client";
-import {MockServer} from "../MockServer";
+import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
 export class ValueDownlinkRecordSpec extends Spec {

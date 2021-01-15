@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {BTree} from "@swim/collections";
 import {Attr, Value, Record} from "@swim/structure";
-import {Uri} from "@swim/uri";
-import {EventMessage} from "@swim/warp";
-import {Host} from "../host/Host";
-import {DownlinkContext} from "./DownlinkContext";
+import type {Uri} from "@swim/uri";
+import type {EventMessage} from "@swim/warp";
+import type {Host} from "../host/Host";
+import type {DownlinkContext} from "./DownlinkContext";
 import {DownlinkModel} from "./DownlinkModel";
-import {DownlinkType} from "./Downlink";
-import {MapDownlink} from "./MapDownlink";
+import type {DownlinkType} from "./Downlink";
+import type {MapDownlink} from "./MapDownlink";
 
 /** @hidden */
 export class MapDownlinkModel extends DownlinkModel {
   /** @hidden */
-  _views: MapDownlink<unknown, unknown>[];
+  declare _views: MapDownlink<unknown, unknown>[];
   /** @hidden */
   _state: BTree<Value, Value>;
 
@@ -107,7 +107,10 @@ export class MapDownlinkModel extends DownlinkModel {
     this.command(Record.create(1).attr("clear"));
   }
 
-  forEach<T, S = unknown>(callback: (this: S, key: Value, value: Value) => T | void,
+  forEach<T>(callback: (key: Value, value: Value) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, key: Value, value: Value) => T | void,
+                          thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, key: Value, value: Value) => T | void,
                           thisArg?: S): T | undefined {
     return this._state.forEach(callback, thisArg);
   }
@@ -187,62 +190,62 @@ export class MapDownlinkModel extends DownlinkModel {
 
   protected mapWillUpdate(key: Value, newValue: Value): Value {
     for (let i = 0; i < this._views.length; i += 1) {
-      newValue = this._views[i].mapWillUpdate(key, newValue);
+      newValue = this._views[i]!.mapWillUpdate(key, newValue);
     }
     return newValue;
   }
 
   protected mapDidUpdate(key: Value, newValue: Value, oldValue: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapDidUpdate(key, newValue, oldValue);
+      this._views[i]!.mapDidUpdate(key, newValue, oldValue);
     }
   }
 
   protected mapWillRemove(key: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapWillRemove(key);
+      this._views[i]!.mapWillRemove(key);
     }
   }
 
   protected mapDidRemove(key: Value, oldValue: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapDidRemove(key, oldValue);
+      this._views[i]!.mapDidRemove(key, oldValue);
     }
   }
 
   protected mapWillDrop(lower: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapWillDrop(lower);
+      this._views[i]!.mapWillDrop(lower);
     }
   }
 
   protected mapDidDrop(lower: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapDidDrop(lower);
+      this._views[i]!.mapDidDrop(lower);
     }
   }
 
   protected mapWillTake(upper: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapWillTake(upper);
+      this._views[i]!.mapWillTake(upper);
     }
   }
 
   protected mapDidTake(upper: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapDidTake(upper);
+      this._views[i]!.mapDidTake(upper);
     }
   }
 
   protected mapWillClear(): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapWillClear();
+      this._views[i]!.mapWillClear();
     }
   }
 
   protected mapDidClear(): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].mapDidClear();
+      this._views[i]!.mapDidClear();
     }
   }
 }

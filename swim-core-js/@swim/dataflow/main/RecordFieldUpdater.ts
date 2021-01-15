@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Value, Record} from "@swim/structure";
+import type {Value, Record} from "@swim/structure";
 import {KeyEffect, AbstractInlet} from "@swim/streamlet";
 import {RecordOutlet} from "./RecordOutlet";
 

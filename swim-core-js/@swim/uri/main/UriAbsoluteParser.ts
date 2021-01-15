@@ -14,11 +14,11 @@
 
 import {Input, Parser, Diagnostic} from "@swim/codec";
 import {Uri} from "./Uri";
-import {UriScheme} from "./UriScheme";
-import {UriAuthority} from "./UriAuthority";
-import {UriPath} from "./UriPath";
-import {UriQuery} from "./UriQuery";
-import {UriFragment} from "./UriFragment";
+import type {UriScheme} from "./UriScheme";
+import type {UriAuthority} from "./UriAuthority";
+import type {UriPath} from "./UriPath";
+import type {UriQuery} from "./UriQuery";
+import type {UriFragment} from "./UriFragment";
 import {UriParser} from "./UriParser";
 
 /** @hidden */

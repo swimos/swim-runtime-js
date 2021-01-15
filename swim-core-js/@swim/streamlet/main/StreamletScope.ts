@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Outlet} from "./Outlet";
-
-import {StreamletContext} from "./StreamletContext";
+import type {Outlet} from "./Outlet";
+import type {StreamletContext} from "./StreamletContext";
 
 export interface StreamletScope<O> {
   /**

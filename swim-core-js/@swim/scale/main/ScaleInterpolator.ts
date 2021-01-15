@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import {Interpolator} from "@swim/interpolate";
-import {ContinuousScale} from "./ContinuousScale";
+import type {ContinuousScale} from "./ContinuousScale";
 import {LinearScale} from "./LinearScale";
 import {TimeScale} from "./TimeScale";
-import {LinearScaleInterpolator} from "./LinearScaleInterpolator";
-import {TimeScaleInterpolator} from "./TimeScaleInterpolator";
+import type {LinearScaleInterpolator} from "./LinearScaleInterpolator";
+import type {TimeScaleInterpolator} from "./TimeScaleInterpolator";
 
-export abstract class ScaleInterpolator<D extends DU, R extends RU, DU = D, RU = R, S extends ContinuousScale<D, R, DU, RU> = ContinuousScale<D, R, DU, RU>> extends Interpolator<S, ContinuousScale<D, R, DU, RU>> {
+export abstract class ScaleInterpolator<D, R, DU = never, RU = never, S extends ContinuousScale<D, R, DU, RU> = ContinuousScale<D, R, DU, RU>> extends Interpolator<S, ContinuousScale<D, R, DU, RU>> {
   range(): readonly [S, S];
   range(ss: readonly [ContinuousScale<D, R, DU, RU>, ContinuousScale<D, R, DU, RU>]): ScaleInterpolator<D, R, DU, RU, S>;
   range(s0: ContinuousScale<D, R, DU, RU>, s1: ContinuousScale<D, R, DU, RU>): ScaleInterpolator<D, R, DU, RU, S>;
@@ -35,7 +35,7 @@ export abstract class ScaleInterpolator<D extends DU, R extends RU, DU = D, RU =
     }
   }
 
-  static between<D extends DU, R extends RU, DU = D, RU = R>(s0: ContinuousScale<D, R, DU, RU>, s1: ContinuousScale<D, R, DU, RU>): ScaleInterpolator<D, R, DU, RU>;
+  static between<D, R, DU = never, RU = never>(s0: ContinuousScale<D, R, DU, RU>, s1: ContinuousScale<D, R, DU, RU>): ScaleInterpolator<D, R, DU, RU>;
   static between(a: unknown, b: unknown): Interpolator<unknown>;
   static between(a: unknown, b: unknown): Interpolator<unknown> {
     if (a instanceof LinearScale && b instanceof LinearScale) {

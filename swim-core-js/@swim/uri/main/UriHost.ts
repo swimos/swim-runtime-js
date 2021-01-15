@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import {Comparable, HashCode, Strings, HashGenCacheMap} from "@swim/util";
-import {Output, Debug, Display} from "@swim/codec";
+import type {Output, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 
 export type AnyUriHost = UriHost | string;
 
-export abstract class UriHost implements Comparable<UriHost>, HashCode, Debug, Display {
+export abstract class UriHost implements Comparable, HashCode, Debug, Display {
   /** @hidden */
   _hashCode?: number;
 
@@ -48,9 +48,11 @@ export abstract class UriHost implements Comparable<UriHost>, HashCode, Debug, D
     return this.toString();
   }
 
-  compareTo(that: UriHost): 0 | 1 | -1 {
-    const order = this.toString().localeCompare(that.toString());
-    return order < 0 ? -1 : order > 0 ? 1 : 0;
+  compareTo(that: unknown): number {
+    if (that instanceof UriHost) {
+      return this.toString().localeCompare(that.toString());
+    }
+    return NaN;
   }
 
   equals(that: unknown): boolean {

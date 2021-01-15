@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Outlet} from "../Outlet";
-import {WatchValueFunction} from "../function";
+import type {WatchValueFunction} from "../function";
 import {WatchValueOperator} from "./WatchValueOperator";
 
 export class WatchValueCombinator<I> extends WatchValueOperator<I> {

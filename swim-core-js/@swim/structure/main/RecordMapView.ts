@@ -16,7 +16,7 @@ import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
 import {Record} from "./Record";
 import {RecordMap} from "./RecordMap";
-import {AnyNum} from "./Num";
+import type {AnyNum} from "./Num";
 
 /** @hidden */
 export class RecordMapView extends Record {
@@ -87,7 +87,7 @@ export class RecordMapView extends Record {
   isConstant(): boolean {
     const array = this._record._array;
     for (let i = this._lower, n = this._upper; i < n; i += 1) {
-      if (!array![i].isConstant()) {
+      if (!array![i]!.isConstant()) {
         return false;
       }
     }
@@ -138,7 +138,7 @@ export class RecordMapView extends Record {
 
   head(): Item {
     if (this.length > 0) {
-      return this._record._array![this._lower];
+      return this._record._array![this._lower]!;
     } else {
       return Item.absent();
     }
@@ -213,7 +213,7 @@ export class RecordMapView extends Record {
       index = n + index;
     }
     if (index >= 0 && index < n) {
-      return this._record._array![this._lower + index];
+      return this._record._array![this._lower + index]!;
     } else {
       return Item.absent();
     }
@@ -280,9 +280,9 @@ export class RecordMapView extends Record {
       throw new Error("immutable");
     }
     if ((this._record._flags & Record.ALIASED) !== 0) {
-      this.pushAliased.apply(this, arguments);
+      this.pushAliased.apply(this, arguments as unknown as AnyItem[]);
     } else {
-      this.pushMutable.apply(this, arguments);
+      this.pushMutable.apply(this, arguments as unknown as AnyItem[]);
     }
     return this.length;
   }
@@ -412,10 +412,10 @@ export class RecordMapView extends Record {
     const n = this._record._itemCount;
     const array = this._record._array!;
     for (let i = this._lower; i < this._upper; i += 1) {
-      const item = array[i];
+      const item = array[i]!;
       if (item instanceof Item.Field && item.key.equals(key)) {
         for (let j = i + 1; j < n; j += 1, i += 1) {
-          array[i] = array[j];
+          array[i] = array[j]!;
         }
         array[n - 1] = void 0 as any;
         this._record._table = null;
@@ -485,7 +485,7 @@ export class RecordMapView extends Record {
     i = this._lower;
     let j = this._upper;
     while (j < m) {
-      const item = array[j];
+      const item = array[j]!;
       if (item instanceof Item.Field) {
         this._record._table = null;
       }
@@ -541,7 +541,7 @@ export class RecordMapView extends Record {
     let i = this._lower;
     let j = 0;
     while (j < m) {
-      const item = oldArray[i];
+      const item = oldArray[i]!;
       newArray[j] = item.clone();
       if (item instanceof Item.Field) {
         n += 1;
@@ -575,16 +575,19 @@ export class RecordMapView extends Record {
     return new RecordMapView(this._record, this._lower + lower, this._upper + upper);
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined {
     const array = this._record._array!;
     for (let i = this._lower, n = this._upper; i < n; i += 1) {
-      const result = callback.call(thisArg, array[i], i);
+      const result = callback.call(thisArg, array[i]!, i);
       if (result !== void 0) {
         return result;
       }
     }
-    return;
+    return void 0;
   }
 }
 Item.RecordMapView = RecordMapView;

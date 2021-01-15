@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {InletOptions} from "./Inlet";
+import type {InletOptions} from "./Inlet";
 import {StreamletClass, AbstractStreamlet} from "./AbstractStreamlet";
 
 export function In(name: string): PropertyDecorator;

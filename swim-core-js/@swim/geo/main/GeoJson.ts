@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {GeoShape} from "./GeoShape";
+import type {GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
-import {GeoCurve} from "./GeoCurve";
+import type {GeoCurve} from "./GeoCurve";
 import {GeoSegment} from "./GeoSegment";
 import {GeoSpline} from "./GeoSpline";
 import {GeoPath} from "./GeoPath";
@@ -210,7 +210,7 @@ GeoJsonMultiPoint.toShape = function (object: GeoJsonMultiPoint): GeoSet<GeoPoin
   const n = positions.length;
   const shapes = new Array<GeoPoint>(n);
   for (let i = 0; i < n; i += 1) {
-    const position = positions[i];
+    const position = positions[i]!;
     shapes[i] = new GeoPoint(position[0], position[1]);
   }
   return new GeoSet(shapes);
@@ -235,11 +235,11 @@ GeoJsonLineString.toShape = function (object: GeoJsonLineString): GeoSpline {
   const n = lineString.length;
   if (n > 0) {
     const curves = new Array<GeoCurve>(n - 1);
-    let position = lineString[0];
+    let position = lineString[0]!;
     let lng = position[0];
     let lat = position[1];
     for (let i = 1; i < n; i += 1) {
-      position = lineString[i];
+      position = lineString[i]!;
       curves[i - 1] = new GeoSegment(lng, lat, (lng = position[0], lng), (lat = position[1], lat));
     }
     return new GeoSpline(curves, false);
@@ -267,15 +267,15 @@ GeoJsonMultiLineString.toShape = function (object: GeoJsonMultiLineString): GeoS
   const n = multiLineString.length;
   const shapes = new Array<GeoSpline>(n);
   for (let i = 0; i < n; i += 1) {
-    const lineString = multiLineString[i];
+    const lineString = multiLineString[i]!;
     const m = lineString.length;
     if (m > 0) {
       const curves = new Array<GeoCurve>(m - 1);
-      let position = lineString[0];
+      let position = lineString[0]!;
       let lng = position[0];
       let lat = position[1];
       for (let j = 1; j < m; j += 1) {
-        position = lineString[j];
+        position = lineString[j]!;
         curves[j - 1] = new GeoSegment(lng, lat, (lng = position[0], lng), (lat = position[1], lat));
       }
       shapes[i] = new GeoSpline(curves, false);
@@ -305,15 +305,15 @@ GeoJsonPolygon.toShape = function (object: GeoJsonPolygon): GeoPath {
   const n = polygons.length;
   const splines = new Array<GeoSpline>(n);
   for (let i = 0; i < n; i += 1) {
-    const polygon = polygons[i];
+    const polygon = polygons[i]!;
     const m = polygon.length;
     if (m > 0) {
       const curves = new Array<GeoCurve>(m - 1);
-      let position = polygon[0];
+      let position = polygon[0]!;
       let lng = position[0];
       let lat = position[1];
       for (let j = 1; j < m; j += 1) {
-        position = polygon[j];
+        position = polygon[j]!;
         curves[j - 1] = new GeoSegment(lng, lat, (lng = position[0], lng), (lat = position[1], lat));
       }
       splines[i] = new GeoSpline(curves, true);
@@ -343,19 +343,19 @@ GeoJsonMultiPolygon.toShape = function (object: GeoJsonMultiPolygon): GeoSet<Geo
   const n = multiPolygon.length;
   const shapes = new Array<GeoPath>(n);
   for (let i = 0; i < n; i += 1) {
-    const polygons = multiPolygon[i];
+    const polygons = multiPolygon[i]!;
     const m = polygons.length;
     const splines = new Array<GeoSpline>(m);
     for (let j = 0; j < m; j += 1) {
-      const polygon = polygons[j];
+      const polygon = polygons[j]!;
       const o = polygon.length;
       if (o > 0) {
         const curves = new Array<GeoCurve>(o - 1);
-        let position = polygon[0];
+        let position = polygon[0]!;
         let lng = position[0];
         let lat = position[1];
         for (let k = 1; k < o; k += 1) {
-          position = polygon[k];
+          position = polygon[k]!;
           curves[k - 1] = new GeoSegment(lng, lat, (lng = position[0], lng), (lat = position[1], lat));
         }
         splines[j] = new GeoSpline(curves, true);
@@ -387,7 +387,7 @@ GeoJsonGeometryCollection.toShape = function (object: GeoJsonGeometryCollection)
   const n = geometries.length;
   const shapes = new Array<GeoShape>(n);
   for (let i = 0; i < n; i += 1) {
-    shapes[i] = GeoJsonGeometry.toShape(geometries[i]);
+    shapes[i] = GeoJsonGeometry.toShape(geometries[i]!);
   }
   return new GeoSet(shapes);
 };
@@ -431,7 +431,7 @@ GeoJsonFeatureCollection.toShapes = function (object: GeoJsonFeatureCollection):
   const n = features.length;
   const shapes = new Array<GeoShape | null>(n);
   for (let i = 0; i < n; i += 1) {
-    shapes[i] = GeoJsonFeature.toShape(features[i]);
+    shapes[i] = GeoJsonFeature.toShape(features[i]!);
   }
   return shapes;
 };

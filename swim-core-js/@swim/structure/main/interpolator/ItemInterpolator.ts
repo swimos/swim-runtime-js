@@ -22,15 +22,15 @@ import {Num} from "../Num";
 import {BinaryOperator} from "../operator/BinaryOperator";
 import {UnaryOperator} from "../operator/UnaryOperator";
 import {InvokeOperator} from "../operator/InvokeOperator";
-import {AttrInterpolator} from "./AttrInterpolator";
-import {SlotInterpolator} from "./SlotInterpolator";
-import {ValueInterpolator} from "./ValueInterpolator";
-import {RecordInterpolator} from "./RecordInterpolator";
-import {NumInterpolator} from "./NumInterpolator";
-import {ConditionalOperatorInterpolator} from "./ConditionalOperatorInterpolator";
-import {BinaryOperatorInterpolator} from "./BinaryOperatorInterpolator";
-import {UnaryOperatorInterpolator} from "./UnaryOperatorInterpolator";
-import {InvokeOperatorInterpolator} from "./InvokeOperatorInterpolator";
+import type {AttrInterpolator} from "./AttrInterpolator";
+import type {SlotInterpolator} from "./SlotInterpolator";
+import type {ValueInterpolator} from "./ValueInterpolator";
+import type {RecordInterpolator} from "./RecordInterpolator";
+import type {NumInterpolator} from "./NumInterpolator";
+import type {ConditionalOperatorInterpolator} from "./ConditionalOperatorInterpolator";
+import type {BinaryOperatorInterpolator} from "./BinaryOperatorInterpolator";
+import type {UnaryOperatorInterpolator} from "./UnaryOperatorInterpolator";
+import type {InvokeOperatorInterpolator} from "./InvokeOperatorInterpolator";
 
 export abstract class ItemInterpolator<I extends Item = Item> extends Interpolator<I, AnyItem> {
   range(): readonly [I, I];

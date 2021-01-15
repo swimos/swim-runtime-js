@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {BTree} from "@swim/collections";
-import {KeyEffect} from "./KeyEffect";
-import {MapInlet} from "./MapInlet";
+import type {KeyEffect} from "./KeyEffect";
+import type {MapInlet} from "./MapInlet";
 import {MapOutlet} from "./MapOutlet";
 
 export abstract class AbstractMapInlet<K, V, O> implements MapInlet<K, V, O> {

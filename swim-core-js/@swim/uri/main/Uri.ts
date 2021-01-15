@@ -14,30 +14,30 @@
 
 import {Comparable, HashCode, Strings} from "@swim/util";
 import {Output, Format, Debug, Display, Base16} from "@swim/codec";
-import {Form} from "@swim/structure";
+import type {Form} from "@swim/structure";
 import {UriException} from "./UriException";
-import {AnyUriScheme, UriScheme} from "./UriScheme";
-import {AnyUriAuthority, UriAuthorityInit, UriAuthority} from "./UriAuthority";
-import {AnyUriUser, UriUser} from "./UriUser";
-import {AnyUriHost, UriHost} from "./UriHost";
-import {UriHostName} from "./UriHostName";
-import {UriHostIPv4} from "./UriHostIPv4";
-import {UriHostIPv6} from "./UriHostIPv6";
-import {UriHostUndefined} from "./UriHostUndefined";
-import {AnyUriPort, UriPort} from "./UriPort";
-import {AnyUriPath, UriPath} from "./UriPath";
-import {UriPathSegment} from "./UriPathSegment";
-import {UriPathSlash} from "./UriPathSlash";
-import {UriPathEmpty} from "./UriPathEmpty";
-import {UriPathBuilder} from "./UriPathBuilder";
-import {AnyUriQuery, UriQuery} from "./UriQuery";
-import {UriQueryParam} from "./UriQueryParam";
-import {UriQueryUndefined} from "./UriQueryUndefined";
-import {UriQueryBuilder} from "./UriQueryBuilder";
-import {AnyUriFragment, UriFragment} from "./UriFragment";
-import {UriParser} from "./UriParser";
-import {UriForm} from "./UriForm";
-import {UriPathForm} from "./UriPathForm";
+import type {AnyUriScheme, UriScheme} from "./UriScheme";
+import type {AnyUriAuthority, UriAuthorityInit, UriAuthority} from "./UriAuthority";
+import type {AnyUriUser, UriUser} from "./UriUser";
+import type {AnyUriHost, UriHost} from "./UriHost";
+import type {UriHostName} from "./UriHostName";
+import type {UriHostIPv4} from "./UriHostIPv4";
+import type {UriHostIPv6} from "./UriHostIPv6";
+import type {UriHostUndefined} from "./UriHostUndefined";
+import type {AnyUriPort, UriPort} from "./UriPort";
+import type {AnyUriPath, UriPath} from "./UriPath";
+import type {UriPathSegment} from "./UriPathSegment";
+import type {UriPathSlash} from "./UriPathSlash";
+import type {UriPathEmpty} from "./UriPathEmpty";
+import type {UriPathBuilder} from "./UriPathBuilder";
+import type {AnyUriQuery, UriQuery} from "./UriQuery";
+import type {UriQueryParam} from "./UriQueryParam";
+import type {UriQueryUndefined} from "./UriQueryUndefined";
+import type {UriQueryBuilder} from "./UriQueryBuilder";
+import type {AnyUriFragment, UriFragment} from "./UriFragment";
+import type {UriParser} from "./UriParser";
+import type {UriForm} from "./UriForm";
+import type {UriPathForm} from "./UriPathForm";
 
 export type AnyUri = Uri | UriInit | string;
 
@@ -49,7 +49,7 @@ export interface UriInit extends UriAuthorityInit {
   fragment?: AnyUriFragment;
 }
 
-export class Uri implements Comparable<Uri>, HashCode, Debug, Display {
+export class Uri implements Comparable, HashCode, Debug, Display {
   /** @hidden */
   readonly _scheme: UriScheme;
   /** @hidden */
@@ -275,7 +275,7 @@ export class Uri implements Comparable<Uri>, HashCode, Debug, Display {
     if (arguments.length === 0) {
       return this._path;
     } else {
-      const path = Uri.Path.from.apply(void 0, components);
+      const path = Uri.Path.of.apply(void 0, components);
       if (path !== this._path) {
         return this.copy(this._scheme, this._authority, path, this._query, this._fragment);
       } else {
@@ -321,7 +321,7 @@ export class Uri implements Comparable<Uri>, HashCode, Debug, Display {
   }
 
   appendedPath(...components: AnyUriPath[]): Uri {
-    return this.path(this._path.appended.apply(this._path, arguments));
+    return this.path(this._path.appended.apply(this._path, arguments as unknown as AnyUriPath[]));
   }
 
   appendedSlash(): Uri {
@@ -333,7 +333,7 @@ export class Uri implements Comparable<Uri>, HashCode, Debug, Display {
   }
 
   prependedPath(...components: AnyUriPath[]): Uri {
-    return this.path(this._path.prepended.apply(this._path, arguments));
+    return this.path(this._path.prepended.apply(this._path, arguments as unknown as AnyUriPath[]));
   }
 
   prependedSlash(): Uri {
@@ -510,9 +510,11 @@ export class Uri implements Comparable<Uri>, HashCode, Debug, Display {
     return uri;
   }
 
-  compareTo(that: Uri): 0 | 1 | -1 {
-    const order = this.toString().localeCompare(that.toString());
-    return order < 0 ? -1 : order > 0 ? 1 : 0;
+  compareTo(that: Uri): number {
+    if (that instanceof Uri) {
+      return this.toString().localeCompare(that.toString());
+    }
+    return NaN;
   }
 
   equals(that: unknown): boolean {
@@ -704,7 +706,7 @@ export class Uri implements Comparable<Uri>, HashCode, Debug, Display {
   }
 
   static path(...components: AnyUriPath[]): Uri {
-    const path = Uri.Path.from.apply(void 0, components);
+    const path = Uri.Path.of.apply(void 0, components);
     return Uri.from(void 0, void 0, path, void 0, void 0);
   }
 

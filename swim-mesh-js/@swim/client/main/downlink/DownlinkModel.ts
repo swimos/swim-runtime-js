@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Uri} from "@swim/uri";
+import type {Uri} from "@swim/uri";
 import {AnyValue, Value} from "@swim/structure";
 import {
   EventMessage,
@@ -23,10 +23,10 @@ import {
   UnlinkRequest,
   UnlinkedResponse,
 } from "@swim/warp";
-import {HostDownlink} from "../host/HostDownlink";
-import {Host} from "../host/Host";
-import {DownlinkContext} from "./DownlinkContext";
-import {DownlinkType, Downlink} from "./Downlink";
+import type {HostDownlink} from "../host/HostDownlink";
+import type {Host} from "../host/Host";
+import type {DownlinkContext} from "./DownlinkContext";
+import type {DownlinkType, Downlink} from "./Downlink";
 
 const LINKING = 1;
 const LINKED = 2;
@@ -99,7 +99,7 @@ export abstract class DownlinkModel implements HostDownlink {
 
   keepLinked(): boolean {
     for (let i = 0; i < this._views.length; i += 1) {
-      if (this._views[i].keepLinked()) {
+      if (this._views[i]!.keepLinked()) {
         return true;
       }
     }
@@ -108,7 +108,7 @@ export abstract class DownlinkModel implements HostDownlink {
 
   keepSynced(): boolean {
     for (let i = 0; i < this._views.length; i += 1) {
-      if (this._views[i].keepSynced()) {
+      if (this._views[i]!.keepSynced()) {
         return true;
       }
     }
@@ -162,48 +162,48 @@ export abstract class DownlinkModel implements HostDownlink {
 
   onEventMessage(message: EventMessage, host: Host): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].onEventMessage(message);
+      this._views[i]!.onEventMessage(message);
     }
   }
 
   onCommandMessage(body: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].onCommandMessage(body);
+      this._views[i]!.onCommandMessage(body);
     }
   }
 
   onLinkRequest(request: LinkRequest): void {
     this._status |= LINKING;
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].onLinkRequest(request);
+      this._views[i]!.onLinkRequest(request);
     }
   }
 
   onLinkedResponse(response: LinkedResponse, host: Host): void {
     this._status = this._status & ~LINKING | LINKED;
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].onLinkedResponse(response);
+      this._views[i]!.onLinkedResponse(response);
     }
   }
 
   onSyncRequest(request: SyncRequest): void {
     this._status |= SYNCING;
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].onSyncRequest(request);
+      this._views[i]!.onSyncRequest(request);
     }
   }
 
   onSyncedResponse(response: SyncedResponse, host: Host): void {
     this._status = this._status & ~SYNCING | SYNCED;
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].onSyncedResponse(response);
+      this._views[i]!.onSyncedResponse(response);
     }
   }
 
   onUnlinkRequest(request: UnlinkRequest, host: Host): void {
     this._status = this._status & ~(LINKING | SYNCING) | UNLINKING;
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].onUnlinkRequest(request);
+      this._views[i]!.onUnlinkRequest(request);
     }
   }
 
@@ -211,7 +211,7 @@ export abstract class DownlinkModel implements HostDownlink {
     this._status &= ~UNLINKING;
     if (this._views.length === 0 || this._status !== 0) {
       for (let i = 0; i < this._views.length; i += 1) {
-        this._views[i].onUnlinkedResponse(response);
+        this._views[i]!.onUnlinkedResponse(response);
       }
       this.close();
     } else { // concurrently relinked
@@ -225,7 +225,7 @@ export abstract class DownlinkModel implements HostDownlink {
 
   hostDidConnect(host: Host): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].hostDidConnect();
+      this._views[i]!.hostDidConnect();
     }
     if (this.keepSynced()) {
       this.sync();
@@ -238,7 +238,7 @@ export abstract class DownlinkModel implements HostDownlink {
     this._status = 0;
     let keepLinked = false;
     for (let i = 0; i < this._views.length; i += 1) {
-      const view = this._views[i];
+      const view = this._views[i]!;
       view.hostDidDisconnect();
       keepLinked = keepLinked || view.keepLinked();
     }
@@ -249,7 +249,7 @@ export abstract class DownlinkModel implements HostDownlink {
 
   hostDidFail(error: unknown, host: Host): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].hostDidFail(error);
+      this._views[i]!.hostDidFail(error);
     }
   }
 
@@ -291,7 +291,7 @@ export abstract class DownlinkModel implements HostDownlink {
   openUp(host: Host): void {
     this._host = host;
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].openUp(host);
+      this._views[i]!.openUp(host);
     }
   }
 
@@ -299,7 +299,7 @@ export abstract class DownlinkModel implements HostDownlink {
     const views = this._views;
     this._views = [];
     for (let i = 0; i < views.length; i += 1) {
-      views[i].closeUp();
+      views[i]!.closeUp();
     }
   }
 }

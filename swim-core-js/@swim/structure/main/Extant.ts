@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {Item} from "./Item";
 import {Value} from "./Value";
-import {Record} from "./Record";
+import type {Record} from "./Record";
 
 export type AnyExtant = Extant | null;
 
@@ -92,11 +92,14 @@ export class Extant extends Value {
     return 98;
   }
 
-  compareTo(that: Item): number {
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+  compareTo(that: unknown): number {
+    if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
+    }
+    return NaN;
   }
 
-  equivalentTo(that: Item): boolean {
+  equivalentTo(that: unknown): boolean {
     return this === that;
   }
 

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Iterator} from "@swim/util";
-import {Inlet} from "./Inlet";
-import {MapValueFunction, WatchValueFunction} from "./function";
-import {MemoizeValueCombinator} from "./combinator/MemoizeValueCombinator";
-import {MapValueCombinator} from "./combinator/MapValueCombinator";
-import {WatchValueCombinator} from "./combinator/WatchValueCombinator";
+import type {Iterator} from "@swim/util";
+import type {Inlet} from "./Inlet";
+import type {MapValueFunction, WatchValueFunction} from "./function";
+import type {MemoizeValueCombinator} from "./combinator/MemoizeValueCombinator";
+import type {MapValueCombinator} from "./combinator/MapValueCombinator";
+import type {WatchValueCombinator} from "./combinator/WatchValueCombinator";
 
 export type OutletType = "value" | "map";
 

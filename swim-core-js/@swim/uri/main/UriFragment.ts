@@ -18,7 +18,7 @@ import {Uri} from "./Uri";
 
 export type AnyUriFragment = UriFragment | string;
 
-export class UriFragment implements Comparable<UriFragment>, HashCode, Debug, Display {
+export class UriFragment implements Comparable, HashCode, Debug, Display {
   /** @hidden */
   readonly _identifier: string | null;
   /** @hidden */
@@ -41,9 +41,11 @@ export class UriFragment implements Comparable<UriFragment>, HashCode, Debug, Di
     return this._identifier !== null ? this._identifier : void 0;
   }
 
-  compareTo(that: UriFragment): 0 | 1 | -1 {
-    const order = this.toString().localeCompare(that.toString());
-    return order < 0 ? -1 : order > 0 ? 1 : 0;
+  compareTo(that: UriFragment): number {
+    if (that instanceof UriFragment) {
+      return this.toString().localeCompare(that.toString());
+    }
+    return NaN;
   }
 
   equals(that: unknown): boolean {

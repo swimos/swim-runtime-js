@@ -18,7 +18,7 @@ import {Uri} from "./Uri";
 
 export type AnyUriPort = UriPort | number | string;
 
-export class UriPort implements Comparable<UriPort>, HashCode, Debug, Display {
+export class UriPort implements Comparable, HashCode, Debug, Display {
   /** @hidden */
   readonly _number: number;
 
@@ -43,8 +43,11 @@ export class UriPort implements Comparable<UriPort>, HashCode, Debug, Display {
     return this._number;
   }
 
-  compareTo(that: UriPort): 0 | 1 | -1 {
-    return this._number < that._number ? -1 : this._number > that._number ? 1 : 0;
+  compareTo(that: unknown): number {
+    if (that instanceof UriPort) {
+      return this._number < that._number ? -1 : this._number > that._number ? 1 : 0;
+    }
+    return NaN;
   }
 
   equals(that: unknown): boolean {

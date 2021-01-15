@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Builder} from "@swim/util";
+import type {Builder} from "@swim/util";
 import {Uri} from "./Uri";
-import {AnyUriPath, UriPath} from "./UriPath";
+import type {AnyUriPath, UriPath} from "./UriPath";
 
 export class UriPathBuilder implements Builder<string, UriPath> {
   /** @hidden */
@@ -39,7 +39,7 @@ export class UriPathBuilder implements Builder<string, UriPath> {
 
   push(...components: AnyUriPath[]): void {
     for (let i = 0; i < components.length; i += 1) {
-      const component = components[i];
+      const component = components[i]!;
       if (component instanceof Uri.Path) {
         this.addPath(component);
       } else if (Array.isArray(component)) {

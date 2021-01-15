@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {OutputSettings, OutputStyle, Unicode} from "@swim/codec";
-import {Spec} from "./Spec";
-import {Proof} from "./Proof";
-import {Exam} from "./Exam";
+import type {Spec} from "./Spec";
+import type {Proof} from "./Proof";
 import {Report} from "./Report";
+import type {Exam} from "./Exam";
 
 /**
  * Unit test `Report` that prints its results to the console.

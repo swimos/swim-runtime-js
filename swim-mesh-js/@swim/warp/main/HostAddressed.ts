@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Murmur3, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {AnyValue, Value, Attr} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
 import {Envelope} from "./Envelope";

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {SplineR2Context} from "./SplineR2Context";
+import type {SplineR2Context} from "./SplineR2Context";
 
 export interface PathR2Context extends SplineR2Context {
 }

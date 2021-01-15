@@ -54,8 +54,8 @@ import {
 import {Outlet, KeyOutlet, StreamletScope, ValueInput} from "@swim/streamlet";
 import {RecordOutlet} from "./RecordOutlet";
 import {GetOutlet} from "./selector/GetOutlet";
-import {BinaryOutlet} from "./operator/BinaryOutlet";
-import {UnaryOutlet} from "./operator/UnaryOutlet";
+import type {BinaryOutlet} from "./operator/BinaryOutlet";
+import type {UnaryOutlet} from "./operator/UnaryOutlet";
 import {ConditionalOutlet} from "./operator/ConditionalOutlet";
 import {OrOutlet} from "./operator/OrOutlet";
 import {AndOutlet} from "./operator/AndOutlet";

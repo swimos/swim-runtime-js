@@ -15,7 +15,7 @@
 import {Cursor} from "@swim/util";
 import {AnyItem, Item, Field, AnyValue, Value, Record, AnyText, AnyNum} from "@swim/structure";
 import {DownlinkRecord} from "./DownlinkRecord";
-import {ValueDownlink} from "./ValueDownlink";
+import type {ValueDownlink} from "./ValueDownlink";
 
 export class ValueDownlinkRecord extends DownlinkRecord {
   /** @hidden */
@@ -172,7 +172,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   push(...newItems: AnyItem[]): number {
     const value = this._downlink.get();
     if (value instanceof Record) {
-      return value.push.apply(value, arguments);
+      return value.push.apply(value, arguments as unknown as AnyItem[]);
     } else {
       throw new Error("unsupported");
     }
@@ -181,7 +181,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   splice(start: number, deleteCount?: number, ...newItems: AnyItem[]): Item[] {
     const value = this._downlink.get();
     if (value instanceof Record) {
-      return value.splice.apply(value, arguments);
+      return value.splice.apply(value, arguments as any);
     } else {
       throw new Error("unsupported");
     }
@@ -205,8 +205,11 @@ export class ValueDownlinkRecord extends DownlinkRecord {
     }
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined {
     const value = this._downlink.get();
     return value.forEach(callback, thisArg);
   }

@@ -15,7 +15,7 @@
 import {Item, Field, Value, Record} from "@swim/structure";
 import {RecordModel, Reifier} from "@swim/dataflow";
 import {DownlinkStreamlet} from "./DownlinkStreamlet";
-import {WarpRef} from "../WarpRef";
+import type {WarpRef} from "../WarpRef";
 
 /** @hidden */
 export class DownlinkReifier extends Reifier {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {R2Function} from "./R2Function";
+import type {R2Function} from "./R2Function";
 
 export interface R2Operator extends R2Function {
   inverse(): R2Operator;

@@ -14,8 +14,8 @@
 
 import {Cmd, Opt, Arg} from "@swim/args";
 import {Build} from "./Build";
-import {Project} from "./Project";
-import {Target} from "./Target";
+import type {Project} from "./Project";
+import type {Target} from "./Target";
 
 function runProjects(this: Cmd, args: {[name: string]: string | null | undefined}): void {
   Build.load(args.config!, args.devel === null).then((build: Build): void => {

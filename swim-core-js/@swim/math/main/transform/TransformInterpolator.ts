@@ -19,12 +19,12 @@ import {ScaleTransform} from "./ScaleTransform";
 import {RotateTransform} from "./RotateTransform";
 import {SkewTransform} from "./SkewTransform";
 import {TransformList} from "./TransformList";
-import {TranslateTransformInterpolator} from "./TranslateTransformInterpolator";
-import {ScaleTransformInterpolator} from "./ScaleTransformInterpolator";
-import {RotateTransformInterpolator} from "./RotateTransformInterpolator";
-import {SkewTransformInterpolator} from "./SkewTransformInterpolator";
-import {AffineTransformInterpolator} from "./AffineTransformInterpolator";
-import {TransformListInterpolator} from "./TransformListInterpolator";
+import type {TranslateTransformInterpolator} from "./TranslateTransformInterpolator";
+import type {ScaleTransformInterpolator} from "./ScaleTransformInterpolator";
+import type {RotateTransformInterpolator} from "./RotateTransformInterpolator";
+import type {SkewTransformInterpolator} from "./SkewTransformInterpolator";
+import type {AffineTransformInterpolator} from "./AffineTransformInterpolator";
+import type {TransformListInterpolator} from "./TransformListInterpolator";
 
 export abstract class TransformInterpolator<F extends Transform = Transform> extends Interpolator<F, AnyTransform> {
   abstract range(): readonly [F, F];

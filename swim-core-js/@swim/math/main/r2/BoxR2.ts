@@ -14,7 +14,7 @@
 
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {R2Function} from "./R2Function";
+import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
 import {PointR2} from "./PointR2";
 import {SegmentR2} from "./SegmentR2";
@@ -29,7 +29,7 @@ export interface BoxR2Init {
   yMax: number;
 }
 
-export class BoxR2 extends ShapeR2 implements Equivalent<BoxR2>, HashCode, Debug {
+export class BoxR2 extends ShapeR2 implements HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _xMin: number;
   /** @hidden */
@@ -250,11 +250,16 @@ export class BoxR2 extends ShapeR2 implements Equivalent<BoxR2>, HashCode, Debug
     };
   }
 
-  equivalentTo(that: BoxR2, epsilon?: number): boolean {
-    return Numbers.equivalent(that._xMin, this._xMin, epsilon)
-        && Numbers.equivalent(that._yMin, this._yMin, epsilon)
-        && Numbers.equivalent(that._xMax, this._xMax, epsilon)
-        && Numbers.equivalent(that._yMax, this._yMax, epsilon);
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof BoxR2) {
+      return Numbers.equivalent(that._xMin, this._xMin, epsilon)
+          && Numbers.equivalent(that._yMin, this._yMin, epsilon)
+          && Numbers.equivalent(that._xMax, this._xMax, epsilon)
+          && Numbers.equivalent(that._yMax, this._yMax, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

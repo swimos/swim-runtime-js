@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Builder} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Builder} from "@swim/util";
+import type {Output} from "@swim/codec";
 import {
   Item,
   Attr,
   Slot,
+  AnyValue,
   Value,
   Record,
   Data,
+  AnyText,
   Text,
   Num,
   Bool,
@@ -63,11 +65,11 @@ export class ReconStructureParser extends ReconParser<Item, Value> {
   }
 
   attr(key: Value, value?: Value): Item {
-    return Attr.of.apply(Attr, arguments);
+    return Attr.of.apply(Attr, arguments as unknown as [AnyText, AnyValue?]);
   }
 
   slot(key: Value, value?: Value): Item {
-    return Slot.of.apply(Slot, arguments);
+    return Slot.of.apply(Slot, arguments as unknown as [AnyValue, AnyValue?]);
   }
 
   valueBuilder(): Builder<Item, Value> {

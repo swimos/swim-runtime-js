@@ -18,10 +18,10 @@ import {PointR2} from "./PointR2";
 import {SegmentR2} from "./SegmentR2";
 import {BoxR2} from "./BoxR2";
 import {CircleR2} from "./CircleR2";
-import {PointR2Interpolator} from "./PointR2Interpolator";
-import {SegmentR2Interpolator} from "./SegmentR2Interpolator";
-import {BoxR2Interpolator} from "./BoxR2Interpolator";
-import {CircleR2Interpolator} from "./CircleR2Interpolator";
+import type {PointR2Interpolator} from "./PointR2Interpolator";
+import type {SegmentR2Interpolator} from "./SegmentR2Interpolator";
+import type {BoxR2Interpolator} from "./BoxR2Interpolator";
+import type {CircleR2Interpolator} from "./CircleR2Interpolator";
 
 export abstract class ShapeR2Interpolator<S extends ShapeR2 & AS, AS = S> extends Interpolator<S, AS> {
   static between<S extends ShapeR2>(s0: S, s1: S): ShapeR2Interpolator<S>;

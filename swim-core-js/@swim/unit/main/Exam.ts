@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {Values, Assert} from "@swim/util";
-import {Spec} from "./Spec";
-import {TestOptions} from "./Test";
 import {TestException} from "./TestException";
+import type {TestOptions} from "./Test";
+import type {Spec} from "./Spec";
 import {Proof} from "./Proof";
-import {Report} from "./Report";
+import type {Report} from "./Report";
 
 /**
  * The `Passing`/`Failing`/`Pending` status of an `Exam`.

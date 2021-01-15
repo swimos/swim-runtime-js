@@ -22,7 +22,7 @@ export interface VectorR2Init {
   y: number;
 }
 
-export class VectorR2 implements Equivalent<VectorR2>, HashCode, Debug {
+export class VectorR2 implements HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _x: number;
   /** @hidden */
@@ -68,20 +68,21 @@ export class VectorR2 implements Equivalent<VectorR2>, HashCode, Debug {
     };
   }
 
-  equivalentTo(that: VectorR2, epsilon?: number): boolean {
-    return Numbers.equivalent(that._x, this._x, epsilon)
-        && Numbers.equivalent(that._y, this._y, epsilon);
-  }
-
-  protected canEqual(that: VectorR2): boolean {
-    return true;
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof VectorR2) {
+      return Numbers.equivalent(that._x, this._x, epsilon)
+          && Numbers.equivalent(that._y, this._y, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof VectorR2) {
-      return that.canEqual(this) && this._x === that._x && this._y === that._y;
+      return this._x === that._x && this._y === that._y;
     }
     return false;
   }

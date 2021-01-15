@@ -15,16 +15,16 @@
 import {BTree} from "@swim/collections";
 import {AnyValue, Value} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
-import {HostContext} from "./host/HostContext";
-import {HostOptions, Host} from "./host/Host";
+import type {HostContext} from "./host/HostContext";
+import type {HostOptions, Host} from "./host/Host";
 import {WebSocketHost} from "./host/WebSocketHost";
-import {DownlinkModel} from "./downlink/DownlinkModel";
+import type {DownlinkModel} from "./downlink/DownlinkModel";
 import {EventDownlinkInit, EventDownlink} from "./downlink/EventDownlink";
 import {ListDownlinkInit, ListDownlink} from "./downlink/ListDownlink";
 import {MapDownlinkInit, MapDownlink} from "./downlink/MapDownlink";
 import {ValueDownlinkInit, ValueDownlink} from "./downlink/ValueDownlink";
-import {WarpRef} from "./WarpRef";
-import {
+import type {WarpRef} from "./WarpRef";
+import type {
   WarpDidConnect,
   WarpDidAuthenticate,
   WarpDidDeauthenticate,
@@ -32,8 +32,8 @@ import {
   WarpDidFail,
   WarpObserver,
 } from "./WarpObserver";
-import {RefContext} from "./ref/RefContext";
-import {BaseRef} from "./ref/BaseRef";
+import type {RefContext} from "./ref/RefContext";
+import type {BaseRef} from "./ref/BaseRef";
 import {HostRef} from "./ref/HostRef";
 import {NodeRef} from "./ref/NodeRef";
 import {LaneRef} from "./ref/LaneRef";
@@ -229,20 +229,20 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
   }
 
   downlinkList(init?: ListDownlinkInit<Value, AnyValue>): ListDownlink<Value, AnyValue>;
-  downlinkList<V extends VU, VU = V>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU>;
-  downlinkList<V extends VU, VU = V>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU> {
+  downlinkList<V extends VU, VU = never>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU>;
+  downlinkList<V extends VU, VU = never>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU> {
     return new ListDownlink(this, void 0, init);
   }
 
   downlinkMap(init?: MapDownlinkInit<Value, Value, AnyValue, AnyValue>): MapDownlink<Value, Value, AnyValue, AnyValue>;
-  downlinkMap<K extends KU, V extends VU, KU = K, VU = V>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU>;
-  downlinkMap<K extends KU, V extends VU, KU = K, VU = V>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU> {
+  downlinkMap<K extends KU, V extends VU, KU = never, VU = never>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU>;
+  downlinkMap<K extends KU, V extends VU, KU = never, VU = never>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU> {
     return new MapDownlink(this, void 0, init);
   }
 
   downlinkValue(init?: ValueDownlinkInit<Value, AnyValue>): ValueDownlink<Value, AnyValue>;
-  downlinkValue<V extends VU, VU = V>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU>;
-  downlinkValue<V extends VU, VU = V>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU> {
+  downlinkValue<V extends VU, VU = never>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU>;
+  downlinkValue<V extends VU, VU = never>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU> {
     return new ValueDownlink(this, void 0, init);
   }
 
@@ -325,7 +325,7 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     const refs = this._refs;
     this._refs = [];
     for (let i = 0; i < refs.length; i += 1) {
-      refs[i].closeUp();
+      refs[i]!.closeUp();
     }
     const downlinks = this._downlinks.clone();
     this._downlinks.clear();
@@ -353,7 +353,7 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     const n = oldObservers !== null ? oldObservers.length : 0;
     const newObservers = new Array<WarpObserver>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newObservers[i] = oldObservers![i];
+      newObservers[i] = oldObservers![i]!;
     }
     newObservers[n] = observer;
     this._observers = newObservers;
@@ -364,7 +364,7 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     const oldObservers = this._observers;
     const n = oldObservers !== null ? oldObservers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const oldObserver = oldObservers![i] as {[key: string]: unknown};
+      const oldObserver = oldObservers![i]! as {[key: string]: unknown};
       let found = oldObserver === observer; // check object identity
       if (!found) {
         for (const key in oldObserver) { // check property identity
@@ -378,10 +378,10 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
         if (n > 1) {
           const newObservers = new Array<WarpObserver>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newObservers[j] = oldObservers![j];
+            newObservers[j] = oldObservers![j]!;
           }
           for (let j = i + 1; j < n; j += 1) {
-            newObservers[j - 1] = oldObservers![j];
+            newObservers[j - 1] = oldObservers![j]!;
           }
           this._observers = newObservers;
         } else {
@@ -418,13 +418,13 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didConnect !== void 0) {
         observer.didConnect(host, this);
       }
     }
     for (let i = 0; i < this._refs.length; i += 1) {
-      const ref = this._refs[i];
+      const ref = this._refs[i]!;
       if (ref.hostUri().equals(host.hostUri())) {
         ref.hostDidConnect(host);
       }
@@ -436,13 +436,13 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didAuthenticate !== void 0) {
         observer.didAuthenticate(body, host, this);
       }
     }
     for (let i = 0; i < this._refs.length; i += 1) {
-      const ref = this._refs[i];
+      const ref = this._refs[i]!;
       if (ref.hostUri().equals(host.hostUri())) {
         ref.hostDidAuthenticate(body, host);
       }
@@ -454,13 +454,13 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didDeauthenticate !== void 0) {
         observer.didDeauthenticate(body, host, this);
       }
     }
     for (let i = 0; i < this._refs.length; i += 1) {
-      const ref = this._refs[i];
+      const ref = this._refs[i]!;
       if (ref.hostUri().equals(host.hostUri())) {
         ref.hostDidDeauthenticate(body, host);
       }
@@ -472,13 +472,13 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didDisconnect !== void 0) {
         observer.didDisconnect(host, this);
       }
     }
     for (let i = 0; i < this._refs.length; i += 1) {
-      const ref = this._refs[i];
+      const ref = this._refs[i]!;
       if (ref.hostUri().equals(host.hostUri())) {
         ref.hostDidDisconnect(host);
       }
@@ -490,26 +490,16 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didFail !== void 0) {
         observer.didFail(error, host, this);
       }
     }
     for (let i = 0; i < this._refs.length; i += 1) {
-      const ref = this._refs[i];
+      const ref = this._refs[i]!;
       if (ref.hostUri().equals(host.hostUri())) {
         ref.hostDidFail(error, host);
       }
     }
   }
 }
-
-/**
- * @deprecated
- */
-export type SwimClientOptions = WarpClientOptions;
-
-/**
- * @deprecated
- */
-export type SwimClient = WarpClient;

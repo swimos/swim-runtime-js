@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {BinaryOperator} from "./BinaryOperator";
 import {AnyInterpreter, Interpreter} from "../Interpreter";
@@ -52,7 +52,20 @@ export class BitwiseXorOperator extends BinaryOperator {
     return 24;
   }
 
-  equivalentTo(that: Item, epsilon?: number): boolean {
+  compareTo(that: unknown): number {
+    if (that instanceof BitwiseXorOperator) {
+      let order = this._operand1.compareTo(that._operand1);
+      if (order === 0) {
+        order = this._operand2.compareTo(that._operand2);
+      }
+      return order;
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
+    }
+    return NaN;
+  }
+
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof BitwiseXorOperator) {
@@ -60,17 +73,6 @@ export class BitwiseXorOperator extends BinaryOperator {
           && this._operand2.equivalentTo(that._operand2, epsilon);
     }
     return false;
-  }
-
-  compareTo(that: Item): number {
-    if (that instanceof BitwiseXorOperator) {
-      let order = this._operand1.compareTo(that._operand1);
-      if (order === 0) {
-        order = this._operand2.compareTo(that._operand2);
-      }
-      return order;
-    }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
   }
 
   equals(that: unknown): boolean {

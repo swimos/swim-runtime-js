@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Selector} from "../Selector";
 import {AnyInterpreter, Interpreter} from "../Interpreter";
@@ -38,9 +38,14 @@ export class LiteralSelector extends Selector {
     return this._then;
   }
 
-  forSelected<T, S = unknown>(interpreter: Interpreter,
-                              callback: (this: S, interpreter: Interpreter) => T | undefined,
-                              thisArg?: S): T | undefined {
+  forSelected<T>(interpreter: Interpreter,
+                 callback: (interpreter: Interpreter) => T | undefined): T | undefined;
+  forSelected<T, S>(interpreter: Interpreter,
+                    callback: (this: S, interpreter: Interpreter) => T | undefined,
+                    thisArg: S): T | undefined;
+  forSelected<T, S>(interpreter: Interpreter,
+                    callback: (this: S | undefined, interpreter: Interpreter) => T | undefined,
+                    thisArg?: S): T | undefined {
     let selected: T | undefined;
     interpreter.willSelect(this);
     if (interpreter.scopeDepth() !== 0) {
@@ -58,9 +63,14 @@ export class LiteralSelector extends Selector {
     return selected;
   }
 
-  mapSelected<S = unknown>(interpreter: Interpreter,
-                           transform: (this: S, interpreter: Interpreter) => Item,
-                           thisArg?: S): Item {
+  mapSelected(interpreter: Interpreter,
+              transform: (interpreter: Interpreter) => Item): Item;
+  mapSelected<S>(interpreter: Interpreter,
+                 transform: (this: S, interpreter: Interpreter) => Item,
+                 thisArg: S): Item;
+  mapSelected<S>(interpreter: Interpreter,
+                 transform: (this: S | undefined, interpreter: Interpreter) => Item,
+                 thisArg?: S): Item {
     let result: Item;
     interpreter.willTransform(this);
     if (interpreter.scopeDepth() !== 0) {
@@ -103,18 +113,20 @@ export class LiteralSelector extends Selector {
     return 11;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof LiteralSelector) {
       let order = this._item.compareTo(that._item);
       if (order === 0) {
         order = this._then.compareTo(that._then);
       }
       return order;
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item, epsilon?: number): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof LiteralSelector) {

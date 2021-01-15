@@ -14,10 +14,10 @@
 
 import {Numbers} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {R2Function} from "./R2Function";
-import {AnyShapeR2} from "./ShapeR2";
+import type {R2Function} from "./R2Function";
+import type {AnyShapeR2} from "./ShapeR2";
 import {PointR2} from "./PointR2";
-import {CurveR2Context} from "./CurveR2Context";
+import type {CurveR2Context} from "./CurveR2Context";
 import {CurveR2} from "./CurveR2";
 import {BezierCurveR2} from "./BezierCurveR2";
 
@@ -220,7 +220,7 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
     Format.displayNumber(this._y3, output);
   }
 
-  equivalentTo(that: CurveR2, epsilon?: number): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof CubicCurveR2) {

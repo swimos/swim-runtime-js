@@ -12,28 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {AnyItem, Item} from "./Item";
+export {
+  AnyItem,
+  Item,
+} from "./Item";
 
-export {AnyField, Field} from "./Field";
+export {
+  AnyField,
+  Field,
+} from "./Field";
 
 export {Attr} from "./Attr";
 
 export {Slot} from "./Slot";
 
-export {AnyValue, Value} from "./Value";
+export {
+  AnyValue,
+  Value,
+} from "./Value";
 export {ValueBuilder} from "./ValueBuilder";
 
-export {AnyRecord, Record} from "./Record";
+export {
+  AnyRecord,
+  Record,
+} from "./Record";
+export {RecordCursor} from "./RecordCursor";
 export {RecordMap} from "./RecordMap";
 export {RecordMapView} from "./RecordMapView";
 
-export {AnyData, Data} from "./Data";
+export {
+  AnyData,
+  Data,
+} from "./Data";
+export {DataOutput} from "./DataOutput";
 
-export {AnyText, Text} from "./Text";
+export {
+  AnyText,
+  Text,
+} from "./Text";
+export {TextOutput} from "./TextOutput";
 
-export {AnyNum, Num} from "./Num";
+export {
+  AnyNum,
+  Num,
+} from "./Num";
 
-export {AnyBool, Bool} from "./Bool";
+export {
+  AnyBool,
+  Bool,
+} from "./Bool";
 
 export {Expression} from "./Expression";
 
@@ -43,9 +70,15 @@ export {Selector} from "./Selector";
 
 export {Func} from "./Func";
 
-export {AnyExtant, Extant} from "./Extant";
+export {
+  AnyExtant,
+  Extant,
+} from "./Extant";
 
-export {AnyAbsent, Absent} from "./Absent";
+export {
+  AnyAbsent,
+  Absent,
+} from "./Absent";
 
 export {FormException} from "./FormException";
 export {Form} from "./Form";

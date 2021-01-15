@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {STree} from "@swim/collections";
 import {Attr, Value, Record} from "@swim/structure";
-import {Uri} from "@swim/uri";
-import {EventMessage} from "@swim/warp";
-import {Host} from "../host/Host";
-import {DownlinkContext} from "./DownlinkContext";
+import type {Uri} from "@swim/uri";
+import type {EventMessage} from "@swim/warp";
+import type {Host} from "../host/Host";
+import type {DownlinkContext} from "./DownlinkContext";
 import {DownlinkModel} from "./DownlinkModel";
-import {DownlinkType} from "./Downlink";
-import {ListDownlink} from "./ListDownlink";
+import type {DownlinkType} from "./Downlink";
+import type {ListDownlink} from "./ListDownlink";
 
 /** @hidden */
 export class ListDownlinkModel extends DownlinkModel {
   /** @hidden */
-  _views: ListDownlink<unknown>[];
+  declare _views: ListDownlink<unknown>[];
   /** @hidden */
   _state: STree<Value, Value>;
 
@@ -110,7 +110,7 @@ export class ListDownlinkModel extends DownlinkModel {
   push(...newValues: Value[]): number {
     for (let i = 0; i < newValues.length; i += 1) {
       const index = this._state.length + i;
-      const newValue = this.listWillUpdate(index, newValues[i]);
+      const newValue = this.listWillUpdate(index, newValues[i]!);
       this._state.insert(index, newValue);
       const newEntry = this._state.getEntry(index)!;
       this.listDidUpdate(index, newValue, Value.absent());
@@ -137,7 +137,7 @@ export class ListDownlinkModel extends DownlinkModel {
 
   unshift(...newValues: Value[]): number {
     for (let i = newValues.length - 1; i >= 0; i -= 1) {
-      const newValue = this.listWillUpdate(0, newValues[i]);
+      const newValue = this.listWillUpdate(0, newValues[i]!);
       this._state.insert(0, newValue);
       const newEntry = this._state.getEntry(0)!;
       this.listDidUpdate(0, newValue, Value.absent());
@@ -205,7 +205,7 @@ export class ListDownlinkModel extends DownlinkModel {
     }
     for (let i = 0; i < newValues.length; i += 1) {
       const index = start + i;
-      const newValue = this.listWillUpdate(index, newValues[i]);
+      const newValue = this.listWillUpdate(index, newValues[i]!);
       this._state.insert(index, newValue);
       const newEntry = this._state.getEntry(index)!;
       this.listDidUpdate(index, newValue, Value.absent());
@@ -222,8 +222,11 @@ export class ListDownlinkModel extends DownlinkModel {
     this.command(Record.create(1).attr("clear"));
   }
 
-  forEach<T, S = unknown>(callback: (this: typeof thisArg, value: Value, index: number, key: Value) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (value: Value, index: number, key: Value) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, value: Value, index: number, key: Value) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, value: Value, index: number, key: Value) => T | void,
+                thisArg?: S): T | undefined {
     return this._state.forEach(callback, thisArg);
   }
 
@@ -332,74 +335,74 @@ export class ListDownlinkModel extends DownlinkModel {
 
   protected listWillUpdate(index: number, newValue: Value): Value {
     for (let i = 0; i < this._views.length; i += 1) {
-      newValue = this._views[i].listWillUpdate(index, newValue);
+      newValue = this._views[i]!.listWillUpdate(index, newValue);
     }
     return newValue;
   }
 
   protected listDidUpdate(index: number, newValue: Value, oldValue: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listDidUpdate(index, newValue, oldValue);
+      this._views[i]!.listDidUpdate(index, newValue, oldValue);
     }
   }
 
   protected listWillMove(fromIndex: number, toIndex: number, value: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listWillMove(fromIndex, toIndex, value);
+      this._views[i]!.listWillMove(fromIndex, toIndex, value);
     }
   }
 
   protected listDidMove(fromIndex: number, toIndex: number, value: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listDidMove(fromIndex, toIndex, value);
+      this._views[i]!.listDidMove(fromIndex, toIndex, value);
     }
   }
 
   protected listWillRemove(index: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listWillRemove(index);
+      this._views[i]!.listWillRemove(index);
     }
   }
 
   protected listDidRemove(index: number, oldValue: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listDidRemove(index, oldValue);
+      this._views[i]!.listDidRemove(index, oldValue);
     }
   }
 
   protected listWillDrop(lower: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listWillDrop(lower);
+      this._views[i]!.listWillDrop(lower);
     }
   }
 
   protected listDidDrop(lower: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listDidDrop(lower);
+      this._views[i]!.listDidDrop(lower);
     }
   }
 
   protected listWillTake(upper: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listWillTake(upper);
+      this._views[i]!.listWillTake(upper);
     }
   }
 
   protected listDidTake(upper: number): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listDidTake(upper);
+      this._views[i]!.listDidTake(upper);
     }
   }
 
   protected listWillClear() {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listWillClear();
+      this._views[i]!.listWillClear();
     }
   }
 
   protected listDidClear() {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].listDidClear();
+      this._views[i]!.listDidClear();
     }
   }
 }

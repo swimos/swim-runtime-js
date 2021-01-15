@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {AnyItem, Value, Record} from "@swim/structure";
-import {StreamletScope} from "@swim/streamlet";
+import type {StreamletScope} from "@swim/streamlet";
 import {RecordOutlet} from "./RecordOutlet";
 import {RecordModel} from "./RecordModel";
 
@@ -38,7 +38,7 @@ export class RecordScope extends RecordModel {
   }
 
   static of(...items: AnyItem[]): RecordScope {
-    return RecordScope.from(Record.of.apply(void 0, arguments));
+    return RecordScope.from(Record.of.apply(void 0, arguments as unknown as AnyItem[]));
   }
 }
 RecordOutlet.Scope = RecordScope;

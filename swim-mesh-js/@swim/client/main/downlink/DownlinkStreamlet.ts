@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Map} from "@swim/util";
+import type {Map} from "@swim/util";
 import {Value, Form} from "@swim/structure";
 import {Outlet, Inoutlet, StreamletScope, Out, Inout} from "@swim/streamlet";
 import {AbstractRecordStreamlet, Reifier} from "@swim/dataflow";
-import {DownlinkType, Downlink} from "./Downlink";
+import type {DownlinkType, Downlink} from "./Downlink";
 import {ValueDownlink} from "./ValueDownlink";
-import {DownlinkRecord} from "./DownlinkRecord";
+import type {DownlinkRecord} from "./DownlinkRecord";
 import {MapDownlinkRecord} from "./MapDownlinkRecord";
 import {DownlinkReifier} from "./DownlinkReifier";
-import {WarpRef} from "../WarpRef";
+import type {WarpRef} from "../WarpRef";
 import {client} from "..";
 
 export class DownlinkStreamlet extends AbstractRecordStreamlet {
@@ -71,7 +71,7 @@ export class DownlinkStreamlet extends AbstractRecordStreamlet {
   type: Inoutlet<Value> = this.inoutlet();
 
   @Out
-  state: Outlet<Value | Map<Value, Value>>;
+  state: Outlet<Value | Map<Value, Value>> = this.outlet();
 
   getOutput(outlet: Outlet<Value> | string): Value | undefined {
     outlet = this.outlet(outlet)!;

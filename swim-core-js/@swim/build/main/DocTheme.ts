@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import * as typedoc from "typedoc";
-
-import {Target} from "./Target";
+import type {Target} from "./Target";
 
 export class DocTheme extends typedoc.DefaultTheme {
   rootTargets: Target[];
@@ -30,7 +29,7 @@ export class DocTheme extends typedoc.DefaultTheme {
   getUrls(project: typedoc.ProjectReflection): typedoc.UrlMapping[] {
     const urls: typedoc.UrlMapping[] = [];
 
-    const rootTarget = this.rootTargets.length === 1 ? this.rootTargets[0] : null;
+    const rootTarget = this.rootTargets.length === 1 ? this.rootTargets[0]! : null;
     const rootReflection = rootTarget !== null ? this.targetReflections[rootTarget.uid]! : null;
     if (rootTarget === null) {
       urls.push(new typedoc.UrlMapping("index.html", project, "reflection.hbs"));
@@ -57,7 +56,7 @@ export class DocTheme extends typedoc.DefaultTheme {
 
   getNavigation(project: typedoc.ProjectReflection): typedoc.NavigationItem {
     const rootItem = new typedoc.NavigationItem("Index", "index.html");
-    const rootTarget = this.rootTargets.length === 1 ? this.rootTargets[0] : null;
+    const rootTarget = this.rootTargets.length === 1 ? this.rootTargets[0]! : null;
     if (rootTarget === null) {
       const modulesItem = new typedoc.NavigationItem("Modules", "index.html", rootItem);
       modulesItem.isModules = true;
@@ -66,7 +65,7 @@ export class DocTheme extends typedoc.DefaultTheme {
       modulesItem.isModules = true;
     }
     for (let i = 0; i < this.rootTargets.length; i += 1) {
-      this.buildTargetNavigation(rootItem, this.rootTargets[i]);
+      this.buildTargetNavigation(rootItem, this.rootTargets[i]!);
     }
     return rootItem;
   }
@@ -79,7 +78,7 @@ export class DocTheme extends typedoc.DefaultTheme {
         targetReflection.kindString = "Framework";
         const targetDeps = target.deps;
         for (let i = 0; i < targetDeps.length; i += 1) {
-          this.buildTargetNavigation(targetItem, targetDeps[i]);
+          this.buildTargetNavigation(targetItem, targetDeps[i]!);
         }
       } else {
         targetReflection.kindString = "Library";
@@ -91,7 +90,7 @@ export class DocTheme extends typedoc.DefaultTheme {
   protected includeDedicatedUrls(reflection: typedoc.ContainerReflection, item: typedoc.NavigationItem) {
     const childCount = reflection.children !== void 0 ? reflection.children.length : 0;
     for (let i = 0; i < childCount; i += 1) {
-      const childReflection = reflection.children![i];
+      const childReflection = reflection.children![i]!;
       if (childReflection.hasOwnDocument && !childReflection.kindOf(typedoc.ReflectionKind.Module)) {
         if (item.dedicatedUrls === void 0) {
           item.dedicatedUrls = [];

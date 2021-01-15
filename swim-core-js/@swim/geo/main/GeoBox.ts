@@ -15,7 +15,7 @@
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {BoxR2} from "@swim/math";
-import {GeoProjection} from "./GeoProjection";
+import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
 import {GeoSegment} from "./GeoSegment";
@@ -29,7 +29,7 @@ export interface GeoBoxInit {
   latMax: number;
 }
 
-export class GeoBox extends GeoShape implements Equivalent<GeoBox>, HashCode, Debug {
+export class GeoBox extends GeoShape implements HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _lngMin: number;
   /** @hidden */
@@ -240,11 +240,16 @@ export class GeoBox extends GeoShape implements Equivalent<GeoBox>, HashCode, De
     };
   }
 
-  equivalentTo(that: GeoBox, epsilon?: number): boolean {
-    return Numbers.equivalent(that._lngMin, this._lngMin, epsilon)
-        && Numbers.equivalent(that._latMin, this._latMin, epsilon)
-        && Numbers.equivalent(that._lngMax, this._lngMax, epsilon)
-        && Numbers.equivalent(that._latMax, this._latMax, epsilon);
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof GeoBox) {
+      return Numbers.equivalent(that._lngMin, this._lngMin, epsilon)
+          && Numbers.equivalent(that._latMin, this._latMin, epsilon)
+          && Numbers.equivalent(that._lngMax, this._lngMax, epsilon)
+          && Numbers.equivalent(that._latMax, this._latMax, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

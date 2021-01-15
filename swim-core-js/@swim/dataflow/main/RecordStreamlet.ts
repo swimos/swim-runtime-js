@@ -21,8 +21,8 @@ export abstract class RecordStreamlet<I extends Value = Value, O extends Value =
     return false;
   }
 
-  protected streamletClass(): StreamletClass {
-    return (this as any).__proto__ as StreamletClass;
+  protected get streamletClass(): StreamletClass {
+    return this.constructor as StreamletClass;
   }
 
   abstract streamletScope(): StreamletScope<O> | null;
@@ -50,7 +50,7 @@ export abstract class RecordStreamlet<I extends Value = Value, O extends Value =
   abstract recohere(version: number): void;
 
   compile(): void {
-    AbstractStreamlet.reflectEachInlet<I, O, void, this>(this, this.streamletClass(), function (inlet: Inlet<I>, name: string): void {
+    AbstractStreamlet.reflectEachInlet<I, O, void, this>(this, this.streamletClass, function (inlet: Inlet<I>, name: string): void {
       if (inlet.input() === null) {
         this.compileInlet(inlet, name);
       }

@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import {Murmur3, Comparable, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
-import {Display, Output} from "@swim/codec";
+import type {Display, Output} from "@swim/codec";
 import {Item, Value, Form} from "@swim/structure";
 import {AnyTimeZone, TimeZone} from "./TimeZone";
-import {DateTimeParser} from "./DateTimeParser";
-import {DateTimeForm} from "./DateTimeForm";
-import {DateTimeFormat} from "./DateTimeFormat";
+import type {DateTimeParser} from "./DateTimeParser";
+import type {DateTimeForm} from "./DateTimeForm";
+import type {DateTimeFormat} from "./DateTimeFormat";
 
 export type AnyDateTime = DateTime | DateTimeInit | Date | string | number;
 
@@ -33,7 +33,7 @@ export interface DateTimeInit {
   zone?: AnyTimeZone;
 }
 
-export class DateTime implements Comparable<AnyDateTime>, Equivalent<AnyDateTime>, HashCode, Display {
+export class DateTime implements HashCode, Equivalent, Comparable, Display {
   /** @hidden */
   readonly _time: number;
   /** @hidden */
@@ -241,16 +241,22 @@ export class DateTime implements Comparable<AnyDateTime>, Equivalent<AnyDateTime
     return this._time;
   }
 
-  compareTo(that: AnyDateTime): number {
-    const x = this._time;
-    const y = DateTime.time(that);
-    return x < y ? -1 : x > y ? 1 : x === y ? 0 : NaN;
+  compareTo(that: unknown): number {
+    if (that instanceof DateTime) {
+      const x = this._time;
+      const y = that._time;
+      return x < y ? -1 : x > y ? 1 : x === y ? 0 : NaN;
+    }
+    return NaN;
   }
 
-  equivalentTo(that: AnyDateTime, epsilon: number = Equivalent.Epsilon): boolean {
-    const x = this._time;
-    const y = DateTime.time(that);
-    return x === y || isNaN(x) && isNaN(y) || Math.abs(y - x) < epsilon;
+  equivalentTo(that: AnyDateTime, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof DateTime) {
+      return Numbers.equivalent(this._time, that._time, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

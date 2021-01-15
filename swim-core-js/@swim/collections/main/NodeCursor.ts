@@ -48,7 +48,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
           this._pageCursor = void 0;
         }
       } else if (this._pageIndex < this._pages.length) {
-        this._pageCursor = this.pageCursor(this._pages[this._pageIndex]);
+        this._pageCursor = this.pageCursor(this._pages[this._pageIndex]!);
         this._pageIndex += 1;
       } else {
         this._pageIndex = this._pages.length;
@@ -67,7 +67,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
         }
       } else {
         if (this._pageIndex < this._pages.length) {
-          this._pageCursor = this.pageCursor(this._pages[this._pageIndex]);
+          this._pageCursor = this.pageCursor(this._pages[this._pageIndex]!);
           this._pageIndex += 1;
         } else {
           this._pageIndex = this._pages.length;
@@ -88,7 +88,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
         }
       } else {
         if (this._pageIndex < this._pages.length) {
-          this._pageCursor = this.pageCursor(this._pages[this._pageIndex]);
+          this._pageCursor = this.pageCursor(this._pages[this._pageIndex]!);
           this._pageIndex += 1;
         } else {
           this._pageIndex = this._pages.length;
@@ -109,7 +109,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
           this._pageCursor = void 0;
         }
       } else if (this._pageIndex < this._pages.length) {
-        const page = this._pages[this._pageIndex];
+        const page = this._pages[this._pageIndex]!;
         const pageSize = this.pageSize(page);
         this._pageIndex += 1;
         if (pageSize < count) {
@@ -139,7 +139,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
           this._pageCursor = void 0;
         }
       } else if (this._pageIndex < this._pages.length) {
-        this._pageCursor = this.pageCursor(this._pages[this._pageIndex]);
+        this._pageCursor = this.pageCursor(this._pages[this._pageIndex]!);
         this._pageIndex += 1;
       } else {
         this._pageIndex = this._pages.length;
@@ -163,7 +163,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
         }
       } else {
         if (this._pageIndex < this._pages.length) {
-          this._pageCursor = this.pageCursor(this._pages[this._pageIndex]);
+          this._pageCursor = this.pageCursor(this._pages[this._pageIndex]!);
           this._pageIndex += 1;
         } else {
           this._pageIndex = this._pages.length;
@@ -182,7 +182,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
           this._pageCursor = void 0;
         }
       } else if (this._pageIndex > 0) {
-        this._pageCursor = this.reversePageCursor(this._pages[this._pageIndex - 1]);
+        this._pageCursor = this.reversePageCursor(this._pages[this._pageIndex - 1]!);
         this._pageIndex -= 1;
       } else {
         this._pageIndex = 0;
@@ -205,7 +205,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
           this._pageCursor = void 0;
         }
       } else if (this._pageIndex > 0) {
-        this._pageCursor = this.reversePageCursor(this._pages[this._pageIndex - 1]);
+        this._pageCursor = this.reversePageCursor(this._pages[this._pageIndex - 1]!);
         this._pageIndex -= 1;
       } else {
         this._pageIndex = 0;

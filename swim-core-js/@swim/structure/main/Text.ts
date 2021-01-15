@@ -105,14 +105,16 @@ export class Text extends Value {
     return 5;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof Text) {
       return this._value.localeCompare(that._value);
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item): boolean {
+  equivalentTo(that: unknown): boolean {
     return this.equals(that);
   }
 

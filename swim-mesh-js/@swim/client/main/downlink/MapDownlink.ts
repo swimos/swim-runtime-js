@@ -22,24 +22,24 @@ import {MapFieldValuesFunction, MapFieldValuesCombinator} from "@swim/streamlet"
 import {ReduceFieldsCombinator} from "@swim/streamlet";
 import {WatchValueFunction, WatchValueCombinator} from "@swim/streamlet";
 import {WatchFieldsFunction, WatchFieldsCombinator} from "@swim/streamlet";
-import {Uri} from "@swim/uri";
-import {DownlinkContext} from "./DownlinkContext";
-import {DownlinkOwner} from "./DownlinkOwner";
+import type {Uri} from "@swim/uri";
+import type {DownlinkContext} from "./DownlinkContext";
+import type {DownlinkOwner} from "./DownlinkOwner";
 import {DownlinkType, DownlinkObserver, DownlinkInit, DownlinkFlags, Downlink} from "./Downlink";
 import {MapDownlinkModel} from "./MapDownlinkModel";
 
-export type MapDownlinkWillUpdate<K, V, KU = K, VU = V> = (key: K, newValue: V, downlink: MapDownlink<K, V, KU, VU>) => V | void;
-export type MapDownlinkDidUpdate<K, V, KU = K, VU = V> = (key: K, newValue: V, oldValue: V, downlink: MapDownlink<K, V, KU, VU>) => void;
-export type MapDownlinkWillRemove<K, V, KU = K, VU = V> = (key: K, downlink: MapDownlink<K, V, KU, VU>) => void;
-export type MapDownlinkDidRemove<K, V, KU = K, VU = V> = (key: K, oldValue: V, downlink: MapDownlink<K, V, KU, VU>) => void;
-export type MapDownlinkWillDrop<K, V, KU = K, VU = V> = (lower: number, downlink: MapDownlink<K, V, KU, VU>) => void;
-export type MapDownlinkDidDrop<K, V, KU = K, VU = V> = (lower: number, downlink: MapDownlink<K, V, KU, VU>) => void;
-export type MapDownlinkWillTake<K, V, KU = K, VU = V> = (upper: number, downlink: MapDownlink<K, V, KU, VU>) => void;
-export type MapDownlinkDidTake<K, V, KU = K, VU = V> = (upper: number, downlink: MapDownlink<K, V, KU, VU>) => void;
-export type MapDownlinkWillClear<K, V, KU = K, VU = V> = (downlink: MapDownlink<K, V, KU, VU>) => void;
-export type MapDownlinkDidClear<K, V, KU = K, VU = V> = (downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkWillUpdate<K, V, KU = never, VU = never> = (key: K, newValue: V, downlink: MapDownlink<K, V, KU, VU>) => V | void;
+export type MapDownlinkDidUpdate<K, V, KU = never, VU = never> = (key: K, newValue: V, oldValue: V, downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkWillRemove<K, V, KU = never, VU = never> = (key: K, downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkDidRemove<K, V, KU = never, VU = never> = (key: K, oldValue: V, downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkWillDrop<K, V, KU = never, VU = never> = (lower: number, downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkDidDrop<K, V, KU = never, VU = never> = (lower: number, downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkWillTake<K, V, KU = never, VU = never> = (upper: number, downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkDidTake<K, V, KU = never, VU = never> = (upper: number, downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkWillClear<K, V, KU = never, VU = never> = (downlink: MapDownlink<K, V, KU, VU>) => void;
+export type MapDownlinkDidClear<K, V, KU = never, VU = never> = (downlink: MapDownlink<K, V, KU, VU>) => void;
 
-export interface MapDownlinkObserver<K, V, KU = K, VU = V> extends DownlinkObserver {
+export interface MapDownlinkObserver<K, V, KU = never, VU = never> extends DownlinkObserver {
   willUpdate?: MapDownlinkWillUpdate<K, V, KU, VU>;
   didUpdate?: MapDownlinkDidUpdate<K, V, KU, VU>;
   willRemove?: MapDownlinkWillRemove<K, V, KU, VU>;
@@ -52,16 +52,16 @@ export interface MapDownlinkObserver<K, V, KU = K, VU = V> extends DownlinkObser
   didClear?: MapDownlinkDidClear<K, V, KU, VU>;
 }
 
-export interface MapDownlinkInit<K, V, KU = K, VU = V> extends MapDownlinkObserver<K, V, KU, VU>, DownlinkInit {
+export interface MapDownlinkInit<K, V, KU = never, VU = never> extends MapDownlinkObserver<K, V, KU, VU>, DownlinkInit {
   keyForm?: Form<K, KU>;
   valueForm?: Form<V, VU>;
 }
 
-export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements OrderedMap<K, V>, MapInlet<K, V, Map<K, V>>, MapOutlet<K, V, MapDownlink<K, V, KU, VU>> {
+export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implements OrderedMap<K, V>, MapInlet<K, V, Map<K, V>>, MapOutlet<K, V, MapDownlink<K, V, KU, VU>> {
   /** @hidden */
-  _observers: ReadonlyArray<MapDownlinkObserver<K, V, KU, VU>> | null;
+  declare _observers: ReadonlyArray<MapDownlinkObserver<K, V, KU, VU>> | null;
   /** @hidden */
-  _model: MapDownlinkModel | null;
+  declare _model: MapDownlinkModel | null;
   /** @hidden */
   _keyForm: Form<K, KU>;
   /** @hidden */
@@ -87,7 +87,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
               keyForm?: Form<K, KU>, valueForm?: Form<V, VU>, state0?: BTree<Value, Value>) {
     super(context, owner, init, hostUri, nodeUri, laneUri, prio, rate, body, flags, observers);
     if (init !== void 0) {
-      const observer = this._observers![this._observers!.length - 1];
+      const observer = this._observers![this._observers!.length - 1]!;
       observer.willUpdate = init.willUpdate || observer.willUpdate;
       observer.didUpdate = init.didUpdate || observer.didUpdate;
       observer.willRemove = init.willRemove || observer.willRemove;
@@ -130,8 +130,8 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
   }
 
   keyForm(): Form<K, KU>;
-  keyForm<K2, K2U = K2>(keyForm: Form<K2, K2U>): MapDownlink<K2, V, K2U, VU>;
-  keyForm<K2, K2U = K2>(keyForm?: Form<K2, K2U>): Form<K, KU> | MapDownlink<K2, V, K2U, VU> {
+  keyForm<K2, K2U = never>(keyForm: Form<K2, K2U>): MapDownlink<K2, V, K2U, VU>;
+  keyForm<K2, K2U = never>(keyForm?: Form<K2, K2U>): Form<K, KU> | MapDownlink<K2, V, K2U, VU> {
     if (keyForm === void 0) {
       return this._keyForm;
     } else {
@@ -142,8 +142,8 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
   }
 
   valueForm(): Form<V, VU>;
-  valueForm<V2, V2U = V2>(valueForm: Form<V2, V2U>): MapDownlink<K, V2, KU, V2U>;
-  valueForm<V2, V2U = V2>(valueForm?: Form<V2, V2U>): Form<V, VU> | MapDownlink<K, V2, KU, V2U> {
+  valueForm<V2, V2U = never>(valueForm: Form<V2, V2U>): MapDownlink<K, V2, KU, V2U>;
+  valueForm<V2, V2U = never>(valueForm?: Form<V2, V2U>): Form<V, VU> | MapDownlink<K, V2, KU, V2U> {
     if (valueForm === void 0) {
       return this._valueForm;
     } else {
@@ -346,8 +346,11 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     this._model!.clear();
   }
 
-  forEach<T, S = unknown>(callback: (this: S, key: K, value: V) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (key: K, value: V) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, key: K, value: V) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, key: K, value: V) => T | void,
+                thisArg?: S): T | undefined {
     if (this._keyForm as any === Form.forValue() && this._valueForm as any === Form.forValue()) {
       return this._model!._state.forEach(callback as any, thisArg);
     } else {
@@ -445,7 +448,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     let keyObject: K | undefined;
     let newObject: V | undefined;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willUpdate !== void 0) {
         if (keyObject === void 0) {
           keyObject = key.coerce(this._keyForm);
@@ -471,7 +474,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     let newObject: V | undefined;
     let oldObject: V | undefined;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didUpdate !== void 0) {
         if (newObject === void 0) {
           newObject = newValue.coerce(this._valueForm);
@@ -492,7 +495,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const n = observers !== null ? observers.length : 0;
     let keyObject: K | undefined;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willRemove !== void 0) {
         if (keyObject === void 0) {
           keyObject = key.coerce(this._keyForm);
@@ -509,7 +512,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const keyObject = key.coerce(this._keyForm);
     let oldObject: V | undefined;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didRemove !== void 0) {
         if (oldObject === void 0) {
           oldObject = oldValue.coerce(this._valueForm);
@@ -526,7 +529,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willDrop !== void 0) {
         observer.willDrop(lower, this);
       }
@@ -538,7 +541,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didDrop !== void 0) {
         observer.didDrop(lower, this);
       }
@@ -550,7 +553,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willTake !== void 0) {
         observer.willTake(upper, this);
       }
@@ -562,7 +565,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didTake !== void 0) {
         observer.didTake(upper, this);
       }
@@ -574,7 +577,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.willClear !== void 0) {
         observer.willClear(this);
       }
@@ -586,7 +589,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didClear !== void 0) {
         observer.didClear(this);
       }
@@ -704,7 +707,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     const n = oldOutputs !== null ? oldOutputs.length : 0;
     const newOutputs = new Array<Inlet<MapDownlink<K, V, KU, VU>>>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newOutputs[i] = oldOutputs![i];
+      newOutputs[i] = oldOutputs![i]!;
     }
     newOutputs[n] = output;
     this._outputs = newOutputs;
@@ -718,10 +721,10 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
         if (n > 1) {
           const newOutputs = new Array<Inlet<MapDownlink<K, V, KU, VU>>>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newOutputs[j] = oldOutputs![j];
+            newOutputs[j] = oldOutputs![j]!;
           }
           for (let j = i; j < n - 1; j += 1) {
-            newOutputs[j] = oldOutputs![j + 1];
+            newOutputs[j] = oldOutputs![j + 1]!;
           }
           this._outputs = newOutputs;
         } else {
@@ -737,7 +740,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     if (oldOutputs !== null) {
       this._outputs = null;
       for (let i = 0, n = oldOutputs.length; i < n; i += 1) {
-        oldOutputs[i].unbindInput();
+        oldOutputs[i]!.unbindInput();
       }
     }
   }
@@ -754,7 +757,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
     if (outputs !== null) {
       this._outputs = null;
       for (let i = 0, n = outputs.length; i < n; i += 1) {
-        const output = outputs[i];
+        const output = outputs[i]!;
         output.unbindInput();
         output.disconnectOutputs();
       }
@@ -778,7 +781,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
       this.onDecohereKey(key, effect);
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        const output = this._outputs![i];
+        const output = this._outputs![i]!;
         if (MapInlet.is(output)) {
           output.decohereOutputKey(key, effect);
         } else {
@@ -808,7 +811,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
       this.onDecohere();
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        this._outputs![i].decohereOutput();
+        this._outputs![i]!.decohereOutput();
       }
       this._outlets.forEach(function (key: K, outlet: KeyOutlet<K, V>): void {
         outlet.decohereInput();
@@ -837,7 +840,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
         }
         this.onRecohereKey(key, effect, version);
         for (let i = 0, n = this._outputs !== null ? this._outputs.length : 0; i < n; i += 1) {
-          const output = this._outputs![i];
+          const output = this._outputs![i]!;
           if (MapInlet.is(output)) {
             output.recohereOutputKey(key, version);
           }
@@ -868,7 +871,7 @@ export class MapDownlink<K, V, KU = K, VU = V> extends Downlink implements Order
       this._version = version;
       this.onRecohere(version);
       for (let i = 0, n = this._outputs !== null ? this._outputs.length : 0; i < n; i += 1) {
-        this._outputs![i].recohereOutput(version);
+        this._outputs![i]!.recohereOutput(version);
       }
       this.didRecohere(version);
     }

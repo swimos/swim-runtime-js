@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {UriParserSpec} from "./UriParserSpec";
 import {UriWriterSpec} from "./UriWriterSpec";
 import {UriPathSpec} from "./UriPathSpec";

@@ -14,11 +14,11 @@
 
 import {Equivalent, Equals, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {R2Function} from "./R2Function";
+import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
-import {BoxR2} from "./BoxR2";
+import type {BoxR2} from "./BoxR2";
 
-export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equivalent<SetR2>, Equals, Debug {
+export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equals, Equivalent, Debug {
   /** @hidden */
   readonly _shapes: ReadonlyArray<S>;
   /** @hidden */
@@ -69,7 +69,7 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equiv
     if (n > 0) {
       const newShapes = new Array<ShapeR2>(n);
       for (let i = 0; i < n; i += 1) {
-        newShapes[i] = oldShapes[i].transform(f);
+        newShapes[i] = oldShapes[i]!.transform(f);
       }
       return new SetR2(newShapes);
     } else {
@@ -86,7 +86,7 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equiv
       let yMax = -Infinity;
       const shapes = this._shapes;
       for (let i = 0, n = shapes.length; i < n; i += 1) {
-        const shape = shapes[i];
+        const shape = shapes[i]!;
         xMin = Math.min(xMin, shape.xMin);
         yMin = Math.min(yMin, shape.yMin);
         xMax = Math.max(shape.xMax, xMax);
@@ -98,8 +98,13 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equiv
     return boundingBox;
   }
 
-  equivalentTo(that: SetR2, epsilon?: number): boolean {
-    return this === that || Arrays.equivalent(this._shapes, that._shapes, epsilon);
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof SetR2) {
+      return Arrays.equivalent(this._shapes, that._shapes, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {
@@ -119,9 +124,9 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equiv
       output = output.write("empty").write(40/*'('*/);
     } else {
       output = output.write("of").write(40/*'('*/);
-      output = output.debug(shapes[0]);
+      output = output.debug(shapes[0]!);
       for (let i = 1; i < n; i += 1) {
-        output = output.write(", ").debug(shapes[i]);
+        output = output.write(", ").debug(shapes[i]!);
       }
     }
     output = output.write(41/*')'*/);

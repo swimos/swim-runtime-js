@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyField, Field} from "./Field";
-import {AnyValue, Value} from "./Value";
+import type {AnyValue, Value} from "./Value";
 import {AnyInterpreter, Interpreter} from "./Interpreter";
 
 export class Slot extends Field {
@@ -322,18 +322,20 @@ export class Slot extends Field {
     return 2;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof Slot) {
       let order = this._key.compareTo(that._key);
       if (order === 0) {
         order = this._value.compareTo(that._value);
       }
       return order;
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item, epsilon?: number): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof Slot) {

@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, Equivalent, HashCode} from "@swim/util";
+import type {Comparable, Equivalent, HashCode} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
 import {Attr, Value, Form} from "@swim/structure";
-import {PxLength} from "./PxLength";
-import {EmLength} from "./EmLength";
-import {RemLength} from "./RemLength";
-import {PctLength} from "./PctLength";
-import {UnitlessLength} from "./UnitlessLength";
-import {LengthParser} from "./LengthParser";
-import {LengthForm} from "./LengthForm";
+import type {PxLength} from "./PxLength";
+import type {EmLength} from "./EmLength";
+import type {RemLength} from "./RemLength";
+import type {PctLength} from "./PctLength";
+import type {UnitlessLength} from "./UnitlessLength";
+import type {LengthParser} from "./LengthParser";
+import type {LengthForm} from "./LengthForm";
 
 export type LengthUnits = "px" | "em" | "rem" | "%" | "";
 
 export type AnyLength = Length | string | number;
 
-export abstract class Length implements Comparable<AnyLength>, Equivalent<AnyLength>, HashCode, Debug {
+export abstract class Length implements HashCode, Equivalent, Comparable, Debug {
   isDefined(): boolean {
     return this.value !== 0;
   }
@@ -124,9 +124,9 @@ export abstract class Length implements Comparable<AnyLength>, Equivalent<AnyLen
     return void 0; // conditionally overridden when CSS Typed OM is available
   }
 
-  abstract compareTo(that: AnyLength): number;
+  abstract compareTo(that: unknown): number;
 
-  abstract equivalentTo(that: AnyLength, epsilon?: number): boolean;
+  abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
   abstract equals(that: unknown): boolean;
 

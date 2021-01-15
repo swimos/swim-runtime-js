@@ -14,62 +14,62 @@
 
 import {Comparable, Equivalent, HashCode, Cursor} from "@swim/util";
 import {Debug, Display, Format, Output} from "@swim/codec";
-import {Field} from "./Field";
-import {Attr} from "./Attr";
-import {Slot} from "./Slot";
-import {AnyValue, Value} from "./Value";
-import {Record} from "./Record";
-import {RecordMap} from "./RecordMap";
-import {RecordMapView} from "./RecordMapView";
-import {Data} from "./Data";
-import {AnyText, Text} from "./Text";
-import {AnyNum, Num} from "./Num";
-import {Bool} from "./Bool";
-import {Expression} from "./Expression";
-import {Selector} from "./Selector";
-import {Operator} from "./Operator";
-import {Func} from "./Func";
-import {Extant} from "./Extant";
-import {Absent} from "./Absent";
-import {Form} from "./Form";
-import {AnyInterpreter} from "./Interpreter";
-import {BinaryOperator} from "./operator/BinaryOperator";
-import {UnaryOperator} from "./operator/UnaryOperator";
-import {ConditionalOperator} from "./operator/ConditionalOperator";
-import {OrOperator} from "./operator/OrOperator";
-import {AndOperator} from "./operator/AndOperator";
-import {BitwiseOrOperator} from "./operator/BitwiseOrOperator";
-import {BitwiseXorOperator} from "./operator/BitwiseXorOperator";
-import {BitwiseAndOperator} from "./operator/BitwiseAndOperator";
-import {LtOperator} from "./operator/LtOperator";
-import {LeOperator} from "./operator/LeOperator";
-import {EqOperator} from "./operator/EqOperator";
-import {NeOperator} from "./operator/NeOperator";
-import {GeOperator} from "./operator/GeOperator";
-import {GtOperator} from "./operator/GtOperator";
-import {PlusOperator} from "./operator/PlusOperator";
-import {MinusOperator} from "./operator/MinusOperator";
-import {TimesOperator} from "./operator/TimesOperator";
-import {DivideOperator} from "./operator/DivideOperator";
-import {ModuloOperator} from "./operator/ModuloOperator";
-import {NotOperator} from "./operator/NotOperator";
-import {BitwiseNotOperator} from "./operator/BitwiseNotOperator";
-import {NegativeOperator} from "./operator/NegativeOperator";
-import {PositiveOperator} from "./operator/PositiveOperator";
-import {InvokeOperator} from "./operator/InvokeOperator";
-import {IdentitySelector} from "./selector/IdentitySelector";
-import {GetSelector} from "./selector/GetSelector";
-import {GetAttrSelector} from "./selector/GetAttrSelector";
-import {GetItemSelector} from "./selector/GetItemSelector";
-import {KeysSelector} from "./selector/KeysSelector";
-import {ValuesSelector} from "./selector/ValuesSelector";
-import {ChildrenSelector} from "./selector/ChildrenSelector";
-import {DescendantsSelector} from "./selector/DescendantsSelector";
-import {FilterSelector} from "./selector/FilterSelector";
-import {LiteralSelector} from "./selector/LiteralSelector";
-import {LambdaFunc} from "./func/LambdaFunc";
-import {BridgeFunc} from "./func/BridgeFunc";
-import {MathModule} from "./func/MathModule";
+import type {Field} from "./Field";
+import type {Attr} from "./Attr";
+import type {Slot} from "./Slot";
+import type {AnyValue, Value} from "./Value";
+import type {Record} from "./Record";
+import type {RecordMap} from "./RecordMap";
+import type {RecordMapView} from "./RecordMapView";
+import type {Data} from "./Data";
+import type {AnyText, Text} from "./Text";
+import type {AnyNum, Num} from "./Num";
+import type {Bool} from "./Bool";
+import type {Expression} from "./Expression";
+import type {Selector} from "./Selector";
+import type {Operator} from "./Operator";
+import type {Func} from "./Func";
+import type {Extant} from "./Extant";
+import type {Absent} from "./Absent";
+import type {Form} from "./Form";
+import type {AnyInterpreter} from "./Interpreter";
+import type {BinaryOperator} from "./operator/BinaryOperator";
+import type {UnaryOperator} from "./operator/UnaryOperator";
+import type {ConditionalOperator} from "./operator/ConditionalOperator";
+import type {OrOperator} from "./operator/OrOperator";
+import type {AndOperator} from "./operator/AndOperator";
+import type {BitwiseOrOperator} from "./operator/BitwiseOrOperator";
+import type {BitwiseXorOperator} from "./operator/BitwiseXorOperator";
+import type {BitwiseAndOperator} from "./operator/BitwiseAndOperator";
+import type {LtOperator} from "./operator/LtOperator";
+import type {LeOperator} from "./operator/LeOperator";
+import type {EqOperator} from "./operator/EqOperator";
+import type {NeOperator} from "./operator/NeOperator";
+import type {GeOperator} from "./operator/GeOperator";
+import type {GtOperator} from "./operator/GtOperator";
+import type {PlusOperator} from "./operator/PlusOperator";
+import type {MinusOperator} from "./operator/MinusOperator";
+import type {TimesOperator} from "./operator/TimesOperator";
+import type {DivideOperator} from "./operator/DivideOperator";
+import type {ModuloOperator} from "./operator/ModuloOperator";
+import type {NotOperator} from "./operator/NotOperator";
+import type {BitwiseNotOperator} from "./operator/BitwiseNotOperator";
+import type {NegativeOperator} from "./operator/NegativeOperator";
+import type {PositiveOperator} from "./operator/PositiveOperator";
+import type {InvokeOperator} from "./operator/InvokeOperator";
+import type {IdentitySelector} from "./selector/IdentitySelector";
+import type {GetSelector} from "./selector/GetSelector";
+import type {GetAttrSelector} from "./selector/GetAttrSelector";
+import type {GetItemSelector} from "./selector/GetItemSelector";
+import type {KeysSelector} from "./selector/KeysSelector";
+import type {ValuesSelector} from "./selector/ValuesSelector";
+import type {ChildrenSelector} from "./selector/ChildrenSelector";
+import type {DescendantsSelector} from "./selector/DescendantsSelector";
+import type {FilterSelector} from "./selector/FilterSelector";
+import type {LiteralSelector} from "./selector/LiteralSelector";
+import type {LambdaFunc} from "./func/LambdaFunc";
+import type {BridgeFunc} from "./func/BridgeFunc";
+import type {MathModule} from "./func/MathModule";
 
 export type AnyItem = Item
                     | {readonly $key: AnyValue, readonly $value: AnyValue}
@@ -82,7 +82,7 @@ export type AnyItem = Item
                     | null
                     | undefined;
 
-export abstract class Item implements Comparable<Item>, Equivalent<Item>, HashCode, Debug, Display {
+export abstract class Item implements HashCode, Equivalent, Comparable, Debug, Display {
   /** @hidden */
   constructor() {
     // stub
@@ -288,13 +288,13 @@ export abstract class Item implements Comparable<Item>, Equivalent<Item>, HashCo
   appended(...items: AnyItem[]): Record {
     const record = Item.Record.create(1 + arguments.length);
     record.push(this);
-    record.push.apply(record, arguments);
+    record.push.apply(record, arguments as unknown as AnyItem[]);
     return record;
   }
 
   prepended(...items: AnyItem[]): Record {
     const record = Item.Record.create(arguments.length + 1);
-    record.push.apply(record, arguments);
+    record.push.apply(record, arguments as unknown as AnyItem[]);
     record.push(this);
     return record;
   }
@@ -382,7 +382,7 @@ export abstract class Item implements Comparable<Item>, Equivalent<Item>, HashCo
 
   filter(predicate?: AnyItem): Selector {
     const selector = Item.Selector.literal(this);
-    return selector.filter.apply(selector, arguments);
+    return selector.filter.apply(selector, arguments as unknown as [AnyItem?]);
   }
 
   max(that: Item): Item {
@@ -483,8 +483,11 @@ export abstract class Item implements Comparable<Item>, Equivalent<Item>, HashCo
     return 11;
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | undefined,
+                thisArg?: S): T | undefined {
     return callback.call(thisArg, this, 0);
   }
 
@@ -499,9 +502,9 @@ export abstract class Item implements Comparable<Item>, Equivalent<Item>, HashCo
    */
   abstract typeOrder(): number;
 
-  abstract compareTo(that: Item): number;
+  abstract compareTo(that: unknown): number;
 
-  abstract equivalentTo(that: Item, epsilon?: number): boolean;
+  abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
   abstract keyEquals(key: unknown): boolean;
 

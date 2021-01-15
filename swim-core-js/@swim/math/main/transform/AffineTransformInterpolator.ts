@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Interpolator} from "@swim/interpolate";
-import {AnyTransform} from "./Transform";
+import type {Interpolator} from "@swim/interpolate";
+import type {AnyTransform} from "./Transform";
 import {AffineTransform} from "./AffineTransform";
 import {TransformInterpolator} from "./TransformInterpolator";
 

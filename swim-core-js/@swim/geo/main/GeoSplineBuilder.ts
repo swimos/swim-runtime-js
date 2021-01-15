@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {GeoCurve} from "./GeoCurve";
+import type {GeoCurve} from "./GeoCurve";
 import {GeoSegment} from "./GeoSegment";
-import {GeoSplineContext} from "./GeoSplineContext";
+import type {GeoSplineContext} from "./GeoSplineContext";
 import {GeoSpline} from "./GeoSpline";
 
 export class GeoSplineBuilder implements GeoSplineContext {

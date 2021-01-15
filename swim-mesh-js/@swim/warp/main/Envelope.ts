@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode} from "@swim/util";
+import type {HashCode} from "@swim/util";
 import {Output, Debug, Format} from "@swim/codec";
-import {AnyValue, Value} from "@swim/structure";
+import type {AnyValue, Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
-import {AnyUri, Uri} from "@swim/uri";
-import {EventMessage} from "./EventMessage";
-import {CommandMessage} from "./CommandMessage";
-import {LinkRequest} from "./LinkRequest";
-import {LinkedResponse} from "./LinkedResponse";
-import {SyncRequest} from "./SyncRequest";
-import {SyncedResponse} from "./SyncedResponse";
-import {UnlinkRequest} from "./UnlinkRequest";
-import {UnlinkedResponse} from "./UnlinkedResponse";
-import {AuthRequest} from "./AuthRequest";
-import {AuthedResponse} from "./AuthedResponse";
-import {DeauthRequest} from "./DeauthRequest";
-import {DeauthedResponse} from "./DeauthedResponse";
+import type {AnyUri, Uri} from "@swim/uri";
+import type {EventMessage} from "./EventMessage";
+import type {CommandMessage} from "./CommandMessage";
+import type {LinkRequest} from "./LinkRequest";
+import type {LinkedResponse} from "./LinkedResponse";
+import type {SyncRequest} from "./SyncRequest";
+import type {SyncedResponse} from "./SyncedResponse";
+import type {UnlinkRequest} from "./UnlinkRequest";
+import type {UnlinkedResponse} from "./UnlinkedResponse";
+import type {AuthRequest} from "./AuthRequest";
+import type {AuthedResponse} from "./AuthedResponse";
+import type {DeauthRequest} from "./DeauthRequest";
+import type {DeauthedResponse} from "./DeauthedResponse";
 
 export abstract class Envelope implements HashCode, Debug {
   tag(): string {

@@ -14,7 +14,7 @@
 
 import {Interpolator} from "./Interpolator";
 
-export class InterpolatorInterpolator<T, U = T> extends Interpolator<Interpolator<T, U>> {
+export class InterpolatorInterpolator<T, U = never> extends Interpolator<Interpolator<T, U>> {
   /** @hidden */
   readonly i0: Interpolator<T, U>;
   /** @hidden */
@@ -70,7 +70,7 @@ export class InterpolatorInterpolator<T, U = T> extends Interpolator<Interpolato
     return false;
   }
 
-  static between<T, U = T>(i0: Interpolator<T, U>, i1: Interpolator<T, U>): InterpolatorInterpolator<T, U>;
+  static between<T, U = never>(i0: Interpolator<T, U>, i1: Interpolator<T, U>): InterpolatorInterpolator<T, U>;
   static between(a: unknown, b: unknown): Interpolator<unknown>;
   static between(a: unknown, b: unknown): Interpolator<unknown> {
     if (a instanceof Interpolator && b instanceof Interpolator) {

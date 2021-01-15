@@ -15,13 +15,13 @@
 import {Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {CurveR2, SegmentR2, SplineR2} from "@swim/math";
-import {GeoProjection} from "./GeoProjection";
+import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
 import {GeoCurve} from "./GeoCurve";
 import {GeoSegment} from "./GeoSegment";
-import {GeoSplineBuilder} from "./GeoSplineBuilder";
-import {GeoBox} from "./GeoBox";
+import type {GeoSplineBuilder} from "./GeoSplineBuilder";
+import type {GeoBox} from "./GeoBox";
 
 export type AnyGeoSpline = GeoSpline | GeoSplinePoints;
 
@@ -76,7 +76,7 @@ export class GeoSpline extends GeoCurve implements Debug {
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      return curves[k].interpolateLng(v);
+      return curves[k]!.interpolateLng(v);
     } else {
       return NaN;
     }
@@ -89,7 +89,7 @@ export class GeoSpline extends GeoCurve implements Debug {
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      return curves[k].interpolateLat(v);
+      return curves[k]!.interpolateLat(v);
     } else {
       return NaN;
     }
@@ -102,7 +102,7 @@ export class GeoSpline extends GeoCurve implements Debug {
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      return curves[k].interpolate(v);
+      return curves[k]!.interpolate(v);
     } else {
       return new GeoPoint(NaN, NaN);
     }
@@ -125,16 +125,16 @@ export class GeoSpline extends GeoCurve implements Debug {
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      const [c0, c1] = curves[k].split(v);
+      const [c0, c1] = curves[k]!.split(v);
       const curves0 = new Array<GeoCurve>(k + 1);
       const curves1 = new Array<GeoCurve>(n - k);
       for (let i = 0; i < k; i += 1) {
-        curves0[i] = curves[i];
+        curves0[i] = curves[i]!;
       }
       curves0[k] = c0;
       curves1[0] = c1;
       for (let i = k + 1; i < n; i += 1) {
-        curves1[i - k] = curves[i];
+        curves1[i - k] = curves[i]!;
       }
       return [new GeoSpline(curves0, false), new GeoSpline(curves1, false)];
     } else {
@@ -149,15 +149,15 @@ export class GeoSpline extends GeoCurve implements Debug {
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      const [c0, c1] = oldCurves[k].split(v);
+      const [c0, c1] = oldCurves[k]!.split(v);
       const newCurves = new Array<GeoCurve>(n + 1);
       for (let i = 0; i < k; i += 1) {
-        newCurves[i] = oldCurves[i];
+        newCurves[i] = oldCurves[i]!;
       }
       newCurves[k] = c0;
       newCurves[k + 1] = c1;
       for (let i = k + 1; i < n; i += 1) {
-        newCurves[i + 1] = oldCurves[i];
+        newCurves[i + 1] = oldCurves[i]!;
       }
       return new GeoSpline(newCurves, this._closed);
     } else {
@@ -173,12 +173,12 @@ export class GeoSpline extends GeoCurve implements Debug {
       const newCurves = new Array<CurveR2>(n);
 
       // project leading adjacent segments
-      let curve = oldCurves[0];
+      let curve = oldCurves[0]!;
       if (curve instanceof GeoSegment) {
         // project first point
         let p0 = f.project(curve._lng0, curve._lat0);
         while (i < n) {
-          curve = oldCurves[i];
+          curve = oldCurves[i]!;
           if (curve instanceof GeoSegment) {
             // project next point
             const p1 = f.project(curve._lng1, curve._lat1);
@@ -193,7 +193,7 @@ export class GeoSpline extends GeoCurve implements Debug {
 
       // project any remaining curves
       while (i < n) {
-        curve = oldCurves[i];
+        curve = oldCurves[i]!;
         newCurves[i] = curve.project(f);
         i += 1;
       }
@@ -213,7 +213,7 @@ export class GeoSpline extends GeoCurve implements Debug {
       let latMax = -Infinity;
       const curves = this._curves;
       for (let i = 0, n = curves.length; i < n; i += 1) {
-        const curve = curves[i];
+        const curve = curves[i]!;
         lngMin = Math.min(lngMin, curve.lngMin);
         latMin = Math.min(latMin, curve.latMin);
         lngMax = Math.max(curve.lngMax, lngMax);
@@ -225,18 +225,21 @@ export class GeoSpline extends GeoCurve implements Debug {
     return boundingBox;
   }
 
-  forEachCoord<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
-                               thisArg?: S): R | undefined {
+  forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
+  forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
+                     thisArg: S): R | undefined;
+  forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
+                     thisArg?: S): R | undefined {
     const curves = this._curves;
     const n = curves.length;
     if (n > 0) {
-      let curve = curves[0];
+      let curve = curves[0]!;
       let result = curve.forEachCoord(callback, thisArg);
       if (result !== void 0) {
         return result;
       }
       for (let i = 1; i < n; i += 1) {
-        curve = curves[i];
+        curve = curves[i]!;
         result = curve.forEachCoordRest(callback, thisArg);
         if (result !== void 0) {
           return result;
@@ -246,11 +249,14 @@ export class GeoSpline extends GeoCurve implements Debug {
     return void 0;
   }
 
-  forEachCoordRest<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
-                                   thisArg?: S): R | undefined {
+  forEachCoordRest<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
+  forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
+                         thisArg: S): R | undefined;
+  forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
+                         thisArg?: S): R | undefined {
     const curves = this._curves;
     for (let i = 0, n = curves.length; i < n; i += 1) {
-      const curve = curves[i];
+      const curve = curves[i]!;
       const result = curve.forEachCoordRest(callback, thisArg);
       if (result !== void 0) {
         return result;
@@ -259,7 +265,7 @@ export class GeoSpline extends GeoCurve implements Debug {
     return void 0;
   }
 
-  equivalentTo(that: GeoCurve, epsilon?: number): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoSpline) {
@@ -287,9 +293,9 @@ export class GeoSpline extends GeoCurve implements Debug {
       output = output.write("empty").write(40/*'('*/);
     } else if (n !== 0) {
       output = output.write(this._closed ? "closed" : "open").write(40/*'('*/);
-      output = output.debug(curves[0]);
+      output = output.debug(curves[0]!);
       for (let i = 1; i < n; i += 1) {
-        output = output.write(", ").debug(curves[i]);
+        output = output.write(", ").debug(curves[i]!);
       }
     }
     output = output.write(41/*')'*/);
@@ -315,10 +321,10 @@ export class GeoSpline extends GeoCurve implements Debug {
     const n = points.length;
     if (n > 1) {
       const curves = new Array<GeoCurve>(n - 1);
-      const p0 = GeoPoint.fromAny(points[0]);
+      const p0 = GeoPoint.fromAny(points[0]!);
       let p1 = p0;
       for (let i = 1; i < n; i += 1) {
-        const p2 = GeoPoint.fromAny(points[i]);
+        const p2 = GeoPoint.fromAny(points[i]!);
         curves[i - 1] = new GeoSegment(p1.lng, p1.lat, p2.lng, p2.lat);
         p1 = p2;
       }
@@ -349,7 +355,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   static isPoints(value: unknown): value is GeoSplinePoints {
     return Array.isArray(value)
         && value.length >= 2
-        && GeoPoint.isAny(value[0]);
+        && GeoPoint.isAny(value[0]!);
   }
 
   /** @hidden */

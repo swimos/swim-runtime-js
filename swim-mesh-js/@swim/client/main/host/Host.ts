@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyUri, Uri} from "@swim/uri";
-import {AnyValue, Value} from "@swim/structure";
-import {Envelope} from "@swim/warp";
-import {HostDownlink} from "./HostDownlink";
+import type {AnyUri, Uri} from "@swim/uri";
+import type {AnyValue, Value} from "@swim/structure";
+import type {Envelope} from "@swim/warp";
+import type {HostDownlink} from "./HostDownlink";
 
 export interface HostOptions {
   credentials?: Value;

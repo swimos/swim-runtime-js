@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Inlet} from "./Inlet";
-import {Outlet} from "./Outlet";
-import {StreamletContext} from "./StreamletContext";
-import {StreamletScope} from "./StreamletScope";
+import type {Inlet} from "./Inlet";
+import type {Outlet} from "./Outlet";
+import type {StreamletContext} from "./StreamletContext";
+import type {StreamletScope} from "./StreamletScope";
 
 /**
  * Stateful node in a dataflow graph that uses the state of its [[Inlet

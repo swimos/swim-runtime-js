@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {Item} from "../Item";
-import {Value} from "../Value";
-import {Record} from "../Record";
-import {Func} from "../Func";
+import type {Value} from "../Value";
+import type {Record} from "../Record";
+import type {Func} from "../Func";
 import {Interpreter} from "../Interpreter";
-import {InvokeOperator} from "../operator/InvokeOperator";
+import type {InvokeOperator} from "../operator/InvokeOperator";
 import {BridgeFunc} from "./BridgeFunc";
 
 export const MathModule = {} as {

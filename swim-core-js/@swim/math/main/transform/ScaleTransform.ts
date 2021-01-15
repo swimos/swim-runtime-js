@@ -17,7 +17,7 @@ import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import {Item, Attr, Slot, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {Transform} from "./Transform";
-import {AffineTransform} from "./AffineTransform";
+import type {AffineTransform} from "./AffineTransform";
 
 export class ScaleTransform extends Transform {
   /** @hidden */
@@ -93,7 +93,15 @@ export class ScaleTransform extends Transform {
     return that instanceof ScaleTransform;
   }
 
-  equals(that: Transform): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (that instanceof ScaleTransform) {
+      return Numbers.equivalent(this._x, that._x, epsilon)
+          && Numbers.equivalent(this._y, that._y, epsilon);
+    }
+    return false;
+  }
+
+  equals(that: unknown): boolean {
     if (that instanceof ScaleTransform) {
       return this._x === that._x && this._y === that._y;
     }

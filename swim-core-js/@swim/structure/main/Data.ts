@@ -47,7 +47,7 @@ export class Data extends Value {
     if (index < 0 || index >= this.size) {
       throw new RangeError("" + index);
     }
-    return this._array![index];
+    return this._array![index]!;
   }
 
   setByte(index: number, value: number): Data {
@@ -294,7 +294,7 @@ export class Data extends Value {
     return 4;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof Data) {
       const xs = this._array!;
       const ys = that._array!;
@@ -304,7 +304,7 @@ export class Data extends Value {
       let i = 0;
       do {
         if (i < xn && i < yn) {
-          order = xs[i] - ys[i];
+          order = xs[i]! - ys[i]!;
           i += 1;
         } else {
           break;
@@ -321,8 +321,10 @@ export class Data extends Value {
       } else {
         return 0;
       }
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
   equivalentTo(that: Item): boolean {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {CurveR2Context} from "./CurveR2Context";
+import type {CurveR2Context} from "./CurveR2Context";
 
 export interface SplineR2Context extends CurveR2Context {
   rect(x: number, y: number, w: number, h: number): void;

@@ -15,8 +15,7 @@
 import * as ChildProcess from "child_process";
 import * as FS from "fs";
 import * as Path from "path";
-import * as ts from "typescript";
-
+import type * as ts from "typescript";
 import {OutputSettings, OutputStyle, Unicode} from "@swim/codec";
 import {Build} from "./Build";
 import {TargetConfig, Target} from "./Target";
@@ -91,7 +90,7 @@ export class Project {
 
   initTargets(config: ProjectConfig): void {
     for (let i = 0; i < config.targets.length; i += 1) {
-      const targetConfig = config.targets[i];
+      const targetConfig = config.targets[i]!;
       const target = new Target(this, targetConfig);
       this.targets[target.id] = target;
       this.targetList.push(target);
@@ -100,7 +99,7 @@ export class Project {
 
   initDeps(config: ProjectConfig): void {
     for (let i = 0; i < config.targets.length; i += 1) {
-      const targetConfig = config.targets[i];
+      const targetConfig = config.targets[i]!;
       const target = this.targets[targetConfig.id]!;
       target.initDeps(targetConfig);
     }
@@ -108,7 +107,7 @@ export class Project {
 
   initPeerDeps(config: ProjectConfig): void {
     for (let i = 0; i < config.targets.length; i += 1) {
-      const targetConfig = config.targets[i];
+      const targetConfig = config.targets[i]!;
       const target = this.targets[targetConfig.id]!;
       target.initPeerDeps(targetConfig);
     }
@@ -120,7 +119,7 @@ export class Project {
       return Build.importScript(bundleConfigPath)
         .then((bundleConfig: any): void => {
           for (let i = 0; i < this.targetList.length; i += 1) {
-            const target = this.targetList[i];
+            const target = this.targetList[i]!;
             const targetBundleConfig = bundleConfig[target.id];
             if (targetBundleConfig !== void 0) {
               target.initBundle(targetBundleConfig);
@@ -152,7 +151,7 @@ export class Project {
       const deps = pkg.dependencies;
       for (const dep in deps) {
         for (let i = 0; i < this.build.projectList.length; i += 1) {
-          const project = this.build.projectList[i];
+          const project = this.build.projectList[i]!;
           if (project.name === dep && deps[dep] !== build.version) {
             deps[dep] = build.version;
             modified = true;
@@ -195,7 +194,7 @@ export class Project {
       for (let i = 0; i < args.length; i += 1) {
         output.write(" ");
         OutputStyle.gray(output);
-        output.write(args[i]);
+        output.write(args[i]!);
         OutputStyle.reset(output);
       }
       console.log(output.bind());
@@ -239,7 +238,7 @@ export class Project {
   clean(): void {
     this.cleanTargets();
     for (let i = 0; i < this.cleanDirs.length; i += 1) {
-      const cleanDir = Path.resolve(this.baseDir, this.cleanDirs[i]);
+      const cleanDir = Path.resolve(this.baseDir, this.cleanDirs[i]!);
       const output = Unicode.stringOutput(OutputSettings.styled());
       OutputStyle.greenBold(output);
       output.write("deleting");
@@ -253,7 +252,7 @@ export class Project {
 
   cleanTargets(): void {
     for (let i = 0; i < this.targetList.length; i += 1) {
-      const target = this.targetList[i];
+      const target = this.targetList[i]!;
       target.clean();
     }
   }

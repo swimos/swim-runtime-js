@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {KeysCursor} from "./KeysCursor";
 import {ValuesCursor} from "./ValuesCursor";
-import {BTreeContext} from "./BTreeContext";
+import type {BTreeContext} from "./BTreeContext";
 import {BTree} from "./BTree";
-import {BTreeLeaf} from "./BTreeLeaf";
+import type {BTreeLeaf} from "./BTreeLeaf";
 
 /** @hidden */
 export abstract class BTreePage<K, V, U> {

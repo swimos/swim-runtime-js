@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals} from "@swim/util";
-import {CurveR2} from "@swim/math";
-import {GeoProjection} from "./GeoProjection";
+import type {Equivalent, Equals} from "@swim/util";
+import type {CurveR2} from "@swim/math";
+import type {GeoProjection} from "./GeoProjection";
 import {GeoShape} from "./GeoShape";
-import {GeoPoint} from "./GeoPoint";
+import type {GeoPoint} from "./GeoPoint";
 
-export abstract class GeoCurve extends GeoShape implements Equivalent<GeoCurve>, Equals {
+export abstract class GeoCurve extends GeoShape implements Equals, Equivalent {
   abstract interpolateLng(u: number): number;
 
   abstract interpolateLat(u: number): number;
@@ -29,13 +29,15 @@ export abstract class GeoCurve extends GeoShape implements Equivalent<GeoCurve>,
 
   abstract project(f: GeoProjection): CurveR2;
 
-  abstract forEachCoord<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
-                                        thisArg?: S): R | undefined;
+  abstract forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
+  abstract forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
+                              thisArg: S): R | undefined;
 
-  abstract forEachCoordRest<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
-                                            thisArg?: S): R | undefined;
+  abstract forEachCoordRest<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
+  abstract forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
+                                  thisArg: S): R | undefined;
 
-  abstract equivalentTo(that: GeoCurve, epsilon?: number): boolean;
+  abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
   abstract equals(that: unknown): boolean;
 }

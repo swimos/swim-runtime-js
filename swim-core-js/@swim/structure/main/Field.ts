@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {AnyItem, Item} from "./Item";
-import {AnyValue, Value} from "./Value";
-import {Record} from "./Record";
-import {AnyText} from "./Text";
-import {AnyNum} from "./Num";
+import type {AnyValue, Value} from "./Value";
+import type {Record} from "./Record";
+import type {AnyText} from "./Text";
+import type {AnyNum} from "./Num";
 
 export type AnyField = Field
                      | {readonly $key: AnyValue, readonly $value: AnyValue}
@@ -300,9 +300,9 @@ export abstract class Field extends Item {
     }
     if (name !== void 0 && name.charCodeAt(0) === 64/*'@'*/) {
       arguments[0] = name.slice(1);
-      return Item.Attr.of.apply(undefined, arguments);
+      return Item.Attr.of.apply(void 0, arguments as unknown as [AnyText, AnyValue?]);
     } else {
-      return Item.Slot.of.apply(undefined, arguments);
+      return Item.Slot.of.apply(void 0, arguments as unknown as [AnyValue, AnyValue?]);
     }
   }
 

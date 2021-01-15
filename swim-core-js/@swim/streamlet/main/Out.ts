@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {OutletOptions} from "./Outlet";
+import type {OutletOptions} from "./Outlet";
 import {StreamletClass, AbstractStreamlet} from "./AbstractStreamlet";
 
 export function Out(name: string): PropertyDecorator;

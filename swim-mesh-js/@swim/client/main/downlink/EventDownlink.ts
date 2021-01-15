@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Value} from "@swim/structure";
-import {Uri} from "@swim/uri";
-import {DownlinkContext} from "./DownlinkContext";
-import {DownlinkOwner} from "./DownlinkOwner";
+import type {Value} from "@swim/structure";
+import type {Uri} from "@swim/uri";
+import type {DownlinkContext} from "./DownlinkContext";
+import type {DownlinkOwner} from "./DownlinkOwner";
 import {DownlinkType, DownlinkObserver, DownlinkInit, DownlinkFlags, Downlink} from "./Downlink";
 import {EventDownlinkModel} from "./EventDownlinkModel";
 
@@ -27,9 +27,9 @@ export interface EventDownlinkInit extends EventDownlinkObserver, DownlinkInit {
 
 export class EventDownlink extends Downlink {
   /** @hidden */
-  _observers: ReadonlyArray<EventDownlinkObserver> | null;
+  declare _observers: ReadonlyArray<EventDownlinkObserver> | null;
   /** @hidden */
-  _model: EventDownlinkModel | null;
+  declare _model: EventDownlinkModel | null;
 
   /** @hidden */
   constructor(context: DownlinkContext, owner?: DownlinkOwner, init?: EventDownlinkInit,

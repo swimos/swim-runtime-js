@@ -13,20 +13,20 @@
 // limitations under the License.
 
 import {AnyValue, Value} from "@swim/structure";
-import {AnyUri, Uri} from "@swim/uri";
-import {Host} from "../host/Host";
-import {DownlinkOwner} from "../downlink/DownlinkOwner";
-import {Downlink} from "../downlink/Downlink";
-import {EventDownlinkInit, EventDownlink} from "../downlink/EventDownlink";
-import {ListDownlinkInit, ListDownlink} from "../downlink/ListDownlink";
-import {MapDownlinkInit, MapDownlink} from "../downlink/MapDownlink";
-import {ValueDownlinkInit, ValueDownlink} from "../downlink/ValueDownlink";
-import {RefContext} from "./RefContext";
-import {HostRef} from "./HostRef";
-import {NodeRef} from "./NodeRef";
-import {LaneRef} from "./LaneRef";
-import {WarpRef} from "../WarpRef";
-import {
+import type {AnyUri, Uri} from "@swim/uri";
+import type {Host} from "../host/Host";
+import type {DownlinkOwner} from "../downlink/DownlinkOwner";
+import type {Downlink} from "../downlink/Downlink";
+import type {EventDownlinkInit, EventDownlink} from "../downlink/EventDownlink";
+import type {ListDownlinkInit, ListDownlink} from "../downlink/ListDownlink";
+import type {MapDownlinkInit, MapDownlink} from "../downlink/MapDownlink";
+import type {ValueDownlinkInit, ValueDownlink} from "../downlink/ValueDownlink";
+import type {RefContext} from "./RefContext";
+import type {HostRef} from "./HostRef";
+import type {NodeRef} from "./NodeRef";
+import type {LaneRef} from "./LaneRef";
+import type {WarpRef} from "../WarpRef";
+import type {
   WarpDidConnect,
   WarpDidAuthenticate,
   WarpDidDeauthenticate,
@@ -42,8 +42,6 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
   _host: Host | undefined;
   /** @hidden */
   _downlinks: Downlink[];
-  /** @hidden */
-  _downlinkCount: number;
   /** @hidden */
   _observers: ReadonlyArray<WarpObserver> | null;
 
@@ -75,13 +73,13 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
   abstract downlink(init?: EventDownlinkInit): EventDownlink;
 
   abstract downlinkList(init?: ListDownlinkInit<Value, AnyValue>): ListDownlink<Value, AnyValue>;
-  abstract downlinkList<V extends VU, VU = V>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU>;
+  abstract downlinkList<V extends VU, VU = never>(init?: ListDownlinkInit<V, VU>): ListDownlink<V, VU>;
 
   abstract downlinkMap(init?: MapDownlinkInit<Value, Value, AnyValue, AnyValue>): MapDownlink<Value, Value, AnyValue, AnyValue>;
-  abstract downlinkMap<K extends KU, V extends VU, KU = K, VU = V>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU>;
+  abstract downlinkMap<K extends KU, V extends VU, KU = never, VU = never>(init?: MapDownlinkInit<K, V, KU, VU>): MapDownlink<K, V, KU, VU>;
 
   abstract downlinkValue(init?: ValueDownlinkInit<Value, AnyValue>): ValueDownlink<Value, AnyValue>;
-  abstract downlinkValue<V extends VU, VU = V>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU>;
+  abstract downlinkValue<V extends VU, VU = never>(init?: ValueDownlinkInit<V, VU>): ValueDownlink<V, VU>;
 
   abstract hostRef(hostUri: AnyUri): HostRef;
 
@@ -123,7 +121,7 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
     const downlinks = this._downlinks;
     this._downlinks = [];
     for (let i = 0, n = downlinks.length; i < n; i += 1) {
-      downlinks[i].close();
+      downlinks[i]!.close();
     }
   }
 
@@ -132,7 +130,7 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
     const n = oldObservers !== null ? oldObservers.length : 0;
     const newObservers = new Array<WarpObserver>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newObservers[i] = oldObservers![i];
+      newObservers[i] = oldObservers![i]!;
     }
     newObservers[n] = observer;
     this._observers = newObservers;
@@ -143,7 +141,7 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
     const oldObservers = this._observers;
     const n = oldObservers !== null ? oldObservers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const oldObserver = oldObservers![i] as {[key: string]: unknown};
+      const oldObserver = oldObservers![i]! as {[key: string]: unknown};
       let found = oldObserver === observer; // check object identity
       if (!found) {
         for (const key in oldObserver) { // check property identity
@@ -157,10 +155,10 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
         if (n > 1) {
           const newObservers = new Array<WarpObserver>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newObservers[j] = oldObservers![j];
+            newObservers[j] = oldObservers![j]!;
           }
           for (let j = i + 1; j < n; j += 1) {
-            newObservers[j - 1] = oldObservers![j];
+            newObservers[j - 1] = oldObservers![j]!;
           }
           this._observers = newObservers;
         } else {
@@ -198,7 +196,7 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didConnect !== void 0) {
         observer.didConnect(host, this);
       }
@@ -210,7 +208,7 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didAuthenticate !== void 0) {
         observer.didAuthenticate(body, host, this);
       }
@@ -222,7 +220,7 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didDeauthenticate !== void 0) {
         observer.didDeauthenticate(body, host, this);
       }
@@ -235,7 +233,7 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didDisconnect !== void 0) {
         observer.didDisconnect(host, this);
       }
@@ -247,7 +245,7 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     for (let i = 0; i < n; i += 1) {
-      const observer = observers![i];
+      const observer = observers![i]!;
       if (observer.didFail !== void 0) {
         observer.didFail(error, host, this);
       }

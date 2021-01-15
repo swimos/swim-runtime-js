@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Inlet} from "./Inlet";
-import {KeyEffect} from "./KeyEffect";
+import type {KeyEffect} from "./KeyEffect";
 
 /**
  * Input connector into a `Streamlet` for a key-value map state.

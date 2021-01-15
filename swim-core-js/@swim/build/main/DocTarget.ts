@@ -17,16 +17,22 @@ import * as Path from "path";
 import * as typedoc from "typedoc";
 import {Component, ConverterComponent} from "typedoc/dist/lib/converter/components";
 import {Converter} from "typedoc/dist/lib/converter/converter";
-import {Context} from "typedoc/dist/lib/converter/context";
 import {Comment} from "typedoc/dist/lib/models/comments";
-
-import {Target} from "./Target";
+import type {Context} from "typedoc/dist/lib/converter/context";
+import type {Target} from "./Target";
 
 @Component({name: "doc-target"})
 export class DocTarget extends ConverterComponent {
   rootTargets: Target[];
   frameworkTargets: Target[];
   targetReflections: {[uid: string]: typedoc.ContainerReflection | undefined};
+
+  constructor(owner: typedoc.Converter) {
+    super(owner);
+    this.rootTargets = [];
+    this.frameworkTargets = [];
+    this.targetReflections = {};
+  }
 
   initialize() {
     this.listenTo(this.owner, {
@@ -49,9 +55,9 @@ export class DocTarget extends ConverterComponent {
   onModuleDeclaration(context: Context, reflection: typedoc.ContainerReflection): void {
     const sources = reflection.sources;
     if (sources !== void 0 && sources.length !== 0) {
-      const fileName = sources[0].fileName;
+      const fileName = sources[0]!.fileName;
       for (let i = 0; i < this.frameworkTargets.length; i += 1) {
-        const target = this.frameworkTargets[i];
+        const target = this.frameworkTargets[i]!;
         if (fileName.startsWith(target.project.baseDir)) {
           this.onTargetDeclaration(target, context, reflection);
         }
@@ -71,7 +77,7 @@ export class DocTarget extends ConverterComponent {
 
   onEnd(context: Context): void {
     if (this.rootTargets.length === 1) {
-      const rootTarget = this.rootTargets[0];
+      const rootTarget = this.rootTargets[0]!;
       if (!rootTarget.project.framework) {
         this.onTargetDeclaration(rootTarget, context, context.project);
       }

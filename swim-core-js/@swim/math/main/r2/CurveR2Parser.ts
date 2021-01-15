@@ -14,10 +14,10 @@
 
 import {Input, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
 import {CurveR2} from "./CurveR2";
-import {SegmentR2Parser} from "./SegmentR2Parser";
-import {QuadraticCurveR2Parser} from "./QuadraticCurveR2Parser";
-import {CubicCurveR2Parser} from "./CubicCurveR2Parser";
-import {EllipticCurveR2Parser} from "./EllipticCurveR2Parser";
+import type {SegmentR2Parser} from "./SegmentR2Parser";
+import type {QuadraticCurveR2Parser} from "./QuadraticCurveR2Parser";
+import type {CubicCurveR2Parser} from "./CubicCurveR2Parser";
+import type {EllipticCurveR2Parser} from "./EllipticCurveR2Parser";
 
 /** @hidden */
 export class CurveR2Parser extends Parser<CurveR2> {

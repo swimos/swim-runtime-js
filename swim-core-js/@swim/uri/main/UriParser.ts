@@ -14,27 +14,27 @@
 
 import {Input, Parser, Diagnostic, Unicode} from "@swim/codec";
 import {Uri} from "./Uri";
-import {UriScheme} from "./UriScheme";
-import {UriAuthority} from "./UriAuthority";
-import {UriUser} from "./UriUser";
-import {UriHost} from "./UriHost";
-import {UriPort} from "./UriPort";
-import {UriPath} from "./UriPath";
-import {UriPathBuilder} from "./UriPathBuilder";
-import {UriQuery} from "./UriQuery";
-import {UriQueryBuilder} from "./UriQueryBuilder";
-import {UriFragment} from "./UriFragment";
-import {UriAbsoluteParser} from "./UriAbsoluteParser";
-import {UriSchemeParser} from "./UriSchemeParser";
-import {UriAuthorityParser} from "./UriAuthorityParser";
-import {UriUserParser} from "./UriUserParser";
-import {UriHostParser} from "./UriHostParser";
-import {UriHostAddressParser} from "./UriHostAddressParser";
-import {UriHostLiteralParser} from "./UriHostLiteralParser";
-import {UriPortParser} from "./UriPortParser";
-import {UriPathParser} from "./UriPathParser";
-import {UriQueryParser} from "./UriQueryParser";
-import {UriFragmentParser} from "./UriFragmentParser";
+import type {UriScheme} from "./UriScheme";
+import type {UriAuthority} from "./UriAuthority";
+import type {UriUser} from "./UriUser";
+import type {UriHost} from "./UriHost";
+import type {UriPort} from "./UriPort";
+import type {UriPath} from "./UriPath";
+import type {UriPathBuilder} from "./UriPathBuilder";
+import type {UriQuery} from "./UriQuery";
+import type {UriQueryBuilder} from "./UriQueryBuilder";
+import type {UriFragment} from "./UriFragment";
+import type {UriAbsoluteParser} from "./UriAbsoluteParser";
+import type {UriSchemeParser} from "./UriSchemeParser";
+import type {UriAuthorityParser} from "./UriAuthorityParser";
+import type {UriUserParser} from "./UriUserParser";
+import type {UriHostParser} from "./UriHostParser";
+import type {UriHostAddressParser} from "./UriHostAddressParser";
+import type {UriHostLiteralParser} from "./UriHostLiteralParser";
+import type {UriPortParser} from "./UriPortParser";
+import type {UriPathParser} from "./UriPathParser";
+import type {UriQueryParser} from "./UriQueryParser";
+import type {UriFragmentParser} from "./UriFragmentParser";
 
 export class UriParser {
   absolute(scheme?: UriScheme, authority?: UriAuthority, path?: UriPath,

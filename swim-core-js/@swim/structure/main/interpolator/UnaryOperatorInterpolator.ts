@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem, Item} from "../Item";
-import {Value} from "../Value";
-import {UnaryOperator} from "../operator/UnaryOperator";
+import type {AnyItem, Item} from "../Item";
+import type {Value} from "../Value";
+import type {UnaryOperator} from "../operator/UnaryOperator";
 import {ItemInterpolator} from "./ItemInterpolator";
 
 export class UnaryOperatorInterpolator extends ItemInterpolator<Item> {

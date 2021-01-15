@@ -15,6 +15,6 @@
 export class InterpreterException extends Error {
   constructor(message?: string) {
     super(message);
-    (this as any).__proto__ = InterpreterException.prototype;
+    Object.setPrototypeOf(this, InterpreterException.prototype);
   }
 }

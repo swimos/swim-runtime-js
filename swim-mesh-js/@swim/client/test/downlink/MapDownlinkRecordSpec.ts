@@ -23,7 +23,7 @@ import {
   SyncedResponse,
 } from "@swim/warp";
 import {MapDownlinkRecord, WarpClient} from "@swim/client";
-import {MockServer} from "../MockServer";
+import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
 export class MapDownlinkRecordSpec extends Spec {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Func} from "../Func";
 
@@ -22,14 +22,16 @@ export abstract class BridgeFunc extends Func {
     return 51;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof BridgeFunc) {
       return Constructors.compare(this.constructor, that.constructor);
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item): boolean {
+  equivalentTo(that: unknown): boolean {
     return this === that;
   }
 

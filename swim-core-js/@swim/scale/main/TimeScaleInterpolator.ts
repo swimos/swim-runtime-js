@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import {NumberInterpolator, InterpolatorInterpolator} from "@swim/interpolate";
-import {AnyDateTime, DateTime} from "@swim/time";
-import {ContinuousScale} from "./ContinuousScale";
+import type {AnyDateTime, DateTime} from "@swim/time";
+import type {ContinuousScale} from "./ContinuousScale";
 import {TimeScale} from "./TimeScale";
 import {ScaleInterpolator} from "./ScaleInterpolator";
 
-export class TimeScaleInterpolator<R extends RU, RU = R> extends ScaleInterpolator<DateTime, R, AnyDateTime, RU, TimeScale<R>> {
+export class TimeScaleInterpolator<R, RU = never> extends ScaleInterpolator<DateTime, R, AnyDateTime, RU, TimeScale<R>> {
   /** @hidden */
   readonly t0: NumberInterpolator;
   /** @hidden */

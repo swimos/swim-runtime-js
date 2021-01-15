@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode} from "@swim/util";
+import type {HashCode, Equivalent} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
-import {Value, Form} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
-import {AnyAngle} from "../angle/Angle";
-import {R2Operator} from "../r2/R2Operator";
-import {IdentityTransform} from "./IdentityTransform";
-import {TranslateTransform} from "./TranslateTransform";
-import {ScaleTransform} from "./ScaleTransform";
-import {RotateTransform} from "./RotateTransform";
-import {SkewTransform} from "./SkewTransform";
-import {AffineTransform} from "./AffineTransform";
-import {TransformList} from "./TransformList";
-import {TranslateTransformParser} from "./TranslateTransformParser";
-import {ScaleTransformParser} from "./ScaleTransformParser";
-import {RotateTransformParser} from "./RotateTransformParser";
-import {SkewTransformParser} from "./SkewTransformParser";
-import {AffineTransformParser} from "./AffineTransformParser";
-import {TransformListParser} from "./TransformListParser";
-import {TransformParser} from "./TransformParser";
-import {TransformForm} from "./TransformForm";
+import type {Value, Form} from "@swim/structure";
+import type {AnyLength, Length} from "../length/Length";
+import type {AnyAngle} from "../angle/Angle";
+import type {R2Operator} from "../r2/R2Operator";
+import type {IdentityTransform} from "./IdentityTransform";
+import type {TranslateTransform} from "./TranslateTransform";
+import type {ScaleTransform} from "./ScaleTransform";
+import type {RotateTransform} from "./RotateTransform";
+import type {SkewTransform} from "./SkewTransform";
+import type {AffineTransform} from "./AffineTransform";
+import type {TransformList} from "./TransformList";
+import type {TranslateTransformParser} from "./TranslateTransformParser";
+import type {ScaleTransformParser} from "./ScaleTransformParser";
+import type {RotateTransformParser} from "./RotateTransformParser";
+import type {SkewTransformParser} from "./SkewTransformParser";
+import type {AffineTransformParser} from "./AffineTransformParser";
+import type {TransformListParser} from "./TransformListParser";
+import type {TransformParser} from "./TransformParser";
+import type {TransformForm} from "./TransformForm";
 
 export type AnyTransform = Transform | string;
 
@@ -43,7 +43,7 @@ export interface Transformation {
   transform(x: AnyLength, y: AnyLength): [Length, Length];
 }
 
-export abstract class Transform implements Transformation, R2Operator, HashCode, Debug {
+export abstract class Transform implements Transformation, R2Operator, HashCode, Equivalent, Debug {
   abstract transform(that: Transform): Transform;
   abstract transform(point: [number, number]): [number, number];
   abstract transform(x: number, y: number): [number, number];
@@ -114,7 +114,9 @@ export abstract class Transform implements Transformation, R2Operator, HashCode,
 
   abstract conformsTo(that: Transform): boolean;
 
-  abstract equals(that: Transform): boolean;
+  abstract equivalentTo(that: unknown, epsilon?: number): boolean;
+
+  abstract equals(that: unknown): boolean;
 
   abstract hashCode(): number;
 

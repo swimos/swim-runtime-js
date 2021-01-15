@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item} from "../Item";
+import type {Item} from "../Item";
 import {Form} from "../Form";
 
 /** @hidden */
-export class UnitForm<T, U = T> extends Form<T, U> {
+export class UnitForm<T, U = never> extends Form<T, U> {
   /** @hidden */
   readonly _unit: T;
   /** @hidden */
@@ -51,11 +51,11 @@ export class UnitForm<T, U = T> extends Form<T, U> {
   }
 
   mold(object: T | U, item?: Item): Item {
-    return this._form.mold.apply(this._form, arguments);
+    return this._form.mold.apply(this._form, arguments as unknown as [T | U, Item?]);
   }
 
   cast(item: Item, object?: T): T | undefined {
-    return this._form.cast.apply(this._form, arguments);
+    return this._form.cast.apply(this._form, arguments as unknown as [Item, T?]);
   }
 }
 Form.UnitForm = UnitForm;

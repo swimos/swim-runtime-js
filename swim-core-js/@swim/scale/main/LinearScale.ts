@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Interpolator} from "@swim/interpolate";
+import type {Interpolator} from "@swim/interpolate";
 import {Scale} from "./Scale";
 import {ContinuousScale} from "./ContinuousScale";
 
-export class LinearScale<R, RU = R> extends ContinuousScale<number, R, number, RU> {
+export class LinearScale<R, RU = never> extends ContinuousScale<number, R, number, RU> {
   readonly x0: number;
   readonly dx: number;
   readonly fx: Interpolator<R, RU>;

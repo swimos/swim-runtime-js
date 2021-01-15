@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Interpolator} from "@swim/interpolate";
+import type {Interpolator} from "@swim/interpolate";
 import {AngleUnits, Angle} from "../angle/Angle";
 import {AnyTransform, Transform} from "./Transform";
 import {SkewTransform} from "./SkewTransform";

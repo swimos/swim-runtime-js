@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {FilterFieldsOperatorSpec} from "./FilterFieldsOperatorSpec";
 import {MapValueOperatorSpec} from "./MapValueOperatorSpec";
 import {MapFieldValuesOperatorSpec} from "./MapFieldValuesOperatorSpec";

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Iterator, Cursor} from "@swim/util";
-import {Inlet} from "./Inlet";
+import type {Inlet} from "./Inlet";
 import {Outlet} from "./Outlet";
-import {Inoutlet} from "./Inoutlet";
-import {MapValueFunction, WatchValueFunction} from "./function";
+import type {Inoutlet} from "./Inoutlet";
+import type {MapValueFunction, WatchValueFunction} from "./function";
 
 export abstract class AbstractInoutlet<I, O> implements Inoutlet<I, O> {
   /** @hidden */
@@ -75,7 +75,7 @@ export abstract class AbstractInoutlet<I, O> implements Inoutlet<I, O> {
     const n = oldOutputs !== null ? oldOutputs.length : 0;
     const newOutputs = new Array<Inlet<O>>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newOutputs[i] = oldOutputs![i];
+      newOutputs[i] = oldOutputs![i]!;
     }
     newOutputs[n] = output;
     this._outputs = newOutputs;
@@ -89,10 +89,10 @@ export abstract class AbstractInoutlet<I, O> implements Inoutlet<I, O> {
         if (n > 1) {
           const newOutputs = new Array<Inlet<O>>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newOutputs[j] = oldOutputs![j];
+            newOutputs[j] = oldOutputs![j]!;
           }
           for (let j = i; j < n - 1; j += 1) {
-            newOutputs[j] = oldOutputs![j + 1];
+            newOutputs[j] = oldOutputs![j + 1]!;
           }
           this._outputs = newOutputs;
         } else {
@@ -108,7 +108,7 @@ export abstract class AbstractInoutlet<I, O> implements Inoutlet<I, O> {
     if (outputs !== null) {
       this._outputs = null;
       for (let i = 0, n = outputs.length; i < n; i += 1) {
-        const output = outputs[i];
+        const output = outputs[i]!;
         output.unbindInput();
       }
     }
@@ -120,7 +120,7 @@ export abstract class AbstractInoutlet<I, O> implements Inoutlet<I, O> {
       if (outputs !== null) {
         this._outputs = null;
         for (let i = 0, n = outputs.length; i < n; i += 1) {
-          const output = outputs[i];
+          const output = outputs[i]!;
           output.unbindInput();
           output.disconnectOutputs();
         }
@@ -143,7 +143,7 @@ export abstract class AbstractInoutlet<I, O> implements Inoutlet<I, O> {
       this.onDecohere();
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        this._outputs![i].decohereOutput();
+        this._outputs![i]!.decohereOutput();
       }
       this.didDecohere();
     }
@@ -167,7 +167,7 @@ export abstract class AbstractInoutlet<I, O> implements Inoutlet<I, O> {
       this.onRecohere(version);
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        this._outputs![i].recohereOutput(version);
+        this._outputs![i]!.recohereOutput(version);
       }
       this.didRecohere(version);
     }

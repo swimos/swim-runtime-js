@@ -15,7 +15,7 @@
 import {Cursor} from "@swim/util";
 import {AnyItem, Item, AnyValue, Value, Record, AnyText, AnyNum, Num} from "@swim/structure";
 import {DownlinkRecord} from "./DownlinkRecord";
-import {ListDownlink} from "./ListDownlink";
+import type {ListDownlink} from "./ListDownlink";
 
 export class ListDownlinkRecord extends DownlinkRecord {
   /** @hidden */
@@ -115,11 +115,11 @@ export class ListDownlinkRecord extends DownlinkRecord {
   }
 
   push(...newItems: AnyItem[]): number {
-    return this._downlink.push.apply(this._downlink, arguments);
+    return this._downlink.push.apply(this._downlink, arguments as unknown as AnyItem[]);
   }
 
   splice(start: number, deleteCount?: number, ...newItems: AnyItem[]): Item[] {
-    return this._downlink.splice.apply(this._downlink, arguments);
+    return this._downlink.splice.apply(this._downlink, arguments as any);
   }
 
   delete(key: AnyValue): Item {
@@ -130,8 +130,11 @@ export class ListDownlinkRecord extends DownlinkRecord {
     this._downlink.clear();
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined {
     return this._downlink.forEach(callback, thisArg);
   }
 

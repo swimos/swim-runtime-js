@@ -15,6 +15,6 @@
 export class FormException extends Error {
   constructor(message?: string) {
     super(message);
-    (this as any).__proto__ = FormException.prototype;
+    Object.setPrototypeOf(this, FormException.prototype);
   }
 }

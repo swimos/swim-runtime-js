@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import {Comparable, HashCode, Strings, HashGenCacheSet} from "@swim/util";
-import {Output, Debug, Display} from "@swim/codec";
+import type {Output, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
-import {UriQueryBuilder} from "./UriQueryBuilder";
+import type {UriQueryBuilder} from "./UriQueryBuilder";
 
 export type AnyUriQuery = UriQuery | {[key: string]: string} | string;
 
-export abstract class UriQuery implements Comparable<UriQuery>, HashCode, Debug, Display {
+export abstract class UriQuery implements Comparable, HashCode, Debug, Display {
   /** @hidden */
   _hashCode?: number;
 
@@ -148,9 +148,11 @@ export abstract class UriQuery implements Comparable<UriQuery>, HashCode, Debug,
     return params;
   }
 
-  compareTo(that: UriQuery): 0 | 1 | -1 {
-    const order = this.toString().localeCompare(that.toString());
-    return order < 0 ? -1 : order > 0 ? 1 : 0;
+  compareTo(that: UriQuery): number {
+    if (that instanceof UriQuery) {
+      return this.toString().localeCompare(that.toString());
+    }
+    return NaN;
   }
 
   equals(that: unknown): boolean {

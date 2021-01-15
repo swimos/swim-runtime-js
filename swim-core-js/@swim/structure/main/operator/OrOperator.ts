@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {BinaryOperator} from "./BinaryOperator";
 import {AnyInterpreter, Interpreter} from "../Interpreter";
@@ -57,18 +57,20 @@ export class OrOperator extends BinaryOperator {
     return 21;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof OrOperator) {
       let order = this._operand1.compareTo(that._operand1);
       if (order === 0) {
         order = this._operand2.compareTo(that._operand2);
       }
       return order;
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item, epsilon?: number): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof OrOperator) {

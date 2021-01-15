@@ -15,11 +15,11 @@
 import {Equivalent, Equals, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {ShapeR2, SetR2} from "@swim/math";
-import {GeoProjection} from "./GeoProjection";
+import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
-import {GeoBox} from "./GeoBox";
+import type {GeoBox} from "./GeoBox";
 
-export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements Equivalent<GeoSet>, Equals, Debug {
+export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements Equals, Equivalent, Debug {
   /** @hidden */
   readonly _shapes: ReadonlyArray<S>;
   /** @hidden */
@@ -70,7 +70,7 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
     if (n > 0) {
       const newShapes = new Array<ShapeR2>(n);
       for (let i = 0; i < n; i += 1) {
-        newShapes[i] = oldShapes[i].project(f);
+        newShapes[i] = oldShapes[i]!.project(f);
       }
       return new SetR2(newShapes);
     } else {
@@ -87,7 +87,7 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
       let latMax = -Infinity;
       const shapes = this._shapes;
       for (let i = 0, n = shapes.length; i < n; i += 1) {
-        const shape = shapes[i];
+        const shape = shapes[i]!;
         lngMin = Math.min(lngMin, shape.lngMin);
         latMin = Math.min(latMin, shape.latMin);
         lngMax = Math.max(shape.lngMax, lngMax);
@@ -99,8 +99,13 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
     return boundingBox;
   }
 
-  equivalentTo(that: GeoSet, epsilon?: number): boolean {
-    return this === that || Arrays.equivalent(this._shapes, that._shapes, epsilon);
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof GeoSet) {
+      return Arrays.equivalent(this._shapes, that._shapes, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {
@@ -120,9 +125,9 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
       output = output.write("empty").write(40/*'('*/);
     } else {
       output = output.write("of").write(40/*'('*/);
-      output = output.debug(shapes[0]);
+      output = output.debug(shapes[0]!);
       for (let i = 1; i < n; i += 1) {
-        output = output.write(", ").debug(shapes[i]);
+        output = output.write(", ").debug(shapes[i]!);
       }
     }
     output = output.write(41/*')'*/);

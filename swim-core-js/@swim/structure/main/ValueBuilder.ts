@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Builder} from "@swim/util";
+import type {Builder} from "@swim/util";
 import {Item} from "./Item";
 import {Field} from "./Field";
 import {Value} from "./Value";
-import {Record} from "./Record";
+import type {Record} from "./Record";
 
 /** @hidden */
 export class ValueBuilder implements Builder<Item, Value> {

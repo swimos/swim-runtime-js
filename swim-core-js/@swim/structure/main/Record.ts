@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import {Murmur3, Numbers, Constructors, Cursor, Builder} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
-import {Field} from "./Field";
+import type {Field} from "./Field";
 import {AnyValue, Value} from "./Value";
 import {RecordCursor} from "./RecordCursor";
-import {AnyText} from "./Text";
-import {AnyNum} from "./Num";
+import type {AnyText} from "./Text";
+import type {AnyNum} from "./Num";
 import {AnyInterpreter, Interpreter} from "./Interpreter";
 
 export type AnyRecord = Record
@@ -500,13 +500,13 @@ export abstract class Record extends Value implements Builder<Item, Record> {
 
   appended(...items: AnyItem[]): Record {
     const record = this.isMutable() ? this : this.branch();
-    record.push.apply(record, arguments);
+    record.push.apply(record, arguments as unknown as AnyItem[]);
     return record;
   }
 
   prepended(...items: AnyItem[]): Record {
     const record = this.isMutable() ? this : this.branch();
-    record.splice.apply(record, Array.prototype.concat.apply([0, 0], arguments));
+    record.splice.apply(record, Array.prototype.concat.apply([0, 0], arguments as unknown as any[]) as any);
     return record;
   }
 
@@ -527,16 +527,16 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   slice(lower?: number, upper?: number): Record {
-    return this.subRecord.apply(this, arguments).branch();
+    return this.subRecord.apply(this, arguments as unknown as [number?, number?]).branch();
   }
 
   attr(key: AnyText, value?: AnyValue): this {
-    this.push(Item.Attr.of.apply(void 0, arguments));
+    this.push(Item.Attr.of.apply(void 0, arguments as unknown as [AnyText, AnyValue?]));
     return this;
   }
 
   slot(key: AnyValue, value?: AnyValue): this {
-    this.push(Item.Slot.of.apply(void 0, arguments));
+    this.push(Item.Slot.of.apply(void 0, arguments as unknown as [AnyValue, AnyValue?]));
     return this;
   }
 
@@ -546,7 +546,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   items(...items: AnyItem[]): this {
-    this.push.apply(this, arguments);
+    this.push.apply(this, arguments as unknown as AnyItem[]);
     return this;
   }
 
@@ -710,8 +710,9 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return record;
   }
 
-  abstract forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                                   thisArg?: S): T | undefined;
+  abstract forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  abstract forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                         thisArg: S): T | undefined;
 
   iterator(): Cursor<Item> {
     return new RecordCursor(this);
@@ -721,7 +722,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return 3;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof Record) {
       const xs = this.iterator();
       const ys = that.iterator();
@@ -744,11 +745,13 @@ export abstract class Record extends Value implements Builder<Item, Record> {
       } else {
         return 0;
       }
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item, epsilon?: number): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof Record) {
@@ -829,7 +832,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   static of(...items: AnyItem[]): Record {
-    return Record.RecordMap.of.apply(void 0, arguments);
+    return Record.RecordMap.of.apply(void 0, arguments as unknown as AnyItem[]);
   }
 
   static fromAny(value: AnyRecord): Record {

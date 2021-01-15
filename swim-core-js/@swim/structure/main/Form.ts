@@ -14,20 +14,20 @@
 
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
-import {TagForm} from "./form/TagForm";
-import {UnitForm} from "./form/UnitForm";
-import {StringForm} from "./form/StringForm";
-import {NumberForm} from "./form/NumberForm";
-import {BooleanForm} from "./form/BooleanForm";
-import {AnyForm} from "./form/AnyForm";
-import {ItemForm} from "./form/ItemForm";
-import {ValueForm} from "./form/ValueForm";
+import type {TagForm} from "./form/TagForm";
+import type {UnitForm} from "./form/UnitForm";
+import type {StringForm} from "./form/StringForm";
+import type {NumberForm} from "./form/NumberForm";
+import type {BooleanForm} from "./form/BooleanForm";
+import type {AnyForm} from "./form/AnyForm";
+import type {ItemForm} from "./form/ItemForm";
+import type {ValueForm} from "./form/ValueForm";
 
 /**
  * Transformation between a structurally typed [Item] and a nominally typed
  * JavaScript object.
  */
-export abstract class Form<T, U = T> {
+export abstract class Form<T, U = never> {
   /**
    * Returns the key of the tag attribute that distinguishes structures of this
    * `Form`; returns `undefined` if this `Form` has no distinguishing tag

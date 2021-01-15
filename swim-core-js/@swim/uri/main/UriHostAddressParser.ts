@@ -14,7 +14,7 @@
 
 import {Input, Output, Parser, Diagnostic, Base10, Base16, Utf8} from "@swim/codec";
 import {Uri} from "./Uri";
-import {UriHost} from "./UriHost";
+import type {UriHost} from "./UriHost";
 import {UriParser} from "./UriParser";
 
 /** @hidden */

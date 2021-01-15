@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Operator} from "../Operator";
 import {AnyInterpreter, Interpreter} from "../Interpreter";
@@ -82,7 +82,7 @@ export class ConditionalOperator extends Operator {
     return 20;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof ConditionalOperator) {
       let order = this._ifTerm.compareTo(that._ifTerm);
       if (order === 0) {
@@ -92,11 +92,13 @@ export class ConditionalOperator extends Operator {
         }
       }
       return order;
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item, epsilon?: number): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof ConditionalOperator) {

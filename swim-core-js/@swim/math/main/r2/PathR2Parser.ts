@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Input, Parser, Diagnostic, Unicode} from "@swim/codec";
-import {SplineR2} from "./SplineR2";
+import type {SplineR2} from "./SplineR2";
 import {PathR2} from "./PathR2";
 import {SplineR2Parser} from "./SplineR2Parser";
 

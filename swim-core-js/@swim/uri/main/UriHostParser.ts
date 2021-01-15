@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Input, Parser} from "@swim/codec";
-import {UriHost} from "./UriHost";
+import type {UriHost} from "./UriHost";
 import {UriParser} from "./UriParser";
 
 /** @hidden */

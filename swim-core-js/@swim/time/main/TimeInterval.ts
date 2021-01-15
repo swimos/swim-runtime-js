@@ -13,17 +13,17 @@
 // limitations under the License.
 
 import {AnyDateTime, DateTime} from "./DateTime";
-import {FilterTimeInterval} from "./interval/FilterTimeInterval";
-import {YearInterval} from "./interval/YearInterval";
-import {YearsInterval} from "./interval/YearsInterval";
-import {MonthInterval} from "./interval/MonthInterval";
-import {WeekInterval} from "./interval/WeekInterval";
-import {DayInterval} from "./interval/DayInterval";
-import {HourInterval} from "./interval/HourInterval";
-import {MinuteInterval} from "./interval/MinuteInterval";
-import {SecondInterval} from "./interval/SecondInterval";
-import {MillisecondInterval} from "./interval/MillisecondInterval";
-import {MillisecondsInterval} from "./interval/MillisecondsInterval";
+import type {FilterTimeInterval} from "./interval/FilterTimeInterval";
+import type {YearInterval} from "./interval/YearInterval";
+import type {YearsInterval} from "./interval/YearsInterval";
+import type {MonthInterval} from "./interval/MonthInterval";
+import type {WeekInterval} from "./interval/WeekInterval";
+import type {DayInterval} from "./interval/DayInterval";
+import type {HourInterval} from "./interval/HourInterval";
+import type {MinuteInterval} from "./interval/MinuteInterval";
+import type {SecondInterval} from "./interval/SecondInterval";
+import type {MillisecondInterval} from "./interval/MillisecondInterval";
+import type {MillisecondsInterval} from "./interval/MillisecondsInterval";
 
 export abstract class TimeInterval {
   abstract offset(d: AnyDateTime, k?: number): DateTime;

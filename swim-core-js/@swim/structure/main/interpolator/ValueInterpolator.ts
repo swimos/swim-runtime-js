@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {AnyItem, Item} from "../Item";
-import {Value} from "../Value";
+import type {Value} from "../Value";
 import {ItemInterpolator} from "./ItemInterpolator";
 
 export class ValueInterpolator<V extends Value> extends ItemInterpolator<V> {

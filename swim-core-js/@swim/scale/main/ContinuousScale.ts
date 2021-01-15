@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Interpolator} from "@swim/interpolate";
+import type {Interpolator} from "@swim/interpolate";
 import {Scale} from "./Scale";
 
-export abstract class ContinuousScale<D, R, DU = D, RU = R> extends Scale<D, R, DU, RU> {
+export abstract class ContinuousScale<D, R, DU = never, RU = never> extends Scale<D, R, DU, RU> {
   abstract norm(x: D | DU): number;
 
   abstract unscale(y: R | RU): D;

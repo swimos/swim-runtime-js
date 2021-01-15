@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {BTree} from "@swim/collections";
 import {AnyItem, Item, Field, Slot, AnyValue, Value, Record, AnyText, Text, AnyNum, MathModule} from "@swim/structure";
 import {KeyEffect, MapOutlet} from "@swim/streamlet";
@@ -216,7 +216,7 @@ export class RecordModel extends AbstractRecordOutlet {
 
   push(...newItems: AnyItem[]): number {
     let i = this._state.length;
-    const n = this._state.push.apply(this._state, arguments);
+    const n = this._state.push.apply(this._state, arguments as unknown as AnyItem[]);
     while (i < n) {
       const newItem = this._state.get(i);
       if (newItem instanceof Field) {
@@ -234,7 +234,7 @@ export class RecordModel extends AbstractRecordOutlet {
     }
     start = Math.max(0, start);
     deleteCount = Math.max(0, deleteCount);
-    const deleted = this._state.splice.apply(this._state, arguments);
+    const deleted = this._state.splice.apply(this._state, arguments as any);
     for (let i = 0; i < deleted.length; i += 1) {
       const oldItem = deleted[i];
       if (oldItem instanceof Field) {
@@ -268,8 +268,11 @@ export class RecordModel extends AbstractRecordOutlet {
     }, this);
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined {
     return this._state.forEach(callback, thisArg);
   }
 
@@ -415,7 +418,7 @@ export class RecordModel extends AbstractRecordOutlet {
   }
 
   static of(...items: AnyItem[]): RecordModel {
-    return RecordModel.from(Record.of.apply(void 0, arguments));
+    return RecordModel.from(Record.of.apply(void 0, arguments as unknown as AnyItem[]));
   }
 
   static globalScope(): RecordModel {

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
+import type {AnyValue, Value} from "./Value";
 import {AnyField, Field} from "./Field";
-import {AnyValue, Value} from "./Value";
-import {AnyText, Text} from "./Text";
+import type {AnyText, Text} from "./Text";
 import {AnyInterpreter, Interpreter} from "./Interpreter";
 
 export class Attr extends Field {
@@ -337,11 +337,13 @@ export class Attr extends Field {
         order = this._value.compareTo(that._value);
       }
       return order;
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item, epsilon?: number): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof Attr) {

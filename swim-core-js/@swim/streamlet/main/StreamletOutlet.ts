@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Streamlet} from "./Streamlet";
-import {GenericStreamlet} from "./GenericStreamlet";
+import type {Streamlet} from "./Streamlet";
+import type {GenericStreamlet} from "./GenericStreamlet";
 import {AbstractOutlet} from "./AbstractOutlet";
 
 /**

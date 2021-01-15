@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equals} from "@swim/util";
-import {NumberInterpolator} from "./NumberInterpolator";
-import {StepInterpolator} from "./StepInterpolator";
-import {ArrayInterpolator} from "./ArrayInterpolator";
-import {InterpolatorInterpolator} from "./InterpolatorInterpolator";
-import {InterpolatorMap} from "./InterpolatorMap";
+import type {Equals} from "@swim/util";
+import type {NumberInterpolator} from "./NumberInterpolator";
+import type {StepInterpolator} from "./StepInterpolator";
+import type {ArrayInterpolator} from "./ArrayInterpolator";
+import type {InterpolatorInterpolator} from "./InterpolatorInterpolator";
+import type {InterpolatorMap} from "./InterpolatorMap";
 
 export interface InterpolatorFactory {
   tryBetween(a: unknown, b: unknown): Interpolator<unknown> | null;
@@ -25,7 +25,7 @@ export interface InterpolatorFactory {
   tryBetweenAny?(a: unknown, b: unknown): Interpolator<unknown> | null;
 }
 
-export abstract class Interpolator<T, U = T> implements Equals {
+export abstract class Interpolator<T, U = never> implements Equals {
   abstract interpolate(u: number): T;
 
   abstract deinterpolate(y: T | U): number;
@@ -51,11 +51,11 @@ export abstract class Interpolator<T, U = T> implements Equals {
     const factories = this._factories;
     const factoryCount = factories.length;
     for (let i = 0; interpolator === null && i < factoryCount; i += 1) {
-      const factory = factories[i];
+      const factory = factories[i]!;
       interpolator = factory.tryBetween(a, b);
     }
     for (let i = 0; interpolator === null && i < factoryCount; i += 1) {
-      const factory = factories[i];
+      const factory = factories[i]!;
       if (factory.tryBetweenAny !== void 0) {
         interpolator = factory.tryBetweenAny(a, b);
       }

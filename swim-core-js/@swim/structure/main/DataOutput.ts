@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {AnyOutputSettings, OutputSettings, Output} from "@swim/codec";
-import {Data} from "./Data";
+import type {Data} from "./Data";
 
 /** @hidden */
 export class DataOutput extends Output<Data> {

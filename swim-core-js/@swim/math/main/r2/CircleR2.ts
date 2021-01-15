@@ -14,7 +14,7 @@
 
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {R2Function} from "./R2Function";
+import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
 import {PointR2} from "./PointR2";
 import {SegmentR2} from "./SegmentR2";
@@ -28,7 +28,7 @@ export interface CircleR2Init {
   r: number;
 }
 
-export class CircleR2 extends ShapeR2 implements Equivalent<CircleR2>, HashCode, Debug {
+export class CircleR2 extends ShapeR2 implements HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _cx: number;
   /** @hidden */
@@ -226,10 +226,15 @@ export class CircleR2 extends ShapeR2 implements Equivalent<CircleR2>, HashCode,
     };
   }
 
-  equivalentTo(that: CircleR2, epsilon?: number): boolean {
-    return Numbers.equivalent(that._cx, this._cx, epsilon)
-        && Numbers.equivalent(that._cy, this._cy, epsilon)
-        && Numbers.equivalent(that._r, this._r, epsilon);
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof CircleR2) {
+      return Numbers.equivalent(that._cx, this._cx, epsilon)
+          && Numbers.equivalent(that._cy, this._cy, epsilon)
+          && Numbers.equivalent(that._r, this._r, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

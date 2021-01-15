@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {TestException} from "./TestException";
-import {TestFunc, TestOptions} from "./Test";
+import type {TestFunc, TestOptions} from "./Test";
 import {SpecClass, Spec} from "./Spec";
 import {Proof} from "./Proof";
-import {Report} from "./Report";
+import type {Report} from "./Report";
 import {Exam} from "./Exam";
 
 /**
@@ -159,11 +159,10 @@ export class SpecTest {
    * Curried [[Test]] method decorator, with captured `options`.
    * @hidden
    */
-  static decorate(options: TestOptions, target: SpecClass, name: string,
+  static decorate(options: TestOptions, target: SpecClass, propertyKey: string | symbol,
                   descriptor: PropertyDescriptor): void {
     Spec.init(target);
-
-    const test = new SpecTest(name, descriptor.value, options);
+    const test = new SpecTest(propertyKey.toString(), descriptor.value, options);
     target._tests!.push(test);
   }
 }

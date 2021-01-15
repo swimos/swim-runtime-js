@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {NodeCursor} from "./NodeCursor";
 import {STree} from "./STree";
-import {STreePage} from "./STreePage";
+import type {STreePage} from "./STreePage";
 
 /** @hidden */
 export class STreeNodeCursor<V, I> extends NodeCursor<[I, V], STreePage<V, I>> {

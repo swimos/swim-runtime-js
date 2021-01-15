@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {PairBuilder} from "@swim/util";
+import type {PairBuilder} from "@swim/util";
 import {Uri} from "./Uri";
-import {AnyUriQuery, UriQuery} from "./UriQuery";
+import type {AnyUriQuery, UriQuery} from "./UriQuery";
 
 export class UriQueryBuilder implements PairBuilder<string | null, string, UriQuery> {
   /** @hidden */
@@ -50,7 +50,7 @@ export class UriQueryBuilder implements PairBuilder<string | null, string, UriQu
       const params = key!;
       for (const k in params) {
         let key = k as string | null;
-        const value = params[k];
+        const value = params[k]!;
         if (k.charCodeAt(0) === 36/*'$'*/) {
           key = null;
         }

@@ -24,8 +24,8 @@ import {
   SyncRequest,
   SyncedResponse,
 } from "@swim/warp";
-import {ListDownlink, WarpClient} from "@swim/client";
-import {MockServer} from "../MockServer";
+import type {ListDownlink, WarpClient} from "@swim/client";
+import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
 export class ListDownlinkSpec extends Spec {

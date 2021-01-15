@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {CombinatorSuite} from "./combinator/CombinatorSuite";
 import {AbstractStreamletSpec} from "./AbstractStreamletSpec";
 

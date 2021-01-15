@@ -90,8 +90,9 @@ export class Opt implements Equals, Debug {
     return this._defs !== 0;
   }
 
-  getArg(index: number = 0): Arg {
-    return this._args[index];
+  getArg(index: number = 0): Arg | null {
+    const arg = this._args[index];
+    return arg !== void 0 ? arg : null;
   }
 
   getValue(index: number = 0): string | undefined {
@@ -103,8 +104,8 @@ export class Opt implements Equals, Debug {
     const argCount = this._args.length;
     const paramCount = params.length;
     for (let argIndex = 0; argIndex < argCount && paramIndex < paramCount; argIndex += 1) {
-      const arg = this._args[argIndex];
-      const param = params[paramIndex];
+      const arg = this._args[argIndex]!;
+      const param = params[paramIndex]!;
       if (!arg._optional || param.charCodeAt(0) !== 45/*'-'*/) {
         arg.value(param);
         paramIndex += 1;
@@ -149,7 +150,7 @@ export class Opt implements Equals, Debug {
     const argCount = this._args.length;
     const args = new Array<Arg>(argCount);
     for (let i = 0; i < argCount; i += 1) {
-      args[i] = this._args[i].clone();
+      args[i] = this._args[i]!.clone();
     }
     return new Opt(this._name, this._flag, this._desc, args, this._defs);
   }
@@ -158,7 +159,7 @@ export class Opt implements Equals, Debug {
     const argCount = anyArgs !== void 0 ? anyArgs.length : 0;
     const args = new Array<Arg>(argCount);
     for (let argIndex = 0; argIndex < argCount; argIndex += 1) {
-      args[argIndex] = Arg.fromAny(anyArgs![argIndex]);
+      args[argIndex] = Arg.fromAny(anyArgs![argIndex]!);
     }
     return new Opt(name, flag, desc, args, 0);
   }
@@ -174,7 +175,7 @@ export class Opt implements Equals, Debug {
       const argCount = opt.args !== void 0 ? opt.args.length : 0;
       const args = new Array<Arg>(argCount);
       for (let argIndex = 0; argIndex < argCount; argIndex += 1) {
-        args[argIndex] = Arg.fromAny(opt.args![argIndex]);
+        args[argIndex] = Arg.fromAny(opt.args![argIndex]!);
       }
       return new Opt(opt.name, flag, desc, args, 0);
     }

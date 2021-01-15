@@ -14,7 +14,7 @@
 
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
-import {Operator} from "./Operator";
+import type {Operator} from "./Operator";
 
 export abstract class Expression extends Value {
   /** @hidden */

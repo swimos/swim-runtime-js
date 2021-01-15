@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import {Cursor} from "@swim/util";
-import {Inlet} from "./Inlet";
+import type {Inlet} from "./Inlet";
 import {Outlet} from "./Outlet";
-import {MapValueFunction, WatchValueFunction} from "./function";
+import type {MapValueFunction, WatchValueFunction} from "./function";
 
 export abstract class AbstractOutlet<O> implements Outlet<O> {
   /** @hidden */
@@ -39,7 +39,7 @@ export abstract class AbstractOutlet<O> implements Outlet<O> {
     const n = oldOutputs !== null ? oldOutputs.length : 0;
     const newOutputs = new Array<Inlet<O>>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newOutputs[i] = oldOutputs![i];
+      newOutputs[i] = oldOutputs![i]!;
     }
     newOutputs[n] = output;
     this._outputs = newOutputs;
@@ -52,10 +52,10 @@ export abstract class AbstractOutlet<O> implements Outlet<O> {
         if (n > 1) {
           const newOutputs = new Array<Inlet<O>>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newOutputs[j] = oldOutputs![j];
+            newOutputs[j] = oldOutputs![j]!;
           }
           for (let j = i; j < n - 1; j += 1) {
-            newOutputs[j] = oldOutputs![j + 1];
+            newOutputs[j] = oldOutputs![j + 1]!;
           }
           this._outputs = newOutputs;
         } else {
@@ -71,7 +71,7 @@ export abstract class AbstractOutlet<O> implements Outlet<O> {
     if (outputs !== null) {
       this._outputs = null;
       for (let i = 0, n = outputs.length; i < n; i += 1) {
-        const output = outputs[i];
+        const output = outputs[i]!;
         output.unbindInput();
       }
     }
@@ -82,7 +82,7 @@ export abstract class AbstractOutlet<O> implements Outlet<O> {
     if (outputs !== null) {
       this._outputs = null;
       for (let i = 0, n = outputs.length; i < n; i += 1) {
-        const output = outputs[i];
+        const output = outputs[i]!;
         output.unbindInput();
         output.disconnectOutputs();
       }
@@ -99,7 +99,7 @@ export abstract class AbstractOutlet<O> implements Outlet<O> {
       this._version = -1;
       this.onDecohereInput();
       for (let i = 0, n = this._outputs !== null ? this._outputs.length : 0; i < n; i += 1) {
-        this._outputs![i].decohereOutput();
+        this._outputs![i]!.decohereOutput();
       }
       this.didDecohereInput();
     }
@@ -111,7 +111,7 @@ export abstract class AbstractOutlet<O> implements Outlet<O> {
       this._version = version;
       this.onRecohereInput(version);
       for (let i = 0, n = this._outputs !== null ? this._outputs.length : 0; i < n; i += 1) {
-        this._outputs![i].recohereOutput(version);
+        this._outputs![i]!.recohereOutput(version);
       }
       this.didRecohereInput(version);
     }

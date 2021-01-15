@@ -19,10 +19,10 @@ export class UriException extends Error {
 
   constructor(message?: Diagnostic | string) {
     super(message instanceof Diagnostic ? message.message() || void 0 : message);
+    Object.setPrototypeOf(this, UriException.prototype);
     if (message instanceof Diagnostic) {
       this.diagnostic = message;
     }
-    (this as any).__proto__ = UriException.prototype;
   }
 
   toString(): string {

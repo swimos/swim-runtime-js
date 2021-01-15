@@ -13,26 +13,32 @@
 // limitations under the License.
 
 import {Arg, Opt, Cmd} from "@swim/args";
-import {Value} from "@swim/structure";
+import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
 import {AnyUri, Uri} from "@swim/uri";
 import * as client from "@swim/client";
 
 function link(hostUri: AnyUri | null | undefined, nodeUri: AnyUri | null | undefined,
               laneUri: AnyUri | null | undefined, format?: string | null): client.Downlink {
-  return client.downlink()
-      .hostUri(hostUri)
-      .nodeUri(nodeUri)
-      .laneUri(laneUri)
-      .keepSynced(true)
-      .onEvent((body: Value) => {
+  let downlink = client.downlink();
+  if (hostUri !== void 0 && hostUri !== null) {
+    downlink = downlink.hostUri(hostUri);
+  }
+  if (nodeUri !== void 0 && nodeUri !== null) {
+    downlink = downlink.nodeUri(nodeUri);
+  }
+  if (laneUri !== void 0 && laneUri !== null) {
+    downlink = downlink.laneUri(laneUri);
+  }
+  return downlink.keepSynced(true)
+      .onEvent(function (body: Value): void {
         if (format === "json") {
           console.log(JSON.stringify(body.toAny()));
         } else {
           console.log(Recon.toString(body));
         }
       })
-      .didUnlink((downlink: client.Downlink) => {
+      .didUnlink(function (downlink: client.Downlink): void {
         downlink.close();
       });
 }

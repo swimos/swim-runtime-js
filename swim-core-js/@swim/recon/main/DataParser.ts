@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Input, Parser, Diagnostic, Base64} from "@swim/codec";
-import {ReconParser} from "./ReconParser";
+import type {ReconParser} from "./ReconParser";
 
 /** @hidden */
 export class DataParser<I, V> extends Parser<V> {

@@ -13,12 +13,23 @@
 // limitations under the License.
 
 import {Random, Values} from "@swim/util";
-import {STreePage} from "./STreePage";
+import type {STreePage} from "./STreePage";
 
 /** @hidden */
 export abstract class STreeContext<V, I> {
-  declare pageSplitSize: number;
+  get pageSplitSize(): number {
+    return 32;
+  }
  
+  set pageSplitSize(pageSplitSize: number) {
+    Object.defineProperty(this, "pageSplitSize", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: pageSplitSize,
+    });
+  }
+
   identify(value: V): I {
     const id = new Uint8Array(6);
     Random.fillBytes(id);
@@ -37,4 +48,3 @@ export abstract class STreeContext<V, I> {
     return page.arity < this.pageSplitSize >>> 1;
   }
 }
-STreeContext.prototype.pageSplitSize = 32;

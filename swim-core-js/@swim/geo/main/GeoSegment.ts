@@ -15,7 +15,7 @@
 import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {SegmentR2} from "@swim/math";
-import {GeoProjection} from "./GeoProjection";
+import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import {GeoCurve} from "./GeoCurve";
@@ -164,9 +164,12 @@ export class GeoSegment extends GeoCurve implements HashCode, Debug {
     return new SegmentR2(p0.x, p0.y, p1.x, p1.y);
   }
 
-  forEachCoord<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
-                               thisArg?: S): R | undefined {
-    let result: R | undefined;
+  forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
+  forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
+                     thisArg: S): R | undefined;
+  forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | undefined,
+                     thisArg?: S): R | undefined {
+    let result: R | void;
     result = callback.call(thisArg, this._lng0, this._lat0);
     if (result !== void 0) {
       return result;
@@ -178,8 +181,11 @@ export class GeoSegment extends GeoCurve implements HashCode, Debug {
     return void 0;
   }
 
-  forEachCoordRest<R, S = unknown>(callback: (this: S, lng: number, lat: number) => R | void,
-                                   thisArg?: S): R | undefined {
+  forEachCoordRest<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
+  forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
+                         thisArg: S): R | undefined;
+  forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
+                         thisArg?: S): R | undefined {
     const result = callback.call(thisArg, this._lng1, this._lat1);
     if (result !== void 0) {
       return result;
@@ -196,11 +202,16 @@ export class GeoSegment extends GeoCurve implements HashCode, Debug {
     };
   }
 
-  equivalentTo(that: GeoSegment, epsilon?: number): boolean {
-    return Numbers.equivalent(that._lng0, this._lng0, epsilon)
-        && Numbers.equivalent(that._lat0, this._lat0, epsilon)
-        && Numbers.equivalent(that._lng1, this._lng1, epsilon)
-        && Numbers.equivalent(that._lat1, this._lat1, epsilon);
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof GeoSegment) {
+      return Numbers.equivalent(that._lng0, this._lng0, epsilon)
+          && Numbers.equivalent(that._lat0, this._lat0, epsilon)
+          && Numbers.equivalent(that._lng1, this._lng1, epsilon)
+          && Numbers.equivalent(that._lat1, this._lat1, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

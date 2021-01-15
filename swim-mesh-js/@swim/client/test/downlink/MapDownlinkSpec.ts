@@ -24,8 +24,8 @@ import {
   SyncRequest,
   SyncedResponse,
 } from "@swim/warp";
-import {MapDownlink, WarpClient} from "@swim/client";
-import {MockServer} from "../MockServer";
+import type {MapDownlink, WarpClient} from "@swim/client";
+import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
 export class MapDownlinkSpec extends Spec {

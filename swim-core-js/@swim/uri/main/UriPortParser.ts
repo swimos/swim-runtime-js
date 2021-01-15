@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Input, Parser, Base10} from "@swim/codec";
-import {UriPort} from "./UriPort";
+import type {UriPort} from "./UriPort";
 import {UriParser} from "./UriParser";
 
 /** @hidden */

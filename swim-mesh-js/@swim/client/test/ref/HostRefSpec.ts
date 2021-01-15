@@ -25,8 +25,8 @@ import {
   AuthedResponse,
   DeauthedResponse,
 } from "@swim/warp";
-import {Host, WarpClient} from "@swim/client";
-import {MockServer} from "../MockServer";
+import type {Host, WarpClient} from "@swim/client";
+import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
 export class HostRefSpec extends Spec {

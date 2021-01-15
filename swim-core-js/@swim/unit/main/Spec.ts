@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TestOptions} from "./Test";
-import {SpecTest} from "./SpecTest";
-import {SpecUnit} from "./SpecUnit";
-import {Proof} from "./Proof";
-import {Report} from "./Report";
+import type {TestOptions} from "./Test";
+import type {SpecTest} from "./SpecTest";
+import type {SpecUnit} from "./SpecUnit";
+import type {Proof} from "./Proof";
+import type {Report} from "./Report";
 import {ConsoleReport} from "./ConsoleReport";
 import {Exam} from "./Exam";
 
@@ -88,7 +88,7 @@ export class Spec {
    * completes with the test report.
    */
   run(report?: Report): Promise<Report> {
-    return Spec.run(report, (this as any).__proto__, this);
+    return Spec.run(report, this as SpecClass, this);
   }
 
   /**
@@ -235,7 +235,7 @@ export class Spec {
       if (specClass.hasOwnProperty("_units")) {
         units = units.concat(specClass._units!);
       }
-      specClass = (specClass as any).__proto__ as SpecClass | null;
+      specClass = Object.getPrototypeOf(specClass);
     } while (specClass !== null);
 
     if (typeof spec.willRunSpec === "function") {
@@ -258,7 +258,7 @@ export class Spec {
     }
     report.willRunTests(spec);
     return Spec.runTest(report, spec, tests, 0)
-        .then(Spec.runTestSuccess.bind(void 0, report, spec) as () => Spec,
+        .then(Spec.runTestSuccess.bind(void 0, report, spec),
               Spec.runTestFailure.bind(void 0, report, spec));
   }
 
@@ -268,9 +268,9 @@ export class Spec {
    */
   static runTest(report: Report, spec: Spec, tests: SpecTest[], index: number): Promise<SpecTest[]> {
     if (index < tests.length) {
-      const testCase = tests[index];
+      const testCase = tests[index]!;
       return testCase.run(report, spec)
-          .then(Spec.runTest.bind(void 0, report, spec, tests, index + 1) as () => Promise<SpecTest[]>);
+          .then(Spec.runTest.bind(void 0, report, spec, tests, index + 1));
     } else {
       return Promise.resolve(tests);
     }
@@ -310,7 +310,7 @@ export class Spec {
     }
     report.willRunUnits(spec);
     return Spec.runUnit(report, spec, units, 0)
-        .then(Spec.runUnitsSuccess.bind(void 0, report, spec) as () => Spec,
+        .then(Spec.runUnitsSuccess.bind(void 0, report, spec),
               Spec.runUnitsFailure.bind(void 0, report, spec));
   }
 
@@ -320,9 +320,9 @@ export class Spec {
    */
   static runUnit(report: Report, spec: Spec, units: SpecUnit[], index: number): Promise<SpecUnit[]> {
     if (index < units.length) {
-      const testUnit = units[index];
+      const testUnit = units[index]!;
       return testUnit.run(report, spec)
-          .then(Spec.runUnit.bind(void 0, report, spec, units, index + 1) as () => Promise<SpecUnit[]>);
+          .then(Spec.runUnit.bind(void 0, report, spec, units, index + 1));
     } else {
       return Promise.resolve(units);
     }

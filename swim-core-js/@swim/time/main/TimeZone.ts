@@ -14,8 +14,8 @@
 
 import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {Value, Form} from "@swim/structure";
-import {TimeZoneForm} from "./TimeZoneForm";
+import type {Value, Form} from "@swim/structure";
+import type {TimeZoneForm} from "./TimeZoneForm";
 
 export type AnyTimeZone = TimeZone | string | number;
 

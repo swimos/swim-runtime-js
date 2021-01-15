@@ -1,8 +1,22 @@
+// Copyright 2015-2020 Swim inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import {InterpreterException} from "./InterpreterException";
 import {InterpreterSettings} from "./InterpreterSettings";
 import {AnyItem, Item} from "./Item";
-import {Selector} from "./Selector";
-import {Operator} from "./Operator";
+import type {Selector} from "./Selector";
+import type {Operator} from "./Operator";
 
 export type AnyInterpreter = Interpreter | AnyItem;
 
@@ -43,14 +57,14 @@ export class Interpreter {
     if (scopeDepth <= 0) {
       throw new InterpreterException("scope stack empty");
     }
-    return this._scopeStack![scopeDepth - 1];
+    return this._scopeStack![scopeDepth - 1]!;
   }
 
   getScope(index: number): Item {
     if (index < 0 || index >= this._scopeDepth) {
       throw new RangeError("" + index);
     }
-    return this._scopeStack![index];
+    return this._scopeStack![index]!;
   }
 
   pushScope(scope: Item): void {
@@ -64,7 +78,7 @@ export class Interpreter {
       newScopeStack = new Array<Item>(Interpreter.expand(scopeDepth + 1));
       if (oldScopeStack !== null) {
         for (let i = 0; i < scopeDepth; i += 1) {
-          newScopeStack[i] = oldScopeStack[i];
+          newScopeStack[i] = oldScopeStack[i]!;
         }
       }
       this._scopeStack = newScopeStack;
@@ -81,7 +95,7 @@ export class Interpreter {
       throw new InterpreterException("scope stack empty");
     }
     const scopeStack = this._scopeStack!;
-    const scope = scopeStack[scopeDepth - 1];
+    const scope = scopeStack[scopeDepth - 1]!;
     scopeStack[scopeDepth - 1] = void 0 as any;
     this._scopeDepth = scopeDepth - 1;
     return scope;
@@ -93,7 +107,7 @@ export class Interpreter {
       throw new InterpreterException("scope stack empty");
     }
     const scopeStack = this._scopeStack!;
-    const oldScope = scopeStack[scopeDepth - 1];
+    const oldScope = scopeStack[scopeDepth - 1]!;
     scopeStack[scopeDepth - 1] = newScope;
     return oldScope;
   }

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Item} from "./Item";
-import {Value} from "./Value";
+import type {Value} from "./Value";
 import {Expression} from "./Expression";
-import {InvokeOperator} from "./operator/InvokeOperator";
-import {Interpreter} from "./Interpreter";
+import type {InvokeOperator} from "./operator/InvokeOperator";
+import type {Interpreter} from "./Interpreter";
 
 export abstract class Func extends Expression {
   /** @hidden */

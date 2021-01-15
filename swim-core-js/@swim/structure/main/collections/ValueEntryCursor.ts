@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {Cursor} from "@swim/util";
-import {Value} from "../Value";
-import {Form} from "../Form";
+import type {Value} from "../Value";
+import type {Form} from "../Form";
 
 /** @hidden */
 export class ValueEntryCursor<K, V> extends Cursor<[K, V]> {

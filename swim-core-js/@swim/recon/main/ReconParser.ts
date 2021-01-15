@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Builder} from "@swim/util";
+import type {Builder} from "@swim/util";
 import {Input, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import {Recon} from "./Recon";
 import {BlockParser} from "./BlockParser";

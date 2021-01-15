@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Equivalent, Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
-import {AngleUnits, AnyAngle, Angle} from "./Angle";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
+import type {Output} from "@swim/codec";
+import {AngleUnits, Angle} from "./Angle";
 
 export class DegAngle extends Angle {
   /** @hidden */
@@ -53,16 +53,20 @@ export class DegAngle extends Angle {
     return this;
   }
 
-  compareTo(that: AnyAngle): number {
-    const x = this._value;
-    const y = Angle.fromAny(that).degValue();
-    return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
+  compareTo(that: unknown): number {
+    if (that instanceof Angle) {
+      const x = this._value;
+      const y = that.degValue();
+      return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
+    }
+    return NaN;
   }
 
-  equivalentTo(that: AnyAngle, epsilon: number = Equivalent.Epsilon): boolean {
-    const x = this._value;
-    const y = Angle.fromAny(that).degValue();
-    return x === y || isNaN(x) && isNaN(y) || Math.abs(y - x) < epsilon;
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (that instanceof Angle) {
+      return Numbers.equivalent(this._value, that.degValue());
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

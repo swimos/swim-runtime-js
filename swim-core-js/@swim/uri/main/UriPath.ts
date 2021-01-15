@@ -13,14 +13,14 @@
 // limitations under the License.
 
 import {Comparable, HashCode, Strings, HashGenCacheSet} from "@swim/util";
-import {Output, Debug, Display} from "@swim/codec";
-import {Form} from "@swim/structure";
+import type {Output, Debug, Display} from "@swim/codec";
+import type {Form} from "@swim/structure";
 import {Uri} from "./Uri";
-import {UriPathBuilder} from "./UriPathBuilder";
+import type {UriPathBuilder} from "./UriPathBuilder";
 
 export type AnyUriPath = UriPath | string[] | string;
 
-export abstract class UriPath implements Comparable<UriPath>, HashCode, Debug, Display {
+export abstract class UriPath implements Comparable, HashCode, Debug, Display {
   /** @hidden */
   _hashCode?: number;
 
@@ -131,7 +131,7 @@ export abstract class UriPath implements Comparable<UriPath>, HashCode, Debug, D
     if (arguments.length > 0) {
       const builder = new Uri.PathBuilder();
       builder.addPath(this);
-      builder.push.apply(builder, arguments);
+      builder.push.apply(builder, arguments as unknown as AnyUriPath[]);
       return builder.bind();
     } else {
       return this;
@@ -155,7 +155,7 @@ export abstract class UriPath implements Comparable<UriPath>, HashCode, Debug, D
   prepended(...components: AnyUriPath[]): UriPath {
     if (arguments.length > 0) {
       const builder = new Uri.PathBuilder();
-      builder.push.apply(builder, arguments);
+      builder.push.apply(builder, arguments as unknown as AnyUriPath[]);
       builder.addPath(this);
       return builder.bind();
     } else {
@@ -301,9 +301,11 @@ export abstract class UriPath implements Comparable<UriPath>, HashCode, Debug, D
     return components;
   }
 
-  compareTo(that: UriPath): 0 | 1 | -1 {
-    const order = this.toString().localeCompare(that.toString());
-    return order < 0 ? -1 : order > 0 ? 1 : 0;
+  compareTo(that: unknown): number {
+    if (that instanceof UriPath) {
+      return this.toString().localeCompare(that.toString());
+    }
+    return NaN;
   }
 
   equals(that: unknown): boolean {
@@ -371,9 +373,9 @@ export abstract class UriPath implements Comparable<UriPath>, HashCode, Debug, D
     return new Uri.PathSegment(segment, tail);
   }
 
-  static from(...components: AnyUriPath[]): UriPath {
+  static of(...components: AnyUriPath[]): UriPath {
     const builder = new Uri.PathBuilder();
-    builder.push.apply(builder, arguments);
+    builder.push.apply(builder, arguments as unknown as UriPath[]);
     return builder.bind();
   }
 
@@ -383,7 +385,7 @@ export abstract class UriPath implements Comparable<UriPath>, HashCode, Debug, D
     } else if (path instanceof UriPath) {
       return path;
     } else if (Array.isArray(path)) {
-      return UriPath.from.apply(void 0, arguments);
+      return UriPath.of.apply(void 0, arguments as unknown as AnyUriPath[]);
     } else if (typeof path === "string") {
       return UriPath.parse(path);
     } else {

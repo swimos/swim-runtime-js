@@ -14,7 +14,7 @@
 
 import {Input, Output, Parser, Diagnostic, Unicode, Base16} from "@swim/codec";
 import {Recon} from "./Recon";
-import {ReconParser} from "./ReconParser";
+import type {ReconParser} from "./ReconParser";
 
 /** @hidden */
 export class NumberParser<I, V> extends Parser<V> {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Iterator} from "@swim/util";
+import type {Iterator} from "@swim/util";
 import {BTree} from "@swim/collections";
 import {KeyEffect} from "../KeyEffect";
 import {MapOutlet} from "../MapOutlet";

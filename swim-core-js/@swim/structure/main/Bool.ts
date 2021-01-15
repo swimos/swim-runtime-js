@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Numbers, Strings} from "@swim/util";
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
 
@@ -84,7 +84,7 @@ export class Bool extends Value {
     return 7;
   }
 
-  compareTo(that: Item): number {
+  compareTo(that: unknown): number {
     if (that instanceof Bool) {
       if (this._value && !that._value) {
         return -1;
@@ -93,11 +93,13 @@ export class Bool extends Value {
       } else {
         return 0;
       }
+    } else if (that instanceof Item) {
+      return Numbers.compare(this.typeOrder(), that.typeOrder());
     }
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return NaN;
   }
 
-  equivalentTo(that: Item): boolean {
+  equivalentTo(that: unknown): boolean {
     return this.equals(that);
   }
 

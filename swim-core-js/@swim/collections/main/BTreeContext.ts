@@ -13,11 +13,22 @@
 // limitations under the License.
 
 import {Values} from "@swim/util";
-import {BTreePage} from "./BTreePage";
+import type {BTreePage} from "./BTreePage";
 
 /** @hidden */
 export abstract class BTreeContext<K, V> {
-  declare pageSplitSize: number;
+  get pageSplitSize(): number {
+    return 32;
+  }
+
+  set pageSplitSize(pageSplitSize: number) {
+    Object.defineProperty(this, "pageSplitSize", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: pageSplitSize,
+    });
+  }
 
   compare(x: K, y: K): number {
     return Values.compare(x, y);
@@ -31,4 +42,3 @@ export abstract class BTreeContext<K, V> {
     return page.arity < this.pageSplitSize >>> 1;
   }
 }
-BTreeContext.prototype.pageSplitSize = 32;

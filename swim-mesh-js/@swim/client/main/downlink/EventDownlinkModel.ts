@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Value} from "@swim/structure";
-import {Uri} from "@swim/uri";
-import {DownlinkContext} from "./DownlinkContext";
+import type {Value} from "@swim/structure";
+import type {Uri} from "@swim/uri";
+import type {DownlinkContext} from "./DownlinkContext";
 import {DownlinkModel} from "./DownlinkModel";
-import {DownlinkType} from "./Downlink";
-import {EventDownlink} from "./EventDownlink";
+import type {DownlinkType} from "./Downlink";
+import type {EventDownlink} from "./EventDownlink";
 
 /** @hidden */
 export class EventDownlinkModel extends DownlinkModel {
   /** @hidden */
-  _views: EventDownlink[];
+  declare _views: EventDownlink[];
 
   constructor(context: DownlinkContext, hostUri: Uri, nodeUri: Uri, laneUri: Uri,
               prio?: number, rate?: number, body?: Value) {

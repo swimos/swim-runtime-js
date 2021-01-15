@@ -18,7 +18,7 @@ import {Item, Attr, Slot, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {AnyAngle, Angle} from "../angle/Angle";
 import {Transform} from "./Transform";
-import {AffineTransform} from "./AffineTransform";
+import type {AffineTransform} from "./AffineTransform";
 
 export class SkewTransform extends Transform {
   /** @hidden */
@@ -98,7 +98,15 @@ export class SkewTransform extends Transform {
     return that instanceof SkewTransform;
   }
 
-  equals(that: Transform): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (that instanceof SkewTransform) {
+      return this._x.equivalentTo(that._x, epsilon)
+          && this._y.equivalentTo(that._y, epsilon);
+    }
+    return false;
+  }
+
+  equals(that: unknown): boolean {
     if (that instanceof SkewTransform) {
       return this._x.equals(that._x) && this._y.equals(that._y);
     }

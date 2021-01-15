@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
-import {Length} from "../length/Length";
+import type {Length} from "../length/Length";
 import {LengthParser} from "../length/LengthParser";
 import {Transform} from "./Transform";
-import {TranslateTransform} from "./TranslateTransform";
+import type {TranslateTransform} from "./TranslateTransform";
 
 /** @hidden */
 export class TranslateTransformParser extends Parser<TranslateTransform> {

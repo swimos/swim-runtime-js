@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Outlet} from "../Outlet";
-import {MapValueFunction} from "../function";
+import type {MapValueFunction} from "../function";
 import {MapValueOperator} from "./MapValueOperator";
 
 export class MapValueCombinator<I, O> extends MapValueOperator<I, O> {

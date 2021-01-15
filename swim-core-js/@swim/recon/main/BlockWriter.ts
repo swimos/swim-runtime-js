@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {Output, WriterException, Writer} from "@swim/codec";
-import {ReconWriter} from "./ReconWriter";
+import type {ReconWriter} from "./ReconWriter";
 
 /** @hidden */
 export class BlockWriter<I, V> extends Writer {

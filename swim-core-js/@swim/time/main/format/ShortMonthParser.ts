@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic} from "@swim/codec";
-import {DateTimeLocale} from "../DateTimeLocale";
-import {DateTimeInit} from "../DateTime";
+import type {DateTimeLocale} from "../DateTimeLocale";
+import type {DateTimeInit} from "../DateTime";
 import {DateTimeFormat} from "../DateTimeFormat";
 
 /** @hidden */

@@ -68,7 +68,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
   }
 
   get length(): number {
-    return AbstractStreamlet.reflectOutletCount(this.streamletClass());
+    return AbstractStreamlet.reflectOutletCount(this.streamletClass);
   }
 
   has(key: AnyValue): boolean {
@@ -122,7 +122,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
     if (index instanceof Num) {
       index = index.value;
     }
-    const entry = AbstractStreamlet.reflectOutletIndex<I, O>(index, this, this.streamletClass());
+    const entry = AbstractStreamlet.reflectOutletIndex<I, O>(index, this, this.streamletClass);
     if (entry !== null) {
       const name = entry[0];
       let output = entry[1].get() as Value | undefined;
@@ -166,9 +166,12 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
     throw new Error("unsupported");
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
-    return AbstractStreamlet.reflectEachOutlet(this, this.streamletClass(), function (outlet: Outlet<O>, name: string, index: number): T | void {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | unknown, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined {
+    return AbstractStreamlet.reflectEachOutlet(this, this.streamletClass, function (outlet: Outlet<O>, name: string, index: number): T | void {
       const output = outlet.get();
       if (output !== void 0) {
         const result = callback.call(thisArg, output, index);
@@ -185,7 +188,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
     if (key === void 0) {
       return new StreamletInlet<I>(this);
     } else {
-      return AbstractStreamlet.reflectInletKey<I, O>(key, this, this.streamletClass());
+      return AbstractStreamlet.reflectInletKey<I, O>(key, this, this.streamletClass);
     }
   }
 
@@ -211,7 +214,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
     if (key === void 0) {
       return new StreamletOutlet<O>(this);
     } else if (typeof key === "string") {
-      return AbstractStreamlet.reflectOutletKey<I, O>(key, this, this.streamletClass());
+      return AbstractStreamlet.reflectOutletKey<I, O>(key, this, this.streamletClass);
     } else {
       return key;
     }
@@ -297,11 +300,11 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
   }
 
   disconnectInputs(): void {
-    AbstractStreamlet.disconnectInputs(this, this.streamletClass());
+    AbstractStreamlet.disconnectInputs(this, this.streamletClass);
   }
 
   disconnectOutputs(): void {
-    AbstractStreamlet.disconnectOutputs(this, this.streamletClass());
+    AbstractStreamlet.disconnectOutputs(this, this.streamletClass);
   }
 
   willDecohereInlet(inlet: Inlet<I>): void {
@@ -349,7 +352,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
   }
 
   protected onDecohereOutlets(): void {
-    AbstractStreamlet.decohereOutlets(this, this.streamletClass());
+    AbstractStreamlet.decohereOutlets(this, this.streamletClass);
   }
 
   protected willRecohere(version: number): void {
@@ -357,7 +360,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
   }
 
   protected onRecohereInlets(version: number): void {
-    AbstractStreamlet.recohereInlets(version, this, this.streamletClass());
+    AbstractStreamlet.recohereInlets(version, this, this.streamletClass);
   }
 
   protected onRecohere(version: number): void {
@@ -365,7 +368,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
   }
 
   protected onRecohereOutlets(version: number): void {
-    AbstractStreamlet.recohereOutlets(version, this, this.streamletClass());
+    AbstractStreamlet.recohereOutlets(version, this, this.streamletClass);
   }
 
   protected didRecohere(version: number): void {

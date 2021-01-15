@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Equivalent, Numbers, Constructors} from "@swim/util";
-import {Output} from "@swim/codec";
-import {LengthUnits, AnyLength, Length} from "./Length";
+import {Murmur3, Numbers, Constructors} from "@swim/util";
+import type {Output} from "@swim/codec";
+import {LengthUnits, Length} from "./Length";
 
 export class UnitlessLength extends Length {
   /** @hidden */
@@ -55,16 +55,20 @@ export class UnitlessLength extends Length {
     return this._value;
   }
 
-  compareTo(that: AnyLength): number {
-    const x = this._value;
-    const y = Length.fromAny(that).value;
-    return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
+  compareTo(that: unknown): number {
+    if (that instanceof Length) {
+      const x = this._value;
+      const y = that.value;
+      return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
+    }
+    return NaN;
   }
 
-  equivalentTo(that: AnyLength, epsilon: number = Equivalent.Epsilon): boolean {
-    const x = this._value;
-    const y = Length.fromAny(that).value;
-    return x === y || isNaN(x) && isNaN(y) || Math.abs(y - x) < epsilon;
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (that instanceof Length) {
+      return Numbers.equivalent(this._value, that.value);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {

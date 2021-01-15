@@ -22,7 +22,7 @@ import {
   LinkedResponse,
 } from "@swim/warp";
 import {Downlink, WarpClient} from "@swim/client";
-import {MockServer} from "../MockServer";
+import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
 export class EventDownlinkSpec extends Spec {

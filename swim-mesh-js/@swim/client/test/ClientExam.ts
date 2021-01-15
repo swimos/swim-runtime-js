@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {TestOptions, Spec, Report, ExamStatus, Exam} from "@swim/unit";
-import {AnyUri} from "@swim/uri";
-import {WarpClient} from "@swim/client";
+import type {AnyUri} from "@swim/uri";
+import type {WarpClient} from "@swim/client";
 import {MockServer} from "./MockServer";
 
 export class ClientExam extends Exam {
@@ -26,7 +26,7 @@ export class ClientExam extends Exam {
   mockServer<T>(callback: (server: MockServer, client: WarpClient,
                            resolve: (result?: T) => void,
                            reject: (reason?: unknown) => void) => void,
-                hostUri?: AnyUri, client?: WarpClient): Promise<T> {
+                hostUri?: AnyUri, client?: WarpClient): Promise<T | void> {
     const server = new MockServer(hostUri, client);
     return server.run(callback);
   }

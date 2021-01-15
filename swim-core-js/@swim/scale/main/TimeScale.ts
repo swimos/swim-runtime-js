@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Interpolator} from "@swim/interpolate";
+import type {Interpolator} from "@swim/interpolate";
 import {TimeZone, AnyDateTime, DateTime} from "@swim/time";
 import {Scale} from "./Scale";
 import {ContinuousScale} from "./ContinuousScale";
 
-export class TimeScale<R, RU = R> extends ContinuousScale<DateTime, R, AnyDateTime, RU> {
+export class TimeScale<R, RU = never> extends ContinuousScale<DateTime, R, AnyDateTime, RU> {
   readonly t0: number;
   readonly dt: number;
   readonly zone: TimeZone;

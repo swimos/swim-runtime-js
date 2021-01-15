@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Output, WriterException, Writer} from "@swim/codec";
-import {ReconWriter} from "./ReconWriter";
+import type {ReconWriter} from "./ReconWriter";
 
 /** @hidden */
 export class FilterSelectorWriter<I, V> extends Writer {

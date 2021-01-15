@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {NodeCursor} from "./NodeCursor";
 import {BTree} from "./BTree";
-import {BTreePage} from "./BTreePage";
+import type {BTreePage} from "./BTreePage";
 
 /** @hidden */
 export class BTreeNodeCursor<K, V, U> extends NodeCursor<[K, V], BTreePage<K, V, U>> {

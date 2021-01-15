@@ -13,18 +13,18 @@
 // limitations under the License.
 
 import {Value} from "@swim/structure";
-import {Uri} from "@swim/uri";
-import {EventMessage} from "@swim/warp";
-import {Host} from "../host/Host";
-import {DownlinkContext} from "./DownlinkContext";
+import type {Uri} from "@swim/uri";
+import type {EventMessage} from "@swim/warp";
+import type {Host} from "../host/Host";
+import type {DownlinkContext} from "./DownlinkContext";
 import {DownlinkModel} from "./DownlinkModel";
-import {DownlinkType} from "./Downlink";
-import {ValueDownlink} from "./ValueDownlink";
+import type {DownlinkType} from "./Downlink";
+import type {ValueDownlink} from "./ValueDownlink";
 
 /** @hidden */
 export class ValueDownlinkModel extends DownlinkModel {
   /** @hidden */
-  _views: ValueDownlink<unknown>[];
+  declare _views: ValueDownlink<unknown>[];
   /** @hidden */
   _state: Value;
 
@@ -68,14 +68,14 @@ export class ValueDownlinkModel extends DownlinkModel {
 
   protected valueWillSet(newValue: Value): Value {
     for (let i = 0; i < this._views.length; i += 1) {
-      newValue = this._views[i].valueWillSet(newValue);
+      newValue = this._views[i]!.valueWillSet(newValue);
     }
     return newValue;
   }
 
   protected valueDidSet(newValue: Value, oldValue: Value): void {
     for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i].valueDidSet(newValue, oldValue);
+      this._views[i]!.valueDidSet(newValue, oldValue);
     }
   }
 }

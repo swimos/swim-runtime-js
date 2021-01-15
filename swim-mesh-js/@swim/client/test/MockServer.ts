@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as http from "http";
+import * as ws from "ws";
 import {AnyUri, Uri} from "@swim/uri";
 import {Envelope} from "@swim/warp";
 import {WarpClient} from "@swim/client";
-import * as http from "http";
-import * as ws from "ws";
 
 export class MockServer {
   readonly _hostUri: Uri;
@@ -61,26 +61,29 @@ export class MockServer {
 
   run<T>(callback: (server: MockServer, client: WarpClient,
                     resolve: (result?: T) => void,
-                    reject: (reason?: unknown) => void) => void): Promise<T> {
+                    reject: (reason?: unknown) => void) => void): Promise<T | void> {
     return new Promise((resolve: (result?: T) => void, reject: (reason?: unknown) => void): void => {
-      this.httpServer = http.createServer();
-      this.httpServer.listen(this._hostUri.portNumber(), () => {
-        try {
-          this.wsServer = new ws.Server({port: void 0, server: this.httpServer});
-          this.wsServer.on("connection", this.onOpen);
-          callback(this, this.client, resolve, reject);
-        } catch (error) {
-          reject(error);
-        }
-      });
-    }).then(this.runSuccess.bind(this), this.runFailure.bind(this));
+        this.httpServer = http.createServer();
+        this.httpServer.listen(this._hostUri.portNumber(), () => {
+          try {
+            this.wsServer = new ws.Server({port: void 0, server: this.httpServer});
+            this.wsServer.on("connection", this.onOpen);
+            callback(this, this.client, resolve, reject);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      })
+      .then(this.runSuccess.bind(this), this.runFailure.bind(this));
   }
 
   protected runSuccess<T>(result: T): Promise<T> {
-    return this.stop().then(() => result);
+    return this.stop().then(function (): T {
+      return result;
+    });
   }
 
-  protected runFailure(): Promise<void> {
+  protected runFailure(reason: unknown): Promise<void> {
     return this.stop();
   }
 

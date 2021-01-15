@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item} from "../Item";
+import type {Item} from "../Item";
 import {Num} from "../Num";
 import {Form} from "../Form";
 

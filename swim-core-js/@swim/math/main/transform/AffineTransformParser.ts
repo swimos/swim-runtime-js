@@ -14,7 +14,7 @@
 
 import {Input, Output, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
 import {Transform} from "./Transform";
-import {AffineTransform} from "./AffineTransform";
+import type {AffineTransform} from "./AffineTransform";
 
 /** @hidden */
 export class AffineTransformParser extends Parser<AffineTransform> {

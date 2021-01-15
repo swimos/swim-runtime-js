@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {Uri} from "./Uri";
 import {AnyUriPath, UriPath} from "./UriPath";
 
@@ -66,7 +66,7 @@ export class UriPathEmpty extends UriPath {
   }
 
   appended(...components: AnyUriPath[]): UriPath {
-    return UriPath.from.apply(void 0, arguments);
+    return UriPath.of.apply(void 0, arguments as unknown as AnyUriPath[]);
   }
 
   appendedSlash(): UriPath {
@@ -78,7 +78,7 @@ export class UriPathEmpty extends UriPath {
   }
 
   prepended(...components: AnyUriPath[]): UriPath {
-    return UriPath.from.apply(void 0, arguments);
+    return UriPath.of.apply(void 0, arguments as unknown as AnyUriPath[]);
   }
 
   prependedSlash(): UriPath {

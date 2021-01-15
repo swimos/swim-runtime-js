@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Uri} from "@swim/uri";
+import type {Uri} from "@swim/uri";
 import {Envelope, CommandMessage, AuthRequest} from "@swim/warp";
-import {HostContext} from "./HostContext";
-import {HostOptions} from "./Host";
+import type {HostContext} from "./HostContext";
+import type {HostOptions} from "./Host";
 import {RemoteHost} from "./RemoteHost";
 
 /** @hidden */
@@ -29,7 +29,7 @@ export interface WebSocketHostOptions extends HostOptions {
 /** @hidden */
 export class WebSocketHost extends RemoteHost {
   /** @hidden */
-  readonly _options: WebSocketHostOptions;
+  declare readonly _options: WebSocketHostOptions;
   /** @hidden */
   _socket: WebSocket | undefined;
 

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {KeysCursor} from "./KeysCursor";
 import {ValuesCursor} from "./ValuesCursor";
-import {STreeContext} from "./STreeContext";
+import type {STreeContext} from "./STreeContext";
 import {STree} from "./STree";
-import {STreeLeaf} from "./STreeLeaf";
+import type {STreeLeaf} from "./STreeLeaf";
 
 /** @hidden */
 export abstract class STreePage<V = unknown, I = unknown> {

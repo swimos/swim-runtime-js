@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, Equivalent, HashCode} from "@swim/util";
+import type {Comparable, Equivalent, HashCode} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
 import {Attr, Value, Form} from "@swim/structure";
-import {DegAngle} from "./DegAngle";
-import {RadAngle} from "./RadAngle";
-import {GradAngle} from "./GradAngle";
-import {TurnAngle} from "./TurnAngle";
-import {AngleParser} from "./AngleParser";
-import {AngleForm} from "./AngleForm";
+import type {DegAngle} from "./DegAngle";
+import type {RadAngle} from "./RadAngle";
+import type {GradAngle} from "./GradAngle";
+import type {TurnAngle} from "./TurnAngle";
+import type {AngleParser} from "./AngleParser";
+import type {AngleForm} from "./AngleForm";
 
 export type AngleUnits = "deg" | "rad" | "grad" | "turn";
 
 export type AnyAngle = Angle | string | number;
 
-export abstract class Angle implements Comparable<AnyAngle>, Equivalent<AnyAngle>, HashCode, Debug {
+export abstract class Angle implements HashCode, Equivalent, Comparable, Debug {
   isDefined(): boolean {
     return this.value !== 0;
   }
@@ -115,9 +115,9 @@ export abstract class Angle implements Comparable<AnyAngle>, Equivalent<AnyAngle
     return void 0; // conditionally overridden when CSS Typed OM is available
   }
 
-  abstract compareTo(that: AnyAngle): number;
+  abstract compareTo(that: unknown): number;
 
-  abstract equivalentTo(that: AnyAngle, epsilon?: number): boolean;
+  abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
   abstract equals(that: unknown): boolean;
 

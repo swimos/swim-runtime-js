@@ -14,9 +14,9 @@
 
 import {Output, Parser, Writer, Unicode, Utf8} from "@swim/codec";
 import {Item, Value, Data} from "@swim/structure";
-import {ReconParser} from "./ReconParser";
+import type {ReconParser} from "./ReconParser";
 import {ReconStructureParser} from "./ReconStructureParser";
-import {ReconWriter} from "./ReconWriter";
+import type {ReconWriter} from "./ReconWriter";
 import {ReconStructureWriter} from "./ReconStructureWriter";
 
 /**

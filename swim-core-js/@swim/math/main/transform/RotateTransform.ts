@@ -18,7 +18,7 @@ import {Item, Attr, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {AnyAngle, Angle} from "../angle/Angle";
 import {Transform} from "./Transform";
-import {AffineTransform} from "./AffineTransform";
+import type {AffineTransform} from "./AffineTransform";
 
 export class RotateTransform extends Transform {
   /** @hidden */
@@ -94,7 +94,14 @@ export class RotateTransform extends Transform {
     return that instanceof RotateTransform;
   }
 
-  equals(that: Transform): boolean {
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (that instanceof RotateTransform) {
+      return this._a.equivalentTo(that._a, epsilon);
+    }
+    return false;
+  }
+
+  equals(that: unknown): boolean {
     if (that instanceof RotateTransform) {
       return this._a.equals(that._a);
     }

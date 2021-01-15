@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equals} from "@swim/util";
-import {ShapeR2} from "@swim/math";
-import {GeoPoint, GeoPointInit, GeoPointTuple} from "./GeoPoint";
-import {GeoProjection} from "./GeoProjection";
-import {GeoSegmentInit, GeoSegment} from "./GeoSegment";
-import {GeoBoxInit, GeoBox} from "./GeoBox";
+import type {Equals} from "@swim/util";
+import type {ShapeR2} from "@swim/math";
+import type {GeoPoint, GeoPointInit, GeoPointTuple} from "./GeoPoint";
+import type {GeoProjection} from "./GeoProjection";
+import type {GeoSegmentInit, GeoSegment} from "./GeoSegment";
+import type {GeoBoxInit, GeoBox} from "./GeoBox";
 
 export type AnyGeoShape = GeoShape | GeoPointInit | GeoPointTuple | GeoSegmentInit | GeoBoxInit;
 

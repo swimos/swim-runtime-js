@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {MapOutlet} from "../MapOutlet";
-import {FilterFieldsFunction} from "../function";
+import type {FilterFieldsFunction} from "../function";
 import {FilterFieldsOperator} from "./FilterFieldsOperator";
 
 export class FilterFieldsCombinator<K, V, I> extends FilterFieldsOperator<K, V, I> {

@@ -80,7 +80,7 @@ export class CmdSpec extends Spec {
   parseCmdArg(exam: Exam): void {
     const cmd = Cmd.of("test").arg(Arg.of("path"));
     const run = cmd.clone().parse(["test", "value"]);
-    exam.equal(run.getArg(0).value(), "value");
+    exam.equal(run.getArg(0)!.value(), "value");
     exam.equal(run.getValue(0), "value");
   }
 

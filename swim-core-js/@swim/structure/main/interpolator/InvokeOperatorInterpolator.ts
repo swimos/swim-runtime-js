@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem, Item} from "../Item";
-import {Value} from "../Value";
-import {InvokeOperator} from "../operator/InvokeOperator";
+import type {AnyItem, Item} from "../Item";
+import type {Value} from "../Value";
+import type {InvokeOperator} from "../operator/InvokeOperator";
 import {Selector} from "../Selector";
 import {ItemInterpolator} from "./ItemInterpolator";
 

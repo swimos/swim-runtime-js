@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Map} from "@swim/util";
-import {Value, Record} from "@swim/structure";
+import type {Map} from "@swim/util";
+import type {Value, Record} from "@swim/structure";
 import {Outlet, MapOutlet, StreamletScope} from "@swim/streamlet";
-import {MapValueFunction, MapFieldValuesFunction} from "@swim/streamlet";
-import {WatchValueFunction, WatchFieldsFunction} from "@swim/streamlet";
-import {RecordStreamlet} from "./RecordStreamlet";
-import {RecordModel} from "./RecordModel";
-import {RecordScope} from "./RecordScope";
-import {Dataflow} from "./Dataflow";
+import type {MapValueFunction, MapFieldValuesFunction} from "@swim/streamlet";
+import type {WatchValueFunction, WatchFieldsFunction} from "@swim/streamlet";
+import type {RecordStreamlet} from "./RecordStreamlet";
+import type {RecordModel} from "./RecordModel";
+import type {RecordScope} from "./RecordScope";
+import type {Dataflow} from "./Dataflow";
 
 export interface RecordOutlet extends Outlet<Record>, MapOutlet<Value, Value, Record>, StreamletScope<Value> {
   outlet(key: Value | string): Outlet<Value>;

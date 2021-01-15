@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {AnyItem, Item} from "./Item";
-import {Field} from "./Field";
+import type {Field} from "./Field";
 import {AnyValue, Value} from "./Value";
 import {Record} from "./Record";
-import {AnyText, Text} from "./Text";
-import {AnyNum} from "./Num";
+import type {AnyText, Text} from "./Text";
+import type {AnyNum} from "./Num";
 import {AnyInterpreter, Interpreter} from "./Interpreter";
 
 /** @hidden */
@@ -113,7 +113,7 @@ export class RecordMap extends Record {
 
   head(): Item {
     if (this._itemCount > 0) {
-      return this._array![0];
+      return this._array![0]!;
     }
     return Item.absent();
   }
@@ -301,7 +301,7 @@ export class RecordMap extends Record {
       index = n + index;
     }
     if (index >= 0 && index < n) {
-      return this._array![index];
+      return this._array![index]!;
     } else {
       return Item.absent();
     }
@@ -729,9 +729,9 @@ export class RecordMap extends Record {
       throw new Error("immutable");
     }
     if ((this._flags & Record.ALIASED) !== 0) {
-      this.pushAliased.apply(this, arguments);
+      this.pushAliased.apply(this, arguments as unknown as AnyItem[]);
     } else {
-      this.pushMutable.apply(this, arguments);
+      this.pushMutable.apply(this, arguments as unknown as AnyItem[]);
     }
     return this._itemCount;
   }
@@ -803,9 +803,9 @@ export class RecordMap extends Record {
     start = Math.min(Math.max(0, start), n);
     deleteCount = Math.min(Math.max(0, deleteCount), n - start);
     if ((this._flags & Record.ALIASED) !== 0) {
-      return this.spliceAliased.apply(this, arguments);
+      return this.spliceAliased.apply(this, arguments as any);
     } else {
-      return this.spliceMutable.apply(this, arguments);
+      return this.spliceMutable.apply(this, arguments as any);
     }
   }
 
@@ -819,9 +819,9 @@ export class RecordMap extends Record {
     for (let i = 0; i < start; i += 1) {
       newArray[i] = oldArray[i];
     }
-    const oldItems = [];
+    const oldItems: Item[] = [];
     for (let i = start; i < start + deleteCount; i += 1) {
-      const oldItem = oldArray[i];
+      const oldItem = oldArray[i]!;
       oldItems.push(oldItem);
       m -= 1;
       if (oldItem instanceof Item.Field) {
@@ -864,9 +864,9 @@ export class RecordMap extends Record {
     } else {
       newArray = oldArray;
     }
-    const oldItems = [];
+    const oldItems: Item[] = [];
     for (let i = start; i < start + deleteCount; i += 1) {
-      const oldItem = oldArray[i];
+      const oldItem = oldArray[i]!;
       oldItems.push(oldItem);
       m -= 1;
       if (oldItem instanceof Item.Field) {
@@ -934,10 +934,10 @@ export class RecordMap extends Record {
     const n = this._itemCount;
     const array = this._array!;
     for (let i = 0; i < n; i += 1) {
-      const item = array[i];
+      const item = array[i]!;
       if (item instanceof Item.Field && item.key.equals(key)) {
         for (let j = i + 1; j < n; j += 1, i += 1) {
-          array[i] = array[j];
+          array[i] = array[j]!;
         }
         array[n - 1] = void 0 as any;
         this._table = null;
@@ -976,7 +976,7 @@ export class RecordMap extends Record {
     if ((this._flags & (Record.ALIASED | Record.IMMUTABLE)) === 0) {
       const array = this._array!;
       for (let i = 0, n = this._itemCount; i < n; i += 1) {
-        array[i].alias();
+        array[i]!.alias();
       }
     }
     this._flags |= Record.ALIASED;
@@ -988,7 +988,7 @@ export class RecordMap extends Record {
     const oldArray = this._array!;
     const newArray = new Array(itemCount);
     for (let i = 0; i < itemCount; i += 1) {
-      newArray[i] = oldArray[i].clone();
+      newArray[i] = oldArray[i]!.clone();
     }
     return new RecordMap(newArray, null, itemCount, this._fieldCount, 0);
   }
@@ -998,7 +998,7 @@ export class RecordMap extends Record {
       this._flags |= Record.IMMUTABLE;
       const array = this._array!;
       for (let i = 0, n = this._itemCount; i < n; i += 1) {
-        array[i].commit();
+        array[i]!.commit();
       }
     }
     return this;
@@ -1052,7 +1052,7 @@ export class RecordMap extends Record {
     interpreter.pushScope(scope);
     let changed = false;
     for (let i = 0; i < n; i += 1) {
-      const oldItem = array[i];
+      const oldItem = array[i]!;
       const newItem = oldItem.evaluate(interpreter);
       if (newItem.isDefined()) {
         scope.push(newItem);
@@ -1073,7 +1073,7 @@ export class RecordMap extends Record {
     interpreter.pushScope(scope);
     let changed = false;
     for (let i = 0; i < n; i += 1) {
-      const oldItem = array[i];
+      const oldItem = array[i]!;
       const newItem = oldItem.substitute(interpreter);
       if (newItem.isDefined()) {
         scope.push(newItem);
@@ -1104,16 +1104,19 @@ export class RecordMap extends Record {
     return new Record.RecordMapView(this, lower, upper);
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined {
     const array = this._array!;
     for (let i = 0, n = this._itemCount; i < n; i += 1) {
-      const result = callback.call(thisArg, array[i], i);
+      const result = callback.call(thisArg, array[i]!, i);
       if (result !== void 0) {
         return result;
       }
     }
-    return;
+    return void 0;
   }
 
   private static _empty?: RecordMap;

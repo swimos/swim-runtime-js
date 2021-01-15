@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem, Item} from "../Item";
+import type {AnyItem, Item} from "../Item";
 import {Record} from "../Record";
 import {ItemInterpolator} from "./ItemInterpolator";
 
@@ -35,7 +35,7 @@ export class RecordInterpolator extends ItemInterpolator<Record> {
     const interpolatorCount = interpolators.length;
     const record = Record.create(interpolatorCount);
     for (let i = 0; i < interpolatorCount; i += 1) {
-      record.push(this.interpolators[i].interpolate(u));
+      record.push(this.interpolators[i]!.interpolate(u));
     }
     return record;
   }
@@ -51,7 +51,7 @@ export class RecordInterpolator extends ItemInterpolator<Record> {
       const n = this.interpolators.length;
       if (n === that.interpolators.length) {
         for (let i = 0; i < n; i += 1) {
-          if (!this.interpolators[i].equals(that.interpolators[i])) {
+          if (!this.interpolators[i]!.equals(that.interpolators[i])) {
             return false;
           }
         }

@@ -18,7 +18,7 @@ import {Murmur3} from "@swim/util";
 function bytes(...xs: number[]): Uint8Array {
   const bs = new Uint8Array(xs.length);
   for (let i = 0; i < xs.length; i += 1) {
-    bs[i] = xs[i];
+    bs[i] = xs[i]!;
   }
   return bs;
 }

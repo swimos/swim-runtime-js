@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
-import {Angle} from "../angle/Angle";
+import type {Angle} from "../angle/Angle";
 import {AngleParser} from "../angle/AngleParser";
 import {Transform} from "./Transform";
-import {RotateTransform} from "./RotateTransform";
+import type {RotateTransform} from "./RotateTransform";
 
 /** @hidden */
 export class RotateTransformParser extends Parser<RotateTransform> {

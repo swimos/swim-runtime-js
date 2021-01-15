@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
 import {AnyInterpreter, Interpreter} from "./Interpreter";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
-import {AnyText} from "./Text";
-import {AnyNum} from "./Num";
+import type {AnyText} from "./Text";
+import type {AnyNum} from "./Num";
 import {Expression} from "./Expression";
-import {IdentitySelector} from "./selector/IdentitySelector";
-import {KeysSelector} from "./selector/KeysSelector";
-import {ValuesSelector} from "./selector/ValuesSelector";
-import {ChildrenSelector} from "./selector/ChildrenSelector";
-import {DescendantsSelector} from "./selector/DescendantsSelector";
-import {Operator} from "./Operator";
+import type {IdentitySelector} from "./selector/IdentitySelector";
+import type {KeysSelector} from "./selector/KeysSelector";
+import type {ValuesSelector} from "./selector/ValuesSelector";
+import type {ChildrenSelector} from "./selector/ChildrenSelector";
+import type {DescendantsSelector} from "./selector/DescendantsSelector";
+import type {Operator} from "./Operator";
 
 export abstract class Selector extends Expression {
   /** @hidden */
@@ -41,13 +41,17 @@ export abstract class Selector extends Expression {
    */
   abstract then(): Selector;
 
-  abstract forSelected<T, S = unknown>(interpreter: Interpreter,
-                                       callback: (this: S, interpreter: Interpreter) => T | undefined,
-                                       thisArg?: S): T | undefined;
+  abstract forSelected<T>(interpreter: Interpreter,
+                          callback: (interpreter: Interpreter) => T | undefined): T | undefined;
+  abstract forSelected<T, S>(interpreter: Interpreter,
+                             callback: (this: S, interpreter: Interpreter) => T | undefined,
+                             thisArg: S): T | undefined;
 
-  abstract mapSelected<S = unknown>(interpreter: Interpreter,
-                                    transform: (this: S, interpreter: Interpreter) => Item,
-                                    thisArg?: S): Item;
+  abstract mapSelected(interpreter: Interpreter,
+                       transform: (interpreter: Interpreter) => Item): Item;
+  abstract mapSelected<S>(interpreter: Interpreter,
+                          transform: (this: S, interpreter: Interpreter) => Item,
+                          thisArg: S): Item;
 
   evaluate(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);

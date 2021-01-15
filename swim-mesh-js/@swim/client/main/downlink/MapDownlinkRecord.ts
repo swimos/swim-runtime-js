@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {AnyItem, Item, Slot, AnyValue, Value, Record, AnyText, AnyNum, Num} from "@swim/structure";
 import {KeyEffect} from "@swim/streamlet";
 import {DownlinkRecord} from "./DownlinkRecord";
-import {MapDownlink} from "./MapDownlink";
+import type {MapDownlink} from "./MapDownlink";
 
 export class MapDownlinkRecord extends DownlinkRecord {
   /** @hidden */
@@ -124,8 +124,11 @@ export class MapDownlinkRecord extends DownlinkRecord {
     this._downlink.clear();
   }
 
-  forEach<T, S = unknown>(callback: (this: S, item: Item, index: number) => T | void,
-                          thisArg?: S): T | undefined {
+  forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
+                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
+                thisArg?: S): T | undefined {
     let index = 0;
     return this._downlink.forEach(function (key: Value, value: Value): T | void {
       const result = callback.call(thisArg, Slot.of(key, value), index);

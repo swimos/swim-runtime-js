@@ -23,19 +23,19 @@ import {
   Diagnostic,
   Unicode,
 } from "@swim/codec";
-import {R2Function} from "./R2Function";
+import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
 import {PointR2} from "./PointR2";
-import {CurveR2} from "./CurveR2";
+import type {CurveR2} from "./CurveR2";
 import {SplineR2} from "./SplineR2";
-import {PathR2Context} from "./PathR2Context";
-import {PathR2Builder} from "./PathR2Builder";
-import {BoxR2} from "./BoxR2";
-import {PathR2Parser} from "./PathR2Parser";
+import type {PathR2Context} from "./PathR2Context";
+import type {PathR2Builder} from "./PathR2Builder";
+import type {BoxR2} from "./BoxR2";
+import type {PathR2Parser} from "./PathR2Parser";
 
 export type AnyPathR2 = PathR2 | string;
 
-export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug {
+export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   /** @hidden */
   readonly _splines: ReadonlyArray<SplineR2>;
   /** @hidden */
@@ -79,7 +79,7 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      return splines[k].interpolateX(v);
+      return splines[k]!.interpolateX(v);
     } else {
       return NaN;
     }
@@ -92,7 +92,7 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      return splines[k].interpolateY(v);
+      return splines[k]!.interpolateY(v);
     } else {
       return NaN;
     }
@@ -105,7 +105,7 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      return splines[k].interpolate(v);
+      return splines[k]!.interpolate(v);
     } else {
       return new PointR2(NaN, NaN);
     }
@@ -128,16 +128,16 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
       const l = 1 / n;
       const k = Math.min(Math.max(0, Math.floor(u / l)), n);
       const v = u * n - k * l;
-      const [s0, s1] = splines[k].split(v);
+      const [s0, s1] = splines[k]!.split(v);
       const splines0 = new Array<SplineR2>(k + 1);
       const splines1 = new Array<SplineR2>(n - k);
       for (let i = 0; i < k; i += 1) {
-        splines0[i] = splines[i];
+        splines0[i] = splines[i]!;
       }
       splines0[k] = s0;
       splines1[0] = s1;
       for (let i = k + 1; i < n; i += 1) {
-        splines1[i - k] = splines[i];
+        splines1[i - k] = splines[i]!;
       }
       return [new PathR2(splines0), new PathR2(splines1)];
     } else {
@@ -154,11 +154,11 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
       const v = u * n - k * l;
       const newSplines = new Array<SplineR2>(n);
       for (let i = 0; i < k; i += 1) {
-        newSplines[i] = oldSplines[i];
+        newSplines[i] = oldSplines[i]!;
       }
-      newSplines[k] = oldSplines[k].subdivide(v);
+      newSplines[k] = oldSplines[k]!.subdivide(v);
       for (let i = k + 1; i < n; i += 1) {
-        newSplines[i] = oldSplines[i];
+        newSplines[i] = oldSplines[i]!;
       }
       return new PathR2(newSplines);
     } else {
@@ -172,7 +172,7 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
     if (n > 0) {
       const newSplines = new Array<SplineR2>(n);
       for (let i = 0; i < n; i += 1) {
-        newSplines[i] = oldSplines[i].transform(f);
+        newSplines[i] = oldSplines[i]!.transform(f);
       }
       return new PathR2(newSplines);
     } else {
@@ -189,7 +189,7 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
       let yMax = -Infinity;
       const splines = this._splines;
       for (let i = 0, n = splines.length; i < n; i += 1) {
-        const spline = splines[i];
+        const spline = splines[i]!;
         xMin = Math.min(xMin, spline.xMin);
         yMin = Math.min(yMin, spline.yMin);
         xMax = Math.max(spline.xMax, xMax);
@@ -204,14 +204,14 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
   draw(context: PathR2Context): void {
     const splines = this._splines;
     for (let i = 0, n = splines.length; i < n; i += 1) {
-      splines[i].draw(context);
+      splines[i]!.draw(context);
     }
   }
 
   transformDraw(context: PathR2Context, f: R2Function): void {
     const splines = this._splines;
     for (let i = 0, n = splines.length; i < n; i += 1) {
-      splines[i].transformDraw(context, f);
+      splines[i]!.transformDraw(context, f);
     }
   }
 
@@ -220,11 +220,11 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
     const n = splines.length;
     if (output.settings() === OutputSettings.standard()) {
       for (let i = 0; i < n; i += 1) {
-        output.write(splines[i].toPathString()); // write memoized subpath strings
+        output.write(splines[i]!.toPathString()); // write memoized subpath strings
       }
     } else {
       for (let i = 0; i < n; i += 1) {
-        splines[i].writePath(output);
+        splines[i]!.writePath(output);
       }
     }
   }
@@ -242,8 +242,13 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
     return pathString;
   }
 
-  equivalentTo(that: PathR2, epsilon?: number): boolean {
-    return this === that || Arrays.equivalent(this._splines, that._splines, epsilon);
+  equivalentTo(that: unknown, epsilon?: number): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof PathR2) {
+      return Arrays.equivalent(this._splines, that._splines, epsilon);
+    }
+    return false;
   }
 
   equals(that: unknown): boolean {
@@ -262,21 +267,21 @@ export class PathR2 extends ShapeR2 implements Equivalent<PathR2>, Equals, Debug
     if (n === 0) {
       output = output.write("empty").write(40/*'('*/);
     } else if (n === 1) {
-      const spline = splines[0];
+      const spline = splines[0]!;
       output = output.write(spline._closed ? "closed" : "open").write(40/*'('*/);
       const curves = spline._curves;
       const m = curves.length;
       if (m !== 0) {
-        output = output.debug(curves[0]);
+        output = output.debug(curves[0]!);
         for (let i = 1; i < m; i += 1) {
-          output = output.write(", ").debug(curves[i]);
+          output = output.write(", ").debug(curves[i]!);
         }
       }
     } else {
       output = output.write("of").write(40/*'('*/);
-      output = output.debug(splines[0]);
+      output = output.debug(splines[0]!);
       for (let i = 1; i < n; i += 1) {
-        output = output.write(", ").debug(splines[i]);
+        output = output.write(", ").debug(splines[i]!);
       }
     }
     output = output.write(41/*')'*/);

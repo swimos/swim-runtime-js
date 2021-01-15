@@ -14,8 +14,8 @@
 
 import {Input, Output, Parser, Diagnostic, Base16, Utf8} from "@swim/codec";
 import {Uri} from "./Uri";
-import {UriQuery} from "./UriQuery";
-import {UriQueryBuilder} from "./UriQueryBuilder";
+import type {UriQuery} from "./UriQuery";
+import type {UriQueryBuilder} from "./UriQueryBuilder";
 import {UriParser} from "./UriParser";
 
 /** @hidden */

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {CurveR2} from "./CurveR2";
+import type {CurveR2} from "./CurveR2";
 import {SegmentR2} from "./SegmentR2";
 import {QuadraticCurveR2} from "./QuadraticCurveR2";
 import {CubicCurveR2} from "./CubicCurveR2";
 import {EllipticCurveR2} from "./EllipticCurveR2";
-import {SplineR2Context} from "./SplineR2Context";
+import type {SplineR2Context} from "./SplineR2Context";
 import {SplineR2} from "./SplineR2";
 
 export class SplineR2Builder implements SplineR2Context {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Map} from "@swim/util";
+import type {Map} from "@swim/util";
 import {TestOptions, Test, Spec, Report} from "@swim/unit";
 import {Attr, Slot, Value, Record, Text} from "@swim/structure";
 import {Outlet, AbstractInlet, ValueInput} from "@swim/streamlet";
@@ -25,7 +25,7 @@ import {
   SyncedResponse,
 } from "@swim/warp";
 import {DownlinkStreamlet, WarpClient} from "@swim/client";
-import {MockServer} from "../MockServer";
+import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
 export class DownlinkStreamletSpec extends Spec {

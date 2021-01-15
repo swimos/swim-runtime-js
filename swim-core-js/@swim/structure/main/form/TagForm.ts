@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item} from "../Item";
+import type {Item} from "../Item";
 import {Attr} from "../Attr";
 import {Form} from "../Form";
 
 /** @hidden */
-export class TagForm<T, U = T> extends Form<T, U> {
+export class TagForm<T, U = never> extends Form<T, U> {
   /** @hidden */
   readonly _tag: string;
   /** @hidden */

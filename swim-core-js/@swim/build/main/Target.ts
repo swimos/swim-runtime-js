@@ -20,10 +20,9 @@ import * as tslint from "tslint";
 import * as rollup from "rollup";
 import * as typedoc from "typedoc";
 import * as terser from "terser";
-
 import {Severity} from "@swim/util";
 import {Tag, Mark, Span, OutputSettings, OutputStyle, Diagnostic, Unicode} from "@swim/codec";
-import {Project} from "./Project";
+import type {Project} from "./Project";
 import {DocTarget} from "./DocTarget";
 import {DocTheme} from "./DocTheme";
 
@@ -101,9 +100,9 @@ export class Target {
   initDeps(config: TargetConfig): void {
     if (config.deps !== void 0) {
       for (let i = 0; i < config.deps.length; i += 1) {
-        const dep = config.deps[i];
+        const dep = config.deps[i]!;
         const [projectId, targetId] = dep.split(":");
-        const project = this.project.build.projects[projectId];
+        const project = this.project.build.projects[projectId!];
         if (project !== void 0) {
           const target = project.targets[targetId || "main"];
           if (target !== void 0) {
@@ -121,9 +120,9 @@ export class Target {
   initPeerDeps(config: TargetConfig): void {
     if (config.peerDeps !== void 0) {
       for (let i = 0; i < config.peerDeps.length; i += 1) {
-        const peerDep = config.peerDeps[i];
+        const peerDep = config.peerDeps[i]!;
         const [projectId, targetId] = peerDep.split(":");
-        const project = this.project.build.projects[projectId];
+        const project = this.project.build.projects[projectId!];
         if (project !== void 0) {
           const target = project.targets[targetId || "main"];
           if (target !== void 0) {
@@ -163,10 +162,10 @@ export class Target {
 
   transitiveProjects(projects: Project[] = []): Project[] {
     for (let i = 0; i < this.peerDeps.length; i += 1) {
-      projects = this.peerDeps[i].transitiveProjects(projects);
+      projects = this.peerDeps[i]!.transitiveProjects(projects);
     }
     for (let i = 0; i < this.deps.length; i += 1) {
-      projects = this.deps[i].transitiveProjects(projects);
+      projects = this.deps[i]!.transitiveProjects(projects);
     }
     if (projects.indexOf(this.project) < 0) {
       projects.push(this.project);
@@ -176,10 +175,10 @@ export class Target {
 
   transitiveTargets(targets: Target[] = []): Target[] {
     for (let i = 0; i < this.peerDeps.length; i += 1) {
-      targets = this.peerDeps[i].transitiveTargets(targets);
+      targets = this.peerDeps[i]!.transitiveTargets(targets);
     }
     for (let i = 0; i < this.deps.length; i += 1) {
-      targets = this.deps[i].transitiveTargets(targets);
+      targets = this.deps[i]!.transitiveTargets(targets);
     }
     if (targets.indexOf(this) < 0) {
       targets.push(this);
@@ -190,10 +189,10 @@ export class Target {
   frameworkTargets(targets: Target[] = []): Target[] {
     if (this.project.framework) {
       for (let i = 0; i < this.peerDeps.length; i += 1) {
-        targets = this.peerDeps[i].frameworkTargets(targets);
+        targets = this.peerDeps[i]!.frameworkTargets(targets);
       }
       for (let i = 0; i < this.deps.length; i += 1) {
-        targets = this.deps[i].frameworkTargets(targets);
+        targets = this.deps[i]!.frameworkTargets(targets);
       }
     }
     if (targets.indexOf(this) < 0) {
@@ -205,7 +204,7 @@ export class Target {
   rootTargets(targets: Target[] = []): Target[] {
     if (this.project.framework) {
       for (let i = 0; i < this.peerDeps.length; i += 1) {
-        targets = this.peerDeps[i].rootTargets(targets);
+        targets = this.peerDeps[i]!.rootTargets(targets);
       }
     }
     if (targets.indexOf(this) < 0) {
@@ -219,13 +218,13 @@ export class Target {
     const newRefs: ts.ProjectReference[] = [];
     let targets: Target[] = [];
     for (let i = 0; i < this.peerDeps.length; i += 1) {
-      targets = this.peerDeps[i].transitiveTargets(targets);
+      targets = this.peerDeps[i]!.transitiveTargets(targets);
     }
     for (let i = 0; i < this.deps.length; i += 1) {
-      targets = this.deps[i].transitiveTargets(targets);
+      targets = this.deps[i]!.transitiveTargets(targets);
     }
     for (let i = 0; i < targets.length; i += 1) {
-      const target = targets[i];
+      const target = targets[i]!;
       newRefs.push({path: target.baseDir});
       if (target.id === "main" && compilerOptions !== void 0) {
         compilerOptions.paths = compilerOptions.paths || {};
@@ -244,10 +243,10 @@ export class Target {
   protected canCompile(): boolean {
     let targets = [] as Target[];
     for (let i = 0; i < this.deps.length; i += 1) {
-      targets = this.deps[i].transitiveTargets(targets);
+      targets = this.deps[i]!.transitiveTargets(targets);
     }
     for (let i = 0; i < targets.length; i += 1) {
-      const target = targets[i];
+      const target = targets[i]!;
       if (target.failed) {
         return false;
       }
@@ -274,7 +273,8 @@ export class Target {
 
       const rootNames = projectReferences.map(ref => ref.path);
       rootNames.push(this.baseDir);
-      const solutionBuilderHost = ts.createSolutionBuilderHost(ts.sys, this.createProgram, this.onCompileError, this.onCompileUpdate);
+      const solutionBuilderHost = ts.createSolutionBuilderHost(ts.sys, this.createProgram as ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram>,
+                                                               this.onCompileError, this.onCompileUpdate);
       const solutionBuilder = ts.createSolutionBuilder(solutionBuilderHost, rootNames, {incremental: true, watch: true});
 
       this.compileStart = Date.now();
@@ -315,8 +315,8 @@ export class Target {
 
     const rootNames = projectReferences.map(ref => ref.path);
     rootNames.push(this.baseDir);
-    const solutionBuilderHost = ts.createSolutionBuilderWithWatchHost(ts.sys, this.createProgram, this.onCompileError,
-                                                                      this.onCompileUpdate, this.onCompileResult);
+    const solutionBuilderHost = ts.createSolutionBuilderWithWatchHost(ts.sys, this.createProgram as ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram>,
+                                                                      this.onCompileError, this.onCompileUpdate, this.onCompileResult);
     const solutionBuilder = ts.createSolutionBuilderWithWatch(solutionBuilderHost, rootNames, {incremental: true, watch: true});
 
     this.watching = true;
@@ -477,7 +477,7 @@ export class Target {
   protected lint(): void {
     const linter = new tslint.Linter({fix: false}, this.program);
     for (let i = 0; i < this.emittedSourceFiles.length; i += 1) {
-      const sourceFile = this.emittedSourceFiles[i];
+      const sourceFile = this.emittedSourceFiles[i]!;
       linter.lint(sourceFile.fileName, sourceFile.text, this.lintConfig);
     }
     this.onLintResult(linter.getResult());
@@ -485,7 +485,7 @@ export class Target {
 
   protected onLintResult(result: tslint.LintResult): void {
     for (let i = 0; i < result.failures.length; i += 1) {
-      this.onLintFailure(result.failures[i]);
+      this.onLintFailure(result.failures[i]!);
     }
   }
 
@@ -878,17 +878,17 @@ export class Target {
     const fileNames: string[] = [];
     const transitiveTargets = this.transitiveTargets();
     for (let i = 0; i < transitiveTargets.length; i += 1) {
-      const target = transitiveTargets[i];
+      const target = transitiveTargets[i]!;
       const targetFileNames = target.getRootFileNames();
       for (let j = 0; j < targetFileNames.length; j += 1) {
-        const fileName = targetFileNames[j];
+        const fileName = targetFileNames[j]!;
         fileNames.push(fileName);
       }
     }
 
     const frameworkTargets = this.frameworkTargets();
     for (let i = 0; i < frameworkTargets.length; i += 1) {
-      docOptions.entryPoints.push(Path.resolve(frameworkTargets[i].baseDir, "index.ts"));
+      docOptions.entryPoints.push(Path.resolve(frameworkTargets[i]!.baseDir, "index.ts"));
     }
 
     const doc = new typedoc.Application();

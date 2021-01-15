@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Interpolator} from "@swim/interpolate";
-import {AnyTransform, Transform} from "./Transform";
+import type {Interpolator} from "@swim/interpolate";
+import type {AnyTransform, Transform} from "./Transform";
 import {TransformList} from "./TransformList";
 import {TransformInterpolator} from "./TransformInterpolator";
 
@@ -29,7 +29,7 @@ export class TransformListInterpolator extends TransformInterpolator<TransformLi
     const interpolatorCount = Math.min(transforms0.length, transforms1.length);
     const interpolators = new Array<TransformInterpolator>(interpolatorCount);
     for (let i = 0; i < interpolatorCount; i += 1) {
-      interpolators[i] = TransformInterpolator.between(transforms0[i], transforms1[i]);
+      interpolators[i] = TransformInterpolator.between(transforms0[i]!, transforms1[i]!);
     }
     this.interpolators = interpolators;
   }
@@ -39,7 +39,7 @@ export class TransformListInterpolator extends TransformInterpolator<TransformLi
     const interpolatorCount = interpolators.length;
     const transforms = new Array<Transform>(interpolatorCount);
     for (let i = 0; i < interpolatorCount; i += 1) {
-      transforms[i] = interpolators[i].interpolate(u);
+      transforms[i] = interpolators[i]!.interpolate(u);
     }
     return new TransformList(transforms);
   }
@@ -72,7 +72,7 @@ export class TransformListInterpolator extends TransformInterpolator<TransformLi
       const n = this.interpolators.length;
       if (n === that.interpolators.length) {
         for (let i = 0; i < n; i += 1) {
-          if (!this.interpolators[i].equals(that.interpolators[i])) {
+          if (!this.interpolators[i]!.equals(that.interpolators[i]!)) {
             return false;
           }
         }

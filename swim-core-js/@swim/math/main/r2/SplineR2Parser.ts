@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Input, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
-import {CurveR2} from "./CurveR2";
+import type {CurveR2} from "./CurveR2";
 import {SegmentR2} from "./SegmentR2";
 import {QuadraticCurveR2} from "./QuadraticCurveR2";
 import {CubicCurveR2} from "./CubicCurveR2";

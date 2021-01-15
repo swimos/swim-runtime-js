@@ -100,7 +100,7 @@ export abstract class AbstractRecordOutlet extends Record implements RecordOutle
     const n = oldOutputs !== null ? oldOutputs.length : 0;
     const newOutputs = new Array<Inlet<Record>>(n + 1);
     for (let i = 0; i < n; i += 1) {
-      newOutputs[i] = oldOutputs![i];
+      newOutputs[i] = oldOutputs![i]!;
     }
     newOutputs[n] = output;
     this._outputs = newOutputs;
@@ -114,10 +114,10 @@ export abstract class AbstractRecordOutlet extends Record implements RecordOutle
         if (n > 1) {
           const newOutputs = new Array<Inlet<Record>>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newOutputs[j] = oldOutputs![j];
+            newOutputs[j] = oldOutputs![j]!;
           }
           for (let j = i; j < n - 1; j += 1) {
-            newOutputs[j] = oldOutputs![j + 1];
+            newOutputs[j] = oldOutputs![j + 1]!;
           }
           this._outputs = newOutputs;
         } else {
@@ -140,7 +140,7 @@ export abstract class AbstractRecordOutlet extends Record implements RecordOutle
     if (oldOutputs !== null) {
       this._outputs = null;
       for (let i = 0, n = oldOutputs.length; i < n; i += 1) {
-        oldOutputs[i].unbindInput();
+        oldOutputs[i]!.unbindInput();
       }
     }
   }
@@ -157,7 +157,7 @@ export abstract class AbstractRecordOutlet extends Record implements RecordOutle
     if (outputs !== null) {
       this._outputs = null;
       for (let i = 0, n = outputs.length; i < n; i += 1) {
-        const output = outputs[i];
+        const output = outputs[i]!;
         output.unbindInput();
         output.disconnectOutputs();
       }
@@ -189,7 +189,7 @@ export abstract class AbstractRecordOutlet extends Record implements RecordOutle
       this.onDecohereInputKey(key, effect);
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        const output = this._outputs![i];
+        const output = this._outputs![i]!;
         if (MapInlet.is(output)) {
           output.decohereOutputKey(key, effect);
         } else {
@@ -211,7 +211,7 @@ export abstract class AbstractRecordOutlet extends Record implements RecordOutle
       this.onDecohereInput();
       const n = this._outputs !== null ? this._outputs.length : 0;
       for (let i = 0; i < n; i += 1) {
-        this._outputs![i].decohereOutput();
+        this._outputs![i]!.decohereOutput();
       }
       this._outlets.forEach(function (key: Value, outlet: KeyOutlet<Value, Value>): void {
         outlet.decohereInput();
@@ -252,7 +252,7 @@ export abstract class AbstractRecordOutlet extends Record implements RecordOutle
       this._version = version;
       this.onRecohereInput(version);
       for (let i = 0, n = this._outputs !== null ? this._outputs.length : 0; i < n; i += 1) {
-        this._outputs![i].recohereOutput(version);
+        this._outputs![i]!.recohereOutput(version);
       }
       this.forEach(function (member: Item): void {
         if (member instanceof Field) {

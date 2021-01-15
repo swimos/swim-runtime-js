@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {UnitFunc, UnitOptions} from "./Unit";
+import type {UnitFunc, UnitOptions} from "./Unit";
 import {SpecClass, Spec} from "./Spec";
-import {Report} from "./Report";
+import type {Report} from "./Report";
 
 /**
  * Test unit factory function registration descriptor.  A `SpecUnit` associates
@@ -106,8 +106,8 @@ export class SpecUnit {
       units._parent = spec;
       this.willRunUnit(report, spec, units);
       return units.run(report)
-          .then(this.runUnitSuccess.bind(this, report, spec) as () => Spec,
-                this.runUnitFailure.bind(this, report, spec));
+          .then(this.runUnitSuccess.bind(this, report, spec, units),
+                this.runUnitFailure.bind(this, report, spec, units));
     } else {
       return Promise.resolve(void 0);
     }
@@ -119,12 +119,12 @@ export class SpecUnit {
    */
   runUnit(report: Report, spec: Spec, units: Spec[], index: number): Promise<Spec[]> {
     if (index < units.length) {
-      const unit = units[index];
+      const unit = units[index]!;
       unit._parent = spec;
       this.willRunUnit(report, spec, unit);
       return unit.run(report)
-          .then(this.runUnitSuccess.bind(this, report, spec),
-                this.runUnitFailure.bind(this, report, spec))
+          .then(this.runUnitSuccess.bind(this, report, spec, unit),
+                this.runUnitFailure.bind(this, report, spec, unit))
           .then(this.runUnit.bind(this, report, spec, units, index + 1) as () => Promise<Spec[]>);
     } else {
       return Promise.resolve(units);
@@ -144,7 +144,7 @@ export class SpecUnit {
    * Asynchronous completes the execution of a failed child unit.
    * @hidden
    */
-  runUnitFailure(report: Report, spec: Spec, error: unknown): never {
+  runUnitFailure(report: Report, spec: Spec, unit: Spec, error: unknown): never {
     // A child spec can only fail if it encounters a bug in the test framework.
     throw error;
   }
@@ -153,11 +153,10 @@ export class SpecUnit {
    * Curried [[Unit]] method decorator, with captured `options`.
    * @hidden
    */
-  static decorate(options: UnitOptions, target: SpecClass, name: string,
+  static decorate(options: UnitOptions, target: SpecClass, propertyKey: string | symbol,
                   descriptor: PropertyDescriptor): void {
     Spec.init(target);
-
-    const unit = new SpecUnit(name, descriptor.value, options);
+    const unit = new SpecUnit(propertyKey.toString(), descriptor.value, options);
     target._units!.push(unit);
   }
 }

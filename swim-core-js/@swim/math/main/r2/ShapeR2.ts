@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {R2Function} from "./R2Function";
-import {PointR2Init, PointR2Tuple, PointR2} from "./PointR2";
-import {SegmentR2Init, SegmentR2} from "./SegmentR2";
-import {BoxR2Init, BoxR2} from "./BoxR2";
-import {CircleR2Init, CircleR2} from "./CircleR2";
+import type {R2Function} from "./R2Function";
+import type {PointR2Init, PointR2Tuple, PointR2} from "./PointR2";
+import type {SegmentR2Init, SegmentR2} from "./SegmentR2";
+import type {BoxR2Init, BoxR2} from "./BoxR2";
+import type {CircleR2Init, CircleR2} from "./CircleR2";
 
 export type AnyShapeR2 = ShapeR2 | PointR2Init | PointR2Tuple | SegmentR2Init | BoxR2Init | CircleR2Init;
 

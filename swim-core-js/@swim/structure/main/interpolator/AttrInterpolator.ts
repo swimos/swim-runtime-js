@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem} from "../Item";
+import type {AnyItem} from "../Item";
 import {Attr} from "../Attr";
-import {Value} from "../Value";
-import {Text} from "../Text";
+import type {Value} from "../Value";
+import type {Text} from "../Text";
 import {ItemInterpolator} from "./ItemInterpolator";
 
 export class AttrInterpolator extends ItemInterpolator<Attr> {

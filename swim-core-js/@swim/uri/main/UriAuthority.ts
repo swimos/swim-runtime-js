@@ -15,9 +15,9 @@
 import {Comparable, HashCode, Strings} from "@swim/util";
 import {Output, Format, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
-import {AnyUriUser, UriUserInit, UriUser} from "./UriUser";
-import {AnyUriHost, UriHost} from "./UriHost";
-import {AnyUriPort, UriPort} from "./UriPort";
+import type {AnyUriUser, UriUserInit, UriUser} from "./UriUser";
+import type {AnyUriHost, UriHost} from "./UriHost";
+import type {AnyUriPort, UriPort} from "./UriPort";
 
 export type AnyUriAuthority = UriAuthority | UriAuthorityInit | string;
 
@@ -27,7 +27,7 @@ export interface UriAuthorityInit extends UriUserInit {
   port?: AnyUriPort;
 }
 
-export class UriAuthority implements Comparable<UriAuthority>, HashCode, Debug, Display {
+export class UriAuthority implements Comparable, HashCode, Debug, Display {
   /** @hidden */
   readonly _user: UriUser;
   /** @hidden */
@@ -210,9 +210,11 @@ export class UriAuthority implements Comparable<UriAuthority>, HashCode, Debug, 
     return authority;
   }
 
-  compareTo(that: UriAuthority): 0 | 1 | -1 {
-    const order = this.toString().localeCompare(that.toString());
-    return order < 0 ? -1 : order > 0 ? 1 : 0;
+  compareTo(that: unknown): number {
+    if (that instanceof UriAuthority) {
+      return this.toString().localeCompare(that.toString());
+    }
+    return NaN;
   }
 
   equals(that: unknown): boolean {

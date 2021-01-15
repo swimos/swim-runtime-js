@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Cursor} from "@swim/util";
-import {STreeContext} from "./STreeContext";
+import type {STreeContext} from "./STreeContext";
 import {STree} from "./STree";
 import {STreePage} from "./STreePage";
-import {STreeNode} from "./STreeNode";
+import type {STreeNode} from "./STreeNode";
 
 /** @hidden */
 export class STreeLeaf<V, I> extends STreePage<V, I> {
@@ -62,7 +62,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
   private updatedItem(index: number, newValue: V): STreeLeaf<V, I> {
     const oldItems = this._slots;
     const oldSlot = oldItems[index];
-    if (newValue !== oldSlot[1]) {
+    if (oldSlot !== void 0 && newValue !== oldSlot[1]) {
       const newValues = oldItems.slice(0);
       newValues[index] = [oldSlot[0], newValue];
       return new STreeLeaf(newValues);
@@ -85,11 +85,11 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     const oldSlots = this._slots;
     const newSlots = new Array<[I, V]>(oldSlots.length + 1);
     for (let i = 0; i < index; i += 1) {
-      newSlots[i] = oldSlots[i];
+      newSlots[i] = oldSlots[i]!;
     }
     newSlots[index] = [id, newValue];
     for (let i = index; i < oldSlots.length; i += 1) {
-      newSlots[i + 1] = oldSlots[i];
+      newSlots[i + 1] = oldSlots[i]!;
     }
     return new STreeLeaf(newSlots);
   }
@@ -109,10 +109,10 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     const oldSlots = this._slots;
     const newSlots = new Array<[I, V]>(oldSlots.length - 1);
     for (let i = 0; i < index; i += 1) {
-      newSlots[i] = oldSlots[i];
+      newSlots[i] = oldSlots[i]!;
     }
     for (let i = index; i < newSlots.length; i += 1) {
-      newSlots[i] = oldSlots[i + 1];
+      newSlots[i] = oldSlots[i + 1]!;
     }
     return new STreeLeaf(newSlots);
   }
@@ -124,7 +124,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
         const size = oldSlots.length - lower;
         const newSlots = new Array<[I, V]>(size);
         for (let i = 0; i < size; i += 1) {
-          newSlots[i] = oldSlots[i + lower];
+          newSlots[i] = oldSlots[i + lower]!;
         }
         return new STreeLeaf(newSlots);
       } else {
@@ -141,7 +141,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
       if (upper > 0) {
         const newSlots = new Array<[I, V]>(upper);
         for (let i = 0; i < upper; i += 1) {
-          newSlots[i] = oldSlots[i];
+          newSlots[i] = oldSlots[i]!;
         }
         return new STreeLeaf(newSlots);
       } else {
@@ -178,7 +178,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     const oldSlots = this._slots;
     const newSlots = new Array<[I, V]>(index);
     for (let i = 0; i < index; i += 1) {
-      newSlots[i] = oldSlots[i];
+      newSlots[i] = oldSlots[i]!;
     }
     return new STreeLeaf(newSlots);
   }
@@ -188,7 +188,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     const newSize = oldSlots.length - index;
     const newSlots = new Array<[I, V]>(newSize);
     for (let i = 0; i < newSize; i += 1) {
-      newSlots[i] = oldSlots[i + index];
+      newSlots[i] = oldSlots[i + index]!;
     }
     return new STreeLeaf(newSlots);
   }
@@ -196,7 +196,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
   forEach<T, S>(callback: (this: S, value: V, index: number, id: I) => T | void,
                 thisArg: S, offset: number): T | undefined {
     for (let i = 0; i < this._slots.length; i += 1) {
-      const slot = this._slots[i];
+      const slot = this._slots[i]!;
       const result = callback.call(thisArg, slot[1], offset + i, slot[0]);
       if (result !== void 0) {
         return result;

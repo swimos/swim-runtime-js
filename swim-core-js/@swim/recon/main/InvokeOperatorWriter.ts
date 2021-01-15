@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Output, WriterException, Writer} from "@swim/codec";
-import {ReconWriter} from "./ReconWriter";
+import type {ReconWriter} from "./ReconWriter";
 
 /** @hidden */
 export class InvokeOperatorWriter<I, V> extends Writer {

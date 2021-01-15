@@ -23,7 +23,7 @@ export class ArrayInterpolator<T> extends Interpolator<T[], ReadonlyArray<T>> {
     const interpolatorCount = Math.min(a0.length, a1.length);
     const interpolators = new Array<Interpolator<T>>(interpolatorCount);
     for (let i = 0; i < interpolatorCount; i += 1) {
-      interpolators[i] = Interpolator.between(a0[i], a1[i]);
+      interpolators[i] = Interpolator.between(a0[i]!, a1[i]!);
     }
     this.interpolators = interpolators;
   }
@@ -33,7 +33,7 @@ export class ArrayInterpolator<T> extends Interpolator<T[], ReadonlyArray<T>> {
     const interpolatorCount = interpolators.length;
     const array = new Array<T>(interpolatorCount);
     for (let i = 0; i < interpolatorCount; i += 1) {
-      array[i] = interpolators[i].interpolate(u);
+      array[i] = interpolators[i]!.interpolate(u);
     }
     return array;
   }
@@ -64,7 +64,7 @@ export class ArrayInterpolator<T> extends Interpolator<T[], ReadonlyArray<T>> {
       const n = this.interpolators.length;
       if (n === that.interpolators.length) {
         for (let i = 0; i < n; i += 1) {
-          if (!this.interpolators[i].equals(that.interpolators[i])) {
+          if (!this.interpolators[i]!.equals(that.interpolators[i]!)) {
             return false;
           }
         }
