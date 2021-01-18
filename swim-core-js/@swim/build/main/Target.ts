@@ -404,7 +404,7 @@ export class Target {
       message = message.messageText;
     }
     const severity = Target.tsSeverity(error.category);
-    if (severity.level() >= Severity.ERROR_LEVEL) {
+    if (severity.level >= Severity.ERROR_LEVEL) {
       this.failed = true;
     }
     if (error.file !== void 0) {
@@ -418,7 +418,7 @@ export class Target {
       }
 
       const input = Unicode.stringInput(error.file.text).withId(error.file.fileName);
-      const diagnostic = new Diagnostic(input, tag, severity, "" + error.code, null, null);
+      const diagnostic = new Diagnostic(input, tag, severity, "" + error.code, void 0, null);
       console.log(diagnostic.toString(OutputSettings.styled()));
     } else {
       const output = Unicode.stringOutput(OutputSettings.styled());
@@ -427,7 +427,7 @@ export class Target {
     }
   }
 
-  private static tsMark(position: number, file: ts.SourceFile, note: string | null = null): Mark {
+  private static tsMark(position: number, file: ts.SourceFile, note?: string): Mark {
     const {line, character} = file.getLineAndCharacterOfPosition(position);
     return Mark.at(position, line + 1, character + 1, note);
   }
@@ -499,17 +499,17 @@ export class Target {
       tag =  Target.tslinkMark(failure.getStartPosition(), 0, failure.getFailure());
     }
     const severity = Target.tslintSeverity(failure.getRuleSeverity());
-    if (severity.level() >= Severity.ERROR_LEVEL) {
+    if (severity.level >= Severity.ERROR_LEVEL) {
       this.failed = true;
     }
 
     const sourceFile = (failure as any).sourceFile;
     const input = Unicode.stringInput(sourceFile.text).withId(sourceFile.fileName);
-    const diagnostic = new Diagnostic(input, tag, severity, failure.getRuleName(), null, null);
+    const diagnostic = new Diagnostic(input, tag, severity, failure.getRuleName(), void 0, null);
     console.log(diagnostic.toString(OutputSettings.styled()));
   }
 
-  private static tslinkMark(pos: tslint.RuleFailurePosition, shift: number = 0, note: string | null = null): Mark {
+  private static tslinkMark(pos: tslint.RuleFailurePosition, shift: number = 0, note?: string): Mark {
     const position = pos.getPosition();
     const {line, character} = pos.getLineAndCharacter();
     return Mark.at(position + shift, line + 1, character + shift + 1, note);
