@@ -117,7 +117,7 @@ export function Unit(target: UnitOptions | Object | Function, propertyKey?: stri
     if (typeof target === "function") {
       Spec.init(target.prototype as SpecClass);
     } else {
-      return SpecUnit.decorate.bind(void 0, target as UnitOptions);
+      return SpecUnit.decorate.bind(SpecUnit, target as UnitOptions);
     }
   } else {
     SpecUnit.decorate({}, target as SpecClass, propertyKey!, descriptor!);

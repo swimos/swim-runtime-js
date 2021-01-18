@@ -22,8 +22,8 @@ import {Exam} from "./Exam";
 
 /** @hidden */
 export interface SpecClass {
-  _tests?: SpecTest[];
-  _units?: SpecUnit[];
+  tests?: SpecTest[];
+  units?: SpecUnit[];
 }
 
 /**
@@ -34,51 +34,52 @@ export interface SpecClass {
  * decorators.
  */
 export class Spec {
-  /**
-   * Optional custom name of this `Spec`.
-   * @hidden
-   */
-  _name?: string;
-
-  /**
-   * Parent of this `Spec`, if this is not a root spec.
-   * @hidden
-   */
-  _parent?: Spec;
-
-  /**
-   * Returns the name of this `Spec`.  Returns the custom `name`, if set via
-   * the `name(string)` method; otherwise returns the constructor name of this
-   * spec's prototype.
-   */
-  name(): string;
-
-  /**
-   * Sets the name of this `Spec`, and returns `this`.  Setting `name` to `null`
-   * reverts this spec's name back to the constructor name of its prototype.
-   */
-  name(name: string | null): Spec;
-
-  name(name?: string | null): string | Spec {
-    if (name === void 0) {
-      return typeof this._name === "string" ? this._name : Object.getPrototypeOf(this).constructor.name;
-    } else {
-      if (name !== null) {
-        this._name = name;
-      } else {
-        this._name = void 0;
-      }
-      return this;
-    }
+  constructor() {
+    Object.defineProperty(this, "name", {
+      value: this.constructor.name,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "parent", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   /**
-   * Returns the `Spec` that instantiated this spec via one of the parent's
-   * [[UnitFunc child unit factory functions]]; returns `undefined` if this
-   * is a root spec.
+   * The name of this `Spec`; either a custom `name` set via the [[withName]]
+   * method, or the name of this spec's constructor function.
    */
-  parent(): Spec | undefined {
-    return this._parent;
+  declare readonly name: string;
+
+  /**
+   * Sets the name of this `Spec`, and returns `this`.  If `name` is `undefined`,
+   * sets this spec's name to the name of its constructor function.
+   */
+  withName(name: string | undefined): this {
+    Object.defineProperty(this, "name", {
+      value: name !== void 0 ? name : this.constructor.name,
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
+  }
+
+  /**
+   * The `Spec` that instantiated this spec via one of the parent's
+   * [[UnitFunc child unit factory functions]], or `null` if this is
+   * a root spec.
+   */
+  declare readonly parent: Spec | null;
+
+  /** @hidden */
+  setParent(parent: Spec | null): void {
+    Object.defineProperty(this, "parent", {
+      value: parent,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   /**
@@ -88,7 +89,7 @@ export class Spec {
    * completes with the test report.
    */
   run(report?: Report): Promise<Report> {
-    return Spec.run(report, this as SpecClass, this);
+    return Spec.run(report, Object.getPrototypeOf(this), this);
   }
 
   /**
@@ -199,11 +200,11 @@ export class Spec {
    * @hidden
    */
   static init(specClass: SpecClass): void {
-    if (!specClass.hasOwnProperty("_tests")) {
-      specClass._tests = [];
+    if (!specClass.hasOwnProperty("tests")) {
+      specClass.tests = [];
     }
-    if (!specClass.hasOwnProperty("_units")) {
-      specClass._units = [];
+    if (!specClass.hasOwnProperty("units")) {
+      specClass.units = [];
     }
   }
 
@@ -229,11 +230,11 @@ export class Spec {
     let tests = new Array<SpecTest>();
     let units = new Array<SpecUnit>();
     do {
-      if (specClass.hasOwnProperty("_tests")) {
-        tests = tests.concat(specClass._tests!);
+      if (specClass.hasOwnProperty("tests")) {
+        tests = tests.concat(specClass.tests!);
       }
-      if (specClass.hasOwnProperty("_units")) {
-        units = units.concat(specClass._units!);
+      if (specClass.hasOwnProperty("units")) {
+        units = units.concat(specClass.units!);
       }
       specClass = Object.getPrototypeOf(specClass);
     } while (specClass !== null);
@@ -244,7 +245,7 @@ export class Spec {
     report.willRunSpec(spec);
     return Spec.runTests(report, spec, tests)
         .then(Spec.runUnits.bind(void 0, report, spec, units))
-        .then(Spec.runSuccess.bind(void 0, report, spec) as () => Report,
+        .then(Spec.runSuccess.bind(void 0, report, spec),
               Spec.runFailure.bind(void 0, report, spec));
   }
 

@@ -23,52 +23,37 @@ import type {Report} from "./Report";
  * the context of a particular parent `Spec` instance.
  */
 export class SpecUnit {
-  /**
-   * The name of this test unit.
-   * @hidden
-   */
-  readonly _name: string;
-
-  /**
-   * The factory function used to instantiate child specs.
-   * @hidden
-   */
-  readonly _func: UnitFunc;
-
-  /**
-   * Options that govern the execution of this test unit.
-   * @hidden
-   */
-  readonly _options: UnitOptions;
-
   constructor(name: string, func: UnitFunc, options: UnitOptions) {
-    this._name = name;
-    this._func = func;
-    this._options = options;
+    Object.defineProperty(this, "name", {
+      value: name,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "func", {
+      value: func,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "options", {
+      value: options,
+      enumerable: true,
+    });
   }
 
   /**
-   * Returns the name of this `SpecUnit`–typically the name of the factory
-   * function that instantiates its child specs.
+   * The name of this `SpecUnit`–typically the name of the factory function
+   * that instantiates its child specs.
    */
-  get name(): string {
-    return this._name;
-  }
+  declare readonly name: string;
 
   /**
-   * Returns the factory function used to instantiate child specs to be
-   * executed by the test unit.
+   * The factory function used to instantiate child specs to be executed by
+   * the test unit.
    */
-  get func(): UnitFunc {
-    return this._func;
-  }
+  declare readonly func: UnitFunc;
 
   /**
-   * Returns the options that govern the execution of this test unit.
+   * The options that govern the execution of this test unit.
    */
-  get options(): UnitOptions {
-    return this._options;
-  }
+  declare readonly options: UnitOptions;
 
   /**
    * Lifecycle callback invoked before the execution of each child spec
@@ -99,11 +84,11 @@ export class SpecUnit {
    * completes with the generated child test specs.
    */
   run(report: Report, spec: Spec): Promise<Spec[] | Spec | undefined> {
-    const units = this._func.call(spec) as Spec[] | Spec | undefined;
+    const units = this.func.call(spec);
     if (Array.isArray(units)) {
       return this.runUnit(report, spec, units, 0);
     } else if (units !== void 0) {
-      units._parent = spec;
+      units.setParent(spec);
       this.willRunUnit(report, spec, units);
       return units.run(report)
           .then(this.runUnitSuccess.bind(this, report, spec, units),
@@ -120,12 +105,12 @@ export class SpecUnit {
   runUnit(report: Report, spec: Spec, units: Spec[], index: number): Promise<Spec[]> {
     if (index < units.length) {
       const unit = units[index]!;
-      unit._parent = spec;
+      unit.setParent(spec);
       this.willRunUnit(report, spec, unit);
       return unit.run(report)
           .then(this.runUnitSuccess.bind(this, report, spec, unit),
                 this.runUnitFailure.bind(this, report, spec, unit))
-          .then(this.runUnit.bind(this, report, spec, units, index + 1) as () => Promise<Spec[]>);
+          .then(this.runUnit.bind(this, report, spec, units, index + 1));
     } else {
       return Promise.resolve(units);
     }
@@ -157,6 +142,6 @@ export class SpecUnit {
                   descriptor: PropertyDescriptor): void {
     Spec.init(target);
     const unit = new SpecUnit(propertyKey.toString(), descriptor.value, options);
-    target._units!.push(unit);
+    target.units!.push(unit);
   }
 }

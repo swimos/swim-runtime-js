@@ -95,7 +95,7 @@ export function Test(target: Object, propertyKey: string | symbol, descriptor: P
 export function Test(target: TestOptions | Object, propertyKey?: string | symbol,
                      descriptor?: PropertyDescriptor): MethodDecorator | void {
   if (arguments.length === 1) {
-    return SpecTest.decorate.bind(void 0, target as TestOptions);
+    return SpecTest.decorate.bind(SpecTest, target as TestOptions);
   } else {
     SpecTest.decorate({}, target as SpecClass, propertyKey!, descriptor!);
   }

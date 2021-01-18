@@ -21,105 +21,70 @@ import type {Report} from "./Report";
 
 /**
  * The `Passing`/`Failing`/`Pending` status of an `Exam`.
+ * - "passing": the `Exam` has only valid proof points.
+ * - "failing": the `Exam` has invalid proof points.
+ * - "pending": the `Exam` has tentative proof points.
  */
-export const enum ExamStatus {
-  /**
-   * The `Exam` has only valid proof points.
-   */
-  Passing,
-  /**
-   * The `Exam` has invalid proof points.
-   */
-  Failing,
-  /**
-   * The `Exam` has tentative proof points.
-   */
-  Pending,
-}
+export type ExamStatus = "passing" | "failing" | "pending";
 
 export class Exam implements Assert {
+  constructor(report: Report, spec: Spec, name: string, options: TestOptions) {
+    Object.defineProperty(this, "report", {
+      value: report,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "spec", {
+      value: spec,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "name", {
+      value: name,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "options", {
+      value: options,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "status", {
+      value: "passing",
+      enumerable: true,
+      configurable: true,
+    });
+  }
+
   /**
    * The unit test `Report` to which this `Exam` sends results.
-   * @hidden
    */
-  readonly _report: Report;
+  declare readonly report: Report;
 
   /**
    * The `Spec` that created this `Exam`.
-   * @hidden
    */
-  readonly _spec: Spec;
+  declare readonly spec: Spec;
 
   /**
    * The name of the test that this `Exam` is evaluating.
-   * @hidden
    */
-  readonly _name: string;
-
-  /**
-   * The options that govern the behavior of this `Exam`.
-   * @hidden
-   */
-  readonly _options: TestOptions;
-
-  /**
-   * The current `Passing`/`Failing`/`Pending` status of this `Exam`.
-   * @hidden
-   */
-  _status: ExamStatus;
-
-  constructor(report: Report, spec: Spec, name: string,
-              options: TestOptions, status: ExamStatus = ExamStatus.Passing) {
-    this._report = report;
-    this._spec = spec;
-    this._name = name;
-    this._options = options;
-    this._status = status;
-  }
-
-  /**
-   * Returns the unit test `Report` to which this `Exam` sends results.
-   */
-  report(): Report {
-    return this._report;
-  }
-
-  /**
-   * Returns the `Spec` that created this `Exam`.
-   */
-  spec(): Spec {
-    return this._spec;
-  }
-
-  /**
-   * Returns the name of the test that this `Exam` is evaluating.
-   */
-  name(): string {
-    return this._name;
-  }
+  declare readonly name: string;
 
   /**
    * Returns the options that govern the behavior of this `Exam`.
    */
-  options(): TestOptions {
-    return this._options;
-  }
+  declare readonly options: TestOptions;
 
   /**
    * Returns the current `Passing`/`Failing`/`Pending` status of this `Exam`.
    */
-  status(): ExamStatus {
-    return this._status;
-  }
+  declare readonly status: ExamStatus;
 
   /**
    * Makes a comment about the circumstances of the test case.
    */
   comment(message: string): void {
-    if (typeof this._spec.onComment === "function") {
-      this._spec.onComment(this._report, this, message);
+    if (typeof this.spec.onComment === "function") {
+      this.spec.onComment(this.report, this, message);
     }
-    this._report.onComment(this._spec, this, message);
+    this.report.onComment(this.spec, this, message);
   }
 
   /**
@@ -127,14 +92,22 @@ export class Exam implements Assert {
    */
   proove(proof: Proof): void {
     if (!proof.isValid()) {
-      this._status = ExamStatus.Failing;
+      Object.defineProperty(this, "status", {
+        value: "failing",
+        enumerable: true,
+        configurable: true,
+      });
     } else if (proof.isPending()) {
-      this._status = ExamStatus.Pending;
+      Object.defineProperty(this, "status", {
+        value: "pending",
+        enumerable: true,
+        configurable: true,
+      });
     }
-    if (typeof this._spec.onProof === "function") {
-      this._spec.onProof(this._report, this, proof);
+    if (typeof this.spec.onProof === "function") {
+      this.spec.onProof(this.report, this, proof);
     }
-    this._report.onProof(this._spec, this, proof);
+    this.report.onProof(this.spec, this, proof);
   }
 
   /**
