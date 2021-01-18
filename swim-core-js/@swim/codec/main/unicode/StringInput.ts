@@ -16,169 +16,257 @@ import {Mark} from "../source/Mark";
 import {InputException} from "../input/InputException";
 import {AnyInputSettings, InputSettings} from "../input/InputSettings";
 import {Input} from "../input/Input";
+import {InputError} from "../input/InputError";
 
 /** @hidden */
 export class StringInput extends Input {
   /** @hidden */
-  readonly _string: string;
+  declare readonly string: string;
   /** @hidden */
-  _id: unknown | null;
+  declare readonly index: number;
   /** @hidden */
-  _offset: number;
-  /** @hidden */
-  _line: number;
-  /** @hidden */
-  _column: number;
-  /** @hidden */
-  _settings: InputSettings;
-  /** @hidden */
-  _index: number;
-  /** @hidden */
-  _isPart: boolean;
+  declare readonly part: boolean;
 
-  constructor(string: string, id: unknown | null = null, offset: number = 0,
-              line: number = 1, column: number = 1, settings: InputSettings = InputSettings.standard(),
-              index: number = 0, isPart: boolean = false) {
+  constructor(string: string, id: string | undefined, offset: number,
+              line: number, column: number, settings: InputSettings,
+              index: number, part: boolean) {
     super();
-    this._string = string;
-    this._id = id;
-    this._offset = offset;
-    this._line = line;
-    this._column = column;
-    this._settings = settings;
-    this._index = index;
-    this._isPart = isPart;
+    Object.defineProperty(this, "string", {
+      value: string,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "index", {
+      value: index,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "part", {
+      value: part,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "id", {
+      value: id,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "offset", {
+      value: offset,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "line", {
+      value: line,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "column", {
+      value: column,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "settings", {
+      value: settings,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   isCont(): boolean {
-    return this._index < this._string.length;
+    return this.index < this.string.length;
   }
 
   isEmpty(): boolean {
-    return this._isPart && this._index >= this._string.length;
+    return this.part && this.index >= this.string.length;
   }
 
   isDone(): boolean {
-    return !this._isPart && this._index >= this._string.length;
+    return !this.part && this.index >= this.string.length;
   }
 
   isError(): boolean {
     return false;
   }
 
-  isPart(): boolean;
-  isPart(isPart: boolean): Input;
-  isPart(isPart?: boolean): boolean | Input {
-    if (isPart === void 0) {
-      return this._isPart;
-    } else {
-      this._isPart = isPart;
-      return this;
-    }
+  isPart(): boolean {
+    return this.part;
+  }
+
+  asPart(part: boolean): Input {
+    Object.defineProperty(this, "part", {
+      value: part,
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
   head(): number {
-    if (this._index < this._string.length) {
-      const c = this._string.codePointAt(this._index);
+    const string = this.string;
+    const index = this.index;
+    if (index < string.length) {
+      const c = string.codePointAt(index);
       if (c !== void 0) {
         return c;
       } else {
-        return this._string.charCodeAt(this._index);
+        return string.charCodeAt(index);
       }
     }
     throw new InputException();
   }
 
   step(): Input {
-    const index = this._index;
-    if (index < this._string.length) {
-      const c = this._string.codePointAt(index);
-      this._index = this._string.offsetByCodePoints(index, 1);
-      this._offset += this._index - index;
+    const string = this.string;
+    const index = this.index;
+    if (index < string.length) {
+      const c = string.codePointAt(index);
+      Object.defineProperty(this, "index", {
+        value: string.offsetByCodePoints(index, 1),
+        enumerable: true,
+        configurable: true,
+      });
+      Object.defineProperty(this, "offset", {
+        value: this.offset + (this.index - index),
+        enumerable: true,
+        configurable: true,
+      });
       if (c === 10/*'\n'*/) {
-        this._line += 1;
-        this._column = 1;
+        Object.defineProperty(this, "line", {
+          value: this.line + 1,
+          enumerable: true,
+          configurable: true,
+        });
+        Object.defineProperty(this, "column", {
+          value: 1,
+          enumerable: true,
+          configurable: true,
+        });
       } else {
-        this._column += 1;
+        Object.defineProperty(this, "column", {
+          value: this.column + 1,
+          enumerable: true,
+          configurable: true,
+        });
       }
       return this;
     } else {
       const error = new InputException("invalid step");
-      return Input.error(error, this._id, this.mark(), this._settings);
+      return new InputError(error, this.id, this.mark, this.settings);
     }
   }
 
   seek(mark?: Mark): Input {
     if (mark !== void 0) {
-      const index = this._index + (mark._offset - this._offset);
-      if (0 <= index && index <= this._string.length) {
-        this._offset = mark._offset;
-        this._line = mark._line;
-        this._column = mark._column;
-        this._index = index;
+      const index = this.index + (mark.offset - this.offset);
+      if (0 <= index && index <= this.string.length) {
+        Object.defineProperty(this, "index", {
+          value: index,
+          enumerable: true,
+          configurable: true,
+        });
+        Object.defineProperty(this, "offset", {
+          value: mark.offset,
+          enumerable: true,
+          configurable: true,
+        });
+        Object.defineProperty(this, "line", {
+          value: mark.line,
+          enumerable: true,
+          configurable: true,
+        });
+        Object.defineProperty(this, "column", {
+          value: mark.column,
+          enumerable: true,
+          configurable: true,
+        });
         return this;
       } else {
         const error = new InputException("invalid seek to " + mark);
-        return Input.error(error, this._id, this.mark(), this._settings);
+        return new InputError(error, this.id, this.mark, this.settings);
       }
     } else {
-      this._offset = 0;
-      this._line = 1;
-      this._column = 1;
-      this._index = 0;
+      Object.defineProperty(this, "index", {
+        value: 0,
+        enumerable: true,
+        configurable: true,
+      });
+      Object.defineProperty(this, "offset", {
+        value: 0,
+        enumerable: true,
+        configurable: true,
+      });
+      Object.defineProperty(this, "line", {
+        value: 1,
+        enumerable: true,
+        configurable: true,
+      });
+      Object.defineProperty(this, "column", {
+        value: 1,
+        enumerable: true,
+        configurable: true,
+      });
       return this;
     }
   }
 
-  id(): unknown | null;
-  id(id: unknown | null): Input;
-  id(id?: unknown | null): unknown | null | Input {
-    if (id === void 0) {
-      return this._id;
-    } else {
-      this._id = id;
-      return this;
-    }
+  declare readonly id: string | undefined;
+
+  withId(id: string | undefined): Input {
+    Object.defineProperty(this, "id", {
+      value: id,
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
-  mark(): Mark;
-  mark(mark: Mark): Input;
-  mark(mark?: Mark): Mark | Input {
-    if (mark === void 0) {
-      return Mark.at(this._offset, this._line, this._column);
-    } else {
-      this._offset = mark._offset;
-      this._line = mark._line;
-      this._column = mark._column;
-      return this;
-    }
+  get mark(): Mark {
+    return Mark.at(this.offset, this.line, this.column);
   }
 
-  offset(): number {
-    return this._offset;
+  withMark(mark: Mark): Input {
+    Object.defineProperty(this, "offset", {
+      value: mark.offset,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "line", {
+      value: mark.line,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "column", {
+      value: mark.column,
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
-  line(): number {
-    return this._line;
-  }
+  declare readonly offset: number;
 
-  column(): number {
-    return this._column;
-  }
+  declare readonly line: number;
 
-  settings(): InputSettings;
-  settings(settings: AnyInputSettings): Input;
-  settings(settings?: AnyInputSettings): InputSettings | Input {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      this._settings = InputSettings.fromAny(settings);
-      return this;
-    }
+  declare readonly column: number;
+
+  declare readonly settings: InputSettings;
+
+  withSettings(settings: AnyInputSettings): Input {
+    settings = InputSettings.fromAny(settings);
+    Object.defineProperty(this, "settings", {
+      value: settings,
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
   clone(): Input {
-    return new StringInput(this._string, this._id, this._offset, this._line,
-                           this._column, this._settings, this._index, this._isPart);
+    return new StringInput(this.string, this.id, this.offset, this.line,
+                           this.column, this.settings, this.index, this.part);
+  }
+
+  static create(string: string): Input {
+    return new StringInput(string, void 0, 0, 1, 1, InputSettings.standard(), 0, false);
   }
 }

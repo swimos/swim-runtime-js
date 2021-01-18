@@ -17,25 +17,40 @@ import type {Input} from "../input/Input";
 import type {Output} from "../output/Output";
 import {Parser} from "../parser/Parser";
 import {Unicode} from "../unicode/Unicode";
-import {Base10} from "./Base10";
 
 /** @hidden */
 export class Base10NumberParser extends Parser<number> {
-  private readonly _sign: number | undefined;
-  private readonly _value: number | undefined;
-  private readonly _mode: number | undefined;
-  private readonly _step: number | undefined;
+  /** @hidden */
+  declare readonly sign: number;
+  /** @hidden */
+  declare readonly value: number;
+  /** @hidden */
+  declare readonly mode: number;
+  /** @hidden */
+  declare readonly step: number;
 
-  constructor(sign?: number, value?: number, mode?: number, step?: number) {
+  constructor(sign: number = 1, value: number = 0, mode: number = 2, step: number = 1) {
     super();
-    this._sign = sign;
-    this._value = value;
-    this._mode = mode;
-    this._step = step;
+    Object.defineProperty(this, "sign", {
+      value: sign,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "mode", {
+      value: mode,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "step", {
+      value: step,
+      enumerable: true,
+    });
   }
 
   feed(input: Input): Parser<number> {
-    return Base10NumberParser.parse(input, this._sign, this._value, this._mode, this._step);
+    return Base10NumberParser.parse(input, this.sign, this.value, this.mode, this.step);
   }
 
   static parse(input: Input, sign: number = 1, value: number = 0,
@@ -121,23 +136,34 @@ export class Base10NumberParser extends Parser<number> {
     return new Base10NumberParser(sign, value, mode, step);
   }
 }
-Base10.NumberParser = Base10NumberParser;
 
 /** @hidden */
 class Base10DecimalParser extends Parser<number> {
-  private readonly _output: Output<string>;
-  private readonly _mode: number | undefined;
-  private readonly _step: number | undefined;
+  /** @hidden */
+  declare readonly output: Output<string>;
+  /** @hidden */
+  declare readonly mode: number;
+  /** @hidden */
+  declare readonly step: number;
 
-  constructor(output: Output<string>, mode?: number, step?: number) {
+  constructor(output: Output<string>, mode: number = 2, step: number = 1) {
     super();
-    this._output = output;
-    this._mode = mode;
-    this._step = step;
+    Object.defineProperty(this, "output", {
+      value: output,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "mode", {
+      value: mode,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "step", {
+      value: step,
+      enumerable: true,
+    });
   }
 
   feed(input: Input): Parser<number> {
-    return Base10DecimalParser.parse(input, this._output, this._mode, this._step);
+    return Base10DecimalParser.parse(input, this.output, this.mode, this.step);
   }
 
   static parse(input: Input, output: Output<string>, mode: number = 2,

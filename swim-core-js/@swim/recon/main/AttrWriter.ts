@@ -63,7 +63,7 @@ export class AttrWriter<I, V> extends Writer {
       if (part.isDone()) {
         part = void 0;
         if (recon.isExtant(recon.item(value))) {
-          return Writer.done();
+          return Writer.end();
         } else {
           step = 3;
         }
@@ -90,7 +90,7 @@ export class AttrWriter<I, V> extends Writer {
     }
     if (step === 5 && output.isCont()) {
       output = output.write(41/*')'*/);
-      return Writer.done();
+      return Writer.end();
     }
     if (output.isDone()) {
       return Writer.error(new WriterException("truncated"));

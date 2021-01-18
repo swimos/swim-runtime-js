@@ -15,37 +15,61 @@
 import type {Output} from "../output/Output";
 import {WriterException} from "../writer/WriterException";
 import {Writer} from "../writer/Writer";
-import {Base16} from "./Base16";
+import type {Base16} from "./Base16";
 
 /** @hidden */
-export class Base16IntegerWriter extends Writer<unknown, unknown> {
-  private readonly _value: unknown;
-  private readonly _input: number;
-  private readonly _width: number;
-  private readonly _base16: Base16;
-  private readonly _index: number | undefined;
-  private readonly _step: number | undefined;
+export class Base16IntegerWriter extends Writer {
+  /** @hidden */
+  declare readonly value: unknown;
+  /** @hidden */
+  declare readonly input: number;
+  /** @hidden */
+  declare readonly width: number;
+  /** @hidden */
+  declare readonly base16: Base16;
+  /** @hidden */
+  declare readonly index: number;
+  /** @hidden */
+  declare readonly step: number;
 
   constructor(value: unknown, input: number, width: number,
-              base16: Base16, index?: number, step?: number) {
+              base16: Base16, index: number = 0, step: number = 3) {
     super();
-    this._value = value;
-    this._input = input;
-    this._width = width;
-    this._base16 = base16;
-    this._index = index;
-    this._step = step;
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "input", {
+      value: input,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "width", {
+      value: width,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "base16", {
+      value: base16,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "index", {
+      value: index,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "step", {
+      value: step,
+      enumerable: true,
+    });
   }
 
-  pull(output: Output): Writer<unknown, unknown> {
-    return Base16IntegerWriter.write(output, this._value, this._input, this._width,
-                                     this._base16, this._index, this._step);
+  pull(output: Output): Writer {
+    return Base16IntegerWriter.write(output, this.value, this.input, this.width,
+                                     this.base16, this.index, this.step);
   }
 
   static write(output: Output, value: unknown, input: number, width: number,
-               base16: Base16, index: number = 0, step: number = 3): Writer<unknown, unknown> {
+               base16: Base16, index: number = 0, step: number = 3): Writer {
     if (step <= 0) {
-      return Writer.done();
+      return Writer.end();
     }
     if (step === 1 && output.isCont()) {
       output = output.write(48/*'0'*/);
@@ -89,9 +113,8 @@ export class Base16IntegerWriter extends Writer<unknown, unknown> {
     return new Base16IntegerWriter(value, input, width, base16, index, step);
   }
 
-  static writeLiteral(output: Output, value: unknown, input: number, width: number,
-                      base16: Base16): Writer<unknown, unknown> {
+  static writeLiteral(output: Output, value: unknown, input: number,
+                      width: number, base16: Base16): Writer {
     return Base16IntegerWriter.write(output, value, input, width, base16, 0, 1);
   }
 }
-Base16.IntegerWriter = Base16IntegerWriter;

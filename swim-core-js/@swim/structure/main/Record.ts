@@ -173,7 +173,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   /**
-   * Returns `this` `Record.
+   * Returns this `Record`.
    */
   unflattened(): Record {
     return this;

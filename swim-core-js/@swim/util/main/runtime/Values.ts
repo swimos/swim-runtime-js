@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equals} from "../any/Equals";
-import {HashCode} from "../any/HashCode";
-import {Equivalent} from "../any/Equivalent";
-import {Comparable} from "../any/Comparable";
+import {Equals} from "../lang/Equals";
+import {HashCode} from "../lang/HashCode";
+import {Equivalent} from "../lang/Equivalent";
+import {Comparable} from "../lang/Comparable";
 import {Numbers} from "./Numbers";
 import {Strings} from "./Strings";
 import {Functions} from "./Functions";

@@ -12,12 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {Identity} from "./Identity";
-export {Booleans} from "./Booleans";
-export {Numbers} from "./Numbers";
-export {Strings} from "./Strings";
-export {Functions} from "./Functions";
-export {Constructors} from "./Constructors";
-export {Arrays} from "./Arrays";
-export {Objects} from "./Objects";
-export {Values} from "./Values";
+import type {Input} from "../input/Input";
+import {Parser} from "./Parser";
+
+/** @hidden */
+export class ParserDone<O> extends Parser<O> {
+  /** @hidden */
+  declare readonly value: O;
+
+  constructor(value: O) {
+    super();
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
+  }
+
+  isCont(): boolean {
+    return false;
+  }
+
+  isDone(): boolean {
+    return true;
+  }
+
+  feed(input: Input): Parser<O> {
+    return this;
+  }
+
+  bind(): O {
+    return this.value;
+  }
+}

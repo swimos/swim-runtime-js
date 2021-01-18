@@ -80,7 +80,7 @@ export class InvokeOperatorWriter<I, V> extends Writer {
     }
     if (step === 4 && output.isCont()) {
       output = output.write(41/*')'*/);
-      return Writer.done();
+      return Writer.end();
     }
     if (output.isDone()) {
       return Writer.error(new WriterException("truncated"));

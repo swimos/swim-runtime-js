@@ -19,5 +19,13 @@ export {
   InputSettingsInit,
   InputSettings,
 } from "./InputSettings";
+
 export {Input} from "./Input";
+export {InputEmpty} from "./InputEmpty";
+export {InputDone} from "./InputDone";
+export {InputError} from "./InputError";
+
 export {InputBuffer} from "./InputBuffer";
+export {InputBufferEmpty} from "./InputBufferEmpty";
+export {InputBufferDone} from "./InputBufferDone";
+export {InputBufferError} from "./InputBufferError";

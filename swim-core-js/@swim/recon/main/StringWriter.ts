@@ -112,23 +112,23 @@ export class StringWriter extends Writer {
         output = output.write(117/*'u'*/);
         step = 5;
       } else if (step === 5) {
-        output = output.write(Base16.uppercase().encodeDigit((escape >>> 12) & 0xf));
+        output = output.write(Base16.uppercase.encodeDigit((escape >>> 12) & 0xf));
         step = 6;
       } else if (step === 6) {
-        output = output.write(Base16.uppercase().encodeDigit((escape >>> 8) & 0xf));
+        output = output.write(Base16.uppercase.encodeDigit((escape >>> 8) & 0xf));
         step = 7;
       } else if (step === 7) {
-        output = output.write(Base16.uppercase().encodeDigit((escape >>> 4) & 0xf));
+        output = output.write(Base16.uppercase.encodeDigit((escape >>> 4) & 0xf));
         step = 8;
       } else if (step === 8) {
-        output = output.write(Base16.uppercase().encodeDigit(escape & 0xf));
+        output = output.write(Base16.uppercase.encodeDigit(escape & 0xf));
         escape = 0;
         step = 2;
       }
     }
     if (step === 9 && output.isCont()) {
       output = output.write(34/*'"'*/);
-      return Writer.done();
+      return Writer.end();
     }
     if (output.isDone()) {
       return Writer.error(new WriterException("truncated"));

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
 import type {Input} from "../input/Input";
 import type {Output} from "../output/Output";
 import type {Parser} from "../parser/Parser";
@@ -19,23 +20,18 @@ import type {Writer} from "../writer/Writer";
 import {Format} from "../format/Format";
 import {Binary} from "../binary/Binary";
 import {Unicode} from "../unicode/Unicode";
-import type {Base64Parser} from "./Base64Parser";
-import type {Base64Writer} from "./Base64Writer";
+import {Base64Parser} from "../"; // circular import
+import {Base64Writer} from "../"; // circular import
 
 /**
  * Base-64 (7-bit ASCII) encoding [[Parser]]/[[Writer]] factory.
  */
 export abstract class Base64 {
-  /** @hidden */
-  constructor() {
-    // stub
-  }
-
   /**
-   * Returns a 64 character string, where the character at index `i` is the
-   * encoding of the base-64 digit `i`.
+   * The 64 character string, where the character at index `i` is the encoding
+   * of the base-64 digit `i`.
    */
-  abstract alphabet(): string;
+  abstract readonly alphabet: string;
 
   /**
    * Returns `true` if this base-64 encoding requires padding.
@@ -43,10 +39,9 @@ export abstract class Base64 {
   abstract isPadded(): boolean;
 
   /**
-   * Returns this `Base64` encoding with required padding, if `isPadded` is
-   * `true`.
+   * Returns this `Base64` encoding with required padding, if `padded` is `true`.
    */
-  abstract isPadded(isPadded: boolean): Base64;
+  abstract asPadded(padded: boolean): Base64;
 
   /**
    * Returns `true` if the Unicode code point `c` is a valid base-64 digit.
@@ -58,7 +53,7 @@ export abstract class Base64 {
    *
    * @throws `Error` if `c` is not a valid base-64 digit.
    */
-  public decodeDigit(c: number): number {
+  decodeDigit(c: number): number {
     if (c >= 65/*'A'*/ && c <= 90/*'Z'*/) {
       return c - 65/*'A'*/;
     } else if (c >= 97/*'a'*/ && c <= 122/*'z'*/) {
@@ -82,7 +77,7 @@ export abstract class Base64 {
    * 7-bit quantity.
    */
   encodeDigit(b: number): number {
-    return this.alphabet().charCodeAt(b);
+    return this.alphabet.charCodeAt(b);
   }
 
   /**
@@ -116,7 +111,7 @@ export abstract class Base64 {
    * writes the decoded bytes to `output`.
    */
   parser<O>(output: Output<O>): Parser<O> {
-    return new Base64.Parser<O>(output, this);
+    return new Base64Parser<O>(output, this);
   }
 
   /**
@@ -125,7 +120,7 @@ export abstract class Base64 {
    * parse any additional input.
    */
   parse<O>(input: Input, output: Output<O>): Parser<O> {
-    return Base64.Parser.parse(input, output, this);
+    return Base64Parser.parse(input, output, this);
   }
 
   /**
@@ -135,7 +130,7 @@ export abstract class Base64 {
    * binds]] a `Uint8Array` array containing all parsed base-64 data.
    */
   parseUint8Array(input: Input): Parser<Uint8Array> {
-    return Base64.Parser.parse(input, Binary.uint8ArrayOutput(), this);
+    return Base64Parser.parse(input, Binary.output(), this);
   }
 
   /**
@@ -145,100 +140,102 @@ export abstract class Base64 {
    */
   uint8ArrayWriter(): Writer<Uint8Array, unknown>;
   /**
-   * Returns a {@code Writer} continuation that writes the base-64 (7-bit ASCII)
-   * encoding of the {@code input} byte array.
+   * Returns a `Writer` continuation that writes the base-64 (7-bit ASCII)
+   * encoding of the `input` byte array.
    */
   uint8ArrayWriter(input: Uint8Array): Writer<unknown, Uint8Array>;
-  uint8ArrayWriter(input?: Uint8Array): Writer<unknown, unknown> {
+  uint8ArrayWriter(input?: Uint8Array): Writer {
     if (input === void 0) {
-      return new Base64.Writer(void 0, void 0, this);
+      return new Base64Writer(void 0, null, this);
     } else {
-      return new Base64.Writer(input, input, this);
+      return new Base64Writer(input, input, this);
     }
   }
 
   /**
    * Writes the base-64 (7-bit ASCII) encoding of the `input` `Uint8Array` to
-   * the `output`, returning a `Writer` continuation that knows how to write any
-   * remaining output that couldn't be immediately generated.
+   * the `output`, returning a `Writer` continuation that knows how to write
+   * any remaining output that couldn't be immediately generated.
    */
-  writeUint8Array(input: Uint8Array, output: Output): Writer<unknown, unknown> {
-    return Base64.Writer.write(output, void 0, input, this);
+  writeUint8Array(input: Uint8Array, output: Output): Writer {
+    return Base64Writer.write(output, void 0, input, this);
   }
 
-  private static _standard?: Base64;
-  private static _standardUnpadded?: Base64;
-  private static _url?: Base64;
-  private static _urlUnpadded?: Base64;
+  /** @hidden */
+  @Lazy
+  static get standardPadded(): Base64 {
+    return new Base64Standard(true);
+  }
+
+  /** @hidden */
+  @Lazy
+  static get standardUnpadded(): Base64 {
+    return new Base64Standard(false);
+  }
 
   /**
    * Returns the `Base64` encoding with the standard alphabet, and required
    * padding, if `isPadding` is `true`.
    */
-  static standard(isPadded: boolean = true): Base64 {
-    if (isPadded) {
-      if (Base64._standard === void 0) {
-        Base64._standard = new Base64Standard(true);
-      }
-      return Base64._standard;
+  static standard(padded: boolean = true): Base64 {
+    if (padded) {
+      return Base64.standardPadded;
     } else {
-      if (Base64._standardUnpadded === void 0) {
-        Base64._standardUnpadded = new Base64Standard(true);
-      }
-      return Base64._standardUnpadded;
+      return Base64.standardUnpadded;
     }
+  }
+
+  /** @hidden */
+  @Lazy
+  static get urlPadded(): Base64 {
+    return new Base64Url(true);
+  }
+
+  /** @hidden */
+  @Lazy
+  static get urlUnpadded(): Base64 {
+    return new Base64Url(false);
   }
 
   /**
    * Returns the `Base64` encoding with the url and filename safe alphabet,
-   * and required padding, if `isPadded` is `true`.
+   * and required padding, if `padded` is `true`.
    */
-  static url(isPadded: boolean = true): Base64 {
-    if (isPadded) {
-      if (Base64._url === void 0) {
-        Base64._url = new Base64Url(true);
-      }
-      return Base64._url;
+  static url(padded: boolean = true): Base64 {
+    if (padded) {
+      return Base64.urlPadded;
     } else {
-      if (Base64._urlUnpadded === void 0) {
-        Base64._urlUnpadded = new Base64Url(false);
-      }
-      return Base64._urlUnpadded;
+      return Base64.urlUnpadded;
     }
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Parser: typeof Base64Parser; // defined by Base64Parser
-  /** @hidden */
-  static Writer: typeof Base64Writer; // defined by Base64Writer
 }
 
 /** @hidden */
 class Base64Standard extends Base64 {
   /** @hidden */
-  readonly _isPadded: boolean;
+  declare readonly padded: boolean;
 
-  constructor(isPadded: boolean) {
+  constructor(padded: boolean) {
     super();
-    this._isPadded = isPadded;
+    Object.defineProperty(this, "padded", {
+      value: padded,
+      enumerable: true,
+    });
   }
 
-  alphabet(): string {
+  get alphabet(): string {
     return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   }
 
-  isPadded(): boolean;
-  isPadded(isPadded: boolean): Base64;
-  isPadded(isPadded?: boolean): boolean | Base64 {
-    if (isPadded === void 0) {
-      return this._isPadded;
+  isPadded(): boolean {
+    return this.padded;
+  }
+
+  asPadded(padded: boolean): Base64 {
+    if (padded === this.padded) {
+      return this;
     } else {
-      if (isPadded === this._isPadded) {
-        return this;
-      } else {
-        return Base64.standard(isPadded);
-      }
+      return Base64.standard(padded);
     }
   }
 
@@ -253,28 +250,29 @@ class Base64Standard extends Base64 {
 /** @hidden */
 class Base64Url extends Base64 {
   /** @hidden */
-  readonly _isPadded: boolean;
+  declare readonly padded: boolean;
 
-  constructor(isPadded: boolean) {
+  constructor(padded: boolean) {
     super();
-    this._isPadded = isPadded;
+    Object.defineProperty(this, "padded", {
+      value: padded,
+      enumerable: true,
+    });
   }
 
-  alphabet(): string {
+  get alphabet(): string {
     return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   }
 
-  isPadded(): boolean;
-  isPadded(isPadded: boolean): Base64;
-  isPadded(isPadded?: boolean): boolean | Base64 {
-    if (isPadded === void 0) {
-      return this._isPadded;
+  isPadded(): boolean {
+    return this.padded;
+  }
+
+  asPadded(padded: boolean): Base64 {
+    if (padded === this.padded) {
+      return this;
     } else {
-      if (isPadded === this._isPadded) {
-        return this;
-      } else {
-        return Base64.url(isPadded);
-      }
+      return Base64.url(padded);
     }
   }
 

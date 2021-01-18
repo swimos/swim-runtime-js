@@ -14,10 +14,16 @@
 
 import {Spec, Unit} from "@swim/unit";
 
+import {LazySpec} from "./LazySpec";
 import {Murmur3Spec} from "./Murmur3Spec";
 
 @Unit
 export class UtilSuite extends Spec {
+  @Unit
+  lazySpec(): Spec {
+    return new LazySpec();
+  }
+
   @Unit
   murmur3Spec(): Spec {
     return new Murmur3Spec();

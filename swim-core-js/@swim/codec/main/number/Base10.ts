@@ -18,8 +18,8 @@ import type {Parser} from "../parser/Parser";
 import type {Writer} from "../writer/Writer";
 import {Format} from "../format/Format";
 import {Unicode} from "../unicode/Unicode";
-import type {Base10NumberParser} from "./Base10NumberParser";
-import type {Base10IntegerWriter} from "./Base10IntegerWriter";
+import {Base10NumberParser} from "../"; // circular import
+import {Base10IntegerWriter} from "../"; // circular import
 
 /**
  * Base-10 (decimal) encoding [[Parser]]/[[Writer]] factory.
@@ -78,13 +78,7 @@ export const Base10 = {} as {
    * returning a `Writer` continuation that knows how to write any remaining
    * output that couldn't be immediately generated.
    */
-  writeInteger(input: number, output: Output): Writer<unknown, unknown>;
-
-  // Forward type declarations
-  /** @hidden */
-  NumberParser: typeof Base10NumberParser; // defined by Base10NumberParser
-  /** @hidden */
-  IntegerWriter: typeof Base10IntegerWriter; // defined by Base10IntegerWriter
+  writeInteger(input: number, output: Output): Writer;
 };
 
 Base10.isDigit = function (c: number): boolean {
@@ -120,37 +114,37 @@ Base10.countDigits = function (value: number): number {
 };
 
 Base10.integerParser = function (): Parser<number> {
-  return new Base10.NumberParser(void 0, void 0, 0);
+  return new Base10NumberParser(void 0, void 0, 0);
 };
 
 Base10.parseInteger = function (input: Input): Parser<number> {
-  return Base10.NumberParser.parse(input, void 0, void 0, 0);
+  return Base10NumberParser.parse(input, void 0, void 0, 0);
 };
 
 Base10.decimalParser = function (): Parser<number> {
-  return new Base10.NumberParser(void 0, void 0, 1);
+  return new Base10NumberParser(void 0, void 0, 1);
 };
 
 Base10.parseDecimal = function (input: Input): Parser<number> {
-  return Base10.NumberParser.parse(input, void 0, void 0, 1);
+  return Base10NumberParser.parse(input, void 0, void 0, 1);
 };
 
 Base10.numberParser = function (): Parser<number> {
-  return new Base10.NumberParser();
+  return new Base10NumberParser();
 };
 
 Base10.parseNumber = function (input: Input): Parser<number> {
-  return Base10.NumberParser.parse(input);
+  return Base10NumberParser.parse(input);
 };
 
-Base10.integerWriter = function (input?: number): Writer<unknown, unknown> {
+Base10.integerWriter = function (input?: number): Writer {
   if (input === void 0) {
-    return new Base10.IntegerWriter(void 0, 0);
+    return new Base10IntegerWriter(void 0, 0);
   } else {
-    return new Base10.IntegerWriter(void 0, input);
+    return new Base10IntegerWriter(void 0, input);
   }
 } as typeof Base10.integerWriter;
 
-Base10.writeInteger = function (input: number, output: Output): Writer<unknown, unknown> {
-  return Base10.IntegerWriter.write(output, void 0, input);
+Base10.writeInteger = function (input: number, output: Output): Writer {
+  return Base10IntegerWriter.write(output, void 0, input);
 };

@@ -68,7 +68,7 @@ Comparable.compare = function (x: unknown, y: unknown): number {
   }
 };
 
-Comparable.is = function(object: unknown): object is Comparable {
+Comparable.is = function (object: unknown): object is Comparable {
   return object !== void 0 && object !== null
       && typeof (object as Comparable).compareTo === "function";
 };

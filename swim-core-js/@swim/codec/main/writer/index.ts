@@ -15,3 +15,7 @@
 export {WriterException} from "./WriterException";
 
 export {Writer} from "./Writer";
+export {WriterEnd} from "./WriterEnd";
+export {WriterDone} from "./WriterDone";
+export {WriterError} from "./WriterError";
+export {WriterSequence} from "./WriterSequence";

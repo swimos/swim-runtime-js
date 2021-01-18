@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
 import type {Input} from "../input/Input";
 import type {Output} from "../output/Output";
 import type {Parser} from "../parser/Parser";
@@ -19,35 +20,33 @@ import type {Writer} from "../writer/Writer";
 import {Format} from "../format/Format";
 import {Binary} from "../binary/Binary";
 import {Unicode} from "../unicode/Unicode";
-import type {Base16Parser} from "./Base16Parser";
-import type {Base16Writer} from "./Base16Writer";
-import type {Base16IntegerWriter} from "./Base16IntegerWriter";
+import {Base16Parser} from "../"; // circular import
+import {Base16Writer} from "../"; // circular import
+import {Base16IntegerWriter} from "../"; // circular import
 
 /**
  * Base-16 (hexadecimal) encoding [[Parser]]/[[Writer]] factory.
  */
 export class Base16 {
-  /** @hidden */
-  readonly _alphabet: string;
-
   constructor(alphabet: string) {
-    this._alphabet = alphabet;
+    Object.defineProperty(this, "alphabet", {
+      value: alphabet,
+      enumerable: true,
+    });
   }
 
   /**
    * Returns a 16 character string, where the character at index `i` is the
    * encoding of the base-16 digit `i`.
    */
-  alphabet(): string {
-    return this._alphabet;
-  }
+  declare readonly alphabet: string;
 
   /**
    * Returns the Unicode code point of the base-16 digit that encodes the given
    * 4-bit quantity.
    */
   encodeDigit(b: number): number {
-    return this._alphabet.charCodeAt(b);
+    return this.alphabet.charCodeAt(b);
   }
 
   /**
@@ -63,9 +62,9 @@ export class Base16 {
   uint8ArrayWriter(input: Uint8Array): Writer<unknown, Uint8Array>;
   uint8ArrayWriter(input?: Uint8Array): Writer<unknown, unknown> {
     if (input === void 0) {
-      return new Base16.Writer(void 0, void 0, this);
+      return new Base16Writer(void 0, null, this);
     } else {
-      return new Base16.Writer(input, input, this);
+      return new Base16Writer(input, input, this);
     }
   }
 
@@ -75,38 +74,31 @@ export class Base16 {
    * remaining output that couldn't be immediately generated.
    */
   writeUint8Array(input: Uint8Array, output: Output): Writer<unknown, unknown> {
-    return Base16.Writer.write(output, void 0, input, this);
+    return Base16Writer.write(output, void 0, input, this);
   }
 
   writeInteger(input: number, output: Output, width: number = 0): Writer<unknown, unknown> {
-    return Base16.IntegerWriter.write(output, void 0, input, width, this);
+    return Base16IntegerWriter.write(output, void 0, input, width, this);
   }
 
   writeIntegerLiteral(input: number, output: Output, width: number = 0): Writer<unknown, unknown> {
-    return Base16.IntegerWriter.writeLiteral(output, void 0, input, width, this);
+    return Base16IntegerWriter.writeLiteral(output, void 0, input, width, this);
   }
-
-  private static _lowercase?: Base16;
-  private static _uppercase?: Base16;
 
   /**
    * Returns the `Base16` encoding with lowercase alphanumeric digits.
    */
-  public static lowercase(): Base16 {
-    if (Base16._lowercase === void 0) {
-      Base16._lowercase = new Base16("0123456789abcdef");
-    }
-    return Base16._lowercase;
+  @Lazy
+  static get lowercase(): Base16 {
+    return new Base16("0123456789abcdef");
   }
 
   /**
    * Returns the `Base16` encoding with uppercase alphanumeric digits.
    */
-  public static uppercase(): Base16 {
-    if (Base16._uppercase === void 0) {
-      Base16._uppercase = new Base16("0123456789ABCDEF");
-    }
-    return Base16._uppercase;
+  @Lazy
+  static get uppercase(): Base16 {
+    return new Base16("0123456789ABCDEF");
   }
 
   /**
@@ -153,7 +145,7 @@ export class Base16 {
    * writes the decoded bytes to `output`.
    */
   static parser<O>(output: Output<O>): Parser<O> {
-    return new Base16.Parser<O>(output);
+    return new Base16Parser<O>(output);
   }
 
   /**
@@ -162,7 +154,7 @@ export class Base16 {
    * parse any additional input.
    */
   static parse<O>(input: Input, output: Output<O>): Parser<O> {
-    return Base16.Parser.parse(input, output);
+    return Base16Parser.parse(input, output);
   }
 
   /**
@@ -172,14 +164,6 @@ export class Base16 {
    * binds]] a `Uint8Array` array containing all parsed base-16 data.
    */
   static parseUint8Array(input: Input): Parser<Uint8Array> {
-    return Base16.Parser.parse(input, Binary.uint8ArrayOutput());
+    return Base16Parser.parse(input, Binary.output());
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Parser: typeof Base16Parser; // defined by Base16Parser
-  /** @hidden */
-  static Writer: typeof Base16Writer; // defined by Base16Writer
-  /** @hidden */
-  static IntegerWriter: typeof Base16IntegerWriter; // defined by Base16IntegerWriter
 }

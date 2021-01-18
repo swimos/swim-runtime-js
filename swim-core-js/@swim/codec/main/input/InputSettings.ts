@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, HashCode, Booleans, Constructors} from "@swim/util";
+import {Lazy, Murmur3, HashCode, Booleans, Constructors} from "@swim/util";
 import type {Output} from "../output/Output";
 import type {Debug} from "../format/Debug";
 import {Format} from "../format/Format";
@@ -31,35 +31,34 @@ export interface InputSettingsInit {
  * [[Input]] consumption parameters.  `InputSettings` provide contextual
  * configuration parameters to input consumers, such as [[Parser Parsers]].
  */
-export class InputSettings implements Debug, HashCode {
+export class InputSettings implements HashCode, Debug {
   /** @hidden */
-  readonly _isStrict: boolean;
+  declare readonly stripped: boolean;
 
-  protected constructor(isStripped: boolean) {
-    this._isStrict = isStripped;
+  protected constructor(stripped: boolean) {
+    Object.defineProperty(this, "stripped", {
+      value: stripped,
+      enumerable: true,
+    });
   }
 
   /**
    * Returns `true` if input consumers should not include diagnostic metadata
    * in generated output.
    */
-  isStripped(): boolean;
-
-  /**
-   * Returns a copy of these settings with the given `isStripped` flag.
-   */
-  isStripped(isStripped: boolean): InputSettings;
-
-  isStripped(isStripped?: boolean): boolean | InputSettings {
-    if (isStripped === void 0) {
-      return this._isStrict;
-    } else {
-      return this.copy(isStripped);
-    }
+  isStripped(): boolean {
+    return this.stripped;
   }
 
-  protected copy(isStripped: boolean): InputSettings {
-    return InputSettings.create(isStripped);
+  /**
+   * Returns a copy of these settings with the given `stripped` flag.
+   */
+  asStripped(stripped: boolean): InputSettings {
+    return this.copy(stripped);
+  }
+
+  protected copy(stripped: boolean): InputSettings {
+    return InputSettings.create(stripped);
   }
 
   protected canEqual(that: unknown): boolean {
@@ -70,19 +69,19 @@ export class InputSettings implements Debug, HashCode {
     if (this === that) {
       return true;
     } else if (that instanceof InputSettings) {
-      return that.canEqual(this) && this._isStrict === that._isStrict;
+      return that.canEqual(this) && this.stripped === that.stripped;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Constructors.hash(InputSettings),
-        Booleans.hash(this._isStrict)));
+        Booleans.hash(this.stripped)));
   }
 
   debug(output: Output): void {
     output = output.write("InputSettings").write(46/*'.'*/);
-    if (!this._isStrict) {
+    if (!this.stripped) {
       output = output.write("standard");
     } else {
       output = output.write("stripped");
@@ -94,29 +93,22 @@ export class InputSettings implements Debug, HashCode {
     return Format.debug(this);
   }
 
-  private static _standard?: InputSettings;
-  private static _stripped?: InputSettings;
-
   /**
    * Returns `InputSettings` configured to include diagnostic metadata in
    * generated output.
    */
+  @Lazy
   static standard(): InputSettings {
-    if (InputSettings._standard === void 0) {
-      InputSettings._standard = new InputSettings(false);
-    }
-    return InputSettings._standard;
+    return new InputSettings(false);
   }
 
   /**
-   * Returns `InputSettings` configured to not include diagnostic metadata in
+   * Returns `InputSettings` configured to omit diagnostic metadata in
    * generated output.
    */
+  @Lazy
   static stripped(): InputSettings {
-    if (InputSettings._stripped === void 0) {
-      InputSettings._stripped = new InputSettings(false);
-    }
-    return InputSettings._stripped;
+    return new InputSettings(true);
   }
 
   /**

@@ -26,7 +26,7 @@ import {StringWriter} from "./StringWriter";
  * The `Unicode.stringInput(...)` function returns an `Input` that reads the
  * Unicode code points of a `string`.
  *
- * The `Unicode.stringOutput(...)}` function returns an `Output` that writes
+ * The `Unicode.stringOutput(...)` function returns an `Output` that writes
  * Unicode code points to an internal buffer, and [[Output.bind binds]] a
  * `string` containing all written code points.
  */
@@ -70,7 +70,7 @@ export const Unicode = {} as {
 };
 
 Unicode.stringInput = function (string: string): Input {
-  return new StringInput(string);
+  return StringInput.create(string);
 };
 
 Unicode.stringOutput = function (string?: string | AnyOutputSettings, settings?: AnyOutputSettings): Output<string> {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "../runtime/Murmur3";
+import {Murmur3} from "./Murmur3";
 import {Strings} from "./Strings";
 import {Values} from "./Values";
 

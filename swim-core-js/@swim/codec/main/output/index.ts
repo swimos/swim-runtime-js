@@ -19,5 +19,13 @@ export {
   OutputSettingsInit,
   OutputSettings,
 } from "./OutputSettings";
+
 export {Output} from "./Output";
+export {OutputFull} from "./OutputFull";
+export {OutputDone} from "./OutputDone";
+export {OutputError} from "./OutputError";
+
 export {OutputBuffer} from "./OutputBuffer";
+export {OutputBufferFull} from "./OutputBufferFull";
+export {OutputBufferDone} from "./OutputBufferDone";
+export {OutputBufferError} from "./OutputBufferError";

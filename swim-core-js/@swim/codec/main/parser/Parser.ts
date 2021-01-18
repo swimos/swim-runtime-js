@@ -15,6 +15,8 @@
 import type {Diagnostic} from "../source/Diagnostic";
 import type {Input} from "../input/Input";
 import {ParserException} from "./ParserException";
+import {ParserDone} from "../"; // circular import
+import {ParserError} from "../"; // circular import
 
 /**
  * Continuation of how to parse subsequent [[Input]] tokens from a stream.
@@ -116,13 +118,6 @@ export abstract class Parser<O> {
   }
 
   /**
-   * Incrementally parses as much `Input` as possible, and returns another
-   * `Parser` that represents the continuation of how to parse additional
-   * `Input`.  The given `input` is only guaranteed to be valid for the
-   * duration of the method call; references to `input` must not be stored.
-   */
-
-  /**
    * Incrementally parses as much `input` as possible, and returns another
    * `Parser` that represents the continuation of how to parse additional
    * `Input`.  If `input` enters the _done_ state, `feed` _must_ return a
@@ -147,7 +142,7 @@ export abstract class Parser<O> {
    * @throws `Error` if this `Parser is not in the _done_ state.
    */
   bind(): O {
-    throw new Error();
+    throw new ParserException();
   }
 
   /**
@@ -157,40 +152,24 @@ export abstract class Parser<O> {
    * @throws `Error` if this `Parser` is not in the _error_ state.
    */
   trap(): Error {
-    throw new Error();
+    throw new ParserException();
   }
 
   /**
    * Casts an errored `Parser` to a different output type.  A `Parser` in the
    * _error_ state can have any output type.
    *
-   * @throws `Error` if this `Parser` is not in the _error_ state.
+   * @throws `ParserException` if this `Parser` is not in the _error_ state.
    */
   asError<O2>(): Parser<O2> {
-    throw new Error();
+    throw new ParserException();
   }
 
-  private static _done?: Parser<any>;
-
   /**
-   * Returns a `Parser` in the _done_ state that `bind`s an `undefined` parsed result.
+   * Returns a `Parser` in the _done_ state that binds the given parsed `value`.
    */
-  static done<O>(): Parser<O>;
-
-  /**
-   * Returns a `Parser` in the _done_ state that `bind`s the given parsed `output`.
-   */
-  static done<O>(output: O): Parser<O>;
-
-  static done<O>(output?: O): Parser<O> {
-    if (output === void 0) {
-      if (Parser._done === void 0) {
-        Parser._done = new ParserDone<any>(void 0);
-      }
-      return Parser._done;
-    } else {
-      return new ParserDone<O>(output);
-    }
+  static done<O>(value: O): Parser<O> {
+    return new ParserDone(value);
   }
 
   /**
@@ -198,71 +177,9 @@ export abstract class Parser<O> {
    */
   static error<O>(error: Error | Diagnostic): Parser<O> {
     if (error instanceof Error) {
-      return new ParserError<O>(error);
+      return new ParserError(error);
     } else {
-      return new ParserError<O>(new ParserException(error));
+      return new ParserError(new ParserException(error));
     }
-  }
-}
-
-/** @hidden */
-class ParserDone<O> extends Parser<O> {
-  /** @hidden */
-  readonly _output: O;
-
-  constructor(output: O) {
-    super();
-    this._output = output;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isDone(): boolean {
-    return true;
-  }
-
-  feed(input: Input): Parser<O> {
-    return this;
-  }
-
-  bind(): O {
-    return this._output;
-  }
-}
-
-/** @hidden */
-class ParserError<O> extends Parser<O> {
-  /** @hidden */
-  readonly _error: Error;
-
-  constructor(error: Error) {
-    super();
-    this._error = error;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isError(): boolean {
-    return true;
-  }
-
-  feed(input: Input): Parser<O> {
-    return this;
-  }
-
-  bind(): O {
-    throw this._error;
-  }
-
-  trap(): Error {
-    return this._error;
-  }
-
-  asError<O2>(): Parser<O2> {
-    return this as any;
   }
 }

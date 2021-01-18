@@ -13,123 +13,108 @@
 // limitations under the License.
 
 import {Murmur3} from "../runtime/Murmur3";
-import type {HashCode} from "../any/HashCode";
-import type {Comparable} from "../any/Comparable";
-import {Numbers} from "../types/Numbers";
-import {Strings} from "../types/Strings";
-import {Constructors} from "../types/Constructors";
+import type {HashCode} from "../lang/HashCode";
+import type {Comparable} from "../lang/Comparable";
+import {Numbers} from "../runtime/Numbers";
+import {Strings} from "../runtime/Strings";
+import {Constructors} from "../runtime/Constructors";
 
 /**
  * Level of importance.  Used for log levels and diagnostic classifications.
  */
 export class Severity implements HashCode, Comparable {
-  /** @hidden */
-  readonly _level: number;
-  /** @hidden */
-  readonly _label: string;
-
   private constructor(level: number, label: string) {
-    this._level = level;
-    this._label = label;
+    Object.defineProperty(this, "level", {
+      value: level,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "label", {
+      value: label,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   /**
-   * Returns the integer level of importance of this `Severity`, with higher
-   * levels signifying greater importance.
-   *
-   * @return an integer between `0` and `7`, inclusive.  One of `TRACE_LEVEL`,
-   *         `DEBUG_LEVEL`, `INFO_LEVEL`, `NOTE_LEVEL`, `WARNING_LEVEL`,
-   *         `ERROR_LEVEL`, `ALERT_LEVEL`, `FATAL_LEVEL`.
+   * The integer level of importance of this `Severity`, with higher  levels
+   * signifying greater importance.  An integer between `0` and `7`, inclusive.
+   * One of `TRACE_LEVEL`, `DEBUG_LEVEL`, `INFO_LEVEL`, `NOTE_LEVEL`,
+   * `WARNING_LEVEL`, `ERROR_LEVEL`, `ALERT_LEVEL`, `FATAL_LEVEL`.
    */
-  level(): number {
-    return this._level;
-  }
+  declare readonly level: number;
 
   /**
-   * Returns a descriptive label for this `Severity`.
+   * A descriptive label for this `Severity`.
    */
-  label(): string;
-
-  /**
-   * Returns a new `Severity` with the same level as this `Severity`, but with
-   * a new descriptive `label`.
-   */
-  label(label: string): Severity;
-
-  label(label?: string): string | Severity {
-    if (label === void 0) {
-      return this._label;
-    } else {
-      return Severity.create(this._level, label);
-    }
-  }
+  declare readonly label: string;
 
   /**
    * Returns `true` if this `Severity` has `TRACE_LEVEL` of importance.
    */
   isTrace(): boolean {
-    return this._level === Severity.TRACE_LEVEL;
+    return this.level === Severity.TRACE_LEVEL;
   }
 
   /**
    * Returns `true` if this `Severity` has `DEBUG_LEVEL` of importance.
    */
   isDebug(): boolean {
-    return this._level === Severity.DEBUG_LEVEL;
+    return this.level === Severity.DEBUG_LEVEL;
   }
 
   /**
    * Returns `true` if this `Severity` has `INFO_LEVEL` of importance.
    */
   isInfo(): boolean {
-    return this._level === Severity.INFO_LEVEL;
+    return this.level === Severity.INFO_LEVEL;
   }
 
   /**
    * Returns `true` if this `Severity` has `NOTE_LEVEL` of importance.
    */
   isNote(): boolean {
-    return this._level === Severity.NOTE_LEVEL;
+    return this.level === Severity.NOTE_LEVEL;
   }
 
   /**
    * Returns `true` if this `Severity` has `WARNING_LEVEL` of importance.
    */
   isWarning(): boolean {
-    return this._level === Severity.WARNING_LEVEL;
+    return this.level === Severity.WARNING_LEVEL;
   }
 
   /**
    * Returns `true` if this `Severity` has `ERROR_LEVEL` of importance.
    */
   isError(): boolean {
-    return this._level === Severity.ERROR_LEVEL;
+    return this.level === Severity.ERROR_LEVEL;
   }
 
   /**
    * Returns `true` if this `Severity` has `ALERT_LEVEL` of importance.
    */
   isAlert(): boolean {
-    return this._level === Severity.ALERT_LEVEL;
+    return this.level === Severity.ALERT_LEVEL;
   }
 
   /**
    * Returns `true` if this `Severity` has `FATAL_LEVEL` of importance.
    */
   isFatal(): boolean {
-    return this._level === Severity.FATAL_LEVEL;
+    return this.level === Severity.FATAL_LEVEL;
   }
 
   compareTo(that: unknown): number {
     if (this === that) {
       return 0;
     } else if (that instanceof Severity) {
-      if (this._level < that._level) {
+      if (this.level < that.level) {
         return -1;
-      } else if (this._level > that._level) {
+      } else if (this.level > that.level) {
         return 1;
       } else {
-        return this._label.localeCompare(that._label);
+        return this.label.localeCompare(that.label);
       }
     }
     return NaN;
@@ -139,18 +124,18 @@ export class Severity implements HashCode, Comparable {
     if (this === that) {
       return true;
     } else if (that instanceof Severity) {
-      return this._level === that._level && this._label === that._label;
+      return this.level === that.level && this.label === that.label;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(Severity),
-        Numbers.hash(this._level)), Strings.hash(this._label)));
+        Numbers.hash(this.level)), Strings.hash(this.label)));
   }
 
   toString(): string {
-    return this._label;
+    return this.label;
   }
 
   static readonly TRACE_LEVEL: number = 0;

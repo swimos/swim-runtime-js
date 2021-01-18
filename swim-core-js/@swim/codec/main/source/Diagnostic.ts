@@ -28,90 +28,85 @@ import {Base10} from "../number/Base10";
  * Informational message attached to an input location.
  */
 export class Diagnostic implements Display {
-  /** @hidden */
-  readonly _input: Input;
-  /** @hidden */
-  readonly _tag: Tag;
-  /** @hidden */
-  readonly _severity: Severity;
-  /** @hidden */
-  readonly _message: string | null;
-  /** @hidden */
-  readonly _note: string | null;
-  /** @hidden */
-  readonly _cause: Diagnostic | null;
-
-  constructor(input: Input, tag: Tag, severity: Severity, message: string | null,
-              note: string | null, cause: Diagnostic | null) {
-    this._input = input;
-    this._tag = tag;
-    this._severity = severity;
-    this._message = message;
-    this._note = note;
-    this._cause = cause;
+  constructor(input: Input, tag: Tag, severity: Severity, message: string | undefined,
+              note: string | undefined, cause: Diagnostic | null) {
+    Object.defineProperty(this, "input", {
+      value: input,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "tag", {
+      value: tag,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "severity", {
+      value: severity,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "message", {
+      value: message,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "note", {
+      value: note,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "cause", {
+      value: cause,
+      enumerable: true,
+      configurable: true,
+    });
   }
+
+  /** @hidden */
+  declare readonly input: Input;
 
   /**
-   * Returns the `Input` source to which this diagnostic is attached.
+   * The location in the `input` to which this diagnostic is attached.
    */
-  input(): Input {
-    return this._input.clone();
-  }
+  declare readonly tag: Tag;
 
   /**
-   * Returns the annotated location `Tag` in the `input` to which this
-   * diagnostic is attached.
+   * The level of importance of this diagnostic.
    */
-  tag(): Tag {
-    return this._tag;
-  }
+  declare readonly severity: Severity;
 
   /**
-   * Returns the level of importance of this diagnostic.
+   * The help message that describes this diagnostic.
    */
-  severity(): Severity {
-    return this._severity;
-  }
+  declare readonly message: string | undefined;
 
   /**
-   * Returns the help message that describes this diagnostic.
+   * An informative comment on the source context to which this diagnostic is attached.
    */
-  message(): string | null {
-    return this._message;
-  }
+  declare readonly note: string | undefined;
 
   /**
-   * Returns an informative comment on the source context to which this
-   * diagnostic is attached.
+   * The `Diagnostic` cause of this diagnostic, forming a linked chain of
+   * diagnostics, or `null` if this diagnostic has no cause.
    */
-  note(): string | null {
-    return this._note;
-  }
-
-  /**
-   * Returns the `Diagnostic` cause of this diagnostic, forming a linked chain
-   * of diagnostics, or `null` if this diagnostic has no cause.
-   */
-  cause(): Diagnostic | null {
-    return this._cause;
-  }
+  declare readonly cause: Diagnostic | null;
 
   private lineDigits(): number {
-    let digits = Base10.countDigits(this._tag.end().line());
-    if (this._cause !== null) {
-      digits = Math.max(digits, this._cause.lineDigits());
+    let digits = Base10.countDigits(this.tag.end.line);
+    if (this.cause !== null) {
+      digits = Math.max(digits, this.cause.lineDigits());
     }
     return digits;
   }
 
   display(output: Output): void {
-    const input = this._input.clone();
-    const start = this._tag.start();
-    const end = this._tag.end();
-    const severity = this._severity;
-    const message = this._message;
-    const note = this._note;
-    const cause = this._cause;
+    const input = this.input.clone();
+    const start = this.tag.start;
+    const end = this.tag.end;
+    const severity = this.severity;
+    const message = this.message;
+    const note = this.note;
+    const cause = this.cause;
     const contextLines = 2;
     const lineDigits = this.lineDigits();
     Diagnostic.displayDiagnostic(input, start, end, severity, message, note,
@@ -122,86 +117,117 @@ export class Diagnostic implements Display {
     return Format.display(this, settings);
   }
 
-  static from(input: Input, tag: Tag, severity: Severity, cause?: Diagnostic | null): Diagnostic;
-  static from(input: Input, tag: Tag, severity: Severity, message: string | null,
-              diagnostic?: Diagnostic | null): Diagnostic;
-  static from(input: Input, tag: Tag, severity: Severity, message: string | null,
-              note: string | null, cause?: Diagnostic | null): Diagnostic;
-  static from(input: Input, tag: Tag, severity: Severity, message?: Diagnostic | string | null,
-              note?: Diagnostic | string | null, cause?: Diagnostic | null): Diagnostic {
-    if (message instanceof Diagnostic) {
-      cause = message;
-      note = null;
-      message = null;
-    } else if (note instanceof Diagnostic) {
-      cause = note;
-      note = null;
-    }
-    input = input.clone();
-    if (message === void 0) {
-      message = null;
-    }
-    if (note === void 0) {
-      note = null;
-    }
-    if (cause === void 0) {
+  static create(input: Input, tag: Tag, severity: Severity, cause?: Diagnostic | null): Diagnostic;
+  static create(input: Input, tag: Tag, severity: Severity, message: string | undefined,
+                cause?: Diagnostic | null): Diagnostic;
+  static create(input: Input, tag: Tag, severity: Severity, message: string | undefined,
+                note: string | undefined, cause?: Diagnostic | null): Diagnostic;
+  static create(input: Input, tag: Tag, severity: Severity, message?: Diagnostic | null | string | undefined,
+                note?: Diagnostic | null | string | undefined, cause?: Diagnostic | null): Diagnostic {
+    if (arguments.length === 3) { // (input, tag, severity)
       cause = null;
+      note = void 0;
+      message = void 0;
+    } else if (arguments.length === 4) {
+      if (message === null || message instanceof Diagnostic) { // (input, tag, severity, cause)
+        cause = message;
+        message = void 0;
+      } else { // (input, tag, severity, message)
+        cause = null;
+      }
+    } else if (arguments.length === 5) {
+      if (note === null || note instanceof Diagnostic) { // (input, tag, severity, message, cause)
+        cause = note;
+        note = void 0;
+      } else { // (input, tag, severity, message, note)
+        cause = null;
+      }
+    } else { // (input, tag, severity, message, note, cause)
+      if (cause === void 0) {
+        cause = null;
+      }
     }
-    return new Diagnostic(input, tag, severity, message, note, cause);
+    return new Diagnostic(input.clone(), tag, severity, message as string | undefined, note as string | undefined, cause);
   }
 
   static message(message: string, input: Input, cause?: Diagnostic | null): Diagnostic;
   static message(message: string, input: Input, note: string, cause?: Diagnostic | null): Diagnostic;
   static message(message: string, input: Input, severity: Severity, cause?: Diagnostic | null): Diagnostic;
   static message(message: string, input: Input, severity?: Severity, note?: string, cause?: Diagnostic | null): Diagnostic;
-  static message(message: string, input: Input, severity?: Diagnostic | Severity | string | null,
-                 note?: Diagnostic | string | null, cause?: Diagnostic | null): Diagnostic {
-    if (severity === null || severity instanceof Diagnostic) {
-      cause = severity;
-      severity = void 0;
-    } else if (typeof severity === "string") {
-      note = severity;
-      severity = void 0;
-    }
-    if (note === null || note instanceof Diagnostic) {
-      cause = note;
+  static message(message: string, input: Input, severity?: Diagnostic | null | Severity | string | undefined,
+                 note?: Diagnostic | null | string | undefined, cause?: Diagnostic | null): Diagnostic {
+    if (arguments.length === 2) { // (message, input)
+      cause = null;
       note = void 0;
-    }
-    if (note === void 0) {
-      note = null;
-    }
-    if (severity === void 0) {
       severity = Severity.error();
+    } else if (arguments.length === 3) {
+      if (severity === null || severity instanceof Diagnostic) { // (message, input, cause)
+        cause = severity;
+        severity = Severity.error();
+      } else if (typeof severity === "string") { // (message, input, note)
+        cause = null;
+        note = severity;
+        severity = Severity.error();
+      } else { // (message, input, severity)
+        cause = null;
+      }
+    } else if (arguments.length === 4) {
+      if (typeof severity === "string") { // (message, input, note, cause)
+        cause = note as Diagnostic | null;
+        note = severity;
+        severity = Severity.error();
+      } else if (note === null || note instanceof Diagnostic) { // (message, input, severity, cause)
+        cause = note;
+        note = void 0;
+      } else { // (message, input, severity, note)
+        cause = null;
+      }
+    } else { // (message, input, severity, note, cause)
+      if (cause === void 0) {
+        cause = null;
+      }
     }
 
-    const mark = input.mark();
+    const mark = input.mark;
     const source = input.clone();
     source.seek();
-    return Diagnostic.from(source, mark, severity, message, note, cause);
+    return new Diagnostic(source, mark, severity as Severity, message, note as string | undefined, cause);
   }
 
   static unexpected(input: Input, cause?: Diagnostic | null): Diagnostic;
   static unexpected(input: Input, note: string, cause?: Diagnostic | null): Diagnostic;
   static unexpected(input: Input, severity: Severity, cause?: Diagnostic | null): Diagnostic;
   static unexpected(input: Input, severity?: Severity, note?: string, cause?: Diagnostic | null): Diagnostic;
-  static unexpected(input: Input, severity?: Diagnostic | Severity | string | null,
-                    note?: Diagnostic | string | null, cause?: Diagnostic | null): Diagnostic {
-    if (severity === null || severity instanceof Diagnostic) {
-      cause = severity;
-      severity = void 0;
-    } else if (typeof severity === "string") {
-      note = severity;
-      severity = void 0;
-    }
-    if (note === null || note instanceof Diagnostic) {
-      cause = note;
-      note = void 0;
-    }
-    if (note === void 0) {
-      note = null;
-    }
-    if (severity === void 0) {
-      severity = Severity.error();
+  static unexpected(input: Input, severity?: Diagnostic | null | Severity | string | undefined,
+                    note?: Diagnostic | null | string | undefined, cause?: Diagnostic | null): Diagnostic {
+    if (arguments.length === 1) { // (input)
+      cause = null;
+    } else if (arguments.length === 2) {
+      if (severity === null || severity instanceof Diagnostic) { // (input, cause)
+        cause = severity;
+        severity = Severity.error();
+      } else if (typeof severity === "string") { // (input, note)
+        cause = null;
+        note = severity;
+        severity = Severity.error();
+      } else { // (input, severity)
+        cause = null;
+      }
+    } else if (arguments.length === 3) {
+      if (typeof severity === "string") { // (input, note, cause)
+        cause = note as Diagnostic | null;
+        note = severity;
+        severity = Severity.error();
+      } else if (note === null || note instanceof Diagnostic) { // (input, severity, cause)
+        cause = note;
+        note = void 0;
+      } else { // (input, severity, note)
+        cause = null;
+      }
+    } else { // (input, severity, note, cause)
+      if (cause === void 0) {
+        cause = null;
+      }
     }
 
     let message;
@@ -212,34 +238,46 @@ export class Diagnostic implements Display {
     } else {
       message = "unexpected end of input";
     }
-    const mark = input.mark();
+    const mark = input.mark;
     const source = input.clone();
     source.seek();
-    return Diagnostic.from(source, mark, severity, message, note, cause);
+    return new Diagnostic(source, mark, severity as Severity, message, note as string | undefined, cause);
   }
 
   static expected(expected: string | number, input: Input, cause?: Diagnostic | null): Diagnostic;
   static expected(expected: string | number, input: Input, note: string, cause?: Diagnostic | null): Diagnostic;
   static expected(expected: string | number, input: Input, severity: Severity, cause?: Diagnostic | null): Diagnostic;
   static expected(expected: string | number, input: Input, severity?: Severity, note?: string, cause?: Diagnostic | null): Diagnostic;
-  static expected(expected: string | number, input: Input, severity?: Diagnostic | Severity | string | null,
-                  note?: Diagnostic | string | null, cause?: Diagnostic | null): Diagnostic {
-    if (severity === null || severity instanceof Diagnostic) {
-      cause = severity;
-      severity = void 0;
-    } else if (typeof severity === "string") {
-      note = severity;
-      severity = void 0;
-    }
-    if (note === null || note instanceof Diagnostic) {
-      cause = note;
-      note = void 0;
-    }
-    if (note === void 0) {
-      note = null;
-    }
-    if (severity === void 0) {
-      severity = Severity.error();
+  static expected(expected: string | number, input: Input, severity?: Diagnostic | null | Severity | string | undefined,
+                  note?: Diagnostic | null | string | undefined, cause?: Diagnostic | null): Diagnostic {
+    if (arguments.length === 1) { // (excpected, input)
+      cause = null;
+    } else if (arguments.length === 2) {
+      if (severity === null || severity instanceof Diagnostic) { // (excpected, input, cause)
+        cause = severity;
+        severity = Severity.error();
+      } else if (typeof severity === "string") { // (excpected, input, note)
+        cause = null;
+        note = severity;
+        severity = Severity.error();
+      } else { // (expected, input, severity)
+        cause = null;
+      }
+    } else if (arguments.length === 3) {
+      if (typeof severity === "string") { // (excpected, input, note, cause)
+        cause = note as Diagnostic | null;
+        note = severity;
+        severity = Severity.error();
+      } else if (note === null || note instanceof Diagnostic) { // (excpected, input, severity, cause)
+        cause = note;
+        note = void 0;
+      } else { // (excpected, input, severity, note)
+        cause = null;
+      }
+    } else { // (excpected, input, severity, note, cause)
+      if (cause === void 0) {
+        cause = null;
+      }
     }
 
     let output = Unicode.stringOutput().write("expected").write(32/*' '*/);
@@ -255,19 +293,19 @@ export class Diagnostic implements Display {
       output = output.write("end of input");
     }
     const message = output.bind();
-    const mark = input.mark();
+    const mark = input.mark;
     const source = input.clone();
     source.seek();
-    return Diagnostic.from(source, mark, severity, message, note, cause);
+    return new Diagnostic(source, mark, severity as Severity, message, note as string | undefined, cause);
   }
 
   private static displayDiagnostic(input: Input, start: Mark, end: Mark,
-                                   severity: Severity, message: string | null,
-                                   note: string | null, cause: Diagnostic | null,
+                                   severity: Severity, message: string | undefined,
+                                   note: string | undefined, cause: Diagnostic | null,
                                    contextLines: number, lineDigits: number,
                                    output: Output): void {
     do {
-      if (message !== null) {
+      if (message !== void 0) {
         Diagnostic.displayMessage(severity, message, output);
         output = output.writeln();
       }
@@ -277,13 +315,13 @@ export class Diagnostic implements Display {
                                              cause, contextLines, lineDigits, output);
       if (next !== null) {
         output = output.writeln();
-        input = next._input.clone();
-        start = next._tag.start();
-        end = next._tag.end();
-        severity = next._severity;
-        message = next._message;
-        note = next._note;
-        cause = next._cause;
+        input = next.input.clone();
+        start = next.tag.start;
+        end = next.tag.end;
+        severity = next.severity;
+        message = next.message;
+        note = next.note;
+        cause = next.cause;
       } else {
         break;
       }
@@ -291,13 +329,13 @@ export class Diagnostic implements Display {
   }
 
   /** @hidden */
-  static displayMessage(severity: Severity, message: string | null, output: Output): void {
+  static displayMessage(severity: Severity, message: string | undefined, output: Output): void {
     Diagnostic.formatSeverity(severity, output);
-    output = output.write(severity.label());
+    output = output.write(severity.label);
     OutputStyle.reset(output);
     OutputStyle.bold(output);
     output = output.write(58/*':'*/);
-    if (message !== null) {
+    if (message !== void 0) {
       output = output.write(32/*' '*/).write(message);
     }
     OutputStyle.reset(output);
@@ -307,14 +345,14 @@ export class Diagnostic implements Display {
                                output: Output): void {
     Diagnostic.displayLineLeadArrow(lineDigits, output);
     output = output.write(32/*' '*/);
-    const id = input.id();
-    if (id !== null) {
+    const id = input.id;
+    if (id !== void 0) {
       Format.display(id, output);
     }
     output = output.write(58/*':'*/);
-    Format.displayNumber(start._line, output);
+    Format.displayNumber(start.line, output);
     output = output.write(58/*':'*/);
-    Format.displayNumber(start._column, output);
+    Format.displayNumber(start.column, output);
     output = output.writeln();
 
     Diagnostic.displayLineLead(lineDigits, output);
@@ -322,24 +360,24 @@ export class Diagnostic implements Display {
 
   private static displayCause(cause: Diagnostic, contextLines: number,
                               lineDigits: number, output: Output): Diagnostic | null {
-    const input = cause._input.clone();
-    const start = cause._tag.start();
-    const end = cause._tag.end();
-    const severity = cause._severity;
-    const note = cause._note;
-    const next = cause._cause;
+    const input = cause.input.clone();
+    const start = cause.tag.start;
+    const end = cause.tag.end;
+    const severity = cause.severity;
+    const note = cause.note;
+    const next = cause.cause;
     return Diagnostic.displayContext(input, start, end, severity, note, next,
                                      contextLines, lineDigits, output);
   }
 
   private static displayContext(input: Input, start: Mark, end: Mark,
-                                severity: Severity, note: string | null,
+                                severity: Severity, note: string | undefined,
                                 cause: Diagnostic | null, contextLines: number,
                                 lineDigits: number, output: Output): Diagnostic | null {
     let next = cause;
-    const sameCause = cause !== null && cause._message === null
-                   && Values.equal(input.id(), cause._input.id());
-    const causeOrder = sameCause ? (start._offset <= cause!._tag.start()._offset ? -1 : 1) : 0;
+    const sameCause = cause !== null && cause.message === void 0
+                   && Values.equal(input.id, cause.input.id);
+    const causeOrder = sameCause ? (start.offset <= cause!.tag.start.offset ? -1 : 1) : 0;
     if (causeOrder === 1) {
       next = Diagnostic.displayCause(cause!, contextLines, lineDigits, output);
       output = output.writeln();
@@ -347,7 +385,7 @@ export class Diagnostic implements Display {
       output = output.writeln();
     }
     Diagnostic.displayLines(input, start, end, severity, contextLines, lineDigits, output);
-    if (note !== null) {
+    if (note !== void 0) {
       Diagnostic.displayNote(note, lineDigits, output);
     }
     if (causeOrder === -1) {
@@ -362,9 +400,9 @@ export class Diagnostic implements Display {
   private static displayLines(input: Input, start: Mark, end: Mark,
                               severity: Severity, contextLines: number,
                               lineDigits: number, output: Output): void {
-    const startLine = start.line();
-    const endLine = end.line();
-    let line = input.line();
+    const startLine = start.line;
+    const endLine = end.line;
+    let line = input.line;
 
     while (line < startLine) {
       Diagnostic.consumeLineText(input, line);
@@ -394,7 +432,7 @@ export class Diagnostic implements Display {
     }
   }
 
-  private static displayNote(note: string | null, lineDigits: number, output: Output): void {
+  private static displayNote(note: string | undefined, lineDigits: number, output: Output): void {
     output = output.writeln();
     Diagnostic.displayLineLead(lineDigits, output);
     output = output.writeln();
@@ -404,11 +442,11 @@ export class Diagnostic implements Display {
   private static displayLine(input: Input, start: Mark, end: Mark,
                              severity: Severity, line: number,
                              lineDigits: number, output: Output): void {
-    if (start._line === line && end._line === line) {
+    if (start.line === line && end.line === line) {
       Diagnostic.displaySingleLine(input, start, end, severity, line, lineDigits, output);
-    } else if (start._line === line) {
+    } else if (start.line === line) {
       Diagnostic.displayStartLine(input, start, severity, line, lineDigits, output);
-    } else if (end._line === line) {
+    } else if (end.line === line) {
       Diagnostic.displayEndLine(input, end, severity, line, lineDigits, output);
     } else {
       Diagnostic.displayMidLine(input, severity, line, lineDigits, output);
@@ -420,7 +458,7 @@ export class Diagnostic implements Display {
                                    lineDigits: number, output: Output): void {
     Diagnostic.displayLineLeadNumber(line, lineDigits, output);
     output = output.write(32/*' '*/);
-    for (let i = 1; i < input.column(); i += 1) {
+    for (let i = 1; i < input.column; i += 1) {
       output = output.write(32/*' '*/);
     }
     Diagnostic.displayLineText(input, line, output);
@@ -428,17 +466,17 @@ export class Diagnostic implements Display {
     Diagnostic.displayLineLead(lineDigits, output);
     output = output.write(32/*' '*/);
     let i = 1;
-    while (i < start._column) {
+    while (i < start.column) {
       output = output.write(32/*' '*/);
       i += 1;
     }
     Diagnostic.formatSeverity(severity, output);
-    while (i <= end._column) {
+    while (i <= end.column) {
       output = output.write(94/*'^'*/);
       i += 1;
     }
-    if (end._note !== null) {
-      output = output.write(32/*' '*/).write(end._note);
+    if (end.note !== void 0) {
+      output = output.write(32/*' '*/).write(end.note);
     }
     OutputStyle.reset(output);
   }
@@ -448,7 +486,7 @@ export class Diagnostic implements Display {
                                   lineDigits: number, output: Output): void {
     Diagnostic.displayLineLeadNumber(line, lineDigits, output);
     output = output.write(32/*' '*/).write(32/*' '*/).write(32/*' '*/);
-    for (let i = 1; i < input.column(); i += 1) {
+    for (let i = 1; i < input.column; i += 1) {
       output = output.write(32/*' '*/);
     }
     Diagnostic.displayLineText(input, line, output);
@@ -458,13 +496,13 @@ export class Diagnostic implements Display {
     Diagnostic.formatSeverity(severity, output);
     output = output.write(95/*'_'*/);
     let i = 1;
-    while (i < start._column) {
+    while (i < start.column) {
       output = output.write(95/*'_'*/);
       i += 1;
     }
     output = output.write(94/*'^'*/);
-    if (start._note !== null) {
-      output = output.write(32/*' '*/).write(start._note);
+    if (start.note !== void 0) {
+      output = output.write(32/*' '*/).write(start.note);
     }
     OutputStyle.reset(output);
     output = output.writeln();
@@ -486,13 +524,13 @@ export class Diagnostic implements Display {
     Diagnostic.formatSeverity(severity, output);
     output = output.write(124/*'|'*/).write(95/*'_'*/);
     let i = 1;
-    while (i < end._column) {
+    while (i < end.column) {
       output = output.write(95/*'_'*/);
       i += 1;
     }
     output = output.write(94/*'^'*/);
-    if (end._note !== null) {
-      output = output.write(32/*' '*/).write(end._note);
+    if (end.note !== void 0) {
+      output = output.write(32/*' '*/).write(end.note);
     }
     OutputStyle.reset(output);
   }
@@ -508,14 +546,14 @@ export class Diagnostic implements Display {
     Diagnostic.displayLineText(input, line, output);
   }
 
-  private static displayLineComment(label: string, comment: string | null,
+  private static displayLineComment(label: string, comment: string | undefined,
                                     lineDigits: number, output: Output): void {
     Diagnostic.displayLineLeadComment(lineDigits, output);
     output = output.write(32/*' '*/);
     OutputStyle.bold(output);
     output = output.write(label).write(58/*':'*/);
     OutputStyle.reset(output);
-    if (comment !== null) {
+    if (comment !== void 0) {
       output = output.write(32/*' '*/).write(comment);
     }
   }
@@ -570,23 +608,23 @@ export class Diagnostic implements Display {
   }
 
   private static displayLineText(input: Input, line: number, output: Output): void {
-    while (input.isCont() && input.line() === line) {
+    while (input.isCont() && input.line === line) {
       output = output.write(input.head());
       input = input.step();
     }
-    if (input.line() === line) {
+    if (input.line === line) {
       output = output.writeln();
     }
   }
 
   private static consumeLineText(input: Input, line: number): void {
-    while (input.isCont() && input.line() === line) {
+    while (input.isCont() && input.line === line) {
       input = input.step();
     }
   }
 
   private static formatSeverity(severity: Severity, output: Output): void {
-    switch (severity.level()) {
+    switch (severity.level) {
       case Severity.FATAL_LEVEL:
       case Severity.ALERT_LEVEL:
       case Severity.ERROR_LEVEL:

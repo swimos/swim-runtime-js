@@ -26,5 +26,6 @@ export interface ReducedMap<K, V, U> extends OrderedMap<K, V> {
    * Stores partial computations to accelerate repeated reduction of
    * continuously mutating datasets.
    */
-  reduced(identity: U, accumulator: (result: U, element: V) => U, combiner: (result: U, result2: U) => U): U;
+  reduced(identity: U, accumulator: (result: U, element: V) => U,
+          combiner: (result: U, result2: U) => U): U;
 }

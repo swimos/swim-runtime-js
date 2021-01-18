@@ -15,12 +15,12 @@
 import {Cursor} from "./Cursor";
 
 /** @hidden */
-export class CursorEmpty extends Cursor<any> {
+export class CursorEmpty<T> extends Cursor<T> {
   isEmpty(): boolean {
     return true;
   }
 
-  head(): any {
+  head(): T {
     throw new Error("empty");
   }
 
@@ -40,7 +40,7 @@ export class CursorEmpty extends Cursor<any> {
     return 0;
   }
 
-  next(): {value?: any, done: boolean} {
+  next(): {value?: T, done: boolean} {
     return {done: true};
   }
 
@@ -52,8 +52,7 @@ export class CursorEmpty extends Cursor<any> {
     return -1;
   }
 
-  previous(): {value?: any, done: boolean} {
+  previous(): {value?: T, done: boolean} {
     return {done: true};
   }
 }
-Cursor.Empty = CursorEmpty;

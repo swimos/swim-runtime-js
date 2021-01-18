@@ -19,11 +19,9 @@ declare global {
   }
 }
 
+export * from "./lang";
+
 export * from "./runtime";
-
-export * from "./any";
-
-export * from "./types";
 
 export * from "./collections";
 

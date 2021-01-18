@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Builder} from "@swim/util";
+import {Lazy, Builder} from "@swim/util";
 import {OutputException} from "./OutputException";
 import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
-import {Format} from "../format/Format";
+import {OutputFull} from "../"; // circular import
+import {OutputDone} from "../"; // circular import
+import {OutputError} from "../"; // circular import
+import {Format} from "../"; // circular import
 
 /**
  * Non-blocking token stream writer.  `Output` enables incremental,
@@ -98,12 +101,12 @@ export abstract class Output<T = unknown> implements Builder<number, T> {
   abstract isPart(): boolean;
 
   /**
-   * Returns a partial `Output` equivalent to this `Output`, if
-   * `isPart` is `true`; returns a final `Output` equivalent
-   * to this `Output` if `isPart` is `false`. The caller's reference
-   * to `this` `Output` should be replaced by the returned `Output`.
+   * Returns a partial `Output` equivalent to this `Output`, if `part` is `true`;
+   * returns a final `Output` equivalent to this `Output` if `part` is `false`.
+   * The caller's reference to this `Output` should be replaced by the returned
+   * `Output`.
    */
-  abstract isPart(isPart: boolean): Output<T>;
+  abstract asPart(part: boolean): Output<T>;
 
   /**
    * Writes a single `token` to the stream, if this `Output` is in the
@@ -137,7 +140,7 @@ export abstract class Output<T = unknown> implements Builder<number, T> {
     if (typeof string === "string") {
       this.write(string);
     }
-    return this.write(this.settings().lineSeparator());
+    return this.write(this.settings.lineSeparator);
   }
 
   /**
@@ -183,17 +186,17 @@ export abstract class Output<T = unknown> implements Builder<number, T> {
   }
 
   /**
-   * Returns the `OutputSettings` used to configure the behavior of output
-   * producers that write to this `Output`.
+   * The `OutputSettings` used to configure the behavior of output producers
+   * that write to this `Output`.
    */
-  abstract settings(): OutputSettings;
+  abstract readonly settings: OutputSettings;
 
   /**
    * Updates the `settings` associated with this `Output`.
    *
    * @return `this`
    */
-  abstract settings(settings: AnyOutputSettings): Output<T>;
+  abstract withSettings(settings: AnyOutputSettings): Output<T>;
 
   /**
    * Returns the implementation-defined result of writing the output.
@@ -219,256 +222,26 @@ export abstract class Output<T = unknown> implements Builder<number, T> {
     throw new Error();
   }
 
-  private static _full?: Output<any>;
-
-  private static _done?: Output<any>;
-
   /**
-   * Return an `Output` in the _full_ state, that binds the given `value`,
-   * with the given `settings`.
+   * Return an `Output` in the _full_ state.
    */
-  static full<T>(value: T | null = null, settings: OutputSettings = OutputSettings.standard()): Output<T> {
-    if (value === null && settings === OutputSettings.standard()) {
-      if (Output._full === void 0) {
-        Output._full = new OutputFull(value, OutputSettings.standard());
-      }
-      return Output._full;
-    }
-    return new OutputFull<T>(value!, settings);
-
+  @Lazy
+  static full(): Output<never> {
+    return new OutputFull(OutputSettings.standard());
   }
 
   /**
-   * Returns an `Output` in the _done_ state, that binds the given `value`,
-   * with the given `settings`.
+   * Returns an `Output` in the _done_ state.
    */
-  static done<T>(value: T | null = null, settings: OutputSettings = OutputSettings.standard()): Output<T> {
-    if (value === null && settings === OutputSettings.standard()) {
-      if (Output._done === void 0) {
-        Output._done = new OutputDone(value, OutputSettings.standard());
-      }
-      return Output._done;
-    }
-    return new OutputDone<T>(value!, settings);
+  @Lazy
+  static done(): Output<never> {
+    return new OutputDone(OutputSettings.standard());
   }
 
   /**
-   * Return an `Output` in the _error_ state, that binds the given `value`,
-   * with the given `settings`.
+   * Return an `Output` in the _error_ state that traps the given `error`.
    */
-  static error<T>(error: Error, settings: OutputSettings = OutputSettings.standard()): Output<T> {
-    return new OutputError<T>(error, settings);
-  }
-}
-
-/** @hidden */
-class OutputFull<T> extends Output<T> {
-  /** @hidden */
-  readonly _value: T;
-  /** @hidden */
-  readonly _settings: OutputSettings;
-
-  constructor(value: T, settings: OutputSettings) {
-    super();
-    this._value = value;
-    this._settings = settings;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isFull(): boolean {
-    return true;
-  }
-
-  isDone(): boolean {
-    return false;
-  }
-
-  isError(): boolean {
-    return false;
-  }
-
-  isPart(): boolean;
-  isPart(isPart: boolean): Output<T>;
-  isPart(isPart?: boolean): boolean | Output<T> {
-    if (isPart === void 0) {
-      return true;
-    } else if (isPart) {
-      return Output.done(this._value, this._settings);
-    } else {
-      return this;
-    }
-  }
-
-  write(token: number): Output<T>;
-  write(string: string): Output<T>;
-  write(tokenOrString: number | string): Output<T> {
-    return Output.error(new OutputException("full"), this._settings);
-  }
-
-  writeln(string?: string): Output<T> {
-    return Output.error(new OutputException("full"), this._settings);
-  }
-
-  bind(): T {
-    return this._value;
-  }
-
-  settings(): OutputSettings;
-  settings(settings: OutputSettings): Output<T>;
-  settings(settings?: OutputSettings): OutputSettings | Output<T> {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      return Output.full(this._value, settings);
-    }
-  }
-
-  clone(): Output<T> {
-    return this;
-  }
-}
-
-/** @hidden */
-class OutputDone<T> extends Output<T> {
-  /** @hidden */
-  readonly _value: T;
-  /** @hidden */
-  readonly _settings: OutputSettings;
-
-  constructor(value: T, settings: OutputSettings) {
-    super();
-    this._value = value;
-    this._settings = settings;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isFull(): boolean {
-    return false;
-  }
-
-  isDone(): boolean {
-    return true;
-  }
-
-  isError(): boolean {
-    return false;
-  }
-
-  isPart(): boolean;
-  isPart(isPart: boolean): Output<T>;
-  isPart(isPart?: boolean): boolean | Output<T> {
-    if (isPart === void 0) {
-      return false;
-    } else if (isPart) {
-      return this;
-    } else {
-      return Output.full(this._value, this._settings);
-    }
-  }
-
-  write(token: number): Output<T>;
-  write(string: string): Output<T>;
-  write(tokenOrString: number | string): Output<T> {
-    return Output.error(new OutputException("done"), this._settings);
-  }
-
-  writeln(string?: string): Output<T> {
-    return Output.error(new OutputException("done"), this._settings);
-  }
-
-  bind(): T {
-    return this._value;
-  }
-
-  settings(): OutputSettings;
-  settings(settings: OutputSettings): Output<T>;
-  settings(settings?: OutputSettings): OutputSettings | Output<T> {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      return Output.done(this._value, settings);
-    }
-  }
-
-  clone(): Output<T> {
-    return this;
-  }
-}
-
-/** @hidden */
-class OutputError<T> extends Output<T> {
-  /** @hidden */
-  readonly _error: Error;
-  /** @hidden */
-  readonly _settings: OutputSettings;
-
-  constructor(error: Error, settings: OutputSettings) {
-    super();
-    this._error = error;
-    this._settings = settings;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isFull(): boolean {
-    return false;
-  }
-
-  isDone(): boolean {
-    return false;
-  }
-
-  isError(): boolean {
-    return true;
-  }
-
-  isPart(): boolean;
-  isPart(isPart: boolean): Output<T>;
-  isPart(isPart?: boolean): boolean | Output<T> {
-    if (isPart === void 0) {
-      return false;
-    } else {
-      return this;
-    }
-  }
-
-  write(token: number): Output<T>;
-  write(string: string): Output<T>;
-  write(tokenOrString: number | string): Output<T> {
-    return this;
-  }
-
-  writeln(string?: string): Output<T> {
-    return this;
-  }
-
-  bind(): T {
-    throw new OutputException();
-  }
-
-  trap(): Error {
-    return this._error;
-  }
-
-  settings(): OutputSettings;
-  settings(settings: OutputSettings): Output<T>;
-  settings(settings?: OutputSettings): OutputSettings | Output<T> {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      return Output.error(this._error, settings);
-    }
-  }
-
-  clone(): Output<T> {
-    return this;
+  static error(error: Error): Output<never> {
+    return new OutputError(error, OutputSettings.standard());
   }
 }

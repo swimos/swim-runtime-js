@@ -16,69 +16,79 @@ import {OutputException} from "../output/OutputException";
 import type {AnyOutputSettings, OutputSettings} from "../output/OutputSettings";
 import {Output} from "../output/Output";
 import {Unicode} from "./Unicode";
-import type {UtfErrorMode} from "./UtfErrorMode";
+import {UtfErrorMode} from "./UtfErrorMode";
 import {Base16} from "../number/Base16";
 
 /** @hidden */
 export class Utf8DecodedOutput<T> extends Output<T> {
   /** @hidden */
-  _output: Output<T>;
+  declare readonly output: Output<T>;
   /** @hidden */
-  readonly _errorMode: UtfErrorMode;
+  declare readonly errorMode: UtfErrorMode;
   /** @hidden */
-  _c1: number;
+  c1: number;
   /** @hidden */
-  _c2: number;
+  c2: number;
   /** @hidden */
-  _c3: number;
+  c3: number;
   /** @hidden */
-  _have: number;
+  have: number;
 
   constructor(output: Output<T>, errorMode: UtfErrorMode,
-              c1: number = -1, c2: number = -1, c3: number = -1, have: number = 0) {
+              c1: number, c2: number, c3: number, have: number) {
     super();
-    this._output = output;
-    this._errorMode = errorMode;
-    this._c1 = c1;
-    this._c2 = c2;
-    this._c3 = c3;
-    this._have = have;
+    Object.defineProperty(this, "output", {
+      value: output,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "errorMode", {
+      value: errorMode,
+      enumerable: true,
+      configurable: true,
+    });
+    this.c1 = c1;
+    this.c2 = c2;
+    this.c3 = c3;
+    this.have = have;
   }
 
   isCont(): boolean {
-    return this._output.isCont();
+    return this.output.isCont();
   }
 
   isFull(): boolean {
-    return this._output.isFull();
+    return this.output.isFull();
   }
 
   isDone(): boolean {
-    return this._output.isDone();
+    return this.output.isDone();
   }
 
   isError(): boolean {
-    return this._output.isError();
+    return this.output.isError();
   }
 
-  isPart(): boolean;
-  isPart(isPart: boolean): Output<T>;
-  isPart(isPart?: boolean): boolean | Output<T> {
-    if (isPart === void 0) {
-      return this._output.isPart();
-    } else {
-      this._output = this._output.isPart(isPart);
-      return this;
-    }
+  isPart(): boolean {
+    return this.output.isPart();
+  }
+
+  asPart(part: boolean): Output<T> {
+    Object.defineProperty(this, "output", {
+      value: this.output.asPart(part),
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
   write(token: number | string): Output<T> {
     if (typeof token === "number") {
-      let c1 = this._c1;
-      let c2 = this._c2;
-      let c3 = this._c3;
+      let c1 = this.c1;
+      let c2 = this.c2;
+      let c3 = this.c3;
       let c4 = -1;
-      let have = this._have;
+      let have = this.have;
 
       if (token >= 0) {
         switch (have) {
@@ -103,105 +113,145 @@ export class Utf8DecodedOutput<T> extends Output<T> {
         }
       }
 
-      if (c1 === 0 && this._errorMode.isNonZero()) { // invalid NUL byte
+      if (c1 === 0 && this.errorMode.isNonZero()) { // invalid NUL byte
         return Output.error(new OutputException("unexpected NUL byte"));
       } else if (c1 >= 0 && c1 <= 0x7f) { // U+0000..U+007F
-        this._output = this._output.write(c1);
-        this._have = 0;
+        Object.defineProperty(this, "output", {
+          value: this.output.write(c1),
+          enumerable: true,
+          configurable: true,
+        });
+        this.have = 0;
       } else if (c1 >= 0xc2 && c1 <= 0xf4) {
         if (c1 >= 0xc2 && c1 <= 0xdf && c2 >= 0x80 && c2 <= 0xbf) { // U+0080..U+07FF
-          this._output = this._output.write((c1 & 0x1f) << 6 | c2 & 0x3f);
-          this._c1 = -1;
-          this._have = 0;
+          Object.defineProperty(this, "output", {
+            value: this.output.write((c1 & 0x1f) << 6 | c2 & 0x3f),
+            enumerable: true,
+            configurable: true,
+          });
+          this.c1 = -1;
+          this.have = 0;
         } else if (c1 === 0xe0 && c2 >= 0xa0 && c2 <= 0xbf // U+0800..U+0FFF
                 || c1 >= 0xe1 && c1 <= 0xec && c2 >= 0x80 && c2 <= 0xbf // U+1000..U+CFFF
                 || c1 === 0xed && c2 >= 0x80 && c2 <= 0x9f // U+D000..U+D7FF
                 || c1 >= 0xee && c1 <= 0xef && c2 >= 0x80 && c2 <= 0xbf) { // U+E000..U+FFFF
           if (c3 >= 0x80 && c3 <= 0xbf) {
-            this._output = this._output.write((c1 & 0x0f) << 12 | (c2 & 0x3f) << 6 | c3 & 0x3f);
-            this._c1 = -1;
-            this._c2 = -1;
-            this._have = 0;
+            Object.defineProperty(this, "output", {
+              value: this.output.write((c1 & 0x0f) << 12 | (c2 & 0x3f) << 6 | c3 & 0x3f),
+              enumerable: true,
+              configurable: true,
+            });
+            this.c1 = -1;
+            this.c2 = -1;
+            this.have = 0;
           } else if (c3 >= 0) { // invalid c3
-            if (this._errorMode.isFatal()) {
+            if (this.errorMode.isFatal()) {
               return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1, c2, c3)));
             }
-            this._output = this._output.write(this._errorMode.replacementChar());
-            this._c1 = c3;
-            this._c2 = -1;
-            this._have = 1;
-          } else if (token < 0 || this._output.isDone()) { // incomplete c3
+            Object.defineProperty(this, "output", {
+              value: this.output.write(this.errorMode.replacementChar),
+              enumerable: true,
+              configurable: true,
+            });
+            this.c1 = c3;
+            this.c2 = -1;
+            this.have = 1;
+          } else if (token < 0 || this.output.isDone()) { // incomplete c3
             return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1, c2)));
           } else { // awaiting c3
-            this._c2 = c2;
-            this._have = 2;
+            this.c2 = c2;
+            this.have = 2;
           }
         } else if (c1 === 0xf0 && c2 >= 0x90 && c2 <= 0xbf // U+10000..U+3FFFF
                 || c1 >= 0xf1 && c1 <= 0xf3 && c2 >= 0x80 && c2 <= 0xbf // U+40000..U+FFFFF
                 || c1 === 0xf4 && c2 >= 0x80 && c2 <= 0x8f) { // U+100000..U+10FFFF
           if (c3 >= 0x80 && c3 <= 0xbf) {
             if (c4 >= 0x80 && c4 <= 0xbf) {
-              this._have = 4;
-              this._output = this._output.write((c1 & 0x07) << 18 | (c2 & 0x3f) << 12 | (c3 & 0x3f) << 6 | c4 & 0x3f);
-              this._c1 = -1;
-              this._c2 = -1;
-              this._c3 = -1;
-              this._have = 0;
+              this.have = 4;
+              Object.defineProperty(this, "output", {
+                value: this.output.write((c1 & 0x07) << 18 | (c2 & 0x3f) << 12 | (c3 & 0x3f) << 6 | c4 & 0x3f),
+                enumerable: true,
+                configurable: true,
+              });
+              this.c1 = -1;
+              this.c2 = -1;
+              this.c3 = -1;
+              this.have = 0;
             } else if (c4 >= 0) { // invalid c4
-              if (this._errorMode.isFatal()) {
+              if (this.errorMode.isFatal()) {
                 return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1, c2, c3, c4)));
               }
-              this._output = this._output.write(this._errorMode.replacementChar());
-              this._c1 = c4;
-              this._c2 = -1;
-              this._c3 = -1;
-              this._have = 1;
-            } else if (token < 0 || this._output.isDone()) { // incomplete c4
+              Object.defineProperty(this, "output", {
+                value: this.output.write(this.errorMode.replacementChar),
+                enumerable: true,
+                configurable: true,
+              });
+              this.c1 = c4;
+              this.c2 = -1;
+              this.c3 = -1;
+              this.have = 1;
+            } else if (token < 0 || this.output.isDone()) { // incomplete c4
               return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1, c2, c3)));
             } else { // awaiting c4
-              this._c3 = c3;
-              this._have = 3;
+              this.c3 = c3;
+              this.have = 3;
             }
           } else if (c3 >= 0) { // invalid c3
-            if (this._errorMode.isFatal()) {
+            if (this.errorMode.isFatal()) {
               return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1, c2, c3)));
             }
-            this._output = this._output.write(this._errorMode.replacementChar());
-            this._c1 = c3;
-            this._c2 = -1;
-            this._have = 1;
-          } else if (token < 0 || this._output.isDone()) { // incomplete c3
+            Object.defineProperty(this, "output", {
+              value: this.output.write(this.errorMode.replacementChar),
+              enumerable: true,
+              configurable: true,
+            });
+            this.c1 = c3;
+            this.c2 = -1;
+            this.have = 1;
+          } else if (token < 0 || this.output.isDone()) { // incomplete c3
             return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1, c2)));
           } else { // awaiting c3
-            this._c2 = c2;
-            this._have = 2;
+            this.c2 = c2;
+            this.have = 2;
           }
         } else if (c2 >= 0) { // invalid c2
-          if (this._errorMode.isFatal()) {
+          if (this.errorMode.isFatal()) {
             return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1, c2)));
           }
-          this._output = this._output.write(this._errorMode.replacementChar());
-          this._c1 = c2;
-          this._have = 1;
-        } else if (token < 0 || this._output.isDone()) { // incomplete c2
+          Object.defineProperty(this, "output", {
+            value: this.output.write(this.errorMode.replacementChar),
+            enumerable: true,
+            configurable: true,
+          });
+          this.c1 = c2;
+          this.have = 1;
+        } else if (token < 0 || this.output.isDone()) { // incomplete c2
           return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1)));
         } else { // awaiting c2
-          this._c1 = c1;
-          this._have = 1;
+          this.c1 = c1;
+          this.have = 1;
         }
       } else if (c1 >= 0) { // invalid c1
-        if (this._errorMode.isFatal()) {
+        if (this.errorMode.isFatal()) {
           return Output.error(new OutputException(Utf8DecodedOutput.invalid(c1)));
         }
-        this._output = this._output.write(this._errorMode.replacementChar());
-        this._have = 0;
+        Object.defineProperty(this, "output", {
+          value: this.output.write(this.errorMode.replacementChar),
+          enumerable: true,
+          configurable: true,
+        });
+        this.have = 0;
       }
-      if (this._output.isError()) {
-        return this._output;
+      if (this.output.isError()) {
+        return this.output;
       }
       return this;
     } else if (typeof token === "string") {
-      this._output.write(token);
+      Object.defineProperty(this, "output", {
+        value: this.output.write(token),
+        enumerable: true,
+        configurable: true,
+      });
       return this;
     } else {
       throw new TypeError("" + token);
@@ -211,47 +261,57 @@ export class Utf8DecodedOutput<T> extends Output<T> {
   static invalid(c1: number, c2?: number, c3?: number, c4?: number): string {
     let output = Unicode.stringOutput();
     output = output.write("invalid UTF-8 code unit sequence: ");
-    Base16.uppercase().writeIntegerLiteral(c1, output, 2);
+    const base16 = Base16.uppercase;
+    base16.writeIntegerLiteral(c1, output, 2);
     if (c2 !== void 0) {
       output = output.write(' ');
-      Base16.uppercase().writeIntegerLiteral(c2, output, 2);
+      base16.writeIntegerLiteral(c2, output, 2);
       if (c3 !== void 0) {
         output = output.write(' ');
-        Base16.uppercase().writeIntegerLiteral(c3, output, 2);
+        base16.writeIntegerLiteral(c3, output, 2);
         if (c4 !== void 0) {
           output = output.write(' ');
-          Base16.uppercase().writeIntegerLiteral(c4, output, 2);
+          base16.writeIntegerLiteral(c4, output, 2);
         }
       }
     }
     return output.bind();
   }
 
-  settings(): OutputSettings;
-  settings(settings: AnyOutputSettings): Output<T>;
-  settings(settings?: AnyOutputSettings): OutputSettings | Output<T> {
-    if (settings === void 0) {
-      return this._output.settings();
-    } else {
-      this._output.settings(settings);
-      return this;
-    }
+  get settings(): OutputSettings {
+    return this.output.settings;
+  }
+
+  withSettings(settings: AnyOutputSettings): Output<T> {
+    Object.defineProperty(this, "output", {
+      value: this.output.withSettings(settings),
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
   bind(): T {
-    if (this._have === 0) {
-      return this._output.bind();
+    if (this.have === 0) {
+      return this.output.bind();
     } else {
       return this.write(-1).bind();
     }
   }
 
   trap(): Error {
-    return this._output.trap();
+    return this.output.trap();
   }
 
   clone(): Output<T> {
-    return new Utf8DecodedOutput<T>(this._output.clone(), this._errorMode,
-                                    this._c1, this._c2, this._c3, this._have);
+    return new Utf8DecodedOutput(this.output.clone(), this.errorMode,
+                                 this.c1, this.c2, this.c3, this.have);
+  }
+
+  static create<T>(output: Output<T>, errorMode?: UtfErrorMode): Output<T> {
+    if (errorMode === void 0) {
+      errorMode = UtfErrorMode.fatal();
+    }
+    return new Utf8DecodedOutput(output, errorMode, -1, -1, -1, 0);
   }
 }

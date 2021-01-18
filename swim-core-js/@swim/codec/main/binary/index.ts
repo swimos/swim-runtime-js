@@ -15,6 +15,6 @@
 export {ByteOutput} from "./ByteOutput";
 export {ByteOutputUint8Array} from "./ByteOutputUint8Array";
 
-export {Uint8ArrayOutput} from "./Uint8ArrayOutput";
+export {ByteOutputBuffer} from "./ByteOutputBuffer";
 
 export {Binary} from "./Binary";

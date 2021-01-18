@@ -63,7 +63,7 @@ export class IdentWriter extends Writer {
       }
     }
     if (index >= length) {
-      return Writer.done();
+      return Writer.end();
     }
     if (output.isDone()) {
       return Writer.error(new WriterException("truncated"));

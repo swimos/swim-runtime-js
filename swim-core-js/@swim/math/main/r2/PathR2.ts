@@ -218,7 +218,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   writePath(output: Output): void {
     const splines = this._splines;
     const n = splines.length;
-    if (output.settings() === OutputSettings.standard()) {
+    if (output.settings === OutputSettings.standard()) {
       for (let i = 0; i < n; i += 1) {
         output.write(splines[i]!.toPathString()); // write memoized subpath strings
       }

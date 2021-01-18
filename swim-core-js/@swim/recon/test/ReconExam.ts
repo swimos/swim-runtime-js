@@ -93,7 +93,7 @@ export class ReconExam extends Exam {
 
   writes(item: Item, expected: Uint8Array | string): void {
     if (typeof expected === "string") {
-      const output = Utf8.encodedOutput(Binary.uint8ArrayOutput());
+      const output = Utf8.encodedOutput(Binary.output());
       Unicode.writeString(expected, output);
       expected = output.bind();
     }
@@ -127,7 +127,7 @@ export class ReconExam extends Exam {
 
   writesBlock(item: Item, expected: Uint8Array | string): void {
     if (typeof expected === "string") {
-      const output = Utf8.encodedOutput(Binary.uint8ArrayOutput());
+      const output = Utf8.encodedOutput(Binary.output());
       Unicode.writeString(expected, output);
       expected = output.bind();
     }

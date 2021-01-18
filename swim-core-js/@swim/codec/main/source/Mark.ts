@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Strings, Constructors} from "@swim/util";
+import {Lazy, Murmur3, Numbers, Strings, Constructors} from "@swim/util";
 import {Tag} from "./Tag";
+import {Span} from "../"; // circular import
 import type {Output} from "../output/Output";
+import {Format} from "../"; // circular import
 
 /**
  * Description of a source position, identified by byte offset, line, and
@@ -22,115 +24,106 @@ import type {Output} from "../output/Output";
  */
 export class Mark extends Tag {
   /** @hidden */
-  readonly _offset: number;
-  /** @hidden */
-  readonly _line: number;
-  /** @hidden */
-  readonly _column: number;
-  /** @hidden */
-  readonly _note: string | null;
-
-  /** @hidden */
-  constructor(offset: number, line: number, column: number, note: string | null) {
+  constructor(offset: number, line: number, column: number, note: string | undefined) {
     super();
-    this._offset = offset;
-    this._line = line;
-    this._column = column;
-    this._note = note;
+    Object.defineProperty(this, "offset", {
+      value: offset,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "line", {
+      value: line,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "column", {
+      value: column,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "note", {
+      value: note,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   /**
-   * Returns the zero-based byte offset of this position.
+   * The zero-based byte offset of this position.
    */
-  offset(): number {
-    return this._offset;
-  }
+  declare readonly offset: number;
 
   /**
-   * Returns the one-based line number of this position.
+   * The one-based line number of this position.
    */
-  line(): number {
-    return this._line;
-  }
+  declare readonly line: number;
 
   /**
-   * Returns the one-based column number of this position.
+   * The one-based column number of this position.
    */
-  column(): number {
-    return this._column;
-  }
+  declare readonly column: number;
 
   /**
-   * Returns the note attached to the marked position, or `null` if this
-   * position has no attached note.
+   * The note attached to the marked position, or `null` if this position has
+   * no attached note.
    */
-  note(): string | null {
-    return this._note;
-  }
+  declare readonly note: string | undefined;
 
   /**
-   * Returns `this` position, if its byte offset is less than or equal to
+   * Returns this position, if its byte offset is less than or equal to
    * `that` position; otherwise returns `that` position.
    */
   min(that: Mark): Mark {
-    if (this._offset <= that._offset) {
-      return this;
-    } else {
-      return that;
-    }
+    return this.offset <= that.offset ? this : that;
   }
 
   /**
-   * Returns `this` position, if its byte offset is greater than or equal to
+   * Returns this position, if its byte offset is greater than or equal to
    * `that` position; otherwise returns `that` position.
    */
   max(that: Mark): Mark {
-    if (this._offset >= that._offset) {
-      return this;
-    } else {
-      return that;
-    }
+    return this.offset >= that.offset ? this : that;
   }
 
-  start(): Mark {
+  get start(): Mark {
     return this;
   }
 
-  end(): Mark {
+  get end(): Mark {
     return this;
   }
 
   union(that: Tag): Tag {
     if (that instanceof Mark) {
-      if (this._offset === that._offset && this._line === that._line
-          && this._column === that._column) {
+      if (this.offset === that.offset && this.line === that.line
+          && this.column === that.column) {
         return this;
       } else {
-        return Tag.Span.from(this, that);
+        return Span.from(this, that);
       }
-    } else if (that instanceof Tag.Span) {
-      const start = this.min(that._start);
-      const end = this.max(that._end);
-      if (start === that._start && end === that._end) {
+    } else if (that instanceof Span) {
+      const start = this.min(that.start);
+      const end = this.max(that.end);
+      if (start === that.start && end === that.end) {
         return that;
       } else {
-        return Tag.Span.from(start, end);
+        return Span.from(start, end);
       }
     }
     throw new Error(that.toString());
   }
 
   shift(mark: Mark): Mark {
-    const offset = this._offset + (this._offset - mark._offset);
-    const line = this._line + (this._line - mark._line);
-    let column = this._column;
+    const offset = this.offset + (this.offset - mark.offset);
+    const line = this.line + (this.line - mark.line);
+    let column = this.column;
     if (line === 1) {
-      column += (this._column - mark._column);
+      column += (this.column - mark.column);
     }
-    if (offset === this._offset && line === this._line && column === this._column) {
+    if (offset === this.offset && line === this.line && column === this.column) {
       return this;
     } else {
-      return Mark.at(offset, line, column, this._note);
+      return Mark.at(offset, line, column, this.note);
     }
   }
 
@@ -138,56 +131,52 @@ export class Mark extends Tag {
     if (this === that) {
       return true;
     } else if (that instanceof Mark) {
-      return this._offset === that._offset && this._line === that._line
-          && this._column === that._column && this._note === that._note;
+      return this.offset === that.offset && this.line === that.line
+          && this.column === that.column && this.note === that.note;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(Mark),
-        Numbers.hash(this._offset)), Numbers.hash(this._line)), Numbers.hash(this._column)),
-        Strings.hash(this._note)));
+        Numbers.hash(this.offset)), Numbers.hash(this.line)), Numbers.hash(this.column)),
+        Strings.hash(this.note)));
   }
 
   display(output: Output): void {
-    Tag.Format.displayNumber(this._line, output);
+    Format.displayNumber(this.line, output);
     output = output.write(58/*':'*/);
-    Tag.Format.displayNumber(this._column, output);
-    if (this._note !== null) {
-      output = output.write(58/*':'*/).write(32/*' '*/).write(this._note);
+    Format.displayNumber(this.column, output);
+    if (this.note !== void 0) {
+      output = output.write(58/*':'*/).write(32/*' '*/).write(this.note);
     }
   }
 
   debug(output: Output): void {
     output = output.write("Mark").write(".").write("at").write("(");
-    Tag.Format.debugNumber(this._offset, output);
+    Format.debugNumber(this.offset, output);
     output = output.write(", ");
-    Tag.Format.debugNumber(this._line, output);
+    Format.debugNumber(this.line, output);
     output = output.write(", ");
-    Tag.Format.debugNumber(this._column, output);
-    if (this._note !== null) {
+    Format.debugNumber(this.column, output);
+    if (this.note !== void 0) {
       output = output.write(", ");
-      Tag.Format.debugString(this._note, output);
+      Format.debugString(this.note, output);
     }
     output = output.write(")");
   }
 
   toString(): string {
-    return Tag.Format.display(this);
+    return Format.display(this);
   }
-
-  private static _zero?: Mark;
 
   /**
    * Returns a `Mark` at byte offset `0`, line `1`, and column `1`, with no
    * attached note.
    */
-  static zero(): Mark {
-    if (Mark._zero === void 0) {
-      Mark._zero = new Mark(0, 1, 1, null);
-    }
-    return Mark._zero;
+  @Lazy
+  static get zero(): Mark {
+    return new Mark(0, 1, 1, void 0);
   }
 
   /**
@@ -195,8 +184,7 @@ export class Mark extends Tag {
    * `line` number, and one-based `column` number, with an optionally attached
    * `note`.
    */
-  static at(offset: number, line: number, column: number, note: string | null = null): Mark {
+  static at(offset: number, line: number, column: number, note?: string | undefined): Mark {
     return new Mark(offset, line, column, note);
   }
 }
-Tag.Mark = Mark;

@@ -417,7 +417,7 @@ export class Target {
         tag = Target.tsMark(error.start!, error.file, message);
       }
 
-      const input = Unicode.stringInput(error.file.text).id(error.file.fileName);
+      const input = Unicode.stringInput(error.file.text).withId(error.file.fileName);
       const diagnostic = new Diagnostic(input, tag, severity, "" + error.code, null, null);
       console.log(diagnostic.toString(OutputSettings.styled()));
     } else {
@@ -504,7 +504,7 @@ export class Target {
     }
 
     const sourceFile = (failure as any).sourceFile;
-    const input = Unicode.stringInput(sourceFile.text).id(sourceFile.fileName);
+    const input = Unicode.stringInput(sourceFile.text).withId(sourceFile.fileName);
     const diagnostic = new Diagnostic(input, tag, severity, failure.getRuleName(), null, null);
     console.log(diagnostic.toString(OutputSettings.styled()));
   }

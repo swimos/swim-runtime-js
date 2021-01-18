@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Values} from "../types/Values";
+import {Values} from "../runtime/Values";
 
 /**
  * A hashed generational cache map discards the least recently used value
@@ -27,217 +27,217 @@ import {Values} from "../types/Values";
  */
 export class HashGenCacheMap<K, V> {
   /** @hidden */
-  readonly _buckets: Array<HashGenCacheMapBucket<K, V> | undefined>;
+  readonly buckets: Array<HashGenCacheMapBucket<K, V> | undefined>;
   /** @hidden */
-  _gen4Hits: number;
+  gen4Hits: number;
   /** @hidden */
-  _gen3Hits: number;
+  gen3Hits: number;
   /** @hidden */
-  _gen2Hits: number;
+  gen2Hits: number;
   /** @hidden */
-  _gen1Hits: number;
+  gen1Hits: number;
   /** @hidden */
-  _misses: number;
+  misses: number;
 
   constructor(size: number) {
-    this._buckets = new Array(size);
-    this._gen4Hits = 0;
-    this._gen3Hits = 0;
-    this._gen2Hits = 0;
-    this._gen1Hits = 0;
-    this._misses = 0;
+    this.buckets = new Array(size);
+    this.gen4Hits = 0;
+    this.gen3Hits = 0;
+    this.gen2Hits = 0;
+    this.gen1Hits = 0;
+    this.misses = 0;
   }
 
   get(key: K): V | undefined {
-    if (this._buckets.length === 0) {
+    if (this.buckets.length === 0) {
       return void 0;
     }
-    const index = Math.abs(Values.hash(key)) % this._buckets.length;
-    const bucket = this._buckets[index];
+    const index = Math.abs(Values.hash(key)) % this.buckets.length;
+    const bucket = this.buckets[index];
     if (bucket === void 0) {
       return void 0;
     }
 
-    const gen4Key = bucket._gen4Key;
+    const gen4Key = bucket.gen4Key;
     if (gen4Key !== void 0 && Values.equal(key, gen4Key)) {
-      const gen4Val = bucket._gen4Val;
+      const gen4Val = bucket.gen4Val;
       if (gen4Val !== void 0) {
-        this._gen4Hits += 1;
-        bucket._gen4Weight++;
+        this.gen4Hits += 1;
+        bucket.gen4Weight++;
         return gen4Val;
       } else {
-        bucket._gen4Key = void 0;
+        bucket.gen4Key = void 0;
       }
     }
 
-    const gen3Key = bucket._gen3Key;
+    const gen3Key = bucket.gen3Key;
     if (gen3Key !== void 0 && Values.equal(key, gen3Key)) {
-      const gen3Val = bucket._gen3Val;
+      const gen3Val = bucket.gen3Val;
       if (gen3Val !== void 0) {
-        this._gen3Hits += 1;
-        if (bucket._gen3Weight++ > bucket._gen4Weight) {
-          this._buckets[index] = new HashGenCacheMapBucket(
-              bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-              bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-              bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
-              bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight);
+        this.gen3Hits += 1;
+        if (bucket.gen3Weight++ > bucket.gen4Weight) {
+          this.buckets[index] = new HashGenCacheMapBucket(
+              bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+              bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+              bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
+              bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight);
         }
         return gen3Val;
       } else {
-        bucket._gen3Key = void 0;
+        bucket.gen3Key = void 0;
       }
     }
 
-    const gen2Key = bucket._gen2Key;
+    const gen2Key = bucket.gen2Key;
     if (gen2Key !== void 0 && Values.equal(key, gen2Key)) {
-      const gen2Val = bucket._gen2Val;
+      const gen2Val = bucket.gen2Val;
       if (gen2Val !== void 0) {
-        this._gen2Hits += 1;
-        if (bucket._gen2Weight++ > bucket._gen3Weight) {
-          this._buckets[index] = new HashGenCacheMapBucket(
-              bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-              bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
-              bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-              bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight);
+        this.gen2Hits += 1;
+        if (bucket.gen2Weight++ > bucket.gen3Weight) {
+          this.buckets[index] = new HashGenCacheMapBucket(
+              bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+              bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
+              bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+              bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight);
         }
         return gen2Val;
       } else {
-        bucket._gen2Key = void 0;
+        bucket.gen2Key = void 0;
       }
     }
 
-    const gen1Key = bucket._gen1Key;
+    const gen1Key = bucket.gen1Key;
     if (gen1Key !== void 0 && Values.equal(key, gen1Key)) {
-      const gen1Val = bucket._gen1Val;
+      const gen1Val = bucket.gen1Val;
       if (gen1Val !== void 0) {
-        this._gen1Hits += 1;
-        if (bucket._gen1Weight++ > bucket._gen2Weight) {
-          this._buckets[index] = new HashGenCacheMapBucket(
-              bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-              bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-              bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
-              bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight);
+        this.gen1Hits += 1;
+        if (bucket.gen1Weight++ > bucket.gen2Weight) {
+          this.buckets[index] = new HashGenCacheMapBucket(
+              bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+              bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+              bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
+              bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight);
         }
         return gen1Val;
       } else {
-        bucket._gen1Key = void 0;
+        bucket.gen1Key = void 0;
       }
     }
 
-    this._misses += 1;
+    this.misses += 1;
     return void 0;
   }
 
   put(key: K, value: V): V {
-    if (this._buckets.length === 0) {
+    if (this.buckets.length === 0) {
       return value;
     }
-    const index = Math.abs(Values.hash(key)) % this._buckets.length;
-    const bucket = this._buckets[index] || new HashGenCacheMapBucket();
+    const index = Math.abs(Values.hash(key)) % this.buckets.length;
+    const bucket = this.buckets[index] || new HashGenCacheMapBucket();
 
-    let gen4Key = bucket._gen4Key;
+    let gen4Key = bucket.gen4Key;
     if (gen4Key !== void 0 && Values.equal(key, gen4Key)) {
-      const gen4Val = bucket._gen4Val;
+      const gen4Val = bucket.gen4Val;
       if (gen4Val !== void 0) {
-        this._gen4Hits += 1;
-        bucket._gen4Weight++;
+        this.gen4Hits += 1;
+        bucket.gen4Weight++;
         return gen4Val;
       } else {
-        bucket._gen4Key = void 0;
+        bucket.gen4Key = void 0;
         gen4Key = void 0;
       }
     }
 
-    let gen3Key = bucket._gen3Key;
+    let gen3Key = bucket.gen3Key;
     if (gen3Key !== void 0 && Values.equal(key, gen3Key)) {
-      const gen3Val = bucket._gen3Val;
+      const gen3Val = bucket.gen3Val;
       if (gen3Val !== void 0) {
-        this._gen3Hits += 1;
-        if (bucket._gen3Weight++ > bucket._gen4Weight) {
-          this._buckets[index] = new HashGenCacheMapBucket(
-              bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-              bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-              bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
-              bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight);
+        this.gen3Hits += 1;
+        if (bucket.gen3Weight++ > bucket.gen4Weight) {
+          this.buckets[index] = new HashGenCacheMapBucket(
+              bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+              bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+              bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
+              bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight);
         }
         return gen3Val;
       } else {
-        bucket._gen3Key = void 0;
+        bucket.gen3Key = void 0;
         gen3Key = void 0;
       }
     }
 
-    let gen2Key = bucket._gen2Key;
+    let gen2Key = bucket.gen2Key;
     if (gen2Key !== void 0 && Values.equal(key, gen2Key)) {
-      const gen2Val = bucket._gen2Val;
+      const gen2Val = bucket.gen2Val;
       if (gen2Val !== void 0) {
-        this._gen2Hits += 1;
-        if (bucket._gen2Weight++ > bucket._gen3Weight) {
-          this._buckets[index] = new HashGenCacheMapBucket(
-              bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-              bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
-              bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-              bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight);
+        this.gen2Hits += 1;
+        if (bucket.gen2Weight++ > bucket.gen3Weight) {
+          this.buckets[index] = new HashGenCacheMapBucket(
+              bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+              bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
+              bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+              bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight);
         }
         return gen2Val;
       } else {
-        bucket._gen2Key = void 0;
+        bucket.gen2Key = void 0;
         gen2Key = void 0;
       }
     }
 
-    let gen1Key = bucket._gen1Key;
+    let gen1Key = bucket.gen1Key;
     if (gen1Key !== void 0 && Values.equal(key, gen1Key)) {
-      const gen1Val = bucket._gen1Val;
+      const gen1Val = bucket.gen1Val;
       if (gen1Val !== void 0) {
-        this._gen1Hits += 1;
-        if (bucket._gen1Weight++ > bucket._gen2Weight) {
-          this._buckets[index] = new HashGenCacheMapBucket(
-              bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-              bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-              bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
-              bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight);
+        this.gen1Hits += 1;
+        if (bucket.gen1Weight++ > bucket.gen2Weight) {
+          this.buckets[index] = new HashGenCacheMapBucket(
+              bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+              bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+              bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
+              bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight);
         }
         return gen1Val;
       } else {
-        bucket._gen1Key = void 0;
+        bucket.gen1Key = void 0;
         gen1Key = void 0;
       }
     }
 
-    this._misses += 1;
+    this.misses += 1;
     if (gen4Key === void 0) {
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
-          bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
+          bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
           key, value, 1);
     } else if (gen3Key === void 0) {
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
-          bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
+          bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
           key, value, 1);
     } else if (gen2Key === void 0) {
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
           key, value, 1);
     } else if (gen1Key === void 0) {
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
           key, value, 1);
     } else {
       // Penalize older gens for thrash. Promote gen1 to prevent nacent gens
       // from flip-flopping. If sacrificed gen2 was worth keeping, it likely
       // would have already been promoted.
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight - 1,
-          bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight - 1,
-          bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight - 1,
+          bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight - 1,
+          bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
           key, value, 1);
     }
 
@@ -245,55 +245,55 @@ export class HashGenCacheMap<K, V> {
   }
 
   remove(key: K): V | undefined {
-    if (this._buckets.length === 0) {
+    if (this.buckets.length === 0) {
       return void 0;
     }
-    const index = Math.abs(Values.hash(key)) % this._buckets.length;
-    const bucket = this._buckets[index];
+    const index = Math.abs(Values.hash(key)) % this.buckets.length;
+    const bucket = this.buckets[index];
     if (bucket === void 0) {
       return void 0;
     }
 
-    const gen4Key = bucket._gen4Key;
+    const gen4Key = bucket.gen4Key;
     if (gen4Key !== void 0 && Values.equal(key, gen4Key)) {
-      const gen4Val = bucket._gen4Val;
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
-          bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
+      const gen4Val = bucket.gen4Val;
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
+          bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
           void 0, void 0, 0);
       return gen4Val;
     }
 
-    const gen3Key = bucket._gen3Key;
+    const gen3Key = bucket.gen3Key;
     if (gen3Key !== void 0 && Values.equal(key, gen3Key)) {
-      const gen3Val = bucket._gen3Val;
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
-          bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
+      const gen3Val = bucket.gen3Val;
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
+          bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
           void 0, void 0, 0);
       return gen3Val;
     }
 
-    const gen2Key = bucket._gen2Key;
+    const gen2Key = bucket.gen2Key;
     if (gen2Key !== void 0 && Values.equal(key, gen2Key)) {
-      const gen2Val = bucket._gen2Val;
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen1Key, bucket._gen1Val, bucket._gen1Weight,
+      const gen2Val = bucket.gen2Val;
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen1Key, bucket.gen1Val, bucket.gen1Weight,
           void 0, void 0, 0);
       return gen2Val;
     }
 
-    const gen1Key = bucket._gen1Key;
+    const gen1Key = bucket.gen1Key;
     if (gen1Key !== void 0 && Values.equal(key, gen1Key)) {
-      const gen1Val = bucket._gen1Val;
-      this._buckets[index] = new HashGenCacheMapBucket(
-          bucket._gen4Key, bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen3Key, bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen2Key, bucket._gen2Val, bucket._gen2Weight,
+      const gen1Val = bucket.gen1Val;
+      this.buckets[index] = new HashGenCacheMapBucket(
+          bucket.gen4Key, bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen3Key, bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen2Key, bucket.gen2Val, bucket.gen2Weight,
           void 0, void 0, 0);
       return gen1Val;
     }
@@ -302,64 +302,64 @@ export class HashGenCacheMap<K, V> {
   }
 
   clear(): void {
-    for (let i = 0; i < this._buckets.length; i += 1) {
-      this._buckets[i] = void 0;
+    for (let i = 0; i < this.buckets.length; i += 1) {
+      this.buckets[i] = void 0;
     }
   }
 
   /** @hidden */
   hits(): number {
-    return this._gen4Hits + this._gen3Hits + this._gen2Hits + this._gen1Hits;
+    return this.gen4Hits + this.gen3Hits + this.gen2Hits + this.gen1Hits;
   }
 
   hitRatio(): number {
     const hits = this.hits();
-    return hits / (hits + this._misses);
+    return hits / (hits + this.misses);
   }
 }
 
 /** @hidden */
 export class HashGenCacheMapBucket<K, V> {
   /** @hidden */
-  _gen4Key: K | undefined;
+  gen4Key: K | undefined;
   /** @hidden */
-  _gen4Val: V | undefined;
+  gen4Val: V | undefined;
   /** @hidden */
-  _gen4Weight: number;
+  gen4Weight: number;
   /** @hidden */
-  _gen3Key: K | undefined;
+  gen3Key: K | undefined;
   /** @hidden */
-  _gen3Val: V | undefined;
+  gen3Val: V | undefined;
   /** @hidden */
-  _gen3Weight: number;
+  gen3Weight: number;
   /** @hidden */
-  _gen2Key: K | undefined;
+  gen2Key: K | undefined;
   /** @hidden */
-  _gen2Val: V | undefined;
+  gen2Val: V | undefined;
   /** @hidden */
-  _gen2Weight: number;
+  gen2Weight: number;
   /** @hidden */
-  _gen1Key: K | undefined;
+  gen1Key: K | undefined;
   /** @hidden */
-  _gen1Val: V | undefined;
+  gen1Val: V | undefined;
   /** @hidden */
-  _gen1Weight: number;
+  gen1Weight: number;
 
   constructor(gen4Key?: K, gen4Val?: V, gen4Weight: number = 0,
               gen3Key?: K, gen3Val?: V, gen3Weight: number = 0,
               gen2Key?: K, gen2Val?: V, gen2Weight: number = 0,
               gen1Key?: K, gen1Val?: V, gen1Weight: number = 0) {
-    this._gen4Key = gen4Key;
-    this._gen4Val = gen4Val;
-    this._gen4Weight = gen4Weight;
-    this._gen3Key = gen3Key;
-    this._gen3Val = gen3Val;
-    this._gen3Weight = gen3Weight;
-    this._gen2Key = gen2Key;
-    this._gen2Val = gen2Val;
-    this._gen2Weight = gen2Weight;
-    this._gen1Key = gen1Key;
-    this._gen1Val = gen1Val;
-    this._gen1Weight = gen1Weight;
+    this.gen4Key = gen4Key;
+    this.gen4Val = gen4Val;
+    this.gen4Weight = gen4Weight;
+    this.gen3Key = gen3Key;
+    this.gen3Val = gen3Val;
+    this.gen3Weight = gen3Weight;
+    this.gen2Key = gen2Key;
+    this.gen2Val = gen2Val;
+    this.gen2Weight = gen2Weight;
+    this.gen1Key = gen1Key;
+    this.gen1Val = gen1Val;
+    this.gen1Weight = gen1Weight;
   }
 }

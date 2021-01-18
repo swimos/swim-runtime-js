@@ -95,10 +95,10 @@ export class PrefixOperatorWriter<I, V> extends Writer {
       if (recon.precedence(rhs) < precedence) {
         if (output.isCont()) {
           output = output.write(41/*')'*/);
-          return Writer.done();
+          return Writer.end();
         }
       } else {
-        return Writer.done();
+        return Writer.end();
       }
     }
     if (output.isDone()) {

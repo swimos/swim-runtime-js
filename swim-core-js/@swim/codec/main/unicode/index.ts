@@ -19,6 +19,9 @@ export {StringOutput} from "./StringOutput";
 export {Unicode} from "./Unicode";
 
 export {UtfErrorMode} from "./UtfErrorMode";
+export {UtfErrorModeFatal} from "./UtfErrorModeFatal";
+export {UtfErrorModeReplacement} from "./UtfErrorModeReplacement";
+
 export {Utf8DecodedOutput} from "./Utf8DecodedOutput";
 export {Utf8EncodedOutput} from "./Utf8EncodedOutput";
 

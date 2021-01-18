@@ -15,3 +15,5 @@
 export {ParserException} from "./ParserException";
 
 export {Parser} from "./Parser";
+export {ParserDone} from "./ParserDone";
+export {ParserError} from "./ParserError";

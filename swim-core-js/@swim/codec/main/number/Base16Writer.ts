@@ -15,46 +15,64 @@
 import type {Output} from "../output/Output";
 import {WriterException} from "../writer/WriterException";
 import {Writer} from "../writer/Writer";
-import {Base16} from "./Base16";
+import type {Base16} from "./Base16";
 
 /** @hidden */
-export class Base16Writer extends Writer<unknown, unknown> {
+export class Base16Writer extends Writer {
   /** @hidden */
-  readonly _value: unknown;
+  declare readonly value: unknown;
   /** @hidden */
-  readonly _input: Uint8Array | undefined;
+  declare readonly input: Uint8Array | null;
   /** @hidden */
-  readonly _base16: Base16;
+  declare readonly base16: Base16;
   /** @hidden */
-  readonly _index: number;
+  declare readonly index: number;
   /** @hidden */
-  readonly _step: number;
+  declare readonly step: number;
 
-  constructor(value: unknown, input: Uint8Array | undefined, base16: Base16,
+  constructor(value: unknown, input: Uint8Array | null, base16: Base16,
               index: number = 0, step: number = 1) {
     super();
-    this._value = value;
-    this._input = input;
-    this._base16 = base16;
-    this._index = index;
-    this._step = step;
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "input", {
+      value: input,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "base16", {
+      value: base16,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "index", {
+      value: index,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "step", {
+      value: step,
+      enumerable: true,
+    });
   }
 
-  feed(value: unknown): Writer<unknown, unknown> {
+  feed(value: unknown): Writer {
     if (value instanceof Uint8Array) {
-      return new Base16Writer(undefined, value, this._base16);
+      return new Base16Writer(void 0, value, this.base16);
     } else {
       throw new TypeError("" + value);
     }
   }
 
-  pull(output: Output): Writer<unknown, unknown> {
-    return Base16Writer.write(output, this._value, this._input!, this._base16,
-                              this._index, this._step);
+  pull(output: Output): Writer {
+    if (this.input === null) {
+      throw new WriterException();
+    }
+    return Base16Writer.write(output, this.value, this.input, this.base16,
+                              this.index, this.step);
   }
 
-  static write(output: Output, value: unknown, input: Uint8Array, base16: Base16,
-               index: number = 0, step: number = 1): Writer<unknown, unknown> {
+  static write(output: Output, value: unknown, input: Uint8Array,
+               base16: Base16, index: number = 0, step: number = 1): Writer {
     while (index < input.length) {
       const x = input[index]!;
       if (step === 1 && output.isCont()) {
@@ -77,4 +95,3 @@ export class Base16Writer extends Writer<unknown, unknown> {
     return new Base16Writer(value, input, base16, index, step);
   }
 }
-Base16.Writer = Base16Writer;

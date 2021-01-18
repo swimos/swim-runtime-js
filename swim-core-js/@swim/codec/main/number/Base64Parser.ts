@@ -16,37 +16,55 @@ import {Diagnostic} from "../source/Diagnostic";
 import type {Input} from "../input/Input";
 import type {Output} from "../output/Output";
 import {Parser} from "../parser/Parser";
-import {Base64} from "./Base64";
+import type {Base64} from "./Base64";
 
 /** @hidden */
 export class Base64Parser<O> extends Parser<O> {
   /** @hidden */
-  readonly _output: Output<O>;
+  declare readonly output: Output<O>;
   /** @hidden */
-  readonly _base64: Base64;
+  declare readonly base64: Base64;
   /** @hidden */
-  readonly _p: number;
+  declare readonly p: number;
   /** @hidden */
-  readonly _q: number;
+  declare readonly q: number;
   /** @hidden */
-  readonly _r: number;
+  declare readonly r: number;
   /** @hidden */
-  readonly _step: number;
+  declare readonly step: number;
 
   constructor(output: Output<O>, base64: Base64, p: number = 0, q: number = 0,
               r: number = 0, step: number = 1) {
     super();
-    this._output = output;
-    this._base64 = base64;
-    this._p = p;
-    this._q = q;
-    this._r = r;
-    this._step = step;
+    Object.defineProperty(this, "output", {
+      value: output,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "base64", {
+      value: base64,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "p", {
+      value: p,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "q", {
+      value: q,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "r", {
+      value: r,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "step", {
+      value: step,
+      enumerable: true,
+    });
   }
 
   feed(input: Input): Parser<O> {
-    return Base64Parser.parse(input, this._output.clone(), this._base64,
-                              this._p, this._q, this._r, this._step);
+    return Base64Parser.parse(input, this.output.clone(), this.base64,
+                              this.p, this.q, this.r, this.step);
   }
 
   static parse<O>(input: Input, output: Output<O>, base64: Base64, p: number = 0,
@@ -125,4 +143,3 @@ export class Base64Parser<O> extends Parser<O> {
     return new Base64Parser<O>(output, base64, p, q, r, step);
   }
 }
-Base64.Parser = Base64Parser;

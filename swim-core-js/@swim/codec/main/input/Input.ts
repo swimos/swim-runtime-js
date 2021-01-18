@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
 import {Mark} from "../source/Mark";
 import {InputException} from "./InputException";
 import {AnyInputSettings, InputSettings} from "./InputSettings";
+import {InputEmpty} from "../"; // circular import
+import {InputDone} from "../"; // circular import
+import {InputError} from "../"; // circular import
 
 /**
  * Non-blocking token stream reader, with single token lookahead.
@@ -77,32 +81,32 @@ export abstract class Input {
   abstract isEmpty(): boolean;
 
   /**
-   * Returns `true` when no lookahead token is currently available, and
-   * no additional input will ever become available.  i.e. this `Input` is in
+   * Returns `true` when no lookahead token is currently available, and no
+   * additional input will ever become available.  i.e. this `Input` is in
    * the _done_ state.
    */
   abstract isDone(): boolean;
 
   /**
-   * Returns `true` when no lookahead token is currently available due to
-   * an error with the token stream. i.e. this `Input` is in the `error` state.
+   * Returns `true` when no lookahead token is currently available due to an
+   * error with the token stream. i.e. this `Input` is in the `error` state.
    * When `true`, `trap()` will return the input error
    */
   abstract isError(): boolean;
 
   /**
-   * Returns `true` if this is a partial `Input` will that enter
-   * the `empty` state after it consumes the last available input token.
+   * Returns `true` if this is a partial `Input` will that enter the _empty_
+   * state after it consumes the last available input token.
    */
   abstract isPart(): boolean;
 
    /**
-    * Returns a partial `Input` equivalent to this `Input`, if
-    * `isPart` is `true`; returns a final `Input` equivalent
-    * to this `Input` if `isPart` is `false`. The caller's reference
-    * to `this` `Input` should be replaced by the returned `Input`
+    * Returns a partial `Input` equivalent to this `Input`, if `part` is `true`;
+    * returns a final `Input` equivalent to this `Input` if `part` is `false`.
+    * The caller's reference to this `Input` should be replaced by the returned
+    * `Input`
     */
-  abstract isPart(isPart: boolean): Input;
+  abstract asPart(part: boolean): Input;
 
   /**
    * Returns the current lookahead token, if this `Input` is in the
@@ -129,8 +133,7 @@ export abstract class Input {
   abstract seek(mark?: Mark): Input;
 
   /**
-   * Returns the input error. Only guaranteed to return an error when in the
-   * _ error_ state
+   * Returns the input error when in the _error_ state
    *
    * @throws InputException if the `Input` is not the _error_state
    */
@@ -139,68 +142,62 @@ export abstract class Input {
   }
 
   /**
-   * Returns an object that identifies the token stream, or `null` if the
+   * An informative identifier for this token stream, or `undefined` if this
    * stream is unidentified.
    */
-  abstract id(): unknown | null;
+  abstract readonly id: string | undefined;
 
   /**
-   * Returns an `Input` equivalent to this `Input`, but logically identified by
-   * the given–possibly `null`–`id`.  The caller's reference to `this` `Input}`
-   * should be replaced by the returned `Input}`.
+   * Returns an `Input` equivalent to this `Input`, but logically identified
+   * by the given–possibly `undefined`–`id`.  The caller's reference to this
+   * `Input` should be replaced by the returned `Input`.
    */
-  abstract id(id: unknown | null): Input;
+  abstract withId(id: string | undefined): Input;
 
   /**
-   * Returns the position of the current lookahead token, relative to the start
+   * The position of the current lookahead token, relative to the start
    * of the stream.
    */
-  abstract mark(): Mark;
+  abstract readonly mark: Mark;
 
   /**
-   * Returns an `Input` equivalent to this `Input`, but logically positioned at
-   * the given `mark`.  The physical position in the input stream is not
-   * modified.  The caller's reference to `this` `Input` should be replaced by
+   * Returns an `Input` equivalent to this `Input`, but logically positioned
+   * at the given `mark`.  The physical position in the input stream is not
+   * modified.  The caller's reference to this `Input` should be replaced by
    * the returned `Input`.
    */
-  abstract mark(mark: Mark): Input;
+  abstract withMark(mark: Mark): Input;
 
   /**
-   * Returns the byte offset of the current lookahead token, relative to the
-   * start of the stream.
+   * The byte offset of the current lookahead token, relative to the start
+   * of the stream.
    */
-  offset(): number {
-    return this.mark()._offset;
-  }
+  abstract readonly offset: number;
 
   /**
-   * Returns the one-based line number of the current lookahead token, relative
-   * to the start of the stream.
+   * The one-based line number of the current lookahead token, relative to
+   * the start of the stream.
    */
-  line(): number {
-    return this.mark()._line;
-  }
+  abstract readonly line: number;
 
   /**
-   * Returns the one-based column number of the current lookahead token,
-   * relative to the current line in the stream.
+   * The one-based column number of the current lookahead token, relative to
+   * the current line in the stream.
    */
-  column(): number {
-    return this.mark()._column;
-  }
+  abstract readonly column: number;
 
   /**
-   * Returns the `InputSettings` used to configure the behavior of input
-   * consumers that read from this `Input`.
+   * The `InputSettings` used to configure the behavior of input consumers
+   * that read from this `Input`.
    */
-  abstract settings(): InputSettings;
+  abstract readonly settings: InputSettings;
 
   /**
    * Returns a clone of this `Input` with the given `settings`.
    *
    * @throws `Error` if this `Input` reader cannot be cloned.
    */
-  abstract settings(settings: AnyInputSettings): Input;
+  abstract withSettings(settings: AnyInputSettings): Input;
 
   /**
    * Returns an independently positioned view into the token stream,
@@ -210,330 +207,26 @@ export abstract class Input {
    */
   abstract clone(): Input;
 
-  private static _empty?: Input;
-
-  private static _done?: Input;
-
   /**
-   * Returns an `Input` reader in the _empty_ state, with the given `settings`,
-   * at the `mark` position of a token stream logically identified by `id`.
+   * Returns an `Input` reader in the _empty_ state.
    */
-  static empty(id: unknown | null = null, mark: Mark = Mark.zero(),
-               settings: InputSettings = InputSettings.standard()): Input {
-    if (id === null && mark === Mark.zero() && settings === InputSettings.standard()) {
-      if (Input._empty === void 0) {
-        Input._empty = new InputEmpty(null, Mark.zero(), InputSettings.standard());
-      }
-      return Input._empty;
-    }
-    return new InputEmpty(id, mark, settings);
+  @Lazy
+  static empty(): Input {
+    return new InputEmpty(void 0, Mark.zero, InputSettings.standard());
   }
 
   /**
-   * Returns an `Input` reader in the _done_ state, with the given `settings`,
-   * at the `mark` position of a token stream logically identified by `id`.
+   * Returns an `Input` reader in the _done_ state.
    */
-  static done(id: unknown | null = null, mark: Mark = Mark.zero(),
-              settings: InputSettings = InputSettings.standard()): Input {
-    if (id === null && mark === Mark.zero() && settings === InputSettings.standard()) {
-      if (Input._done === void 0) {
-        Input._done = new InputDone(null, Mark.zero(), InputSettings.standard());
-      }
-      return Input._done;
-    }
-    return new InputDone(id, mark, settings);
+  @Lazy
+  static done(): Input {
+    return new InputDone(void 0, Mark.zero, InputSettings.standard());
   }
 
   /**
-   * Returns an `Input` in the _error_ state, with the given `settings`,
-   * at the `mark` position of a token stream logically identified by `id`.
+   * Returns an `Input` in the _error_ state that traps the given `error`.
    */
-  static error(error: Error, id: unknown | null = null, mark: Mark = Mark.zero(),
-               settings: InputSettings = InputSettings.standard()): Input {
-    return new InputError(error, id, mark, settings);
-  }
-}
-
-/** @hidden */
-class InputEmpty extends Input {
-  /** @hidden */
-  readonly _id: unknown | null;
-  /** @hidden */
-  readonly _mark: Mark;
-  /** @hidden */
-  readonly _settings: InputSettings;
-
-  constructor(id: unknown | null, mark: Mark, settings: InputSettings) {
-    super();
-    this._id = id;
-    this._mark = mark;
-    this._settings = settings;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isEmpty(): boolean {
-    return true;
-  }
-
-  isDone(): boolean {
-    return false;
-  }
-
-  isError(): boolean {
-    return false;
-  }
-
-  isPart(): boolean;
-  isPart(isPart: boolean): Input;
-  isPart(isPart?: boolean): boolean | Input {
-    if (isPart === void 0) {
-      return true;
-    } else if (isPart) {
-      return this;
-    } else {
-      return Input.done(this._id, this._mark, this._settings);
-    }
-  }
-
-  head(): number {
-    throw new InputException();
-  }
-
-  step(): Input {
-    const error = new InputException("empty step");
-    return Input.error(error, this._id, this._mark, this._settings);
-  }
-
-  seek(mark?: Mark): Input {
-    const error = new InputException("empty seek");
-    return Input.error(error, this._id, this._mark, this._settings);
-  }
-
-  id(): unknown | null;
-  id(id: unknown | null): Input;
-  id(id?: unknown | null): unknown | null | Input {
-    if (id === void 0) {
-      return this._id;
-    } else {
-      return Input.empty(id, this._mark, this._settings);
-    }
-  }
-
-  mark(): Mark;
-  mark(mark: Mark): Input;
-  mark(mark?: Mark): Mark | Input {
-    if (mark === void 0) {
-      return this._mark;
-    } else {
-      return Input.empty(this._id, mark, this._settings);
-    }
-  }
-
-  settings(): InputSettings;
-  settings(settings: InputSettings): Input;
-  settings(settings?: InputSettings): InputSettings | Input {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      return Input.empty(this._id, this._mark, settings);
-    }
-  }
-
-  clone(): Input {
-    return this;
-  }
-}
-
-/** @hidden */
-class InputDone extends Input {
-  /** @hidden */
-  readonly _id: unknown | null;
-  /** @hidden */
-  readonly _mark: Mark;
-  /** @hidden */
-  readonly _settings: InputSettings;
-
-  constructor(id: unknown | null, mark: Mark, settings: InputSettings) {
-    super();
-    this._id = id;
-    this._mark = mark;
-    this._settings = settings;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isEmpty(): boolean {
-    return false;
-  }
-
-  isDone(): boolean {
-    return true;
-  }
-
-  isError(): boolean {
-    return false;
-  }
-
-  isPart(): boolean;
-  isPart(isPart: boolean): Input;
-  isPart(isPart?: boolean): boolean | Input {
-    if (isPart === void 0) {
-      return false;
-    } else if (isPart) {
-      return Input.empty(this._id, this._mark, this._settings);
-    } else {
-      return this;
-    }
-  }
-
-  head(): number {
-    throw new InputException();
-  }
-
-  step(): Input {
-    const error = new InputException("done step");
-    return Input.error(error, this._id, this._mark, this._settings);
-  }
-
-  seek(mark?: Mark): Input {
-    const error = new InputException("empty seek");
-    return Input.error(error, this._id, this._mark, this._settings);
-  }
-
-  id(): unknown | null;
-  id(id: unknown | null): Input;
-  id(id?: unknown | null): unknown | null | Input {
-    if (id === void 0) {
-      return this._id;
-    } else {
-      return Input.done(id, this._mark, this._settings);
-    }
-  }
-
-  mark(): Mark;
-  mark(mark: Mark): Input;
-  mark(mark?: Mark): Mark | Input {
-    if (mark === void 0) {
-      return this._mark;
-    } else {
-      return Input.done(this._id, mark, this._settings);
-    }
-  }
-
-  settings(): InputSettings;
-  settings(settings: InputSettings): Input;
-  settings(settings?: InputSettings): InputSettings | Input {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      return Input.done(this._id, this._mark, settings);
-    }
-  }
-
-  clone(): Input {
-    return this;
-  }
-}
-
-/** @hidden */
-class InputError extends Input {
-  /** @hidden */
-  readonly _id: unknown | null;
-  /** @hidden */
-  readonly _mark: Mark;
-  /** @hidden */
-  readonly _settings: InputSettings;
-  /** @hidden */
-  readonly _error: Error;
-
-  constructor(error: Error, id: unknown | null, mark: Mark, settings: InputSettings) {
-    super();
-    this._error = error;
-    this._id = id;
-    this._mark = mark;
-    this._settings = settings;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isEmpty(): boolean {
-    return false;
-  }
-
-  isDone(): boolean {
-    return false;
-  }
-
-  isError(): boolean {
-    return true;
-  }
-
-  isPart(): boolean;
-  isPart(isPart: boolean): Input;
-  isPart(isPart?: boolean): boolean | Input {
-    if (isPart === void 0) {
-      return false;
-    } else {
-      return this;
-    }
-  }
-
-  head(): number {
-    throw new InputException();
-  }
-
-  step(): Input {
-    const error = new InputException("error step");
-    return Input.error(error, this._id, this._mark, this._settings);
-  }
-
-  trap(): Error {
-    return this._error;
-  }
-
-  seek(mark?: Mark): Input {
-    const error = new InputException("error seek");
-    return Input.error(error, this._id, this._mark, this._settings);
-  }
-
-  id(): unknown | null;
-  id(id: unknown | null): Input;
-  id(id?: unknown | null): unknown | null | Input {
-    if (id === void 0) {
-      return this._id;
-    } else {
-      return Input.error(this._error, id, this._mark, this._settings);
-    }
-  }
-
-  mark(): Mark;
-  mark(mark: Mark): Input;
-  mark(mark?: Mark): Mark | Input {
-    if (mark === void 0) {
-      return this._mark;
-    } else {
-      return Input.error(this._error, this._id, mark, this._settings);
-    }
-  }
-
-  settings(): InputSettings;
-  settings(settings: InputSettings): Input;
-  settings(settings?: InputSettings): InputSettings | Input {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      return Input.error(this._error, this._id, this._mark, settings);
-    }
-  }
-
-  clone(): Input {
-    return this;
+  static error(error: Error): Input {
+    return new InputError(error, void 0, Mark.zero, InputSettings.standard());
   }
 }

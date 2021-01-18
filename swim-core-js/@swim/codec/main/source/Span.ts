@@ -14,8 +14,9 @@
 
 import {Murmur3, Constructors} from "@swim/util";
 import {Tag} from "./Tag";
-import type {Mark} from "./Mark";
+import {Mark} from "./Mark";
 import type {Output} from "../output/Output";
+import {Format} from "../"; // circular import
 
 /**
  * Description of a source range, identified by a closed interval between start
@@ -23,38 +24,37 @@ import type {Output} from "../output/Output";
  */
 export class Span extends Tag {
   /** @hidden */
-  readonly _start: Mark;
-  /** @hidden */
-  readonly _end: Mark;
-
-  /** @hidden */
   constructor(start: Mark, end: Mark) {
     super();
-    this._start = start;
-    this._end = end;
+    Object.defineProperty(this, "start", {
+      value: start,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "end", {
+      value: end,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  start(): Mark {
-    return this._start;
-  }
+  declare readonly start: Mark;
 
-  end(): Mark {
-    return this._end;
-  }
+  declare readonly end: Mark;
 
   union(that: Tag): Tag {
-    if (that instanceof Tag.Mark) {
-      const start = this._start.min(that);
-      const end = this._end.max(that);
-      if (start === this._start && end === this._end) {
+    if (that instanceof Mark) {
+      const start = this.start.min(that);
+      const end = this.end.max(that);
+      if (start === this.start && end === this.end) {
         return this;
       } else {
         return Span.from(start, end);
       }
     } else if (that instanceof Span) {
-      const start = this._start.min(that._start);
-      const end = this._end.max(that._end);
-      if (start === this._start && end === this._end) {
+      const start = this.start.min(that.start);
+      const end = this.end.max(that.end);
+      if (start === this.start && end === this.end) {
         return this;
       } else {
         return Span.from(start, end);
@@ -64,9 +64,9 @@ export class Span extends Tag {
   }
 
   shift(mark: Mark): Span {
-    const start = this._start.shift(mark);
-    const end = this._end.shift(mark);
-    if (start === this._start && end === this._end) {
+    const start = this.start.shift(mark);
+    const end = this.end.shift(mark);
+    if (start === this.start && end === this.end) {
       return this;
     } else {
       return Span.from(start, end);
@@ -77,42 +77,42 @@ export class Span extends Tag {
     if (this === that) {
       return true;
     } else if (that instanceof Span) {
-      return this._start.equals(that._start) && this._end.equals(that._end);
+      return this.start.equals(that.start) && this.end.equals(that.end);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(Span),
-        this._start.hashCode()), this._end.hashCode()));
+        this.start.hashCode()), this.end.hashCode()));
   }
 
   display(output: Output): void {
-    if (this._start._note !== null) {
-      output = output.write(this._start._note).write(58/*':'*/).write(32/*' '*/);
+    if (this.start.note !== void 0) {
+      output = output.write(this.start.note).write(58/*':'*/).write(32/*' '*/);
     }
-    Tag.Format.displayNumber(this._start._line, output);
+    Format.displayNumber(this.start.line, output);
     output = output.write(58/*':'*/);
-    Tag.Format.displayNumber(this._start._column, output);
+    Format.displayNumber(this.start.column, output);
     output = output.write(45/*'-'*/);
-    Tag.Format.displayNumber(this._end._line, output);
+    Format.displayNumber(this.end.line, output);
     output = output.write(58/*':'*/);
-    Tag.Format.displayNumber(this._end._column, output);
-    if (this._end._note !== null) {
-      output = output.write(58/*':'*/).write(32/*' '*/).write(this._end._note);
+    Format.displayNumber(this.end.column, output);
+    if (this.end.note !== void 0) {
+      output = output.write(58/*':'*/).write(32/*' '*/).write(this.end.note);
     }
   }
 
   debug(output: Output): void {
     output = output.write("Span").write(".").write("from").write("(");
-    this._start.debug(output);
+    this.start.debug(output);
     output = output.write(", ");
-    this._end.debug(output);
+    this.end.debug(output);
     output = output.write(")");
   }
 
   toString(): string {
-    return Tag.Format.display(this);
+    return Format.display(this);
   }
 
   /**
@@ -120,7 +120,7 @@ export class Span extends Tag {
    * `start` and `end` marks.
    */
   static from(start: Mark, end: Mark): Span {
-    if (start._offset > end._offset) {
+    if (start.offset > end.offset) {
       const tmp = start;
       start = end;
       end = tmp;
@@ -128,4 +128,3 @@ export class Span extends Tag {
     return new Span(start, end);
   }
 }
-Tag.Span = Span;

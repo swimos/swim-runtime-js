@@ -97,7 +97,7 @@ export class MarkupTextWriter extends Writer {
             output = output.write(c);
           }
         } else {
-          return Writer.done();
+          return Writer.end();
         }
       } else if (step === 2) {
         output = output.write(escape);
@@ -107,16 +107,16 @@ export class MarkupTextWriter extends Writer {
         output = output.write(117/*'u'*/);
         step = 4;
       } else if (step === 4) {
-        output = output.write(Base16.uppercase().encodeDigit((escape >>> 12) & 0xf));
+        output = output.write(Base16.uppercase.encodeDigit((escape >>> 12) & 0xf));
         step = 5;
       } else if (step === 5) {
-        output = output.write(Base16.uppercase().encodeDigit((escape >>> 8) & 0xf));
+        output = output.write(Base16.uppercase.encodeDigit((escape >>> 8) & 0xf));
         step = 6;
       } else if (step === 6) {
-        output = output.write(Base16.uppercase().encodeDigit((escape >>> 4) & 0xf));
+        output = output.write(Base16.uppercase.encodeDigit((escape >>> 4) & 0xf));
         step = 7;
       } else if (step === 7) {
-        output = output.write(Base16.uppercase().encodeDigit(escape & 0xf));
+        output = output.write(Base16.uppercase.encodeDigit(escape & 0xf));
         escape = 0;
         step = 1;
       }

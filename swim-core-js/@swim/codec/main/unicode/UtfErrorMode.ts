@@ -12,50 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, HashCode, Booleans, Numbers, Constructors} from "@swim/util";
+import {Lazy, HashCode} from "@swim/util";
 import type {Output} from "../output/Output";
 import type {Debug} from "../format/Debug";
 import {Format} from "../format/Format";
+import {UtfErrorModeFatal} from "../"; // circular import
+import {UtfErrorModeReplacement} from "../"; // circular import
 
 /**
  * Unicode transformation format error handling mode.
  */
 export abstract class UtfErrorMode implements HashCode, Debug {
   /**
-   * Returns {@code true} if a Unicode decoding should abort with an error when
-   * an invalid code unit sequence is encountered.
+   * Returns `true` if a Unicode decoding should abort with an error when an
+   * invalid code unit sequence is encountered.
    */
   isFatal(): boolean {
     return false;
   }
 
   /**
-   * Returns {@code true} if a Unicode decoding should substitute invalid code
-   * unit sequences with a replacement character.
+   * Returns `true` if a Unicode decoding should substitute invalid code unit
+   * sequences with a replacement character.
    */
   isReplacement(): boolean {
     return false;
   }
 
   /**
-   * Returns the Unicode code point of the replacement character to substitute
-   * for invalid code unit sequences.  Defaults to {@code U+FFFD}.
+   * The Unicode code point of the replacement character used to substitute
+   * for invalid code unit sequences.
    */
-  replacementChar(): number {
-    return 0xfffd;
-  }
+  abstract readonly replacementChar: number;
 
   /**
-   * Returns {@code true} if Unicode decoding should abort with an error when
-   * a {@code NUL} byte is encountered.
+   * Returns `true` if Unicode decoding should abort with an error when a
+   * `NUL` byte is encountered.
    */
   abstract isNonZero(): boolean;
 
   /**
-   * Returns a {@code UtfErrorMode} that, if {@code isNonZero} is {@code true},
-   * aborts when Unicode decoding encounters a {@code NUL} byte.
+   * Returns a `UtfErrorMode` that, if `isNonZero` is `true`, aborts when
+   * Unicode decoding encounters a `NUL` byte.
    */
-  abstract isNonZero(isNonZero: boolean): UtfErrorMode;
+  abstract asNonZero(isNonZero: boolean): UtfErrorMode;
 
   abstract equals(that: unknown): boolean;
 
@@ -67,187 +67,40 @@ export abstract class UtfErrorMode implements HashCode, Debug {
     return Format.debug(this);
   }
 
-  private static _fatal?: UtfErrorMode;
-  private static _fatalNonZero?: UtfErrorMode;
-  private static _replacement?: UtfErrorMode;
-  private static _replacementNonZero?: UtfErrorMode;
-
   /**
-   * Returns a {@code UtfErrorMode} that aborts Unicode decoding with an error
-   * when invalid code unit sequences are encountered.
+   * Returns a `UtfErrorMode` that aborts Unicode decoding with an error when
+   * invalid code unit sequences are encountered.
    */
+  @Lazy
   static fatal(): UtfErrorMode {
-    if (UtfErrorMode._fatal === void 0) {
-      UtfErrorMode._fatal = new UtfFatalErrorMode(false);
-    }
-    return UtfErrorMode._fatal;
+    return new UtfErrorModeFatal(false);
   }
 
   /**
-   * Returns a {@code UtfErrorMode} that aborts Unicode decoding with an error
-   * when invalid code unit sequences, and {@code NUL} bytes, are encountered.
+   * Returns a `UtfErrorMode` that aborts Unicode decoding with an error when
+   * invalid code unit sequences, and `NUL` bytes, are encountered.
    */
+  @Lazy
   static fatalNonZero(): UtfErrorMode {
-    if (UtfErrorMode._fatalNonZero === void 0) {
-      UtfErrorMode._fatalNonZero = new UtfFatalErrorMode(true);
-    }
-    return UtfErrorMode._fatalNonZero;
+    return new UtfErrorModeFatal(true);
   }
 
   /**
-   * Returns a {@code UtfErrorMode} that substitutes invalid code unit
-   * sequences with the replacement character ({@code U+FFFD}).
+   * Returns a `UtfErrorMode` that substitutes invalid code unit sequences
+   * with the replacement character (`U+FFFD`).
    */
-  static replacement(): UtfErrorMode;
-
-  /**
-   * Returns a {@code UtfErrorMode} that substitutes invalid code unit
-   * sequences with the given {@code replacementChar}.
-   */
-  static replacement(replacementChar: number): UtfErrorMode;
-
-  static replacement(replacementChar?: number): UtfErrorMode {
-    if (replacementChar === void 0 || replacementChar === 0xfffd) {
-      if (UtfErrorMode._replacement === void 0) {
-        UtfErrorMode._replacement = new UtfReplacementErrorMode(0xfffd, false);
-      }
-      return UtfErrorMode._replacement;
-    } else {
-      return new UtfReplacementErrorMode(replacementChar, false);
-    }
+  @Lazy
+  static replacement(): UtfErrorMode {
+    return new UtfErrorModeReplacement(0xfffd, false);
   }
 
   /**
-   * Returns a {@code UtfErrorMode} that substitutes invalid code unit
-   * sequences with the replacement character ({@code U+FFFD}), and aborts
-   * decoding with an error when {@code NUL} bytes are encountered.
+   * Returns a `UtfErrorMode` that substitutes invalid code unit sequences
+   * with the replacement character (`U+FFFD`), and aborts decoding with an
+   * error when `NUL` bytes are encountered.
    */
-  static replacementNonZero(): UtfErrorMode;
-
-  /**
-   * Returns a {@code UtfErrorMode} that substitutes invalid code unit
-   * sequences with the given {@code replacementChar}, and aborts decoding
-   * with an error when {@code NUL} bytes are encountered.
-   */
-  static replacementNonZero(replacementChar: number): UtfErrorMode;
-
-  static replacementNonZero(replacementChar?: number): UtfErrorMode {
-    if (replacementChar === void 0 || replacementChar === 0xfffd) {
-      if (UtfErrorMode._replacementNonZero === void 0) {
-        UtfErrorMode._replacementNonZero = new UtfReplacementErrorMode(0xfffd, true);
-      }
-      return UtfErrorMode._replacementNonZero;
-    } else {
-      return new UtfReplacementErrorMode(replacementChar, true);
-    }
-  }
-}
-
-/** @hidden */
-class UtfFatalErrorMode extends UtfErrorMode {
-  /** @hidden */
-  private readonly _isNonZero: boolean;
-
-  constructor(isNonZero: boolean) {
-    super();
-    this._isNonZero = isNonZero;
-  }
-
-  isFatal(): boolean {
-    return true;
-  }
-
-  isNonZero(): boolean;
-  isNonZero(isNonZero: boolean): UtfErrorMode;
-  isNonZero(isNonZero?: boolean): boolean | UtfErrorMode {
-    if (isNonZero === void 0) {
-      return this._isNonZero;
-    } else if (isNonZero) {
-      return UtfErrorMode.fatalNonZero();
-    } else {
-      return UtfErrorMode.fatal();
-    }
-  }
-
-  equals(that: unknown): boolean {
-    if (this === that) {
-      return true;
-    } else if (that instanceof UtfFatalErrorMode) {
-      return this._isNonZero === that._isNonZero;
-    }
-    return false;
-  }
-
-  hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(UtfFatalErrorMode),
-        Booleans.hash(this._isNonZero)));
-  }
-
-  debug(output: Output): void {
-    output = output.write("UtfErrorMode").write(46/*'.'*/)
-        .write(this._isNonZero ? "fatalNonZero" : "fatal")
-        .write(40/*'('*/).write(41/*')'*/);
-  }
-}
-
-/** @hidden */
-class UtfReplacementErrorMode extends UtfErrorMode {
-  private readonly _replacementChar: number;
-  private readonly _isNonZero: boolean;
-
-  /** @hidden */
-  constructor(replacementChar: number, isNonZero: boolean) {
-    super();
-    this._replacementChar = replacementChar;
-    this._isNonZero = isNonZero;
-  }
-
-  isReplacement(): boolean {
-    return true;
-  }
-
-  replacementChar(): number {
-    return this._replacementChar;
-  }
-
-  isNonZero(): boolean;
-  isNonZero(isNonZero: boolean): UtfErrorMode;
-  isNonZero(isNonZero?: boolean): boolean | UtfErrorMode {
-    if (isNonZero === void 0) {
-      return this._isNonZero;
-    } else if (this._replacementChar === 0xfffd) {
-      if (isNonZero) {
-        return UtfErrorMode.replacementNonZero();
-      } else {
-        return UtfErrorMode.replacement();
-      }
-    } else {
-      return new UtfReplacementErrorMode(this._replacementChar, isNonZero);
-    }
-  }
-
-  equals(that: unknown): boolean {
-    if (this === that) {
-      return true;
-    } else if (that instanceof UtfReplacementErrorMode) {
-      return this._replacementChar === that._replacementChar
-          && this._isNonZero === that._isNonZero;
-    }
-    return false;
-  }
-
-  hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(UtfReplacementErrorMode),
-        Numbers.hash(this._replacementChar)), Booleans.hash(this._isNonZero)));
-  }
-
-  debug(output: Output): void {
-    output = output.write("UtfErrorMode").write(46/*'.'*/)
-        .write(this._isNonZero ? "replacementNonZero" : "replacement")
-        .write(40/*'('*/);
-    if (this._replacementChar !== 0xfffd) {
-      Format.debugChar(this._replacementChar, output);
-    }
-    output = output.write(41/*')'*/);
+  @Lazy
+  static replacementNonZero(): UtfErrorMode {
+    return new UtfErrorModeReplacement(0xfffd, true);
   }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent} from "../any/Equivalent";
+import {Equivalent} from "../lang/Equivalent";
 
 /**
  * Utilities for comparing and hashing numbers.

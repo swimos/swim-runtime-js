@@ -14,7 +14,7 @@
 
 import type {Output} from "../output/Output";
 import {Unicode} from "./Unicode";
-import {UtfErrorMode} from "./UtfErrorMode";
+import type {UtfErrorMode} from "./UtfErrorMode";
 import {Utf8DecodedOutput} from "./Utf8DecodedOutput";
 import {Utf8EncodedOutput} from "./Utf8EncodedOutput";
 
@@ -99,7 +99,7 @@ Utf8.sizeOf = function (u: string | number | undefined, errorMode?: UtfErrorMode
     if (errorMode === void 0) {
       return 3;
     } else if (errorMode.isReplacement()) {
-      return Utf8.sizeOf(errorMode.replacementChar());
+      return Utf8.sizeOf(errorMode.replacementChar);
     } else {
       return 0;
     }
@@ -114,12 +114,12 @@ Utf8.sizeOf = function (u: string | number | undefined, errorMode?: UtfErrorMode
   }
 };
 
-Utf8.decodedOutput = function <T>(output: Output<T>, errorMode: UtfErrorMode = UtfErrorMode.fatal()): Output<T> {
-  return new Utf8DecodedOutput<T>(output, errorMode);
+Utf8.decodedOutput = function <T>(output: Output<T>, errorMode?: UtfErrorMode): Output<T> {
+  return Utf8DecodedOutput.create(output, errorMode);
 };
 
-Utf8.encodedOutput = function <T>(output: Output<T>, errorMode: UtfErrorMode = UtfErrorMode.fatal()): Output<T> {
-  return new Utf8EncodedOutput<T>(output, errorMode);
+Utf8.encodedOutput = function <T>(output: Output<T>, errorMode?: UtfErrorMode): Output<T> {
+  return Utf8EncodedOutput.create(output, errorMode);
 };
 
 Utf8.decodedString = function (): Output<string> {

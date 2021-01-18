@@ -64,7 +64,7 @@ export class SlotWriter<I, V> extends Writer {
     if (step === 2 && output.isCont()) {
       output = output.write(58/*':'*/);
       if (recon.isExtant(recon.item(value))) {
-        return Writer.done();
+        return Writer.end();
       } else {
         step = 3;
       }
@@ -76,7 +76,7 @@ export class SlotWriter<I, V> extends Writer {
         part = part.pull(output);
       }
       if (part.isDone()) {
-        return Writer.done();
+        return Writer.end();
       } else if (part.isError()) {
         return part.asError();
       }

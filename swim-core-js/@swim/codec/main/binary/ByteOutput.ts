@@ -18,17 +18,27 @@ import {Output} from "../output/Output";
 /** @hidden */
 export abstract class ByteOutput<T> extends Output<T> {
   /** @hidden */
-  _array: Uint8Array | null;
+  declare readonly array: Uint8Array | null;
   /** @hidden */
-  _size: number;
-  /** @hidden */
-  _settings: OutputSettings;
+  declare readonly size: number;
 
   constructor(array: Uint8Array | null, size: number, settings: OutputSettings) {
     super();
-    this._array = array;
-    this._size = size;
-    this._settings = settings;
+    Object.defineProperty(this, "array", {
+      value: array,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "size", {
+      value: size,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "settings", {
+      value: settings,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   isCont(): boolean {
@@ -47,32 +57,38 @@ export abstract class ByteOutput<T> extends Output<T> {
     return false;
   }
 
-  isPart(): boolean;
-  isPart(isPart: boolean): Output<T>;
-  isPart(isPart?: boolean): boolean | Output<T> {
-    if (isPart === void 0) {
-      return false;
-    } else {
-      return this;
-    }
+  isPart(): boolean {
+    return false;
+  }
+
+  asPart(part: boolean): Output<T> {
+    return this;
   }
 
   write(b: number | string): Output<T> {
     if (typeof b === "number") {
-      const n = this._size;
-      const oldArray = this._array;
+      const n = this.size;
+      const oldArray = this.array;
       let newArray;
       if (oldArray === null || n + 1 > oldArray.length) {
         newArray = new Uint8Array(ByteOutput.expand(n + 1));
         if (oldArray !== null) {
           newArray.set(oldArray, 0);
         }
-        this._array = newArray;
+        Object.defineProperty(this, "array", {
+          value: newArray,
+          enumerable: true,
+          configurable: true,
+        });
       } else {
         newArray = oldArray;
       }
       newArray[n] = b;
-      this._size = n + 1;
+      Object.defineProperty(this, "size", {
+        value: n + 1,
+        enumerable: true,
+        configurable: true,
+      });
       return this;
     } else {
       throw new TypeError("" + b);
@@ -84,8 +100,8 @@ export abstract class ByteOutput<T> extends Output<T> {
   }
 
   toUint8Array(): Uint8Array {
-    const n = this._size;
-    const oldArray = this._array;
+    const n = this.size;
+    const oldArray = this.array;
     if (oldArray !== null && n === oldArray.length) {
       return oldArray;
     } else {
@@ -93,31 +109,37 @@ export abstract class ByteOutput<T> extends Output<T> {
       if (oldArray !== null) {
         newArray.set(oldArray.slice(0, n), 0);
       }
-      this._array = newArray;
+      Object.defineProperty(this, "array", {
+        value: newArray,
+        enumerable: true,
+        configurable: true,
+      });
       return newArray;
     }
   }
 
   cloneArray(): Uint8Array | null {
-    const oldArray = this._array;
+    const oldArray = this.array;
     if (oldArray !== null) {
-      return oldArray.slice(0, this._size);
+      return oldArray.slice(0, this.size);
     } else {
       return null;
     }
   }
 
-  settings(): OutputSettings;
-  settings(settings: AnyOutputSettings): Output<T>;
-  settings(settings?: AnyOutputSettings): OutputSettings | Output<T> {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      this._settings = OutputSettings.fromAny(settings);
-      return this;
-    }
+  declare readonly settings: OutputSettings;
+
+  withSettings(settings: AnyOutputSettings): Output<T> {
+    settings = OutputSettings.fromAny(settings);
+    Object.defineProperty(this, "settings", {
+      value: settings,
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
+  /** @hidden */
   static expand(n: number): number {
     n = Math.max(32, n) - 1;
     n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16;

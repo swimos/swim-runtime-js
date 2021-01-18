@@ -284,7 +284,7 @@ export abstract class ReconWriter<I, V> {
   }
 
   writeUint32(value: number, output: Output): Writer {
-    return Base16.lowercase().writeIntegerLiteral(value, output, 8);
+    return Base16.lowercase.writeIntegerLiteral(value, output, 8);
   }
 
   sizeOfUint64(value: number): number {
@@ -292,7 +292,7 @@ export abstract class ReconWriter<I, V> {
   }
 
   writeUint64(value: number, output: Output): Writer {
-    return Base16.lowercase().writeIntegerLiteral(value, output, 16);
+    return Base16.lowercase.writeIntegerLiteral(value, output, 16);
   }
 
   sizeOfBool(value: boolean): number {
@@ -352,7 +352,7 @@ export abstract class ReconWriter<I, V> {
   }
 
   writeIdentitySelector(output: Output): Writer {
-    return Writer.done();
+    return Writer.end();
   }
 
   sizeOfThenIdentitySelector(): number {
@@ -360,7 +360,7 @@ export abstract class ReconWriter<I, V> {
   }
 
   writeThenIdentitySelector(output: Output): Writer {
-    return Writer.done();
+    return Writer.end();
   }
 
   sizeOfLiteralSelector(item: I, then: V): number {
@@ -376,7 +376,7 @@ export abstract class ReconWriter<I, V> {
   }
 
   writeThenLiteralSelector(item: I, then: V, output: Output): Writer {
-    return Writer.done();
+    return Writer.end();
   }
 
   sizeOfGetSelector(key: V, then: V): number {
@@ -512,7 +512,7 @@ export abstract class ReconWriter<I, V> {
   }
 
   writeExtant(output: Output): Writer {
-    return Writer.done();
+    return Writer.end();
   }
 
   sizeOfAbsent(): number {
@@ -520,6 +520,6 @@ export abstract class ReconWriter<I, V> {
   }
 
   writeAbsent(output: Output): Writer {
-    return Writer.done();
+    return Writer.end();
   }
 }

@@ -14,11 +14,9 @@
 
 import type {HashCode} from "@swim/util";
 import type {Mark} from "./Mark";
-import type {Span} from "./Span";
 import type {Output} from "../output/Output";
 import type {Display} from "../format/Display";
 import type {Debug} from "../format/Debug";
-import type {Format} from "../format/Format";
 
 /**
  * Description of a source location.  Tags are used to annotate input sources,
@@ -27,16 +25,16 @@ import type {Format} from "../format/Format";
  *
  * @see [[Diagnostic]]
  */
-export abstract class Tag implements Display, Debug, HashCode {
+export abstract class Tag implements HashCode, Display, Debug {
   /**
-   * Returns the first source position covered by this `Tag`.
+   * The first source position covered by this `Tag`.
    */
-  abstract start(): Mark;
+  abstract get start(): Mark;
 
   /**
-   * Returns the last source position covered by this `Tag`.
+   * The last source position covered by this `Tag`.
    */
-  abstract end(): Mark;
+  abstract get end(): Mark;
 
   /**
    * Returns a `Tag` that includes all source locations covered by
@@ -56,12 +54,4 @@ export abstract class Tag implements Display, Debug, HashCode {
   abstract equals(that: unknown): boolean;
 
   abstract hashCode(): number;
-
-  // Forward type declarations
-  /** @hidden */
-  static Mark: typeof Mark; // defined by Mark
-  /** @hidden */
-  static Span: typeof Span; // defined by Span
-  /** @hidden */
-  static Format: typeof Format; // defined by Format
 }

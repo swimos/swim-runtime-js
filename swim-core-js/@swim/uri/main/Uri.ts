@@ -985,9 +985,10 @@ export class Uri implements Comparable, HashCode, Debug, Display {
 
   /** @hidden */
   static writePctEncoded(c: number, output: Output) {
+    const base16 = Base16.lowercase;
     output = output.write(37/*'%'*/)
-          .write(Base16.lowercase().encodeDigit(c >>> 4 & 0xF))
-          .write(Base16.lowercase().encodeDigit(c       & 0xF));
+          .write(base16.encodeDigit(c >>> 4 & 0xF))
+          .write(base16.encodeDigit(c       & 0xF));
   }
 
   // Forward type declarations

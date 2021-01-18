@@ -138,7 +138,7 @@ export class ConditionalOperatorWriter<I, V> extends Writer {
         part = part.pull(output);
       }
       if (part.isDone()) {
-        return Writer.done();
+        return Writer.end();
       } else if (part.isError()) {
         return part.asError();
       }

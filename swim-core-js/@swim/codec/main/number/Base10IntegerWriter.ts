@@ -18,32 +18,44 @@ import {Writer} from "../writer/Writer";
 import {Base10} from "./Base10";
 
 /** @hidden */
-export class Base10IntegerWriter extends Writer<any, any> {
+export class Base10IntegerWriter extends Writer {
   /** @hidden */
-  readonly _value: any;
+  declare readonly value: unknown;
   /** @hidden */
-  readonly _input: number;
+  declare readonly input: number;
   /** @hidden */
-  readonly _index: number;
+  declare readonly index: number;
   /** @hidden */
-  readonly _step: number;
+  declare readonly step: number;
 
-  constructor(value: any, input: number, index: number = 0, step: number = 1) {
+  constructor(value: unknown, input: number, index: number = 0, step: number = 1) {
     super();
-    this._value = value;
-    this._input = input;
-    this._index = index;
-    this._step = step;
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "input", {
+      value: input,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "index", {
+      value: index,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "step", {
+      value: step,
+      enumerable: true,
+    });
   }
 
-  pull(output: Output): Writer<any, any> {
-    return Base10IntegerWriter.write(output, this._value, this._input, this._index, this._step);
+  pull(output: Output): Writer {
+    return Base10IntegerWriter.write(output, this.value, this.input, this.index, this.step);
   }
 
-  static write(output: Output, value: any, input: number, index: number = 0,
-               step: number = 1): Writer<any, any> {
+  static write(output: Output, value: unknown, input: number, index: number = 0,
+               step: number = 1): Writer {
     if (step === 0) {
-      return Writer.done();
+      return Writer.end();
     }
     if (step === 1) {
       if (input < 0) {
@@ -89,4 +101,3 @@ export class Base10IntegerWriter extends Writer<any, any> {
     return new Base10IntegerWriter(value, input, index, step);
   }
 }
-Base10.IntegerWriter = Base10IntegerWriter;

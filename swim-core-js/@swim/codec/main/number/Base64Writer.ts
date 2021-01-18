@@ -15,46 +15,64 @@
 import type {Output} from "../output/Output";
 import {WriterException} from "../writer/WriterException";
 import {Writer} from "../writer/Writer";
-import {Base64} from "./Base64";
+import type {Base64} from "./Base64";
 
 /** @hidden */
-export class Base64Writer extends Writer<unknown, unknown> {
+export class Base64Writer extends Writer {
   /** @hidden */
-  readonly _value: unknown;
+  declare readonly value: unknown;
   /** @hidden */
-  readonly _input: Uint8Array | undefined;
+  declare readonly input: Uint8Array | null;
   /** @hidden */
-  readonly _base64: Base64;
+  declare readonly base64: Base64;
   /** @hidden */
-  readonly _index: number;
+  declare readonly index: number;
   /** @hidden */
-  readonly _step: number;
+  declare readonly step: number;
 
-  constructor(value: unknown, input: Uint8Array | undefined, base64: Base64,
+  constructor(value: unknown, input: Uint8Array | null, base64: Base64,
               index: number = 0, step: number = 1) {
     super();
-    this._value = value;
-    this._input = input;
-    this._base64 = base64;
-    this._index = index;
-    this._step = step;
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "input", {
+      value: input,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "base64", {
+      value: base64,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "index", {
+      value: index,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "step", {
+      value: step,
+      enumerable: true,
+    });
   }
 
-  feed(value: unknown): Writer<unknown, unknown> {
+  feed(value: unknown): Writer {
     if (value instanceof Uint8Array) {
-      return new Base64Writer(undefined, value, this._base64);
+      return new Base64Writer(null, value, this.base64);
     } else {
       throw new TypeError("" + value);
     }
   }
 
-  pull(output: Output): Writer<unknown, unknown> {
-    return Base64Writer.write(output, this._value, this._input!, this._base64,
-                              this._index, this._step);
+  pull(output: Output): Writer {
+    if (this.input === null) {
+      throw new WriterException();
+    }
+    return Base64Writer.write(output, this.value, this.input, this.base64,
+                              this.index, this.step);
   }
 
   static write(output: Output, value: unknown, input: Uint8Array, base64: Base64,
-               index: number = 0, step: number = 1): Writer<unknown, unknown> {
+               index: number = 0, step: number = 1): Writer {
     while (index + 2 < input.length && output.isCont()) {
       const x = input[index]!;
       const y = input[index + 1]!;
@@ -133,4 +151,3 @@ export class Base64Writer extends Writer<unknown, unknown> {
     return new Base64Writer(value, input, base64, index, step);
   }
 }
-Base64.Writer = Base64Writer;

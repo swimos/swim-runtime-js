@@ -21,21 +21,30 @@ import {Base16} from "./Base16";
 /** @hidden */
 export class Base16Parser<O> extends Parser<O> {
   /** @hidden */
-  readonly _output: Output<O>;
+  declare readonly output: Output<O>;
   /** @hidden */
-  readonly _p: number;
+  declare readonly p: number;
   /** @hidden */
-  readonly _step: number;
+  declare readonly step: number;
 
   constructor(output: Output<O>, p: number = 0, step: number = 1) {
     super();
-    this._output = output;
-    this._p = p;
-    this._step = step;
+    Object.defineProperty(this, "output", {
+      value: output,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "p", {
+      value: p,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "step", {
+      value: step,
+      enumerable: true,
+    });
   }
 
   feed(input: Input): Parser<O> {
-    return Base16Parser.parse(input, this._output.clone(), this._p, this._step);
+    return Base16Parser.parse(input, this.output.clone(), this.p, this.step);
   }
 
   static parse<O>(input: Input, output: Output<O>, p: number = 0, step: number = 1): Parser<O> {
@@ -64,4 +73,3 @@ export class Base16Parser<O> extends Parser<O> {
     return new Base16Parser<O>(output, p, step);
   }
 }
-Base16.Parser = Base16Parser;

@@ -16,71 +16,84 @@ import {Cursor} from "./Cursor";
 
 /** @hidden */
 export class CursorUnary<T> extends Cursor<T> {
-  private readonly _value: T;
-  private _index: number;
+  private declare readonly value: T;
+  private declare index: number;
 
   constructor(value: T) {
     super();
-    this._value = value;
-    this._index = 0;
+    Object.defineProperty(this, "value", {
+      value: value,
+    });
+    Object.defineProperty(this, "index", {
+      value: 0,
+      configurable: true,
+    });
   }
 
   isEmpty(): boolean {
-    return this._index !== 0;
+    return this.index !== 0;
   }
 
   head(): T {
-    if (this._index === 0) {
-      return this._value;
+    if (this.index === 0) {
+      return this.value;
     } else {
       throw new Error("empty");
     }
   }
 
   step(): void {
-    if (this._index === 0) {
-      this._index = 1;
+    if (this.index === 0) {
+      Object.defineProperty(this, "index", {
+        value: 1,
+        configurable: true,
+      });
     } else {
       throw new Error("empty");
     }
   }
 
   skip(count: number): void {
-    this._index = Math.min(Math.max(0, this._index + count), 1);
+    this.index = Math.min(Math.max(0, this.index + count), 1);
   }
 
   hasNext(): boolean {
-    return this._index === 0;
+    return this.index === 0;
   }
 
   nextIndex(): number {
-    return this._index;
+    return this.index;
   }
 
   next(): {value?: T, done: boolean} {
-    if (this._index === 0) {
-      this._index = 1;
-      return {value: this._value, done: true};
+    if (this.index === 0) {
+      Object.defineProperty(this, "index", {
+        value: 1,
+        configurable: true,
+      });
+      return {value: this.value, done: true};
     } else {
       return {done: true};
     }
   }
 
   hasPrevious(): boolean {
-    return this._index === 1;
+    return this.index === 1;
   }
 
   previousIndex(): number {
-    return this._index - 1;
+    return this.index - 1;
   }
 
   previous(): {value?: T, done: boolean} {
-    if (this._index === 1) {
-      this._index = 0;
-      return {value: this._value, done: true};
+    if (this.index === 1) {
+      Object.defineProperty(this, "index", {
+        value: 0,
+        configurable: true,
+      });
+      return {value: this.value, done: true};
     } else {
       return {done: true};
     }
   }
 }
-Cursor.Unary = CursorUnary;

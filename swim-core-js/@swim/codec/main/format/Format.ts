@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Tag} from "../source/Tag";
 import type {AnyOutputSettings} from "../output/OutputSettings";
 import {Output} from "../output/Output";
 import type {Display} from "./Display";
@@ -124,7 +123,6 @@ export const Format = {} as {
    */
   duration(millis: number, separator?: string): string;
 };
-Tag.Format = Format;
 
 Object.defineProperty(Format, "lineSeparator", {
   get(): string {
@@ -140,13 +138,13 @@ Object.defineProperty(Format, "lineSeparator", {
     }
     Object.defineProperty(Format, "lineSeparator", {
       value: lineSeparator,
-      configurable: true,
       enumerable: true,
+      configurable: true,
     })
     return lineSeparator;
   },
-  configurable: true,
   enumerable: true,
+  configurable: true,
 });
 
 Format.display = function (object: unknown, output?: Output | AnyOutputSettings): void | string {
@@ -284,7 +282,7 @@ Format.displayNumber = function (value: number, output: Output): void {
       }
     }
   } else {
-    const precision = output.settings().precision();
+    const precision = output.settings.precision;
     if (precision >= 0) {
       let s = Format.trimTrailingZeros(Math.abs(value).toFixed(precision));
       if (value < 0 && +s !== 0) {

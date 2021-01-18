@@ -292,7 +292,7 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
     if (func instanceof LambdaFunc) {
       return this.writeLambdaFunc(func.bindings(), func.template(), output);
     } else if (func instanceof BridgeFunc) {
-      return Writer.done();
+      return Writer.end();
     }
     return Writer.error(new WriterException("No Recon serialization for " + func));
   }

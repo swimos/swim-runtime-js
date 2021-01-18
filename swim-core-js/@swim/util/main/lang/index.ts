@@ -19,3 +19,5 @@ export {Comparable} from "./Comparable";
 
 export {FromAny} from "./FromAny";
 export {ToAny} from "./ToAny";
+
+export {Lazy} from "./Lazy";

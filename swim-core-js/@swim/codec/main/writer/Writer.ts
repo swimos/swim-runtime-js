@@ -12,7 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
 import type {Output} from "../output/Output";
+import {WriterException} from "./WriterException";
+import {WriterEnd} from "../"; // circular import
+import {WriterDone} from "../"; // circular import
+import {WriterError} from "../"; // circular import
+import {WriterSequence} from "../"; // circular import
 
 /**
  * Continuation of how to write subsequent [[Output]] tokens to a stream.
@@ -99,11 +105,11 @@ export abstract class Writer<I = unknown, O = unknown> {
    * Returns a `Writer` that represents the continuation of how to write the
    * given `input` object.
    *
-   * @throws `Error` if this `Writer` does not know how to write the given
-   *         `input` object.
+   * @throws `WriterException` if this `Writer` does not know how to write the
+   *         given `input` object.
    */
   feed(input: I): Writer<I, O> {
-    throw new Error();
+    throw new WriterException();
   }
 
   /**
@@ -131,7 +137,7 @@ export abstract class Writer<I = unknown, O = unknown> {
    * @throws `Error` if this `Writer` is not in the _done_ state.
    */
   bind(): O {
-    throw new Error();
+    throw new WriterException();
   }
 
   /**
@@ -141,169 +147,56 @@ export abstract class Writer<I = unknown, O = unknown> {
    * @throws `Error` if this `Writer` is not in the _error_ state.
    */
   trap(): Error {
-    throw new Error();
+    throw new WriterException();
   }
 
   /**
    * Casts a done `Writer` to a different input type.  A `Writer` in the _done_
    * state can have any input type.
    *
-   * @throws `Error` if this `Writer` is not in the _done_ state.
+   * @throws `WriterException` if this `Writer` is not in the _done_ state.
    */
   asDone<I2>(): Writer<I2, O> {
-    throw new Error();
+    throw new WriterException();
   }
 
   /**
    * Casts an errored `Writer` to different input and output types.  A `Writer`
    * in the _error_ state can have any input type, and any output type.
    *
-   * @throws `Error` if this `Writer` is not in the _error_ state.
+   * @throws `WriterException` if this `Writer` is not in the _error_ state.
    */
   asError<I2, O2>(): Writer<I2, O2> {
-    throw new Error();
+    throw new WriterException();
   }
 
   /**
    * Returns a `Writer` that continues writing `that` `Writer`, after it
-   * finishes writing `this` `Writer`.
+   * finishes writing this `Writer`.
    */
-  andThen<O2>(that: Writer<I, O2>): Writer<I, O2> {
-    return new WriterAndThen<I, O2>(this, that);
-  }
-
-  private static _done?: Writer<any, any>;
-
-  /**
-   * Returns a `Writer` in the _done_ state that `bind`s an `undefined`
-   * writtern result.
-   */
-  static done<I, O>(): Writer<I, O>;
-
-  /**
-   * Returns a `Writer` in the _done_ state that `bind`s the given
-   * written `output`.
-   */
-  static done<I, O>(output: O): Writer<I, O>;
-
-  static done<I, O>(output?: O): Writer<I, O> {
-    if (output === void 0) {
-      if (Writer._done === void 0) {
-        Writer._done = new WriterDone<any, any>(void 0);
-      }
-      return Writer._done;
-    } else {
-      return new WriterDone<I, O>(output);
-    }
+  andThen<O2>(that: Writer<unknown, O2>): Writer<never, O2> {
+    return new WriterSequence(this, that);
   }
 
   /**
-   * Returns a `Writer` in the _error_ state that `trap`s the given
-   * write `error`.
+   * Returns a `Writer` in the _done_ state that never binds a value.
+   */
+  @Lazy
+  static end<I>(): Writer<I, never> {
+    return new WriterEnd();
+  }
+
+  /**
+   * Returns a `Writer` in the _done_ state that binds the given written `value`.
+   */
+  static done<I, O>(value: O): Writer<I, O> {
+    return new WriterDone(value);
+  }
+
+  /**
+   * Returns a `Writer` in the _error_ state that traps the given write `error`.
    */
   static error<I, O>(error: Error): Writer<I, O> {
-    return new WriterError<I, O>(error);
-  }
-}
-
-/** @hidden */
-class WriterDone<I, O> extends Writer<I, O> {
-  /** @hidden */
-  readonly _output: O;
-
-  constructor(output: O) {
-    super();
-    this._output = output;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isDone(): boolean {
-    return true;
-  }
-
-  pull(output: Output): Writer<I, O> {
-    return this;
-  }
-
-  bind(): O {
-    return this._output;
-  }
-
-  asDone<I2>(): Writer<I2, O> {
-    return this as any;
-  }
-
-  andThen<O2>(that: Writer<I, O2>): Writer<I, O2> {
-    return that;
-  }
-}
-
-/** @hidden */
-class WriterError<I, O> extends Writer<I, O> {
-  /** @hidden */
-  readonly _error: Error;
-
-  constructor(error: Error) {
-    super();
-    this._error = error;
-  }
-
-  isCont(): boolean {
-    return false;
-  }
-
-  isError(): boolean {
-    return true;
-  }
-
-  pull(output: Output): Writer<I, O> {
-    return this;
-  }
-
-  bind(): O {
-    throw this._error;
-  }
-
-  trap(): Error {
-    return this._error;
-  }
-
-  asError<I2, O2>(): Writer<I2, O2> {
-    return this as any;
-  }
-
-  andThen<O2>(that: Writer<I, O2>): Writer<I, O2> {
-    return this as any;
-  }
-}
-
-/** @hidden */
-class WriterAndThen<I, O> extends Writer<I, O> {
-  /** @hidden */
-  readonly _head: Writer<I, any>;
-  /** @hidden */
-  readonly _tail: Writer<I, O>;
-
-  constructor(head: Writer<I, any>, tail: Writer<I, O>) {
-    super();
-    this._head = head;
-    this._tail = tail;
-  }
-
-  pull(output: Output): Writer<I, O> {
-    let head = this._head;
-    if (head.isCont()) {
-      head = head.pull(output);
-    }
-    if (head.isError()) {
-      return head.asError();
-    } else if (head.isDone()) {
-      return this._tail.pull(output);
-    } else {
-      return new WriterAndThen<I, O>(head, this._tail);
-    }
+    return new WriterError(error);
   }
 }

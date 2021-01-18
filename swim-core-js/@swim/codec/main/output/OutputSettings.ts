@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, HashCode, Booleans, Numbers, Strings, Constructors} from "@swim/util";
+import {Lazy, Murmur3, HashCode, Booleans, Numbers, Strings, Constructors} from "@swim/util";
 import type {Output} from "../output/Output";
 import type {Debug} from "../format/Debug";
 import {Format} from "../format/Format";
@@ -27,7 +27,7 @@ export type AnyOutputSettings = OutputSettings | OutputSettingsInit;
  * [[OutputSettings]] object initializer.
  */
 export interface OutputSettingsInit {
-  lineSeparator?: string | null;
+  lineSeparator?: string;
   isPretty?: boolean;
   isStyled?: boolean;
   precision?: number;
@@ -41,102 +41,91 @@ export interface OutputSettingsInit {
  * output producers.
  */
 export class OutputSettings implements Debug, HashCode {
-  /** @hidden */
-  readonly _lineSeparator: string;
-  /** @hidden */
-  readonly _isPretty: boolean;
-  /** @hidden */
-  readonly _isStyled: boolean;
-  /** @hidden */
-  readonly _precision: number;
-
-  protected constructor(lineSeparator: string, isPretty: boolean,
-                        isStyled: boolean, precision: number) {
-    this._lineSeparator = lineSeparator;
-    this._isPretty = isPretty;
-    this._isStyled = isStyled;
-    this._precision = precision;
+  protected constructor(lineSeparator: string, pretty: boolean,
+                        styled: boolean, precision: number) {
+    Object.defineProperty(this, "lineSeparator", {
+      value: lineSeparator,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "pretty", {
+      value: pretty,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "styled", {
+      value: styled,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "precision", {
+      value: precision,
+      enumerable: true,
+    });
   }
 
   /**
-   * Returns the code point sequence used to separate lines of text.
-   * Defaults to the operating system's line separator.
+   * The Unicode code point sequence used to separate lines of text.
+   * Defaults to the runtime operating system's line separator.
    */
-  lineSeparator(): string;
+  declare readonly lineSeparator: string;
 
   /**
    * Returns a copy of these settings with the given `lineSeparator`.
    */
-  lineSeparator(lineSeparator: string | null): OutputSettings;
-
-  lineSeparator(lineSeparator?: string | null): string | OutputSettings {
-    if (lineSeparator === void 0) {
-      return this._lineSeparator;
-    } else {
-      return this.copy(lineSeparator, this._isPretty, this._isStyled, this._precision);
-    }
+  withLineSeparator(lineSeparator: string | undefined): string | OutputSettings {
+    return this.copy(lineSeparator, this.pretty, this.styled, this.precision);
   }
+
+  /** @hidden */
+  declare readonly pretty: boolean;
 
   /**
    * Returns `true` if output producers should pretty print their output,
    * when possible.
    */
-  isPretty(): boolean;
+  isPretty(): boolean {
+    return this.pretty;
+  }
 
   /**
-   * Returns a copy of these settings with the given `isPretty` flag.
+   * Returns a copy of these settings with the given `pretty` flag.
    */
-  isPretty(isPretty: boolean): OutputSettings;
-
-  isPretty(isPretty?: boolean): boolean | OutputSettings {
-    if (isPretty === void 0) {
-      return this._isPretty;
-    } else {
-      return this.copy(this._lineSeparator, isPretty, this._isStyled, this._precision);
-    }
+  asPretty(pretty: boolean): OutputSettings {
+    return this.copy(this.lineSeparator, pretty, this.styled, this.precision);
   }
+
+  /** @hidden */
+  declare readonly styled: boolean;
 
   /**
    * Returns `true` if output producers should style their output,
    * when possible.
    */
-  isStyled(): boolean;
+  isStyled(): boolean {
+    return this.styled;
+  }
 
   /**
-   * Returns a copy of these settings with the given `isStyled` flag.
+   * Returns a copy of these settings with the given `styled` flag.
    */
-  isStyled(isStyled: boolean): OutputSettings;
-
-  isStyled(isStyled?: boolean): boolean | OutputSettings {
-    if (isStyled === void 0) {
-      return this._isStyled;
-    } else {
-      return this.copy(this._lineSeparator, this._isPretty, isStyled, this._precision);
-    }
+  asStyled(styled: boolean): OutputSettings {
+    return this.copy(this.lineSeparator, this.pretty, styled, this.precision);
   }
 
   /**
    * Returns the numeric precision output producers should use
    * when formatting numbers.
    */
-  precision(): number;
+  declare readonly precision: number;
 
   /**
    * Returns a copy of these settings with the given numeric `precision`.
    */
-  precision(precision: number): OutputSettings;
-
-  precision(precision?: number): number | OutputSettings {
-    if (precision === void 0) {
-      return this._precision;
-    } else {
-      return this.copy(this._lineSeparator, this._isPretty, this._isStyled, precision);
-    }
+  withPrecision(precision: number): OutputSettings {
+    return this.copy(this.lineSeparator, this.pretty, this.styled, precision);
   }
 
-  protected copy(lineSeparator: string | null, isPretty: boolean,
-                 isStyled: boolean, precision: number): OutputSettings {
-    return OutputSettings.create(lineSeparator, isPretty, isStyled, precision);
+  protected copy(lineSeparator: string | undefined, pretty: boolean,
+                 styled: boolean, precision: number): OutputSettings {
+    return OutputSettings.create(lineSeparator, pretty, styled, precision);
   }
 
   protected canEqual(that: unknown): boolean {
@@ -147,39 +136,39 @@ export class OutputSettings implements Debug, HashCode {
     if (this === that) {
       return true;
     } else if (that instanceof OutputSettings) {
-      return that.canEqual(this) && this._lineSeparator === that._lineSeparator
-          && this._isPretty === that._isPretty && this._isStyled === that._isStyled
-          && this._precision === that._precision;
+      return that.canEqual(this) && this.lineSeparator === that.lineSeparator
+          && this.pretty === that.pretty && this.styled === that.styled
+          && this.precision === that.precision;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
-        Constructors.hash(OutputSettings), Strings.hash(this._lineSeparator)),
-        Booleans.hash(this._isPretty)), Booleans.hash(this._isStyled)),
-        Numbers.hash(this._precision)));
+        Constructors.hash(OutputSettings), Strings.hash(this.lineSeparator)),
+        Booleans.hash(this.pretty)), Booleans.hash(this.styled)),
+        Numbers.hash(this.precision)));
   }
 
   debug(output: Output): void {
     output = output.write("OutputSettings").write(46/*'.'*/);
-    if (!this._isPretty && !this._isStyled) {
+    if (!this.pretty && !this.styled) {
       output = output.write("standard");
-    } else if (this._isPretty && !this._isStyled) {
+    } else if (this.pretty && !this.styled) {
       output = output.write("pretty");
-    } else if (!this._isPretty && this._isStyled) {
+    } else if (!this.pretty && this.styled) {
       output = output.write("styled");
     } else {
       output = output.write("prettyStyled");
     }
     output = output.write(40/*'('*/).write(41/*')'*/);
-    if (this._lineSeparator !== Format.lineSeparator) {
+    if (this.lineSeparator !== Format.lineSeparator) {
       output = output.write(46/*'.'*/).write("lineSeparator").write(40/*'('*/)
-          .display(this._lineSeparator).write(41/*')'*/);
+          .display(this.lineSeparator).write(41/*')'*/);
     }
-    if (this._precision !== -1) {
+    if (this.precision !== -1) {
       output = output.write(46/*'.'*/).write("precision").write(40/*'('*/)
-          .display(this._precision).write(41/*')'*/);
+          .display(this.precision).write(41/*')'*/);
     }
   }
 
@@ -187,53 +176,40 @@ export class OutputSettings implements Debug, HashCode {
     return Format.debug(this);
   }
 
-  private static _standard?: OutputSettings;
-  private static _pretty?: OutputSettings;
-  private static _styled?: OutputSettings;
-  private static _prettyStyled?: OutputSettings;
-
   /**
    * Returns `OutputSettings` configured with the system line separator,
    * pretty printing disabled, and styling disabled.
    */
+  @Lazy
   static standard(): OutputSettings {
-    if (OutputSettings._standard === void 0) {
-      OutputSettings._standard = new OutputSettings(Format.lineSeparator, false, false, -1);
-    }
-    return OutputSettings._standard;
+    return new OutputSettings(Format.lineSeparator, false, false, -1);
   }
 
   /**
    * Returns `OutputSettings` configured with the system line separator,
    * pretty printing enabled, and styling disabled.
    */
+  @Lazy
   static pretty(): OutputSettings {
-    if (OutputSettings._pretty === void 0) {
-      OutputSettings._pretty = new OutputSettings(Format.lineSeparator, true, false, -1);
-    }
-    return OutputSettings._pretty;
+    return new OutputSettings(Format.lineSeparator, true, false, -1);
   }
 
   /**
    * Returns `OutputSettings` configured with the system line separator,
    * pretty printing disabled, and styling enabled.
    */
+  @Lazy
   static styled(): OutputSettings {
-    if (OutputSettings._styled === void 0) {
-      OutputSettings._styled = new OutputSettings(Format.lineSeparator, false, true, -1);
-    }
-    return OutputSettings._styled;
+    return new OutputSettings(Format.lineSeparator, false, true, -1);
   }
 
   /**
    * Returns `OutputSettings` configured with the system line separator,
    * pretty printing enabled, and styling enabled.
    */
+  @Lazy
   static prettyStyled(): OutputSettings {
-    if (OutputSettings._prettyStyled === void 0) {
-      OutputSettings._prettyStyled = new OutputSettings(Format.lineSeparator, true, true, -1);
-    }
-    return OutputSettings._prettyStyled;
+    return new OutputSettings(Format.lineSeparator, true, true, -1);
   }
 
   /**
@@ -241,43 +217,50 @@ export class OutputSettings implements Debug, HashCode {
    * rinting enabled if `isPretty` is `true`, styling enabled if `isStyled` is
    * `true`, and with the given numeric `precision`.
    */
-  static create(lineSeparator?: string | null, isPretty?: boolean,
-                isStyled?: boolean, precision?: number): OutputSettings {
+  static create(lineSeparator?: string, pretty?: boolean,
+                styled?: boolean, precision?: number): OutputSettings {
     if (typeof lineSeparator !== "string") {
       lineSeparator = Format.lineSeparator;
     }
-    if (typeof isPretty !== "boolean") {
-      isPretty = false;
+    if (typeof pretty !== "boolean") {
+      pretty = false;
     }
-    if (typeof isStyled !== "boolean") {
-      isStyled = false;
+    if (typeof styled !== "boolean") {
+      styled = false;
     }
     if (typeof precision !== "number") {
       precision = -1;
     }
     if (lineSeparator === Format.lineSeparator && precision === -1) {
-      if (!isPretty && !isStyled) {
+      if (!pretty && !styled) {
         return OutputSettings.standard();
-      } else if (isPretty && !isStyled) {
+      } else if (pretty && !styled) {
         return OutputSettings.pretty();
-      } else if (!isPretty && isStyled) {
+      } else if (!pretty && styled) {
         return OutputSettings.styled();
       } else {
         return OutputSettings.prettyStyled();
       }
     }
-    return new OutputSettings(lineSeparator, isPretty, isStyled, precision);
+    return new OutputSettings(lineSeparator, pretty, styled, precision);
   }
 
   /**
-   * Converts the loosely typed `settings` to an instance of `OutputSettings`.
+   * Converts a settings `init` object to an instance of `OutputSettings`.
    */
-  static fromAny(settings: AnyOutputSettings | undefined): OutputSettings {
-    if (settings instanceof OutputSettings) {
-      return settings;
-    } else if (typeof settings === "object" && settings !== null) {
-      return OutputSettings.create(settings.lineSeparator, settings.isPretty,
-                                   settings.isStyled, settings.precision);
+  static fromInit(init: OutputSettingsInit): OutputSettings {
+    return OutputSettings.create(init.lineSeparator, init.isPretty,
+                                 init.isStyled, init.precision);
+  }
+
+  /**
+   * Converts a loosely typed settings `value` to an instance of `OutputSettings`.
+   */
+  static fromAny(value: AnyOutputSettings | undefined): OutputSettings {
+    if (value instanceof OutputSettings) {
+      return value;
+    } else if (typeof value === "object" && value !== null) {
+      return OutputSettings.fromInit(value);
     }
     return OutputSettings.standard();
   }

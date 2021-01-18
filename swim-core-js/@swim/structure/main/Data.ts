@@ -80,7 +80,7 @@ export class Data extends Value {
     return this;
   }
 
-  public addByte(value: number): Data {
+  addByte(value: number): Data {
     const flags = this._flags;
     if ((flags & Data.IMMUTABLE) !== 0) {
       throw new Error("immutable");
@@ -252,7 +252,7 @@ export class Data extends Value {
     return this;
   }
 
-  writeBase16(output: Output, base16: Base16 = Base16.uppercase()): Writer<unknown, unknown> {
+  writeBase16(output: Output, base16: Base16 = Base16.uppercase): Writer<unknown, unknown> {
     let array = this._array;
     const size = this._size;
     if (array !== null && size !== 0) {
@@ -261,11 +261,11 @@ export class Data extends Value {
       }
       return base16.writeUint8Array(array, output);
     } else {
-      return Writer.done();
+      return Writer.end();
     }
   }
 
-  toBase16(base16: Base16 = Base16.uppercase()): string {
+  toBase16(base16: Base16 = Base16.uppercase): string {
     const output = Unicode.stringOutput();
     this.writeBase16(output, base16);
     return output.bind();
@@ -280,7 +280,7 @@ export class Data extends Value {
       }
       return base64.writeUint8Array(array, output);
     } else {
-      return Writer.done();
+      return Writer.end();
     }
   }
 

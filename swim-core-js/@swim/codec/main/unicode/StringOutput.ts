@@ -18,14 +18,20 @@ import {Output} from "../output/Output";
 /** @hidden */
 export class StringOutput extends Output<string> {
   /** @hidden */
-  _string: string;
-  /** @hidden */
-  _settings: OutputSettings;
+  declare readonly string: string;
 
   constructor(string: string, settings: OutputSettings) {
     super();
-    this._string = string;
-    this._settings = settings;
+    Object.defineProperty(this, "string", {
+      value: string,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "settings", {
+      value: settings,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   isCont(): boolean {
@@ -44,14 +50,12 @@ export class StringOutput extends Output<string> {
     return false;
   }
 
-  isPart(): boolean;
-  isPart(isPart: boolean): Output<string>;
-  isPart(isPart?: boolean): boolean | Output<string> {
-    if (isPart === void 0) {
-      return false;
-    } else {
-      return this;
-    }
+  isPart(): boolean {
+    return false;
+  }
+
+  asPart(part: boolean): Output<string> {
+    return this;
   }
 
   write(token: number | string): Output<string> {
@@ -66,40 +70,53 @@ export class StringOutput extends Output<string> {
         token = "\ufffd";
       }
     }
-    this._string += token;
+    Object.defineProperty(this, "string", {
+      value: this.string + token,
+      enumerable: true,
+      configurable: true,
+    });
     return this;
   }
 
   writeln(string?: string): Output<string> {
     if (string === void 0) {
-      this._string = this._string.concat(this._settings._lineSeparator);
+      Object.defineProperty(this, "string", {
+        value: this.string.concat(this.settings.lineSeparator),
+        enumerable: true,
+        configurable: true,
+      });
       return this;
     } else {
-      this._string = this._string.concat(string).concat(this._settings._lineSeparator);
+      Object.defineProperty(this, "string", {
+        value: this.string.concat(string).concat(this.settings.lineSeparator),
+        enumerable: true,
+        configurable: true,
+      });
       return this;
     }
   }
 
-  settings(): OutputSettings;
-  settings(settings: AnyOutputSettings): Output<string>;
-  settings(settings?: AnyOutputSettings): OutputSettings | Output<string> {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      this._settings = OutputSettings.fromAny(settings);
-      return this;
-    }
+  declare readonly settings: OutputSettings;
+
+  withSettings(settings: AnyOutputSettings): Output<string> {
+    settings = OutputSettings.fromAny(settings);
+    Object.defineProperty(this, "settings", {
+      value: settings,
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
   bind(): string {
-    return this._string;
+    return this.string;
   }
 
   clone(): Output<string> {
-    return new StringOutput(this._string, this._settings);
+    return new StringOutput(this.string, this.settings);
   }
 
   toString(): string {
-    return this._string;
+    return this.string;
   }
 }

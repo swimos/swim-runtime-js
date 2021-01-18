@@ -17,27 +17,39 @@ import {WriterException} from "../writer/WriterException";
 import {Writer} from "../writer/Writer";
 
 /** @hidden */
-export class StringWriter<I> extends Writer<I, unknown> {
-  private readonly _value: unknown;
-  private readonly _input: string;
-  private readonly _index: number;
+export class StringWriter extends Writer<unknown, unknown> {
+  /** @hidden */
+  declare readonly value: unknown;
+  /** @hidden */
+  declare readonly input: string;
+  /** @hidden */
+  declare readonly index: number;
 
   constructor(value: unknown, input: string, index: number = 0) {
     super();
-    this._value = value;
-    this._input = input;
-    this._index = index;
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "input", {
+      value: input,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "index", {
+      value: index,
+      enumerable: true,
+    });
   }
 
-  feed(input: unknown): Writer<I, unknown> {
+  feed(input: unknown): Writer<unknown, unknown> {
     return new StringWriter(input, "" + input);
   }
 
-  pull(output: Output): Writer<I, unknown> {
-    return StringWriter.write(output, this._value, this._input, this._index);
+  pull(output: Output): Writer<unknown, unknown> {
+    return StringWriter.write(output, this.value, this.input, this.index);
   }
 
-  static write<I>(output: Output, value: unknown, input: string, index: number = 0): Writer<I, unknown> {
+  static write(output: Output, value: unknown, input: string, index: number = 0): Writer<unknown, unknown> {
     const length = input.length;
     while (index < length && output.isCont()) {
       let c = input.codePointAt(index);

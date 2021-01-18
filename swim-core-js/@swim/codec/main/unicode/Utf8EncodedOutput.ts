@@ -15,74 +15,85 @@
 import {OutputException} from "../output/OutputException";
 import type {AnyOutputSettings, OutputSettings} from "../output/OutputSettings";
 import {Output} from "../output/Output";
-import type {UtfErrorMode} from "./UtfErrorMode";
+import {UtfErrorMode} from "./UtfErrorMode";
 
 /** @hidden */
 export class Utf8EncodedOutput<T> extends Output<T> {
   /** @hidden */
-  _output: Output<T>;
+  declare readonly output: Output<T>;
   /** @hidden */
-  readonly _errorMode: UtfErrorMode;
+  declare readonly errorMode: UtfErrorMode;
   /** @hidden */
-  _c2: number;
+  c2: number;
   /** @hidden */
-  _c3: number;
+  c3: number;
   /** @hidden */
-  _c4: number;
+  c4: number;
   /** @hidden */
-  _index: number;
+  index: number;
 
-  constructor(output: Output<T>, errorMode: UtfErrorMode, c2: number = 0,
-              c3: number = 0, c4: number = 0, index: number = 4) {
+  constructor(output: Output<T>, errorMode: UtfErrorMode, c2: number,
+              c3: number, c4: number, index: number) {
     super();
-    this._output = output;
-    this._errorMode = errorMode;
-    this._c2 = c2;
-    this._c3 = c3;
-    this._c4 = c4;
-    this._index = index;
+    Object.defineProperty(this, "output", {
+      value: output,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "errorMode", {
+      value: errorMode,
+      enumerable: true,
+      configurable: true,
+    });
+    this.c2 = c2;
+    this.c3 = c3;
+    this.c4 = c4;
+    this.index = index;
   }
 
   isCont(): boolean {
-    return this._output.isCont();
+    return this.output.isCont();
   }
 
   isFull(): boolean {
-    return this._output.isFull();
+    return this.output.isFull();
   }
 
   isDone(): boolean {
-    return this._output.isDone();
+    return this.output.isDone();
   }
 
   isError(): boolean {
     return false;
   }
 
-  isPart(): boolean;
-  isPart(isPart: boolean): Output<T>;
-  isPart(isPart?: boolean): boolean | Output<T> {
-    if (isPart === void 0) {
-      return this._output.isPart();
-    } else {
-      this._output = this._output.isPart(isPart);
-      return this;
-    }
+  isPart(): boolean {
+    return this.output.isPart();
+  }
+
+  asPart(part: boolean): Output<T> {
+    Object.defineProperty(this, "output", {
+      value: this.output.asPart(part),
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
   write(token: number | string): Output<T> {
     if (typeof token === "number") {
       let c1 = 0;
-      let c2 = this._c2;
-      let c3 = this._c3;
-      let c4 = this._c4;
-      let index = this._index;
+      let c2 = this.c2;
+      let c3 = this.c3;
+      let c4 = this.c4;
+      let output = this.output;
+      let index = this.index;
       while (index < 4) {
-        if (this._output.isCont()) {
+        if (output.isCont()) {
           switch (index) {
-            case 1: this._output = this._output.write(c2); this._c2 = 0; break;
-            case 2: this._output = this._output.write(c3); this._c3 = 0; break;
-            case 3: this._output = this._output.write(c4); this._c4 = 0; break;
+            case 1: output = output.write(c2); this.c2 = 0; break;
+            case 2: output = output.write(c3); this.c3 = 0; break;
+            case 3: output = output.write(c4); this.c4 = 0; break;
             default: throw new Error("unreachable");
           }
           index += 1;
@@ -110,35 +121,49 @@ export class Utf8EncodedOutput<T> extends Output<T> {
         c4 = 0x80 | (token & 0x3f);
         index = 0;
       } else { // surrogate or invalid code point
-        if (this._errorMode.isFatal()) {
+        if (this.errorMode.isFatal()) {
           return Output.error(new OutputException("invalid code point: " + token));
         } else {
-          return this.write(this._errorMode.replacementChar());
+          return this.write(this.errorMode.replacementChar);
         }
       }
       do {
         switch (index) {
-          case 0: this._output = this._output.write(c1); break;
-          case 1: this._output = this._output.write(c2); this._c2 = 0; break;
-          case 2: this._output = this._output.write(c3); this._c3 = 0; break;
-          case 3: this._output = this._output.write(c4); this._c4 = 0; break;
+          case 0: output = output.write(c1); break;
+          case 1: output = output.write(c2); this.c2 = 0; break;
+          case 2: output = output.write(c3); this.c3 = 0; break;
+          case 3: output = output.write(c4); this.c4 = 0; break;
           default: throw new Error("unreachable");
         }
+        Object.defineProperty(this, "output", {
+          value: output,
+          enumerable: true,
+          configurable: true,
+        });
         index += 1;
-      } while (index < 4 && this._output.isCont());
+      } while (index < 4 && output.isCont());
       if (index < 4) {
         if (index < 3) {
           if (index < 2) {
-            this._c2 = c2;
+            this.c2 = c2;
           }
-          this._c3 = c3;
+          this.c3 = c3;
         }
-        this._c4 = c4;
+        this.c4 = c4;
       }
-      this._index = index;
+      Object.defineProperty(this, "output", {
+        value: output,
+        enumerable: true,
+        configurable: true,
+      });
+      this.index = index;
       return this;
     } else if (typeof token === "string") {
-      this._output.write(token);
+      Object.defineProperty(this, "output", {
+        value: this.output.write(token),
+        enumerable: true,
+        configurable: true,
+      });
       return this;
     } else {
       throw new TypeError("" + token);
@@ -146,13 +171,14 @@ export class Utf8EncodedOutput<T> extends Output<T> {
   }
 
   flush(): Output<T> {
-    let index = this._index;
+    let output = this.output;
+    let index = this.index;
     while (index < 4) {
-      if (this._output.isCont()) {
+      if (output.isCont()) {
         switch (index) {
-          case 1: this._output = this._output.write(this._c2); this._c2 = 0; break;
-          case 2: this._output = this._output.write(this._c3); this._c3 = 0; break;
-          case 3: this._output = this._output.write(this._c4); this._c4 = 0; break;
+          case 1: output = output.write(this.c2); this.c2 = 0; break;
+          case 2: output = output.write(this.c3); this.c3 = 0; break;
+          case 3: output = output.write(this.c4); this.c4 = 0; break;
           default: throw new Error("unreachable");
         }
         index += 1;
@@ -160,27 +186,41 @@ export class Utf8EncodedOutput<T> extends Output<T> {
         return Output.error(new OutputException("unable to flush buffered code units"));
       }
     }
-    this._index = index;
+    Object.defineProperty(this, "output", {
+      value: output,
+      enumerable: true,
+      configurable: true,
+    });
+    this.index = index;
     return this;
   }
 
-  settings(): OutputSettings;
-  settings(settings: AnyOutputSettings): Output<T>;
-  settings(settings?: AnyOutputSettings): OutputSettings | Output<T> {
-    if (settings === void 0) {
-      return this._output.settings();
-    } else {
-      this._output.settings(settings);
-      return this;
-    }
+  get settings(): OutputSettings {
+    return this.output.settings;
+  }
+
+  withSettings(settings: AnyOutputSettings): Output<T> {
+    Object.defineProperty(this, "output", {
+      value: this.output.withSettings(settings),
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
   bind(): T {
-    return this._output.bind();
+    return this.output.bind();
   }
 
   clone(): Output<T> {
-    return new Utf8EncodedOutput<T>(this._output.clone(), this._errorMode,
-                                    this._c2, this._c3, this._c4, this._index);
+    return new Utf8EncodedOutput(this.output.clone(), this.errorMode,
+                                 this.c2, this.c3, this.c4, this.index);
+  }
+
+  static create<T>(output: Output<T>, errorMode?: UtfErrorMode): Output<T> {
+    if (errorMode === void 0) {
+      errorMode = UtfErrorMode.fatal();
+    }
+    return new Utf8EncodedOutput(output, errorMode, 0, 0, 0, 4);
   }
 }

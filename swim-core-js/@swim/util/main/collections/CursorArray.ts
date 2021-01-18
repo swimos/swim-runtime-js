@@ -16,77 +16,102 @@ import {Cursor} from "./Cursor";
 
 /** @hidden */
 export class CursorArray<T> extends Cursor<T> {
-  private readonly _array: ReadonlyArray<T>;
-  private _index: number;
-  private _limit: number;
+  private declare readonly array: ReadonlyArray<T>;
+  private declare index: number;
+  private declare readonly limit: number;
 
   constructor(array: ReadonlyArray<T>, index: number, limit: number) {
     super();
-    this._array = array;
-    this._index = index;
-    this._limit = limit;
+    Object.defineProperty(this, "array", {
+      value: array,
+    });
+    Object.defineProperty(this, "index", {
+      value: index,
+      configurable: true,
+    });
+    Object.defineProperty(this, "limit", {
+      value: limit,
+    });
   }
 
   isEmpty(): boolean {
-    return this._index >= this._limit;
+    return this.index >= this.limit;
   }
 
   head(): T {
-    if (this._index < this._limit) {
-      return this._array[this._index]!;
+    if (this.index < this.limit) {
+      return this.array[this.index]!;
     } else {
       throw new Error("empty");
     }
   }
 
   step(): void {
-    if (this._index < this._limit) {
-      this._index = 1;
+    const index = this.index;
+    if (index < this.limit) {
+      Object.defineProperty(this, "index", {
+        value: index + 1,
+        configurable: true,
+      });
     } else {
       throw new Error("empty");
     }
   }
 
   skip(count: number): void {
-    this._index = Math.min(this._index + count, this._limit);
+    Object.defineProperty(this, "index", {
+      value: Math.min(this.index + count, this.limit),
+      configurable: true,
+    });
   }
 
   hasNext(): boolean {
-    return this._index < this._limit;
+    return this.index < this.limit;
   }
 
   nextIndex(): number {
-    return this._index;
+    return this.index;
   }
 
   next(): {value?: T, done: boolean} {
-    const index = this._index;
-    if (index < this._limit) {
-      this._index = index + 1;
-      return {value: this._array[index], done: this._index === this._limit};
+    const index = this.index;
+    if (index < this.limit) {
+      Object.defineProperty(this, "index", {
+        value: index + 1,
+        configurable: true,
+      });
+      return {value: this.array[index]!, done: this.index === this.limit};
     } else {
-      this._index = this._limit;
+      Object.defineProperty(this, "index", {
+        value: this.limit,
+        configurable: true,
+      });
       return {done: true};
     }
   }
 
   hasPrevious(): boolean {
-    return this._index > 0;
+    return this.index > 0;
   }
 
   previousIndex(): number {
-    return this._index - 1;
+    return this.index - 1;
   }
 
   previous(): {value?: T, done: boolean} {
-    const index = this._index - 1;
+    const index = this.index - 1;
     if (index >= 0) {
-      this._index = index;
-      return {value: this._array[index], done: index === 0};
+      Object.defineProperty(this, "index", {
+        value: index,
+        configurable: true,
+      });
+      return {value: this.array[index]!, done: index === 0};
     } else {
-      this._index = 0;
+      Object.defineProperty(this, "index", {
+        value: 0,
+        configurable: true,
+      });
       return {done: true};
     }
   }
 }
-Cursor.Array = CursorArray;

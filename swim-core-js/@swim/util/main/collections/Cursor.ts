@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "../lang/Lazy";
 import type {Iterator} from "./Iterator";
-import type {CursorEmpty} from "./CursorEmpty";
-import type {CursorUnary} from "./CursorUnary";
-import type {CursorArray} from "./CursorArray";
+import {CursorEmpty} from "../"; // circular import
+import {CursorUnary} from "../"; // circular import
+import {CursorArray} from "../"; // circular import
 
 export abstract class Cursor<T> implements Iterator<T> {
   abstract isEmpty(): boolean;
@@ -46,27 +47,22 @@ export abstract class Cursor<T> implements Iterator<T> {
     throw new Error("immutable");
   }
 
-  private static _empty?: Cursor<any>;
+  @Lazy
   static empty<T>(): Cursor<T> {
-    if (Cursor._empty === void 0) {
-      Cursor._empty = new Cursor.Empty();
-    }
-    return Cursor._empty;
+    return new CursorEmpty();
   }
 
   static unary<T>(value: T): Cursor<T> {
-    return new Cursor.Unary<T>(value);
+    return new CursorUnary<T>(value);
   }
 
-  static array<T>(array: ReadonlyArray<T>, index: number = 0, limit: number = array.length): Cursor<T> {
-    return new Cursor.Array<T>(array, index, limit);
+  static array<T>(array: ReadonlyArray<T>, index?: number, limit?: number): Cursor<T> {
+    if (index === void 0) {
+      index = 0;
+    }
+    if (limit === void 0) {
+      limit = array.length;
+    }
+    return new CursorArray<T>(array, index, limit);
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Empty: typeof CursorEmpty; // defined by CursorEmpty
-  /** @hidden */
-  static Unary: typeof CursorUnary; // defined by CursorUnary
-  /** @hidden */
-  static Array: typeof CursorArray; // defined by CursorArray
 }

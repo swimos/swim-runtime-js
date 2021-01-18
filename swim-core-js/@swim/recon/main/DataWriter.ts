@@ -49,7 +49,7 @@ export class DataWriter extends Writer {
       }
       if (part.isDone()) {
         part = void 0;
-        return Writer.done();
+        return Writer.end();
       } else if (part.isError()) {
         return part.asError();
       }

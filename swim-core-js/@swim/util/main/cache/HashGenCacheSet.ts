@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Values} from "../types/Values";
+import {Values} from "../runtime/Values";
 
 /**
  * A hashed generational cache set discards the least recently used value
@@ -31,108 +31,108 @@ import {Values} from "../types/Values";
  * cache generations.
  */
 export class HashGenCacheSet<T> {
-  readonly _buckets: Array<HashGenCacheSetBucket<T> | undefined>;
-  _gen4Hits: number;
-  _gen3Hits: number;
-  _gen2Hits: number;
-  _gen1Hits: number;
-  _misses: number;
+  readonly buckets: Array<HashGenCacheSetBucket<T> | undefined>;
+  gen4Hits: number;
+  gen3Hits: number;
+  gen2Hits: number;
+  gen1Hits: number;
+  misses: number;
 
   constructor(size: number) {
-    this._buckets = new Array(size);
-    this._gen4Hits = 0;
-    this._gen3Hits = 0;
-    this._gen2Hits = 0;
-    this._gen1Hits = 0;
-    this._misses = 0;
+    this.buckets = new Array(size);
+    this.gen4Hits = 0;
+    this.gen3Hits = 0;
+    this.gen2Hits = 0;
+    this.gen1Hits = 0;
+    this.misses = 0;
   }
 
   put(value: T): T {
-    if (this._buckets.length === 0) {
+    if (this.buckets.length === 0) {
       return value;
     }
-    const index = Math.abs(Values.hash(value)) % this._buckets.length;
-    const bucket = this._buckets[index] || new HashGenCacheSetBucket<T>();
+    const index = Math.abs(Values.hash(value)) % this.buckets.length;
+    const bucket = this.buckets[index] || new HashGenCacheSetBucket<T>();
 
-    const gen4Val = bucket._gen4Val;
+    const gen4Val = bucket.gen4Val;
     if (gen4Val !== void 0 && Values.equal(value, gen4Val)) {
-      this._gen4Hits += 1;
-      bucket._gen4Weight++;
+      this.gen4Hits += 1;
+      bucket.gen4Weight++;
       return gen4Val;
     }
 
-    const gen3Val = bucket._gen3Val;
+    const gen3Val = bucket.gen3Val;
     if (gen3Val !== void 0 && Values.equal(value, gen3Val)) {
-      this._gen3Hits += 1;
-      if (bucket._gen3Weight++ > bucket._gen4Weight) {
-        this._buckets[index] = new HashGenCacheSetBucket<T>(
-            bucket._gen3Val, bucket._gen3Weight,
-            bucket._gen4Val, bucket._gen4Weight,
-            bucket._gen2Val, bucket._gen2Weight,
-            bucket._gen1Val, bucket._gen1Weight);
+      this.gen3Hits += 1;
+      if (bucket.gen3Weight++ > bucket.gen4Weight) {
+        this.buckets[index] = new HashGenCacheSetBucket<T>(
+            bucket.gen3Val, bucket.gen3Weight,
+            bucket.gen4Val, bucket.gen4Weight,
+            bucket.gen2Val, bucket.gen2Weight,
+            bucket.gen1Val, bucket.gen1Weight);
       }
       return gen3Val;
     }
 
-    const gen2Val = bucket._gen2Val;
+    const gen2Val = bucket.gen2Val;
     if (gen2Val !== void 0 && Values.equal(value, gen2Val)) {
-      this._gen2Hits += 1;
-      if (bucket._gen2Weight++ > bucket._gen3Weight) {
-        this._buckets[index] = new HashGenCacheSetBucket<T>(
-            bucket._gen4Val, bucket._gen4Weight,
-            bucket._gen2Val, bucket._gen2Weight,
-            bucket._gen3Val, bucket._gen3Weight,
-            bucket._gen1Val, bucket._gen1Weight);
+      this.gen2Hits += 1;
+      if (bucket.gen2Weight++ > bucket.gen3Weight) {
+        this.buckets[index] = new HashGenCacheSetBucket<T>(
+            bucket.gen4Val, bucket.gen4Weight,
+            bucket.gen2Val, bucket.gen2Weight,
+            bucket.gen3Val, bucket.gen3Weight,
+            bucket.gen1Val, bucket.gen1Weight);
       }
       return gen2Val;
     }
 
-    const gen1Val = bucket._gen1Val;
+    const gen1Val = bucket.gen1Val;
     if (gen1Val !== void 0 && Values.equal(value, gen1Val)) {
-      this._gen1Hits += 1;
-      if (bucket._gen1Weight++ > bucket._gen2Weight) {
-        this._buckets[index] = new HashGenCacheSetBucket<T>(
-            bucket._gen4Val, bucket._gen4Weight,
-            bucket._gen3Val, bucket._gen3Weight,
-            bucket._gen1Val, bucket._gen1Weight,
-            bucket._gen2Val, bucket._gen2Weight);
+      this.gen1Hits += 1;
+      if (bucket.gen1Weight++ > bucket.gen2Weight) {
+        this.buckets[index] = new HashGenCacheSetBucket<T>(
+            bucket.gen4Val, bucket.gen4Weight,
+            bucket.gen3Val, bucket.gen3Weight,
+            bucket.gen1Val, bucket.gen1Weight,
+            bucket.gen2Val, bucket.gen2Weight);
       }
       return gen1Val;
     }
 
-    this._misses += 1;
+    this.misses += 1;
     if (gen4Val === void 0) {
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen2Val, bucket._gen2Weight,
-          bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen2Val, bucket.gen2Weight,
+          bucket.gen1Val, bucket.gen1Weight,
           value, 1);
     } else if (gen3Val === void 0) {
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen2Val, bucket._gen2Weight,
-          bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen2Val, bucket.gen2Weight,
+          bucket.gen1Val, bucket.gen1Weight,
           value, 1);
     } else if (gen2Val === void 0) {
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen1Val, bucket.gen1Weight,
           value, 1);
     } else if (gen1Val === void 0) {
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen2Val, bucket._gen2Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen2Val, bucket.gen2Weight,
           value, 1);
     } else {
       // Penalize older gens for thrash. Promote gen1 to prevent nacent gens
       // from flip-flopping. If sacrificed gen2 was worth keeping, it likely
       // would have already been promoted.
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen4Val, bucket._gen4Weight - 1,
-          bucket._gen3Val, bucket._gen3Weight - 1,
-          bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen4Val, bucket.gen4Weight - 1,
+          bucket.gen3Val, bucket.gen3Weight - 1,
+          bucket.gen1Val, bucket.gen1Weight,
           value, 1);
     }
 
@@ -140,51 +140,51 @@ export class HashGenCacheSet<T> {
   }
 
   remove(value: T): boolean {
-    if (this._buckets.length === 0) {
+    if (this.buckets.length === 0) {
       return false;
     }
-    const index = Math.abs(Values.hash(value)) % this._buckets.length;
-    const bucket = this._buckets[index];
+    const index = Math.abs(Values.hash(value)) % this.buckets.length;
+    const bucket = this.buckets[index];
     if (bucket === void 0) {
       return false;
     }
 
-    const gen4Val = bucket._gen4Val;
+    const gen4Val = bucket.gen4Val;
     if (gen4Val !== void 0 && Values.equal(value, gen4Val)) {
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen2Val, bucket._gen2Weight,
-          bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen2Val, bucket.gen2Weight,
+          bucket.gen1Val, bucket.gen1Weight,
           void 0, 0);
       return true;
     }
 
-    const gen3Val = bucket._gen3Val;
+    const gen3Val = bucket.gen3Val;
     if (gen3Val !== void 0 && Values.equal(value, gen3Val)) {
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen2Val, bucket._gen2Weight,
-          bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen2Val, bucket.gen2Weight,
+          bucket.gen1Val, bucket.gen1Weight,
           void 0, 0);
       return true;
     }
 
-    const gen2Val = bucket._gen2Val;
+    const gen2Val = bucket.gen2Val;
     if (gen2Val !== void 0 && Values.equal(value, gen2Val)) {
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen1Val, bucket._gen1Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen1Val, bucket.gen1Weight,
           void 0, 0);
       return true;
     }
 
-    const gen1Val = bucket._gen1Val;
+    const gen1Val = bucket.gen1Val;
     if (gen1Val !== void 0 && Values.equal(value, gen1Val)) {
-      this._buckets[index] = new HashGenCacheSetBucket<T>(
-          bucket._gen4Val, bucket._gen4Weight,
-          bucket._gen3Val, bucket._gen3Weight,
-          bucket._gen2Val, bucket._gen2Weight,
+      this.buckets[index] = new HashGenCacheSetBucket<T>(
+          bucket.gen4Val, bucket.gen4Weight,
+          bucket.gen3Val, bucket.gen3Weight,
+          bucket.gen2Val, bucket.gen2Weight,
           void 0, 0);
       return true;
     }
@@ -193,52 +193,52 @@ export class HashGenCacheSet<T> {
   }
 
   clear(): void {
-    for (let i = 0; i < this._buckets.length; i += 1) {
-      this._buckets[i] = void 0;
+    for (let i = 0; i < this.buckets.length; i += 1) {
+      this.buckets[i] = void 0;
     }
   }
 
   /** @hidden */
-  hits(): number {
-    return this._gen4Hits + this._gen3Hits + this._gen2Hits + this._gen1Hits;
+  get hits(): number {
+    return this.gen4Hits + this.gen3Hits + this.gen2Hits + this.gen1Hits;
   }
 
-  hitRatio(): number {
-    const hits = this.hits();
-    return hits / (hits + this._misses);
+  get hitRatio(): number {
+    const hits = this.hits;
+    return hits / (hits + this.misses);
   }
 }
 
 /** @hidden */
 export class HashGenCacheSetBucket<T> {
   /** @hidden */
-  _gen4Val: T | undefined;
+  gen4Val: T | undefined;
   /** @hidden */
-  _gen4Weight: number;
+  gen4Weight: number;
   /** @hidden */
-  _gen3Val: T | undefined;
+  gen3Val: T | undefined;
   /** @hidden */
-  _gen3Weight: number;
+  gen3Weight: number;
   /** @hidden */
-  _gen2Val: T | undefined;
+  gen2Val: T | undefined;
   /** @hidden */
-  _gen2Weight: number;
+  gen2Weight: number;
   /** @hidden */
-  _gen1Val: T | undefined;
+  gen1Val: T | undefined;
   /** @hidden */
-  _gen1Weight: number;
+  gen1Weight: number;
 
   constructor(gen4Val?: T, gen4Weight: number = 0,
               gen3Val?: T, gen3Weight: number = 0,
               gen2Val?: T, gen2Weight: number = 0,
               gen1Val?: T, gen1Weight: number = 0) {
-    this._gen4Val = gen4Val;
-    this._gen4Weight = gen4Weight;
-    this._gen3Val = gen3Val;
-    this._gen3Weight = gen3Weight;
-    this._gen2Val = gen2Val;
-    this._gen2Weight = gen2Weight;
-    this._gen1Val = gen1Val;
-    this._gen1Weight = gen1Weight;
+    this.gen4Val = gen4Val;
+    this.gen4Weight = gen4Weight;
+    this.gen3Val = gen3Val;
+    this.gen3Weight = gen3Weight;
+    this.gen2Val = gen2Val;
+    this.gen2Weight = gen2Weight;
+    this.gen1Val = gen1Val;
+    this.gen1Weight = gen1Weight;
   }
 }

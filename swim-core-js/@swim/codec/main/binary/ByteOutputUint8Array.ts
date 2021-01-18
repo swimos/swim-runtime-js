@@ -27,6 +27,6 @@ export class ByteOutputUint8Array extends ByteOutput<Uint8Array> {
   }
 
   clone(): Output<Uint8Array> {
-    return new ByteOutputUint8Array(this.cloneArray(), this._size, this._settings);
+    return new ByteOutputUint8Array(this.cloneArray(), this.size, this.settings);
   }
 }

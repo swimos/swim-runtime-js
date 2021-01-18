@@ -498,7 +498,7 @@ export abstract class Item implements HashCode, Equivalent, Comparable, Debug, D
   /**
    * Returns the heterogeneous sort order of this `Item`.  Used to impose a
    * total order on the set of all items.  When comparing two items of
-   * different types, the items order according to their `typeOrder}`.
+   * different types, the items order according to their `typeOrder`.
    */
   abstract typeOrder(): number;
 

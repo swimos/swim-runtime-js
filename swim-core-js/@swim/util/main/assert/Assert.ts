@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Values} from "../types/Values";
+import {Values} from "../runtime/Values";
 import {AssertException} from "./AssertException";
 
 /**

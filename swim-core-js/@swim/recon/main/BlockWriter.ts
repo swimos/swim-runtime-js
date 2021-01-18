@@ -357,10 +357,10 @@ export class BlockWriter<I, V> extends Writer {
       if (inBrackets) {
         if (output.isCont()) {
           output = output.write(93/*']'*/);
-          return Writer.done();
+          return Writer.end();
         }
       } else {
-        return Writer.done();
+        return Writer.end();
       }
     }
     if (output.isDone()) {
