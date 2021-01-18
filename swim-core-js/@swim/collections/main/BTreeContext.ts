@@ -23,10 +23,10 @@ export abstract class BTreeContext<K, V> {
 
   set pageSplitSize(pageSplitSize: number) {
     Object.defineProperty(this, "pageSplitSize", {
+      value: pageSplitSize,
       configurable: true,
       enumerable: true,
       writable: true,
-      value: pageSplitSize,
     });
   }
 

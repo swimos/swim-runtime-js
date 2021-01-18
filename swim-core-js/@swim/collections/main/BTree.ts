@@ -14,16 +14,16 @@
 
 import type {Cursor, ReducedMap} from "@swim/util";
 import {BTreeContext} from "./BTreeContext";
-import type {BTreePage} from "./BTreePage";
-import type {BTreeLeaf} from "./BTreeLeaf";
-import type {BTreeNode} from "./BTreeNode";
-import type {BTreeNodeCursor} from "./BTreeNodeCursor";
+import {BTreePage} from "./"; // circular import
 
 export class BTree<K = unknown, V = unknown, U = never> extends BTreeContext<K, V> implements ReducedMap<K, V, U> {
   root: BTreePage<K, V, U>;
 
-  constructor(root: BTreePage<K, V, U> = BTree.Page.empty()) {
+  constructor(root?: BTreePage<K, V, U>) {
     super();
+    if (root === void 0) {
+      root = BTreePage.empty();
+    }
     this.root = root;
   }
 
@@ -163,7 +163,7 @@ export class BTree<K = unknown, V = unknown, U = never> extends BTreeContext<K, 
       if (lower < this.root.size) {
         this.root = this.root.drop(lower, this);
       } else {
-        this.root = BTree.Page.empty();
+        this.root = BTreePage.empty();
       }
     }
     return this;
@@ -174,14 +174,14 @@ export class BTree<K = unknown, V = unknown, U = never> extends BTreeContext<K, 
       if (upper > 0) {
         this.root = this.root.take(upper, this);
       } else {
-        this.root = BTree.Page.empty();
+        this.root = BTreePage.empty();
       }
     }
     return this;
   }
 
   clear(): void {
-    this.root = BTree.Page.empty();
+    this.root = BTreePage.empty();
   }
 
   updated(key: K, newValue: V): BTree<K, V, U> {
@@ -209,7 +209,7 @@ export class BTree<K = unknown, V = unknown, U = never> extends BTreeContext<K, 
 
   cleared(): BTree<K, V, U> {
     if (!this.root.isEmpty()) {
-      return this.copy(BTree.Page.empty());
+      return this.copy(BTreePage.empty());
     } else {
       return this;
     }
@@ -221,7 +221,7 @@ export class BTree<K = unknown, V = unknown, U = never> extends BTreeContext<K, 
     if (oldRoot !== newRoot) {
       this.root = newRoot;
     }
-    return newRoot.fold()!;
+    return newRoot.fold!;
   }
 
   forEach<T>(callback: (key: K, value: V) => T | void): T | undefined;
@@ -286,14 +286,4 @@ export class BTree<K = unknown, V = unknown, U = never> extends BTreeContext<K, 
     }
     return tree;
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Page: typeof BTreePage; // defined by BTreePage
-  /** @hidden */
-  static Leaf: typeof BTreeLeaf; // defined by BTreeLeaf
-  /** @hidden */
-  static Node: typeof BTreeNode; // defined by BTreeNode
-  /** @hidden */
-  static NodeCursor: typeof BTreeNodeCursor; // defined by BTreeNodeCursor
 }

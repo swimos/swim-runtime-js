@@ -14,16 +14,16 @@
 
 import type {Cursor} from "@swim/util";
 import {STreeContext} from "./STreeContext";
-import type {STreePage} from "./STreePage";
-import type {STreeLeaf} from "./STreeLeaf";
-import type {STreeNode} from "./STreeNode";
-import type {STreeNodeCursor} from "./STreeNodeCursor";
+import {STreePage} from "./"; // circular import
 
 export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
   root: STreePage<V, I>;
 
-  constructor(root: STreePage<V, I> = STree.Page.empty()) {
+  constructor(root?: STreePage<V, I>) {
     super();
+    if (root === void 0) {
+      root = STreePage.empty();
+    }
     this.root = root;
   }
 
@@ -185,7 +185,7 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
       if (lower < oldRoot.size) {
         this.root = oldRoot.drop(lower, this);
       } else {
-        this.root = STree.Page.empty();
+        this.root = STreePage.empty();
       }
     }
     return this;
@@ -197,14 +197,14 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
       if (upper > 0) {
         this.root = oldRoot.take(upper, this);
       } else {
-        this.root = STree.Page.empty();
+        this.root = STreePage.empty();
       }
     }
     return this;
   }
 
   clear(): void {
-    this.root = STree.Page.empty();
+    this.root = STreePage.empty();
   }
 
   forEach<T>(callback: (value: V, index: number, id: I) => T | void): T | undefined;
@@ -270,14 +270,4 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
     } while (isFinite(index) && index !== start);
     return -1;
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Page: typeof STreePage; // defined by STreePage
-  /** @hidden */
-  static Leaf: typeof STreeLeaf; // defined by STreeLeaf
-  /** @hidden */
-  static Node: typeof STreeNode; // defined by STreeNode
-  /** @hidden */
-  static NodeCursor: typeof STreeNodeCursor; // defined by STreeNodeCursor
 }

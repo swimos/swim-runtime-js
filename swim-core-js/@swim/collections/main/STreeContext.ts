@@ -20,13 +20,13 @@ export abstract class STreeContext<V, I> {
   get pageSplitSize(): number {
     return 32;
   }
- 
+
   set pageSplitSize(pageSplitSize: number) {
     Object.defineProperty(this, "pageSplitSize", {
+      value: pageSplitSize,
       configurable: true,
       enumerable: true,
       writable: true,
-      value: pageSplitSize,
     });
   }
 

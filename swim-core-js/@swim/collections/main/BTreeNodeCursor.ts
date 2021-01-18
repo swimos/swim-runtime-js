@@ -14,14 +14,13 @@
 
 import type {Cursor} from "@swim/util";
 import {NodeCursor} from "./NodeCursor";
-import {BTree} from "./BTree";
 import type {BTreePage} from "./BTreePage";
 
 /** @hidden */
 export class BTreeNodeCursor<K, V, U> extends NodeCursor<[K, V], BTreePage<K, V, U>> {
-  constructor(pages: BTreePage<K, V, U>[], index?: number, pageIndex?: number,
-              subCursor?: Cursor<[K, V]>) {
-    super(pages, index, pageIndex, subCursor);
+  constructor(pages: ReadonlyArray<BTreePage<K, V, U>>, index: number = 0,
+              childIndex: number = 0, childCursor: Cursor<[K, V]> | null = null) {
+    super(pages, index, childIndex, childCursor);
   }
 
   protected pageSize(page: BTreePage<K, V, U>): number {
@@ -36,4 +35,3 @@ export class BTreeNodeCursor<K, V, U> extends NodeCursor<[K, V], BTreePage<K, V,
     return page.reverseEntries();
   }
 }
-BTree.NodeCursor = BTreeNodeCursor;
