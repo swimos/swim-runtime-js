@@ -1,0 +1,91 @@
+// Copyright 2015-2020 Swim inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import {__extends} from "tslib";
+import {Domain, Interpolate, Interpolator} from "@swim/mapping";
+import type {DateTime} from "../DateTime";
+import {TimeDomainInterpolator} from "./"; // forward import
+import {TimeRange} from "./"; // forward import
+
+export declare abstract class TimeDomain {
+  declare readonly 0: DateTime;
+
+  declare readonly 1: DateTime;
+
+  get inverse(): TimeRange;
+
+  interpolateTo(that: TimeDomain): Interpolator<TimeDomain>;
+  interpolateTo(that: unknown): Interpolator<TimeDomain> | null;
+
+  canEqual(that: unknown): boolean;
+
+  equals(that: unknown): boolean;
+
+  toString(): string;
+}
+
+export interface TimeDomain extends Domain<DateTime>, Interpolate<TimeDomain> {
+}
+
+export function TimeDomain(x0: DateTime, x1: DateTime): TimeDomain {
+  const domain = function (x: DateTime): number {
+    const t0 = domain[0]._time;
+    const t1 = domain[1]._time;
+    const dt = t1 - t0;
+    return dt !== 0 ? (x._time - t0) / dt : 0;
+  } as TimeDomain;
+  Object.setPrototypeOf(domain, TimeDomain.prototype);
+  Object.defineProperty(domain, 0, {
+    value: x0,
+    enumerable: true,
+  });
+  Object.defineProperty(domain, 1, {
+    value: x1,
+    enumerable: true,
+  });
+  return domain;
+}
+__extends(TimeDomain, Domain);
+
+Object.defineProperty(TimeDomain.prototype, "inverse", {
+  get(this: TimeDomain): TimeRange {
+    return TimeRange(this[0], this[1]);
+  },
+  enumerable: true,
+  configurable: true,
+});
+
+TimeDomain.prototype.interpolateTo = function (this: TimeDomain, that: unknown): Interpolator<TimeDomain> | null {
+  if (that instanceof TimeDomain) {
+    return TimeDomainInterpolator(this, that);
+  }
+  return null;
+} as typeof TimeDomain.prototype.interpolateTo;
+
+TimeDomain.prototype.canEqual = function (that: unknown): boolean {
+  return that instanceof TimeDomain;
+};
+
+TimeDomain.prototype.equals = function (that: unknown): boolean {
+  if (this === that) {
+    return true;
+  } else if (that instanceof TimeDomain) {
+    return that.canEqual(this) && this[0].equals(that[0]) && this[1].equals(that[1]);
+  }
+  return false;
+};
+
+TimeDomain.prototype.toString = function (): string {
+  return "TimeDomain(" + this[0] + ", " + this[1] + ")";
+};

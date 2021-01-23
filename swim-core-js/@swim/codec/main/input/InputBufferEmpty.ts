@@ -16,8 +16,8 @@ import type {Mark} from "../source/Mark";
 import {InputException} from "./InputException";
 import {AnyInputSettings, InputSettings} from "./InputSettings";
 import {InputBuffer} from "./InputBuffer";
-import {InputBufferDone} from "../"; // circular import
-import {InputBufferError} from "../"; // circular import
+import {InputBufferDone} from "../"; // forward import
+import {InputBufferError} from "../"; // forward import
 
 /** @hidden */
 export class InputBufferEmpty extends InputBuffer {
@@ -123,7 +123,7 @@ export class InputBufferEmpty extends InputBuffer {
 
   declare readonly id: string | undefined;
 
-  withId(id: string | undefined) {
+  withId(id: string | undefined): InputBuffer {
     return new InputBufferEmpty(id, this.mark, this.settings);
   }
 

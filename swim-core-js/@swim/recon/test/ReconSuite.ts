@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {ReconParserSpec} from "./ReconParserSpec";
 import {ReconOperatorParserSpec} from "./ReconOperatorParserSpec";
 import {ReconSelectorParserSpec} from "./ReconSelectorParserSpec";

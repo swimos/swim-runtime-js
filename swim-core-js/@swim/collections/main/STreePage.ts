@@ -16,7 +16,7 @@ import {Lazy, Cursor} from "@swim/util";
 import {KeysCursor} from "./KeysCursor";
 import {ValuesCursor} from "./ValuesCursor";
 import type {STreeContext} from "./STreeContext";
-import {STreeLeaf} from "./"; // circular import
+import {STreeLeaf} from "./"; // forward import
 
 /** @hidden */
 export abstract class STreePage<V = unknown, I = unknown> {

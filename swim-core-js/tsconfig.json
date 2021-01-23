@@ -6,8 +6,8 @@
     {"path": "./@swim/codec"},
     {"path": "./@swim/args"},
     {"path": "./@swim/unit"},
+    {"path": "./@swim/mapping"},
     {"path": "./@swim/collections"},
-    {"path": "./@swim/interpolate"},
     {"path": "./@swim/structure"},
     {"path": "./@swim/streamlet"},
     {"path": "./@swim/dataflow"},
@@ -16,7 +16,6 @@
     {"path": "./@swim/math"},
     {"path": "./@swim/geo"},
     {"path": "./@swim/time"},
-    {"path": "./@swim/scale"},
     {"path": "./@swim/core"}
   ]
 }

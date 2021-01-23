@@ -14,6 +14,7 @@
 
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
+import {Interpolator, IdentityInterpolator} from "@swim/mapping";
 import {Attr, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {Transform} from "./Transform";
@@ -61,6 +62,17 @@ export class IdentityTransform extends Transform {
 
   toValue(): Value {
     return Record.of(Attr.of("identity"));
+  }
+
+  interpolateTo(that: IdentityTransform): Interpolator<IdentityTransform>;
+  interpolateTo(that: Transform): Interpolator<Transform>;
+  interpolateTo(that: unknown): Interpolator<Transform> | null;
+  interpolateTo(that: unknown): Interpolator<Transform> | null {
+    if (that instanceof IdentityTransform) {
+      return IdentityInterpolator(this);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   conformsTo(that: Transform): boolean {

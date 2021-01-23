@@ -15,7 +15,7 @@
 import type {Cursor} from "@swim/util";
 import type {BTreeContext} from "./BTreeContext";
 import {BTreePage} from "./BTreePage";
-import {BTreeNodeCursor} from "./"; // circular import
+import {BTreeNodeCursor} from "./"; // forward import
 
 /** @hidden */
 export class BTreeNode<K, V, U> extends BTreePage<K, V, U> {

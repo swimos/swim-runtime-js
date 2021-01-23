@@ -15,8 +15,8 @@
 import {OutputException} from "./OutputException";
 import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
 import {OutputBuffer} from "./OutputBuffer";
-import {OutputBufferFull} from "../"; // circular import
-import {OutputBufferError} from "../"; // circular import
+import {OutputBufferFull} from "../"; // forward import
+import {OutputBufferError} from "../"; // forward import
 
 /** @hidden */
 export class OutputBufferDone extends OutputBuffer<never> {

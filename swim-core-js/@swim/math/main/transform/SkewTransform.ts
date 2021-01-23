@@ -14,10 +14,12 @@
 
 import {Murmur3, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item, Attr, Slot, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {AnyAngle, Angle} from "../angle/Angle";
 import {Transform} from "./Transform";
+import {SkewTransformInterpolator} from "../"; // forward import
 import type {AffineTransform} from "./AffineTransform";
 
 export class SkewTransform extends Transform {
@@ -92,6 +94,17 @@ export class SkewTransform extends Transform {
   toValue(): Value {
     return Record.of(Attr.of("skew", Record.of(Slot.of("x", this._x.toString()),
                                                Slot.of("y", this._y.toString()))));
+  }
+
+  interpolateTo(that: SkewTransform): Interpolator<SkewTransform>;
+  interpolateTo(that: Transform): Interpolator<Transform>;
+  interpolateTo(that: unknown): Interpolator<Transform> | null;
+  interpolateTo(that: unknown): Interpolator<Transform> | null {
+    if (that instanceof SkewTransform) {
+      return SkewTransformInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   conformsTo(that: Transform): boolean {

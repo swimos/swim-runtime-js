@@ -14,11 +14,13 @@
 
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import {BoxR2} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
 import {GeoSegment} from "./GeoSegment";
+import {GeoBoxInterpolator} from "./"; // forward import
 
 export type AnyGeoBox = GeoBox | GeoBoxInit;
 
@@ -29,7 +31,7 @@ export interface GeoBoxInit {
   latMax: number;
 }
 
-export class GeoBox extends GeoShape implements HashCode, Equivalent, Debug {
+export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _lngMin: number;
   /** @hidden */
@@ -238,6 +240,16 @@ export class GeoBox extends GeoShape implements HashCode, Equivalent, Debug {
       lngMax: this._lngMax,
       latMax: this._latMax,
     };
+  }
+
+  interpolateTo(that: GeoBox): Interpolator<GeoBox>;
+  interpolateTo(that: unknown): Interpolator<GeoBox> | null;
+  interpolateTo(that: unknown): Interpolator<GeoBox> | null {
+    if (that instanceof GeoBox) {
+      return GeoBoxInterpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {

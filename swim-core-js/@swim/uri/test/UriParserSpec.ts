@@ -175,7 +175,7 @@ export class UriParserSpec extends Spec {
 
   @Test
   parseURIsWithPathsContainingPermittedDelimeters(exam: Exam): void {
-    exam.equal(Uri.parse("/one/!$&()*+,;='/three"), Uri.path("/", "one", "/", "!$&()*+,;=\'", "/", "three"));
+    exam.equal(Uri.parse("/one/!$&()*+,;='/three"), Uri.path("/", "one", "/", "!$&()*+,;='", "/", "three"));
   }
 
   @Test

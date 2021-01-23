@@ -115,11 +115,11 @@ export class ListDownlinkRecord extends DownlinkRecord {
   }
 
   push(...newItems: AnyItem[]): number {
-    return this._downlink.push.apply(this._downlink, arguments as unknown as AnyItem[]);
+    return this._downlink.push(...newItems);
   }
 
   splice(start: number, deleteCount?: number, ...newItems: AnyItem[]): Item[] {
-    return this._downlink.splice.apply(this._downlink, arguments as any);
+    return this._downlink.splice(start, deleteCount, ...newItems);
   }
 
   delete(key: AnyValue): Item {

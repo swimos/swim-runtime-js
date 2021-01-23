@@ -14,6 +14,7 @@
 
 import {Numbers, Strings, HashGenCacheSet} from "@swim/util";
 import {OutputSettings, Output, Format} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
 import {TextOutput} from "./TextOutput";
@@ -53,7 +54,7 @@ export class Text extends Value {
   numberValue<T>(orElse: T): number | T;
   numberValue<T>(orElse?: T): number | T | undefined {
     try {
-      return Item.Num.from(this._value).numberValue();
+      return Item.Num.parse(this._value).numberValue();
     } catch (error) {
       return orElse;
     }
@@ -99,6 +100,13 @@ export class Text extends Value {
 
   commit(): this {
     return this;
+  }
+
+  interpolateTo(that: Text): Interpolator<Text>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    return super.interpolateTo(that);
   }
 
   typeOrder(): number {

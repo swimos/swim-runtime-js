@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Strings, HashGenCacheMap} from "@swim/util";
+import {HashCode, Compare, Strings, HashGenCacheMap} from "@swim/util";
 import type {Output, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 
 export type AnyUriScheme = UriScheme | string;
 
-export class UriScheme implements Comparable, HashCode, Debug, Display {
+export class UriScheme implements HashCode, Compare, Debug, Display {
   /** @hidden */
   readonly _name: string;
 

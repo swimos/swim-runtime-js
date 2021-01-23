@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Comparable, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
+import {Murmur3, HashCode, Equivalent, Compare, Numbers, Constructors} from "@swim/util";
 import type {Display, Output} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import {Item, Value, Form} from "@swim/structure";
 import {AnyTimeZone, TimeZone} from "./TimeZone";
+import {DateTimeInterpolator} from "./"; // forward import
 import type {DateTimeParser} from "./DateTimeParser";
 import type {DateTimeForm} from "./DateTimeForm";
 import type {DateTimeFormat} from "./DateTimeFormat";
@@ -33,7 +35,7 @@ export interface DateTimeInit {
   zone?: AnyTimeZone;
 }
 
-export class DateTime implements HashCode, Equivalent, Comparable, Display {
+export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Compare, Display {
   /** @hidden */
   readonly _time: number;
   /** @hidden */
@@ -239,6 +241,16 @@ export class DateTime implements HashCode, Equivalent, Comparable, Display {
 
   valueOf(): number {
     return this._time;
+  }
+
+  interpolateTo(that: DateTime): Interpolator<DateTime>;
+  interpolateTo(that: unknown): Interpolator<DateTime> | null;
+  interpolateTo(that: unknown): Interpolator<DateTime> | null {
+    if (that instanceof DateTime) {
+      return DateTimeInterpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   compareTo(that: unknown): number {

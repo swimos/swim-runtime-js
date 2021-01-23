@@ -66,7 +66,7 @@ export class UriPathEmpty extends UriPath {
   }
 
   appended(...components: AnyUriPath[]): UriPath {
-    return UriPath.of.apply(void 0, arguments as unknown as AnyUriPath[]);
+    return UriPath.of(...components);
   }
 
   appendedSlash(): UriPath {
@@ -78,7 +78,7 @@ export class UriPathEmpty extends UriPath {
   }
 
   prepended(...components: AnyUriPath[]): UriPath {
-    return UriPath.of.apply(void 0, arguments as unknown as AnyUriPath[]);
+    return UriPath.of(...components);
   }
 
   prependedSlash(): UriPath {

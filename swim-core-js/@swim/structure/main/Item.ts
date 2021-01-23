@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, Equivalent, HashCode, Cursor} from "@swim/util";
+import {HashCode, Equivalent, Compare, Cursor} from "@swim/util";
 import {Debug, Display, Format, Output} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
+import {ItemInterpolator} from "./"; // forward import
 import type {Field} from "./Field";
 import type {Attr} from "./Attr";
 import type {Slot} from "./Slot";
@@ -82,7 +84,7 @@ export type AnyItem = Item
                     | null
                     | undefined;
 
-export abstract class Item implements HashCode, Equivalent, Comparable, Debug, Display {
+export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, Compare, Debug, Display {
   /** @hidden */
   constructor() {
     // stub
@@ -288,13 +290,13 @@ export abstract class Item implements HashCode, Equivalent, Comparable, Debug, D
   appended(...items: AnyItem[]): Record {
     const record = Item.Record.create(1 + arguments.length);
     record.push(this);
-    record.push.apply(record, arguments as unknown as AnyItem[]);
+    record.push(...items);
     return record;
   }
 
   prepended(...items: AnyItem[]): Record {
     const record = Item.Record.create(arguments.length + 1);
-    record.push.apply(record, arguments as unknown as AnyItem[]);
+    record.push(...items);
     record.push(this);
     return record;
   }
@@ -304,8 +306,8 @@ export abstract class Item implements HashCode, Equivalent, Comparable, Debug, D
   concat(...items: AnyItem[]): Record {
     const record = Item.Record.create();
     record.push(this);
-    for (let i = 0, n = arguments.length; i < n; i += 1) {
-      Item.fromAny(arguments[i]).forEach(function (item: Item): void {
+    for (let i = 0, n = items.length; i < n; i += 1) {
+      Item.fromAny(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });
     }
@@ -382,7 +384,11 @@ export abstract class Item implements HashCode, Equivalent, Comparable, Debug, D
 
   filter(predicate?: AnyItem): Selector {
     const selector = Item.Selector.literal(this);
-    return selector.filter.apply(selector, arguments as unknown as [AnyItem?]);
+    if (arguments.length === 0) {
+      return selector.filter();
+    } else {
+      return selector.filter(predicate);
+    }
   }
 
   max(that: Item): Item {
@@ -493,6 +499,16 @@ export abstract class Item implements HashCode, Equivalent, Comparable, Debug, D
 
   iterator(): Cursor<Item> {
     return Cursor.unary(this);
+  }
+
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof Item) {
+      return ItemInterpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   /**

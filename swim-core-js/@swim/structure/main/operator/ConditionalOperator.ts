@@ -14,8 +14,10 @@
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item} from "../Item";
 import {Operator} from "../Operator";
+import {ConditionalOperatorInterpolator} from "../"; // forward import
 import {AnyInterpreter, Interpreter} from "../Interpreter";
 
 export class ConditionalOperator extends Operator {
@@ -78,7 +80,18 @@ export class ConditionalOperator extends Operator {
     return new ConditionalOperator(ifTerm, thenTerm, elseTerm);
   }
 
-  typeOrder() {
+  interpolateTo(that: ConditionalOperator): Interpolator<ConditionalOperator>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof ConditionalOperator) {
+      return ConditionalOperatorInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
+  }
+
+  typeOrder(): number {
     return 20;
   }
 

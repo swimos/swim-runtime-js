@@ -15,10 +15,10 @@
 import {Lazy} from "@swim/util";
 import type {Output} from "../output/Output";
 import {WriterException} from "./WriterException";
-import {WriterEnd} from "../"; // circular import
-import {WriterDone} from "../"; // circular import
-import {WriterError} from "../"; // circular import
-import {WriterSequence} from "../"; // circular import
+import {WriterEnd} from "../"; // forward import
+import {WriterDone} from "../"; // forward import
+import {WriterError} from "../"; // forward import
+import {WriterSequence} from "../"; // forward import
 
 /**
  * Continuation of how to write subsequent [[Output]] tokens to a stream.

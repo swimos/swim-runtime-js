@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Test, Exam} from "@swim/unit";
-
 import {GeoSegment, GeoSpline} from "@swim/geo";
 
 export class GeoSplineBuilderSpec extends Spec {

@@ -17,13 +17,26 @@ export {
   Transformation,
   Transform,
 } from "./Transform";
+
 export {IdentityTransform} from "./IdentityTransform";
+
 export {TranslateTransform} from "./TranslateTransform";
+export {TranslateTransformInterpolator} from "./TranslateTransformInterpolator";
+
 export {ScaleTransform} from "./ScaleTransform";
+export {ScaleTransformInterpolator} from "./ScaleTransformInterpolator";
+
 export {RotateTransform} from "./RotateTransform";
+export {RotateTransformInterpolator} from "./RotateTransformInterpolator";
+
 export {SkewTransform} from "./SkewTransform";
+export {SkewTransformInterpolator} from "./SkewTransformInterpolator";
+
 export {AffineTransform} from "./AffineTransform";
+export {AffineTransformInterpolator} from "./AffineTransformInterpolator";
+
 export {TransformList} from "./TransformList";
+export {TransformListInterpolator} from "./TransformListInterpolator";
 
 export {TranslateTransformParser} from "./TranslateTransformParser";
 export {ScaleTransformParser} from "./ScaleTransformParser";
@@ -32,13 +45,5 @@ export {SkewTransformParser} from "./SkewTransformParser";
 export {AffineTransformParser} from "./AffineTransformParser";
 export {TransformListParser} from "./TransformListParser";
 export {TransformParser} from "./TransformParser";
-
-export {TransformInterpolator} from "./TransformInterpolator";
-export {TranslateTransformInterpolator} from "./TranslateTransformInterpolator";
-export {ScaleTransformInterpolator} from "./ScaleTransformInterpolator";
-export {RotateTransformInterpolator} from "./RotateTransformInterpolator";
-export {SkewTransformInterpolator} from "./SkewTransformInterpolator";
-export {AffineTransformInterpolator} from "./AffineTransformInterpolator";
-export {TransformListInterpolator} from "./TransformListInterpolator";
 
 export {TransformForm} from "./TransformForm";

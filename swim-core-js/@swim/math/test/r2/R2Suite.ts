@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {CurveR2ParserSpec} from "./CurveR2ParserSpec";
 import {SplineR2BuilderSpec} from "./SplineR2BuilderSpec";
 import {SplineR2ParserSpec} from "./SplineR2ParserSpec";

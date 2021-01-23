@@ -18,8 +18,8 @@ import type {Parser} from "../parser/Parser";
 import type {Writer} from "../writer/Writer";
 import {Format} from "../format/Format";
 import {Unicode} from "../unicode/Unicode";
-import {Base10NumberParser} from "../"; // circular import
-import {Base10IntegerWriter} from "../"; // circular import
+import {Base10NumberParser} from "../"; // forward import
+import {Base10IntegerWriter} from "../"; // forward import
 
 /**
  * Base-10 (decimal) encoding [[Parser]]/[[Writer]] factory.

@@ -14,6 +14,7 @@
 
 import {AnyItem, Item} from "./Item";
 import type {Builder} from "@swim/util";
+import type {Interpolator} from "@swim/mapping";
 import type {Field} from "./Field";
 import {ValueBuilder} from "./ValueBuilder";
 import type {Record} from "./Record";
@@ -580,6 +581,13 @@ export abstract class Value extends Item {
 
   commit(): this {
     return this;
+  }
+
+  interpolateTo(that: Value): Interpolator<Value>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    return super.interpolateTo(that);
   }
 
   keyEquals(key: unknown): boolean {

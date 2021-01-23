@@ -216,7 +216,7 @@ export class RecordModel extends AbstractRecordOutlet {
 
   push(...newItems: AnyItem[]): number {
     let i = this._state.length;
-    const n = this._state.push.apply(this._state, arguments as unknown as AnyItem[]);
+    const n = this._state.push(...newItems);
     while (i < n) {
       const newItem = this._state.get(i);
       if (newItem instanceof Field) {
@@ -234,7 +234,7 @@ export class RecordModel extends AbstractRecordOutlet {
     }
     start = Math.max(0, start);
     deleteCount = Math.max(0, deleteCount);
-    const deleted = this._state.splice.apply(this._state, arguments as any);
+    const deleted = this._state.splice(start, deleteCount, ...newItems);
     for (let i = 0; i < deleted.length; i += 1) {
       const oldItem = deleted[i];
       if (oldItem instanceof Field) {
@@ -418,7 +418,7 @@ export class RecordModel extends AbstractRecordOutlet {
   }
 
   static of(...items: AnyItem[]): RecordModel {
-    return RecordModel.from(Record.of.apply(void 0, arguments as unknown as AnyItem[]));
+    return RecordModel.from(Record.of(...items));
   }
 
   static globalScope(): RecordModel {

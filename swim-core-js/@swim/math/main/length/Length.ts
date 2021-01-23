@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Comparable, Equivalent, HashCode} from "@swim/util";
+import type {HashCode, Equivalent, Compare} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import {Attr, Value, Form} from "@swim/structure";
+import {LengthInterpolator} from "../"; // forward import
 import type {PxLength} from "./PxLength";
 import type {EmLength} from "./EmLength";
 import type {RemLength} from "./RemLength";
@@ -27,7 +29,7 @@ export type LengthUnits = "px" | "em" | "rem" | "%" | "";
 
 export type AnyLength = Length | string | number;
 
-export abstract class Length implements HashCode, Equivalent, Comparable, Debug {
+export abstract class Length implements Interpolate<Length>, HashCode, Equivalent, Compare, Debug {
   isDefined(): boolean {
     return this.value !== 0;
   }
@@ -122,6 +124,16 @@ export abstract class Length implements HashCode, Equivalent, Comparable, Debug 
 
   toCssValue(): CSSUnitValue | undefined {
     return void 0; // conditionally overridden when CSS Typed OM is available
+  }
+
+  interpolateTo(that: Length): Interpolator<Length>;
+  interpolateTo(that: unknown): Interpolator<Length> | null;
+  interpolateTo(that: unknown): Interpolator<Length> | null {
+    if (that instanceof Length) {
+      return LengthInterpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   abstract compareTo(that: unknown): number;

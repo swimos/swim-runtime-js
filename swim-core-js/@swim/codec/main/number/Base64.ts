@@ -20,8 +20,8 @@ import type {Writer} from "../writer/Writer";
 import {Format} from "../format/Format";
 import {Binary} from "../binary/Binary";
 import {Unicode} from "../unicode/Unicode";
-import {Base64Parser} from "../"; // circular import
-import {Base64Writer} from "../"; // circular import
+import {Base64Parser} from "../"; // forward import
+import {Base64Writer} from "../"; // forward import
 
 /**
  * Base-64 (7-bit ASCII) encoding [[Parser]]/[[Writer]] factory.

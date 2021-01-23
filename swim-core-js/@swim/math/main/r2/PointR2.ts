@@ -14,9 +14,11 @@
 
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {R2Function} from "./R2Function";
 import {AnyVectorR2, VectorR2} from "./VectorR2";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
+import {PointR2Interpolator} from "../"; // forward import
 
 export type AnyPointR2 = PointR2 | PointR2Init | PointR2Tuple;
 
@@ -27,7 +29,7 @@ export interface PointR2Init {
 
 export type PointR2Tuple = [number, number];
 
-export class PointR2 extends ShapeR2 implements HashCode, Equivalent, Debug {
+export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _x: number;
   /** @hidden */
@@ -114,6 +116,16 @@ export class PointR2 extends ShapeR2 implements HashCode, Equivalent, Debug {
       x: this._x,
       y: this._y,
     };
+  }
+
+  interpolateTo(that: PointR2): Interpolator<PointR2>;
+  interpolateTo(that: unknown): Interpolator<PointR2> | null;
+  interpolateTo(that: unknown): Interpolator<PointR2> | null {
+    if (that instanceof PointR2) {
+      return PointR2Interpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {

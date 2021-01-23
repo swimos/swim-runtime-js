@@ -14,10 +14,12 @@
 
 import {Murmur3, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {AnyTransform, Transform} from "./Transform";
 import {AffineTransform} from "./AffineTransform";
+import {TransformListInterpolator} from "../"; // forward import
 
 export class TransformList extends Transform {
   /** @hidden */
@@ -115,6 +117,17 @@ export class TransformList extends Transform {
       record.push(transforms[i]!.toValue());
     }
     return record;
+  }
+
+  interpolateTo(that: TransformList): Interpolator<TransformList>;
+  interpolateTo(that: Transform): Interpolator<Transform>;
+  interpolateTo(that: unknown): Interpolator<Transform> | null;
+  interpolateTo(that: unknown): Interpolator<Transform> | null {
+    if (that instanceof TransformList) {
+      return TransformListInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   conformsTo(that: Transform): boolean {

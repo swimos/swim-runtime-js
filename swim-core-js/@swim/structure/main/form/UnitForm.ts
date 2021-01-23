@@ -51,11 +51,19 @@ export class UnitForm<T, U = never> extends Form<T, U> {
   }
 
   mold(object: T | U, item?: Item): Item {
-    return this._form.mold.apply(this._form, arguments as unknown as [T | U, Item?]);
+    if (arguments.length === 1) {
+      return this._form.mold(object);
+    } else {
+      return this._form.mold(object, item);
+    }
   }
 
   cast(item: Item, object?: T): T | undefined {
-    return this._form.cast.apply(this._form, arguments as unknown as [Item, T?]);
+    if (arguments.length === 1) {
+      return this._form.cast(item);
+    } else {
+      return this._form.cast(item, object);
+    }
   }
 }
 Form.UnitForm = UnitForm;

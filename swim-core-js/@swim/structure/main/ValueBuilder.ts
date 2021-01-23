@@ -29,8 +29,8 @@ export class ValueBuilder implements Builder<Item, Value> {
   }
 
   push(...items: Item[]): void {
-    for (let i = 0, n = arguments.length; i < n; i += 1) {
-      const item = arguments[i] as Item;
+    for (let i = 0, n = items.length; i < n; i += 1) {
+      const item = items[i]!;
       if (item instanceof Field) {
         return this.pushField(item);
       } else if (item instanceof Value) {

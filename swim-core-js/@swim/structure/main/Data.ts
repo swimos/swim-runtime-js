@@ -14,6 +14,7 @@
 
 import {Random, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Input, OutputSettings, Output, Writer, Unicode, Base16, Base64} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item} from "./Item";
 import {Value} from "./Value";
 import {DataOutput} from "./DataOutput";
@@ -288,6 +289,13 @@ export class Data extends Value {
     const output = Unicode.stringOutput();
     this.writeBase64(output, base64);
     return output.bind();
+  }
+
+  interpolateTo(that: Data): Interpolator<Data>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    return super.interpolateTo(that);
   }
 
   typeOrder(): number {

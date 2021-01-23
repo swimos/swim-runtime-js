@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {ItemOrderSpec} from "./ItemOrderSpec";
 import {RecordMapSpec} from "./RecordMapSpec";
 import {RecordMapViewSpec} from "./RecordMapViewSpec";

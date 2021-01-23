@@ -14,10 +14,12 @@
 
 import {Murmur3, Numbers, Constructors, Cursor, Builder} from "@swim/util";
 import type {Output} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
 import type {Field} from "./Field";
 import {AnyValue, Value} from "./Value";
 import {RecordCursor} from "./RecordCursor";
+import {RecordInterpolator} from "./"; // forward import
 import type {AnyText} from "./Text";
 import type {AnyNum} from "./Num";
 import {AnyInterpreter, Interpreter} from "./Interpreter";
@@ -500,13 +502,13 @@ export abstract class Record extends Value implements Builder<Item, Record> {
 
   appended(...items: AnyItem[]): Record {
     const record = this.isMutable() ? this : this.branch();
-    record.push.apply(record, arguments as unknown as AnyItem[]);
+    record.push(...items);
     return record;
   }
 
   prepended(...items: AnyItem[]): Record {
     const record = this.isMutable() ? this : this.branch();
-    record.splice.apply(record, Array.prototype.concat.apply([0, 0], arguments as unknown as any[]) as any);
+    record.splice(0, 0, ...items);
     return record;
   }
 
@@ -518,8 +520,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
 
   concat(...items: AnyItem[]): Record {
     const record = this.isMutable() ? this : this.branch();
-    for (let i = 0, n = arguments.length; i < n; i += 1) {
-      Item.fromAny(arguments[i]).forEach(function (item: Item): void {
+    for (let i = 0, n = items.length; i < n; i += 1) {
+      Item.fromAny(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });
     }
@@ -527,16 +529,28 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   slice(lower?: number, upper?: number): Record {
-    return this.subRecord.apply(this, arguments as unknown as [number?, number?]).branch();
+    return this.subRecord(lower, upper).branch();
   }
 
   attr(key: AnyText, value?: AnyValue): this {
-    this.push(Item.Attr.of.apply(void 0, arguments as unknown as [AnyText, AnyValue?]));
+    let field: Field;
+    if (arguments.length === 1) {
+      field = Item.Attr.of(key);
+    } else {
+      field = Item.Attr.of(key, value);
+    }
+    this.push(field);
     return this;
   }
 
   slot(key: AnyValue, value?: AnyValue): this {
-    this.push(Item.Slot.of.apply(void 0, arguments as unknown as [AnyValue, AnyValue?]));
+    let field: Field;
+    if (arguments.length === 1) {
+      field = Item.Slot.of(key);
+    } else {
+      field = Item.Slot.of(key, value);
+    }
+    this.push(field);
     return this;
   }
 
@@ -546,7 +560,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   items(...items: AnyItem[]): this {
-    this.push.apply(this, arguments as unknown as AnyItem[]);
+    this.push(this, ...items);
     return this;
   }
 
@@ -718,6 +732,17 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return new RecordCursor(this);
   }
 
+  interpolateTo(that: Record): Interpolator<Record>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof Record) {
+      return RecordInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
+  }
+
   typeOrder(): number {
     return 3;
   }
@@ -832,7 +857,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   static of(...items: AnyItem[]): Record {
-    return Record.RecordMap.of.apply(void 0, arguments as unknown as AnyItem[]);
+    return Record.RecordMap.of(...items);
   }
 
   static fromAny(value: AnyRecord): Record {
@@ -861,7 +886,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     for (const key in object) {
       const value = object[key];
       if (key.charCodeAt(0) === 36/*'$'*/) {
-        if (!value || typeof value !== "object" || !value.hasOwnProperty("$key")) {
+        if (!value || typeof value !== "object" || !Object.prototype.hasOwnProperty.call(value, "$key")) {
           record.push(Value.fromAny(value));
         } else {
           record.push(Item.Field.of((value as any).$key, (value as any).$value));

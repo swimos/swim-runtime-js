@@ -137,10 +137,10 @@ export class Interpreter {
   }
 
   static of(...objects: AnyItem[]): Interpreter {
-    const n = arguments.length;
+    const n = objects.length;
     const scopes = new Array(Interpreter.expand(n));
     for (let i = 0; i < n; i += 1) {
-      const scope = Item.fromAny(arguments[i]);
+      const scope = Item.fromAny(objects[i]);
       scopes[i] = scope;
     }
     return new Interpreter(InterpreterSettings.standard(), scopes, n);

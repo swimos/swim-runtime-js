@@ -14,6 +14,7 @@
 
 import {Numbers, Constructors, Cursor} from "@swim/util";
 import type {Output} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
 import type {Record} from "./Record";
@@ -74,8 +75,8 @@ export class Absent extends Value {
 
   concat(...items: AnyItem[]): Record {
     const record = Value.Record.create();
-    for (let i = 0, n = arguments.length; i < n; i += 1) {
-      Item.fromAny(arguments[i]).forEach(function (item: Item): void {
+    for (let i = 0, n = items.length; i < n; i += 1) {
+      Item.fromAny(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });
     }
@@ -130,6 +131,13 @@ export class Absent extends Value {
 
   iterator(): Cursor<Item> {
     return Cursor.empty();
+  }
+
+  interpolateTo(that: Absent): Interpolator<Absent>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    return super.interpolateTo(that);
   }
 
   typeOrder(): number {

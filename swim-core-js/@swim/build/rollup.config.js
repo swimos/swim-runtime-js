@@ -17,6 +17,7 @@ const main = {
   },
   external: [
     "child_process",
+    "eslint",
     "fs",
     "path",
     "rollup",

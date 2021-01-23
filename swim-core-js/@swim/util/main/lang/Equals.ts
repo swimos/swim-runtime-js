@@ -22,25 +22,23 @@ export interface Equals {
   equals(that: unknown): boolean;
 }
 
-export const Equals = {} as {
-  /**
-   * Returns `true` if `x` conforms to [[Equals]] and is [[Equals.equals equal]]
-   * to `y`, otherwise returns `x === y`.
-   */
-  equal(x: unknown, y: unknown): boolean;
-
-  /**
-   * Returns `true` if `object` conforms to the [[Equals]] interface.
-   */
-  is(object: unknown): object is Equals;
-};
-
-Equals.equal = function (x: unknown, y: unknown): boolean {
+export const Equals = function (x: unknown, y: unknown): boolean {
   if (x !== void 0 && x !== null && typeof (x as Equals).equals === "function") {
     return (x as Equals).equals(y);
   } else {
     return x === y;
   }
+} as {
+  /**
+   * Returns `true` if `x` conforms to [[Equals]] and is [[Equals.equals
+   * equal]] to `y`, otherwise returns `x === y`.
+   */
+  (x: unknown, y: unknown): boolean;
+
+  /**
+   * Returns `true` if `object` conforms to the [[Equals]] interface.
+   */
+  is(object: unknown): object is Equals;
 };
 
 Equals.is = function (object: unknown): object is Equals {

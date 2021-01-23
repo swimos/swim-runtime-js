@@ -12,80 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Interpolator} from "@swim/interpolate";
-import {AnyCircleR2, CircleR2} from "./CircleR2";
-import {ShapeR2Interpolator} from "./ShapeR2Interpolator";
+import {__extends} from "tslib";
+import {Interpolator} from "@swim/mapping";
+import {CircleR2} from "./CircleR2";
 
-export class CircleR2Interpolator extends ShapeR2Interpolator<CircleR2, AnyCircleR2> {
-  /** @hidden */
-  readonly cx: number;
-  /** @hidden */
-  readonly dcx: number;
-  /** @hidden */
-  readonly cy: number;
-  /** @hidden */
-  readonly dcy: number;
-  /** @hidden */
-  readonly r: number;
-  /** @hidden */
-  readonly dr: number;
-
-  constructor(s0: CircleR2, s1: CircleR2) {
-    super();
-    this.cx = s0.cx;
-    this.dcx = s1.cx - this.cx;
-    this.cy = s0.cy;
-    this.dcy = s1.cy - this.cy;
-    this.r = s0.r;
-    this.dr = s1.r - this.r;
-  }
-
-  interpolate(u: number): CircleR2 {
-    const cx = this.cx + this.dcx * u;
-    const cy = this.cy + this.dcy * u;
-    const r = this.r + this.dr * u;
+/** @hidden */
+export function CircleR2Interpolator(s0: CircleR2, s1: CircleR2): Interpolator<CircleR2> {
+  const interpolator = function (u: number): CircleR2 {
+    const s0 = interpolator[0];
+    const s1 = interpolator[1];
+    const cx = s0._cx + u * (s1._cx - s0._cx);
+    const cy = s0._cy + u * (s1._cy - s0._cy);
+    const r = s0._r + u * (s1._r - s0._r);
     return new CircleR2(cx, cy, r);
-  }
-
-  deinterpolate(s: AnyCircleR2): number {
-    return 0;
-  }
-
-  range(): readonly [CircleR2, CircleR2];
-  range(ss: readonly [AnyCircleR2, AnyCircleR2]): CircleR2Interpolator;
-  range(s0: AnyCircleR2, s1: AnyCircleR2): CircleR2Interpolator;
-  range(s0?: readonly [AnyCircleR2, AnyCircleR2] | AnyCircleR2,
-        s1?: AnyCircleR2): readonly [CircleR2, CircleR2] | CircleR2Interpolator {
-    if (arguments.length === 0) {
-      return [this.interpolate(0), this.interpolate(1)];
-    } else if (arguments.length === 1) {
-      s0 = s0 as readonly [AnyCircleR2, AnyCircleR2];
-      return CircleR2Interpolator.between(s0[0], s0[1]);
-    } else {
-      return CircleR2Interpolator.between(s0 as AnyCircleR2, s1 as AnyCircleR2);
-    }
-  }
-
-  equals(that: unknown): boolean {
-    if (this === that) {
-      return true;
-    } else if (that instanceof CircleR2Interpolator) {
-      return this.cx === that.cx && this.dcx === that.dcx
-          && this.cy === that.cy && this.dcy === that.dcy
-          && this.r === that.r && this.dr === that.dr;
-    }
-    return false;
-  }
-
-  static between(s0: AnyCircleR2, s1: AnyCircleR2): CircleR2Interpolator;
-  static between(a: unknown, b: unknown): Interpolator<unknown>;
-  static between(a: unknown, b: unknown): Interpolator<unknown> {
-    if (a instanceof CircleR2 && b instanceof CircleR2) {
-      return new CircleR2Interpolator(a, b);
-    } else if (CircleR2.isAny(a) && CircleR2.isAny(b)) {
-      return new CircleR2Interpolator(CircleR2.fromAny(a), CircleR2.fromAny(b));
-    }
-    return ShapeR2Interpolator.between(a, b);
-  }
+  } as Interpolator<CircleR2>;
+  Object.setPrototypeOf(interpolator, CircleR2Interpolator.prototype);
+  Object.defineProperty(interpolator, 0, {
+    value: s0,
+    enumerable: true,
+  });
+  Object.defineProperty(interpolator, 1, {
+    value: s1,
+    enumerable: true,
+  });
+  return interpolator;
 }
-ShapeR2Interpolator.Circle = CircleR2Interpolator;
+__extends(CircleR2Interpolator, Interpolator);

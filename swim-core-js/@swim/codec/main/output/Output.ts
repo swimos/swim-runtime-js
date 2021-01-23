@@ -15,10 +15,10 @@
 import {Lazy, Builder} from "@swim/util";
 import {OutputException} from "./OutputException";
 import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
-import {OutputFull} from "../"; // circular import
-import {OutputDone} from "../"; // circular import
-import {OutputError} from "../"; // circular import
-import {Format} from "../"; // circular import
+import {OutputFull} from "../"; // forward import
+import {OutputDone} from "../"; // forward import
+import {OutputError} from "../"; // forward import
+import {Format} from "../"; // forward import
 
 /**
  * Non-blocking token stream writer.  `Output` enables incremental,

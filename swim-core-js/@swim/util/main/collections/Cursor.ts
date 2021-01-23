@@ -14,9 +14,9 @@
 
 import {Lazy} from "../lang/Lazy";
 import type {Iterator} from "./Iterator";
-import {CursorEmpty} from "../"; // circular import
-import {CursorUnary} from "../"; // circular import
-import {CursorArray} from "../"; // circular import
+import {CursorEmpty} from "../"; // forward import
+import {CursorUnary} from "../"; // forward import
+import {CursorArray} from "../"; // forward import
 
 export abstract class Cursor<T> implements Iterator<T> {
   abstract isEmpty(): boolean;

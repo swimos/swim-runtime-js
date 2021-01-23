@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Strings, HashGenCacheMap} from "@swim/util";
+import {HashCode, Compare, Strings, HashGenCacheMap} from "@swim/util";
 import type {Output, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 
 export type AnyUriHost = UriHost | string;
 
-export abstract class UriHost implements Comparable, HashCode, Debug, Display {
+export abstract class UriHost implements HashCode, Compare, Debug, Display {
   /** @hidden */
   _hashCode?: number;
 

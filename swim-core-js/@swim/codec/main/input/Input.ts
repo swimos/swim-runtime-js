@@ -16,9 +16,9 @@ import {Lazy} from "@swim/util";
 import {Mark} from "../source/Mark";
 import {InputException} from "./InputException";
 import {AnyInputSettings, InputSettings} from "./InputSettings";
-import {InputEmpty} from "../"; // circular import
-import {InputDone} from "../"; // circular import
-import {InputError} from "../"; // circular import
+import {InputEmpty} from "../"; // forward import
+import {InputDone} from "../"; // forward import
+import {InputError} from "../"; // forward import
 
 /**
  * Non-blocking token stream reader, with single token lookahead.

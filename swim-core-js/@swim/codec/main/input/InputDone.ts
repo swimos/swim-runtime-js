@@ -16,8 +16,8 @@ import type {Mark} from "../source/Mark";
 import {InputException} from "./InputException";
 import {AnyInputSettings, InputSettings} from "./InputSettings";
 import {Input} from "./Input";
-import {InputEmpty} from "../"; // circular import
-import {InputError} from "../"; // circular import
+import {InputEmpty} from "../"; // forward import
+import {InputError} from "../"; // forward import
 
 /** @hidden */
 export class InputDone extends Input {
@@ -77,7 +77,7 @@ export class InputDone extends Input {
 
   declare readonly id: string | undefined;
 
-  withId(id: string | undefined) {
+  withId(id: string | undefined): Input {
     return new InputDone(id, this.mark, this.settings);
   }
 

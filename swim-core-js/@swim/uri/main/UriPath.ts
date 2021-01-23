@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Strings, HashGenCacheSet} from "@swim/util";
+import {HashCode, Compare, Strings, HashGenCacheSet} from "@swim/util";
 import type {Output, Debug, Display} from "@swim/codec";
 import type {Form} from "@swim/structure";
 import {Uri} from "./Uri";
@@ -20,7 +20,7 @@ import type {UriPathBuilder} from "./UriPathBuilder";
 
 export type AnyUriPath = UriPath | string[] | string;
 
-export abstract class UriPath implements Comparable, HashCode, Debug, Display {
+export abstract class UriPath implements HashCode, Compare, Debug, Display {
   /** @hidden */
   _hashCode?: number;
 
@@ -131,7 +131,7 @@ export abstract class UriPath implements Comparable, HashCode, Debug, Display {
     if (arguments.length > 0) {
       const builder = new Uri.PathBuilder();
       builder.addPath(this);
-      builder.push.apply(builder, arguments as unknown as AnyUriPath[]);
+      builder.push(...components);
       return builder.bind();
     } else {
       return this;
@@ -155,7 +155,7 @@ export abstract class UriPath implements Comparable, HashCode, Debug, Display {
   prepended(...components: AnyUriPath[]): UriPath {
     if (arguments.length > 0) {
       const builder = new Uri.PathBuilder();
-      builder.push.apply(builder, arguments as unknown as AnyUriPath[]);
+      builder.push(...components);
       builder.addPath(this);
       return builder.bind();
     } else {
@@ -375,7 +375,7 @@ export abstract class UriPath implements Comparable, HashCode, Debug, Display {
 
   static of(...components: AnyUriPath[]): UriPath {
     const builder = new Uri.PathBuilder();
-    builder.push.apply(builder, arguments as unknown as UriPath[]);
+    builder.push(...components);
     return builder.bind();
   }
 
@@ -385,7 +385,7 @@ export abstract class UriPath implements Comparable, HashCode, Debug, Display {
     } else if (path instanceof UriPath) {
       return path;
     } else if (Array.isArray(path)) {
-      return UriPath.of.apply(void 0, arguments as unknown as AnyUriPath[]);
+      return UriPath.of(...path);
     } else if (typeof path === "string") {
       return UriPath.parse(path);
     } else {

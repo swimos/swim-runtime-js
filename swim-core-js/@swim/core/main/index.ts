@@ -14,8 +14,8 @@
 
 export * from "@swim/util";
 export * from "@swim/codec";
+export * from "@swim/mapping";
 export * from "@swim/collections";
-export * from "@swim/interpolate";
 export * from "@swim/structure";
 export * from "@swim/streamlet";
 export * from "@swim/dataflow";
@@ -24,4 +24,3 @@ export * from "@swim/uri";
 export * from "@swim/math";
 export * from "@swim/geo";
 export * from "@swim/time";
-export * from "@swim/scale";

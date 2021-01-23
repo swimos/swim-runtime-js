@@ -107,7 +107,7 @@ export class LambdaFunc extends Func {
     return false;
   }
 
-  hashCode() {
+  hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(LambdaFunc),
         this._bindings.hashCode()), this._template.hashCode()));
   }

@@ -16,15 +16,19 @@ export {
   AnyItem,
   Item,
 } from "./Item";
+export {ItemInterpolator} from "./ItemInterpolator";
 
 export {
   AnyField,
   Field,
 } from "./Field";
+export {FieldInterpolator} from "./FieldInterpolator";
 
 export {Attr} from "./Attr";
+export {AttrInterpolator} from "./AttrInterpolator";
 
 export {Slot} from "./Slot";
+export {SlotInterpolator} from "./SlotInterpolator";
 
 export {
   AnyValue,
@@ -39,6 +43,7 @@ export {
 export {RecordCursor} from "./RecordCursor";
 export {RecordMap} from "./RecordMap";
 export {RecordMapView} from "./RecordMapView";
+export {RecordInterpolator} from "./RecordInterpolator";
 
 export {
   AnyData,
@@ -56,6 +61,7 @@ export {
   AnyNum,
   Num,
 } from "./Num";
+export {NumInterpolator} from "./NumInterpolator";
 
 export {
   AnyBool,
@@ -95,8 +101,11 @@ export {
 } from "./Interpreter";
 
 export {BinaryOperator} from "./operator/BinaryOperator";
+export {BinaryOperatorInterpolator} from "./operator/BinaryOperatorInterpolator";
 export {UnaryOperator} from "./operator/UnaryOperator";
+export {UnaryOperatorInterpolator} from "./operator/UnaryOperatorInterpolator";
 export {ConditionalOperator} from "./operator/ConditionalOperator";
+export {ConditionalOperatorInterpolator} from "./operator/ConditionalOperatorInterpolator";
 export {OrOperator} from "./operator/OrOperator";
 export {AndOperator} from "./operator/AndOperator";
 export {BitwiseOrOperator} from "./operator/BitwiseOrOperator";
@@ -118,6 +127,7 @@ export {BitwiseNotOperator} from "./operator/BitwiseNotOperator";
 export {NegativeOperator} from "./operator/NegativeOperator";
 export {PositiveOperator} from "./operator/PositiveOperator";
 export {InvokeOperator} from "./operator/InvokeOperator";
+export {InvokeOperatorInterpolator} from "./operator/InvokeOperatorInterpolator";
 
 export {IdentitySelector} from "./selector/IdentitySelector";
 export {GetSelector} from "./selector/GetSelector";
@@ -145,14 +155,3 @@ export {ValueForm} from "./form/ValueForm";
 
 export {ValueCursor} from "./collections/ValueCursor";
 export {ValueEntryCursor} from "./collections/ValueEntryCursor";
-
-export {ItemInterpolator} from "./interpolator/ItemInterpolator";
-export {AttrInterpolator} from "./interpolator/AttrInterpolator";
-export {SlotInterpolator} from "./interpolator/SlotInterpolator";
-export {ValueInterpolator} from "./interpolator/ValueInterpolator";
-export {RecordInterpolator} from "./interpolator/RecordInterpolator";
-export {NumInterpolator} from "./interpolator/NumInterpolator";
-export {ConditionalOperatorInterpolator} from "./interpolator/ConditionalOperatorInterpolator";
-export {BinaryOperatorInterpolator} from "./interpolator/BinaryOperatorInterpolator";
-export {UnaryOperatorInterpolator} from "./interpolator/UnaryOperatorInterpolator";
-export {InvokeOperatorInterpolator} from "./interpolator/InvokeOperatorInterpolator";

@@ -21,6 +21,8 @@ export * from "./r2";
 export * from "./transform";
 
 declare global { // CSS Typed OM shim
+  /* eslint-disable no-var */
+
   interface CSSStyleValue {
   }
   var CSSStyleValue: {

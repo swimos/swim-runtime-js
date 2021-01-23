@@ -105,7 +105,7 @@ export class UriQueryParser extends Parser<UriQuery> {
           valueOutput = void 0;
           step = 1;
           continue;
-        } else if (input.isCont() && c === 38/*'%'*/) {
+        } else if (input.isCont() && c === 37/*'%'*/) {
           input = input.step();
           step = 5;
         } else if (!input.isEmpty()) {

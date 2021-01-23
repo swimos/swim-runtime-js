@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Strings, HashGenCacheSet} from "@swim/util";
+import {HashCode, Compare, Strings, HashGenCacheSet} from "@swim/util";
 import type {Output, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 import type {UriQueryBuilder} from "./UriQueryBuilder";
 
 export type AnyUriQuery = UriQuery | {[key: string]: string} | string;
 
-export abstract class UriQuery implements Comparable, HashCode, Debug, Display {
+export abstract class UriQuery implements HashCode, Compare, Debug, Display {
   /** @hidden */
   _hashCode?: number;
 

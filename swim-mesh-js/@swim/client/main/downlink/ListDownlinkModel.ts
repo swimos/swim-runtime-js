@@ -394,13 +394,13 @@ export class ListDownlinkModel extends DownlinkModel {
     }
   }
 
-  protected listWillClear() {
+  protected listWillClear(): void {
     for (let i = 0; i < this._views.length; i += 1) {
       this._views[i]!.listWillClear();
     }
   }
 
-  protected listDidClear() {
+  protected listDidClear(): void {
     for (let i = 0; i < this._views.length; i += 1) {
       this._views[i]!.listDidClear();
     }

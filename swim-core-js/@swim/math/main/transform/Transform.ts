@@ -14,6 +14,7 @@
 
 import type {HashCode, Equivalent} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {Value, Form} from "@swim/structure";
 import type {AnyLength, Length} from "../length/Length";
 import type {AnyAngle} from "../angle/Angle";
@@ -24,6 +25,7 @@ import type {ScaleTransform} from "./ScaleTransform";
 import type {RotateTransform} from "./RotateTransform";
 import type {SkewTransform} from "./SkewTransform";
 import type {AffineTransform} from "./AffineTransform";
+import {AffineTransformInterpolator} from "../"; // forward import
 import type {TransformList} from "./TransformList";
 import type {TranslateTransformParser} from "./TranslateTransformParser";
 import type {ScaleTransformParser} from "./ScaleTransformParser";
@@ -43,7 +45,7 @@ export interface Transformation {
   transform(x: AnyLength, y: AnyLength): [Length, Length];
 }
 
-export abstract class Transform implements Transformation, R2Operator, HashCode, Equivalent, Debug {
+export abstract class Transform implements Transformation, R2Operator, Interpolate<Transform>, HashCode, Equivalent, Debug {
   abstract transform(that: Transform): Transform;
   abstract transform(point: [number, number]): [number, number];
   abstract transform(x: number, y: number): [number, number];
@@ -111,6 +113,16 @@ export abstract class Transform implements Transformation, R2Operator, HashCode,
   }
 
   abstract toValue(): Value;
+
+  interpolateTo(that: Transform): Interpolator<Transform>;
+  interpolateTo(that: unknown): Interpolator<Transform> | null;
+  interpolateTo(that: unknown): Interpolator<Transform> | null {
+    if (that instanceof Transform) {
+      return AffineTransformInterpolator(this.toAffine(), that.toAffine());
+    } else {
+      return null;
+    }
+  }
 
   abstract conformsTo(that: Transform): boolean;
 

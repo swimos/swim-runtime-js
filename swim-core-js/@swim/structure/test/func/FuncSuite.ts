@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {LambdaFuncSpec} from "./LambdaFuncSpec";
 
 @Unit

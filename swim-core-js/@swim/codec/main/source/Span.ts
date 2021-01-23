@@ -16,7 +16,7 @@ import {Murmur3, Constructors} from "@swim/util";
 import {Tag} from "./Tag";
 import {Mark} from "./Mark";
 import type {Output} from "../output/Output";
-import {Format} from "../"; // circular import
+import {Format} from "../"; // forward import
 
 /**
  * Description of a source range, identified by a closed interval between start

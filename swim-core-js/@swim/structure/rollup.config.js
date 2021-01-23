@@ -13,7 +13,7 @@ const main = {
     globals: {
       "@swim/util": "swim",
       "@swim/codec": "swim",
-      "@swim/interpolate": "swim",
+      "@swim/mapping": "swim",
     },
     sourcemap: true,
     interop: false,
@@ -22,7 +22,7 @@ const main = {
   external: [
     "@swim/util",
     "@swim/codec",
-    "@swim/interpolate",
+    "@swim/mapping",
   ],
   plugins: [
     nodeResolve({moduleDirectories: ["../..", "node_modules"]}),

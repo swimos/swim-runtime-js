@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Strings, HashGenCacheMap} from "@swim/util";
+import {HashCode, Compare, Strings, HashGenCacheMap} from "@swim/util";
 import {Output, Format, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 
 export type AnyUriPort = UriPort | number | string;
 
-export class UriPort implements Comparable, HashCode, Debug, Display {
+export class UriPort implements HashCode, Compare, Debug, Display {
   /** @hidden */
   readonly _number: number;
 
@@ -93,7 +93,7 @@ export class UriPort implements Comparable, HashCode, Debug, Display {
     return UriPort._undefined;
   }
 
-  static from(number: number) {
+  static from(number: number): UriPort {
     if (number > 0) {
       const cache = UriPort.cache();
       const port = cache.get(number);

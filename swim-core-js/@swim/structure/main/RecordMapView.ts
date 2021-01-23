@@ -280,9 +280,9 @@ export class RecordMapView extends Record {
       throw new Error("immutable");
     }
     if ((this._record._flags & Record.ALIASED) !== 0) {
-      this.pushAliased.apply(this, arguments as unknown as AnyItem[]);
+      this.pushAliased(...newItems);
     } else {
-      this.pushMutable.apply(this, arguments as unknown as AnyItem[]);
+      this.pushMutable(...newItems);
     }
     return this.length;
   }

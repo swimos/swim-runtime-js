@@ -12,88 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Interpolator} from "@swim/interpolate";
-import {AnySegmentR2, SegmentR2} from "./SegmentR2";
-import {ShapeR2Interpolator} from "./ShapeR2Interpolator";
+import {__extends} from "tslib";
+import {Interpolator} from "@swim/mapping";
+import {SegmentR2} from "./SegmentR2";
 
-export class SegmentR2Interpolator extends ShapeR2Interpolator<SegmentR2, AnySegmentR2> {
-  /** @hidden */
-  readonly x0: number;
-  /** @hidden */
-  readonly dx0: number;
-  /** @hidden */
-  readonly y0: number;
-  /** @hidden */
-  readonly dy0: number;
-  /** @hidden */
-  readonly x1: number;
-  /** @hidden */
-  readonly dx1: number;
-  /** @hidden */
-  readonly y1: number;
-  /** @hidden */
-  readonly dy1: number;
-
-  constructor(s0: SegmentR2, s1: SegmentR2) {
-    super();
-    this.x0 = s0.x0;
-    this.dx0 = s1.x0 - this.x0;
-    this.y0 = s0.y0;
-    this.dy0 = s1.y0 - this.y0;
-    this.x1 = s0.x1;
-    this.dx1 = s1.x1 - this.x1;
-    this.y1 = s0.y1;
-    this.dy1 = s1.y1 - this.y1;
-  }
-
-  interpolate(u: number): SegmentR2 {
-    const x0 = this.x0 + this.dx0 * u;
-    const y0 = this.y0 + this.dy0 * u;
-    const x1 = this.x1 + this.dx1 * u;
-    const y1 = this.y1 + this.dy1 * u;
+/** @hidden */
+export function SegmentR2Interpolator(s0: SegmentR2, s1: SegmentR2): Interpolator<SegmentR2> {
+  const interpolator = function (u: number): SegmentR2 {
+    const s0 = interpolator[0];
+    const s1 = interpolator[1];
+    const x0 = s0._x0 + u * (s1._x0 - s0._x0);
+    const y0 = s0._y0 + u * (s1._y0 - s0._y0);
+    const x1 = s0._x1 + u * (s1._x1 - s0._x1);
+    const y1 = s0._y1 + u * (s1._y1 - s0._y1);
     return new SegmentR2(x0, y0, x1, y1);
-  }
-
-  deinterpolate(s: AnySegmentR2): number {
-    return 0;
-  }
-
-  range(): readonly [SegmentR2, SegmentR2];
-  range(ss: readonly [AnySegmentR2, AnySegmentR2]): SegmentR2Interpolator;
-  range(s0: AnySegmentR2, s1: AnySegmentR2): SegmentR2Interpolator;
-  range(s0?: readonly [AnySegmentR2, AnySegmentR2] | AnySegmentR2,
-        s1?: AnySegmentR2): readonly [SegmentR2, SegmentR2] | SegmentR2Interpolator {
-    if (arguments.length === 0) {
-      return [this.interpolate(0), this.interpolate(1)];
-    } else if (arguments.length === 1) {
-      s0 = s0 as readonly [AnySegmentR2, AnySegmentR2];
-      return SegmentR2Interpolator.between(s0[0], s0[1]);
-    } else {
-      return SegmentR2Interpolator.between(s0 as AnySegmentR2, s1 as AnySegmentR2);
-    }
-  }
-
-  equals(that: unknown): boolean {
-    if (this === that) {
-      return true;
-    } else if (that instanceof SegmentR2Interpolator) {
-      return this.x0 === that.x0 && this.dx0 === that.dx0
-          && this.y0 === that.y0 && this.dy0 === that.dy0
-          && this.x1 === that.x1 && this.dx1 === that.dx1
-          && this.y1 === that.y1 && this.dy1 === that.dy1;
-    }
-    return false;
-  }
-
-  static between(s0: AnySegmentR2, s1: AnySegmentR2): SegmentR2Interpolator;
-  static between(a: unknown, b: unknown): Interpolator<unknown>;
-  static between(a: unknown, b: unknown): Interpolator<unknown> {
-    if (a instanceof SegmentR2 && b instanceof SegmentR2) {
-      return new SegmentR2Interpolator(a, b);
-    } else if (SegmentR2.isAny(a) && SegmentR2.isAny(b)) {
-      return new SegmentR2Interpolator(SegmentR2.fromAny(a), SegmentR2.fromAny(b));
-    }
-    return ShapeR2Interpolator.between(a, b);
-  }
+  } as Interpolator<SegmentR2>;
+  Object.setPrototypeOf(interpolator, SegmentR2Interpolator.prototype);
+  Object.defineProperty(interpolator, 0, {
+    value: s0,
+    enumerable: true,
+  });
+  Object.defineProperty(interpolator, 1, {
+    value: s1,
+    enumerable: true,
+  });
+  return interpolator;
 }
-ShapeR2Interpolator.Segment = SegmentR2Interpolator;
+__extends(SegmentR2Interpolator, Interpolator);

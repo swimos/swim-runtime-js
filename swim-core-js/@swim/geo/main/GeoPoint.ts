@@ -14,9 +14,11 @@
 
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Output, Debug, Format} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {PointR2} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
+import {GeoPointInterpolator} from "./"; // forward import
 
 export type AnyGeoPoint = GeoPoint | GeoPointInit | GeoPointTuple;
 
@@ -30,7 +32,7 @@ export type GeoPointTuple = [number, number];
 /**
  * A geographic point represented by a WGS84 longitude and latitude.
  */
-export class GeoPoint extends GeoShape implements HashCode, Equivalent, Debug {
+export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _lng: number;
   /** @hidden */
@@ -101,6 +103,16 @@ export class GeoPoint extends GeoShape implements HashCode, Equivalent, Debug {
       lng: this._lng,
       lat: this._lat,
     };
+  }
+
+  interpolateTo(that: GeoPoint): Interpolator<GeoPoint>;
+  interpolateTo(that: unknown): Interpolator<GeoPoint> | null;
+  interpolateTo(that: unknown): Interpolator<GeoPoint> | null {
+    if (that instanceof GeoPoint) {
+      return GeoPointInterpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {

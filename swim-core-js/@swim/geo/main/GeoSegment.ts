@@ -14,11 +14,13 @@
 
 import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import {SegmentR2} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import {GeoCurve} from "./GeoCurve";
+import {GeoSegmentInterpolator} from "./"; // forward import
 
 export type AnyGeoSegment = GeoSegment | GeoSegmentInit;
 
@@ -29,7 +31,7 @@ export interface GeoSegmentInit {
   lat1: number;
 }
 
-export class GeoSegment extends GeoCurve implements HashCode, Debug {
+export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, HashCode, Debug {
   /** @hidden */
   readonly _lng0: number;
   /** @hidden */
@@ -200,6 +202,16 @@ export class GeoSegment extends GeoCurve implements HashCode, Debug {
       lng1: this._lng1,
       lat1: this._lat1,
     };
+  }
+
+  interpolateTo(that: GeoSegment): Interpolator<GeoSegment>;
+  interpolateTo(that: unknown): Interpolator<GeoSegment> | null;
+  interpolateTo(that: unknown): Interpolator<GeoSegment> | null {
+    if (that instanceof GeoSegment) {
+      return GeoSegmentInterpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {

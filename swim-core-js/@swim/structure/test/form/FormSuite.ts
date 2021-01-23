@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {StringFormSpec} from "./StringFormSpec";
 import {NumberFormSpec} from "./NumberFormSpec";
 import {BooleanFormSpec} from "./BooleanFormSpec";

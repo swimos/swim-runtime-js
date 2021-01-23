@@ -12,84 +12,94 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Interpolator} from "@swim/interpolate";
-import type {AnyTransform, Transform} from "./Transform";
+import {__extends} from "tslib";
+import {Interpolator} from "@swim/mapping";
+import type {Transform} from "./Transform";
 import {TransformList} from "./TransformList";
-import {TransformInterpolator} from "./TransformInterpolator";
 
 /** @hidden */
-export class TransformListInterpolator extends TransformInterpolator<TransformList> {
+export declare abstract class TransformListInterpolator {
   /** @hidden */
-  readonly interpolators: ReadonlyArray<TransformInterpolator>;
+  declare readonly interpolators: ReadonlyArray<Interpolator<Transform>>;
 
-  constructor(f0: TransformList, f1: TransformList) {
-    super();
-    const transforms0 = f0.transforms;
-    const transforms1 = f1.transforms;
-    const interpolatorCount = Math.min(transforms0.length, transforms1.length);
-    const interpolators = new Array<TransformInterpolator>(interpolatorCount);
+  get 0(): TransformList;
+
+  get 1(): TransformList;
+
+  equals(that: unknown): boolean;
+}
+
+export interface TransformListInterpolator extends Interpolator<TransformList> {
+}
+
+/** @hidden */
+export function TransformListInterpolator(f0: TransformList, f1: TransformList): TransformListInterpolator {
+  const interpolator = function (u: number): TransformList {
+    const interpolators = interpolator.interpolators;
+    const interpolatorCount = interpolators.length;
+    const transforms = new Array<Transform>(interpolatorCount);
     for (let i = 0; i < interpolatorCount; i += 1) {
-      interpolators[i] = TransformInterpolator.between(transforms0[i]!, transforms1[i]!);
+      transforms[i] = interpolators[i]!(u);
     }
-    this.interpolators = interpolators;
+    return new TransformList(transforms);
+  } as TransformListInterpolator;
+  Object.setPrototypeOf(interpolator, TransformListInterpolator.prototype);
+  const transforms0 = f0.transforms;
+  const transforms1 = f1.transforms;
+  const interpolatorCount = Math.min(transforms0.length, transforms1.length);
+  const interpolators = new Array<Interpolator<Transform>>(interpolatorCount);
+  for (let i = 0; i < interpolatorCount; i += 1) {
+    interpolators[i] = transforms0[i]!.interpolateTo(transforms1[i]!);
   }
+  Object.defineProperty(interpolator, "interpolators", {
+    value: interpolators,
+    enumerable: true,
+  });
+  return interpolator;
+}
+__extends(TransformListInterpolator, Interpolator);
 
-  interpolate(u: number): TransformList {
+Object.defineProperty(TransformListInterpolator.prototype, 0, {
+  get(this: TransformListInterpolator): TransformList {
     const interpolators = this.interpolators;
     const interpolatorCount = interpolators.length;
     const transforms = new Array<Transform>(interpolatorCount);
     for (let i = 0; i < interpolatorCount; i += 1) {
-      transforms[i] = interpolators[i]!.interpolate(u);
+      transforms[i] = interpolators[i]![0];
     }
     return new TransformList(transforms);
-  }
+  },
+  enumerable: true,
+  configurable: true,
+});
 
-  deinterpolate(f: AnyTransform): number {
-    return 0; // not implemented
-  }
-
-  range(): readonly [TransformList, TransformList];
-  range(fs: readonly [TransformList, TransformList]): TransformListInterpolator;
-  range(f0: TransformList, f1: TransformList): TransformListInterpolator;
-  range(fs: readonly [AnyTransform, AnyTransform]): TransformInterpolator;
-  range(f0: AnyTransform, f1: AnyTransform): TransformInterpolator;
-  range(f0?: readonly [AnyTransform, AnyTransform] | AnyTransform,
-        f1?: AnyTransform): readonly [TransformList, TransformList] | TransformInterpolator {
-    if (arguments.length === 0) {
-      return [this.interpolate(0), this.interpolate(1)];
-    } else if (arguments.length === 1) {
-      f0 = f0 as readonly [AnyTransform, AnyTransform];
-      return TransformListInterpolator.between(f0[0], f0[1]);
-    } else {
-      return TransformListInterpolator.between(f0 as AnyTransform, f1 as AnyTransform);
+Object.defineProperty(TransformListInterpolator.prototype, 1, {
+  get(this: TransformListInterpolator): TransformList {
+    const interpolators = this.interpolators;
+    const interpolatorCount = interpolators.length;
+    const transforms = new Array<Transform>(interpolatorCount);
+    for (let i = 0; i < interpolatorCount; i += 1) {
+      transforms[i] = interpolators[i]![1];
     }
-  }
+    return new TransformList(transforms);
+  },
+  enumerable: true,
+  configurable: true,
+});
 
-  equals(that: unknown): boolean {
-    if (this === that) {
-      return true;
-    } else if (that instanceof TransformListInterpolator) {
-      const n = this.interpolators.length;
-      if (n === that.interpolators.length) {
-        for (let i = 0; i < n; i += 1) {
-          if (!this.interpolators[i]!.equals(that.interpolators[i]!)) {
-            return false;
-          }
+TransformListInterpolator.prototype.equals = function (that: unknown): boolean {
+  if (this === that) {
+    return true;
+  } else if (that instanceof TransformListInterpolator) {
+    const n = this.interpolators.length;
+    if (n === that.interpolators.length) {
+      for (let i = 0; i < n; i += 1) {
+        if (!this.interpolators[i]!.equals(that.interpolators[i]!)) {
+          return false;
         }
-        return true;
       }
+      return true;
     }
-    return false;
   }
-
-  static between(f0: TransformList, f1: TransformList): TransformListInterpolator;
-  static between(f0: AnyTransform, f1: AnyTransform): TransformInterpolator;
-  static between(a: unknown, b: unknown): Interpolator<unknown>;
-  static between(a: unknown, b: unknown): Interpolator<unknown> {
-    if (a instanceof TransformList && b instanceof TransformList && a.conformsTo(b)) {
-      return new TransformListInterpolator(a, b);
-    }
-    return TransformInterpolator.between(a, b);
-  }
-}
-TransformInterpolator.List = TransformListInterpolator;
+  return false;
+};

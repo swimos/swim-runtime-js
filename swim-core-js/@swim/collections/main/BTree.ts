@@ -14,7 +14,7 @@
 
 import type {Cursor, ReducedMap} from "@swim/util";
 import {BTreeContext} from "./BTreeContext";
-import {BTreePage} from "./"; // circular import
+import {BTreePage} from "./"; // forward import
 
 export class BTree<K = unknown, V = unknown, U = never> extends BTreeContext<K, V> implements ReducedMap<K, V, U> {
   root: BTreePage<K, V, U>;

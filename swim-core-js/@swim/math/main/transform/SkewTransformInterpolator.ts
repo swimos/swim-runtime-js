@@ -12,95 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Interpolator} from "@swim/interpolate";
-import {AngleUnits, Angle} from "../angle/Angle";
-import {AnyTransform, Transform} from "./Transform";
+import {__extends} from "tslib";
+import {Interpolator} from "@swim/mapping";
+import {Angle} from "../angle/Angle";
 import {SkewTransform} from "./SkewTransform";
-import {TransformInterpolator} from "./TransformInterpolator";
 
 /** @hidden */
-export class SkewTransformInterpolator extends TransformInterpolator<SkewTransform> {
-  /** @hidden */
-  readonly x0: number;
-  /** @hidden */
-  readonly dx: number;
-  /** @hidden */
-  readonly xUnits: AngleUnits;
-  /** @hidden */
-  readonly y0: number;
-  /** @hidden */
-  readonly dy: number;
-  /** @hidden */
-  readonly yUnits: AngleUnits;
-
-  constructor(f0: SkewTransform, f1: SkewTransform) {
-    super();
-    this.xUnits = f1.x.units;
-    this.x0 = f0.x.toValue(this.xUnits);
-    this.dx = f1.x.value - this.x0;
-    this.yUnits = f1.y.units;
-    this.y0 = f0.y.toValue(this.yUnits);
-    this.dy = f1.y.value - this.y0;
-  }
-
-  interpolate(u: number): SkewTransform {
-    const x = Angle.from(this.x0 + this.dx * u, this.xUnits);
-    const y = Angle.from(this.y0 + this.dy * u, this.yUnits);
+export function SkewTransformInterpolator(f0: SkewTransform, f1: SkewTransform): Interpolator<SkewTransform> {
+  const interpolator = function (u: number): SkewTransform {
+    const f0 = interpolator[0];
+    const f1 = interpolator[1];
+    const x = Angle.from(f0._x.value + u * (f1._x.value - f0._x.value), f1._x.units);
+    const y = Angle.from(f0._y.value + u * (f1._y.value - f0._y.value), f1._y.units);
     return new SkewTransform(x, y);
-  }
-
-  deinterpolate(f: AnyTransform): number {
-    f = Transform.fromAny(f);
-    if (f instanceof SkewTransform) {
-      const units = f.x.units;
-      const x0 = Angle.fromAny(this.x0, this.xUnits).toValue(units);
-      const y0 = Angle.fromAny(this.y0, this.yUnits).toValue(units);
-      const dx = Angle.fromAny(this.dx, this.xUnits).toValue(units);
-      const dy = Angle.fromAny(this.dy, this.yUnits).toValue(units);
-      const fx = f.x.toValue(units) - x0;
-      const fy = f.y.toValue(units) - y0;
-      const dp = fx * dx + fy * dy;
-      const lf = Math.sqrt(fx * fx + fy * fy);
-      return lf !== 0 ? dp / lf : lf;
-    }
-    return 0;
-  }
-
-  range(): readonly [SkewTransform, SkewTransform];
-  range(fs: readonly [SkewTransform, SkewTransform]): SkewTransformInterpolator;
-  range(f0: SkewTransform, f1: SkewTransform): SkewTransformInterpolator;
-  range(fs: readonly [AnyTransform, AnyTransform]): TransformInterpolator;
-  range(f0: AnyTransform, f1: AnyTransform): TransformInterpolator;
-  range(f0?: readonly [AnyTransform, AnyTransform] | AnyTransform,
-        f1?: AnyTransform): readonly [SkewTransform, SkewTransform] | TransformInterpolator {
-    if (arguments.length === 0) {
-      return [this.interpolate(0), this.interpolate(1)];
-    } else if (arguments.length === 1) {
-      f0 = f0 as readonly [AnyTransform, AnyTransform];
-      return SkewTransformInterpolator.between(f0[0], f0[1]);
-    } else {
-      return SkewTransformInterpolator.between(f0 as AnyTransform, f1 as AnyTransform);
-    }
-  }
-
-  equals(that: unknown): boolean {
-    if (this === that) {
-      return true;
-    } else if (that instanceof SkewTransformInterpolator) {
-      return this.x0 === that.x0 && this.dx === that.dx && this.xUnits === that.xUnits
-          && this.y0 === that.y0 && this.dy === that.dy && this.yUnits === that.yUnits;
-    }
-    return false;
-  }
-
-  static between(f0: SkewTransform, f1: SkewTransform): SkewTransformInterpolator;
-  static between(f0: AnyTransform, f1: AnyTransform): TransformInterpolator;
-  static between(a: unknown, b: unknown): Interpolator<unknown>;
-  static between(a: unknown, b: unknown): Interpolator<unknown> {
-    if (a instanceof SkewTransform && b instanceof SkewTransform) {
-      return new SkewTransformInterpolator(a, b);
-    }
-    return TransformInterpolator.between(a, b);
-  }
+  } as Interpolator<SkewTransform>;
+  Object.setPrototypeOf(interpolator, SkewTransformInterpolator.prototype);
+  Object.defineProperty(interpolator, 0, {
+    value: f0._x.units === f1._x.units && f0._y.units === f1._y.units
+         ? f0 : new SkewTransform(f0._x.to(f1._x.units), f0._y.to(f1._y.units)),
+    enumerable: true,
+  });
+  Object.defineProperty(interpolator, 1, {
+    value: f1,
+    enumerable: true,
+  });
+  return interpolator;
 }
-TransformInterpolator.Skew = SkewTransformInterpolator;
+__extends(SkewTransformInterpolator, Interpolator);

@@ -90,7 +90,7 @@ export class ReconParserSpec extends Spec {
   @Test
   parseStringsWithEscapes(exam: ReconExam): void {
     exam.parses("\"\\\"\\\\\\/\\@\\{\\}\\[\\]\\b\\f\\n\\r\\t\"", Text.from("\"\\/@{}[]\b\f\n\r\t"));
-    exam.parses("'\\\'\\\\\\/\\@\\{\\}\\[\\]\\b\\f\\n\\r\\t'", Text.from("'\\/@{}[]\b\f\n\r\t"));
+    exam.parses("'\\'\\\\\\/\\@\\{\\}\\[\\]\\b\\f\\n\\r\\t'", Text.from("'\\/@{}[]\b\f\n\r\t"));
   }
 
   @Test

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {LazySpec} from "./LazySpec";
-export {Murmur3Spec} from "./Murmur3Spec";
+export * from "./lang";
+export * from "./runtime";
 export {UtilSuite} from "./UtilSuite";
 
 import {UtilSuite} from "./UtilSuite";

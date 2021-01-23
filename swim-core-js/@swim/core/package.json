@@ -13,8 +13,8 @@
   "dependencies": {
     "@swim/util": "3.11.0-dev.20201021",
     "@swim/codec": "3.11.0-dev.20201021",
+    "@swim/mapping": "3.11.0-dev.20201021",
     "@swim/collections": "3.11.0-dev.20201021",
-    "@swim/interpolate": "3.11.0-dev.20201021",
     "@swim/structure": "3.11.0-dev.20201021",
     "@swim/streamlet": "3.11.0-dev.20201021",
     "@swim/dataflow": "3.11.0-dev.20201021",
@@ -22,7 +22,6 @@
     "@swim/uri": "3.11.0-dev.20201021",
     "@swim/math": "3.11.0-dev.20201021",
     "@swim/geo": "3.11.0-dev.20201021",
-    "@swim/time": "3.11.0-dev.20201021",
-    "@swim/scale": "3.11.0-dev.20201021"
+    "@swim/time": "3.11.0-dev.20201021"
   }
 }

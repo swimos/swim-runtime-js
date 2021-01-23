@@ -30,15 +30,15 @@ component libraries:
   [doc](https://docs.swimos.org/js/latest/modules/_swim_codec.html)) –
   incremental I/O; functional parsers and writers; display, debug, and
   diagnostic formatters; and Unicode and binary codecs.
+- [**@swim/mapping**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/mapping)
+  ([npm](https://www.npmjs.com/package/@swim/mapping),
+  [doc](https://docs.swimos.org/js/latest/modules/_swim_mapping.html)) –
+  functional maps, interpolators, and scales.
 - [**@swim/collections**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/collections)
   ([npm](https://www.npmjs.com/package/@swim/collections),
   [doc](https://docs.swimos.org/js/latest/modules/_swim_collections.html)) –
   immutable, structure sharing collections, including B-trees and S-trees
   (sequence trees).
-- [**@swim/interpolate**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/interpolate)
-  ([npm](https://www.npmjs.com/package/@swim/interpolate),
-  [doc](https://docs.swimos.org/js/latest/modules/_swim_interpolate.html)) –
-  extensible interpolators for smoothly blending between values.
 - [**@swim/structure**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/structure)
   ([npm](https://www.npmjs.com/package/@swim/structure),
   [doc](https://docs.swimos.org/js/latest/modules/_swim_structure.html)) –
@@ -78,12 +78,6 @@ component libraries:
   [doc](https://docs.swimos.org/js/latest/modules/_swim_time.html)) –
   date-time, time zone, and time interval data types,
   with `strptime`/`strftime`-style parsers and formatters.
-- [**@swim/scale**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/scale)
-  ([npm](https://www.npmjs.com/package/@swim/scale),
-  [doc](https://docs.swimos.org/js/latest/modules/_swim_scale.html)) –
-  mappings from numeric and temporal input domains to interpolated output
-  ranges, with support for continuous domain clamping, domain solving,
-  range unscaling, and interpolation between scales.
 
 **@swim/core** has no external dependencies.
 

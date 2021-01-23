@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
+import {FieldInterpolator} from "./"; // forward import
 import type {AnyValue, Value} from "./Value";
 import type {Record} from "./Record";
 import type {AnyText} from "./Text";
@@ -288,21 +290,40 @@ export abstract class Field extends Item {
 
   abstract commit(): this;
 
+  interpolateTo(that: Field): Interpolator<Field>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof Field) {
+      return FieldInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
+  }
+
   /** @hidden */
   static readonly IMMUTABLE: number = 1 << 0;
 
   static of(key: AnyValue, value?: AnyValue): Field {
-    let name;
+    let name: string | undefined;
     if (typeof key === "string") {
       name = key;
     } else if (key instanceof Item.Text) {
       name = key.value;
     }
     if (name !== void 0 && name.charCodeAt(0) === 64/*'@'*/) {
-      arguments[0] = name.slice(1);
-      return Item.Attr.of.apply(void 0, arguments as unknown as [AnyText, AnyValue?]);
+      name = name.slice(1);
+      if (arguments.length === 1) {
+        return Item.Attr.of(name);
+      } else {
+        return Item.Attr.of(name, value);
+      }
     } else {
-      return Item.Slot.of.apply(void 0, arguments as unknown as [AnyValue, AnyValue?]);
+      if (arguments.length === 1) {
+        return Item.Slot.of(key);
+      } else {
+        return Item.Slot.of(key, value);
+      }
     }
   }
 

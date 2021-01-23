@@ -14,8 +14,10 @@
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
 import {AnyField, Field} from "./Field";
+import {SlotInterpolator} from "./"; // forward import
 import type {AnyValue, Value} from "./Value";
 import {AnyInterpreter, Interpreter} from "./Interpreter";
 
@@ -316,6 +318,17 @@ export class Slot extends Field {
       this._value.commit();
     }
     return this;
+  }
+
+  interpolateTo(that: Slot): Interpolator<Slot>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof Slot) {
+      return SlotInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   typeOrder(): number {

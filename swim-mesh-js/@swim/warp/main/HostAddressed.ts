@@ -67,7 +67,7 @@ export abstract class HostAddressed extends Envelope {
     return false;
   }
 
-  hashCode() {
+  hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Constructors.hash(this.constructor), this._body.hashCode()));
   }
 

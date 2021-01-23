@@ -75,8 +75,8 @@ const core = [
     ],
   },
   {
-    id: "interpolate",
-    name: "@swim/interpolate",
+    id: "mapping",
+    name: "@swim/mapping",
     targets: [
       {
         id: "main",
@@ -84,7 +84,7 @@ const core = [
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "interpolate"],
+        deps: ["util", "codec", "unit", "mapping"],
       },
     ],
   },
@@ -94,11 +94,11 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "interpolate"],
+        deps: ["util", "codec", "mapping"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "interpolate", "structure"],
+        deps: ["util", "codec", "unit", "mapping", "structure"],
       },
     ],
   },
@@ -122,11 +122,11 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "collections", "interpolate", "structure", "streamlet"],
+        deps: ["util", "codec", "mapping", "collections", "structure", "streamlet"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "collections", "interpolate", "structure", "streamlet", "dataflow"],
+        deps: ["util", "codec", "unit", "mapping", "collections", "structure", "streamlet", "dataflow"],
       },
     ],
   },
@@ -136,11 +136,11 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "interpolate", "structure"],
+        deps: ["util", "codec", "mapping", "structure"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "interpolate", "structure", "recon"],
+        deps: ["util", "codec", "unit", "mapping", "structure", "recon"],
       },
     ],
   },
@@ -150,11 +150,11 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "interpolate", "structure"],
+        deps: ["util", "codec", "mapping", "structure"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "interpolate", "structure", "uri"],
+        deps: ["util", "codec", "unit", "mapping", "structure", "uri"],
       },
     ],
   },
@@ -164,11 +164,11 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "interpolate", "structure"],
+        deps: ["util", "codec", "mapping", "structure"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "interpolate", "structure", "math"],
+        deps: ["util", "codec", "unit", "mapping", "structure", "math"],
       },
     ],
   },
@@ -178,11 +178,11 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "interpolate", "structure", "math"],
+        deps: ["util", "codec", "mapping", "structure", "math"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "interpolate", "structure", "math", "geo"],
+        deps: ["util", "codec", "unit", "mapping", "structure", "math", "geo"],
       },
     ],
   },
@@ -192,25 +192,11 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "interpolate", "structure"],
+        deps: ["util", "codec", "mapping", "structure"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "interpolate", "structure", "time"],
-      },
-    ],
-  },
-  {
-    id: "scale",
-    name: "@swim/scale",
-    targets: [
-      {
-        id: "main",
-        deps: ["util", "codec", "interpolate", "structure", "time"],
-      },
-      {
-        id: "test",
-        deps: ["util", "codec", "unit", "interpolate", "structure", "time", "scale"],
+        deps: ["util", "codec", "unit", "mapping", "structure", "time"],
       },
     ],
   },
@@ -222,7 +208,7 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "collections", "interpolate", "structure", "streamlet", "dataflow", "recon", "uri", "math", "geo", "time", "scale"],
+        deps: ["util", "codec", "mapping", "collections", "structure", "streamlet", "dataflow", "recon", "uri", "math", "geo", "time"],
       },
     ],
   },

@@ -23,35 +23,33 @@ export interface Equivalent {
   equivalentTo(that: unknown, epsilon?: number): boolean;
 }
 
-export const Equivalent = {} as {
-  /**
-   * Default equivalence tolerance.
-   */
-  Epsilon: number;
-
-  /**
-   * Returns `true` if `x` conforms to [[Equivalent]] and is
-   * [[Equivalent.equivalentTo equivalent to]] `y`, otherwise returns `x === y`.
-   */
-  equivalent(x: unknown, y: unknown, epsilon?: number): boolean;
-
-  /**
-   * Returns `true` if `object` conforms to the [[Equivalent]] interface.
-   */
-  is(object: unknown): object is Equivalent;
-};
-
-Equivalent.Epsilon = 1.0e-8;
-
-Equivalent.equivalent = function (x:unknown, y: unknown, epsilon?: number): boolean {
+export const Equivalent = function (x:unknown, y: unknown, epsilon?: number): boolean {
   if (x !== void 0 && x !== null && typeof (x as Equivalent).equivalentTo === "function") {
     return (x as Equivalent).equivalentTo(y, epsilon);
   } else {
     return x === y;
   }
+} as {
+  /**
+   * Returns `true` if `x` conforms to [[Equivalent]] and is
+   * [[Equivalent.equivalentTo equivalent to]] `y`, otherwise returns `x === y`.
+   */
+  (x: unknown, y: unknown, epsilon?: number): boolean;
+
+  /**
+   * Returns `true` if `object` conforms to the [[Equivalent]] interface.
+   */
+  is(object: unknown): object is Equivalent;
+
+  /**
+   * Default equivalence tolerance.
+   */
+  Epsilon: number;
 };
 
 Equivalent.is = function (object: unknown): object is Equivalent {
   return object !== void 0 && object !== null
       && typeof (object as Equivalent).equivalentTo === "function";
 };
+
+Equivalent.Epsilon = 1.0e-8;

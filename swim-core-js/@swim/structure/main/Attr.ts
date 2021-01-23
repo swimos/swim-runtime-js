@@ -14,9 +14,11 @@
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
 import type {AnyValue, Value} from "./Value";
 import {AnyField, Field} from "./Field";
+import {AttrInterpolator} from "./"; // forward import
 import type {AnyText, Text} from "./Text";
 import {AnyInterpreter, Interpreter} from "./Interpreter";
 
@@ -324,6 +326,17 @@ export class Attr extends Field {
       this._value.commit();
     }
     return this;
+  }
+
+  interpolateTo(that: Attr): Interpolator<Attr>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof Attr) {
+      return AttrInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   typeOrder(): number {

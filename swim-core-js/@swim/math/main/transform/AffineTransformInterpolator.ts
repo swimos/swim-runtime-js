@@ -12,69 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Interpolator} from "@swim/interpolate";
-import type {AnyTransform} from "./Transform";
+import {__extends} from "tslib";
+import {Interpolator} from "@swim/mapping";
 import {AffineTransform} from "./AffineTransform";
-import {TransformInterpolator} from "./TransformInterpolator";
 
 /** @hidden */
-export class AffineTransformInterpolator extends TransformInterpolator<AffineTransform> {
-  /** @hidden */
-  readonly f0: AffineTransform;
-  /** @hidden */
-  readonly f1: AffineTransform;
-
-  constructor(f0: AffineTransform, f1: AffineTransform) {
-    super();
-    // TODO: decompose matrices
-    this.f0 = f0!;
-    this.f1 = f1!;
-  }
-
-  interpolate(u: number): AffineTransform {
+export function AffineTransformInterpolator(f0: AffineTransform, f1: AffineTransform): Interpolator<AffineTransform> {
+  const interpolator = function (u: number): AffineTransform {
     // TODO: interpolate and recompose matrices
-    return this.f1;
-  }
-
-  deinterpolate(f: AnyTransform): number {
-    //f = Transform.fromAny(f);
-    return 0; // TODO: interpolate matrices
-  }
-
-  range(): readonly [AffineTransform, AffineTransform];
-  range(fs: readonly [AffineTransform, AffineTransform]): AffineTransformInterpolator;
-  range(f0: AffineTransform, f1: AffineTransform): AffineTransformInterpolator;
-  range(fs: readonly [AnyTransform, AnyTransform]): TransformInterpolator;
-  range(f0: AnyTransform, f1: AnyTransform): TransformInterpolator;
-  range(f0?: readonly [AnyTransform, AnyTransform] | AnyTransform,
-        f1?: AnyTransform): readonly [AffineTransform, AffineTransform] | TransformInterpolator {
-    if (arguments.length === 0) {
-      return [this.interpolate(0), this.interpolate(1)];
-    } else if (arguments.length === 1) {
-      f0 = f0 as readonly [AnyTransform, AnyTransform];
-      return AffineTransformInterpolator.between(f0[0], f0[1]);
-    } else {
-      return AffineTransformInterpolator.between(f0 as AnyTransform, f1 as AnyTransform);
-    }
-  }
-
-  equals(that: unknown): boolean {
-    if (this === that) {
-      return true;
-    } else if (that instanceof AffineTransformInterpolator) {
-      return this.f0.equals(that.f0) && this.f1.equals(that.f1);
-    }
-    return false;
-  }
-
-  static between(f0: AffineTransform, f1: AffineTransform): AffineTransformInterpolator;
-  static between(f0: AnyTransform, f1: AnyTransform): TransformInterpolator;
-  static between(a: unknown, b: unknown): Interpolator<unknown>;
-  static between(a: unknown, b: unknown): Interpolator<unknown> {
-    if (a instanceof AffineTransform && b instanceof AffineTransform) {
-      return new AffineTransformInterpolator(a, b);
-    }
-    return TransformInterpolator.between(a, b);
-  }
+    const f0 = interpolator[0];
+    const f1 = interpolator[1];
+    const x0 = f0._x0 + u * (f1._x0 - f0._x0);
+    const y0 = f0._y0 + u * (f1._y0 - f0._y0);
+    const x1 = f0._x1 + u * (f1._x1 - f0._x1);
+    const y1 = f0._y1 + u * (f1._y1 - f0._y1);
+    const tx = f0._tx + u * (f1._tx - f0._tx);
+    const ty = f0._ty + u * (f1._ty - f0._ty);
+    return new AffineTransform(x0, y0, x1, y1, tx, ty);
+  } as Interpolator<AffineTransform>;
+  Object.setPrototypeOf(interpolator, AffineTransformInterpolator.prototype);
+  // TODO: decompose matrices
+  Object.defineProperty(interpolator, 0, {
+    value: f0,
+    enumerable: true,
+  });
+  Object.defineProperty(interpolator, 1, {
+    value: f1,
+    enumerable: true,
+  });
+  return interpolator;
 }
-TransformInterpolator.Affine = AffineTransformInterpolator;
+__extends(AffineTransformInterpolator, Interpolator);

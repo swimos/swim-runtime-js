@@ -347,8 +347,8 @@ export class Cmd implements Equals, Debug {
     } else if (that instanceof Cmd) {
       return this.id === that.id && this.name === that.name && this.desc === that.desc
           && Arrays.equal(this.opts, that.opts) && Arrays.equal(this.args, that.args)
-          && Arrays.equal(this.cmds, that.cmds) && Equals.equal(this.exec, that.exec)
-          && Equals.equal(this.base, that.base);
+          && Arrays.equal(this.cmds, that.cmds) && Equals(this.exec, that.exec)
+          && Equals(this.base, that.base);
     }
     return false;
   }

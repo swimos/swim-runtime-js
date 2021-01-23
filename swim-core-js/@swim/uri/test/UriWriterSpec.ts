@@ -165,7 +165,7 @@ export class UriWriterSpec extends Spec {
 
   @Test
   writeURIsWithPathsContainingPermittedDelimeters(exam: Exam): void {
-    exam.equal(Uri.path("/", "one", "/", "!$&()*+,;=\'", "/", "three").toString(), "/one/!$&()*+,;='/three");
+    exam.equal(Uri.path("/", "one", "/", "!$&()*+,;='", "/", "three").toString(), "/one/!$&()*+,;='/three");
   }
 
   @Test

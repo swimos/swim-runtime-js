@@ -6,8 +6,8 @@
     "paths": {
       "@swim/util": ["swim-core-js/@swim/util/main"],
       "@swim/codec": ["swim-core-js/@swim/codec/main"],
+      "@swim/mapping": ["swim-core-js/@swim/mapping/main"],
       "@swim/collections": ["swim-core-js/@swim/collections/main"],
-      "@swim/interpolate": ["swim-core-js/@swim/interpolate/main"],
       "@swim/structure": ["swim-core-js/@swim/structure/main"],
       "@swim/streamlet": ["swim-core-js/@swim/streamlet/main"],
       "@swim/dataflow": ["swim-core-js/@swim/dataflow/main"],
@@ -16,7 +16,6 @@
       "@swim/math": ["swim-core-js/@swim/math/main"],
       "@swim/geo": ["swim-core-js/@swim/geo/main"],
       "@swim/time": ["swim-core-js/@swim/time/main"],
-      "@swim/scale": ["swim-core-js/@swim/scale/main"],
       "@swim/core": ["swim-core-js/@swim/core/main"],
 
       "@swim/warp": ["swim-mesh-js/@swim/warp/main"],
@@ -28,8 +27,8 @@
   "references": [
     {"path": "../../../swim-core-js/@swim/util/main"},
     {"path": "../../../swim-core-js/@swim/codec/main"},
+    {"path": "../../../swim-core-js/@swim/mapping/main"},
     {"path": "../../../swim-core-js/@swim/collections/main"},
-    {"path": "../../../swim-core-js/@swim/interpolate/main"},
     {"path": "../../../swim-core-js/@swim/structure/main"},
     {"path": "../../../swim-core-js/@swim/streamlet/main"},
     {"path": "../../../swim-core-js/@swim/dataflow/main"},
@@ -38,7 +37,6 @@
     {"path": "../../../swim-core-js/@swim/math/main"},
     {"path": "../../../swim-core-js/@swim/geo/main"},
     {"path": "../../../swim-core-js/@swim/time/main"},
-    {"path": "../../../swim-core-js/@swim/scale/main"},
     {"path": "../../../swim-core-js/@swim/core/main"},
 
     {"path": "../../../swim-mesh-js/@swim/warp/main"},

@@ -47,14 +47,28 @@ export interface Assert {
    *
    * @throws [[AssertException]] with `message` if `lhs` is not identical (`!==`) to `rhs`.
    */
-  identity(lhs: unknown, rhs: unknown, message?: string): void;
+  identical(lhs: unknown, rhs: unknown, message?: string): void;
 
   /**
    * Asserts that `lhs` is not identical (`!==`) to `rhs`.
    *
    * @throws [[AssertException]] with `message` if `lhs` is identical (`===`) to `rhs`.
    */
-  notIdentity(lhs: unknown, rhs: unknown, message?: string): void;
+  notIdentical(lhs: unknown, rhs: unknown, message?: string): void;
+
+  /**
+   * Asserts that `object` has the prototype of `constructor` in its prototype chain.
+   *
+   * @throws [[AssertException]] with `message` if `object` does not have the prototype of `constructor` in its prototype chain.
+   */
+  instanceOf(object: unknown, constructor: Function, message?: string): void;
+
+  /**
+   * Asserts that `object` does not have the prototype of `constructor` in its prototype chain.
+   *
+   * @throws [[AssertException]] with `message` if `object` does have the prototype of `constructor` in its prototype chain.
+   */
+  notInstanceOf(object: unknown, constructor: Function, message?: string): void;
 
   /**
    * Asserts that `lhs` is [[Values.equal structurally equal]] to `rhs`.
@@ -191,14 +205,26 @@ assert.notEqual = function (lhs: unknown, rhs: unknown, message?: string): void 
   }
 };
 
-assert.identity = function (lhs: unknown, rhs: unknown, message?: string): void {
+assert.identical = function (lhs: unknown, rhs: unknown, message?: string): void {
   if (lhs !== rhs) {
     throw new AssertException(message);
   }
 };
 
-assert.notIdentity = function (lhs: unknown, rhs: unknown, message?: string): void {
+assert.notIdentical = function (lhs: unknown, rhs: unknown, message?: string): void {
   if (lhs === rhs) {
+    throw new AssertException(message);
+  }
+};
+
+assert.instanceOf = function (object: unknown, constructor: Function, message?: string): void {
+  if (!(object instanceof constructor)) {
+    throw new AssertException(message);
+  }
+};
+
+assert.notInstanceOf = function (object: unknown, constructor: Function, message?: string): void {
+  if (object instanceof constructor) {
     throw new AssertException(message);
   }
 };

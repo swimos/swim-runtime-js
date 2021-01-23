@@ -15,8 +15,8 @@
 import type {Diagnostic} from "../source/Diagnostic";
 import type {Input} from "../input/Input";
 import {ParserException} from "./ParserException";
-import {ParserDone} from "../"; // circular import
-import {ParserError} from "../"; // circular import
+import {ParserDone} from "../"; // forward import
+import {ParserError} from "../"; // forward import
 
 /**
  * Continuation of how to parse subsequent [[Input]] tokens from a stream.

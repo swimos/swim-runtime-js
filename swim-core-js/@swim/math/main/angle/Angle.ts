@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Comparable, Equivalent, HashCode} from "@swim/util";
+import type {HashCode, Equivalent, Compare} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import {Attr, Value, Form} from "@swim/structure";
+import {AngleInterpolator} from "../"; // forward import
 import type {DegAngle} from "./DegAngle";
 import type {RadAngle} from "./RadAngle";
 import type {GradAngle} from "./GradAngle";
@@ -26,7 +28,7 @@ export type AngleUnits = "deg" | "rad" | "grad" | "turn";
 
 export type AnyAngle = Angle | string | number;
 
-export abstract class Angle implements HashCode, Equivalent, Comparable, Debug {
+export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent, Compare, Debug {
   isDefined(): boolean {
     return this.value !== 0;
   }
@@ -113,6 +115,16 @@ export abstract class Angle implements HashCode, Equivalent, Comparable, Debug {
 
   toCssValue(): CSSUnitValue | undefined {
     return void 0; // conditionally overridden when CSS Typed OM is available
+  }
+
+  interpolateTo(that: Angle): Interpolator<Angle>;
+  interpolateTo(that: unknown): Interpolator<Angle> | null;
+  interpolateTo(that: unknown): Interpolator<Angle> | null {
+    if (that instanceof Angle) {
+      return AngleInterpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   abstract compareTo(that: unknown): number;

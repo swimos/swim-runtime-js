@@ -16,7 +16,7 @@ import {Lazy, Cursor} from "@swim/util";
 import {KeysCursor} from "./KeysCursor";
 import {ValuesCursor} from "./ValuesCursor";
 import type {BTreeContext} from "./BTreeContext";
-import {BTreeLeaf} from "./"; // circular import
+import {BTreeLeaf} from "./"; // forward import
 
 /** @hidden */
 export abstract class BTreePage<K, V, U> {

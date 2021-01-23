@@ -31,11 +31,11 @@ The **Swim Core** framework consists of the following component libraries:
   composable command line argument parser.
 - [**@swim/unit**](@swim/unit) –
   specializable unit testing framework.
+- [**@swim/mapping**](@swim/mapping) –
+  functional maps, interpolators, and scales.
 - [**@swim/collections**](@swim/collections) –
   immutable, structure sharing collections, including B-trees and S-trees
   (sequence trees).
-- [**@swim/interpolate**](@swim/interpolate) –
-  extensible interpolators for smoothly blending between values.
 - [**@swim/structure**](@swim/structure) –
   generic structured data model, with support for selectors, expressions,
   and lambda functions.  Used as a common abstract syntax tree for Recon,
@@ -59,10 +59,6 @@ The **Swim Core** framework consists of the following component libraries:
 - [**@swim/time**](@swim/time) –
   date-time, time zone, and time interval data types,
   with `strptime`/`strftime`-style parsers and formatters.
-- [**@swim/scale**](@swim/scale) –
-  mappings from numeric and temporal input domains to interpolated output
-  ranges, with support for continuous domain clamping, domain solving,
-  range unscaling, and interpolation between scales.
 
 **Swim Core** has no external dependencies.
 

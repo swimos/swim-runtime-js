@@ -20,9 +20,9 @@ import type {Writer} from "../writer/Writer";
 import {Format} from "../format/Format";
 import {Binary} from "../binary/Binary";
 import {Unicode} from "../unicode/Unicode";
-import {Base16Parser} from "../"; // circular import
-import {Base16Writer} from "../"; // circular import
-import {Base16IntegerWriter} from "../"; // circular import
+import {Base16Parser} from "../"; // forward import
+import {Base16Writer} from "../"; // forward import
+import {Base16IntegerWriter} from "../"; // forward import
 
 /**
  * Base-16 (hexadecimal) encoding [[Parser]]/[[Writer]] factory.

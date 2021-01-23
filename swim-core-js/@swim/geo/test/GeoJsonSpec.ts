@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Test, Exam} from "@swim/unit";
-
 import {GeoJson, GeoShape, GeoPoint, GeoSegment, GeoSpline, GeoPath, GeoSet} from "@swim/geo";
 
 export class GeoJsonSpec extends Spec {

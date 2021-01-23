@@ -13,7 +13,7 @@
 // limitations under the License.
 
 if (String.prototype.codePointAt === void 0) {
-  String.prototype.codePointAt = function (this: String, index: number): number | undefined {
+  String.prototype.codePointAt = function (this: string, index: number): number | undefined {
     const size = this.length;
     index = index ? Number(index) : 0; // Coerce to number.
     if (index !== index) { // Convert NaN to zero.
@@ -35,7 +35,7 @@ if (String.prototype.codePointAt === void 0) {
 }
 
 if (String.prototype.offsetByCodePoints === void 0) {
-  String.prototype.offsetByCodePoints = function (this: String, index: number, count: number): number {
+  String.prototype.offsetByCodePoints = function (this: string, index: number, count: number): number {
     if (count > 0) {
       const size = this.length;
       while (count > 0 && index < size) {

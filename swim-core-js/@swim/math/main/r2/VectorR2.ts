@@ -14,6 +14,8 @@
 
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
+import {VectorR2Interpolator} from "../"; // forward import
 
 export type AnyVectorR2 = VectorR2 | VectorR2Init;
 
@@ -22,7 +24,7 @@ export interface VectorR2Init {
   y: number;
 }
 
-export class VectorR2 implements HashCode, Equivalent, Debug {
+export class VectorR2 implements Interpolate<VectorR2>, HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _x: number;
   /** @hidden */
@@ -66,6 +68,16 @@ export class VectorR2 implements HashCode, Equivalent, Debug {
       x: this._x,
       y: this._y,
     };
+  }
+
+  interpolateTo(that: VectorR2): Interpolator<VectorR2>;
+  interpolateTo(that: unknown): Interpolator<VectorR2> | null;
+  interpolateTo(that: unknown): Interpolator<VectorR2> | null {
+    if (that instanceof VectorR2) {
+      return VectorR2Interpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {

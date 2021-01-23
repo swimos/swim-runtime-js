@@ -200,10 +200,10 @@ export class Spec {
    * @hidden
    */
   static init(specClass: SpecClass): void {
-    if (!specClass.hasOwnProperty("tests")) {
+    if (!Object.prototype.hasOwnProperty.call(specClass, "tests")) {
       specClass.tests = [];
     }
-    if (!specClass.hasOwnProperty("units")) {
+    if (!Object.prototype.hasOwnProperty.call(specClass, "units")) {
       specClass.units = [];
     }
   }
@@ -230,10 +230,10 @@ export class Spec {
     let tests = new Array<SpecTest>();
     let units = new Array<SpecUnit>();
     do {
-      if (specClass.hasOwnProperty("tests")) {
+      if (Object.prototype.hasOwnProperty.call(specClass, "tests")) {
         tests = tests.concat(specClass.tests!);
       }
-      if (specClass.hasOwnProperty("units")) {
+      if (Object.prototype.hasOwnProperty.call(specClass, "units")) {
         units = units.concat(specClass.units!);
       }
       specClass = Object.getPrototypeOf(specClass);

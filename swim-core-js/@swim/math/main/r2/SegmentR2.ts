@@ -14,12 +14,14 @@
 
 import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
 import {PointR2} from "./PointR2";
 import type {CurveR2Context} from "./CurveR2Context";
 import {CurveR2} from "./CurveR2";
 import {BezierCurveR2} from "./BezierCurveR2";
+import {SegmentR2Interpolator} from "../"; // forward import
 
 export type AnySegmentR2 = SegmentR2 | SegmentR2Init;
 
@@ -30,7 +32,7 @@ export interface SegmentR2Init {
   y1: number;
 }
 
-export class SegmentR2 extends BezierCurveR2 implements HashCode, Debug {
+export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, HashCode, Debug {
   /** @hidden */
   readonly _x0: number;
   /** @hidden */
@@ -231,6 +233,16 @@ export class SegmentR2 extends BezierCurveR2 implements HashCode, Debug {
     Format.displayNumber(this._x1, output)
     output.write(44/*','*/)
     Format.displayNumber(this._y1, output);
+  }
+
+  interpolateTo(that: SegmentR2): Interpolator<SegmentR2>;
+  interpolateTo(that: unknown): Interpolator<SegmentR2> | null;
+  interpolateTo(that: unknown): Interpolator<SegmentR2> | null {
+    if (that instanceof SegmentR2) {
+      return SegmentR2Interpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {

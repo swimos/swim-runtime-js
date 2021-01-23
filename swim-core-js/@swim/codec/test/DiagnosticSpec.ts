@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Spec, Test, Exam} from "@swim/unit";
 import {Severity} from "@swim/util";
 import {Mark, Span, OutputSettings, Diagnostic, Unicode} from "@swim/codec";
-import {Spec, Test, Exam} from "@swim/unit";
 
 export class DiagnosticSpec extends Spec {
   printDiagnostic(diagnostic: Diagnostic): void {

@@ -15,7 +15,7 @@
 export {Equals} from "./Equals";
 export {HashCode} from "./HashCode";
 export {Equivalent} from "./Equivalent";
-export {Comparable} from "./Comparable";
+export {Compare} from "./Compare";
 
 export {FromAny} from "./FromAny";
 export {ToAny} from "./ToAny";

@@ -43,7 +43,7 @@ export class UriPathBuilder implements Builder<string, UriPath> {
       if (component instanceof Uri.Path) {
         this.addPath(component);
       } else if (Array.isArray(component)) {
-        this.push.apply(this, component);
+        this.push(...component);
       } else if (component === "/") {
         this.addSlash();
       } else {

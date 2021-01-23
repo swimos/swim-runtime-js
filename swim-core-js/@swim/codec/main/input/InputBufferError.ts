@@ -132,7 +132,7 @@ export class InputBufferError extends InputBuffer {
 
   declare readonly id: string | undefined;
 
-  withId(id: string | undefined) {
+  withId(id: string | undefined): InputBuffer {
     return new InputBufferError(this.error, id, this.mark, this.settings);
   }
 

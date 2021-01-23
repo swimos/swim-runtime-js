@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Strings, HashGenCacheMap} from "@swim/util";
+import {HashCode, Compare, Strings, HashGenCacheMap} from "@swim/util";
 import {Output, Format, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 
 export type AnyUriFragment = UriFragment | string;
 
-export class UriFragment implements Comparable, HashCode, Debug, Display {
+export class UriFragment implements HashCode, Compare, Debug, Display {
   /** @hidden */
   readonly _identifier: string | null;
   /** @hidden */

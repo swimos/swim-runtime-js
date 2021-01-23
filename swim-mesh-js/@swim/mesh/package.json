@@ -16,8 +16,8 @@
   "dependencies": {
     "@swim/util": "3.11.0-dev.20201021",
     "@swim/codec": "3.11.0-dev.20201021",
+    "@swim/mapping": "3.11.0-dev.20201021",
     "@swim/collections": "3.11.0-dev.20201021",
-    "@swim/interpolate": "3.11.0-dev.20201021",
     "@swim/structure": "3.11.0-dev.20201021",
     "@swim/streamlet": "3.11.0-dev.20201021",
     "@swim/dataflow": "3.11.0-dev.20201021",

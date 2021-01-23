@@ -148,7 +148,7 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   }
 
   /** @hidden */
-  valueDidSet(newValue: Value, oldValue: Value) {
+  valueDidSet(newValue: Value, oldValue: Value): void {
     const observers = this._observers;
     const n = observers !== null ? observers.length : 0;
     let newObject: V | undefined;

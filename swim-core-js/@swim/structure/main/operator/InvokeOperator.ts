@@ -14,9 +14,11 @@
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item} from "../Item";
 import type {Value} from "../Value";
 import {Operator} from "../Operator";
+import {InvokeOperatorInterpolator} from "../"; // forward import
 import {AnyInterpreter, Interpreter} from "../Interpreter";
 
 export class InvokeOperator extends Operator {
@@ -45,7 +47,7 @@ export class InvokeOperator extends Operator {
     return this._state;
   }
 
-  setState(state: unknown) {
+  setState(state: unknown): void {
     this._state = state;
   }
 
@@ -77,6 +79,17 @@ export class InvokeOperator extends Operator {
     }
     const args = this._args.substitute(interpreter).toValue();
     return new InvokeOperator(this._func, args);
+  }
+
+  interpolateTo(that: InvokeOperator): Interpolator<InvokeOperator>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof InvokeOperator) {
+      return InvokeOperatorInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   typeOrder(): number {

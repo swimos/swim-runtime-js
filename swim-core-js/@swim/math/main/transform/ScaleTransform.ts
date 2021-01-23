@@ -14,9 +14,11 @@
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item, Attr, Slot, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {Transform} from "./Transform";
+import {ScaleTransformInterpolator} from "../"; // forward import
 import type {AffineTransform} from "./AffineTransform";
 
 export class ScaleTransform extends Transform {
@@ -87,6 +89,17 @@ export class ScaleTransform extends Transform {
   toValue(): Value {
     return Record.of(Attr.of("scale", Record.of(Slot.of("x", this._x),
                                                 Slot.of("y", this._y))));
+  }
+
+  interpolateTo(that: ScaleTransform): Interpolator<ScaleTransform>;
+  interpolateTo(that: Transform): Interpolator<Transform>;
+  interpolateTo(that: unknown): Interpolator<Transform> | null;
+  interpolateTo(that: unknown): Interpolator<Transform> | null {
+    if (that instanceof ScaleTransform) {
+      return ScaleTransformInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   conformsTo(that: Transform): boolean {

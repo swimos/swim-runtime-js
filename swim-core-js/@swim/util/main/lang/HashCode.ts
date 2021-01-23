@@ -25,20 +25,7 @@ export interface HashCode extends Equals {
   hashCode(): number;
 }
 
-export const HashCode = {} as {
-  /**
-   * Returns the [[HashCode.hashCode hash code]] of `x`, if `x` is an object;
-   * otherwise returns `0` or `1` if `x` is `undefined` or `null`, respectively.
-   */
-  hash(x: HashCode | null | undefined): number;
-
-  /**
-   * Returns `true` if `object` conforms to the [[HashCode]] interface.
-   */
-  is(object: unknown): object is HashCode;
-};
-
-HashCode.hash = function (x: HashCode | null | undefined): number {
+export const HashCode = function (x: HashCode | null | undefined): number {
   if (x === void 0) {
     return 0;
   } else if (x === null) {
@@ -46,6 +33,17 @@ HashCode.hash = function (x: HashCode | null | undefined): number {
   } else {
     return x.hashCode();
   }
+} as {
+  /**
+   * Returns the [[HashCode.hashCode hash code]] of `x`, if `x` is an object;
+   * otherwise returns `0` or `1` if `x` is `undefined` or `null`, respectively.
+   */
+  (x: HashCode | null | undefined): number;
+
+  /**
+   * Returns `true` if `object` conforms to the [[HashCode]] interface.
+   */
+  is(object: unknown): object is HashCode;
 };
 
 HashCode.is = function (object: unknown): object is HashCode {

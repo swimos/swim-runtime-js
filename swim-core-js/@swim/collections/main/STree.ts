@@ -14,7 +14,7 @@
 
 import type {Cursor} from "@swim/util";
 import {STreeContext} from "./STreeContext";
-import {STreePage} from "./"; // circular import
+import {STreePage} from "./"; // forward import
 
 export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
   root: STreePage<V, I>;

@@ -14,7 +14,7 @@
 
 import {Murmur3} from "../runtime/Murmur3";
 import type {HashCode} from "../lang/HashCode";
-import type {Comparable} from "../lang/Comparable";
+import type {Compare} from "../lang/Compare";
 import {Numbers} from "../runtime/Numbers";
 import {Strings} from "../runtime/Strings";
 import {Constructors} from "../runtime/Constructors";
@@ -22,7 +22,7 @@ import {Constructors} from "../runtime/Constructors";
 /**
  * Level of importance.  Used for log levels and diagnostic classifications.
  */
-export class Severity implements HashCode, Comparable {
+export class Severity implements HashCode, Compare {
   private constructor(level: number, label: string) {
     Object.defineProperty(this, "level", {
       value: level,

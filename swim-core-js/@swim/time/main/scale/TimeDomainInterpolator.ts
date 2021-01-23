@@ -1,0 +1,43 @@
+// Copyright 2015-2020 Swim inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import {__extends} from "tslib";
+import {Interpolator} from "@swim/mapping";
+import {DateTime} from "../DateTime";
+import {TimeDomain} from "./TimeDomain";
+
+/** @hidden */
+export function TimeDomainInterpolator(x0: TimeDomain, x1: TimeDomain): Interpolator<TimeDomain> {
+  const interpolator = function (u: number): TimeDomain {
+    const x0 = interpolator[0];
+    const x00 = x0[0];
+    const x01 = x0[1];
+    const x1 = interpolator[1];
+    const x10 = x1[0];
+    const x11 = x1[1];
+    return TimeDomain(new DateTime(x00._time + u * (x10._time - x00._time), u === 0 ? x00._zone : x10._zone),
+                      new DateTime(x01._time + u * (x11._time - x01._time), u === 0 ? x01._zone : x11._zone));
+  } as Interpolator<TimeDomain>;
+  Object.setPrototypeOf(interpolator, TimeDomainInterpolator.prototype);
+  Object.defineProperty(interpolator, 0, {
+    value: x0,
+    enumerable: true,
+  });
+  Object.defineProperty(interpolator, 1, {
+    value: x1,
+    enumerable: true,
+  });
+  return interpolator;
+}
+__extends(TimeDomainInterpolator, Interpolator);

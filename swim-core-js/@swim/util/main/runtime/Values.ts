@@ -15,7 +15,7 @@
 import {Equals} from "../lang/Equals";
 import {HashCode} from "../lang/HashCode";
 import {Equivalent} from "../lang/Equivalent";
-import {Comparable} from "../lang/Comparable";
+import {Compare} from "../lang/Compare";
 import {Numbers} from "./Numbers";
 import {Strings} from "./Strings";
 import {Functions} from "./Functions";
@@ -178,7 +178,7 @@ Values.compare = function (x: unknown, y: unknown): number {
     } else {
       return 1;
     }
-  } else if (Comparable.is(x)) {
+  } else if (Compare.is(x)) {
     return x.compareTo(y);
   } else if (typeof x === "function") {
     if (y === void 0 || y === null || typeof y === "boolean" || typeof y === "number" || typeof y === "string") {

@@ -14,11 +14,13 @@
 
 import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
+import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
 import {PointR2} from "./PointR2";
 import {SegmentR2} from "./SegmentR2";
 import {BoxR2} from "./BoxR2";
+import {CircleR2Interpolator} from "../"; // forward import
 
 export type AnyCircleR2 = CircleR2 | CircleR2Init;
 
@@ -28,7 +30,7 @@ export interface CircleR2Init {
   r: number;
 }
 
-export class CircleR2 extends ShapeR2 implements HashCode, Equivalent, Debug {
+export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode, Equivalent, Debug {
   /** @hidden */
   readonly _cx: number;
   /** @hidden */
@@ -224,6 +226,16 @@ export class CircleR2 extends ShapeR2 implements HashCode, Equivalent, Debug {
       cy: this._cy,
       r: this._r,
     };
+  }
+
+  interpolateTo(that: CircleR2): Interpolator<CircleR2>;
+  interpolateTo(that: unknown): Interpolator<CircleR2> | null;
+  interpolateTo(that: unknown): Interpolator<CircleR2> | null {
+    if (that instanceof CircleR2) {
+      return CircleR2Interpolator(this, that);
+    } else {
+      return null;
+    }
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {

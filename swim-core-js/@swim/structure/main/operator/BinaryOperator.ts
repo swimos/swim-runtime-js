@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Interpolator} from "@swim/mapping";
 import {Item} from "../Item";
 import {Operator} from "../Operator";
+import {BinaryOperatorInterpolator} from "../"; // forward import
 
 export abstract class BinaryOperator extends Operator {
   /** @hidden */
@@ -39,6 +41,17 @@ export abstract class BinaryOperator extends Operator {
 
   isConstant(): boolean {
     return this._operand1.isConstant() && this._operand2.isConstant();
+  }
+
+  interpolateTo(that: BinaryOperator): Interpolator<BinaryOperator>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof BinaryOperator && this.operator() === that.operator()) {
+      return BinaryOperatorInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 }
 Item.BinaryOperator = BinaryOperator;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Strings} from "@swim/util";
+import {HashCode, Compare, Strings} from "@swim/util";
 import {Output, Format, Debug, Display, Base16} from "@swim/codec";
 import type {Form} from "@swim/structure";
 import {UriException} from "./UriException";
@@ -49,7 +49,7 @@ export interface UriInit extends UriAuthorityInit {
   fragment?: AnyUriFragment;
 }
 
-export class Uri implements Comparable, HashCode, Debug, Display {
+export class Uri implements HashCode, Compare, Debug, Display {
   /** @hidden */
   readonly _scheme: UriScheme;
   /** @hidden */
@@ -275,7 +275,7 @@ export class Uri implements Comparable, HashCode, Debug, Display {
     if (arguments.length === 0) {
       return this._path;
     } else {
-      const path = Uri.Path.of.apply(void 0, components);
+      const path = Uri.Path.of(...components);
       if (path !== this._path) {
         return this.copy(this._scheme, this._authority, path, this._query, this._fragment);
       } else {
@@ -321,7 +321,7 @@ export class Uri implements Comparable, HashCode, Debug, Display {
   }
 
   appendedPath(...components: AnyUriPath[]): Uri {
-    return this.path(this._path.appended.apply(this._path, arguments as unknown as AnyUriPath[]));
+    return this.path(this._path.appended(...components));
   }
 
   appendedSlash(): Uri {
@@ -333,7 +333,7 @@ export class Uri implements Comparable, HashCode, Debug, Display {
   }
 
   prependedPath(...components: AnyUriPath[]): Uri {
-    return this.path(this._path.prepended.apply(this._path, arguments as unknown as AnyUriPath[]));
+    return this.path(this._path.prepended(...components));
   }
 
   prependedSlash(): Uri {
@@ -706,7 +706,7 @@ export class Uri implements Comparable, HashCode, Debug, Display {
   }
 
   static path(...components: AnyUriPath[]): Uri {
-    const path = Uri.Path.of.apply(void 0, components);
+    const path = Uri.Path.of(...components);
     return Uri.from(void 0, void 0, path, void 0, void 0);
   }
 
@@ -984,7 +984,7 @@ export class Uri implements Comparable, HashCode, Debug, Display {
   }
 
   /** @hidden */
-  static writePctEncoded(c: number, output: Output) {
+  static writePctEncoded(c: number, output: Output): void {
     const base16 = Base16.lowercase;
     output = output.write(37/*'%'*/)
           .write(base16.encodeDigit(c >>> 4 & 0xF))

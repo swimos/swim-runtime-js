@@ -172,7 +172,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   push(...newItems: AnyItem[]): number {
     const value = this._downlink.get();
     if (value instanceof Record) {
-      return value.push.apply(value, arguments as unknown as AnyItem[]);
+      return value.push(...newItems);
     } else {
       throw new Error("unsupported");
     }
@@ -181,7 +181,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   splice(start: number, deleteCount?: number, ...newItems: AnyItem[]): Item[] {
     const value = this._downlink.get();
     if (value instanceof Record) {
-      return value.splice.apply(value, arguments as any);
+      return value.splice(start, deleteCount, ...newItems);
     } else {
       throw new Error("unsupported");
     }

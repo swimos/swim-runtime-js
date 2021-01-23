@@ -86,7 +86,7 @@ export class InputError extends Input {
 
   declare readonly id: string | undefined;
 
-  withId(id: string | undefined) {
+  withId(id: string | undefined): Input {
     return new InputError(this.error, id, this.mark, this.settings);
   }
 

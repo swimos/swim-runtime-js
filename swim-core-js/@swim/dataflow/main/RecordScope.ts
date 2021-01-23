@@ -38,7 +38,7 @@ export class RecordScope extends RecordModel {
   }
 
   static of(...items: AnyItem[]): RecordScope {
-    return RecordScope.from(Record.of.apply(void 0, arguments as unknown as AnyItem[]));
+    return RecordScope.from(Record.of(...items));
   }
 }
 RecordOutlet.Scope = RecordScope;

@@ -47,7 +47,7 @@ export class TimeZone implements HashCode, Debug {
     return this._offset;
   }
 
-  equals(that: unknown) {
+  equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof TimeZone) {

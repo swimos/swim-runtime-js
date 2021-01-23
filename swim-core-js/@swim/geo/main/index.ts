@@ -25,6 +25,7 @@ export {
   GeoPointInit,
   GeoPoint,
 } from "./GeoPoint";
+export {GeoPointInterpolator} from "./GeoPointInterpolator";
 
 export {GeoCurveContext} from "./GeoCurveContext";
 
@@ -35,6 +36,7 @@ export {
   GeoSegmentInit,
   GeoSegment,
 } from "./GeoSegment";
+export {GeoSegmentInterpolator} from "./GeoSegmentInterpolator";
 
 export {GeoSplineContext} from "./GeoSplineContext";
 
@@ -61,12 +63,8 @@ export {
   GeoBoxInit,
   GeoBox,
 } from "./GeoBox";
+export {GeoBoxInterpolator} from "./GeoBoxInterpolator";
 
 export {GeoSet} from "./GeoSet";
 
 export * from "./GeoJson";
-
-export {GeoShapeInterpolator} from "./GeoShapeInterpolator";
-export {GeoPointInterpolator} from "./GeoPointInterpolator";
-export {GeoSegmentInterpolator} from "./GeoSegmentInterpolator";
-export {GeoBoxInterpolator} from "./GeoBoxInterpolator";

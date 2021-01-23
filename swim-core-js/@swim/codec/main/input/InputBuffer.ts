@@ -16,9 +16,9 @@ import {Lazy} from "@swim/util";
 import {Mark} from "../source/Mark";
 import {AnyInputSettings, InputSettings} from "./InputSettings";
 import {Input} from "./Input";
-import {InputBufferEmpty} from "../"; // circular import
-import {InputBufferDone} from "../"; // circular import
-import {InputBufferError} from "../"; // circular import
+import {InputBufferEmpty} from "../"; // forward import
+import {InputBufferDone} from "../"; // forward import
+import {InputBufferError} from "../"; // forward import
 
 /**
  * Non-blocking token stream buffer.

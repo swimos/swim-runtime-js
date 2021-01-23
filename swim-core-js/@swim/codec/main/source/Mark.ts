@@ -14,9 +14,9 @@
 
 import {Lazy, Murmur3, Numbers, Strings, Constructors} from "@swim/util";
 import {Tag} from "./Tag";
-import {Span} from "../"; // circular import
+import {Span} from "../"; // forward import
 import type {Output} from "../output/Output";
-import {Format} from "../"; // circular import
+import {Format} from "../"; // forward import
 
 /**
  * Description of a source position, identified by byte offset, line, and
@@ -68,6 +68,14 @@ export class Mark extends Tag {
    * no attached note.
    */
   declare readonly note: string | undefined;
+
+  withNote(note: string | undefined): Mark {
+    if (this.note !== note) {
+      return Mark.at(this.offset, this.line, this.column, note);
+    } else {
+      return this;
+    }
+  }
 
   /**
    * Returns this position, if its byte offset is less than or equal to

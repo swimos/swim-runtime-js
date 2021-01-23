@@ -15,8 +15,8 @@
 import {OutputException} from "./OutputException";
 import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
 import {Output} from "./Output";
-import {OutputDone} from "../"; // circular import
-import {OutputError} from "../"; // circular import
+import {OutputDone} from "../"; // forward import
+import {OutputError} from "../"; // forward import
 
 /** @hidden */
 export class OutputFull extends Output<never> {

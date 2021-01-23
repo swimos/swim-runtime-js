@@ -14,9 +14,11 @@
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item, Attr, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {Transform} from "./Transform";
+import {AffineTransformInterpolator} from "../"; // forward import
 
 export class AffineTransform extends Transform {
   /** @hidden */
@@ -145,6 +147,17 @@ export class AffineTransform extends Transform {
     return Record.of(Attr.of("matrix", Record.of(this._x0, this._y0,
                                                  this._x1, this._y1,
                                                  this._tx, this._ty)));
+  }
+
+  interpolateTo(that: AffineTransform): Interpolator<AffineTransform>;
+  interpolateTo(that: Transform): Interpolator<Transform>;
+  interpolateTo(that: unknown): Interpolator<Transform> | null;
+  interpolateTo(that: unknown): Interpolator<Transform> | null {
+    if (that instanceof AffineTransform) {
+      return AffineTransformInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   conformsTo(that: Transform): boolean {

@@ -19,7 +19,7 @@ import {Values} from "./Values";
  * Utilities for immutably updating, comparing, and hashing arrays.
  */
 export const Arrays = {} as {
-  readonly empty: ReadonlyArray<any>;
+  readonly empty: ReadonlyArray<never>;
 
   /**
    * Returns a copy of an array with the given element inserted, if the element
@@ -41,7 +41,7 @@ export const Arrays = {} as {
   equal(x: ArrayLike<unknown> | null | undefined, y: ArrayLike<unknown> | null | undefined): boolean;
 
   /**
-   * Returns `true` if `x` and `y` are structurally [[Equivalent.equivalent
+   * Returns `true` if `x` and `y` are structurally [[Equivalent.equivalentTo
    * equivalent]] arrays; otherwise returns `x === y` if either `x` or `y` is
    * not an array.
    */

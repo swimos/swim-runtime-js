@@ -43,7 +43,7 @@ export abstract class BridgeFunc extends Func {
     return Constructors.hash(this.constructor);
   }
 
-  debug(output: Output) {
+  debug(output: Output): void {
     output = output.write(this.constructor.name);
   }
 }

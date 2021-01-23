@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Comparable, HashCode, Strings} from "@swim/util";
+import {HashCode, Compare, Strings} from "@swim/util";
 import {Output, Format, Debug, Display} from "@swim/codec";
 import {Uri} from "./Uri";
 import type {AnyUriUser, UriUserInit, UriUser} from "./UriUser";
@@ -27,7 +27,7 @@ export interface UriAuthorityInit extends UriUserInit {
   port?: AnyUriPort;
 }
 
-export class UriAuthority implements Comparable, HashCode, Debug, Display {
+export class UriAuthority implements HashCode, Compare, Debug, Display {
   /** @hidden */
   readonly _user: UriUser;
   /** @hidden */

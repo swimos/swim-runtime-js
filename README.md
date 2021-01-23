@@ -40,11 +40,11 @@ and strongly typed baseline on which to build higher level libraries.
   composable command line argument parser.
 - [**@swim/unit**](swim-core-js/@swim/unit) –
   specializable unit testing framework.
+- [**@swim/mapping**](swim-core-js/@swim/mapping) –
+  functional maps, interpolators, and scales.
 - [**@swim/collections**](swim-core-js/@swim/collections) –
   immutable, structure sharing collections, including B-trees and S-trees
   (sequence trees).
-- [**@swim/interpolate**](swim-core-js/@swim/interpolate) –
-  extensible interpolators for smoothly blending between values.
 - [**@swim/structure**](swim-core-js/@swim/structure) –
   generic structured data model, with support for selectors, expressions,
   and lambda functions.  Used as a common abstract syntax tree for Recon,
@@ -68,10 +68,6 @@ and strongly typed baseline on which to build higher level libraries.
 - [**@swim/time**](swim-core-js/@swim/time) –
   date-time, time zone, and time interval data types,
   with `strptime`/`strftime`-style parsers and formatters.
-- [**@swim/scale**](swim-core-js/@swim/scale) –
-  mappings from numeric and temporal input domains to interpolated output
-  ranges, with support for continuous domain clamping, domain solving,
-  range unscaling, and interpolation between scales.
 
 ### [**Swim Mesh** Framework](swim-mesh-js)
 

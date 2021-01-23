@@ -13,19 +13,18 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
-import {LazySpec} from "./LazySpec";
-import {Murmur3Spec} from "./Murmur3Spec";
+import {LangSuite} from "./lang/LangSuite";
+import {RuntimeSuite} from "./runtime/RuntimeSuite";
 
 @Unit
 export class UtilSuite extends Spec {
   @Unit
-  lazySpec(): Spec {
-    return new LazySpec();
+  langSuite(): Spec {
+    return new LangSuite();
   }
 
   @Unit
-  murmur3Spec(): Spec {
-    return new Murmur3Spec();
+  runtimeSuite(): Spec {
+    return new RuntimeSuite();
   }
 }

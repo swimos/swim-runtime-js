@@ -729,15 +729,15 @@ export class RecordMap extends Record {
       throw new Error("immutable");
     }
     if ((this._flags & Record.ALIASED) !== 0) {
-      this.pushAliased.apply(this, arguments as unknown as AnyItem[]);
+      this.pushAliased(...newItems);
     } else {
-      this.pushMutable.apply(this, arguments as unknown as AnyItem[]);
+      this.pushMutable(...newItems);
     }
     return this._itemCount;
   }
 
   private pushAliased(...newItems: AnyItem[]): void {
-    const k = arguments.length;
+    const k = newItems.length;
     let m = this._itemCount;
     let n = this._fieldCount;
     const oldArray = this._array;
@@ -748,7 +748,7 @@ export class RecordMap extends Record {
       }
     }
     for (let i = 0; i < k; i += 1) {
-      const newItem = Item.fromAny(arguments[i]);
+      const newItem = Item.fromAny(newItems[i]);
       newArray[m] = newItem;
       m += 1;
       if (newItem instanceof Item.Field) {
@@ -763,7 +763,7 @@ export class RecordMap extends Record {
   }
 
   private pushMutable(...newItems: AnyItem[]): void {
-    const k = arguments.length;
+    const k = newItems.length;
     let m = this._itemCount;
     let n = this._fieldCount;
     const oldArray = this._array;
@@ -779,7 +779,7 @@ export class RecordMap extends Record {
       newArray = oldArray;
     }
     for (let i = 0; i < k; i += 1) {
-      const newItem = Item.fromAny(arguments[i]);
+      const newItem = Item.fromAny(newItems[i]);
       newArray[m] = newItem;
       m += 1;
       if (newItem instanceof Item.Field) {
@@ -803,9 +803,9 @@ export class RecordMap extends Record {
     start = Math.min(Math.max(0, start), n);
     deleteCount = Math.min(Math.max(0, deleteCount), n - start);
     if ((this._flags & Record.ALIASED) !== 0) {
-      return this.spliceAliased.apply(this, arguments as any);
+      return this.spliceAliased(start, deleteCount, ...newItems);
     } else {
-      return this.spliceMutable.apply(this, arguments as any);
+      return this.spliceMutable(start, deleteCount, ...newItems);
     }
   }
 
@@ -1137,7 +1137,7 @@ export class RecordMap extends Record {
   }
 
   static of(...items: AnyItem[]): RecordMap {
-    const n = arguments.length;
+    const n = items.length;
     if (n === 0) {
       return new RecordMap(null, null, 0, 0, Record.ALIASED);
     } else {
@@ -1145,7 +1145,7 @@ export class RecordMap extends Record {
       let itemCount = 0;
       let fieldCount = 0;
       for (let i = 0; i < n; i += 1) {
-        const item = Item.fromAny(arguments[i]);
+        const item = Item.fromAny(items[i]);
         array[i] = item;
         itemCount += 1;
         if (item instanceof Item.Field) {

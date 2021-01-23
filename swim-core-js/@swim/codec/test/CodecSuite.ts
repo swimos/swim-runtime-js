@@ -13,23 +13,10 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
-import {InputsSpec} from "./InputsSpec";
-import {OutputsSpec} from "./OutputsSpec";
 import {DiagnosticSpec} from "./DiagnosticSpec";
 
 @Unit
 export class CodecSuite extends Spec {
-  @Unit
-  inputsSpec(): Spec {
-    return new InputsSpec();
-  }
-
-  @Unit
-  outputsSpec(): Spec {
-    return new OutputsSpec();
-  }
-
   @Unit
   diagnosticSpec(): Spec {
     return new DiagnosticSpec();

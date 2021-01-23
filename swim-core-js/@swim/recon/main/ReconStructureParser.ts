@@ -18,11 +18,9 @@ import {
   Item,
   Attr,
   Slot,
-  AnyValue,
   Value,
   Record,
   Data,
-  AnyText,
   Text,
   Num,
   Bool,
@@ -65,11 +63,19 @@ export class ReconStructureParser extends ReconParser<Item, Value> {
   }
 
   attr(key: Value, value?: Value): Item {
-    return Attr.of.apply(Attr, arguments as unknown as [AnyText, AnyValue?]);
+    if (arguments.length === 1) {
+      return Attr.of(key as Text);
+    } else {
+      return Attr.of(key as Text, value);
+    }
   }
 
   slot(key: Value, value?: Value): Item {
-    return Slot.of.apply(Slot, arguments as unknown as [AnyValue, AnyValue?]);
+    if (arguments.length === 1) {
+      return Slot.of(key);
+    } else {
+      return Slot.of(key, value);
+    }
   }
 
   valueBuilder(): Builder<Item, Value> {

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Test, Exam} from "@swim/unit";
-
 import {CurveR2} from "@swim/math";
 
 export class CurveR2ParserSpec extends Spec {

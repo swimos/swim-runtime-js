@@ -192,20 +192,38 @@ export class Exam implements Assert {
     }
   }
 
-  identity(lhs: unknown, rhs: unknown, message?: string): void {
+  identical(lhs: unknown, rhs: unknown, message?: string): void {
     if (lhs === rhs) {
-      this.proove(Proof.valid("identity", message));
+      this.proove(Proof.valid("identical", message));
     } else {
       this.proove(Proof.refuted(lhs, "===", rhs, message));
       throw new TestException(message);
     }
   }
 
-  notIdentity(lhs: unknown, rhs: unknown, message?: string): void {
+  notIdentical(lhs: unknown, rhs: unknown, message?: string): void {
     if (lhs !== rhs) {
-      this.proove(Proof.valid("not identity", message));
+      this.proove(Proof.valid("not identical", message));
     } else {
       this.proove(Proof.refuted(lhs, "!==", rhs, message));
+      throw new TestException(message);
+    }
+  }
+
+  instanceOf(object: unknown, constructor: Function, message?: string): void {
+    if (object instanceof constructor) {
+      this.proove(Proof.valid("instanceof", message));
+    } else {
+      this.proove(Proof.refuted(object, "instanceof", constructor, message));
+      throw new TestException(message);
+    }
+  }
+
+  notInstanceOf(object: unknown, constructor: Function, message?: string): void {
+    if (!(object instanceof constructor)) {
+      this.proove(Proof.valid("not instanceof", message));
+    } else {
+      this.proove(Proof.refuted(object, "!instanceof", constructor, message));
       throw new TestException(message);
     }
   }

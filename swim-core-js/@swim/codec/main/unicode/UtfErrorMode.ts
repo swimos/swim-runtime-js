@@ -16,8 +16,8 @@ import {Lazy, HashCode} from "@swim/util";
 import type {Output} from "../output/Output";
 import type {Debug} from "../format/Debug";
 import {Format} from "../format/Format";
-import {UtfErrorModeFatal} from "../"; // circular import
-import {UtfErrorModeReplacement} from "../"; // circular import
+import {UtfErrorModeFatal} from "../"; // forward import
+import {UtfErrorModeReplacement} from "../"; // forward import
 
 /**
  * Unicode transformation format error handling mode.

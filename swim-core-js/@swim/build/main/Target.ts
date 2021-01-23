@@ -16,7 +16,7 @@ import * as ChildProcess from "child_process";
 import * as FS from "fs";
 import * as Path from "path";
 import * as ts from "typescript";
-import * as tslint from "tslint";
+import {ESLint, Linter, Rule} from "eslint";
 import * as rollup from "rollup";
 import * as typedoc from "typedoc";
 import * as terser from "terser";
@@ -49,9 +49,9 @@ export class Target {
   preamble: string | undefined;
 
   readonly compilerOptions: ts.CompilerOptions;
-  readonly lintConfig: tslint.Configuration.IConfigurationFile;
   readonly emittedSourceFiles: ts.SourceFile[];
   program: ts.Program | undefined;
+  linter: ESLint | null;
 
   selected: boolean;
   watching: boolean;
@@ -76,8 +76,9 @@ export class Target {
     this.preamble = config.preamble;
 
     this.compilerOptions = config.compilerOptions || this.project.compilerOptions;
-    this.lintConfig = tslint.Configuration.findConfiguration(null, this.baseDir).results!;
     this.emittedSourceFiles = [];
+    this.program = void 0;
+    this.linter = null;
 
     this.selected = false;
     this.watching = false;
@@ -280,19 +281,20 @@ export class Target {
       this.compileStart = Date.now();
       solutionBuilder.build();
 
-      if (!this.failed) {
-        this.lint();
-      }
-      this.emittedSourceFiles.length = 0;
-      if (!this.failed) {
-        this.onCompileSuccess();
-        if (this.selected) {
-          return this.bundle();
-        }
-      } else {
-        this.onCompileFailure();
-      }
-      this.program = void 0;
+      return this.lint()
+        .then((): Promise<unknown> => {
+          this.emittedSourceFiles.length = 0;
+          if (!this.failed) {
+            this.onCompileSuccess();
+            if (this.selected) {
+              return this.bundle();
+            }
+          } else {
+            this.onCompileFailure();
+          }
+          this.program = void 0;
+          return Promise.resolve(void 0);
+        });
     }
     return Promise.resolve(void 0);
   }
@@ -352,7 +354,7 @@ export class Target {
     }
   }
 
-  protected onCompileResult(status: ts.Diagnostic) {
+  protected onCompileResult(status: ts.Diagnostic): void {
     if (this.canCompile()) {
       if (status.code === 6031) {
         // watching
@@ -373,18 +375,18 @@ export class Target {
         console.log(output.bind());
       } else if (status.code === 6194) {
         // complete
-        if (!this.failed) {
-          this.lint();
-        }
-        this.emittedSourceFiles.length = 0;
-        if (!this.failed) {
-          this.onCompileSuccess();
-          if (this.selected) {
-            this.throttleBundle();
-          }
-        } else {
-          this.onCompileFailure();
-        }
+        this.lint()
+          .then(() => {
+            this.emittedSourceFiles.length = 0;
+            if (!this.failed) {
+              this.onCompileSuccess();
+              if (this.selected) {
+                this.throttleBundle();
+              }
+            } else {
+              this.onCompileFailure();
+            }
+          });
       } else {
         this.onCompileError(status);
       }
@@ -474,54 +476,138 @@ export class Target {
     console.log();
   }
 
-  protected lint(): void {
-    const linter = new tslint.Linter({fix: false}, this.program);
-    for (let i = 0; i < this.emittedSourceFiles.length; i += 1) {
-      const sourceFile = this.emittedSourceFiles[i]!;
-      linter.lint(sourceFile.fileName, sourceFile.text, this.lintConfig);
-    }
-    this.onLintResult(linter.getResult());
+  protected createLinter(): ESLint {
+    return new ESLint({
+      useEslintrc: true,
+    });
   }
 
-  protected onLintResult(result: tslint.LintResult): void {
-    for (let i = 0; i < result.failures.length; i += 1) {
-      this.onLintFailure(result.failures[i]!);
-    }
-  }
-
-  protected onLintFailure(failure: tslint.RuleFailure): void {
-    let tag: Tag;
-    if (failure.getEndPosition().getPosition() - failure.getStartPosition().getPosition() > 1) {
-      const start = Target.tslinkMark(failure.getStartPosition());
-      const end = Target.tslinkMark(failure.getEndPosition(), -1, failure.getFailure());
-      tag = Span.from(start, end);
+  protected lint(): Promise<unknown> {
+    if (!this.failed) {
+      let linter = this.linter;
+      if (linter === null) {
+        linter = this.createLinter();
+        this.linter = linter;
+      }
+      return this.lintSourceFiles(linter, this.emittedSourceFiles, 0);
     } else {
-      tag =  Target.tslinkMark(failure.getStartPosition(), 0, failure.getFailure());
+      return Promise.resolve(void 0);
     }
-    const severity = Target.tslintSeverity(failure.getRuleSeverity());
+  }
+
+  protected lintSourceFiles(linter: ESLint, sourceFiles: ReadonlyArray<ts.SourceFile>, index: number): Promise<unknown> {
+    if (index < sourceFiles.length) {
+      const sourceFile = sourceFiles[index]!;
+      return linter.lintText(sourceFile.text, {filePath: sourceFile.fileName})
+        .then((results: ESLint.LintResult[]): void => {
+          for (let i = 0; i < results.length; i += 1) {
+            this.onLintResult(results[i]!);
+          }
+        })
+        .then(this.lintSourceFiles.bind(this, linter, sourceFiles, index + 1));
+    } else {
+      return Promise.resolve(void 0);
+    }
+  }
+
+  protected onLintResult(result: ESLint.LintResult): void {
+    const messages = result.messages;
+    for (let i = 0; i < messages.length; i += 1) {
+      this.onLintMessage(result, messages[i]!);
+    }
+  }
+
+  protected onLintMessage(result: ESLint.LintResult, lint: Linter.LintMessage): void {
+    const diagnostic = this.lintResultDiagnostic(result, lint);
+    console.log(diagnostic.toString(OutputSettings.styled()));
+  }
+
+  protected lintResultDiagnostic(result: ESLint.LintResult, lint: Linter.LintMessage): Diagnostic {
+    let tag: Tag;
+    const startLine = lint.line;
+    const startColumn = lint.column;
+    const endLine = lint.endLine !== void 0 ? lint.endLine : startLine;
+    const endColumn = lint.endColumn !== void 0 ? lint.endColumn : startColumn;
+    if (startLine === endLine && startColumn === endColumn) {
+      tag = Mark.at(0, startLine, startColumn, lint.message);
+    } else {
+      const start = Mark.at(0, startLine, startColumn);
+      const end = Mark.at(0, endLine, endColumn, lint.message);
+      tag = Span.from(start, end);
+    }
+    let severity: Severity;
+    switch (lint.severity) {
+      case 2: severity = Severity.error(); break;
+      case 1: severity = Severity.warning(); break;
+      case 0:
+      default: severity = Severity.info();
+    }
     if (severity.level >= Severity.ERROR_LEVEL) {
       this.failed = true;
     }
 
-    const sourceFile = (failure as any).sourceFile;
-    const input = Unicode.stringInput(sourceFile.text).withId(sourceFile.fileName);
-    const diagnostic = new Diagnostic(input, tag, severity, failure.getRuleName(), void 0, null);
-    console.log(diagnostic.toString(OutputSettings.styled()));
-  }
-
-  private static tslinkMark(pos: tslint.RuleFailurePosition, shift: number = 0, note?: string): Mark {
-    const position = pos.getPosition();
-    const {line, character} = pos.getLineAndCharacter();
-    return Mark.at(position + shift, line + 1, character + shift + 1, note);
-  }
-
-  private static tslintSeverity(severity: tslint.RuleSeverity): Severity {
-    switch (severity) {
-      case "warning": return Severity.warning();
-      case "error": return Severity.error();
-      case "off":
-      default: return Severity.info();
+    let cause: Diagnostic | null = null;
+    if (lint.suggestions !== void 0) {
+      for (let i = lint.suggestions.length - 1; i >= 0; i -= 1) {
+        cause = this.lintSuggestionDiagnostic(result, lint.suggestions[i]!, cause);
+      }
     }
+    if (lint.fix !== void 0) {
+      cause = this.lintFixDiagnostic(result, lint.fix, cause);
+    }
+
+    const input = Unicode.stringInput(result.source!).withId(result.filePath);
+    const message = lint.ruleId !== null ? "lint rule " + lint.ruleId : void 0;
+    return new Diagnostic(input, tag, severity, message, void 0, cause);
+  }
+
+  protected lintSuggestionDiagnostic(result: ESLint.LintResult, suggestion: Linter.LintSuggestion, cause: Diagnostic | null): Diagnostic {
+    let tag: Tag;
+    const [startOffset, endOffset] = suggestion.fix.range;
+    if (startOffset === endOffset) {
+      tag = Target.markAtOffset(result.source!, startOffset, suggestion.desc);
+    } else {
+      tag = Target.spanAtOffsets(result.source!, startOffset, endOffset, suggestion.desc);
+    }
+
+    const input = Unicode.stringInput(result.source!).withId(result.filePath);
+    return new Diagnostic(input, tag, Severity.debug(), "suggestion", void 0, cause);
+  }
+
+  protected lintFixDiagnostic(result: ESLint.LintResult, fix: Rule.Fix, cause: Diagnostic | null): Diagnostic {
+    const note = "Replace with `" + fix.text + "`";
+    let tag: Tag;
+    const [startOffset, endOffset] = fix.range;
+    if (startOffset === endOffset) {
+      tag = Target.markAtOffset(result.source!, startOffset, note);
+    } else {
+      tag = Target.spanAtOffsets(result.source!, startOffset, endOffset, note);
+    }
+
+    const input = Unicode.stringInput(result.source!).withId(result.filePath);
+    return new Diagnostic(input, tag, Severity.debug(), "fix", void 0, cause);
+  }
+
+  private static markAtOffset(source: string, offset: number, note?: string): Mark {
+    let input = Unicode.stringInput(source);
+    for (let i = 0; i < offset; i += 1) {
+      input = input.step();
+    }
+    return input.mark.withNote(note);
+  }
+
+  private static spanAtOffsets(source: string, startOffset: number, endOffset: number, note?: string): Span {
+    let input = Unicode.stringInput(source);
+    let i = 0;
+    for (; i < startOffset; i += 1) {
+      input = input.step();
+    }
+    const start = input.mark;
+    for (; i < endOffset; i += 1) {
+      input = input.step();
+    }
+    const end = input.mark.withNote(note);
+    return Span.from(start, end);
   }
 
   protected cancelBundle(): void {

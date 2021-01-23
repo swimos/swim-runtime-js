@@ -14,6 +14,7 @@
 
 import {Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item} from "./Item";
 import {Value} from "./Value";
 import type {Record} from "./Record";
@@ -86,6 +87,13 @@ export class Extant extends Value {
 
   toAny(): AnyExtant {
     return null;
+  }
+
+  interpolateTo(that: Extant): Interpolator<Extant>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    return super.interpolateTo(that);
   }
 
   typeOrder(): number {

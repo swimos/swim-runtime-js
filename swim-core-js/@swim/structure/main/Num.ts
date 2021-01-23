@@ -13,9 +13,11 @@
 // limitations under the License.
 
 import {Equivalent, Numbers, HashGenCacheSet} from "@swim/util";
+import type {Interpolator} from "@swim/mapping";
 import {Output, Format} from "@swim/codec";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
+import {NumInterpolator} from "./"; // forward import
 
 export type AnyNum = Num | number;
 
@@ -214,6 +216,17 @@ export class Num extends Value {
     return this.compareTo(that) <= 0 ? this : that;
   }
 
+  interpolateTo(that: Num): Interpolator<Num>;
+  interpolateTo(that: Item): Interpolator<Item>;
+  interpolateTo(that: unknown): Interpolator<Item> | null;
+  interpolateTo(that: unknown): Interpolator<Item> | null {
+    if (that instanceof Num) {
+      return NumInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
+  }
+
   typeOrder(): number {
     return 6;
   }
@@ -322,35 +335,22 @@ export class Num extends Value {
     return new Num(value, Num.UINT64);
   }
 
-  static from(value: number | string): Num {
-    if (typeof value === "number") {
-      if (value === 0) {
-        if (1 / value === -Infinity) {
-          return Num.negativeZero();
-        } else {
-          return Num.positiveZero();
-        }
-      } else if (value === 1) {
-        return Num.positiveOne();
-      } else if (value === -1) {
-        return Num.negativeOne();
-      } else if (isNaN(value)) {
-        return Num.nan();
+  static from(value: number): Num {
+    if (value === 0) {
+      if (1 / value === -Infinity) {
+        return Num.negativeZero();
       } else {
-        return Num.cache().put(new Num(value));
+        return Num.positiveZero();
       }
-    } else if (typeof value === "string") {
-      if (value === "NaN") {
-        return Num.nan();
-      } else {
-        const num = +value;
-        if (isFinite(num)) {
-          return Num.from(num);
-        }
-      }
-      throw new Error(value);
+    } else if (value === 1) {
+      return Num.positiveOne();
+    } else if (value === -1) {
+      return Num.negativeOne();
+    } else if (isNaN(value)) {
+      return Num.nan();
+    } else {
+      return Num.cache().put(new Num(value));
     }
-    throw new TypeError("" + value);
   }
 
   static fromAny(value: AnyNum): Num {
@@ -361,6 +361,18 @@ export class Num extends Value {
     } else {
       throw new TypeError("" + value);
     }
+  }
+
+  static parse(value: string): Num {
+    if (value === "NaN") {
+      return Num.nan();
+    } else {
+      const num = +value;
+      if (isFinite(num)) {
+        return Num.from(num);
+      }
+    }
+    throw new Error(value);
   }
 
   /** @hidden */

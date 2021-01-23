@@ -14,10 +14,12 @@
 
 import {Murmur3, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
+import type {Interpolator} from "@swim/mapping";
 import {Item, Attr, Value, Record} from "@swim/structure";
 import {AnyLength, Length} from "../length/Length";
 import {AnyAngle, Angle} from "../angle/Angle";
 import {Transform} from "./Transform";
+import {RotateTransformInterpolator} from "../"; // forward import
 import type {AffineTransform} from "./AffineTransform";
 
 export class RotateTransform extends Transform {
@@ -88,6 +90,17 @@ export class RotateTransform extends Transform {
 
   toValue(): Value {
     return Record.of(Attr.of("rotate", this._a.toString()));
+  }
+
+  interpolateTo(that: RotateTransform): Interpolator<RotateTransform>;
+  interpolateTo(that: Transform): Interpolator<Transform>;
+  interpolateTo(that: unknown): Interpolator<Transform> | null;
+  interpolateTo(that: unknown): Interpolator<Transform> | null {
+    if (that instanceof RotateTransform) {
+      return RotateTransformInterpolator(this, that);
+    } else {
+      return super.interpolateTo(that);
+    }
   }
 
   conformsTo(that: Transform): boolean {

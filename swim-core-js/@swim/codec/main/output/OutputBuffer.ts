@@ -15,10 +15,10 @@
 import {Lazy} from "@swim/util";
 import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
 import {Output} from "./Output";
-import {OutputBufferFull} from "../"; // circular import
-import {OutputBufferDone} from "../"; // circular import
-import {OutputBufferError} from "../"; // circular import
-import {Format} from "../"; // circular import
+import {OutputBufferFull} from "../"; // forward import
+import {OutputBufferDone} from "../"; // forward import
+import {OutputBufferError} from "../"; // forward import
+import {Format} from "../"; // forward import
 
 /**
  * Non-blocking token stream buffer.

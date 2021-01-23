@@ -27,7 +27,7 @@ export const Objects = {} as {
   equal(x: object | null | undefined, y: object | null | undefined): boolean;
 
   /**
-   * Returns `true` if `x` and `y` are structurally [[Equivalent.equivalent
+   * Returns `true` if `x` and `y` are structurally [[Equivalent.equivalentTo
    * equivalent]] objects; otherwise returns `x === y` if either `x` or `y` is
    * not an object.
    */

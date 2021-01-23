@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-
 import {LengthSuite} from "./length/LengthSuite";
 import {AngleSuite} from "./angle/AngleSuite";
 import {R2Suite} from "./r2/R2Suite";

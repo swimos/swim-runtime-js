@@ -27,9 +27,7 @@ declare module "@swim/structure" {
     toRecon(): string;
     toReconBlock(): string;
   }
-}
 
-declare module "@swim/structure" {
   namespace Value {
     function parseRecon(recon: string): Value;
   }
