@@ -12,31 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {Attr} from "./Attr";
 import type {Value} from "./Value";
 import type {Text} from "./Text";
 
 /** @hidden */
-export declare abstract class AttrInterpolator {
+export interface AttrInterpolator extends Interpolator<Attr> {
   /** @hidden */
-  declare readonly keyInterpolator: Interpolator<Text>;
+  readonly keyInterpolator: Interpolator<Text>;
   /** @hidden */
-  declare readonly valueInterpolator: Interpolator<Value>;
+  readonly valueInterpolator: Interpolator<Value>;
 
-  get 0(): Attr;
+  readonly 0: Attr;
 
-  get 1(): Attr;
+  readonly 1: Attr;
 
   equals(that: unknown): boolean;
 }
 
-export interface AttrInterpolator extends Interpolator<Attr> {
-}
-
 /** @hidden */
-export function AttrInterpolator(y0: Attr, y1: Attr): AttrInterpolator {
+export const AttrInterpolator = function (y0: Attr, y1: Attr): AttrInterpolator {
   const interpolator = function (u: number): Attr {
     const key = interpolator.keyInterpolator(u);
     const value = interpolator.valueInterpolator(u);
@@ -52,8 +48,14 @@ export function AttrInterpolator(y0: Attr, y1: Attr): AttrInterpolator {
     enumerable: true,
   });
   return interpolator;
-}
-__extends(AttrInterpolator, Interpolator);
+} as {
+  (y0: Attr, y1: Attr): AttrInterpolator;
+
+  /** @hidden */
+  prototype: AttrInterpolator;
+};
+
+AttrInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(AttrInterpolator.prototype, 0, {
   get(this: AttrInterpolator): Attr {

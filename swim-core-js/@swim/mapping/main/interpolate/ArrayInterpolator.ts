@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "./Interpolator";
 
 /** @hidden */
-export declare abstract class ArrayInterpolator<Y> {
+export interface ArrayInterpolator<Y> extends Interpolator<ReadonlyArray<Y>> {
   /** @hidden */
-  declare readonly interpolators: ReadonlyArray<Interpolator<Y>>;
+  readonly interpolators: ReadonlyArray<Interpolator<Y>>;
 
-  get 0(): ReadonlyArray<Y>;
+  readonly 0: ReadonlyArray<Y>;
 
-  get 1(): ReadonlyArray<Y>;
+  readonly 1: ReadonlyArray<Y>;
 
   equals(that: unknown): boolean;
 }
 
-export interface ArrayInterpolator<Y> extends Interpolator<ReadonlyArray<Y>> {
-}
-
 /** @hidden */
-export function ArrayInterpolator<Y>(y0: ReadonlyArray<Y>, y1: ReadonlyArray<Y>): ArrayInterpolator<Y> {
+export const ArrayInterpolator = function <Y>(y0: ReadonlyArray<Y>, y1: ReadonlyArray<Y>): ArrayInterpolator<Y> {
   const interpolator = function (u: number): ReadonlyArray<Y> {
     const interpolators = interpolator.interpolators;
     const interpolatorCount = interpolators.length;
@@ -52,8 +48,14 @@ export function ArrayInterpolator<Y>(y0: ReadonlyArray<Y>, y1: ReadonlyArray<Y>)
     enumerable: true,
   });
   return interpolator;
-}
-__extends(ArrayInterpolator, Interpolator);
+} as {
+  <Y>(y0: ReadonlyArray<Y>, y1: ReadonlyArray<Y>): ArrayInterpolator<Y>;
+
+  /** @hidden */
+  prototype: ArrayInterpolator<any>;
+};
+
+ArrayInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(ArrayInterpolator.prototype, 0, {
   get<Y>(this: ArrayInterpolator<Y>): ReadonlyArray<Y> {

@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import type {Transform} from "./Transform";
 import {TransformList} from "./TransformList";
 
 /** @hidden */
-export declare abstract class TransformListInterpolator {
+export interface TransformListInterpolator extends Interpolator<TransformList> {
   /** @hidden */
-  declare readonly interpolators: ReadonlyArray<Interpolator<Transform>>;
+  readonly interpolators: ReadonlyArray<Interpolator<Transform>>;
 
-  get 0(): TransformList;
+  readonly 0: TransformList;
 
-  get 1(): TransformList;
+  readonly 1: TransformList;
 
   equals(that: unknown): boolean;
 }
 
-export interface TransformListInterpolator extends Interpolator<TransformList> {
-}
-
 /** @hidden */
-export function TransformListInterpolator(f0: TransformList, f1: TransformList): TransformListInterpolator {
+export const TransformListInterpolator = function (f0: TransformList, f1: TransformList): TransformListInterpolator {
   const interpolator = function (u: number): TransformList {
     const interpolators = interpolator.interpolators;
     const interpolatorCount = interpolators.length;
@@ -56,8 +52,14 @@ export function TransformListInterpolator(f0: TransformList, f1: TransformList):
     enumerable: true,
   });
   return interpolator;
-}
-__extends(TransformListInterpolator, Interpolator);
+} as {
+  (f0: TransformList, f1: TransformList): TransformListInterpolator;
+
+  /** @hidden */
+  prototype: TransformListInterpolator;
+};
+
+TransformListInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(TransformListInterpolator.prototype, 0, {
   get(this: TransformListInterpolator): TransformList {

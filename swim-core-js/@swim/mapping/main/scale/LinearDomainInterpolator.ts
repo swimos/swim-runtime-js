@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "../interpolate/Interpolator";
 import {LinearDomain} from "./LinearDomain";
 
 /** @hidden */
-export function LinearDomainInterpolator(x0: LinearDomain, x1: LinearDomain): Interpolator<LinearDomain> {
+export const LinearDomainInterpolator = function (x0: LinearDomain, x1: LinearDomain): Interpolator<LinearDomain> {
   const interpolator = function (u: number): LinearDomain {
     const x0 = interpolator[0];
     const x00 = x0[0];
@@ -37,5 +36,11 @@ export function LinearDomainInterpolator(x0: LinearDomain, x1: LinearDomain): In
     enumerable: true,
   });
   return interpolator;
-}
-__extends(LinearDomainInterpolator, Interpolator);
+} as {
+  (x0: LinearDomain, x1: LinearDomain): Interpolator<LinearDomain>;
+
+  /** @hidden */
+  prototype: Interpolator<LinearDomain>;
+};
+
+LinearDomainInterpolator.prototype = Object.create(Interpolator.prototype);

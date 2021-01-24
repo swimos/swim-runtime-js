@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {Angle} from "./Angle";
 
 /** @hidden */
-export function AngleInterpolator(a0: Angle, a1: Angle): Interpolator<Angle> {
+export const AngleInterpolator = function (a0: Angle, a1: Angle): Interpolator<Angle> {
   const interpolator = function (u: number): Angle {
     const a0 = interpolator[0];
     const a1 = interpolator[1];
@@ -33,5 +32,11 @@ export function AngleInterpolator(a0: Angle, a1: Angle): Interpolator<Angle> {
     enumerable: true,
   });
   return interpolator;
-}
-__extends(AngleInterpolator, Interpolator);
+} as {
+  (a0: Angle, a1: Angle): Interpolator<Angle>;
+
+  /** @hidden */
+  prototype: Interpolator<Angle>;
+};
+
+AngleInterpolator.prototype = Object.create(Interpolator.prototype);

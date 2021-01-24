@@ -12,30 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import type {Item} from "../Item";
 import {InvokeOperator} from "./InvokeOperator";
 
 /** @hidden */
-export declare abstract class InvokeOperatorInterpolator {
+export interface InvokeOperatorInterpolator extends Interpolator<InvokeOperator> {
   /** @hidden */
-  declare readonly funcInterpolator: Interpolator<Item>;
+  readonly funcInterpolator: Interpolator<Item>;
   /** @hidden */
-  declare readonly argsInterpolator: Interpolator<Item>;
+  readonly argsInterpolator: Interpolator<Item>;
 
-  get 0(): InvokeOperator;
+  readonly 0: InvokeOperator;
 
-  get 1(): InvokeOperator;
+  readonly 1: InvokeOperator;
 
   equals(that: unknown): boolean;
 }
 
-export interface InvokeOperatorInterpolator extends Interpolator<InvokeOperator> {
-}
-
 /** @hidden */
-export function InvokeOperatorInterpolator(y0: InvokeOperator, y1: InvokeOperator): InvokeOperatorInterpolator {
+export const InvokeOperatorInterpolator = function (y0: InvokeOperator, y1: InvokeOperator): InvokeOperatorInterpolator {
   const interpolator = function (u: number): InvokeOperator {
     const func = interpolator.funcInterpolator(u);
     const args = interpolator.argsInterpolator(u);
@@ -51,8 +47,14 @@ export function InvokeOperatorInterpolator(y0: InvokeOperator, y1: InvokeOperato
     enumerable: true,
   });
   return interpolator;
-}
-__extends(InvokeOperatorInterpolator, Interpolator);
+} as {
+  (y0: InvokeOperator, y1: InvokeOperator): InvokeOperatorInterpolator;
+
+  /** @hidden */
+  prototype: InvokeOperatorInterpolator;
+};
+
+InvokeOperatorInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(InvokeOperatorInterpolator.prototype, 0, {
   get(this: InvokeOperatorInterpolator): InvokeOperator {

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Values} from "@swim/util";
 import {Range} from "../mapping/Range";
 import {Interpolate} from "./Interpolate";
@@ -23,10 +22,10 @@ import {NumberInterpolator} from "../"; // forward import
 import {ArrayInterpolator} from "../"; // forward import
 import {InterpolatorInterpolator} from "../"; // forward import
 
-export declare abstract class Interpolator<Y = unknown> implements Interpolate<Interpolator<Y>> {
-  abstract readonly 0: Y;
+export interface Interpolator<Y = unknown> extends Range<Y>, Interpolate<Interpolator<Y>> {
+  readonly 0: Y;
 
-  abstract readonly 1: Y;
+  readonly 1: Y;
 
   map<FY>(transform: (y: Y) => FY): Interpolator<FY>;
 
@@ -40,12 +39,7 @@ export declare abstract class Interpolator<Y = unknown> implements Interpolate<I
   toString(): string;
 }
 
-export interface Interpolator<Y> extends Range<Y> {
-}
-
-export function Interpolator<Y>(y0: Y, y1: Y): Interpolator<Y>;
-export function Interpolator(y0: unknown, y1: unknown): Interpolator;
-export function Interpolator(y0: unknown, y1: unknown): Interpolator {
+export const Interpolator = function (y0: unknown, y1: unknown): Interpolator {
   let interpolator: Interpolator | null;
   if (y0 === y1) {
     interpolator = IdentityInterpolator(y0);
@@ -60,8 +54,15 @@ export function Interpolator(y0: unknown, y1: unknown): Interpolator {
     }
   }
   return interpolator;
-}
-__extends(Interpolator, Range);
+} as {
+  <Y>(y0: Y, y1: Y): Interpolator<Y>;
+  (y0: unknown, y1: unknown): Interpolator;
+
+  /** @hidden */
+  prototype: Interpolator<any>;
+};
+
+Interpolator.prototype = Object.create(Range.prototype);
 
 Interpolator.prototype.map = function <Y, FY>(this: Interpolator<Y>, transform: (y: Y) => FY): Interpolator<FY> {
   return InterpolatorMap(this, transform);

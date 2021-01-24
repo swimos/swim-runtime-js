@@ -12,31 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import type {Field} from "./Field";
 import {Slot} from "./Slot";
 import type {Value} from "./Value";
 
 /** @hidden */
-export declare abstract class FieldInterpolator {
+export interface FieldInterpolator extends Interpolator<Field> {
   /** @hidden */
-  declare readonly keyInterpolator: Interpolator<Value>;
+  readonly keyInterpolator: Interpolator<Value>;
   /** @hidden */
-  declare readonly valueInterpolator: Interpolator<Value>;
+  readonly valueInterpolator: Interpolator<Value>;
 
-  get 0(): Field;
+  readonly 0: Field;
 
-  get 1(): Field;
+  readonly 1: Field;
 
   equals(that: unknown): boolean;
 }
 
-export interface FieldInterpolator extends Interpolator<Field> {
-}
-
 /** @hidden */
-export function FieldInterpolator(y0: Field, y1: Field): FieldInterpolator {
+export const FieldInterpolator = function (y0: Field, y1: Field): FieldInterpolator {
   const interpolator = function (u: number): Field {
     const key = interpolator.keyInterpolator(u);
     const value = interpolator.valueInterpolator(u);
@@ -52,8 +48,14 @@ export function FieldInterpolator(y0: Field, y1: Field): FieldInterpolator {
     enumerable: true,
   });
   return interpolator;
-}
-__extends(FieldInterpolator, Interpolator);
+} as {
+  (y0: Field, y1: Field): FieldInterpolator;
+
+  /** @hidden */
+  prototype: FieldInterpolator;
+};
+
+FieldInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(FieldInterpolator.prototype, 0, {
   get(this: FieldInterpolator): Field {

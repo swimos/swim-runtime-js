@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {Angle} from "../angle/Angle";
 import {RotateTransform} from "./RotateTransform";
 
 /** @hidden */
-export function RotateTransformInterpolator(f0: RotateTransform, f1: RotateTransform): Interpolator<RotateTransform> {
+export const RotateTransformInterpolator = function (f0: RotateTransform, f1: RotateTransform): Interpolator<RotateTransform> {
   const interpolator = function (u: number): RotateTransform {
     const f0 = interpolator[0];
     const f1 = interpolator[1];
@@ -35,5 +34,11 @@ export function RotateTransformInterpolator(f0: RotateTransform, f1: RotateTrans
     enumerable: true,
   });
   return interpolator;
-}
-__extends(RotateTransformInterpolator, Interpolator);
+} as {
+  (f0: RotateTransform, f1: RotateTransform): Interpolator<RotateTransform>;
+
+  /** @hidden */
+  prototype: Interpolator<RotateTransform>;
+};
+
+RotateTransformInterpolator.prototype = Object.create(Interpolator.prototype);

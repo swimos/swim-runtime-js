@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Values} from "@swim/util";
 import {Domain} from "../mapping/Domain";
 import {Interpolator} from "../interpolate/Interpolator";
 import type {Easing} from "./Easing";
 import {Tweening} from "../"; // forward import
 
-export declare abstract class Timing {
-  abstract readonly easing: Easing;
+export interface Timing extends Domain<number> {
+  readonly 0: number;
 
-  abstract readonly 0: number;
+  readonly 1: number;
 
-  abstract readonly 1: number;
+  readonly duration: number;
 
-  get duration(): number;
+  readonly easing: Easing;
 
   withDomain(t0: number, t1: number): Timing;
 
@@ -40,10 +39,7 @@ export declare abstract class Timing {
   toString(): string;
 }
 
-export interface Timing extends Domain<number> {
-}
-
-export function Timing(easing: Easing, t0: number, t1: number): Timing {
+export const Timing = function (easing: Easing, t0: number, t1: number): Timing {
   const timing = function (t: number): number {
     const t0 = timing[0];
     const t1 = timing[1];
@@ -63,8 +59,14 @@ export function Timing(easing: Easing, t0: number, t1: number): Timing {
     enumerable: true,
   });
   return timing;
-}
-__extends(Timing, Domain);
+} as {
+  (easing: Easing, t0: number, t1: number): Timing;
+
+  /** @hidden */
+  prototype: Timing;
+};
+
+Timing.prototype = Object.create(Domain.prototype);
 
 Object.defineProperty(Timing.prototype, "duration", {
   get(this: Timing): number {

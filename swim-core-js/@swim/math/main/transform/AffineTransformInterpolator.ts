@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {AffineTransform} from "./AffineTransform";
 
 /** @hidden */
-export function AffineTransformInterpolator(f0: AffineTransform, f1: AffineTransform): Interpolator<AffineTransform> {
+export const AffineTransformInterpolator = function (f0: AffineTransform, f1: AffineTransform): Interpolator<AffineTransform> {
   const interpolator = function (u: number): AffineTransform {
     // TODO: interpolate and recompose matrices
     const f0 = interpolator[0];
@@ -41,5 +40,11 @@ export function AffineTransformInterpolator(f0: AffineTransform, f1: AffineTrans
     enumerable: true,
   });
   return interpolator;
-}
-__extends(AffineTransformInterpolator, Interpolator);
+} as {
+  (f0: AffineTransform, f1: AffineTransform): Interpolator<AffineTransform>;
+
+  /** @hidden */
+  prototype: Interpolator<AffineTransform>;
+};
+
+AffineTransformInterpolator.prototype = Object.create(Interpolator.prototype);

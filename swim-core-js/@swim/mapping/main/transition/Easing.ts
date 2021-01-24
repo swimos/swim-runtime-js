@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Timing} from "./Timing";
 
 export type AnyEasing = Easing | EasingType;
@@ -26,54 +25,23 @@ export type EasingType = "linear" | "quad-in" | "quad-out" | "quad-in-out"
                        | "elastic-in" | "elastic-out" | "elastic-in-out"
                        | "bounce-in" | "bounce-out" | "bounce-in-out";
 
-export declare abstract class Easing {
-  declare readonly type: string;
+export interface Easing extends Timing {
+  readonly type: string;
 
-  declare readonly 0: 0;
+  readonly 0: 0;
 
-  declare readonly 1: 1;
+  readonly 1: 1;
 
-  get easing(): this;
+  readonly easing: this;
 
   canEqual(that: unknown): boolean;
 
   equals(that: unknown): boolean;
 
   toString(): string;
-
-  static linear: Easing;
-  static quadIn: Easing;
-  static quadOut: Easing;
-  static quadInOut: Easing;
-  static cubicIn: Easing;
-  static cubicOut: Easing;
-  static cubicInOut: Easing;
-  static quartIn: Easing;
-  static quartOut: Easing;
-  static quartInOut: Easing;
-  static expoIn: Easing;
-  static expoOut: Easing;
-  static expoInOut: Easing;
-  static circIn: Easing;
-  static circOut: Easing;
-  static circInOut: Easing;
-  static backIn: Easing;
-  static backOut: Easing;
-  static backInOut: Easing;
-  static elasticIn: Easing;
-  static elasticOut: Easing;
-  static elasticInOut: Easing;
-  static bounceIn: Easing;
-  static bounceOut: Easing;
-  static bounceInOut: Easing;
-
-  static fromAny(value: AnyEasing): Easing;
 }
 
-export interface Easing extends Timing {
-}
-
-export function Easing(type: string): Easing {
+export const Easing = function (type: string): Easing {
   switch (type) {
     case "linear": return Easing.linear;
     case "quad-in": return Easing.quadIn;
@@ -102,8 +70,42 @@ export function Easing(type: string): Easing {
     case "bounce-in-out": return Easing.bounceInOut;
     default: throw new Error("unknown easing: " + type);
   }
-}
-__extends(Easing, Timing);
+} as {
+  (type: string): Easing;
+
+  /** @hidden */
+  prototype: Easing;
+
+  linear: Easing;
+  quadIn: Easing;
+  quadOut: Easing;
+  quadInOut: Easing;
+  cubicIn: Easing;
+  cubicOut: Easing;
+  cubicInOut: Easing;
+  quartIn: Easing;
+  quartOut: Easing;
+  quartInOut: Easing;
+  expoIn: Easing;
+  expoOut: Easing;
+  expoInOut: Easing;
+  circIn: Easing;
+  circOut: Easing;
+  circInOut: Easing;
+  backIn: Easing;
+  backOut: Easing;
+  backInOut: Easing;
+  elasticIn: Easing;
+  elasticOut: Easing;
+  elasticInOut: Easing;
+  bounceIn: Easing;
+  bounceOut: Easing;
+  bounceInOut: Easing;
+
+  fromAny(value: AnyEasing): Easing;
+};
+
+Easing.prototype = Object.create(Timing.prototype);
 
 Object.defineProperty(Easing.prototype, 0, {
   value: 0,

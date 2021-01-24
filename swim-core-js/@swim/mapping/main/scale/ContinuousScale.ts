@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import type {Mapping} from "../mapping/Mapping";
 import type {Domain} from "../mapping/Domain";
 import type {Range} from "../mapping/Range";
 import {Scale} from "./Scale";
 
-export declare abstract class ContinuousScale<X, Y> {
-  abstract readonly inverse: Mapping<Y, X>;
+export interface ContinuousScale<X, Y> extends Scale<X, Y> {
+  readonly inverse: Mapping<Y, X>;
 
-  abstract withDomain(domain: Domain<X>): ContinuousScale<X, Y>;
-  abstract withDomain(x0: X, x1: X): ContinuousScale<X, Y>;
+  withDomain(domain: Domain<X>): ContinuousScale<X, Y>;
+  withDomain(x0: X, x1: X): ContinuousScale<X, Y>;
 
-  abstract overRange(range: Range<Y>): ContinuousScale<X, Y>;
-  abstract overRange(y0: Y, y1: Y): ContinuousScale<X, Y>;
+  overRange(range: Range<Y>): ContinuousScale<X, Y>;
+  overRange(y0: Y, y1: Y): ContinuousScale<X, Y>;
 
-  abstract clampDomain(xMin: X | undefined, xMax: X | undefined,
-                       zMin: number | undefined, zMax: number | undefined,
-                       epsilon?: number): ContinuousScale<X, Y>;
+  clampDomain(xMin: X | undefined, xMax: X | undefined,
+              zMin: number | undefined, zMax: number | undefined,
+              epsilon?: number): ContinuousScale<X, Y>;
 
-  abstract solveDomain(x1: X, y1: Y, x2?: X, y2?: Y,
-                       reflect?: boolean, epsilon?: number): ContinuousScale<X, Y>;
+  solveDomain(x1: X, y1: Y, x2?: X, y2?: Y,
+              reflect?: boolean, epsilon?: number): ContinuousScale<X, Y>;
 
   canEqual(that: unknown): boolean;
 
@@ -41,14 +40,17 @@ export declare abstract class ContinuousScale<X, Y> {
   toString(): string;
 }
 
-export interface ContinuousScale<X, Y> extends Scale<X, Y> {
-}
-
-/** @hidden */
-export function ContinuousScale(): never {
+export const ContinuousScale = function (): never {
   throw new Error();
-}
-__extends(ContinuousScale, Scale);
+} as {
+  /** @hidden */
+  (): never;
+
+  /** @hidden */
+  prototype: ContinuousScale<any, any>;
+};
+
+ContinuousScale.prototype = Object.create(Scale.prototype);
 
 ContinuousScale.prototype.canEqual = function (that: unknown): boolean {
   return that instanceof ContinuousScale;

@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "../interpolate/Interpolator";
 import {LinearRange} from "./LinearRange";
 
 /** @hidden */
-export function LinearRangeInterpolator(y0: LinearRange, y1: LinearRange): Interpolator<LinearRange> {
+export const LinearRangeInterpolator = function (y0: LinearRange, y1: LinearRange): Interpolator<LinearRange> {
   const interpolator = function (u: number): LinearRange {
     const y0 = interpolator[0];
     const y00 = y0[0];
@@ -37,5 +36,11 @@ export function LinearRangeInterpolator(y0: LinearRange, y1: LinearRange): Inter
     enumerable: true,
   });
   return interpolator;
-}
-__extends(LinearRangeInterpolator, Interpolator);
+} as {
+  (y0: LinearRange, y1: LinearRange): Interpolator<LinearRange>;
+
+  /** @hidden */
+  prototype: Interpolator<LinearRange>;
+};
+
+LinearRangeInterpolator.prototype = Object.create(Interpolator.prototype);

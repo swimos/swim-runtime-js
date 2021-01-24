@@ -12,32 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import type {Item} from "../Item";
 import {ConditionalOperator} from "./ConditionalOperator";
 
 /** @hidden */
-export declare abstract class ConditionalOperatorInterpolator {
+export interface ConditionalOperatorInterpolator extends Interpolator<ConditionalOperator> {
   /** @hidden */
-  declare readonly ifTermInterpolator: Interpolator<Item>;
+  readonly ifTermInterpolator: Interpolator<Item>;
   /** @hidden */
-  declare readonly thenTermInterpolator: Interpolator<Item>;
+  readonly thenTermInterpolator: Interpolator<Item>;
   /** @hidden */
-  declare readonly elseTermInterpolator: Interpolator<Item>;
+  readonly elseTermInterpolator: Interpolator<Item>;
 
-  get 0(): ConditionalOperator;
+  readonly 0: ConditionalOperator;
 
-  get 1(): ConditionalOperator;
+  readonly 1: ConditionalOperator;
 
   equals(that: unknown): boolean;
 }
 
-export interface ConditionalOperatorInterpolator extends Interpolator<ConditionalOperator> {
-}
-
 /** @hidden */
-export function ConditionalOperatorInterpolator(y0: ConditionalOperator, y1: ConditionalOperator): ConditionalOperatorInterpolator {
+export const ConditionalOperatorInterpolator = function (y0: ConditionalOperator, y1: ConditionalOperator): ConditionalOperatorInterpolator {
   const interpolator = function (u: number): ConditionalOperator {
     const ifTerm = interpolator.ifTermInterpolator(u);
     const thenTerm = interpolator.thenTermInterpolator(u);
@@ -58,8 +54,14 @@ export function ConditionalOperatorInterpolator(y0: ConditionalOperator, y1: Con
     enumerable: true,
   });
   return interpolator;
-}
-__extends(ConditionalOperatorInterpolator, Interpolator);
+} as {
+  (y0: ConditionalOperator, y1: ConditionalOperator): ConditionalOperatorInterpolator;
+
+  /** @hidden */
+  prototype: ConditionalOperatorInterpolator;
+};
+
+ConditionalOperatorInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(ConditionalOperatorInterpolator.prototype, 0, {
   get(this: ConditionalOperatorInterpolator): ConditionalOperator {

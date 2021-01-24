@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Equivalent} from "@swim/util";
 import {Mapping, Interpolate, Interpolator, LinearRange, ContinuousScale} from "@swim/mapping";
 import {DateTime} from "../DateTime";
 import {TimeDomain} from "./TimeDomain";
 import {TimeScaleInterpolator} from "./"; // forward import
 
-export declare abstract class TimeScale {
-  declare readonly domain: TimeDomain;
+export interface TimeScale extends ContinuousScale<DateTime, number>, Interpolate<TimeScale> {
+  readonly domain: TimeDomain;
 
-  declare readonly range: LinearRange;
+  readonly range: LinearRange;
 
-  get inverse(): Mapping<number, DateTime>;
+  readonly inverse: Mapping<number, DateTime>;
 
   withDomain(domain: TimeDomain): TimeScale;
   withDomain(x0: DateTime, x1: DateTime): TimeScale;
@@ -49,10 +48,7 @@ export declare abstract class TimeScale {
   toString(): string;
 }
 
-export interface TimeScale extends ContinuousScale<DateTime, number>, Interpolate<TimeScale> {
-}
-
-export function TimeScale(domain: TimeDomain, range: LinearRange): TimeScale {
+export const TimeScale = function (domain: TimeDomain, range: LinearRange): TimeScale {
   const scale = function (x: DateTime): number {
     return scale.range(scale.domain(x));
   } as TimeScale;
@@ -66,8 +62,14 @@ export function TimeScale(domain: TimeDomain, range: LinearRange): TimeScale {
     enumerable: true,
   });
   return scale;
-}
-__extends(TimeScale, ContinuousScale);
+} as {
+  (domain: TimeDomain, range: LinearRange): TimeScale;
+
+  /** @hidden */
+  prototype: TimeScale;
+};
+
+TimeScale.prototype = Object.create(ContinuousScale.prototype);
 
 Object.defineProperty(TimeScale.prototype, "inverse", {
   get(this: TimeScale): Mapping<number, DateTime> {

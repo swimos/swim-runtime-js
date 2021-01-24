@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Mapping} from "../mapping/Mapping";
 import type {Interpolator} from "../interpolate/Interpolator";
 import type {Timing} from "./Timing";
 
-export declare abstract class Tweening<Y> {
-  abstract readonly domain: Timing;
+export interface Tweening<Y> extends Mapping<number, Y> {
+  readonly domain: Timing;
 
-  abstract readonly range: Interpolator<Y>;
+  readonly range: Interpolator<Y>;
 
   withDomain(t0: number, t1: number): Tweening<Y>;
 
@@ -31,10 +30,7 @@ export declare abstract class Tweening<Y> {
   toString(): string;
 }
 
-export interface Tweening<Y> extends Mapping<number, Y> {
-}
-
-export function Tweening<Y>(domain: Timing, range: Interpolator<Y>): Tweening<Y> {
+export const Tweening = function <Y>(domain: Timing, range: Interpolator<Y>): Tweening<Y> {
   const tweening = function (u: number): Y {
     return tweening.range(tweening.domain(u));
   } as Tweening<Y>;
@@ -48,8 +44,14 @@ export function Tweening<Y>(domain: Timing, range: Interpolator<Y>): Tweening<Y>
     enumerable: true,
   });
   return tweening;
-}
-__extends(Tweening, Mapping);
+} as {
+  <Y>(domain: Timing, range: Interpolator<Y>): Tweening<Y>
+
+  /** @hidden */
+  prototype: Tweening<any>;
+};
+
+Tweening.prototype = Object.create(Mapping.prototype);
 
 Tweening.prototype.withDomain = function <Y>(this: Tweening<Y>, t0: number, t1: number): Tweening<Y> {
   return this.domain.withDomain(t0, t1).overRange(this.range);

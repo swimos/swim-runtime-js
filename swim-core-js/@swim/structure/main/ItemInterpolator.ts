@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import type {Item} from "./Item";
 
 /** @hidden */
-export function ItemInterpolator<Y extends Item>(y0: Y, y1: Y): Interpolator<Y> {
+export const ItemInterpolator = function <Y extends Item>(y0: Y, y1: Y): Interpolator<Y> {
   const interpolator = function (u: number): Y {
     return u < 1 ? interpolator[0] : interpolator[1];
   } as Interpolator<Y>;
@@ -31,5 +30,11 @@ export function ItemInterpolator<Y extends Item>(y0: Y, y1: Y): Interpolator<Y> 
     enumerable: true,
   });
   return interpolator;
-}
-__extends(ItemInterpolator, Interpolator);
+} as {
+  <Y extends Item>(y0: Y, y1: Y): Interpolator<Y>;
+
+  /** @hidden */
+  prototype: Interpolator<any>;
+};
+
+ItemInterpolator.prototype = Object.create(Interpolator.prototype);

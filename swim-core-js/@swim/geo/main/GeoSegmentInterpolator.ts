@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {GeoSegment} from "./GeoSegment";
 
 /** @hidden */
-export function GeoSegmentInterpolator(s0: GeoSegment, s1: GeoSegment): Interpolator<GeoSegment> {
+export const GeoSegmentInterpolator = function (s0: GeoSegment, s1: GeoSegment): Interpolator<GeoSegment> {
   const interpolator = function (u: number): GeoSegment {
     const s0 = interpolator[0];
     const s1 = interpolator[1];
@@ -37,5 +36,11 @@ export function GeoSegmentInterpolator(s0: GeoSegment, s1: GeoSegment): Interpol
     enumerable: true,
   });
   return interpolator;
-}
-__extends(GeoSegmentInterpolator, Interpolator);
+} as {
+  (s0: GeoSegment, s1: GeoSegment): Interpolator<GeoSegment>;
+
+  /** @hidden */
+  prototype: Interpolator<GeoSegment>;
+};
+
+GeoSegmentInterpolator.prototype = Object.create(Interpolator.prototype);

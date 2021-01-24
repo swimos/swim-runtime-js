@@ -12,28 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import type {Item} from "./Item";
 import {Record} from "./Record";
 
 /** @hidden */
-export declare abstract class RecordInterpolator {
+export interface RecordInterpolator extends Interpolator<Record> {
   /** @hidden */
-  declare readonly interpolators: ReadonlyArray<Interpolator<Item>>;
+  readonly interpolators: ReadonlyArray<Interpolator<Item>>;
 
-  get 0(): Record;
+  readonly 0: Record;
 
-  get 1(): Record;
+  readonly 1: Record;
 
   equals(that: unknown): boolean;
 }
 
-export interface RecordInterpolator extends Interpolator<Record> {
-}
-
 /** @hidden */
-export function RecordInterpolator(y0: Record, y1: Record): RecordInterpolator {
+export const RecordInterpolator = function (y0: Record, y1: Record): RecordInterpolator {
   const interpolator = function (u: number): Record {
     const interpolators = interpolator.interpolators;
     const interpolatorCount = interpolators.length;
@@ -54,8 +50,14 @@ export function RecordInterpolator(y0: Record, y1: Record): RecordInterpolator {
     enumerable: true,
   });
   return interpolator;
-}
-__extends(RecordInterpolator, Interpolator);
+} as {
+  (y0: Record, y1: Record): RecordInterpolator;
+
+  /** @hidden */
+  prototype: RecordInterpolator;
+};
+
+RecordInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(RecordInterpolator.prototype, 0, {
   get(this: RecordInterpolator): Record {

@@ -12,31 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import type {Item} from "../Item";
 import {Operator} from "../Operator";
 import type {UnaryOperator} from "./UnaryOperator";
 
 /** @hidden */
-export declare abstract class UnaryOperatorInterpolator {
+export interface UnaryOperatorInterpolator extends Interpolator<UnaryOperator> {
   /** @hidden */
-  declare readonly operator: string;
+  readonly operator: string;
   /** @hidden */
-  declare readonly operandInterpolator: Interpolator<Item>;
+  readonly operandInterpolator: Interpolator<Item>;
 
-  get 0(): UnaryOperator;
+  readonly 0: UnaryOperator;
 
-  get 1(): UnaryOperator;
+  readonly 1: UnaryOperator;
 
   equals(that: unknown): boolean;
 }
 
-export interface UnaryOperatorInterpolator extends Interpolator<UnaryOperator> {
-}
-
 /** @hidden */
-export function UnaryOperatorInterpolator(y0: UnaryOperator, y1: UnaryOperator): UnaryOperatorInterpolator {
+export const UnaryOperatorInterpolator = function (y0: UnaryOperator, y1: UnaryOperator): UnaryOperatorInterpolator {
   const operator = y0.operator();
   if (operator !== y1.operator()) {
     throw new Error();
@@ -55,8 +51,14 @@ export function UnaryOperatorInterpolator(y0: UnaryOperator, y1: UnaryOperator):
     enumerable: true,
   });
   return interpolator;
-}
-__extends(UnaryOperatorInterpolator, Interpolator);
+} as {
+  (y0: UnaryOperator, y1: UnaryOperator): UnaryOperatorInterpolator;
+
+  /** @hidden */
+  prototype: UnaryOperatorInterpolator;
+};
+
+UnaryOperatorInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(UnaryOperatorInterpolator.prototype, 0, {
   get(this: UnaryOperatorInterpolator): UnaryOperator {

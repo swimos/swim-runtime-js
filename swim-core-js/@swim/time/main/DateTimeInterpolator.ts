@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {DateTime} from "./DateTime";
 
 /** @hidden */
-export function DateTimeInterpolator(d0: DateTime, d1: DateTime): Interpolator<DateTime> {
+export const DateTimeInterpolator = function (d0: DateTime, d1: DateTime): Interpolator<DateTime> {
   const interpolator = function (u: number): DateTime {
     const d0 = interpolator[0];
     const d1 = interpolator[1];
@@ -33,5 +32,11 @@ export function DateTimeInterpolator(d0: DateTime, d1: DateTime): Interpolator<D
     enumerable: true,
   });
   return interpolator;
-}
-__extends(DateTimeInterpolator, Interpolator);
+} as {
+  (d0: DateTime, d1: DateTime): Interpolator<DateTime>;
+
+  /** @hidden */
+  prototype: Interpolator<DateTime>;
+};
+
+DateTimeInterpolator.prototype = Object.create(Interpolator.prototype);

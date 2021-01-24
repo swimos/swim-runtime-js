@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Mapping} from "../mapping/Mapping";
 import type {Domain} from "../mapping/Domain";
 import type {Range} from "../mapping/Range";
 
-export declare abstract class Scale<X, Y> {
-  abstract readonly inverse: Mapping<Y, X>;
+export interface Scale<X, Y> extends Mapping<X, Y> {
+  readonly inverse: Mapping<Y, X>;
 
-  abstract withDomain(domain: Domain<X>): Scale<X, Y>;
-  abstract withDomain(x0: X, x1: X): Scale<X, Y>;
+  withDomain(domain: Domain<X>): Scale<X, Y>;
+  withDomain(x0: X, x1: X): Scale<X, Y>;
 
-  abstract overRange(range: Range<Y>): Scale<X, Y>;
-  abstract overRange(y0: Y, y1: Y): Scale<X, Y>;
+  overRange(range: Range<Y>): Scale<X, Y>;
+  overRange(y0: Y, y1: Y): Scale<X, Y>;
 
   canEqual(that: unknown): boolean;
 
@@ -33,14 +32,17 @@ export declare abstract class Scale<X, Y> {
   toString(): string;
 }
 
-export interface Scale<X, Y> extends Mapping<X, Y> {
-}
-
-/** @hidden */
-export function Scale(): never {
+export const Scale = function (): never {
   throw new Error();
-}
-__extends(Scale, Mapping);
+} as {
+  /** @hidden */
+  (): never;
+
+  /** @hidden */
+  prototype: Scale<any, any>;
+};
+
+Scale.prototype = Object.create(Mapping.prototype);
 
 Scale.prototype.canEqual = function (that: unknown): boolean {
   return that instanceof Scale;

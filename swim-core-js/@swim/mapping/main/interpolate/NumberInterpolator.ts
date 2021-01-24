@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "./Interpolator";
 
 /** @hidden */
-export function NumberInterpolator(y0: number, y1: number): Interpolator<number> {
+export const NumberInterpolator = function (y0: number, y1: number): Interpolator<number> {
   const interpolator = function (u: number): number {
     const y0 = interpolator[0];
     const y1 = interpolator[1];
@@ -32,5 +31,11 @@ export function NumberInterpolator(y0: number, y1: number): Interpolator<number>
     enumerable: true,
   });
   return interpolator;
-}
-__extends(NumberInterpolator, Interpolator);
+} as {
+  (y0: number, y1: number): Interpolator<number>;
+
+  /** @hidden */
+  prototype: Interpolator<number>;
+};
+
+NumberInterpolator.prototype = Object.create(Interpolator.prototype);

@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {VectorR2} from "./VectorR2";
 
 /** @hidden */
-export function VectorR2Interpolator(v0: VectorR2, v1: VectorR2): Interpolator<VectorR2> {
+export const VectorR2Interpolator = function (v0: VectorR2, v1: VectorR2): Interpolator<VectorR2> {
   const interpolator = function (u: number): VectorR2 {
     const v0 = interpolator[0];
     const v1 = interpolator[1];
@@ -35,5 +34,11 @@ export function VectorR2Interpolator(v0: VectorR2, v1: VectorR2): Interpolator<V
     enumerable: true,
   });
   return interpolator;
-}
-__extends(VectorR2Interpolator, Interpolator);
+} as {
+  (v0: VectorR2, v1: VectorR2): Interpolator<VectorR2>;
+
+  /** @hidden */
+  prototype: Interpolator<VectorR2>;
+};
+
+VectorR2Interpolator.prototype = Object.create(Interpolator.prototype);

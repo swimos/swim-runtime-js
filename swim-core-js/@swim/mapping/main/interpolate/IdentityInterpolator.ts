@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "./Interpolator";
 
 /** @hidden */
-export declare abstract class IdentityInterpolator<Y> {
+export interface IdentityInterpolator<Y> extends Interpolator<Y> {
   /** @hidden */
-  declare readonly value: Y;
+  readonly value: Y;
 
-  get 0(): Y;
+  readonly 0: Y;
 
-  get 1(): Y;
+  readonly 1: Y;
 
   equals(that: unknown): boolean;
 }
 
-export interface IdentityInterpolator<Y> extends Interpolator<Y> {
-}
-
 /** @hidden */
-export function IdentityInterpolator<Y>(value: Y): IdentityInterpolator<Y> {
+export const IdentityInterpolator = function <Y>(value: Y): IdentityInterpolator<Y> {
   const interpolator = function (u: number): Y {
     return interpolator.value;
   } as IdentityInterpolator<Y>;
@@ -41,8 +37,14 @@ export function IdentityInterpolator<Y>(value: Y): IdentityInterpolator<Y> {
     enumerable: true,
   });
   return interpolator;
-}
-__extends(IdentityInterpolator, Interpolator);
+} as {
+  <Y>(value: Y): IdentityInterpolator<Y>;
+
+  /** @hidden */
+  prototype: IdentityInterpolator<any>;
+};
+
+IdentityInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(IdentityInterpolator.prototype, 0, {
   get<Y>(this: IdentityInterpolator<Y>): Y {

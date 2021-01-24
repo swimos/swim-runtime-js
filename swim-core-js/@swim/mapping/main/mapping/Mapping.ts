@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import type {Equals} from "@swim/util";
 import type {Domain} from "./Domain";
 import type {Range} from "./Range";
+ 
+export interface Mapping<X, Y> extends Equals {
+  (x: X): Y;
 
-export declare abstract class Mapping<X, Y> {
-  abstract readonly domain: Domain<X>;
+  readonly domain: Domain<X>;
 
-  abstract readonly range: Range<Y>;
+  readonly range: Range<Y>;
 
   canEqual(that: unknown): boolean;
 
@@ -29,11 +30,7 @@ export declare abstract class Mapping<X, Y> {
   toString(): string;
 }
 
-export interface Mapping<X, Y> extends Equals {
-  (x: X): Y;
-}
-
-export function Mapping<X, Y>(domain: Domain<X>, range: Range<Y>): Mapping<X, Y> {
+export const Mapping = function <X, Y>(domain: Domain<X>, range: Range<Y>): Mapping<X, Y> {
   const mapping = function (x: X): Y {
     return mapping.range(mapping.domain(x));
   } as Mapping<X, Y>;
@@ -47,8 +44,14 @@ export function Mapping<X, Y>(domain: Domain<X>, range: Range<Y>): Mapping<X, Y>
     enumerable: true,
   });
   return mapping;
-}
-__extends(Mapping, Object);
+} as {
+  <X, Y>(domain: Domain<X>, range: Range<Y>): Mapping<X, Y>;
+
+  /** @hidden */
+  prototype: Mapping<any, any>;
+};
+
+Mapping.prototype = Object.create(Object.prototype);
 
 Mapping.prototype.canEqual = function (that: unknown): boolean {
   return that instanceof Mapping;

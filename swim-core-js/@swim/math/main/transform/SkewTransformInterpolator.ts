@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {Angle} from "../angle/Angle";
 import {SkewTransform} from "./SkewTransform";
 
 /** @hidden */
-export function SkewTransformInterpolator(f0: SkewTransform, f1: SkewTransform): Interpolator<SkewTransform> {
+export const SkewTransformInterpolator = function (f0: SkewTransform, f1: SkewTransform): Interpolator<SkewTransform> {
   const interpolator = function (u: number): SkewTransform {
     const f0 = interpolator[0];
     const f1 = interpolator[1];
@@ -37,5 +36,11 @@ export function SkewTransformInterpolator(f0: SkewTransform, f1: SkewTransform):
     enumerable: true,
   });
   return interpolator;
-}
-__extends(SkewTransformInterpolator, Interpolator);
+} as {
+  (f0: SkewTransform, f1: SkewTransform): Interpolator<SkewTransform>;
+
+  /** @hidden */
+  prototype: Interpolator<SkewTransform>;
+};
+
+SkewTransformInterpolator.prototype = Object.create(Interpolator.prototype);

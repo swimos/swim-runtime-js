@@ -12,30 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "./Interpolator";
 
 /** @hidden */
-export declare abstract class InterpolatorMap<Y, FY> {
+export interface InterpolatorMap<Y, FY> extends Interpolator<FY> {
   /** @hidden */
-  declare readonly interpolator: Interpolator<Y>;
+  readonly interpolator: Interpolator<Y>;
 
   /** @hidden */
-  declare readonly transform: (y: Y) => FY;
+  readonly transform: (y: Y) => FY;
 
-  get 0(): FY;
+  readonly 0: FY;
 
-  get 1(): FY;
+  readonly 1: FY;
 
   equals(that: unknown): boolean;
 }
 
-export interface InterpolatorMap<Y, FY> extends Interpolator<FY> {
-}
-
-/** @hidden */
-export function InterpolatorMap<Y, FY>(interpolator: Interpolator<Y>,
-                                       transform: (y: Y) => FY): InterpolatorMap<Y, FY> {
+export const InterpolatorMap = function <Y, FY>(interpolator: Interpolator<Y>,
+                                                transform: (y: Y) => FY): InterpolatorMap<Y, FY> {
   const map = function (u: number): FY {
     return map.transform(map.interpolator(u));
   } as InterpolatorMap<Y, FY>;
@@ -49,8 +44,14 @@ export function InterpolatorMap<Y, FY>(interpolator: Interpolator<Y>,
     enumerable: true,
   });
   return map;
-}
-__extends(InterpolatorMap, Interpolator);
+} as {
+  <Y, FY>(interpolator: Interpolator<Y>, transform: (y: Y) => FY): InterpolatorMap<Y, FY>;
+
+  /** @hidden */
+  prototype: InterpolatorMap<any, any>;
+};
+
+InterpolatorMap.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(InterpolatorMap.prototype, 0, {
   get<Y, FY>(this: InterpolatorMap<Y, FY>): FY {

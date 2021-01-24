@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Range} from "../mapping/Range";
 import type {Interpolate} from "../interpolate/Interpolate";
 import type {Interpolator} from "../interpolate/Interpolator";
 import {LinearDomain} from "../"; // forward import
 import {LinearRangeInterpolator} from "../"; // forward import
 
-export declare abstract class LinearRange {
-  declare readonly 0: number;
+export interface LinearRange extends Range<number>, Interpolate<LinearRange> {
+  readonly 0: number;
 
-  declare readonly 1: number;
+  readonly 1: number;
 
-  get inverse(): LinearDomain;
+  readonly inverse: LinearDomain;
 
   interpolateTo(that: LinearRange): Interpolator<LinearRange>;
   interpolateTo(that: unknown): Interpolator<LinearRange> | null;
@@ -36,10 +35,7 @@ export declare abstract class LinearRange {
   toString(): string;
 }
 
-export interface LinearRange extends Range<number>, Interpolate<LinearRange> {
-}
-
-export function LinearRange(y0: number, y1: number): LinearRange {
+export const LinearRange = function (y0: number, y1: number): LinearRange {
   const range = function (u: number): number {
     const y0 = range[0];
     const y1 = range[1];
@@ -55,8 +51,14 @@ export function LinearRange(y0: number, y1: number): LinearRange {
     enumerable: true,
   });
   return range;
-}
-__extends(LinearRange, Range);
+} as {
+  (y0: number, y1: number): LinearRange;
+
+  /** @hidden */
+  prototype: LinearRange;
+};
+
+LinearRange.prototype = Object.create(Range.prototype);
 
 Object.defineProperty(LinearRange.prototype, "inverse", {
   get(this: LinearRange): LinearDomain {

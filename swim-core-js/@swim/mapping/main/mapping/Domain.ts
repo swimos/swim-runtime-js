@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Values} from "@swim/util";
 import {Mapping} from "./Mapping";
 import {Range} from "../"; // forward import
@@ -21,28 +20,23 @@ import type {LinearRange} from "../scale/LinearRange";
 
 export type AnyDomain<X> = Domain<X> | readonly [X, X];
 
-export declare abstract class Domain<X> {
-  abstract readonly 0: X;
+export interface Domain<X> extends Mapping<X, number> {
+  readonly 0: X;
 
-  abstract readonly 1: X;
+  readonly 1: X;
 
-  get domain(): this;
+  readonly domain: this;
 
-  get range(): LinearRange;
+  readonly range: LinearRange;
 
   canEqual(that: unknown): boolean;
 
   equals(that: unknown): boolean;
 
   toString(): string;
-
-  static get unit(): LinearDomain;
 }
 
-export interface Domain<X> extends Mapping<X, number> {
-}
-
-export function Domain<X>(x0: X, x1: X): Domain<X> {
+export const Domain = function <X>(x0: X, x1: X): Domain<X> {
   const domain = function (x: X): number {
     return Values.equal(x, domain[1]) ? 1 : 0;
   } as Domain<X>;
@@ -56,8 +50,16 @@ export function Domain<X>(x0: X, x1: X): Domain<X> {
     enumerable: true,
   });
   return domain;
-}
-__extends(Domain, Mapping);
+} as {
+  <X>(x0: X, x1: X): Domain<X>;
+
+  /** @hidden */
+  prototype: Domain<any>;
+
+  readonly unit: LinearDomain;
+};
+
+Domain.prototype = Object.create(Mapping.prototype);
 
 Object.defineProperty(Domain.prototype, "domain", {
   get<X>(this: Domain<X>): Domain<X> {

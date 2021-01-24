@@ -12,33 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import type {Item} from "../Item";
 import {Operator} from "../Operator";
 import type {BinaryOperator} from "./BinaryOperator";
 
 /** @hidden */
-export declare abstract class BinaryOperatorInterpolator {
+export interface BinaryOperatorInterpolator extends Interpolator<BinaryOperator> {
   /** @hidden */
-  declare readonly operand1Interpolator: Interpolator<Item>;
+  readonly operand1Interpolator: Interpolator<Item>;
   /** @hidden */
-  declare readonly operator: string;
+  readonly operator: string;
   /** @hidden */
-  declare readonly operand2Interpolator: Interpolator<Item>;
+  readonly operand2Interpolator: Interpolator<Item>;
 
-  get 0(): BinaryOperator;
+  readonly 0: BinaryOperator;
 
-  get 1(): BinaryOperator;
+  readonly 1: BinaryOperator;
 
   equals(that: unknown): boolean;
 }
 
-export interface BinaryOperatorInterpolator extends Interpolator<BinaryOperator> {
-}
-
 /** @hidden */
-export function BinaryOperatorInterpolator(y0: BinaryOperator, y1: BinaryOperator): BinaryOperatorInterpolator {
+export const BinaryOperatorInterpolator = function (y0: BinaryOperator, y1: BinaryOperator): BinaryOperatorInterpolator {
   const operator = y0.operator();
   if (operator !== y1.operator()) {
     throw new Error();
@@ -62,8 +58,14 @@ export function BinaryOperatorInterpolator(y0: BinaryOperator, y1: BinaryOperato
     enumerable: true,
   });
   return interpolator;
-}
-__extends(BinaryOperatorInterpolator, Interpolator);
+} as {
+  (y0: BinaryOperator, y1: BinaryOperator): BinaryOperatorInterpolator;
+
+  /** @hidden */
+  prototype: BinaryOperatorInterpolator;
+};
+
+BinaryOperatorInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(BinaryOperatorInterpolator.prototype, 0, {
   get(this: BinaryOperatorInterpolator): BinaryOperator {

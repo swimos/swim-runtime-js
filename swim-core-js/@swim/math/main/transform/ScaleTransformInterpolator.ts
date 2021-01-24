@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {ScaleTransform} from "./ScaleTransform";
 
 /** @hidden */
-export function ScaleTransformInterpolator(f0: ScaleTransform, f1: ScaleTransform): Interpolator<ScaleTransform> {
+export const ScaleTransformInterpolator = function (f0: ScaleTransform, f1: ScaleTransform): Interpolator<ScaleTransform> {
   const interpolator = function (u: number): ScaleTransform {
     const f0 = interpolator[0];
     const f1 = interpolator[1];
@@ -35,5 +34,11 @@ export function ScaleTransformInterpolator(f0: ScaleTransform, f1: ScaleTransfor
     enumerable: true,
   });
   return interpolator;
-}
-__extends(ScaleTransformInterpolator, Interpolator);
+} as {
+  (f0: ScaleTransform, f1: ScaleTransform): Interpolator<ScaleTransform>;
+
+  /** @hidden */
+  prototype: Interpolator<ScaleTransform>;
+};
+
+ScaleTransformInterpolator.prototype = Object.create(Interpolator.prototype);

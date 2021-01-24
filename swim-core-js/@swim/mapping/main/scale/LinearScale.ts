@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Equivalent} from "@swim/util";
 import type {Interpolate} from "../interpolate/Interpolate";
 import type {Interpolator} from "../interpolate/Interpolator";
@@ -21,12 +20,12 @@ import {LinearRange} from "./LinearRange";
 import {ContinuousScale} from "./ContinuousScale";
 import {LinearScaleInterpolator} from "./"; // forward import
 
-export declare abstract class LinearScale {
-  declare readonly domain: LinearDomain;
+export interface LinearScale extends ContinuousScale<number, number>, Interpolate<LinearScale> {
+  readonly domain: LinearDomain;
 
-  declare readonly range: LinearRange;
+  readonly range: LinearRange;
 
-  get inverse(): LinearScale;
+  readonly inverse: LinearScale;
 
   withDomain(domain: LinearDomain): LinearScale;
   withDomain(x0: number, x1: number): LinearScale;
@@ -51,10 +50,7 @@ export declare abstract class LinearScale {
   toString(): string;
 }
 
-export interface LinearScale extends ContinuousScale<number, number>, Interpolate<LinearScale> {
-}
-
-export function LinearScale(domain: LinearDomain, range: LinearRange): LinearScale {
+export const LinearScale = function (domain: LinearDomain, range: LinearRange): LinearScale {
   const scale = function (x: number): number {
     return scale.range(scale.domain(x));
   } as LinearScale;
@@ -68,8 +64,14 @@ export function LinearScale(domain: LinearDomain, range: LinearRange): LinearSca
     enumerable: true,
   });
   return scale;
-}
-__extends(LinearScale, ContinuousScale);
+} as {
+  (domain: LinearDomain, range: LinearRange): LinearScale;
+
+  /** @hidden */
+  prototype: LinearScale;
+};
+
+LinearScale.prototype = Object.create(ContinuousScale.prototype);
 
 Object.defineProperty(LinearScale.prototype, "inverse", {
   get(this: LinearScale): LinearScale {

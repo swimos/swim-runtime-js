@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Domain, Interpolate, Interpolator} from "@swim/mapping";
 import type {DateTime} from "../DateTime";
 import {TimeDomainInterpolator} from "./"; // forward import
 import {TimeRange} from "./"; // forward import
 
-export declare abstract class TimeDomain {
-  declare readonly 0: DateTime;
+export interface TimeDomain extends Domain<DateTime>, Interpolate<TimeDomain> {
+  readonly 0: DateTime;
 
-  declare readonly 1: DateTime;
+  readonly 1: DateTime;
 
-  get inverse(): TimeRange;
+  readonly inverse: TimeRange;
 
   interpolateTo(that: TimeDomain): Interpolator<TimeDomain>;
   interpolateTo(that: unknown): Interpolator<TimeDomain> | null;
@@ -35,10 +34,7 @@ export declare abstract class TimeDomain {
   toString(): string;
 }
 
-export interface TimeDomain extends Domain<DateTime>, Interpolate<TimeDomain> {
-}
-
-export function TimeDomain(x0: DateTime, x1: DateTime): TimeDomain {
+export const TimeDomain = function (x0: DateTime, x1: DateTime): TimeDomain {
   const domain = function (x: DateTime): number {
     const t0 = domain[0]._time;
     const t1 = domain[1]._time;
@@ -55,8 +51,14 @@ export function TimeDomain(x0: DateTime, x1: DateTime): TimeDomain {
     enumerable: true,
   });
   return domain;
+} as {
+  (x0: DateTime, x1: DateTime): TimeDomain;
+
+  /** @hidden */
+  prototype: TimeDomain;
 }
-__extends(TimeDomain, Domain);
+
+TimeDomain.prototype = Object.create(Domain.prototype);
 
 Object.defineProperty(TimeDomain.prototype, "inverse", {
   get(this: TimeDomain): TimeRange {

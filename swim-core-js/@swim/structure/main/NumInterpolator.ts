@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {Num} from "./Num";
 
 /** @hidden */
-export function NumInterpolator(y0: Num, y1: Num): Interpolator<Num> {
+export const NumInterpolator = function (y0: Num, y1: Num): Interpolator<Num> {
   const interpolator = function (u: number): Num {
     const y0 = interpolator[0].value;
     const y1 = interpolator[1].value;
@@ -33,5 +32,11 @@ export function NumInterpolator(y0: Num, y1: Num): Interpolator<Num> {
     enumerable: true,
   });
   return interpolator;
-}
-__extends(NumInterpolator, Interpolator);
+} as {
+  (y0: Num, y1: Num): Interpolator<Num>;
+
+  /** @hidden */
+  prototype: Interpolator<Num>;
+};
+
+NumInterpolator.prototype = Object.create(Interpolator.prototype);

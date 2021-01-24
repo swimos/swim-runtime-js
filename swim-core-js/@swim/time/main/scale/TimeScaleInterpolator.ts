@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator, LinearRange} from "@swim/mapping";
 import {DateTime} from "../DateTime";
 import {TimeDomain} from "./TimeDomain";
 import {TimeScale} from "./TimeScale";
 
 /** @hidden */
-export function TimeScaleInterpolator(s0: TimeScale, s1: TimeScale): Interpolator<TimeScale> {
+export const TimeScaleInterpolator = function (s0: TimeScale, s1: TimeScale): Interpolator<TimeScale> {
   const interpolator = function (u: number): TimeScale {
     const s0 = interpolator[0];
     const s1 = interpolator[1];
@@ -50,5 +49,11 @@ export function TimeScaleInterpolator(s0: TimeScale, s1: TimeScale): Interpolato
     enumerable: true,
   });
   return interpolator;
-}
-__extends(TimeScaleInterpolator, Interpolator);
+} as {
+  (s0: TimeScale, s1: TimeScale): Interpolator<TimeScale>;
+
+  /** @hidden */
+  prototype: Interpolator<TimeScale>;
+};
+
+TimeScaleInterpolator.prototype = Object.create(Interpolator.prototype);

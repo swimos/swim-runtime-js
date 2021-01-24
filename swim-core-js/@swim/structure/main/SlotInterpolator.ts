@@ -12,30 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {__extends} from "tslib";
 import {Interpolator} from "@swim/mapping";
 import {Slot} from "./Slot";
 import type {Value} from "./Value";
 
 /** @hidden */
-export declare abstract class SlotInterpolator {
+export interface SlotInterpolator extends Interpolator<Slot> {
   /** @hidden */
-  declare readonly keyInterpolator: Interpolator<Value>;
+  readonly keyInterpolator: Interpolator<Value>;
   /** @hidden */
-  declare readonly valueInterpolator: Interpolator<Value>;
+  readonly valueInterpolator: Interpolator<Value>;
 
-  get 0(): Slot;
+  readonly 0: Slot;
 
-  get 1(): Slot;
+  readonly 1: Slot;
 
   equals(that: unknown): boolean;
 }
 
-export interface SlotInterpolator extends Interpolator<Slot> {
-}
-
 /** @hidden */
-export function SlotInterpolator(y0: Slot, y1: Slot): SlotInterpolator {
+export const SlotInterpolator = function (y0: Slot, y1: Slot): SlotInterpolator {
   const interpolator = function (u: number): Slot {
     const key = interpolator.keyInterpolator(u);
     const value = interpolator.valueInterpolator(u);
@@ -51,8 +47,14 @@ export function SlotInterpolator(y0: Slot, y1: Slot): SlotInterpolator {
     enumerable: true,
   });
   return interpolator;
-}
-__extends(SlotInterpolator, Interpolator);
+} as {
+  (y0: Slot, y1: Slot): SlotInterpolator;
+
+  /** @hidden */
+  prototype: SlotInterpolator;
+};
+
+SlotInterpolator.prototype = Object.create(Interpolator.prototype);
 
 Object.defineProperty(SlotInterpolator.prototype, 0, {
   get(this: SlotInterpolator): Slot {
