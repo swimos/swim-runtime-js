@@ -17,7 +17,8 @@ import {OutputSettings, Output, Format} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
 import {AnyValue, Value} from "./Value";
-import {TextOutput} from "./TextOutput";
+import {Num} from "./"; // forward import
+import {TextOutput} from "./"; // forward import
 
 export type AnyText = Text | string;
 
@@ -54,7 +55,7 @@ export class Text extends Value {
   numberValue<T>(orElse: T): number | T;
   numberValue<T>(orElse?: T): number | T | undefined {
     try {
-      return Item.Num.parse(this._value).numberValue();
+      return Num.parse(this._value).numberValue();
     } catch (error) {
       return orElse;
     }
@@ -109,7 +110,7 @@ export class Text extends Value {
     return super.interpolateTo(that);
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 5;
   }
 
@@ -117,7 +118,7 @@ export class Text extends Value {
     if (that instanceof Text) {
       return this._value.localeCompare(that._value);
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -206,4 +207,3 @@ export class Text extends Value {
     return Text._cache;
   }
 }
-Item.Text = Text;

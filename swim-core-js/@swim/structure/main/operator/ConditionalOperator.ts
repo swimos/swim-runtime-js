@@ -16,9 +16,9 @@ import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {Item} from "../Item";
-import {Operator} from "../Operator";
+import {Operator} from "./Operator";
 import {ConditionalOperatorInterpolator} from "../"; // forward import
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class ConditionalOperator extends Operator {
   /** @hidden */
@@ -52,7 +52,7 @@ export class ConditionalOperator extends Operator {
         && this._elseTerm.isConstant();
   }
 
-  precedence(): number {
+  get precedence(): number {
     return 2;
   }
 
@@ -91,7 +91,7 @@ export class ConditionalOperator extends Operator {
     }
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 20;
   }
 
@@ -106,7 +106,7 @@ export class ConditionalOperator extends Operator {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -147,4 +147,3 @@ export class ConditionalOperator extends Operator {
     return new ConditionalOperator(this._ifTerm.clone(), this._thenTerm.clone(), this._elseTerm.clone());
   }
 }
-Item.ConditionalOperator = ConditionalOperator;

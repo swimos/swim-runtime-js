@@ -14,7 +14,7 @@
 
 import {Cursor} from "@swim/util";
 import type {Value} from "../Value";
-import type {Form} from "../Form";
+import type {Form} from "../form/Form";
 
 /** @hidden */
 export class ValueCursor<V> extends Cursor<V> {

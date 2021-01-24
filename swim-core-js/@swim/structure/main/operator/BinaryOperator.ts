@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import type {Interpolator} from "@swim/mapping";
-import {Item} from "../Item";
-import {Operator} from "../Operator";
+import type {Item} from "../Item";
+import {Operator} from "./Operator";
 import {BinaryOperatorInterpolator} from "../"; // forward import
 
 export abstract class BinaryOperator extends Operator {
@@ -29,13 +29,13 @@ export abstract class BinaryOperator extends Operator {
     this._operand2 = operand2;
   }
 
-  operand1(): Item {
+  get operand1(): Item {
     return this._operand1;
   }
 
-  abstract operator(): string;
+  abstract readonly operator: string;
 
-  operand2(): Item {
+  get operand2(): Item {
     return this._operand2;
   }
 
@@ -47,11 +47,10 @@ export abstract class BinaryOperator extends Operator {
   interpolateTo(that: Item): Interpolator<Item>;
   interpolateTo(that: unknown): Interpolator<Item> | null;
   interpolateTo(that: unknown): Interpolator<Item> | null {
-    if (that instanceof BinaryOperator && this.operator() === that.operator()) {
+    if (that instanceof BinaryOperator && this.operator === that.operator) {
       return BinaryOperatorInterpolator(this, that);
     } else {
       return super.interpolateTo(that);
     }
   }
 }
-Item.BinaryOperator = BinaryOperator;

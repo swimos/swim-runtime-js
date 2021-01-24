@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Numbers, Constructors} from "@swim/util";
+import {Lazy, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {Item} from "./Item";
 import {Value} from "./Value";
-import type {Record} from "./Record";
+import {Record} from "./Record";
 
 export type AnyExtant = Extant | null;
 
@@ -50,7 +50,7 @@ export class Extant extends Value {
    * Always returns an empty `Record` because `Extant` is not a distinct value.
    */
   unflattened(): Record {
-    return Value.Record.empty();
+    return Record.empty();
   }
 
   not(): Value {
@@ -96,13 +96,13 @@ export class Extant extends Value {
     return super.interpolateTo(that);
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 98;
   }
 
   compareTo(that: unknown): number {
     if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -127,10 +127,9 @@ export class Extant extends Value {
     output = output.write("null");
   }
 
-  private static readonly _extant: Extant = new Extant();
-
+  @Lazy
   static extant(): Extant {
-    return Extant._extant;
+    return new Extant();
   }
 
   static fromAny(value: AnyExtant): Extant {
@@ -143,4 +142,3 @@ export class Extant extends Value {
     }
   }
 }
-Item.Extant = Extant;

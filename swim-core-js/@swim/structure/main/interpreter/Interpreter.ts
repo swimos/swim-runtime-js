@@ -14,9 +14,9 @@
 
 import {InterpreterException} from "./InterpreterException";
 import {InterpreterSettings} from "./InterpreterSettings";
-import {AnyItem, Item} from "./Item";
-import type {Selector} from "./Selector";
-import type {Operator} from "./Operator";
+import {AnyItem, Item} from "../Item";
+import type {Operator} from "../operator/Operator";
+import type {Selector} from "../selector/Selector";
 
 export type AnyInterpreter = Interpreter | AnyItem;
 
@@ -69,7 +69,7 @@ export class Interpreter {
 
   pushScope(scope: Item): void {
     const scopeDepth = this._scopeDepth;
-    if (scopeDepth >= this._settings._maxScopeDepth) {
+    if (scopeDepth >= this._settings.maxScopeDepth) {
       throw new InterpreterException("scope stack overflow");
     }
     const oldScopeStack = this._scopeStack;

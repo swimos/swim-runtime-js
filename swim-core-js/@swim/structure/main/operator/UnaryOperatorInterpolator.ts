@@ -14,7 +14,7 @@
 
 import {Interpolator} from "@swim/mapping";
 import type {Item} from "../Item";
-import {Operator} from "../Operator";
+import {Operator} from "./Operator";
 import type {UnaryOperator} from "./UnaryOperator";
 
 /** @hidden */
@@ -33,8 +33,8 @@ export interface UnaryOperatorInterpolator extends Interpolator<UnaryOperator> {
 
 /** @hidden */
 export const UnaryOperatorInterpolator = function (y0: UnaryOperator, y1: UnaryOperator): UnaryOperatorInterpolator {
-  const operator = y0.operator();
-  if (operator !== y1.operator()) {
+  const operator = y0.operator;
+  if (operator !== y1.operator) {
     throw new Error();
   }
   const interpolator = function (u: number): UnaryOperator {
@@ -47,7 +47,7 @@ export const UnaryOperatorInterpolator = function (y0: UnaryOperator, y1: UnaryO
     enumerable: true,
   });
   Object.defineProperty(interpolator, "operandInterpolator", {
-    value: y0.operand().interpolateTo(y1.operand()),
+    value: y0.operand.interpolateTo(y1.operand),
     enumerable: true,
   });
   return interpolator;

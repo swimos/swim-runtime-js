@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import type {Builder} from "@swim/util";
-import {Item} from "./Item";
+import type {Item} from "./Item";
 import {Field} from "./Field";
 import {Value} from "./Value";
-import type {Record} from "./Record";
+import {Record} from "./Record";
 
 /** @hidden */
 export class ValueBuilder implements Builder<Item, Value> {
@@ -44,7 +44,7 @@ export class ValueBuilder implements Builder<Item, Value> {
   /** @hidden */
   pushField(item: Field): void {
     if (this._record === null) {
-      this._record = Item.Record.create();
+      this._record = Record.create();
       if (this._value !== null) {
         this._record.push(this._value);
         this._value = null;
@@ -60,7 +60,7 @@ export class ValueBuilder implements Builder<Item, Value> {
     } else if (this._value === null) {
       this._value = item;
     } else {
-      this._record = Item.Record.create();
+      this._record = Record.create();
       this._record.push(this._value);
       this._value = null;
       this._record.push(item);

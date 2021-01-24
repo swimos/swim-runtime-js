@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item} from "./Item";
-import type {Value} from "./Value";
-import {Expression} from "./Expression";
-import type {InvokeOperator} from "./operator/InvokeOperator";
-import type {Interpreter} from "./Interpreter";
+import type {Item} from "../Item";
+import type {Value} from "../Value";
+import {Expression} from "../Expression";
+import type {InvokeOperator} from "../operator/InvokeOperator";
+import type {Interpreter} from "../interpreter/Interpreter";
 
 export abstract class Func extends Expression {
   /** @hidden */
@@ -34,4 +34,3 @@ export abstract class Func extends Expression {
     return false;
   }
 }
-Item.Func = Func;

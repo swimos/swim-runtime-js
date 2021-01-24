@@ -15,8 +15,10 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Field} from "../Field";
+import {Record} from "../Record";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class ValuesSelector extends Selector {
   /** @hidden */
@@ -44,7 +46,7 @@ export class ValuesSelector extends Selector {
     if (interpreter.scopeDepth() !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope();
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const children = scope.iterator();
         // For each child, while none have been selected:
         while (selected === void 0 && children.hasNext()) {
@@ -84,11 +86,11 @@ export class ValuesSelector extends Selector {
     if (interpreter.scopeDepth() !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       let scope = interpreter.popScope();
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const children = scope.iterator();
         while (children.hasNext()) {
           const child = children.next().value!;
-          if (child instanceof Item.Field) {
+          if (child instanceof Field) {
             const oldValue = child.toValue();
             // Push the child value onto the scope stack.
             interpreter.pushScope(oldValue);
@@ -97,7 +99,7 @@ export class ValuesSelector extends Selector {
             // Pop the child value off of the scope stack.
             interpreter.popScope();
             if (newItem.isDefined()) {
-              if (newItem instanceof Item.Field) {
+              if (newItem instanceof Field) {
                 children.set(newItem);
               } else if (newItem !== oldValue) {
                 children.set(child.updatedValue(newItem.toValue()));
@@ -121,7 +123,7 @@ export class ValuesSelector extends Selector {
             }
           }
         }
-      } else if (scope instanceof Item.Field) {
+      } else if (scope instanceof Field) {
         const oldValue = scope.toValue();
         // Push the field value onto the scope stack.
         interpreter.pushScope(oldValue);
@@ -130,7 +132,7 @@ export class ValuesSelector extends Selector {
         // Pop the field value off of the scope stack.
         interpreter.popScope();
         if (newItem.isDefined()) {
-          if (newItem instanceof Item.Field) {
+          if (newItem instanceof Field) {
             scope = newItem;
           } else if (newItem !== oldValue) {
             scope = scope.updatedValue(newItem.toValue());
@@ -169,7 +171,7 @@ export class ValuesSelector extends Selector {
     return new ValuesSelector(this._then.andThen(then));
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 16;
   }
 
@@ -177,7 +179,7 @@ export class ValuesSelector extends Selector {
     if (that instanceof ValuesSelector) {
       return this._then.compareTo(that._then);
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -213,4 +215,3 @@ export class ValuesSelector extends Selector {
     return new ValuesSelector(this._then.clone());
   }
 }
-Item.ValuesSelector = ValuesSelector;

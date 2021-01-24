@@ -17,7 +17,7 @@ import {Input, OutputSettings, Output, Writer, Unicode, Base16, Base64} from "@s
 import type {Interpolator} from "@swim/mapping";
 import {Item} from "./Item";
 import {Value} from "./Value";
-import {DataOutput} from "./DataOutput";
+import {DataOutput} from "./"; // forward import
 
 export type AnyData = Data | Uint8Array;
 
@@ -298,7 +298,7 @@ export class Data extends Value {
     return super.interpolateTo(that);
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 4;
   }
 
@@ -330,7 +330,7 @@ export class Data extends Value {
         return 0;
       }
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -452,4 +452,3 @@ export class Data extends Value {
     return n + 1;
   }
 }
-Item.Data = Data;

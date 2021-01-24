@@ -44,7 +44,7 @@ export class UriForm extends Form<Uri> {
   }
 
   cast(item: Item, object?: Uri): Uri | undefined {
-    const value = item.target();
+    const value = item.target;
     try {
       const string = value.stringValue();
       if (typeof string === "string") {

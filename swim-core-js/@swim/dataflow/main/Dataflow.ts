@@ -363,8 +363,8 @@ Dataflow.compileBinaryOperator = function (operator: BinaryOperator, scope: Outl
 };
 
 Dataflow.compileBinaryOutlet = function (operator: BinaryOperator, outlet: BinaryOutlet, scope: Outlet<Value>): Outlet<Value> {
-  const operand1 = operator.operand1().toValue();
-  const operand2 = operator.operand2().toValue();
+  const operand1 = operator.operand1.toValue();
+  const operand2 = operator.operand2.toValue();
   const operand1Outlet = Dataflow.compile(operand1, scope);
   const operand2Outlet = Dataflow.compile(operand2, scope);
   outlet.operand1Inlet().bindInput(operand1Outlet);
@@ -374,8 +374,8 @@ Dataflow.compileBinaryOutlet = function (operator: BinaryOperator, outlet: Binar
 
 Dataflow.compileOrOperator = function (operator: OrOperator, scope: Outlet<Value>): Outlet<Value> {
   const outlet = new OrOutlet();
-  const operand1 = operator.operand1().toValue();
-  const operand2 = operator.operand2().toValue();
+  const operand1 = operator.operand1.toValue();
+  const operand2 = operator.operand2.toValue();
   const operand1Outlet = Dataflow.compile(operand1, scope);
   const operand2Outlet = Dataflow.compile(operand2, scope);
   outlet.operand1Inlet().bindInput(operand1Outlet);
@@ -385,8 +385,8 @@ Dataflow.compileOrOperator = function (operator: OrOperator, scope: Outlet<Value
 
 Dataflow.compileAndOperator = function (operator: AndOperator, scope: Outlet<Value>): Outlet<Value> {
   const outlet = new AndOutlet();
-  const operand1 = operator.operand1().toValue();
-  const operand2 = operator.operand2().toValue();
+  const operand1 = operator.operand1.toValue();
+  const operand2 = operator.operand2.toValue();
   const operand1Outlet = Dataflow.compile(operand1, scope);
   const operand2Outlet = Dataflow.compile(operand2, scope);
   outlet.operand1Inlet().bindInput(operand1Outlet);
@@ -464,7 +464,7 @@ Dataflow.compileUnaryOperator = function (operator: UnaryOperator, scope: Outlet
 };
 
 Dataflow.compileUnaryOutlet = function (operator: UnaryOperator, outlet: UnaryOutlet, scope: Outlet<Value>): Outlet<Value> {
-  const operand = operator.operand().toValue();
+  const operand = operator.operand.toValue();
   const operandOutlet = Dataflow.compile(operand, scope);
   outlet.operandInlet().bindInput(operandOutlet);
   return outlet;

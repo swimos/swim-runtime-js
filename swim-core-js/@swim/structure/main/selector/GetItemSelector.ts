@@ -15,9 +15,10 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
+import {Record} from "../Record";
 import type {Num} from "../Num";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class GetItemSelector extends Selector {
   /** @hidden */
@@ -53,7 +54,7 @@ export class GetItemSelector extends Selector {
     if (interpreter.scopeDepth() !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
-      if (scope instanceof Item.Record && index < scope.length) {
+      if (scope instanceof Record && index < scope.length) {
         const item = scope.getItem(index);
         // Push the item onto the scope stack.
         interpreter.pushScope(item);
@@ -83,7 +84,7 @@ export class GetItemSelector extends Selector {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       const index = this._index.numberValue();
-      if (scope instanceof Item.Record && index < scope.length) {
+      if (scope instanceof Record && index < scope.length) {
         const oldItem = scope.getItem(index);
         // Push the item onto the scope stack.
         interpreter.pushScope(oldItem);
@@ -114,7 +115,7 @@ export class GetItemSelector extends Selector {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       let selected: Item | undefined;
-      if (scope instanceof Item.Record && index < scope.length) {
+      if (scope instanceof Record && index < scope.length) {
         const item = scope.getItem(index);
         // Substitute the item.
         selected = item.substitute(interpreter);
@@ -136,7 +137,7 @@ export class GetItemSelector extends Selector {
     return new GetItemSelector(this._index, this._then.andThen(then));
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 14;
   }
 
@@ -148,7 +149,7 @@ export class GetItemSelector extends Selector {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -185,4 +186,3 @@ export class GetItemSelector extends Selector {
     return new GetItemSelector(this._index, this._then.clone());
   }
 }
-Item.GetItemSelector = GetItemSelector;

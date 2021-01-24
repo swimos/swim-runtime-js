@@ -243,7 +243,7 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
   }
 
   static fromValue(value: Value): Transform | undefined {
-    const tag = value.tag();
+    const tag = value.tag;
     switch (tag) {
       case "identity": return Transform.Identity.fromValue(value);
       case "translate": return Transform.Translate.fromValue(value);

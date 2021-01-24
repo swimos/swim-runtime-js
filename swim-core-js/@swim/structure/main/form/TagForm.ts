@@ -14,7 +14,7 @@
 
 import type {Item} from "../Item";
 import {Attr} from "../Attr";
-import {Form} from "../Form";
+import {Form} from "./Form";
 
 /** @hidden */
 export class TagForm<T, U = never> extends Form<T, U> {
@@ -68,4 +68,3 @@ export class TagForm<T, U = never> extends Form<T, U> {
     return void 0;
   }
 }
-Form.TagForm = TagForm;

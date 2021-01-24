@@ -15,8 +15,13 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Field} from "../Field";
+import {Attr} from "../Attr";
+import {Slot} from "../Slot";
+import {Record} from "../Record";
+import {Text} from "../Text";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class KeysSelector extends Selector {
   /** @hidden */
@@ -44,13 +49,13 @@ export class KeysSelector extends Selector {
     if (interpreter.scopeDepth() !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope();
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const children = scope.iterator();
         // For each child, while none have been selected:
         while (selected === void 0 && children.hasNext()) {
           const child = children.next().value!;
           // Only fields can have keys.
-          if (child instanceof Item.Field) {
+          if (child instanceof Field) {
             // Push the child key onto the scope stack.
             interpreter.pushScope(child.key);
             // Subselect the child key.
@@ -59,7 +64,7 @@ export class KeysSelector extends Selector {
             interpreter.popScope();
           }
         }
-      } else if (scope instanceof Item.Field) {
+      } else if (scope instanceof Field) {
         // Push the key onto the scope stack.
         interpreter.pushScope(scope.key);
         // Subselect the key.
@@ -87,11 +92,11 @@ export class KeysSelector extends Selector {
     if (interpreter.scopeDepth() !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       let scope = interpreter.popScope();
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const children = scope.iterator();
         while (children.hasNext()) {
           const child = children.next().value!;
-          if (child instanceof Item.Field) {
+          if (child instanceof Field) {
             const oldKey = child.key;
             // Push the key onto the scope stack.
             interpreter.pushScope(oldKey);
@@ -101,10 +106,10 @@ export class KeysSelector extends Selector {
             interpreter.popScope();
             if (newKey.isDefined()) {
               if (oldKey !== newKey) {
-                if (scope instanceof Item.Attr && newKey instanceof Item.Text) {
-                  children.set(Item.Attr.of(newKey, scope.toValue()));
+                if (scope instanceof Attr && newKey instanceof Text) {
+                  children.set(Attr.of(newKey, scope.toValue()));
                 } else {
-                  children.set(Item.Slot.of(newKey, scope.toValue()));
+                  children.set(Slot.of(newKey, scope.toValue()));
                 }
               }
             } else {
@@ -112,7 +117,7 @@ export class KeysSelector extends Selector {
             }
           }
         }
-      } else if (scope instanceof Item.Field) {
+      } else if (scope instanceof Field) {
         const oldKey = scope.key;
         // Push the key onto the scope stack.
         interpreter.pushScope(oldKey);
@@ -122,10 +127,10 @@ export class KeysSelector extends Selector {
         interpreter.popScope();
         if (newKey.isDefined()) {
           if (oldKey !== newKey) {
-            if (scope instanceof Item.Attr && newKey instanceof Item.Text) {
-              scope = Item.Attr.of(newKey, scope.toValue());
+            if (scope instanceof Attr && newKey instanceof Text) {
+              scope = Attr.of(newKey, scope.toValue());
             } else {
-              scope = Item.Slot.of(newKey, scope.toValue());
+              scope = Slot.of(newKey, scope.toValue());
             }
           }
         } else {
@@ -155,7 +160,7 @@ export class KeysSelector extends Selector {
     return new KeysSelector(this._then.andThen(then));
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 15;
   }
 
@@ -163,7 +168,7 @@ export class KeysSelector extends Selector {
     if (that instanceof KeysSelector) {
       return this._then.compareTo(that._then);
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -199,4 +204,3 @@ export class KeysSelector extends Selector {
     return new KeysSelector(this._then.clone());
   }
 }
-Item.KeysSelector = KeysSelector;

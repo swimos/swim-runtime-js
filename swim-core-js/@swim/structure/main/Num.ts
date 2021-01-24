@@ -227,7 +227,7 @@ export class Num extends Value {
     }
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 6;
   }
 
@@ -237,7 +237,7 @@ export class Num extends Value {
       const y = that._value;
       return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -384,4 +384,3 @@ export class Num extends Value {
     return Num._cache;
   }
 }
-Item.Num = Num;

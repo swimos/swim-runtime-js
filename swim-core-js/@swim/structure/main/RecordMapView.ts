@@ -13,10 +13,12 @@
 // limitations under the License.
 
 import {AnyItem, Item} from "./Item";
+import {Field} from "./Field";
+import {Attr} from "./Attr";
 import {AnyValue, Value} from "./Value";
 import {Record} from "./Record";
 import {RecordMap} from "./RecordMap";
-import type {AnyNum} from "./Num";
+import {AnyNum, Num} from "./"; // forward import
 
 /** @hidden */
 export class RecordMapView extends Record {
@@ -41,7 +43,7 @@ export class RecordMapView extends Record {
   isArray(): boolean {
     const array = this._record._array!;
     for (let i = this._lower, n = this._upper; i < n; i += 1) {
-      if (array[i] instanceof Item.Field) {
+      if (array[i] instanceof Field) {
         return false;
       }
     }
@@ -66,7 +68,7 @@ export class RecordMapView extends Record {
     const array = this._record._array!;
     let k = 0;
     for (let i = this._lower, n = this._upper; i < n; i += 1) {
-      if (array[i] instanceof Item.Field) {
+      if (array[i] instanceof Field) {
         k += 1;
       }
     }
@@ -94,24 +96,24 @@ export class RecordMapView extends Record {
     return true;
   }
 
-  tag(): string | undefined {
+  get tag(): string | undefined {
     if (this.length > 0) {
       const item = this._record._array![this._lower];
-      if (item instanceof Item.Attr) {
+      if (item instanceof Attr) {
         return item.key.value;
       }
     }
     return void 0;
   }
 
-  target(): Value {
+  get target(): Value {
     let value: Value | undefined;
     let record: Record | undefined;
     let modified = false;
     const array = this._record._array!;
     for (let i = this._lower, n = this._upper; i < n; i += 1) {
       const item = array[i];
-      if (item instanceof Item.Attr) {
+      if (item instanceof Attr) {
         modified = true;
       } else if (value === void 0 && item instanceof Value) {
         value = item;
@@ -205,7 +207,7 @@ export class RecordMapView extends Record {
   }
 
   getItem(index: AnyNum): Item {
-    if (index instanceof Item.Num) {
+    if (index instanceof Num) {
       index = index.value;
     }
     const n = this.length;
@@ -250,11 +252,11 @@ export class RecordMapView extends Record {
     newArray[this._lower + index] = newItem;
     this._record._array = newArray;
     this._record._table = null;
-    if (newItem instanceof Item.Field) {
-      if (!(oldItem instanceof Item.Field)) {
+    if (newItem instanceof Field) {
+      if (!(oldItem instanceof Field)) {
         this._record._fieldCount += 1;
       }
-    } else if (oldItem instanceof Item.Field) {
+    } else if (oldItem instanceof Field) {
       this._record._fieldCount -= 1;
     }
     this._record._flags &= ~Record.ALIASED;
@@ -264,12 +266,12 @@ export class RecordMapView extends Record {
     const array = this._record._array!;
     const oldItem = array[this._lower + index];
     array[this._lower + index] = newItem;
-    if (newItem instanceof Item.Field) {
+    if (newItem instanceof Field) {
       this._record._table = null;
-      if (!(oldItem instanceof Item.Field)) {
+      if (!(oldItem instanceof Field)) {
         this._record._fieldCount += 1;
       }
-    } else if (oldItem instanceof Item.Field) {
+    } else if (oldItem instanceof Field) {
       this._record._table = null;
       this._record._fieldCount -= 1;
     }
@@ -305,7 +307,7 @@ export class RecordMapView extends Record {
       const newItem = Item.fromAny(newItems[i]);
       newArray[i + this._upper] = newItem;
       m += 1;
-      if (newItem instanceof Item.Field) {
+      if (newItem instanceof Field) {
         n += 1;
       }
     }
@@ -340,7 +342,7 @@ export class RecordMapView extends Record {
       const newItem = Item.fromAny(newItems[i]);
       newArray[i + this._upper] = newItem;
       m += 1;
-      if (newItem instanceof Item.Field) {
+      if (newItem instanceof Field) {
         n += 1;
         this._record._table = null;
       }
@@ -390,7 +392,7 @@ export class RecordMapView extends Record {
     const newArray = new Array(Record.expand(n));
     for (let i = this._lower; i < this._upper; i += 1) {
       const item = oldArray[i];
-      if (item instanceof Item.Field && item.key.equals(key)) {
+      if (item instanceof Field && item.key.equals(key)) {
         for (let j = i + 1; j < n; j += 1, i += 1) {
           newArray[i] = oldArray[j];
         }
@@ -413,7 +415,7 @@ export class RecordMapView extends Record {
     const array = this._record._array!;
     for (let i = this._lower; i < this._upper; i += 1) {
       const item = array[i]!;
-      if (item instanceof Item.Field && item.key.equals(key)) {
+      if (item instanceof Field && item.key.equals(key)) {
         for (let j = i + 1; j < n; j += 1, i += 1) {
           array[i] = array[j]!;
         }
@@ -451,7 +453,7 @@ export class RecordMapView extends Record {
       i += 1;
     }
     while (i < this._upper) {
-      if (oldArray[i] instanceof Item.Field) {
+      if (oldArray[i] instanceof Field) {
         n -= 1;
       }
       i += 1;
@@ -477,7 +479,7 @@ export class RecordMapView extends Record {
     const array = this._record._array!;
     let i = this._lower;
     while (i < this._upper) {
-      if (array[i] instanceof Item.Field) {
+      if (array[i] instanceof Field) {
         n -= 1;
       }
       i += 1;
@@ -486,7 +488,7 @@ export class RecordMapView extends Record {
     let j = this._upper;
     while (j < m) {
       const item = array[j]!;
-      if (item instanceof Item.Field) {
+      if (item instanceof Field) {
         this._record._table = null;
       }
       array[i] = item;
@@ -524,7 +526,7 @@ export class RecordMapView extends Record {
     while (j < m) {
       const item = oldArray[i];
       newArray[j] = item;
-      if (item instanceof Item.Field) {
+      if (item instanceof Field) {
         n += 1;
       }
       i += 1;
@@ -543,7 +545,7 @@ export class RecordMapView extends Record {
     while (j < m) {
       const item = oldArray[i]!;
       newArray[j] = item.clone();
-      if (item instanceof Item.Field) {
+      if (item instanceof Field) {
         n += 1;
       }
       i += 1;
@@ -590,4 +592,3 @@ export class RecordMapView extends Record {
     return void 0;
   }
 }
-Item.RecordMapView = RecordMapView;

@@ -12,19 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {AnyInterpreter, Interpreter} from "./Interpreter";
-import {AnyItem, Item} from "./Item";
-import {AnyValue, Value} from "./Value";
-import type {AnyText} from "./Text";
-import type {AnyNum} from "./Num";
-import {Expression} from "./Expression";
-import type {IdentitySelector} from "./selector/IdentitySelector";
-import type {KeysSelector} from "./selector/KeysSelector";
-import type {ValuesSelector} from "./selector/ValuesSelector";
-import type {ChildrenSelector} from "./selector/ChildrenSelector";
-import type {DescendantsSelector} from "./selector/DescendantsSelector";
-import type {Operator} from "./Operator";
+import {AnyItem, Item} from "../Item";
+import {AnyValue, Value} from "../Value";
+import {Record} from "../Record";
+import {AnyText, Text} from "../Text";
+import {AnyNum, Num} from "../Num";
+import {Expression} from "../Expression";
+import type {Operator} from "../operator/Operator";
+import {InvokeOperator} from "../operator/InvokeOperator";
+import {IdentitySelector} from "../"; // forward import
+import {GetSelector} from "../"; // forward import
+import {GetAttrSelector} from "../"; // forward import
+import {GetItemSelector} from "../"; // forward import
+import {KeysSelector} from "../"; // forward import
+import {ValuesSelector} from "../"; // forward import
+import {ChildrenSelector} from "../"; // forward import
+import {DescendantsSelector} from "../"; // forward import
+import {FilterSelector} from "../"; // forward import
+import {LiteralSelector} from "../"; // forward import
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export abstract class Selector extends Expression {
   /** @hidden */
@@ -55,7 +63,7 @@ export abstract class Selector extends Expression {
 
   evaluate(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const selected = Item.Record.create();
+    const selected = Record.create();
     this.forSelected(interpreter, function (interpreter: Interpreter): void {
       const scope = interpreter.peekScope();
       if (scope !== void 0) {
@@ -71,17 +79,17 @@ export abstract class Selector extends Expression {
 
   get(key: AnyValue): Selector {
     key = Value.fromAny(key);
-    return this.andThen(new Item.GetSelector(key, Selector.identity()));
+    return this.andThen(new GetSelector(key, Selector.identity()));
   }
 
   getAttr(key: AnyText): Selector {
-    key = Item.Text.fromAny(key);
-    return this.andThen(new Item.GetAttrSelector(key, Selector.identity()));
+    key = Text.fromAny(key);
+    return this.andThen(new GetAttrSelector(key, Selector.identity()));
   }
 
   getItem(index: AnyNum): Selector {
-    index = Item.Num.fromAny(index);
-    return this.andThen(new Item.GetItemSelector(index, Selector.identity()));
+    index = Num.fromAny(index);
+    return this.andThen(new GetItemSelector(index, Selector.identity()));
   }
 
   keys(): Selector {
@@ -102,7 +110,7 @@ export abstract class Selector extends Expression {
 
   filter(predicate?: AnyItem): Selector {
     if (arguments.length === 0) {
-      return new Item.FilterSelector(this, Selector.identity());
+      return new FilterSelector(this, Selector.identity());
     } else {
       predicate = Item.fromAny(predicate);
       return this.andThen(predicate.filter());
@@ -110,10 +118,10 @@ export abstract class Selector extends Expression {
   }
 
   invoke(args: Value): Operator {
-    return new Item.InvokeOperator(this, args);
+    return new InvokeOperator(this, args);
   }
 
-  precedence(): number {
+  get precedence(): number {
     return 11;
   }
 
@@ -126,66 +134,51 @@ export abstract class Selector extends Expression {
 
   abstract clone(): Selector;
 
-  /** @hidden */
-  static _identity: IdentitySelector; // defined by IdentitySelector
-  private static _keys?: KeysSelector;
-  private static _values?: ValuesSelector;
-  private static _children?: ChildrenSelector;
-  private static _descendants?: DescendantsSelector;
-
+  @Lazy
   static identity(): Selector {
-    return Selector._identity;
+    return new IdentitySelector();
   }
 
   static get(key: AnyValue): Selector {
     key = Value.fromAny(key);
-    return new Item.GetSelector(key, Selector.identity());
+    return new GetSelector(key, Selector.identity());
   }
 
   static getAttr(key: AnyText): Selector {
-    key = Item.Text.fromAny(key);
-    return new Item.GetAttrSelector(key, Selector.identity());
+    key = Text.fromAny(key);
+    return new GetAttrSelector(key, Selector.identity());
   }
 
   static getItem(index: AnyNum): Selector {
-    index = Item.Num.fromAny(index);
-    return new Item.GetItemSelector(index, Selector.identity());
+    index = Num.fromAny(index);
+    return new GetItemSelector(index, Selector.identity());
   }
 
+  @Lazy
   static keys(): Selector {
-    if (Selector._keys === void 0) {
-      Selector._keys = new Item.KeysSelector(Selector.identity());
-    }
-    return Selector._keys;
+    return new KeysSelector(Selector.identity());
   }
 
+  @Lazy
   static values(): Selector {
-    if (Selector._values === void 0) {
-      Selector._values = new Item.ValuesSelector(Selector.identity());
-    }
-    return Selector._values;
+    return new ValuesSelector(Selector.identity());
   }
 
+  @Lazy
   static children(): Selector {
-    if (Selector._children === void 0) {
-      Selector._children = new Item.ChildrenSelector(Selector.identity());
-    }
-    return Selector._children;
+    return new ChildrenSelector(Selector.identity());
   }
 
+  @Lazy
   static descendants(): Selector {
-    if (Selector._descendants === void 0) {
-      Selector._descendants = new Item.DescendantsSelector(Selector.identity());
-    }
-    return Selector._descendants;
+    return new DescendantsSelector(Selector.identity());
   }
 
   static literal(item: AnyItem): Selector {
     item = Item.fromAny(item);
     if (!(item instanceof Selector)) {
-      item = new Item.LiteralSelector(item, Selector.identity());
+      item = new LiteralSelector(item, Selector.identity());
     }
     return item as Selector;
   }
 }
-Item.Selector = Selector;

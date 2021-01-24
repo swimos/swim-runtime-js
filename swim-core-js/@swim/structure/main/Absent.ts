@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Numbers, Constructors, Cursor} from "@swim/util";
+import {Lazy, Numbers, Constructors, Cursor} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
+import {Attr} from "./Attr";
+import {Slot} from "./Slot";
 import {AnyValue, Value} from "./Value";
-import type {Record} from "./Record";
+import {Record} from "./Record";
 import type {AnyText} from "./Text";
 
 export type AnyAbsent = Absent | undefined;
@@ -50,31 +52,31 @@ export class Absent extends Value {
    * Always returns an empty `Record` because `Absent` is not a distinct value.
    */
   unflattened(): Record {
-    return Value.Record.empty();
+    return Record.empty();
   }
 
   updated(key: AnyValue, value: AnyValue): Record {
-    return Value.Record.of(Item.Slot.of(key, value));
+    return Record.of(Slot.of(key, value));
   }
 
   updatedAttr(key: AnyText, value: AnyValue): Record {
-    return Value.Record.of(Item.Attr.of(key, value));
+    return Record.of(Attr.of(key, value));
   }
 
   updatedSlot(key: AnyValue, value: AnyValue): Record {
-    return Value.Record.of(Item.Slot.of(key, value));
+    return Record.of(Slot.of(key, value));
   }
 
   appended(...items: AnyItem[]): Record {
-    return Value.Record.of(items);
+    return Record.of(items);
   }
 
   prepended(...items: AnyItem[]): Record {
-    return Value.Record.of(items);
+    return Record.of(items);
   }
 
   concat(...items: AnyItem[]): Record {
-    const record = Value.Record.create();
+    const record = Record.create();
     for (let i = 0, n = items.length; i < n; i += 1) {
       Item.fromAny(items[i]).forEach(function (item: Item): void {
         record.push(item);
@@ -140,13 +142,13 @@ export class Absent extends Value {
     return super.interpolateTo(that);
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 99;
   }
 
   compareTo(that: unknown): number {
     if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -171,10 +173,9 @@ export class Absent extends Value {
     output = output.write("undefined");
   }
 
-  private static readonly _absent: Absent = new Absent();
-
+  @Lazy
   static absent(): Absent {
-    return Absent._absent;
+    return new Absent();
   }
 
   static fromAny(value: AnyAbsent): Absent {
@@ -187,4 +188,3 @@ export class Absent extends Value {
     }
   }
 }
-Item.Absent = Absent;

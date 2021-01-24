@@ -15,10 +15,11 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import type {Field} from "../Field";
+import {Field} from "../Field";
 import type {Value} from "../Value";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Record} from "../Record";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class GetSelector extends Selector {
   /** @hidden */
@@ -65,7 +66,7 @@ export class GetSelector extends Selector {
       const scope = interpreter.popScope().toValue();
       let field: Field | undefined;
       // Only records can have members.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         field = scope.getField(key);
         if (field !== void 0) {
           // Push the field value onto the scope stack.
@@ -101,7 +102,7 @@ export class GetSelector extends Selector {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have members.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const oldField = scope.getField(key);
         if (oldField !== void 0) {
           // Push the field value onto the scope stack.
@@ -110,7 +111,7 @@ export class GetSelector extends Selector {
           const newItem = this._then.mapSelected(interpreter, transform, thisArg);
           // Pop the field value off the scope stack.
           interpreter.popScope();
-          if (newItem instanceof Item.Field) {
+          if (newItem instanceof Field) {
             // Replace the original field with the transformed field.
             if (key.equals(newItem.key)) {
               scope.set(key, newItem.toValue());
@@ -159,7 +160,7 @@ export class GetSelector extends Selector {
       const scope = interpreter.popScope().toValue();
       let field: Field | undefined;
       // Only records can have members.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         field = scope.getField(key);
         if (field !== void 0) {
           // Substitute the field value.
@@ -179,7 +180,7 @@ export class GetSelector extends Selector {
     return new GetSelector(this._key, this._then.andThen(then));
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 12;
   }
 
@@ -191,7 +192,7 @@ export class GetSelector extends Selector {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -228,4 +229,3 @@ export class GetSelector extends Selector {
     return new GetSelector(this._key.clone(), this._then.clone());
   }
 }
-Item.GetSelector = GetSelector;

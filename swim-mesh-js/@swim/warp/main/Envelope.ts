@@ -86,7 +86,7 @@ export abstract class Envelope implements HashCode, Debug {
   }
 
   static fromValue(value: Value): Envelope | undefined {
-    switch (value.tag()) {
+    switch (value.tag) {
       case "event": return Envelope.EventMessage.fromValue(value);
       case "command": return Envelope.CommandMessage.fromValue(value);
       case "link": return Envelope.LinkRequest.fromValue(value);

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
+import {Lazy, Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
 import {Output, Format, Debug} from "@swim/codec";
 
 /**
@@ -31,23 +31,17 @@ export interface InterpreterSettingsInit {
 }
 
 export class InterpreterSettings implements Debug, HashCode {
-  /** @hidden */
-  readonly _maxScopeDepth: number;
-
   constructor(maxScopeDepth: number) {
-    this._maxScopeDepth = maxScopeDepth;
+    Object.defineProperty(this, "maxScopeDepth", {
+      value: maxScopeDepth,
+      enumerable: true,
+    });
   }
 
-  maxScopeDepth(): number;
+  declare readonly maxScopeDepth: number;
 
-  maxScopeDepth(maxScopeDepth: number): InterpreterSettings;
-
-  maxScopeDepth(maxScopeDepth?: number): number | InterpreterSettings {
-    if (maxScopeDepth === void 0) {
-      return this._maxScopeDepth;
-    } else {
-      return this.copy(maxScopeDepth);
-    }
+  withMaxScopeDepth(maxScopeDepth: number): InterpreterSettings {
+    return this.copy(maxScopeDepth);
   }
 
   protected copy(maxScopeDepth: number): InterpreterSettings {
@@ -62,32 +56,28 @@ export class InterpreterSettings implements Debug, HashCode {
     if (this === that) {
       return true;
     } else if (that instanceof InterpreterSettings) {
-      return that.canEqual(this) && this._maxScopeDepth === that._maxScopeDepth;
+      return that.canEqual(this) && this.maxScopeDepth === that.maxScopeDepth;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Constructors.hash(InterpreterSettings),
-        Numbers.hash(this._maxScopeDepth)));
+        Numbers.hash(this.maxScopeDepth)));
   }
 
   debug(output: Output): void {
     output = output.write("new").write(32/*' '*/).write("InterpreterSettings")
-        .write(40/*'('*/).debug(this._maxScopeDepth).write(41/*')'*/);
+        .write(40/*'('*/).debug(this.maxScopeDepth).write(41/*')'*/);
   }
 
   toString(): string {
     return Format.debug(this);
   }
 
-  private static _standard?: InterpreterSettings;
-
+  @Lazy
   static standard(): InterpreterSettings {
-    if (InterpreterSettings._standard === void 0) {
-      const maxScopeDepth = 1024;
-      InterpreterSettings._standard = new InterpreterSettings(maxScopeDepth);
-    }
-    return InterpreterSettings._standard;
+    const maxScopeDepth = 1024;
+    return new InterpreterSettings(maxScopeDepth);
   }
 }

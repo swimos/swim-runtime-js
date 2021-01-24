@@ -16,18 +16,18 @@ import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {BinaryOperator} from "./BinaryOperator";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {AnyInterpreter, Interpreter} from "../interpreter/Interpreter";
 
 export class OrOperator extends BinaryOperator {
   constructor(operand1: Item, operand2: Item) {
     super(operand1, operand2);
   }
 
-  operator(): string {
+  get operator(): string {
     return "||";
   }
 
-  precedence(): number {
+  get precedence(): number {
     return 3;
   }
 
@@ -53,7 +53,7 @@ export class OrOperator extends BinaryOperator {
     return argument1.or(argument2);
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 21;
   }
 
@@ -65,7 +65,7 @@ export class OrOperator extends BinaryOperator {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -103,4 +103,3 @@ export class OrOperator extends BinaryOperator {
     return new OrOperator(this._operand1.clone(), this._operand2.clone());
   }
 }
-Item.OrOperator = OrOperator;

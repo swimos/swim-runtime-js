@@ -18,8 +18,19 @@ import type {Interpolator} from "@swim/mapping";
 import {AnyItem, Item} from "./Item";
 import {AnyField, Field} from "./Field";
 import {SlotInterpolator} from "./"; // forward import
-import type {AnyValue, Value} from "./Value";
-import {AnyInterpreter, Interpreter} from "./Interpreter";
+import {AnyValue, Value} from "./"; // forward import
+import {Text} from "./"; // forward import
+import {Extant} from "./" // forward import
+import {Expression} from "./"; // forward import
+import {BitwiseOrOperator} from "./"; // forward import
+import {BitwiseXorOperator} from "./"; // forward import
+import {BitwiseAndOperator} from "./"; // forward import
+import {PlusOperator} from "./"; // forward import
+import {MinusOperator} from "./"; // forward import
+import {TimesOperator} from "./"; // forward import
+import {DivideOperator} from "./"; // forward import
+import {ModuloOperator} from "./"; // forward import
+import {AnyInterpreter, Interpreter} from "./"; // forward import
 
 export class Slot extends Field {
   /** @hidden */
@@ -29,7 +40,7 @@ export class Slot extends Field {
   /** @hidden */
   _flags: number;
 
-  constructor(key: Value, value: Value = Item.Value.extant(), flags: number = 0) {
+  constructor(key: Value, value: Value = Value.extant(), flags: number = 0) {
     super();
     this._key = key.commit();
     this._value = value;
@@ -63,16 +74,16 @@ export class Slot extends Field {
 
   bitwiseOr(that: AnyItem): Item {
     that = Item.fromAny(that);
-    if (that instanceof Item.Expression) {
-      return new Item.BitwiseOrOperator(this, that);
+    if (that instanceof Expression) {
+      return new BitwiseOrOperator(this, that);
     }
     let newValue;
     if (that instanceof Slot && this._key.equals(that._key)) {
       newValue = this._value.bitwiseOr(that._value);
-    } else if (that instanceof Item.Value) {
+    } else if (that instanceof Value) {
       newValue = this._value.bitwiseOr(that);
     } else {
-      newValue = Item.Value.absent();
+      newValue = Value.absent();
     }
     if (newValue.isDefined()) {
       return new Slot(this._key, newValue);
@@ -82,16 +93,16 @@ export class Slot extends Field {
 
   bitwiseXor(that: AnyItem): Item {
     that = Item.fromAny(that);
-    if (that instanceof Item.Expression) {
-      return new Item.BitwiseXorOperator(this, that);
+    if (that instanceof Expression) {
+      return new BitwiseXorOperator(this, that);
     }
     let newValue;
     if (that instanceof Slot && this._key.equals(that._key)) {
       newValue = this._value.bitwiseXor(that._value);
-    } else if (that instanceof Item.Value) {
+    } else if (that instanceof Value) {
       newValue = this._value.bitwiseXor(that);
     } else {
-      newValue = Item.Value.absent();
+      newValue = Value.absent();
     }
     if (newValue.isDefined()) {
       return new Slot(this._key, newValue);
@@ -101,16 +112,16 @@ export class Slot extends Field {
 
   bitwiseAnd(that: AnyItem): Item {
     that = Item.fromAny(that);
-    if (that instanceof Item.Expression) {
-      return new Item.BitwiseAndOperator(this, that);
+    if (that instanceof Expression) {
+      return new BitwiseAndOperator(this, that);
     }
     let newValue;
     if (that instanceof Slot && this._key.equals(that._key)) {
       newValue = this._value.bitwiseAnd(that._value);
-    } else if (that instanceof Item.Value) {
+    } else if (that instanceof Value) {
       newValue = this._value.bitwiseAnd(that);
     } else {
-      newValue = Item.Value.absent();
+      newValue = Value.absent();
     }
     if (newValue.isDefined()) {
       return new Slot(this._key, newValue);
@@ -120,16 +131,16 @@ export class Slot extends Field {
 
   plus(that: AnyItem): Item {
     that = Item.fromAny(that);
-    if (that instanceof Item.Expression) {
-      return new Item.PlusOperator(this, that);
+    if (that instanceof Expression) {
+      return new PlusOperator(this, that);
     }
     let newValue;
     if (that instanceof Slot && this._key.equals(that._key)) {
       newValue = this._value.plus(that._value);
-    } else if (that instanceof Item.Value) {
+    } else if (that instanceof Value) {
       newValue = this._value.plus(that);
     } else {
-      newValue = Item.Value.absent();
+      newValue = Value.absent();
     }
     if (newValue.isDefined()) {
       return new Slot(this._key, newValue);
@@ -139,16 +150,16 @@ export class Slot extends Field {
 
   minus(that: AnyItem): Item {
     that = Item.fromAny(that);
-    if (that instanceof Item.Expression) {
-      return new Item.MinusOperator(this, that);
+    if (that instanceof Expression) {
+      return new MinusOperator(this, that);
     }
     let newValue;
     if (that instanceof Slot && this._key.equals(that._key)) {
       newValue = this._value.minus(that._value);
-    } else if (that instanceof Item.Value) {
+    } else if (that instanceof Value) {
       newValue = this._value.minus(that);
     } else {
-      newValue = Item.Value.absent();
+      newValue = Value.absent();
     }
     if (newValue.isDefined()) {
       return new Slot(this._key, newValue);
@@ -158,16 +169,16 @@ export class Slot extends Field {
 
   times(that: AnyItem): Item {
     that = Item.fromAny(that);
-    if (that instanceof Item.Expression) {
-      return new Item.TimesOperator(this, that);
+    if (that instanceof Expression) {
+      return new TimesOperator(this, that);
     }
     let newValue;
     if (that instanceof Slot && this._key.equals(that._key)) {
       newValue = this._value.times(that._value);
-    } else if (that instanceof Item.Value) {
+    } else if (that instanceof Value) {
       newValue = this._value.times(that);
     } else {
-      newValue = Item.Value.absent();
+      newValue = Value.absent();
     }
     if (newValue.isDefined()) {
       return new Slot(this._key, newValue);
@@ -177,16 +188,16 @@ export class Slot extends Field {
 
   divide(that: AnyItem): Item {
     that = Item.fromAny(that);
-    if (that instanceof Item.Expression) {
-      return new Item.DivideOperator(this, that);
+    if (that instanceof Expression) {
+      return new DivideOperator(this, that);
     }
     let newValue;
     if (that instanceof Slot && this._key.equals(that._key)) {
       newValue = this._value.divide(that._value);
-    } else if (that instanceof Item.Value) {
+    } else if (that instanceof Value) {
       newValue = this._value.divide(that);
     } else {
-      newValue = Item.Value.absent();
+      newValue = Value.absent();
     }
     if (newValue.isDefined()) {
       return new Slot(this._key, newValue);
@@ -196,16 +207,16 @@ export class Slot extends Field {
 
   modulo(that: AnyItem): Item {
     that = Item.fromAny(that);
-    if (that instanceof Item.Expression) {
-      return new Item.ModuloOperator(this, that);
+    if (that instanceof Expression) {
+      return new ModuloOperator(this, that);
     }
     let newValue;
     if (that instanceof Slot && this._key.equals(that._key)) {
       newValue = this._value.modulo(that._value);
-    } else if (that instanceof Item.Value) {
+    } else if (that instanceof Value) {
       newValue = this._value.modulo(that);
     } else {
-      newValue = Item.Value.absent();
+      newValue = Value.absent();
     }
     if (newValue.isDefined()) {
       return new Slot(this._key, newValue);
@@ -279,7 +290,7 @@ export class Slot extends Field {
 
   toAny(): AnyField {
     const field = {} as {[key: string]: AnyValue};
-    if (this._key instanceof Item.Text) {
+    if (this._key instanceof Text) {
       field[this._key.value] = this._value.toAny();
     } else {
       field.$key = this._key.toAny();
@@ -331,7 +342,7 @@ export class Slot extends Field {
     }
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 2;
   }
 
@@ -343,7 +354,7 @@ export class Slot extends Field {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -358,7 +369,7 @@ export class Slot extends Field {
   }
 
   keyEquals(key: unknown): boolean {
-    if (typeof key === "string" && this._key instanceof Item.Text) {
+    if (typeof key === "string" && this._key instanceof Text) {
       return this._key.value === key;
     } else if (key instanceof Field) {
       return this._key.equals(key.key);
@@ -383,7 +394,7 @@ export class Slot extends Field {
 
   debug(output: Output): void {
     output = output.write("Slot").write(46/*'.'*/).write("of").write(40/*'('*/).display(this.key);
-    if (!(this.value instanceof Item.Extant)) {
+    if (!(this.value instanceof Extant)) {
       output = output.write(44/*','*/).write(32/*' '*/).display(this.value);
     }
     output = output.write(41/*')'*/);
@@ -394,9 +405,8 @@ export class Slot extends Field {
   }
 
   static of(key: AnyValue, value?: AnyValue): Slot {
-    key = Item.Value.fromAny(key);
-    value = arguments.length >= 2 ? Item.Value.fromAny(value) : Item.Value.extant();
+    key = Value.fromAny(key);
+    value = arguments.length >= 2 ? Value.fromAny(value) : Value.extant();
     return new Slot(key, value);
   }
 }
-Item.Slot = Slot;

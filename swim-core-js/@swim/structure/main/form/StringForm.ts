@@ -14,7 +14,7 @@
 
 import type {Item} from "../Item";
 import {Text} from "../Text";
-import {Form} from "../Form";
+import {Form} from "./Form";
 
 /** @hidden */
 export class StringForm extends Form<string> {
@@ -45,7 +45,7 @@ export class StringForm extends Form<string> {
   }
 
   cast(item: Item, object?: string): string | undefined {
-    const value = item.target();
+    const value = item.target;
     try {
       return value.stringValue();
     } catch (error) {
@@ -53,4 +53,3 @@ export class StringForm extends Form<string> {
     }
   }
 }
-Form.StringForm = StringForm;

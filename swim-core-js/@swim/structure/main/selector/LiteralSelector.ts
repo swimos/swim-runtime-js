@@ -15,8 +15,8 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class LiteralSelector extends Selector {
   /** @hidden */
@@ -105,11 +105,11 @@ export class LiteralSelector extends Selector {
     return new LiteralSelector(this._item, this._then.andThen(then));
   }
 
-  precedence(): number {
-    return this._item.precedence();
+  get precedence(): number {
+    return this._item.precedence;
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 11;
   }
 
@@ -121,7 +121,7 @@ export class LiteralSelector extends Selector {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -164,4 +164,3 @@ export class LiteralSelector extends Selector {
     return new LiteralSelector(this._item.clone(), this._then.clone());
   }
 }
-Item.LiteralSelector = LiteralSelector;

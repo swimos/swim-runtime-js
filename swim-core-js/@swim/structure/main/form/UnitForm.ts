@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Item} from "../Item";
-import {Form} from "../Form";
+import {Form} from "./Form";
 
 /** @hidden */
 export class UnitForm<T, U = never> extends Form<T, U> {
@@ -66,4 +66,3 @@ export class UnitForm<T, U = never> extends Form<T, U> {
     }
   }
 }
-Form.UnitForm = UnitForm;

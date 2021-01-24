@@ -13,12 +13,15 @@
 // limitations under the License.
 
 import {AnyItem, Item} from "./Item";
-import type {Field} from "./Field";
+import {Field} from "./Field";
+import {Attr} from "./Attr";
+import {Slot} from "./Slot";
 import {AnyValue, Value} from "./Value";
 import {Record} from "./Record";
-import type {AnyText, Text} from "./Text";
-import type {AnyNum} from "./Num";
-import {AnyInterpreter, Interpreter} from "./Interpreter";
+import {RecordMapView} from "./"; // forward import
+import {AnyText, Text} from "./"; // forward import
+import {AnyNum, Num} from "./"; // forward import
+import {AnyInterpreter, Interpreter} from "./"; // forward import
 
 /** @hidden */
 export class RecordMap extends Record {
@@ -69,24 +72,24 @@ export class RecordMap extends Record {
     return true;
   }
 
-  tag(): string | undefined {
+  get tag(): string | undefined {
     if (this._fieldCount > 0) {
       const head = this._array![0];
-      if (head instanceof Item.Attr) {
+      if (head instanceof Attr) {
         return head.key.value;
       }
     }
     return void 0;
   }
 
-  target(): Value {
+  get target(): Value {
     let value: Value | undefined;
     let record: Record | undefined;
     let modified = false;
     const array = this._array!;
     for (let i = 0, n = this._itemCount; i < n; i += 1) {
       const item = array[i];
-      if (item instanceof Item.Attr) {
+      if (item instanceof Attr) {
         modified = true;
       } else if (value === void 0 && item instanceof Value) {
         value = item;
@@ -121,7 +124,7 @@ export class RecordMap extends Record {
   tail(): Record {
     const n = this._itemCount;
     if (n > 0) {
-      return new Record.RecordMapView(this, 1, n);
+      return new RecordMapView(this, 1, n);
     } else {
       return Record.empty();
     }
@@ -130,7 +133,7 @@ export class RecordMap extends Record {
   body(): Value {
     const n = this._itemCount;
     if (n > 2) {
-      return new Record.RecordMapView(this, 1, n).branch();
+      return new RecordMapView(this, 1, n).branch();
     } else if (n === 2) {
       const item = this._array![1];
       if (item instanceof Value) {
@@ -225,7 +228,7 @@ export class RecordMap extends Record {
 
   getAttr(key: AnyText): Value {
     if (this._fieldCount > 0) {
-      key = Value.Text.fromAny(key);
+      key = Text.fromAny(key);
       const table = this.hashTable()!;
       const n = table.length;
       //assert(n > 0);
@@ -234,7 +237,7 @@ export class RecordMap extends Record {
       do {
         const field = table[i];
         if (field !== void 0) {
-          if (field instanceof Item.Attr && field.key.equals(key)) {
+          if (field instanceof Attr && field.key.equals(key)) {
             return field.value;
           }
         } else {
@@ -257,7 +260,7 @@ export class RecordMap extends Record {
       do {
         const field = table[i];
         if (field !== void 0) {
-          if (field instanceof Item.Slot && field.key.equals(key)) {
+          if (field instanceof Slot && field.key.equals(key)) {
             return field.value;
           }
         } else {
@@ -293,7 +296,7 @@ export class RecordMap extends Record {
   }
 
   getItem(index: AnyNum): Item {
-    if (index instanceof Item.Num) {
+    if (index instanceof Num) {
       index = index.value;
     }
     const n = this._itemCount;
@@ -317,7 +320,7 @@ export class RecordMap extends Record {
       if (this._fieldCount > 0) {
         this.setAliased(key, newValue);
       } else {
-        this.pushAliased(new Item.Slot(key, newValue));
+        this.pushAliased(new Slot(key, newValue));
       }
     } else {
       if (this._fieldCount > 0) {
@@ -327,7 +330,7 @@ export class RecordMap extends Record {
           this.updateMutable(key, newValue);
         }
       } else {
-        this.pushMutable(new Item.Slot(key, newValue));
+        this.pushMutable(new Slot(key, newValue));
       }
     }
     return this;
@@ -339,7 +342,7 @@ export class RecordMap extends Record {
     const newArray = new Array(Record.expand(n + 1));
     for (let i = 0; i < n; i += 1) {
       const item = oldArray[i];
-      if (item instanceof Item.Field && item.key.equals(key)) {
+      if (item instanceof Field && item.key.equals(key)) {
         newArray[i] = item.updatedValue(newValue);
         i += 1;
         while (i < n) {
@@ -353,7 +356,7 @@ export class RecordMap extends Record {
       }
       newArray[i] = item;
     }
-    newArray[n] = new Item.Slot(key, newValue);
+    newArray[n] = new Slot(key, newValue);
     this._array = newArray;
     this._table = null;
     this._itemCount = n + 1;
@@ -384,7 +387,7 @@ export class RecordMap extends Record {
       }
       i = (i + 1) % n;
     } while (i !== x);
-    const field = new Item.Slot(key, newValue);
+    const field = new Slot(key, newValue);
     this.pushMutable(field);
     RecordMap.put(table, field);
   }
@@ -393,13 +396,13 @@ export class RecordMap extends Record {
     const array = this._array!;
     for (let i = 0, n = this._itemCount; i < n; i += 1) {
       const item = array[i];
-      if (item instanceof Item.Field && item.key.equals(key)) {
+      if (item instanceof Field && item.key.equals(key)) {
         array[i] = item.updatedValue(newValue);
         this._table = null;
         return;
       }
     }
-    const field = new Item.Slot(key, newValue);
+    const field = new Slot(key, newValue);
     this.pushMutable(field);
     RecordMap.put(this._table, field);
   }
@@ -408,13 +411,13 @@ export class RecordMap extends Record {
     if ((this._flags & Record.IMMUTABLE) !== 0) {
       throw new Error("immutable");
     }
-    key = Value.Text.fromAny(key);
+    key = Text.fromAny(key);
     newValue = Value.fromAny(newValue);
     if ((this._flags & Record.ALIASED) !== 0) {
       if (this._fieldCount > 0) {
         this.setAttrAliased(key, newValue);
       } else {
-        this.pushAliased(new Item.Attr(key, newValue));
+        this.pushAliased(new Attr(key, newValue));
       }
     } else {
       if (this._fieldCount > 0) {
@@ -424,7 +427,7 @@ export class RecordMap extends Record {
           this.updateAttrMutable(key, newValue);
         }
       } else {
-        this.pushMutable(new Item.Attr(key, newValue));
+        this.pushMutable(new Attr(key, newValue));
       }
     }
     return this;
@@ -436,8 +439,8 @@ export class RecordMap extends Record {
     const newArray = new Array(Record.expand(n + 1));
     for (let i = 0; i < n; i += 1) {
       const item = oldArray[i];
-      if (item instanceof Item.Field && item.key.equals(key)) {
-        newArray[i] = new Item.Attr(key, newValue);
+      if (item instanceof Field && item.key.equals(key)) {
+        newArray[i] = new Attr(key, newValue);
         i += 1;
         while (i < n) {
           newArray[i] = oldArray[i];
@@ -450,7 +453,7 @@ export class RecordMap extends Record {
       }
       newArray[i] = item;
     }
-    newArray[n] = new Item.Attr(key, newValue);
+    newArray[n] = new Attr(key, newValue);
     this._array = newArray;
     this._table = null;
     this._itemCount = n + 1;
@@ -468,7 +471,7 @@ export class RecordMap extends Record {
       const field = table[i];
       if (field !== void 0) {
         if (field.key.equals(key)) {
-          if (field instanceof Item.Attr && field.isMutable()) {
+          if (field instanceof Attr && field.isMutable()) {
             field.setValue(newValue);
           } else {
             this.updateAttrMutable(key, newValue);
@@ -480,7 +483,7 @@ export class RecordMap extends Record {
       }
       i = (i + 1) % n;
     } while (i !== x);
-    const field = new Item.Attr(key, newValue);
+    const field = new Attr(key, newValue);
     this.push(field);
     RecordMap.put(table, field);
   }
@@ -489,13 +492,13 @@ export class RecordMap extends Record {
     const array = this._array!;
     for (let i = 0, n = this._itemCount; i < n; i += 1) {
       const item = array[i];
-      if (item instanceof Item.Field && item.key.equals(key)) {
-        array[i] = new Item.Attr(key, newValue);
+      if (item instanceof Field && item.key.equals(key)) {
+        array[i] = new Attr(key, newValue);
         this._table = null;
         return;
       }
     }
-    const field = new Item.Attr(key, newValue);
+    const field = new Attr(key, newValue);
     this.push(field);
     RecordMap.put(this._table, field);
   }
@@ -510,7 +513,7 @@ export class RecordMap extends Record {
       if (this._fieldCount > 0) {
         this.setSlotAliased(key, newValue);
       } else {
-        this.pushAliased(new Item.Slot(key, newValue));
+        this.pushAliased(new Slot(key, newValue));
       }
     } else {
       if (this._fieldCount > 0) {
@@ -520,7 +523,7 @@ export class RecordMap extends Record {
           this.updateSlotMutable(key, newValue);
         }
       } else {
-        this.pushMutable(new Item.Slot(key, newValue));
+        this.pushMutable(new Slot(key, newValue));
       }
     }
     return this;
@@ -532,8 +535,8 @@ export class RecordMap extends Record {
     const newArray = new Array(Record.expand(n + 1));
     for (let i = 0; i < n; i += 1) {
       const item = oldArray[i];
-      if (item instanceof Item.Field && item.key.equals(key)) {
-        newArray[i] = new Item.Slot(key, newValue);
+      if (item instanceof Field && item.key.equals(key)) {
+        newArray[i] = new Slot(key, newValue);
         i += 1;
         while (i < n) {
           newArray[i] = oldArray[i];
@@ -546,7 +549,7 @@ export class RecordMap extends Record {
       }
       newArray[i] = item;
     }
-    newArray[n] = new Item.Slot(key, newValue);
+    newArray[n] = new Slot(key, newValue);
     this._array = newArray;
     this._table = null;
     this._itemCount = n + 1;
@@ -564,7 +567,7 @@ export class RecordMap extends Record {
       const field = table[i];
       if (field !== void 0) {
         if (field.key.equals(key)) {
-          if (field instanceof Item.Slot && field.isMutable()) {
+          if (field instanceof Slot && field.isMutable()) {
             field.setValue(newValue);
           } else {
             this.updateSlotMutable(key, newValue);
@@ -576,7 +579,7 @@ export class RecordMap extends Record {
       }
       i = (i + 1) % n;
     } while (i !== x);
-    const field = new Item.Slot(key, newValue);
+    const field = new Slot(key, newValue);
     this.push(field);
     RecordMap.put(table, field);
   }
@@ -585,13 +588,13 @@ export class RecordMap extends Record {
     const array = this._array!;
     for (let i = 0, n = this._itemCount; i < n; i += 1) {
       const item = array[i];
-      if (item instanceof Item.Field && item.key.equals(key)) {
-        array[i] = new Item.Slot(key, newValue);
+      if (item instanceof Field && item.key.equals(key)) {
+        array[i] = new Slot(key, newValue);
         this._table = null;
         return;
       }
     }
-    const field = new Item.Slot(key, newValue);
+    const field = new Slot(key, newValue);
     this.push(field);
     RecordMap.put(this._table, field);
   }
@@ -627,11 +630,11 @@ export class RecordMap extends Record {
     newArray[index] = newItem;
     this._array = newArray;
     this._table = null;
-    if (newItem instanceof Item.Field) {
-      if (!(oldItem instanceof Item.Field)) {
+    if (newItem instanceof Field) {
+      if (!(oldItem instanceof Field)) {
         this._fieldCount += 1;
       }
-    } else if (oldItem instanceof Item.Field) {
+    } else if (oldItem instanceof Field) {
       this._fieldCount -= 1;
     }
     this._flags &= ~Record.ALIASED;
@@ -641,12 +644,12 @@ export class RecordMap extends Record {
     const array = this._array!;
     const oldItem = array[index];
     array[index] = newItem;
-    if (newItem instanceof Item.Field) {
+    if (newItem instanceof Field) {
       this._table = null;
-      if (!(oldItem instanceof Item.Field)) {
+      if (!(oldItem instanceof Field)) {
         this._fieldCount += 1;
       }
-    } else if (oldItem instanceof Item.Field) {
+    } else if (oldItem instanceof Field) {
       this._table = null;
       this._fieldCount -= 1;
     }
@@ -660,7 +663,7 @@ export class RecordMap extends Record {
       if (record._fieldCount > 0) {
         record.setAliased(key, newValue);
       } else {
-        record.pushAliased(new Item.Slot(key, newValue));
+        record.pushAliased(new Slot(key, newValue));
       }
     } else {
       if (record._fieldCount > 0) {
@@ -670,21 +673,21 @@ export class RecordMap extends Record {
           record.updateMutable(key, newValue);
         }
       } else {
-        record.pushMutable(new Item.Slot(key, newValue));
+        record.pushMutable(new Slot(key, newValue));
       }
     }
     return record;
   }
 
   updatedAttr(key: AnyText, newValue: AnyValue): Record {
-    key = Value.Text.fromAny(key);
+    key = Text.fromAny(key);
     newValue = Value.fromAny(newValue);
     const record = (this._flags & Record.IMMUTABLE) === 0 ? this : this.branch();
     if ((record._flags & Record.ALIASED) !== 0) {
       if (record._fieldCount > 0) {
         record.setAttrAliased(key, newValue);
       } else {
-        record.pushAliased(new Item.Attr(key, newValue));
+        record.pushAliased(new Attr(key, newValue));
       }
     } else {
       if (record._fieldCount > 0) {
@@ -694,7 +697,7 @@ export class RecordMap extends Record {
           record.updateAttrMutable(key, newValue);
         }
       } else {
-        record.pushMutable(new Item.Attr(key, newValue));
+        record.pushMutable(new Attr(key, newValue));
       }
     }
     return record;
@@ -708,7 +711,7 @@ export class RecordMap extends Record {
       if (record._fieldCount > 0) {
         record.setSlotAliased(key, newValue);
       } else {
-        record.pushAliased(new Item.Slot(key, newValue));
+        record.pushAliased(new Slot(key, newValue));
       }
     } else {
       if (record._fieldCount > 0) {
@@ -718,7 +721,7 @@ export class RecordMap extends Record {
           record.updateSlotMutable(key, newValue);
         }
       } else {
-        record.pushMutable(new Item.Slot(key, newValue));
+        record.pushMutable(new Slot(key, newValue));
       }
     }
     return record;
@@ -751,7 +754,7 @@ export class RecordMap extends Record {
       const newItem = Item.fromAny(newItems[i]);
       newArray[m] = newItem;
       m += 1;
-      if (newItem instanceof Item.Field) {
+      if (newItem instanceof Field) {
         n += 1;
       }
     }
@@ -782,7 +785,7 @@ export class RecordMap extends Record {
       const newItem = Item.fromAny(newItems[i]);
       newArray[m] = newItem;
       m += 1;
-      if (newItem instanceof Item.Field) {
+      if (newItem instanceof Field) {
         n += 1;
         this._table = null;
       }
@@ -824,7 +827,7 @@ export class RecordMap extends Record {
       const oldItem = oldArray[i]!;
       oldItems.push(oldItem);
       m -= 1;
-      if (oldItem instanceof Item.Field) {
+      if (oldItem instanceof Field) {
         n -= 1;
       }
     }
@@ -835,7 +838,7 @@ export class RecordMap extends Record {
       const newItem = Item.fromAny(newItems[i]);
       newArray[i + start] = newItem;
       m += 1;
-      if (newItem instanceof Item.Field) {
+      if (newItem instanceof Field) {
         n += 1;
       }
     }
@@ -869,7 +872,7 @@ export class RecordMap extends Record {
       const oldItem = oldArray[i]!;
       oldItems.push(oldItem);
       m -= 1;
-      if (oldItem instanceof Item.Field) {
+      if (oldItem instanceof Field) {
         n -= 1;
       }
     }
@@ -886,7 +889,7 @@ export class RecordMap extends Record {
       const newItem = Item.fromAny(newItems[i]);
       newArray[i + start] = newItem;
       m += 1;
-      if (newItem instanceof Item.Field) {
+      if (newItem instanceof Field) {
         n += 1;
       }
     }
@@ -914,7 +917,7 @@ export class RecordMap extends Record {
     const newArray = new Array(Record.expand(n));
     for (let i = 0; i < n; i += 1) {
       const item = oldArray[i];
-      if (item instanceof Item.Field && item.key.equals(key)) {
+      if (item instanceof Field && item.key.equals(key)) {
         for (let j = i + 1; j < n; j += 1, i += 1) {
           newArray[i] = oldArray[j];
         }
@@ -935,7 +938,7 @@ export class RecordMap extends Record {
     const array = this._array!;
     for (let i = 0; i < n; i += 1) {
       const item = array[i]!;
-      if (item instanceof Item.Field && item.key.equals(key)) {
+      if (item instanceof Field && item.key.equals(key)) {
         for (let j = i + 1; j < n; j += 1, i += 1) {
           array[i] = array[j]!;
         }
@@ -1012,7 +1015,7 @@ export class RecordMap extends Record {
       const array = this._array!;
       for (let i = 0, m = this._itemCount; i < m; i += 1) {
         const item = array[i];
-        if (item instanceof Item.Field) {
+        if (item instanceof Field) {
           RecordMap.put(table, item);
         }
       }
@@ -1101,7 +1104,7 @@ export class RecordMap extends Record {
     if (lower < 0 || upper > n || lower > upper) {
       throw new RangeError(lower + ", " + upper);
     }
-    return new Record.RecordMapView(this, lower, upper);
+    return new RecordMapView(this, lower, upper);
   }
 
   forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
@@ -1148,7 +1151,7 @@ export class RecordMap extends Record {
         const item = Item.fromAny(items[i]);
         array[i] = item;
         itemCount += 1;
-        if (item instanceof Item.Field) {
+        if (item instanceof Field) {
           fieldCount += 1;
         }
       }
@@ -1156,4 +1159,3 @@ export class RecordMap extends Record {
     }
   }
 }
-Item.RecordMap = RecordMap;

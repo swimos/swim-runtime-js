@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {AnyItem, Item} from "../Item";
-import {Form} from "../Form";
+import {Form} from "./Form";
 
 /** @hidden */
 export class AnyForm extends Form<AnyItem> {
@@ -47,4 +47,3 @@ export class AnyForm extends Form<AnyItem> {
     return item.toAny();
   }
 }
-Form.AnyForm = AnyForm;

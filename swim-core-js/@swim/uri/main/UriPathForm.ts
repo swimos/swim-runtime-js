@@ -45,7 +45,7 @@ export class UriPathForm extends Form<UriPath> {
   }
 
   cast(item: Item, object?: UriPath): UriPath | undefined {
-    const value = item.target();
+    const value = item.target;
     try {
       const string = value.stringValue();
       if (typeof string === "string") {

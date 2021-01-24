@@ -15,10 +15,13 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import type {Value} from "../Value";
-import {Func} from "../Func";
-import {Interpreter} from "../Interpreter";
+import {Slot} from "../Slot";
+import {Value} from "../Value";
+import {Record} from "../Record";
+import {Text} from "../Text";
 import type {InvokeOperator} from "../operator/InvokeOperator";
+import {Func} from "./Func";
+import {Interpreter} from "../"; // forward import
 
 export class LambdaFunc extends Func {
   readonly _bindings: Value;
@@ -38,7 +41,7 @@ export class LambdaFunc extends Func {
     return this._template;
   }
 
-  precedence(): number {
+  get precedence(): number {
     return 1;
   }
 
@@ -46,16 +49,16 @@ export class LambdaFunc extends Func {
     interpreter = Interpreter.fromAny(interpreter);
     const bindings = this._bindings;
     const arity = Math.max(1, bindings.length);
-    const params = Item.Record.create(arity);
+    const params = Record.create(arity);
     let i = 0;
     let j = 0;
     while (i < arity) {
-      const binding = bindings instanceof Item.Record ? bindings.getItem(i) : i === 0 ? bindings : Item.absent();
-      const arg = args instanceof Item.Record ? args.getItem(j).toValue() : j === 0 ? args : Item.Value.absent();
-      if (binding instanceof Item.Text && arg.isDistinct()) {
-        params.push(Item.Slot.of(binding, arg));
+      const binding = bindings instanceof Record ? bindings.getItem(i) : i === 0 ? bindings : Item.absent();
+      const arg = args instanceof Record ? args.getItem(j).toValue() : j === 0 ? args : Value.absent();
+      if (binding instanceof Text && arg.isDistinct()) {
+        params.push(Slot.of(binding, arg));
         j += 1;
-      } else if (binding instanceof Item.Slot) {
+      } else if (binding instanceof Slot) {
         if (arg.isDistinct()) {
           params.push(binding.updatedValue(arg));
         } else {
@@ -71,7 +74,7 @@ export class LambdaFunc extends Func {
     return result;
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 50;
   }
 
@@ -83,7 +86,7 @@ export class LambdaFunc extends Func {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -117,4 +120,3 @@ export class LambdaFunc extends Func {
         .debug(this.template).write(41/*')'*/);
   }
 }
-Item.LambdaFunc = LambdaFunc;

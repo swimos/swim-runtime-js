@@ -101,7 +101,7 @@ export class IdentityTransform extends Transform {
   }
 
   static fromValue(value: Value): IdentityTransform | undefined {
-    if (value.tag() === "identity") {
+    if (value.tag === "identity") {
       return Transform.identity();
     }
     return void 0;

@@ -14,11 +14,12 @@
 
 import {Item} from "../Item";
 import type {Value} from "../Value";
-import type {Record} from "../Record";
-import type {Func} from "../Func";
-import {Interpreter} from "../Interpreter";
+import {Record} from "../Record";
+import {Num} from "../Num";
 import type {InvokeOperator} from "../operator/InvokeOperator";
+import type {Func} from "./Func";
 import {BridgeFunc} from "./BridgeFunc";
+import {Interpreter} from "../"; // forward import
 
 export const MathModule = {} as {
   readonly max: Func;
@@ -43,7 +44,6 @@ export const MathModule = {} as {
 
   readonly scope: Record;
 };
-Item.MathModule = MathModule;
 
 Object.defineProperty(MathModule, "max", {
   get(): Func {
@@ -187,7 +187,7 @@ Object.defineProperty(MathModule, "random", {
 
 Object.defineProperty(MathModule, "scope", {
   get(): Record {
-    const scope = Item.Record.create(10)
+    const scope = Record.create(10)
         .slot("max", MathModule.max)
         .slot("min", MathModule.min)
         .slot("abs", MathModule.abs)
@@ -278,7 +278,7 @@ class MinFunc extends BridgeFunc {
 class AbsFunc extends BridgeFunc {
   invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
     args = args.evaluate(interpreter).toValue();
-    if (args instanceof Item.Num) {
+    if (args instanceof Num) {
       return args.abs();
     }
     return Item.absent();
@@ -289,7 +289,7 @@ class AbsFunc extends BridgeFunc {
 class CeilFunc extends BridgeFunc {
   invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
     args = args.evaluate(interpreter).toValue();
-    if (args instanceof Item.Num) {
+    if (args instanceof Num) {
       return args.ceil();
     }
     return Item.absent();
@@ -300,7 +300,7 @@ class CeilFunc extends BridgeFunc {
 class FloorFunc extends BridgeFunc {
   invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
     args = args.evaluate(interpreter).toValue();
-    if (args instanceof Item.Num) {
+    if (args instanceof Num) {
       return args.floor();
     }
     return Item.absent();
@@ -311,7 +311,7 @@ class FloorFunc extends BridgeFunc {
 class RoundFunc extends BridgeFunc {
   invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
     args = args.evaluate(interpreter).toValue();
-    if (args instanceof Item.Num) {
+    if (args instanceof Num) {
       return args.round();
     }
     return Item.absent();
@@ -322,7 +322,7 @@ class RoundFunc extends BridgeFunc {
 class SqrtFunc extends BridgeFunc {
   invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
     args = args.evaluate(interpreter).toValue();
-    if (args instanceof Item.Num) {
+    if (args instanceof Num) {
       return args.sqrt();
     }
     return Item.absent();
@@ -335,7 +335,7 @@ class PowFunc extends BridgeFunc {
     interpreter = Interpreter.fromAny(interpreter);
     const x = args.getItem(0).evaluate(interpreter);
     const y = args.getItem(1).evaluate(interpreter);
-    if (x instanceof Item.Num && y instanceof Item.Num) {
+    if (x instanceof Num && y instanceof Num) {
       return x.pow(y);
     }
     return Item.absent();
@@ -373,7 +373,7 @@ class RateFunc extends BridgeFunc {
         operator.setState(state);
         if (state.dt !== 0) {
           const rate = period * state.dv / state.dt;
-          return Item.Num.from(rate);
+          return Num.from(rate);
         }
       }
     }
@@ -393,6 +393,6 @@ class RandomFunc extends BridgeFunc {
     const lower = args.length >= 1 ? args.getItem(0).numberValue(0.0) : 0.0;
     const upper = args.length >= 2 ? args.getItem(1).numberValue(lower + 1.0) : lower + 1.0;
     const value = lower + Math.random() * (upper - lower);
-    return Item.Num.from(value);
+    return Num.from(value);
   }
 }

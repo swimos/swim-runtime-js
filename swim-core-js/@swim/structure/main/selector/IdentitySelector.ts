@@ -16,10 +16,14 @@ import {Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {AnyItem, Item} from "../Item";
 import {AnyValue, Value} from "../Value";
-import type {AnyText} from "../Text";
-import type {AnyNum} from "../Num";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {AnyText, Text} from "../Text";
+import {AnyNum, Num} from "../Num";
+import {Selector} from "./Selector";
+import {GetSelector} from "../"; // forward import
+import {GetAttrSelector} from "../"; // forward import
+import {GetItemSelector} from "../"; // forward import
+import {FilterSelector} from "../"; // forward import
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class IdentitySelector extends Selector {
   then(): Selector {
@@ -70,17 +74,17 @@ export class IdentitySelector extends Selector {
 
   get(key: AnyValue): Selector {
     key = Value.fromAny(key);
-    return new Item.GetSelector(key, this);
+    return new GetSelector(key, this);
   }
 
   getAttr(key: AnyText): Selector {
-    key = Item.Text.fromAny(key);
-    return new Item.GetAttrSelector(key, this);
+    key = Text.fromAny(key);
+    return new GetAttrSelector(key, this);
   }
 
   getItem(index: AnyNum): Selector {
-    index = Item.Num.fromAny(index);
-    return new Item.GetItemSelector(index, this);
+    index = Num.fromAny(index);
+    return new GetItemSelector(index, this);
   }
 
   andThen(then: Selector): Selector {
@@ -105,20 +109,20 @@ export class IdentitySelector extends Selector {
 
   filter(predicate?: AnyItem): Selector {
     if (arguments.length === 0) {
-      return new Item.FilterSelector(this, this);
+      return new FilterSelector(this, this);
     } else {
       predicate = Item.fromAny(predicate);
       return predicate.filter();
     }
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 10;
   }
 
   compareTo(that: unknown): number {
     if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -143,5 +147,3 @@ export class IdentitySelector extends Selector {
     return this;
   }
 }
-Item.IdentitySelector = IdentitySelector;
-Selector._identity = new IdentitySelector();

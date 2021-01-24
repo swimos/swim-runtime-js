@@ -40,10 +40,10 @@ export {
   AnyRecord,
   Record,
 } from "./Record";
+export {RecordInterpolator} from "./RecordInterpolator";
 export {RecordCursor} from "./RecordCursor";
 export {RecordMap} from "./RecordMap";
 export {RecordMapView} from "./RecordMapView";
-export {RecordInterpolator} from "./RecordInterpolator";
 
 export {
   AnyData,
@@ -68,14 +68,6 @@ export {
   Bool,
 } from "./Bool";
 
-export {Expression} from "./Expression";
-
-export {Operator} from "./Operator";
-
-export {Selector} from "./Selector";
-
-export {Func} from "./Func";
-
 export {
   AnyExtant,
   Extant,
@@ -86,72 +78,16 @@ export {
   Absent,
 } from "./Absent";
 
-export {FormException} from "./FormException";
-export {Form} from "./Form";
+export {Expression} from "./Expression";
 
-export {InterpreterException} from "./InterpreterException";
-export {
-  AnyInterpreterSettings,
-  InterpreterSettingsInit,
-  InterpreterSettings,
-} from "./InterpreterSettings";
-export {
-  AnyInterpreter,
-  Interpreter,
-} from "./Interpreter";
+export * from "./operator";
 
-export {BinaryOperator} from "./operator/BinaryOperator";
-export {BinaryOperatorInterpolator} from "./operator/BinaryOperatorInterpolator";
-export {UnaryOperator} from "./operator/UnaryOperator";
-export {UnaryOperatorInterpolator} from "./operator/UnaryOperatorInterpolator";
-export {ConditionalOperator} from "./operator/ConditionalOperator";
-export {ConditionalOperatorInterpolator} from "./operator/ConditionalOperatorInterpolator";
-export {OrOperator} from "./operator/OrOperator";
-export {AndOperator} from "./operator/AndOperator";
-export {BitwiseOrOperator} from "./operator/BitwiseOrOperator";
-export {BitwiseXorOperator} from "./operator/BitwiseXorOperator";
-export {BitwiseAndOperator} from "./operator/BitwiseAndOperator";
-export {LtOperator} from "./operator/LtOperator";
-export {LeOperator} from "./operator/LeOperator";
-export {EqOperator} from "./operator/EqOperator";
-export {NeOperator} from "./operator/NeOperator";
-export {GeOperator} from "./operator/GeOperator";
-export {GtOperator} from "./operator/GtOperator";
-export {PlusOperator} from "./operator/PlusOperator";
-export {MinusOperator} from "./operator/MinusOperator";
-export {TimesOperator} from "./operator/TimesOperator";
-export {DivideOperator} from "./operator/DivideOperator";
-export {ModuloOperator} from "./operator/ModuloOperator";
-export {NotOperator} from "./operator/NotOperator";
-export {BitwiseNotOperator} from "./operator/BitwiseNotOperator";
-export {NegativeOperator} from "./operator/NegativeOperator";
-export {PositiveOperator} from "./operator/PositiveOperator";
-export {InvokeOperator} from "./operator/InvokeOperator";
-export {InvokeOperatorInterpolator} from "./operator/InvokeOperatorInterpolator";
+export * from "./selector";
 
-export {IdentitySelector} from "./selector/IdentitySelector";
-export {GetSelector} from "./selector/GetSelector";
-export {GetAttrSelector} from "./selector/GetAttrSelector";
-export {GetItemSelector} from "./selector/GetItemSelector";
-export {KeysSelector} from "./selector/KeysSelector";
-export {ValuesSelector} from "./selector/ValuesSelector";
-export {ChildrenSelector} from "./selector/ChildrenSelector";
-export {DescendantsSelector} from "./selector/DescendantsSelector";
-export {FilterSelector} from "./selector/FilterSelector";
-export {LiteralSelector} from "./selector/LiteralSelector";
+export * from "./func";
 
-export {LambdaFunc} from "./func/LambdaFunc";
-export {BridgeFunc} from "./func/BridgeFunc";
-export {MathModule} from "./func/MathModule";
+export * from "./interpreter";
 
-export {TagForm} from "./form/TagForm";
-export {UnitForm} from "./form/UnitForm";
-export {StringForm} from "./form/StringForm";
-export {NumberForm} from "./form/NumberForm";
-export {BooleanForm} from "./form/BooleanForm";
-export {AnyForm} from "./form/AnyForm";
-export {ItemForm} from "./form/ItemForm";
-export {ValueForm} from "./form/ValueForm";
+export * from "./form";
 
-export {ValueCursor} from "./collections/ValueCursor";
-export {ValueEntryCursor} from "./collections/ValueEntryCursor";
+export * from "./collections";

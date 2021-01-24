@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem, Item} from "./Item";
-import {AnyValue, Value} from "./Value";
-import type {TagForm} from "./form/TagForm";
-import type {UnitForm} from "./form/UnitForm";
-import type {StringForm} from "./form/StringForm";
-import type {NumberForm} from "./form/NumberForm";
-import type {BooleanForm} from "./form/BooleanForm";
-import type {AnyForm} from "./form/AnyForm";
-import type {ItemForm} from "./form/ItemForm";
-import type {ValueForm} from "./form/ValueForm";
+import {Lazy} from "@swim/util";
+import {AnyItem, Item} from "../Item";
+import {AnyValue, Value} from "../Value";
+import {TagForm} from "../"; // forward import
+import {UnitForm} from "../"; // forward import
+import {StringForm} from "../"; // forward import
+import {NumberForm} from "../"; // forward import
+import {BooleanForm} from "../"; // forward import
+import {AnyForm} from "../"; // forward import
+import {ItemForm} from "../"; // forward import
+import {ValueForm} from "../"; // forward import
 
 /**
  * Transformation between a structurally typed [Item] and a nominally typed
@@ -46,7 +47,7 @@ export abstract class Form<T, U = never> {
     if (arguments.length === 0) {
       return void 0;
     } else if (tag !== void 0) {
-      return new Form.TagForm<T, U>(tag, this);
+      return new TagForm<T, U>(tag, this);
     } else {
       return this;
     }
@@ -68,7 +69,7 @@ export abstract class Form<T, U = never> {
     if (arguments.length === 0) {
       return void 0;
     } else if (unit !== void 0) {
-      return new Form.UnitForm<T, U>(unit, this);
+      return new UnitForm<T, U>(unit, this);
     } else {
       return this;
     }
@@ -86,70 +87,33 @@ export abstract class Form<T, U = never> {
    */
   abstract cast(item: Item, object?: T): T | undefined;
 
-  // Forward type declarations
-  /** @hidden */
-  static TagForm: typeof TagForm; // defined by TagForm
-  /** @hidden */
-  static UnitForm: typeof UnitForm; // defined by UnitForm
-  /** @hidden */
-  static StringForm: typeof StringForm; // defined by StringForm
-  /** @hidden */
-  static NumberForm: typeof NumberForm; // defined by NumberForm
-  /** @hidden */
-  static BooleanForm: typeof BooleanForm; // defined by BooleanForm
-  /** @hidden */
-  static AnyForm: typeof AnyForm; // defined by AnyForm
-  /** @hidden */
-  static ItemForm: typeof ItemForm; // defined by ItemForm
-  /** @hidden */
-  static ValueForm: typeof ValueForm; // defined by ValueForm
-
-  private static _stringForm?: Form<string>;
-  private static _numberForm?: Form<number>;
-  private static _booleanForm?: Form<boolean>;
-  private static _anyForm?: Form<AnyItem>;
-  private static _itemForm?: Form<Item, AnyItem>;
-  private static _valueForm?: Form<Value, AnyValue>;
-
+  @Lazy
   static forString(): Form<string> {
-    if (Form._stringForm === void 0) {
-      Form._stringForm = new Form.StringForm("");
-    }
-    return Form._stringForm;
+    return new StringForm("");
   }
 
+  @Lazy
   static forNumber(): Form<number> {
-    if (Form._numberForm === void 0) {
-      Form._numberForm = new Form.NumberForm(0);
-    }
-    return Form._numberForm;
+    return new NumberForm(0);
   }
 
+  @Lazy
   static forBoolean(): Form<boolean> {
-    if (Form._booleanForm === void 0) {
-      Form._booleanForm = new Form.BooleanForm(false);
-    }
-    return Form._booleanForm;
+    return new BooleanForm(false);
   }
 
+  @Lazy
   static forAny(): Form<AnyItem> {
-    if (Form._anyForm === void 0) {
-      Form._anyForm = new Form.AnyForm(void 0);
-    }
-    return Form._anyForm;
+    return new AnyForm(void 0);
   }
 
+  @Lazy
   static forItem(): Form<Item, AnyItem> {
-    if (Form._itemForm === void 0) {
-      Form._itemForm = new Form.ItemForm(Item.absent());
-    }
-    return Form._itemForm;
+    return new ItemForm(Item.absent());
   }
 
+  @Lazy
   static forValue(): Form<Value, AnyValue> {
-    if (Form._valueForm === void 0) {
-      Form._valueForm = new Form.ValueForm(Value.absent());
-    }
-    return Form._valueForm;
+    return new ValueForm(Value.absent());
   }
 }

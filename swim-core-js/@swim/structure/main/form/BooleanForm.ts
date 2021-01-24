@@ -14,7 +14,7 @@
 
 import type {Item} from "../Item";
 import {Bool} from "../Bool";
-import {Form} from "../Form";
+import {Form} from "./Form";
 
 /** @hidden */
 export class BooleanForm extends Form<boolean> {
@@ -45,7 +45,7 @@ export class BooleanForm extends Form<boolean> {
   }
 
   cast(item: Item, object?: boolean): boolean | undefined {
-    const value = item.target();
+    const value = item.target;
     try {
       return value.booleanValue();
     } catch (error) {
@@ -53,4 +53,3 @@ export class BooleanForm extends Form<boolean> {
     }
   }
 }
-Form.BooleanForm = BooleanForm;

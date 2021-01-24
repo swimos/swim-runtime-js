@@ -15,8 +15,8 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {AnyItem, Item} from "../Item";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class FilterSelector extends Selector {
   /** @hidden */
@@ -118,7 +118,7 @@ export class FilterSelector extends Selector {
     }
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 19;
   }
 
@@ -130,7 +130,7 @@ export class FilterSelector extends Selector {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -168,4 +168,3 @@ export class FilterSelector extends Selector {
     return new FilterSelector(this._predicate.clone(), this._then.clone());
   }
 }
-Item.FilterSelector = FilterSelector;

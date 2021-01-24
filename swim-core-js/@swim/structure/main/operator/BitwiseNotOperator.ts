@@ -16,18 +16,18 @@ import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {UnaryOperator} from "./UnaryOperator";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {AnyInterpreter, Interpreter} from "../interpreter/Interpreter";
 
 export class BitwiseNotOperator extends UnaryOperator {
   constructor(operand: Item) {
     super(operand);
   }
 
-  operator(): string {
+  get operator(): string {
     return "~";
   }
 
-  precedence(): number {
+  get precedence(): number {
     return 10;
   }
 
@@ -43,7 +43,7 @@ export class BitwiseNotOperator extends UnaryOperator {
     return argument.bitwiseNot();
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 38;
   }
 
@@ -51,7 +51,7 @@ export class BitwiseNotOperator extends UnaryOperator {
     if (that instanceof BitwiseNotOperator) {
       return this._operand.compareTo(that._operand);
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -86,4 +86,3 @@ export class BitwiseNotOperator extends UnaryOperator {
     return new BitwiseNotOperator(this._operand.clone());
   }
 }
-Item.BitwiseNotOperator = BitwiseNotOperator;

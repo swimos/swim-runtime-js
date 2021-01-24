@@ -112,7 +112,7 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
   }
 
   precedence(item: Item): number {
-    return item.precedence();
+    return item.precedence;
   }
 
   sizeOfItem(item: Item): number {
@@ -255,26 +255,26 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
 
   sizeOfOperator(operator: Operator): number {
     if (operator instanceof BinaryOperator) {
-      return this.sizeOfInfixOperator(operator.operand1(), operator.operator(), operator.operand2(), operator.precedence());
+      return this.sizeOfInfixOperator(operator.operand1, operator.operator, operator.operand2, operator.precedence);
     } else if (operator instanceof UnaryOperator) {
-      return this.sizeOfPrefixOperator(operator.operator(), operator.operand(), operator.precedence());
+      return this.sizeOfPrefixOperator(operator.operator, operator.operand, operator.precedence);
     } else if (operator instanceof InvokeOperator) {
       return this.sizeOfInvokeOperator(operator.func(), operator.args());
     } else if (operator instanceof ConditionalOperator) {
-      return this.sizeOfConditionalOperator(operator.ifTerm(), operator.thenTerm(), operator.elseTerm(), operator.precedence());
+      return this.sizeOfConditionalOperator(operator.ifTerm(), operator.thenTerm(), operator.elseTerm(), operator.precedence);
     }
     throw new WriterException("No Recon serialization for " + operator);
   }
 
   writeOperator(operator: Operator, output: Output): Writer {
     if (operator instanceof BinaryOperator) {
-      return this.writeInfixOperator(operator.operand1(), operator.operator(), operator.operand2(), operator.precedence(), output);
+      return this.writeInfixOperator(operator.operand1, operator.operator, operator.operand2, operator.precedence, output);
     } else if (operator instanceof UnaryOperator) {
-      return this.writePrefixOperator(operator.operator(), operator.operand(), operator.precedence(), output);
+      return this.writePrefixOperator(operator.operator, operator.operand, operator.precedence, output);
     } else if (operator instanceof InvokeOperator) {
       return this.writeInvokeOperator(operator.func(), operator.args(), output);
     } else if (operator instanceof ConditionalOperator) {
-      return this.writeConditionalOperator(operator.ifTerm(), operator.thenTerm(), operator.elseTerm(), operator.precedence(), output);
+      return this.writeConditionalOperator(operator.ifTerm(), operator.thenTerm(), operator.elseTerm(), operator.precedence, output);
     }
     return Writer.error(new WriterException("No Recon serialization for " + operator));
   }

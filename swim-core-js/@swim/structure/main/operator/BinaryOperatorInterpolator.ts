@@ -14,7 +14,7 @@
 
 import {Interpolator} from "@swim/mapping";
 import type {Item} from "../Item";
-import {Operator} from "../Operator";
+import {Operator} from "./Operator";
 import type {BinaryOperator} from "./BinaryOperator";
 
 /** @hidden */
@@ -35,8 +35,8 @@ export interface BinaryOperatorInterpolator extends Interpolator<BinaryOperator>
 
 /** @hidden */
 export const BinaryOperatorInterpolator = function (y0: BinaryOperator, y1: BinaryOperator): BinaryOperatorInterpolator {
-  const operator = y0.operator();
-  if (operator !== y1.operator()) {
+  const operator = y0.operator;
+  if (operator !== y1.operator) {
     throw new Error();
   }
   const interpolator = function (u: number): BinaryOperator {
@@ -46,7 +46,7 @@ export const BinaryOperatorInterpolator = function (y0: BinaryOperator, y1: Bina
   } as BinaryOperatorInterpolator;
   Object.setPrototypeOf(interpolator, BinaryOperatorInterpolator.prototype);
   Object.defineProperty(interpolator, "operand1Interpolator", {
-    value: y0.operand1().interpolateTo(y1.operand1()),
+    value: y0.operand1.interpolateTo(y1.operand1),
     enumerable: true,
   });
   Object.defineProperty(interpolator, "operator", {
@@ -54,7 +54,7 @@ export const BinaryOperatorInterpolator = function (y0: BinaryOperator, y1: Bina
     enumerable: true,
   });
   Object.defineProperty(interpolator, "operand2Interpolator", {
-    value: y0.operand2().interpolateTo(y1.operand2()),
+    value: y0.operand2.interpolateTo(y1.operand2),
     enumerable: true,
   });
   return interpolator;

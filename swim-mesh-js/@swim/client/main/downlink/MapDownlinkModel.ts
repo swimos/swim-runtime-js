@@ -138,7 +138,7 @@ export class MapDownlinkModel extends DownlinkModel {
   onEventMessage(message: EventMessage, host: Host): void {
     super.onEventMessage(message, host);
     const event = message.body();
-    const tag = event.tag();
+    const tag = event.tag;
     if (tag === "update") {
       const header = event.head().toValue();
       this.onUpdateEvent(header.get("key"), event.body());

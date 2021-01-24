@@ -14,20 +14,20 @@
 
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {Item} from "../Item";
+import type {Item} from "../Item";
 import {UnaryOperator} from "./UnaryOperator";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {AnyInterpreter, Interpreter} from "../interpreter/Interpreter";
 
 export class NotOperator extends UnaryOperator {
   constructor(operand: Item) {
     super(operand);
   }
 
-  operator(): string {
+  get operator(): string {
     return "!";
   }
 
-  precedence(): number {
+  get precedence(): number {
     return 10;
   }
 
@@ -43,12 +43,12 @@ export class NotOperator extends UnaryOperator {
     return argument.not();
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 37;
   }
 
   compareTo(that: Item): number {
-    return Numbers.compare(this.typeOrder(), that.typeOrder());
+    return Numbers.compare(this.typeOrder, that.typeOrder);
   }
 
   equivalentTo(that: Item, epsilon?: number): boolean {
@@ -81,4 +81,3 @@ export class NotOperator extends UnaryOperator {
     return new NotOperator(this._operand.clone());
   }
 }
-Item.NotOperator = NotOperator;

@@ -15,10 +15,10 @@
 import {Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import {Func} from "../Func";
+import {Func} from "./Func";
 
 export abstract class BridgeFunc extends Func {
-  typeOrder(): number {
+  get typeOrder(): number {
     return 51;
   }
 
@@ -26,7 +26,7 @@ export abstract class BridgeFunc extends Func {
     if (that instanceof BridgeFunc) {
       return Constructors.compare(this.constructor, that.constructor);
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -47,4 +47,3 @@ export abstract class BridgeFunc extends Func {
     output = output.write(this.constructor.name);
   }
 }
-Item.BridgeFunc = BridgeFunc;

@@ -14,7 +14,7 @@
 
 import type {Item} from "../Item";
 import {AnyValue, Value} from "../Value";
-import {Form} from "../Form";
+import {Form} from "./Form";
 
 /** @hidden */
 export class ValueForm extends Form<Value, AnyValue> {
@@ -48,4 +48,3 @@ export class ValueForm extends Form<Value, AnyValue> {
     return item.toValue();
   }
 }
-Form.ValueForm = ValueForm;

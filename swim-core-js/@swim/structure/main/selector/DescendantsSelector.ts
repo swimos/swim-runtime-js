@@ -15,8 +15,9 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Record} from "../Record";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class DescendantsSelector extends Selector {
   /** @hidden */
@@ -45,7 +46,7 @@ export class DescendantsSelector extends Selector {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have descendants.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const children = scope.iterator();
         // For each child, while none have selected a result:
         while (selected === void 0 && children.hasNext()) {
@@ -84,7 +85,7 @@ export class DescendantsSelector extends Selector {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have descendants.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const children = scope.iterator();
         // For each child:
         while (children.hasNext()) {
@@ -134,7 +135,7 @@ export class DescendantsSelector extends Selector {
     return new DescendantsSelector(this._then.andThen(then));
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 18;
   }
 
@@ -142,7 +143,7 @@ export class DescendantsSelector extends Selector {
     if (that instanceof DescendantsSelector) {
       return this._then.compareTo(that._then);
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -178,4 +179,3 @@ export class DescendantsSelector extends Selector {
     return new DescendantsSelector(this._then.clone());
   }
 }
-Item.DescendantsSelector = DescendantsSelector;

@@ -14,7 +14,7 @@
 
 import type {Item} from "../Item";
 import {Num} from "../Num";
-import {Form} from "../Form";
+import {Form} from "./Form";
 
 /** @hidden */
 export class NumberForm extends Form<number> {
@@ -45,7 +45,7 @@ export class NumberForm extends Form<number> {
   }
 
   cast(item: Item, object?: number): number | undefined {
-    const value = item.target();
+    const value = item.target;
     try {
       return value.numberValue();
     } catch (error) {
@@ -53,4 +53,3 @@ export class NumberForm extends Form<number> {
     }
   }
 }
-Form.NumberForm = NumberForm;

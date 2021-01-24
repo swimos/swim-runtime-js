@@ -56,7 +56,7 @@ export class DownlinkReifier extends Reifier {
 
   /** @hidden */
   reifyModel(model: RecordModel): Record {
-    if (model.tag() === "link") {
+    if (model.tag === "link") {
       const streamlet = new DownlinkStreamlet(this.warp, model);
       streamlet.compile();
       return streamlet;

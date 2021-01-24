@@ -15,8 +15,9 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Record} from "../Record";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class ChildrenSelector extends Selector {
   /** @hidden */
@@ -45,7 +46,7 @@ export class ChildrenSelector extends Selector {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have children.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const children = scope.iterator();
         // For each child, while none have been selected:
         while (selected === void 0 && children.hasNext()) {
@@ -79,7 +80,7 @@ export class ChildrenSelector extends Selector {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have children.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const children = scope.iterator();
         // For each child:
         while (children.hasNext()) {
@@ -124,7 +125,7 @@ export class ChildrenSelector extends Selector {
     return new ChildrenSelector(this._then.andThen(then));
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 17;
   }
 
@@ -132,7 +133,7 @@ export class ChildrenSelector extends Selector {
     if (that instanceof ChildrenSelector) {
       return this._then.compareTo(that._then);
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -168,4 +169,3 @@ export class ChildrenSelector extends Selector {
     return new ChildrenSelector(this._then.clone());
   }
 }
-Item.ChildrenSelector = ChildrenSelector;

@@ -17,9 +17,10 @@ import type {Output} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {Item} from "../Item";
 import type {Value} from "../Value";
-import {Operator} from "../Operator";
+import {Operator} from "./Operator";
 import {InvokeOperatorInterpolator} from "../"; // forward import
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Func} from "../"; // forward import
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class InvokeOperator extends Operator {
   /** @hidden */
@@ -55,14 +56,14 @@ export class InvokeOperator extends Operator {
     return this._func.isConstant() && this._args.isConstant();
   }
 
-  precedence(): number {
+  get precedence(): number {
     return 11;
   }
 
   evaluate(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
     const func = this._func.evaluate(interpreter);
-    if (func instanceof Item.Func) {
+    if (func instanceof Func) {
       return func.invoke(this._args, interpreter, this);
     }
     return Item.absent();
@@ -71,7 +72,7 @@ export class InvokeOperator extends Operator {
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
     const func = this._func.evaluate(interpreter);
-    if (func instanceof Item.Func) {
+    if (func instanceof Func) {
       const result = func.expand(this._args, interpreter, this);
       if (result !== void 0) {
         return result;
@@ -92,7 +93,7 @@ export class InvokeOperator extends Operator {
     }
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 41;
   }
 
@@ -104,7 +105,7 @@ export class InvokeOperator extends Operator {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -142,4 +143,3 @@ export class InvokeOperator extends Operator {
     return new InvokeOperator(this._func.clone(), this._args.clone());
   }
 }
-Item.InvokeOperator = InvokeOperator;

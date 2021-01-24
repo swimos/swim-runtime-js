@@ -80,7 +80,7 @@ export class Bool extends Value {
     return Bool.from(!this._value);
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 7;
   }
 
@@ -94,7 +94,7 @@ export class Bool extends Value {
         return 0;
       }
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -146,4 +146,3 @@ export class Bool extends Value {
     }
   }
 }
-Item.Bool = Bool;

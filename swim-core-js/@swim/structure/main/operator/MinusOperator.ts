@@ -16,18 +16,18 @@ import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {BinaryOperator} from "./BinaryOperator";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {AnyInterpreter, Interpreter} from "../interpreter/Interpreter";
 
 export class MinusOperator extends BinaryOperator {
   constructor(operand1: Item, operand2: Item) {
     super(operand1, operand2);
   }
 
-  operator(): string {
+  get operator(): string {
     return "-";
   }
 
-  precedence(): number {
+  get precedence(): number {
     return 8;
   }
 
@@ -48,7 +48,7 @@ export class MinusOperator extends BinaryOperator {
     return argument1.minus(argument2);
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 33;
   }
 
@@ -60,7 +60,7 @@ export class MinusOperator extends BinaryOperator {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -98,4 +98,3 @@ export class MinusOperator extends BinaryOperator {
     return new MinusOperator(this._operand1.clone(), this._operand2.clone());
   }
 }
-Item.MinusOperator = MinusOperator;

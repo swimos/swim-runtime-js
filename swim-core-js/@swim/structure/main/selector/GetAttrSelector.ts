@@ -15,11 +15,12 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
-import type {Field} from "../Field";
+import {Field} from "../Field";
 import {Attr} from "../Attr";
+import {Record} from "../Record";
 import type {Text} from "../Text";
-import {Selector} from "../Selector";
-import {AnyInterpreter, Interpreter} from "../Interpreter";
+import {Selector} from "./Selector";
+import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class GetAttrSelector extends Selector {
   /** @hidden */
@@ -65,7 +66,7 @@ export class GetAttrSelector extends Selector {
       const scope = interpreter.popScope().toValue();
       let field: Field | undefined;
       // Only records can have members.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         field = scope.getField(key);
         if (field instanceof Attr) {
           // Push the field value onto the scope stack.
@@ -100,16 +101,16 @@ export class GetAttrSelector extends Selector {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have members.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         const oldField = scope.getField(key);
-        if (oldField instanceof Item.Attr) {
+        if (oldField instanceof Attr) {
           // Push the field value onto the scope stack.
           interpreter.pushScope(oldField.toValue());
           // Transform the field value.
           const newItem = this._then.mapSelected(interpreter, transform, thisArg);
           // Pop the field value off the scope stack.
           interpreter.popScope();
-          if (newItem instanceof Item.Field) {
+          if (newItem instanceof Field) {
             // Replace the original field with the transformed field.
             if (key.equals(newItem.key)) {
               scope.setAttr(key, newItem.toValue());
@@ -157,9 +158,9 @@ export class GetAttrSelector extends Selector {
       const scope = interpreter.popScope().toValue();
       let field: Field | undefined;
       // Only records can have members.
-      if (scope instanceof Item.Record) {
+      if (scope instanceof Record) {
         field = scope.getField(key);
-        if (field instanceof Item.Attr) {
+        if (field instanceof Attr) {
           // Substitute the field value.
           selected = field.toValue().substitute(interpreter);
         }
@@ -177,7 +178,7 @@ export class GetAttrSelector extends Selector {
     return new GetAttrSelector(this._key, this._then.andThen(then));
   }
 
-  typeOrder(): number {
+  get typeOrder(): number {
     return 13;
   }
 
@@ -189,7 +190,7 @@ export class GetAttrSelector extends Selector {
       }
       return order;
     } else if (that instanceof Item) {
-      return Numbers.compare(this.typeOrder(), that.typeOrder());
+      return Numbers.compare(this.typeOrder, that.typeOrder);
     }
     return NaN;
   }
@@ -226,4 +227,3 @@ export class GetAttrSelector extends Selector {
     return new GetAttrSelector(this._key.clone(), this._then.clone());
   }
 }
-Item.GetAttrSelector = GetAttrSelector;
