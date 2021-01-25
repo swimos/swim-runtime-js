@@ -25,9 +25,7 @@ export type AnyInterpreterSettings = InterpreterSettings | InterpreterSettingsIn
  * [[InterpreterSettings]] object initializer.
  */
 export interface InterpreterSettingsInit {
-  lineSeparator?: string | null;
-  isPretty?: boolean;
-  isStyled?: boolean;
+  maxScopeDepth?: number;
 }
 
 export class InterpreterSettings implements Debug, HashCode {

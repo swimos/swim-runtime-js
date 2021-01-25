@@ -19,24 +19,21 @@ import {Selector} from "./Selector";
 import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class LiteralSelector extends Selector {
-  /** @hidden */
-  readonly _item: Item;
-  /** @hidden */
-  readonly _then: Selector;
-
   constructor(item: Item, then: Selector) {
     super();
-    this._item = item.commit();
-    this._then = then;
+    Object.defineProperty(this, "item", {
+      value: item.commit(),
+      enumerable: true,
+    });
+    Object.defineProperty(this, "then", {
+      value: then,
+      enumerable: true,
+    });
   }
 
-  item(): Item {
-    return this._item;
-  }
+  declare readonly item: Item;
 
-  then(): Selector {
-    return this._then;
-  }
+  declare readonly then: Selector;
 
   forSelected<T>(interpreter: Interpreter,
                  callback: (interpreter: Interpreter) => T | undefined): T | undefined;
@@ -48,13 +45,13 @@ export class LiteralSelector extends Selector {
                     thisArg?: S): T | undefined {
     let selected: T | undefined;
     interpreter.willSelect(this);
-    if (interpreter.scopeDepth() !== 0) {
-      const literal = this._item.evaluate(interpreter);
+    if (interpreter.scopeDepth !== 0) {
+      const literal = this.item.evaluate(interpreter);
       if (literal.isDefined()) {
         // Push the literal onto the scope stack.
         interpreter.pushScope(literal);
         // Subselect the literal.
-        selected = this._then.forSelected(interpreter, callback, thisArg);
+        selected = this.then.forSelected(interpreter, callback, thisArg);
         // Pop the literal off of the scope stack.
         interpreter.popScope();
       }
@@ -73,13 +70,13 @@ export class LiteralSelector extends Selector {
                  thisArg?: S): Item {
     let result: Item;
     interpreter.willTransform(this);
-    if (interpreter.scopeDepth() !== 0) {
-      let literal = this._item.evaluate(interpreter);
+    if (interpreter.scopeDepth !== 0) {
+      let literal = this.item.evaluate(interpreter);
       if (literal.isDefined()) {
         // Push the literal onto the scope stack.
         interpreter.pushScope(literal);
         // Transform the literal.
-        literal = this._then.mapSelected(interpreter, transform, thisArg);
+        literal = this.then.mapSelected(interpreter, transform, thisArg);
         // Pop the literal off of the scope stack.
         interpreter.popScope();
       }
@@ -93,20 +90,20 @@ export class LiteralSelector extends Selector {
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const item = this._item.substitute(interpreter);
-    let then = this._then.substitute(interpreter);
+    const item = this.item.substitute(interpreter);
+    let then = this.then.substitute(interpreter);
     if (!(then instanceof Selector)) {
-      then = this._then;
+      then = this.then;
     }
     return new LiteralSelector(item, then as Selector);
   }
 
   andThen(then: Selector): Selector {
-    return new LiteralSelector(this._item, this._then.andThen(then));
+    return new LiteralSelector(this.item, this.then.andThen(then));
   }
 
   get precedence(): number {
-    return this._item.precedence;
+    return this.item.precedence;
   }
 
   get typeOrder(): number {
@@ -115,9 +112,9 @@ export class LiteralSelector extends Selector {
 
   compareTo(that: unknown): number {
     if (that instanceof LiteralSelector) {
-      let order = this._item.compareTo(that._item);
+      let order = this.item.compareTo(that.item);
       if (order === 0) {
-        order = this._then.compareTo(that._then);
+        order = this.then.compareTo(that.then);
       }
       return order;
     } else if (that instanceof Item) {
@@ -130,8 +127,8 @@ export class LiteralSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof LiteralSelector) {
-      return this._item.equivalentTo(that._item, epsilon)
-          && this._then.equivalentTo(that._then, epsilon);
+      return this.item.equivalentTo(that.item, epsilon)
+          && this.then.equivalentTo(that.then, epsilon);
     }
     return false;
   }
@@ -140,20 +137,20 @@ export class LiteralSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof LiteralSelector) {
-      return this._item.equals(that._item) && this._then.equals(that._then);
+      return this.item.equals(that.item) && this.then.equals(that.then);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(LiteralSelector),
-        this._item.hashCode()), this._then.hashCode()));
+        this.item.hashCode()), this.then.hashCode()));
   }
 
   debug(output: Output): void {
     output = output.write("Selector").write(46/*'.'*/).write("literal").write(40/*'('*/)
-        .debug(this._item).write(41/*')'*/);
-    this._then.debugThen(output);
+        .debug(this.item).write(41/*')'*/);
+    this.then.debugThen(output);
   }
 
   debugThen(output: Output): void {
@@ -161,6 +158,6 @@ export class LiteralSelector extends Selector {
   }
 
   clone(): Selector {
-    return new LiteralSelector(this._item.clone(), this._then.clone());
+    return new LiteralSelector(this.item.clone(), this.then.clone());
   }
 }

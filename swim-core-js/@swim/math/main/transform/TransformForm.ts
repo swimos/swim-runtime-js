@@ -17,20 +17,22 @@ import {AnyTransform, Transform} from "./Transform";
 
 /** @hidden */
 export class TransformForm extends Form<Transform, AnyTransform> {
-  private readonly _unit: Transform | undefined;
-
-  constructor(unit?: Transform) {
+  constructor(unit: Transform | undefined) {
     super();
-    this._unit = unit;
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  unit(): Transform | undefined;
-  unit(unit: Transform | undefined): Form<Transform, AnyTransform>;
-  unit(unit?: Transform | undefined): Transform | undefined | Form<Transform, AnyTransform> {
-    if (arguments.length === 0) {
-      return this._unit;
-    } else {
+  // @ts-ignore
+  declare readonly unit: Transform | undefined;
+
+  withUnit(unit: Transform | undefined): Form<Transform, AnyTransform> {
+    if (unit !== this.unit) {
       return new TransformForm(unit);
+    } else {
+      return this;
     }
   }
 

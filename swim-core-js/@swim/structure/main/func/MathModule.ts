@@ -225,7 +225,7 @@ class MaxFunc extends BridgeFunc {
     if (y !== void 0) {
       return x.max(y);
     } else if (operator !== void 0) {
-      y = operator.state() as Item;
+      y = operator.state as Item;
       const max = y !== void 0 ? x.max(y) : x;
       operator.setState(max);
       return max;
@@ -257,7 +257,7 @@ class MinFunc extends BridgeFunc {
     if (y !== void 0) {
       return x.min(y);
     } else if (operator !== void 0) {
-      y = operator.state() as Item;
+      y = operator.state as Item;
       const min = y !== void 0 ? x.min(y) : x;
       operator.setState(min);
       return min;
@@ -356,7 +356,7 @@ class RateFunc extends BridgeFunc {
       period = 1000;
     }
     if (isFinite(value) && operator !== void 0) {
-      let state = operator.state() as {v0: number, t0: number, dv: number, dt: number} | undefined;
+      let state = operator.state as {v0: number, t0: number, dv: number, dt: number} | undefined;
       if (state === void 0) {
         state = {v0: value, t0: Date.now(), dv: 0, dt: 0};
         operator.setState(state);

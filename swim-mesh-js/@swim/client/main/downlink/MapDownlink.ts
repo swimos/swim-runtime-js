@@ -194,7 +194,7 @@ export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implemen
         return keyObject;
       }
     }
-    return this._keyForm.unit();
+    return this._keyForm.unit;
   }
 
   firstValue(): V | undefined {
@@ -205,7 +205,7 @@ export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implemen
         return object;
       }
     }
-    return this._valueForm.unit();
+    return this._valueForm.unit;
   }
 
   firstEntry(): [K, V] | undefined {
@@ -226,7 +226,7 @@ export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implemen
         return keyObject;
       }
     }
-    return this._keyForm.unit();
+    return this._keyForm.unit;
   }
 
   lastValue(): V | undefined {
@@ -237,7 +237,7 @@ export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implemen
         return object;
       }
     }
-    return this._valueForm.unit();
+    return this._valueForm.unit;
   }
 
   lastEntry(): [K, V] | undefined {
@@ -259,7 +259,7 @@ export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implemen
         return nextKeyObject;
       }
     }
-    return this._keyForm.unit();
+    return this._keyForm.unit;
   }
 
   nextValue(keyObject: K): V | undefined {
@@ -271,7 +271,7 @@ export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implemen
         return nextObject;
       }
     }
-    return this._valueForm.unit();
+    return this._valueForm.unit;
   }
 
   nextEntry(keyObject: K): [K, V] | undefined {
@@ -294,7 +294,7 @@ export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implemen
         return previousKeyObject;
       }
     }
-    return this._keyForm.unit();
+    return this._keyForm.unit;
   }
 
   previousValue(keyObject: K): V | undefined {
@@ -306,7 +306,7 @@ export class MapDownlink<K, V, KU = never, VU = never> extends Downlink implemen
         return previousObject;
       }
     }
-    return this._valueForm.unit();
+    return this._valueForm.unit;
   }
 
   previousEntry(keyObject: K): [K, V] | undefined {

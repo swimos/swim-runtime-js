@@ -33,9 +33,6 @@ export type AnyRecord = Record
 
 export abstract class Record extends Value implements Builder<Item, Record> {
   /** @hidden */
-  _hashCode?: number;
-
-  /** @hidden */
   constructor() {
     super();
   }
@@ -50,7 +47,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * members.
    */
   isArray(): boolean {
-    return this.fieldCount() === 0;
+    return this.fieldCount === 0;
   }
 
   /**
@@ -58,7 +55,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * members.
    */
   isObject(): boolean {
-    return this.valueCount() === 0;
+    return this.valueCount === 0;
   }
 
   /**
@@ -69,7 +66,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   /**
    * Returns the number of [[Field]] members contained in this `Record`.
    */
-  fieldCount(): number {
+  get fieldCount(): number {
     let count = 0;
     this.forEach(function (member: Item): void {
       if (member instanceof Field) {
@@ -82,7 +79,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   /**
    * Returns the number of [[Value]] members contained in this `Record`.
    */
-  valueCount(): number {
+  get valueCount(): number {
     let count = 0;
     this.forEach(function (member: Item): void {
       if (member instanceof Value) {
@@ -816,14 +813,11 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   hashCode(): number {
-    if (this._hashCode === void 0) {
-      let code = Constructors.hash(Record);
-      this.forEach(function (item: Item): void {
-        code = Murmur3.mix(code, item.hashCode());
-      }, this);
-      this._hashCode = Murmur3.mash(code);
-    }
-    return this._hashCode;
+    let code = Constructors.hash(Record);
+    this.forEach(function (item: Item): void {
+      code = Murmur3.mix(code, item.hashCode());
+    }, this);
+    return code;
   }
 
   debug(output: Output): void {
@@ -847,9 +841,9 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   /** @hidden */
-  static readonly ALIASED: number = 1;
+  static readonly AliasedFlag: number = 1;
   /** @hidden */
-  static readonly IMMUTABLE: number = 2;
+  static readonly ImmutableFlag: number = 2;
 
   static empty(): Record {
     return RecordMap.empty();

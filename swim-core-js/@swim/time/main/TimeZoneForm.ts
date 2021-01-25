@@ -17,20 +17,22 @@ import {AnyTimeZone, TimeZone} from "./TimeZone";
 
 /** @hidden */
 export class TimeZoneForm extends Form<TimeZone, AnyTimeZone> {
-  private readonly _unit: TimeZone | undefined;
-
-  constructor(unit?: TimeZone) {
+  constructor(unit: TimeZone | undefined) {
     super();
-    this._unit = unit;
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  unit(): TimeZone | undefined;
-  unit(unit: TimeZone | undefined): Form<TimeZone, AnyTimeZone>;
-  unit(unit?: TimeZone | undefined): TimeZone | undefined | Form<TimeZone, AnyTimeZone> {
-    if (arguments.length === 0) {
-      return this._unit;
-    } else {
+  // @ts-ignore
+  declare readonly unit: TimeZone | undefined;
+
+  withUnit(unit: TimeZone | undefined): Form<TimeZone, AnyTimeZone> {
+    if (unit !== this.unit) {
       return new TimeZoneForm(unit);
+    } else {
+      return this;
     }
   }
 

@@ -18,29 +18,26 @@ import {Operator} from "./Operator";
 import {BinaryOperatorInterpolator} from "../"; // forward import
 
 export abstract class BinaryOperator extends Operator {
-  /** @hidden */
-  readonly _operand1: Item;
-  /** @hidden */
-  readonly _operand2: Item;
-
   constructor(operand1: Item, operand2: Item) {
     super();
-    this._operand1 = operand1;
-    this._operand2 = operand2;
+    Object.defineProperty(this, "operand1", {
+      value: operand1,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "operand2", {
+      value: operand2,
+      enumerable: true,
+    });
   }
 
-  get operand1(): Item {
-    return this._operand1;
-  }
+  declare readonly operand1: Item;
 
   abstract readonly operator: string;
 
-  get operand2(): Item {
-    return this._operand2;
-  }
+  declare readonly operand2: Item;
 
   isConstant(): boolean {
-    return this._operand1.isConstant() && this._operand2.isConstant();
+    return this.operand1.isConstant() && this.operand2.isConstant();
   }
 
   interpolateTo(that: BinaryOperator): Interpolator<BinaryOperator>;

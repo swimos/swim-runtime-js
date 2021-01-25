@@ -460,16 +460,14 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
 
   private static _form: Form<DateTime, AnyDateTime>;
   static form(unit?: AnyDateTime): Form<DateTime, AnyDateTime> {
-    if (unit !== void 0) {
-      unit = DateTime.fromAny(unit);
-    }
-    if (unit !== void 0) {
-      return new DateTime.Form(unit);
-    } else {
+    if (unit === void 0) {
       if (DateTime._form === void 0) {
-        DateTime._form = new DateTime.Form();
+        DateTime._form = new DateTime.Form(new DateTime(0));
       }
       return DateTime._form;
+    } else {
+      unit = DateTime.fromAny(unit);
+      return new DateTime.Form(unit);
     }
   }
 

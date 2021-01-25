@@ -50,12 +50,12 @@ export class RecordModel extends AbstractRecordOutlet {
     return this._state.length;
   }
 
-  fieldCount(): number {
-    return this._state.fieldCount();
+  get fieldCount(): number {
+    return this._state.fieldCount;
   }
 
-  valueCount(): number {
-    return this._state.valueCount();
+  get valueCount(): number {
+    return this._state.valueCount;
   }
 
   has(key: AnyValue): boolean {

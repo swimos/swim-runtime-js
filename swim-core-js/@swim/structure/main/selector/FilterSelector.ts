@@ -19,24 +19,21 @@ import {Selector} from "./Selector";
 import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class FilterSelector extends Selector {
-  /** @hidden */
-  readonly _predicate: Selector;
-  /** @hidden */
-  readonly _then: Selector;
-
   constructor(predicate: Selector, then: Selector) {
     super();
-    this._predicate = predicate;
-    this._then = then;
+    Object.defineProperty(this, "predicate", {
+      value: predicate,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "then", {
+      value: then,
+      enumerable: true,
+    });
   }
 
-  predicate(): Selector {
-    return this._predicate;
-  }
+  declare readonly predicate: Selector;
 
-  then(): Selector {
-    return this._then;
-  }
+  declare readonly then: Selector;
 
   forSelected<T>(interpreter: Interpreter,
                  callback: (interpreter: Interpreter) => T | undefined): T | undefined;
@@ -48,11 +45,11 @@ export class FilterSelector extends Selector {
                     thisArg?: S): T | undefined {
     let selected: T | undefined;
     interpreter.willSelect(this);
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // If the filter matches the selection scope:
       if (this.filterSelected(interpreter)) {
         // Then subselect the selection scope.
-        selected = this._then.forSelected(interpreter, callback, thisArg);
+        selected = this.then.forSelected(interpreter, callback, thisArg);
       }
     }
     interpreter.didSelect(this, selected);
@@ -69,11 +66,11 @@ export class FilterSelector extends Selector {
                  thisArg?: S): Item {
     let result: Item;
     interpreter.willTransform(this);
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // If the filter matches the selection scope:
       if (this.filterSelected(interpreter)) {
         // Then transform the selection scope.
-        result = this._then.mapSelected(interpreter, transform, thisArg);
+        result = this.then.mapSelected(interpreter, transform, thisArg);
       } else {
         result = interpreter.peekScope().toValue();
       }
@@ -86,19 +83,19 @@ export class FilterSelector extends Selector {
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    let predicate = this._predicate.substitute(interpreter);
+    let predicate = this.predicate.substitute(interpreter);
     if (!(predicate instanceof Selector)) {
-      predicate = this._predicate;
+      predicate = this.predicate;
     }
-    let then = this._then.substitute(interpreter);
+    let then = this.then.substitute(interpreter);
     if (!(then instanceof Selector)) {
-      then = this._then;
+      then = this.then;
     }
     return new FilterSelector(predicate as Selector, then as Selector);
   }
 
   protected filterSelected(interpreter: Interpreter): boolean {
-    return this._predicate.forSelected(interpreter, this.selected, this) !== void 0;
+    return this.predicate.forSelected(interpreter, this.selected, this) !== void 0;
   }
 
   protected selected(interpreter: Interpreter): null {
@@ -106,7 +103,7 @@ export class FilterSelector extends Selector {
   }
 
   andThen(then: Selector): Selector {
-    return new FilterSelector(this._predicate, this._then.andThen(then));
+    return new FilterSelector(this.predicate, this.then.andThen(then));
   }
 
   filter(predicate?: AnyItem): Selector {
@@ -124,9 +121,9 @@ export class FilterSelector extends Selector {
 
   compareTo(that: unknown): number {
     if (that instanceof FilterSelector) {
-      let order = this._predicate.compareTo(that._predicate);
+      let order = this.predicate.compareTo(that.predicate);
       if (order === 0) {
-        order = this._then.compareTo(that._then);
+        order = this.then.compareTo(that.then);
       }
       return order;
     } else if (that instanceof Item) {
@@ -139,8 +136,8 @@ export class FilterSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof FilterSelector) {
-      return this._predicate.equivalentTo(that._predicate, epsilon)
-          && this._then.equivalentTo(that._then, epsilon);
+      return this.predicate.equivalentTo(that.predicate, epsilon)
+          && this.then.equivalentTo(that.then, epsilon);
     }
     return false;
   }
@@ -149,22 +146,23 @@ export class FilterSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof FilterSelector) {
-      return this._predicate.equals(that._predicate) && this._then.equals(that._then);
+      return this.predicate.equals(that.predicate) && this.then.equals(that.then);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(FilterSelector),
-        this._predicate.hashCode()), this._then.hashCode()));
+        this.predicate.hashCode()), this.then.hashCode()));
   }
 
   debugThen(output: Output): void {
-    output = output.write(46/*'.'*/).write("filter").write(40/*'('*/).debug(this._predicate).write(41/*')'*/);
-    this._then.debugThen(output);
+    output = output.write(46/*'.'*/).write("filter").write(40/*'('*/)
+        .debug(this.predicate).write(41/*')'*/);
+    this.then.debugThen(output);
   }
 
   clone(): Selector {
-    return new FilterSelector(this._predicate.clone(), this._then.clone());
+    return new FilterSelector(this.predicate.clone(), this.then.clone());
   }
 }

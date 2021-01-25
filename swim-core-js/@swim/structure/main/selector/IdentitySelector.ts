@@ -26,7 +26,7 @@ import {FilterSelector} from "../"; // forward import
 import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class IdentitySelector extends Selector {
-  then(): Selector {
+  get then(): Selector {
     return this;
   }
 
@@ -40,7 +40,7 @@ export class IdentitySelector extends Selector {
                     thisArg?: S): T | undefined {
     let selected: T | undefined;
     interpreter.willSelect(this);
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const oldScope = interpreter.popScope();
       // Evaluate the current selection.

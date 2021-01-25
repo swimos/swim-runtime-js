@@ -22,24 +22,21 @@ import {Selector} from "./Selector";
 import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class GetSelector extends Selector {
-  /** @hidden */
-  readonly _key: Value;
-  /** @hidden */
-  readonly _then: Selector;
-
   constructor(key: Value, then: Selector) {
     super();
-    this._key = key.commit();
-    this._then = then;
+    Object.defineProperty(this, "accessor", {
+      value: key.commit(),
+      enumerable: true,
+    });
+    Object.defineProperty(this, "then", {
+      value: then,
+      enumerable: true,
+    });
   }
 
-  accessor(): Value {
-    return this._key;
-  }
+  declare readonly accessor: Value;
 
-  then(): Selector {
-    return this._then;
-  }
+  declare readonly then: Selector;
 
   forSelected<T>(interpreter: Interpreter,
                  callback: (interpreter: Interpreter) => T | undefined): T | undefined;
@@ -51,8 +48,8 @@ export class GetSelector extends Selector {
                     thisArg?: S): T | undefined {
     interpreter.willSelect(this);
     // Evaluate the key, in case it's dynamic.
-    const key = this._key.evaluate(interpreter).toValue();
-    const selected = GetSelector.forSelected(key, this._then, interpreter, callback, thisArg);
+    const key = this.accessor.evaluate(interpreter).toValue();
+    const selected = GetSelector.forSelected(key, this.then, interpreter, callback, thisArg);
     interpreter.didSelect(this, selected);
     return selected;
   }
@@ -61,7 +58,7 @@ export class GetSelector extends Selector {
                                    callback: (this: S | undefined, interpreter: Interpreter) => T,
                                    thisArg?: S): T | undefined {
     let selected: T | undefined;
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // Pop the next selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       let field: Field | undefined;
@@ -97,8 +94,8 @@ export class GetSelector extends Selector {
     let result: Item;
     interpreter.willTransform(this);
     // Evaluate the key, if it's dynamic.
-    const key = this._key.evaluate(interpreter).toValue();
-    if (interpreter.scopeDepth() !== 0) {
+    const key = this.accessor.evaluate(interpreter).toValue();
+    if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have members.
@@ -108,7 +105,7 @@ export class GetSelector extends Selector {
           // Push the field value onto the scope stack.
           interpreter.pushScope(oldField.toValue());
           // Transform the field value.
-          const newItem = this._then.mapSelected(interpreter, transform, thisArg);
+          const newItem = this.then.mapSelected(interpreter, transform, thisArg);
           // Pop the field value off the scope stack.
           interpreter.popScope();
           if (newItem instanceof Field) {
@@ -141,21 +138,21 @@ export class GetSelector extends Selector {
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
     // Evaluate the key, in case it's dynamic.
-    const key = this._key.evaluate(interpreter).toValue();
-    const value = GetSelector.substitute(key, this._then, interpreter);
+    const key = this.accessor.evaluate(interpreter).toValue();
+    const value = GetSelector.substitute(key, this.then, interpreter);
     if (value !== void 0) {
       return value;
     }
-    let then = this._then.substitute(interpreter);
+    let then = this.then.substitute(interpreter);
     if (!(then instanceof Selector)) {
-      then = this._then;
+      then = this.then;
     }
-    return new GetSelector(this._key, then as Selector);
+    return new GetSelector(this.accessor, then as Selector);
   }
 
   private static substitute(key: Value, then: Selector, interpreter: Interpreter): Item | undefined {
     let selected: Item | undefined;
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // Pop the next selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       let field: Field | undefined;
@@ -177,7 +174,7 @@ export class GetSelector extends Selector {
   }
 
   andThen(then: Selector): Selector {
-    return new GetSelector(this._key, this._then.andThen(then));
+    return new GetSelector(this.accessor, this.then.andThen(then));
   }
 
   get typeOrder(): number {
@@ -186,9 +183,9 @@ export class GetSelector extends Selector {
 
   compareTo(that: unknown): number {
     if (that instanceof GetSelector) {
-      let order = this._key.compareTo(that._key);
+      let order = this.accessor.compareTo(that.accessor);
       if (order === 0) {
-        order = this._then.compareTo(that._then);
+        order = this.then.compareTo(that.then);
       }
       return order;
     } else if (that instanceof Item) {
@@ -201,7 +198,7 @@ export class GetSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof GetSelector) {
-      return this._key.equals(that._key) && this._then.equivalentTo(that._then, epsilon);
+      return this.accessor.equals(that.accessor) && this.then.equivalentTo(that.then, epsilon);
     }
     return false;
   }
@@ -210,22 +207,22 @@ export class GetSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof GetSelector) {
-      return this._key.equals(that._key) && this._then.equals(that._then);
+      return this.accessor.equals(that.accessor) && this.then.equals(that.then);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(GetSelector),
-        this._key.hashCode()), this._then.hashCode()));
+        this.accessor.hashCode()), this.then.hashCode()));
   }
 
   debugThen(output: Output): void {
-    output = output.write(46/*'.'*/).write("get").write(40/*'('*/).debug(this._key).write(41/*')'*/);
-    this._then.debugThen(output);
+    output = output.write(46/*'.'*/).write("get").write(40/*'('*/).debug(this.accessor).write(41/*')'*/);
+    this.then.debugThen(output);
   }
 
   clone(): Selector {
-    return new GetSelector(this._key.clone(), this._then.clone());
+    return new GetSelector(this.accessor.clone(), this.then.clone());
   }
 }

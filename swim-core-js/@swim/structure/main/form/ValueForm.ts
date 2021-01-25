@@ -18,21 +18,22 @@ import {Form} from "./Form";
 
 /** @hidden */
 export class ValueForm extends Form<Value, AnyValue> {
-  /** @hidden */
-  readonly _unit: Value | undefined;
-
   constructor(unit?: Value) {
     super();
-    this._unit = unit ? unit.commit() : unit;
+    Object.defineProperty(this, "unit", {
+      value: unit !== void 0 ? unit.commit() : void 0,
+      enumerable: true,
+    });
   }
 
-  unit(): Value | undefined;
-  unit(unit: Value | undefined): Form<Value, AnyValue>;
-  unit(unit?: Value | undefined): Value | undefined | Form<Value, AnyValue> {
-    if (arguments.length === 0) {
-      return this._unit;
-    } else {
+  // @ts-ignore
+  declare readonly unit: Value | undefined;
+
+  withUnit(unit: Value | undefined): Form<Value> {
+    if (unit !== this.unit) {
       return new ValueForm(unit);
+    } else {
+      return this;
     }
   }
 

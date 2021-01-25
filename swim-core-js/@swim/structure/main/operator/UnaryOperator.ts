@@ -18,22 +18,20 @@ import {Operator} from "./Operator";
 import {UnaryOperatorInterpolator} from "../"; // forward import
 
 export abstract class UnaryOperator extends Operator {
-  /** @hidden */
-  readonly _operand: Item;
-
   constructor(operand: Item) {
     super();
-    this._operand = operand;
+    Object.defineProperty(this, "operand", {
+      value: operand,
+      enumerable: true,
+    });
   }
 
-  get operand(): Item {
-    return this._operand;
-  }
+  declare readonly operand: Item;
 
   abstract readonly operator: string;
 
   isConstant(): boolean {
-    return this._operand.isConstant();
+    return this.operand.isConstant();
   }
 
   interpolateTo(that: UnaryOperator): Interpolator<UnaryOperator>;

@@ -35,19 +35,17 @@ export abstract class Form<T, U = never> {
    * attribute.  Used to accelerate distrcrimination of polymorphic structural
    * types with nominal type hints.
    */
-  tag(): string | undefined;
+  get tag(): string | undefined {
+    return void 0;
+  }
 
   /**
    * Returns a version of this `Form` that requires a head [Attr] with the
    * given `tag` name.
    */
-  tag(tag: string | undefined): Form<T, U>;
-
-  tag(tag?: string | undefined): string | undefined | Form<T, U> {
-    if (arguments.length === 0) {
-      return void 0;
-    } else if (tag !== void 0) {
-      return new TagForm<T, U>(tag, this);
+  withTag(tag: string | undefined): Form<T, U> {
+    if (tag !== void 0 && tag !== this.tag) {
+      return new TagForm(this, tag);
     } else {
       return this;
     }
@@ -58,18 +56,16 @@ export abstract class Form<T, U = never> {
    * fallback return value when [Item.coerce coercing] an invalid structural
    * value.
    */
-  unit(): T | undefined;
+  get unit(): T | undefined {
+    return void 0;
+  }
 
   /**
    * Returns a version of this `Form` with the given `unit` value.
    */
-  unit(unit: T | undefined): Form<T, U>;
-
-  unit(unit?: T | undefined): T | undefined | Form<T, U> {
-    if (arguments.length === 0) {
-      return void 0;
-    } else if (unit !== void 0) {
-      return new UnitForm<T, U>(unit, this);
+  withUnit(unit: T | undefined): Form<T, U> {
+    if (unit !== this.unit) {
+      return new UnitForm(this, unit);
     } else {
       return this;
     }

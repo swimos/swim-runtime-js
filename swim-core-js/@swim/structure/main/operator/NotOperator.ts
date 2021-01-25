@@ -33,13 +33,13 @@ export class NotOperator extends UnaryOperator {
 
   evaluate(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const argument = this._operand.evaluate(interpreter);
+    const argument = this.operand.evaluate(interpreter);
     return argument.not();
   }
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const argument = this._operand.substitute(interpreter);
+    const argument = this.operand.substitute(interpreter);
     return argument.not();
   }
 
@@ -55,7 +55,7 @@ export class NotOperator extends UnaryOperator {
     if (this === that) {
       return true;
     } else if (that instanceof NotOperator) {
-      return this._operand.equivalentTo(that._operand, epsilon);
+      return this.operand.equivalentTo(that.operand, epsilon);
     }
     return false;
   }
@@ -64,20 +64,20 @@ export class NotOperator extends UnaryOperator {
     if (this === that) {
       return true;
     } else if (that instanceof NotOperator) {
-      return this._operand.equals(that._operand);
+      return this.operand.equals(that.operand);
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(NotOperator), this._operand.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(NotOperator), this.operand.hashCode()));
   }
 
   debug(output: Output): void {
-    output.debug(this._operand).write(46/*'.'*/).write("not").write(40/*'('*/).write(41/*')'*/);
+    output.debug(this.operand).write(46/*'.'*/).write("not").write(40/*'('*/).write(41/*')'*/);
   }
 
   clone(): NotOperator {
-    return new NotOperator(this._operand.clone());
+    return new NotOperator(this.operand.clone());
   }
 }

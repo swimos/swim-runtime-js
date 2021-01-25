@@ -17,21 +17,22 @@ import {Form} from "./Form";
 
 /** @hidden */
 export class AnyForm extends Form<AnyItem> {
-  /** @hidden */
-  readonly _unit: AnyItem | undefined;
-
   constructor(unit?: AnyItem) {
     super();
-    this._unit = unit;
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  unit(): AnyItem | undefined;
-  unit(unit: AnyItem | undefined): Form<AnyItem>;
-  unit(unit?: AnyItem | undefined): AnyItem | undefined | Form<AnyItem> {
-    if (arguments.length === 0) {
-      return this._unit;
-    } else {
+  // @ts-ignore
+  declare readonly unit: AnyItem | undefined;
+
+  withUnit(unit: AnyItem | undefined): Form<AnyItem> {
+    if (unit !== this.unit) {
       return new AnyForm(unit);
+    } else {
+      return this;
     }
   }
 

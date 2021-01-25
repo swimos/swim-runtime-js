@@ -18,21 +18,22 @@ import {Form} from "./Form";
 
 /** @hidden */
 export class BooleanForm extends Form<boolean> {
-  /** @hidden */
-  readonly _unit: boolean | undefined;
-
   constructor(unit?: boolean) {
     super();
-    this._unit = unit;
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  unit(): boolean | undefined;
-  unit(unit: boolean | undefined): Form<boolean>;
-  unit(unit?: boolean | undefined): boolean | undefined | Form<boolean> {
-    if (arguments.length === 0) {
-      return this._unit;
-    } else {
+  // @ts-ignore
+  declare readonly unit: boolean | undefined;
+
+  withUnit(unit: boolean | undefined): Form<boolean> {
+    if (unit !== this.unit) {
       return new BooleanForm(unit);
+    } else {
+      return this;
     }
   }
 

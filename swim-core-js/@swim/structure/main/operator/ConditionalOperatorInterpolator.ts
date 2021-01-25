@@ -42,15 +42,15 @@ export const ConditionalOperatorInterpolator = function (y0: ConditionalOperator
   } as ConditionalOperatorInterpolator;
   Object.setPrototypeOf(interpolator, ConditionalOperatorInterpolator.prototype);
   Object.defineProperty(interpolator, "ifTermInterpolator", {
-    value: y0.ifTerm().interpolateTo(y1.ifTerm()),
+    value: y0.ifTerm.interpolateTo(y1.ifTerm),
     enumerable: true,
   });
   Object.defineProperty(interpolator, "thenTermInterpolator", {
-    value: y0.thenTerm().interpolateTo(y1.thenTerm()),
+    value: y0.thenTerm.interpolateTo(y1.thenTerm),
     enumerable: true,
   });
   Object.defineProperty(interpolator, "elseTermInterpolator", {
-    value: y0.elseTerm().interpolateTo(y1.elseTerm()),
+    value: y0.elseTerm.interpolateTo(y1.elseTerm),
     enumerable: true,
   });
   return interpolator;

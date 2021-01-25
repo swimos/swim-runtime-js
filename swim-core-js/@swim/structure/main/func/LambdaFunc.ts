@@ -24,22 +24,21 @@ import {Func} from "./Func";
 import {Interpreter} from "../"; // forward import
 
 export class LambdaFunc extends Func {
-  readonly _bindings: Value;
-  readonly _template: Value;
-
   constructor(bindings: Value, template: Value) {
     super();
-    this._bindings = bindings;
-    this._template = template;
+    Object.defineProperty(this, "bindings", {
+      value: bindings,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "template", {
+      value: template,
+      enumerable: true,
+    });
   }
 
-  bindings(): Value {
-    return this._bindings;
-  }
+  declare readonly bindings: Value;
 
-  template(): Value {
-    return this._template;
-  }
+  declare readonly template: Value;
 
   get precedence(): number {
     return 1;
@@ -47,7 +46,7 @@ export class LambdaFunc extends Func {
 
   invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const bindings = this._bindings;
+    const bindings = this.bindings;
     const arity = Math.max(1, bindings.length);
     const params = Record.create(arity);
     let i = 0;
@@ -69,7 +68,7 @@ export class LambdaFunc extends Func {
       i += 1;
     }
     interpreter.pushScope(params);
-    const result = this._template.evaluate(interpreter);
+    const result = this.template.evaluate(interpreter);
     interpreter.popScope();
     return result;
   }
@@ -80,9 +79,9 @@ export class LambdaFunc extends Func {
 
   compareTo(that: unknown): number {
     if (that instanceof LambdaFunc) {
-      let order = this._bindings.compareTo(that._bindings);
+      let order = this.bindings.compareTo(that.bindings);
       if (order === 0) {
-        order = this._template.compareTo(that._template);
+        order = this.template.compareTo(that.template);
       }
       return order;
     } else if (that instanceof Item) {
@@ -95,8 +94,8 @@ export class LambdaFunc extends Func {
     if (this === that) {
       return true;
     } else if (that instanceof LambdaFunc) {
-      return this._bindings.equivalentTo(that._bindings, epsilon)
-          && this._template.equivalentTo(that._template, epsilon);
+      return this.bindings.equivalentTo(that.bindings, epsilon)
+          && this.template.equivalentTo(that.template, epsilon);
     }
     return false;
   }
@@ -105,14 +104,14 @@ export class LambdaFunc extends Func {
     if (this === that) {
       return true;
     } else if (that instanceof LambdaFunc) {
-      return this._bindings.equals(that._bindings) && this._template.equals(that._template);
+      return this.bindings.equals(that.bindings) && this.template.equals(that.template);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(LambdaFunc),
-        this._bindings.hashCode()), this._template.hashCode()));
+        this.bindings.hashCode()), this.template.hashCode()));
   }
 
   debug(output: Output): void {

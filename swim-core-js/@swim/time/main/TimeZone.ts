@@ -153,13 +153,13 @@ export class TimeZone implements HashCode, Debug {
     if (unit !== void 0) {
       unit = TimeZone.fromAny(unit);
     }
-    if (unit !== TimeZone.utc()) {
-      return new TimeZone.Form(unit);
-    } else {
+    if (unit === void 0 || unit === TimeZone.utc()) {
       if (TimeZone._form === void 0) {
         TimeZone._form = new TimeZone.Form(TimeZone.utc());
       }
       return TimeZone._form;
+    } else {
+      return new TimeZone.Form(unit);
     }
   }
 

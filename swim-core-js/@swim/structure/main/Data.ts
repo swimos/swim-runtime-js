@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Random, Murmur3, Numbers, Constructors} from "@swim/util";
+import {Lazy, Random, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Input, OutputSettings, Output, Writer, Unicode, Base16, Base64} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {Item} from "./Item";
@@ -22,43 +22,52 @@ import {DataOutput} from "./"; // forward import
 export type AnyData = Data | Uint8Array;
 
 export class Data extends Value {
-  /** @hidden */
-  _array: Uint8Array | null;
-  /** @hidden */
-  _size: number;
-  /** @hidden */
-  _flags: number;
-
   constructor(array: Uint8Array | null, size: number, flags: number) {
     super();
-    this._array = array;
-    this._size = size;
-    this._flags = flags;
+    Object.defineProperty(this, "array", {
+      value: array,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "size", {
+      value: size,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "flags", {
+      value: flags,
+      enumerable: true,
+      configurable: true,
+    });
   }
+
+  /** @hidden */
+  declare readonly array: Uint8Array | null;
 
   isConstant(): boolean {
     return true;
   }
 
-  get size(): number {
-    return this._size;
-  }
+  declare readonly size: number;
+
+  /** @hidden */
+  declare readonly flags: number;
 
   getByte(index: number): number {
     if (index < 0 || index >= this.size) {
       throw new RangeError("" + index);
     }
-    return this._array![index]!;
+    return this.array![index]!;
   }
 
   setByte(index: number, value: number): Data {
-    const flags = this._flags;
-    if ((flags & Data.IMMUTABLE) !== 0) {
+    const flags = this.flags;
+    if ((flags & Data.ImmutableFlag) !== 0) {
       throw new Error("immutable");
-    } else if (index < 0 || index >= this._size) {
+    } else if (index < 0 || index >= this.size) {
       throw new RangeError("" + index);
     }
-    if ((flags & Data.ALIASED) !== 0) {
+    if ((flags & Data.AliasedFlag) !== 0) {
       return this.setByteAliased(index, value);
     } else {
       return this.setByteMutable(index, value);
@@ -67,26 +76,34 @@ export class Data extends Value {
 
   private setByteAliased(index: number, value: number): Data {
     const n = this.size;
-    const oldArray = this._array!;
+    const oldArray = this.array!;
     const newArray = new Uint8Array(Data.expand(n));
     newArray.set(oldArray, 0);
     newArray[index] = value;
-    this._array = newArray;
-    this._flags &= ~Data.ALIASED;
+    Object.defineProperty(this, "array", {
+      value: newArray,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "flags", {
+      value: this.flags & ~Data.AliasedFlag,
+      enumerable: true,
+      configurable: true,
+    });
     return this;
   }
 
   private setByteMutable(index: number, value: number): Data {
-    this._array![index] = value;
+    this.array![index] = value;
     return this;
   }
 
   addByte(value: number): Data {
-    const flags = this._flags;
-    if ((flags & Data.IMMUTABLE) !== 0) {
+    const flags = this.flags;
+    if ((flags & Data.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    if ((flags & Data.ALIASED) !== 0) {
+    if ((flags & Data.AliasedFlag) !== 0) {
       return this.addByteAliased(value);
     } else {
       return this.addByteMutable(value);
@@ -95,40 +112,60 @@ export class Data extends Value {
 
   private addByteAliased(value: number): Data {
     const n = this.size;
-    const oldArray = this._array;
+    const oldArray = this.array;
     const newArray = new Uint8Array(Data.expand(n + 1));
     if (oldArray !== null) {
       newArray.set(oldArray, 0);
     }
     newArray[n] = value;
-    this._array = newArray;
-    this._size = n + 1;
-    this._flags &= ~Data.ALIASED;
+    Object.defineProperty(this, "array", {
+      value: newArray,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "size", {
+      value: n + 1,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "flags", {
+      value: this.flags & ~Data.AliasedFlag,
+      enumerable: true,
+      configurable: true,
+    });
     return this;
   }
 
   private addByteMutable(value: number): Data {
     const n = this.size;
-    const oldArray = this._array;
+    const oldArray = this.array;
     let newArray;
     if (oldArray === null || n + 1 > oldArray.length) {
       newArray = new Uint8Array(Data.expand(n + 1));
       if (oldArray !== null) {
         newArray.set(oldArray, 0);
       }
-      this._array = newArray;
+      Object.defineProperty(this, "array", {
+        value: newArray,
+        enumerable: true,
+        configurable: true,
+      });
     } else {
       newArray = oldArray;
     }
     newArray[n] = value;
-    this._size = n + 1;
+    Object.defineProperty(this, "size", {
+      value: n + 1,
+      enumerable: true,
+      configurable: true,
+    });
     return this;
   }
 
   addData(data: Data): Data {
-    let array = data._array;
+    let array = data.array;
     if (array !== null) {
-      const size = data._size;
+      const size = data.size;
       if (array.length > size) {
         array = array.slice(0, size);
       }
@@ -139,11 +176,11 @@ export class Data extends Value {
   }
 
   addUint8Array(array: Uint8Array): Data {
-    const flags = this._flags;
-    if ((flags & Data.IMMUTABLE) !== 0) {
+    const flags = this.flags;
+    if ((flags & Data.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    if ((flags & Data.ALIASED) !== 0) {
+    if ((flags & Data.AliasedFlag) !== 0) {
       return this.addUint8ArrayAliased(array);
     } else {
       return this.addUint8ArrayMutable(array);
@@ -156,15 +193,27 @@ export class Data extends Value {
       return this;
     }
     const n = this.size;
-    const oldArray = this._array;
+    const oldArray = this.array;
     const newArray = new Uint8Array(Data.expand(n + size));
     if (oldArray !== null) {
       newArray.set(oldArray, 0);
     }
     newArray.set(array, n);
-    this._array = newArray;
-    this._size = n + size;
-    this._flags &= ~Data.ALIASED;
+    Object.defineProperty(this, "array", {
+      value: newArray,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "size", {
+      value: n + size,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "flags", {
+      value: this.flags & ~Data.AliasedFlag,
+      enumerable: true,
+      configurable: true,
+    });
     return this;
   }
 
@@ -174,40 +223,68 @@ export class Data extends Value {
       return this;
     }
     const n = this.size;
-    const oldArray = this._array;
+    const oldArray = this.array;
     let newArray;
     if (oldArray === null || n + size > oldArray.length) {
       newArray = new Uint8Array(Data.expand(n + size));
       if (oldArray !== null) {
         newArray.set(oldArray, 0);
       }
-      this._array = newArray;
+      Object.defineProperty(this, "array", {
+        value: newArray,
+        enumerable: true,
+        configurable: true,
+      });
     } else {
       newArray = oldArray;
     }
     newArray.set(array, n);
-    this._size = n + size;
+    Object.defineProperty(this, "size", {
+      value: n + size,
+      enumerable: true,
+      configurable: true,
+    });
     return this;
   }
 
   clear(): void {
-    if ((this._flags & Data.IMMUTABLE) !== 0) {
+    if ((this.flags & Data.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    this._array = null;
-    this._size = 0;
-    this._flags = Data.ALIASED;
+    Object.defineProperty(this, "array", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "size", {
+      value: 0,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "flags", {
+      value: Data.AliasedFlag,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   toUint8Array(): Uint8Array {
-    const oldArray = this._array;
-    const flags = this._flags;
-    if ((flags & Data.IMMUTABLE) !== 0) {
+    const oldArray = this.array;
+    const flags = this.flags;
+    if ((flags & Data.ImmutableFlag) !== 0) {
       return oldArray !== null ? oldArray.slice(0) : new Uint8Array(0);
-    } else if ((flags & Data.ALIASED) !== 0 || this._size !== oldArray!.length) {
+    } else if ((flags & Data.AliasedFlag) !== 0 || this.size !== oldArray!.length) {
       const newArray = oldArray !== null ? oldArray.slice(0) : new Uint8Array(0);
-      this._array = newArray;
-      this._flags &= ~Data.ALIASED;
+      Object.defineProperty(this, "array", {
+        value: newArray,
+        enumerable: true,
+        configurable: true,
+      });
+      Object.defineProperty(this, "flags", {
+        value: this.flags & ~Data.AliasedFlag,
+        enumerable: true,
+        configurable: true,
+      });
       return newArray;
     } else {
       return oldArray!;
@@ -216,10 +293,10 @@ export class Data extends Value {
 
   asUint8Array(): Uint8Array | undefined {
     let array: Uint8Array | undefined;
-    if (this._array !== null && this._size > 0) {
-      array = this._array;
-      if (array.length !== this._size) {
-        array = new Uint8Array(array.buffer, array.byteOffset, this._size);
+    if (this.array !== null && this.size > 0) {
+      array = this.array;
+      if (array.length !== this.size) {
+        array = new Uint8Array(array.buffer, array.byteOffset, this.size);
       }
     } else {
       array = void 0;
@@ -232,16 +309,20 @@ export class Data extends Value {
   }
 
   isAliased(): boolean {
-    return (this._flags & Data.ALIASED) !== 0;
+    return (this.flags & Data.AliasedFlag) !== 0;
   }
 
   isMutable(): boolean {
-    return (this._flags & Data.IMMUTABLE) === 0;
+    return (this.flags & Data.ImmutableFlag) === 0;
   }
 
   branch(): Data {
-    this._flags |= Data.ALIASED;
-    return new Data(this._array, this._size, Data.ALIASED);
+    Object.defineProperty(this, "flags", {
+      value: this.flags | Data.AliasedFlag,
+      enumerable: true,
+      configurable: true,
+    });
+    return new Data(this.array, this.size, Data.AliasedFlag);
   }
 
   clone(): Data {
@@ -249,13 +330,17 @@ export class Data extends Value {
   }
 
   commit(): this {
-    this._flags |= Data.IMMUTABLE;
+    Object.defineProperty(this, "flags", {
+      value: this.flags | Data.ImmutableFlag,
+      enumerable: true,
+      configurable: true,
+    });
     return this;
   }
 
   writeBase16(output: Output, base16: Base16 = Base16.uppercase): Writer<unknown, unknown> {
-    let array = this._array;
-    const size = this._size;
+    let array = this.array;
+    const size = this.size;
     if (array !== null && size !== 0) {
       if (array.length !== size) {
         array = array.slice(0, size);
@@ -273,8 +358,8 @@ export class Data extends Value {
   }
 
   writeBase64(output: Output, base64: Base64 = Base64.standard()): Writer<unknown, unknown> {
-    let array = this._array;
-    const size = this._size;
+    let array = this.array;
+    const size = this.size;
     if (array !== null && size !== 0) {
       if (array.length !== size) {
         array = array.slice(0, size);
@@ -304,10 +389,10 @@ export class Data extends Value {
 
   compareTo(that: unknown): number {
     if (that instanceof Data) {
-      const xs = this._array!;
-      const ys = that._array!;
-      const xn = this._size;
-      const yn = that._size;
+      const xs = this.array!;
+      const ys = that.array!;
+      const xn = this.size;
+      const yn = that.size;
       let order = 0;
       let i = 0;
       do {
@@ -343,10 +428,10 @@ export class Data extends Value {
     if (this === that) {
       return true;
     } else if (that instanceof Data) {
-      const xs = this._array!;
-      const ys = that._array!;
-      const xn = this._size;
-      if (xn !== that._size) {
+      const xs = this.array!;
+      const ys = that.array!;
+      const xn = this.size;
+      if (xn !== that.size) {
         return false;
       }
       for (let i = 0; i < xn; i += 1) {
@@ -361,12 +446,12 @@ export class Data extends Value {
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mixUint8Array(Constructors.hash(Data),
-        this._array !== null ? this._array : new Uint8Array(0)));
+        this.array !== null ? this.array : new Uint8Array(0)));
   }
 
   debug(output: Output): void {
     output = output.write("Data").write(46/*'.'*/);
-    if (this._size === 0) {
+    if (this.size === 0) {
       output = output.write("empty").write(40/*'('*/).write(41/*')'*/);
     } else {
       output = output.write("base16").write(40/*'('*/).write(34/*'"'*/);
@@ -380,39 +465,25 @@ export class Data extends Value {
   }
 
   /** @hidden */
-  static readonly ALIASED: number = 1 << 0;
+  static readonly AliasedFlag: number = 1 << 0;
   /** @hidden */
-  static readonly IMMUTABLE: number = 1 << 1;
+  static readonly ImmutableFlag: number = 1 << 1;
 
-  private static _empty?: Data;
-
-  static output(): Output<Data>;
-  static output(initialCapacity: number): Output<Data>;
-  static output(data: Data): Output<Data>;
-  static output(data?: number | Data): Output<Data> {
-    if (!(data instanceof Data)) {
-      data = Data.create(data);
-    }
-    return new DataOutput(data, OutputSettings.standard());
-  }
-
+  @Lazy
   static empty(): Data {
-    if (Data._empty === void 0) {
-      Data._empty = new Data(null, 0, Data.ALIASED | Data.IMMUTABLE);
-    }
-    return Data._empty;
+    return new Data(null, 0, Data.AliasedFlag | Data.ImmutableFlag);
   }
 
   static create(initialCapacity?: number): Data {
     if (initialCapacity === void 0) {
-      return new Data(null, 0, Data.ALIASED);
+      return new Data(null, 0, Data.AliasedFlag);
     } else {
       return new Data(new Uint8Array(initialCapacity), 0, 0);
     }
   }
 
   static wrap(value: Uint8Array): Data {
-    return new Data(value, value.length, Data.ALIASED);
+    return new Data(value, value.length, Data.AliasedFlag);
   }
 
   static fromBase16(input: Input | string): Data {
@@ -443,6 +514,16 @@ export class Data extends Value {
     const array = new Uint8Array(size);
     Random.fillBytes(array);
     return Data.wrap(array);
+  }
+
+  static output(): Output<Data>;
+  static output(initialCapacity: number): Output<Data>;
+  static output(data: Data): Output<Data>;
+  static output(data?: number | Data): Output<Data> {
+    if (!(data instanceof Data)) {
+      data = Data.create(data);
+    }
+    return new DataOutput(data, OutputSettings.standard());
   }
 
   /** @hidden */

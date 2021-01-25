@@ -207,23 +207,23 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
     if (selector instanceof IdentitySelector) {
       return this.sizeOfIdentitySelector();
     } else if (selector instanceof LiteralSelector) {
-      return this.sizeOfLiteralSelector(selector.item(), selector.then());
+      return this.sizeOfLiteralSelector(selector.item, selector.then);
     } else if (selector instanceof GetSelector) {
-      return this.sizeOfGetSelector(selector.accessor(), selector.then());
+      return this.sizeOfGetSelector(selector.accessor, selector.then);
     } else if (selector instanceof GetAttrSelector) {
-      return this.sizeOfGetAttrSelector(selector.accessor(), selector.then());
+      return this.sizeOfGetAttrSelector(selector.accessor, selector.then);
     } else if (selector instanceof GetItemSelector) {
-      return this.sizeOfGetItemSelector(selector.accessor(), selector.then());
+      return this.sizeOfGetItemSelector(selector.accessor, selector.then);
     } else if (selector instanceof KeysSelector) {
-      return this.sizeOfKeysSelector(selector.then());
+      return this.sizeOfKeysSelector(selector.then);
     } else if (selector instanceof ValuesSelector) {
-      return this.sizeOfValuesSelector(selector.then());
+      return this.sizeOfValuesSelector(selector.then);
     } else if (selector instanceof ChildrenSelector) {
-      return this.sizeOfChildrenSelector(selector.then());
+      return this.sizeOfChildrenSelector(selector.then);
     } else if (selector instanceof DescendantsSelector) {
-      return this.sizeOfDescendantsSelector(selector.then());
+      return this.sizeOfDescendantsSelector(selector.then);
     } else if (selector instanceof FilterSelector) {
-      return this.sizeOfFilterSelector(selector.predicate(), selector.then());
+      return this.sizeOfFilterSelector(selector.predicate, selector.then);
     }
     throw new WriterException("No Recon serialization for " + selector);
   }
@@ -232,23 +232,23 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
     if (selector instanceof IdentitySelector) {
       return this.writeIdentitySelector(output);
     } else if (selector instanceof LiteralSelector) {
-      return this.writeLiteralSelector(selector.item(), selector.then(), output);
+      return this.writeLiteralSelector(selector.item, selector.then, output);
     } else if (selector instanceof GetSelector) {
-      return this.writeGetSelector(selector.accessor(), selector.then(), output);
+      return this.writeGetSelector(selector.accessor, selector.then, output);
     } else if (selector instanceof GetAttrSelector) {
-      return this.writeGetAttrSelector(selector.accessor(), selector.then(), output);
+      return this.writeGetAttrSelector(selector.accessor, selector.then, output);
     } else if (selector instanceof GetItemSelector) {
-      return this.writeGetItemSelector(selector.accessor(), selector.then(), output);
+      return this.writeGetItemSelector(selector.accessor, selector.then, output);
     } else if (selector instanceof KeysSelector) {
-      return this.writeKeysSelector(selector.then(), output);
+      return this.writeKeysSelector(selector.then, output);
     } else if (selector instanceof ValuesSelector) {
-      return this.writeValuesSelector(selector.then(), output);
+      return this.writeValuesSelector(selector.then, output);
     } else if (selector instanceof ChildrenSelector) {
-      return this.writeChildrenSelector(selector.then(), output);
+      return this.writeChildrenSelector(selector.then, output);
     } else if (selector instanceof DescendantsSelector) {
-      return this.writeDescendantsSelector(selector.then(), output);
+      return this.writeDescendantsSelector(selector.then, output);
     } else if (selector instanceof FilterSelector) {
-      return this.writeFilterSelector(selector.predicate(), selector.then(), output);
+      return this.writeFilterSelector(selector.predicate, selector.then, output);
     }
     return Writer.error(new WriterException("No Recon serialization for " + selector));
   }
@@ -259,9 +259,9 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
     } else if (operator instanceof UnaryOperator) {
       return this.sizeOfPrefixOperator(operator.operator, operator.operand, operator.precedence);
     } else if (operator instanceof InvokeOperator) {
-      return this.sizeOfInvokeOperator(operator.func(), operator.args());
+      return this.sizeOfInvokeOperator(operator.func, operator.args);
     } else if (operator instanceof ConditionalOperator) {
-      return this.sizeOfConditionalOperator(operator.ifTerm(), operator.thenTerm(), operator.elseTerm(), operator.precedence);
+      return this.sizeOfConditionalOperator(operator.ifTerm, operator.thenTerm, operator.elseTerm, operator.precedence);
     }
     throw new WriterException("No Recon serialization for " + operator);
   }
@@ -272,16 +272,16 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
     } else if (operator instanceof UnaryOperator) {
       return this.writePrefixOperator(operator.operator, operator.operand, operator.precedence, output);
     } else if (operator instanceof InvokeOperator) {
-      return this.writeInvokeOperator(operator.func(), operator.args(), output);
+      return this.writeInvokeOperator(operator.func, operator.args, output);
     } else if (operator instanceof ConditionalOperator) {
-      return this.writeConditionalOperator(operator.ifTerm(), operator.thenTerm(), operator.elseTerm(), operator.precedence, output);
+      return this.writeConditionalOperator(operator.ifTerm, operator.thenTerm, operator.elseTerm, operator.precedence, output);
     }
     return Writer.error(new WriterException("No Recon serialization for " + operator));
   }
 
   sizeOfFunc(func: Func): number {
     if (func instanceof LambdaFunc) {
-      return this.sizeOfLambdaFunc(func.bindings(), func.template());
+      return this.sizeOfLambdaFunc(func.bindings, func.template);
     } else if (func instanceof BridgeFunc) {
       return 0;
     }
@@ -290,7 +290,7 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
 
   writeFunc(func: Func, output: Output): Writer {
     if (func instanceof LambdaFunc) {
-      return this.writeLambdaFunc(func.bindings(), func.template(), output);
+      return this.writeLambdaFunc(func.bindings, func.template, output);
     } else if (func instanceof BridgeFunc) {
       return Writer.end();
     }
@@ -334,23 +334,23 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
       if (then instanceof IdentitySelector) {
         return this.sizeOfThenIdentitySelector();
       } else if (then instanceof LiteralSelector) {
-        return this.sizeOfThenLiteralSelector(then.item(), then.then());
+        return this.sizeOfThenLiteralSelector(then.item, then.then);
       } else if (then instanceof GetSelector) {
-        return this.sizeOfThenGetSelector(then.accessor(), then.then());
+        return this.sizeOfThenGetSelector(then.accessor, then.then);
       } else if (then instanceof GetAttrSelector) {
-        return this.sizeOfThenGetAttrSelector(then.accessor(), then.then());
+        return this.sizeOfThenGetAttrSelector(then.accessor, then.then);
       } else if (then instanceof GetItemSelector) {
-        return this.sizeOfThenGetItemSelector(then.accessor(), then.then());
+        return this.sizeOfThenGetItemSelector(then.accessor, then.then);
       } else if (then instanceof KeysSelector) {
-        return this.sizeOfThenKeysSelector(then.then());
+        return this.sizeOfThenKeysSelector(then.then);
       } else if (then instanceof ValuesSelector) {
-        return this.sizeOfThenValuesSelector(then.then());
+        return this.sizeOfThenValuesSelector(then.then);
       } else if (then instanceof ChildrenSelector) {
-        return this.sizeOfThenChildrenSelector(then.then());
+        return this.sizeOfThenChildrenSelector(then.then);
       } else if (then instanceof DescendantsSelector) {
-        return this.sizeOfThenDescendantsSelector(then.then());
+        return this.sizeOfThenDescendantsSelector(then.then);
       } else if (then instanceof FilterSelector) {
-        return this.sizeOfThenFilterSelector(then.predicate(), then.then());
+        return this.sizeOfThenFilterSelector(then.predicate, then.then);
       }
     }
     throw new WriterException("No Recon serialization for " + then);
@@ -361,23 +361,23 @@ export class ReconStructureWriter extends ReconWriter<Item, Value> {
       if (then instanceof IdentitySelector) {
         return this.writeThenIdentitySelector(output);
       } else if (then instanceof LiteralSelector) {
-        return this.writeThenLiteralSelector(then.item(), then.then(), output);
+        return this.writeThenLiteralSelector(then.item, then.then, output);
       } else if (then instanceof GetSelector) {
-        return this.writeThenGetSelector(then.accessor(), then.then(), output);
+        return this.writeThenGetSelector(then.accessor, then.then, output);
       } else if (then instanceof GetAttrSelector) {
-        return this.writeThenGetAttrSelector(then.accessor(), then.then(), output);
+        return this.writeThenGetAttrSelector(then.accessor, then.then, output);
       } else if (then instanceof GetItemSelector) {
-        return this.writeThenGetItemSelector(then.accessor(), then.then(), output);
+        return this.writeThenGetItemSelector(then.accessor, then.then, output);
       } else if (then instanceof KeysSelector) {
-        return this.writeThenKeysSelector(then.then(), output);
+        return this.writeThenKeysSelector(then.then, output);
       } else if (then instanceof ValuesSelector) {
-        return this.writeThenValuesSelector(then.then(), output);
+        return this.writeThenValuesSelector(then.then, output);
       } else if (then instanceof ChildrenSelector) {
-        return this.writeThenChildrenSelector(then.then(), output);
+        return this.writeThenChildrenSelector(then.then, output);
       } else if (then instanceof DescendantsSelector) {
-        return this.writeThenDescendantsSelector(then.then(), output);
+        return this.writeThenDescendantsSelector(then.then, output);
       } else if (then instanceof FilterSelector) {
-        return this.writeThenFilterSelector(then.predicate(), then.then(), output);
+        return this.writeThenFilterSelector(then.predicate, then.then, output);
       }
     }
     return Writer.error(new WriterException("No Recon serialization for " + then));

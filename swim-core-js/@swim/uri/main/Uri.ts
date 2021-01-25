@@ -1037,9 +1037,9 @@ export class Uri implements HashCode, Compare, Debug, Display {
   /** @hidden */
   static PathForm: typeof UriPathForm; // defined by UriPathForm
 
-  private static _form?: Form<Uri>;
+  private static _form?: Form<Uri, AnyUri>;
 
-  static form(): Form<Uri> {
+  static form(): Form<Uri, AnyUri> {
     if (Uri._form === void 0) {
       Uri._form = new Uri.Form(Uri.empty());
     }

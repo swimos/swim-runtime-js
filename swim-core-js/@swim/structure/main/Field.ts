@@ -304,7 +304,7 @@ export abstract class Field extends Item {
   }
 
   /** @hidden */
-  static readonly IMMUTABLE: number = 1 << 0;
+  static readonly ImmutableFlag: number = 1 << 0;
 
   static of(key: AnyValue, value?: AnyValue): Field {
     let name: string | undefined;

@@ -23,24 +23,21 @@ import {Selector} from "./Selector";
 import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class GetAttrSelector extends Selector {
-  /** @hidden */
-  readonly _key: Text;
-  /** @hidden */
-  readonly _then: Selector;
-
   constructor(key: Text, then: Selector) {
     super();
-    this._key = key;
-    this._then = then;
+    Object.defineProperty(this, "accessor", {
+      value: key,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "then", {
+      value: then,
+      enumerable: true,
+    });
   }
 
-  accessor(): Text {
-    return this._key;
-  }
+  declare readonly accessor: Text;
 
-  then(): Selector {
-    return this._then;
-  }
+  declare readonly then: Selector;
 
   forSelected<T>(interpreter: Interpreter,
                  callback: (interpreter: Interpreter) => T | undefined): T | undefined;
@@ -51,8 +48,8 @@ export class GetAttrSelector extends Selector {
                     callback: (this: S | undefined, interpreter: Interpreter) => T | undefined,
                     thisArg?: S): T | undefined {
     interpreter.willSelect(this);
-    const key = this._key;
-    const selected = GetAttrSelector.forSelected(key, this._then, interpreter, callback);
+    const key = this.accessor;
+    const selected = GetAttrSelector.forSelected(key, this.then, interpreter, callback);
     interpreter.didSelect(this, selected);
     return selected;
   }
@@ -61,7 +58,7 @@ export class GetAttrSelector extends Selector {
                                    callback: (this: S | undefined, interpreter: Interpreter) => T | undefined,
                                    thisArg?: S): T | undefined {
     let selected: T | undefined;
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // Pop the next selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       let field: Field | undefined;
@@ -96,8 +93,8 @@ export class GetAttrSelector extends Selector {
                  thisArg?: S): Item {
     let result: Item;
     interpreter.willTransform(this);
-    const key = this._key;
-    if (interpreter.scopeDepth() !== 0) {
+    const key = this.accessor;
+    if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have members.
@@ -107,7 +104,7 @@ export class GetAttrSelector extends Selector {
           // Push the field value onto the scope stack.
           interpreter.pushScope(oldField.toValue());
           // Transform the field value.
-          const newItem = this._then.mapSelected(interpreter, transform, thisArg);
+          const newItem = this.then.mapSelected(interpreter, transform, thisArg);
           // Pop the field value off the scope stack.
           interpreter.popScope();
           if (newItem instanceof Field) {
@@ -139,21 +136,21 @@ export class GetAttrSelector extends Selector {
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const key = this._key;
-    const value = GetAttrSelector.substitute(key, this._then, interpreter);
+    const key = this.accessor;
+    const value = GetAttrSelector.substitute(key, this.then, interpreter);
     if (value !== void 0) {
       return value;
     }
-    let then = this._then.substitute(interpreter);
+    let then = this.then.substitute(interpreter);
     if (!(then instanceof Selector)) {
-      then = this._then;
+      then = this.then;
     }
-    return new GetAttrSelector(this._key, then as Selector);
+    return new GetAttrSelector(this.accessor, then as Selector);
   }
 
   private static substitute(key: Text, then: Selector, interpreter: Interpreter): Item | undefined {
     let selected: Item | undefined;
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // Pop the next selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       let field: Field | undefined;
@@ -175,7 +172,7 @@ export class GetAttrSelector extends Selector {
   }
 
   andThen(then: Selector): Selector {
-    return new GetAttrSelector(this._key, this._then.andThen(then));
+    return new GetAttrSelector(this.accessor, this.then.andThen(then));
   }
 
   get typeOrder(): number {
@@ -184,9 +181,9 @@ export class GetAttrSelector extends Selector {
 
   compareTo(that: unknown): number {
     if (that instanceof GetAttrSelector) {
-      let order = this._key.compareTo(that._key);
+      let order = this.accessor.compareTo(that.accessor);
       if (order === 0) {
-        order = this._then.compareTo(that._then);
+        order = this.then.compareTo(that.then);
       }
       return order;
     } else if (that instanceof Item) {
@@ -199,7 +196,7 @@ export class GetAttrSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof GetAttrSelector) {
-      return this._key.equals(that._key) && this._then.equivalentTo(that._then, epsilon);
+      return this.accessor.equals(that.accessor) && this.then.equivalentTo(that.then, epsilon);
     }
     return false;
   }
@@ -208,22 +205,23 @@ export class GetAttrSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof GetAttrSelector) {
-      return this._key.equals(that._key) && this._then.equals(that._then);
+      return this.accessor.equals(that.accessor) && this.then.equals(that.then);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(GetAttrSelector),
-        this._key.hashCode()), this._then.hashCode()));
+        this.accessor.hashCode()), this.then.hashCode()));
   }
 
   debugThen(output: Output): void {
-    output = output.write(46/*'.'*/).write("getAttr").write(40/*'('*/).debug(this._key).write(41/*')'*/);
-    this._then.debugThen(output);
+    output = output.write(46/*'.'*/).write("getAttr").write(40/*'('*/)
+        .debug(this.accessor).write(41/*')'*/);
+    this.then.debugThen(output);
   }
 
   clone(): Selector {
-    return new GetAttrSelector(this._key.clone(), this._then.clone());
+    return new GetAttrSelector(this.accessor.clone(), this.then.clone());
   }
 }

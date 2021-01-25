@@ -37,7 +37,7 @@ export const Lazy: MethodDecorator = function <T>(target: Object, propertyKey: s
     descriptor.value = function (this: unknown): T {
       const value = method.call(this);
       Object.defineProperty(target, propertyKey, {
-        value(): T {
+        value: function (): T {
           return value;
         },
         writable,

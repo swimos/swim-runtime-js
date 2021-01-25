@@ -45,9 +45,9 @@ export abstract class Selector extends Expression {
   }
 
   /**
-   * Returns the `Selector` that this `Selector` uses to match sub-selections.
+   * The `Selector` that this `Selector` uses to match sub-selections.
    */
-  abstract then(): Selector;
+  abstract readonly then: Selector;
 
   abstract forSelected<T>(interpreter: Interpreter,
                           callback: (interpreter: Interpreter) => T | undefined): T | undefined;

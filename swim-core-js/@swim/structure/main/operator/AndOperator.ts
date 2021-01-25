@@ -35,9 +35,9 @@ export class AndOperator extends BinaryOperator {
     interpreter = Interpreter.fromAny(interpreter);
     interpreter.willOperate(this);
     let result: Item;
-    const argument1 = this._operand1.evaluate(interpreter);
+    const argument1 = this.operand1.evaluate(interpreter);
     if (argument1.booleanValue(false)) {
-      const argument2 = this._operand2.evaluate(interpreter);
+      const argument2 = this.operand2.evaluate(interpreter);
       result = argument2;
     } else {
       result = argument1;
@@ -48,8 +48,8 @@ export class AndOperator extends BinaryOperator {
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const argument1 = this._operand1.substitute(interpreter);
-    const argument2 = this._operand2.substitute(interpreter);
+    const argument1 = this.operand1.substitute(interpreter);
+    const argument2 = this.operand2.substitute(interpreter);
     return argument1.and(argument2);
   }
 
@@ -59,9 +59,9 @@ export class AndOperator extends BinaryOperator {
 
   compareTo(that: unknown): number {
     if (that instanceof AndOperator) {
-      let order = this._operand1.compareTo(that._operand1);
+      let order = this.operand1.compareTo(that.operand1);
       if (order === 0) {
-        order = this._operand2.compareTo(that._operand2);
+        order = this.operand2.compareTo(that.operand2);
       }
       return order;
     } else if (that instanceof Item) {
@@ -74,8 +74,8 @@ export class AndOperator extends BinaryOperator {
     if (this === that) {
       return true;
     } else if (that instanceof AndOperator) {
-      return this._operand1.equivalentTo(that._operand1, epsilon)
-          && this._operand2.equivalentTo(that._operand2, epsilon);
+      return this.operand1.equivalentTo(that.operand1, epsilon)
+          && this.operand2.equivalentTo(that.operand2, epsilon);
     }
     return false;
   }
@@ -84,22 +84,22 @@ export class AndOperator extends BinaryOperator {
     if (this === that) {
       return true;
     } else if (that instanceof AndOperator) {
-      return this._operand1.equals(that._operand1) && this._operand2.equals(that._operand2);
+      return this.operand1.equals(that.operand1) && this.operand2.equals(that.operand2);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(AndOperator),
-        this._operand1.hashCode()), this._operand2.hashCode()));
+        this.operand1.hashCode()), this.operand2.hashCode()));
   }
 
   debug(output: Output): void {
-    output.debug(this._operand1).write(46/*'.'*/).write("and").write(40/*'('*/)
-        .debug(this._operand2).write(41/*')'*/);
+    output.debug(this.operand1).write(46/*'.'*/).write("and").write(40/*'('*/)
+        .debug(this.operand2).write(41/*')'*/);
   }
 
   clone(): AndOperator {
-    return new AndOperator(this._operand1.clone(), this._operand2.clone());
+    return new AndOperator(this.operand1.clone(), this.operand2.clone());
   }
 }

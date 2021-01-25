@@ -42,6 +42,7 @@ export {
 } from "./Record";
 export {RecordInterpolator} from "./RecordInterpolator";
 export {RecordCursor} from "./RecordCursor";
+
 export {RecordMap} from "./RecordMap";
 export {RecordMapView} from "./RecordMapView";
 

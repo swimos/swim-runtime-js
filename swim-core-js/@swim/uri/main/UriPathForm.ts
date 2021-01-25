@@ -14,29 +14,31 @@
 
 import {Item, Text, Form} from "@swim/structure";
 import {Uri} from "./Uri";
-import type {UriPath} from "./UriPath";
+import type {AnyUriPath, UriPath} from "./UriPath";
 
 /** @hidden */
-export class UriPathForm extends Form<UriPath> {
-  /** @hidden */
-  readonly _unit: UriPath | undefined;
-
-  constructor(unit?: UriPath ) {
+export class UriPathForm extends Form<UriPath, AnyUriPath> {
+  constructor(unit: UriPath | undefined) {
     super();
-    this._unit = unit;
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  unit(): UriPath | undefined;
-  unit(unit: UriPath | undefined): Form<UriPath>;
-  unit(unit?: UriPath | undefined): UriPath | undefined | Form<UriPath> {
-    if (arguments.length === 0) {
-      return this._unit;
-    } else {
+  // @ts-ignore
+  declare readonly unit: UriPath | undefined;
+
+  withUnit(unit: UriPath | undefined): Form<UriPath, AnyUriPath> {
+    if (unit !== this.unit) {
       return new UriPathForm(unit);
+    } else {
+      return this;
     }
   }
 
-  mold(object: UriPath, item?: Item): Item {
+  mold(object: AnyUriPath, item?: Item): Item {
+    object = Uri.Path.fromAny(object);
     if (item === void 0) {
       return Text.from(object.toString());
     } else {

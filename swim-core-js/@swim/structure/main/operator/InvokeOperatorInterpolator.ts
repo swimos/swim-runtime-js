@@ -39,11 +39,11 @@ export const InvokeOperatorInterpolator = function (y0: InvokeOperator, y1: Invo
   } as InvokeOperatorInterpolator;
   Object.setPrototypeOf(interpolator, InvokeOperatorInterpolator.prototype);
   Object.defineProperty(interpolator, "funcInterpolator", {
-    value: y0.func().interpolateTo(y1.func()),
+    value: y0.func.interpolateTo(y1.func),
     enumerable: true,
   });
   Object.defineProperty(interpolator, "argsInterpolator", {
-    value: y0.args().interpolateTo(y1.args()),
+    value: y0.args.interpolateTo(y1.args),
     enumerable: true,
   });
   return interpolator;

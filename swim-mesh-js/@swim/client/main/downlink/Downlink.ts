@@ -534,16 +534,8 @@ export abstract class Downlink {
 
 /** @hidden */
 class DownlinkInitForm extends Form<DownlinkInit | undefined> {
-  tag(): string;
-  tag(tag: string | undefined): Form<DownlinkInit | undefined>;
-  tag(tag?: string | undefined): string | Form<DownlinkInit | undefined> {
-    if (arguments.length === 0) {
-      return "link";
-    } else if (tag !== void 0) {
-      return super.tag(tag);
-    } else {
-      return this;
-    }
+  get tag(): string | undefined {
+    return "link";
   }
 
   mold(init: DownlinkInit | undefined): Item {

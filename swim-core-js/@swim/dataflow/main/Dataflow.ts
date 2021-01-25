@@ -244,19 +244,19 @@ Dataflow.compileIdentitySelector = function (scope: Outlet<Value>): Outlet<Value
 };
 
 Dataflow.compileGetSelector = function (selector: GetSelector, scope: Outlet<Value>): Outlet<Value> {
-  const key = selector.accessor();
+  const key = selector.accessor;
   if (key.isConstant()) {
     if (RecordOutlet.is(scope)) {
       const outlet = scope.outlet(key);
       if (outlet !== null) {
-        return Dataflow.compile(selector.then(), outlet);
+        return Dataflow.compile(selector.then, outlet);
       }
     } else if (StreamletScope.is<Value>(scope)) {
       const name = key.stringValue(void 0);
       if (name !== void 0) {
         const outlet = scope.outlet(name);
         if (outlet !== null) {
-          return Dataflow.compile(selector.then(), outlet);
+          return Dataflow.compile(selector.then, outlet);
         }
       }
     }
@@ -313,9 +313,9 @@ Dataflow.compileOperator = function (operator: Operator, scope: Outlet<Value>): 
 
 Dataflow.compileConditionalOperator = function (operator: ConditionalOperator, scope: Outlet<Value>): Outlet<Value> {
   const outlet = new ConditionalOutlet();
-  const ifTerm = operator.ifTerm().toValue();
-  const thenTerm = operator.thenTerm().toValue();
-  const elseTerm = operator.elseTerm().toValue();
+  const ifTerm = operator.ifTerm.toValue();
+  const thenTerm = operator.thenTerm.toValue();
+  const elseTerm = operator.elseTerm.toValue();
   const ifOutlet = Dataflow.compile(ifTerm, scope);
   const thenOutlet = Dataflow.compile(thenTerm, scope);
   const elseOutlet = Dataflow.compile(elseTerm, scope);
@@ -487,8 +487,8 @@ Dataflow.compilePositiveOperator = function (operator: PositiveOperator, scope: 
 };
 
 Dataflow.compileInvokeOperator = function (operator: InvokeOperator, scope: Outlet<Value>): Outlet<Value> {
-  const func = operator.func();
-  const args = operator.args();
+  const func = operator.func;
+  const args = operator.args;
   const invokeOutlet = new InvokeOutlet(scope as unknown as Record);
   const funcOutlet = Dataflow.compile(func, scope);
   const argsOutlet = Dataflow.compile(args, scope);

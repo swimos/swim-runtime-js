@@ -17,52 +17,59 @@ import {Form} from "./Form";
 
 /** @hidden */
 export class UnitForm<T, U = never> extends Form<T, U> {
-  /** @hidden */
-  readonly _unit: T;
-  /** @hidden */
-  readonly _form: Form<T, U>;
-
-  constructor(unit: T, form: Form<T, U>) {
+  constructor(form: Form<T, U>, unit: T | undefined) {
     super();
-    this._unit = unit;
-    this._form = form;
+    Object.defineProperty(this, "form", {
+      value: form,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  tag(): string | undefined;
-  tag(tag: string | undefined): Form<T, U>;
-  tag(tag?: string | undefined): string | undefined | Form<T, U> {
-    if (arguments.length === 0) {
-      return this._form.tag();
+  /** @hidden */
+  declare readonly form: Form<T, U>;
+
+  get tag(): string | undefined {
+    return this.form.tag;
+  }
+
+  withTag(tag: string | undefined): Form<T, U> {
+    if (tag !== this.tag) {
+      return new UnitForm(this.form.withTag(tag), this.unit);
     } else {
-      return new UnitForm<T, U>(this._unit, this._form.tag(tag));
+      return this;
     }
   }
 
-  unit(): T | undefined;
-  unit(unit: T | undefined): Form<T, U>;
-  unit(unit?: T | undefined): T | undefined | Form<T, U> {
-    if (arguments.length === 0) {
-      return this._form.unit();
-    } else if (unit !== void 0) {
-      return new UnitForm<T, U>(unit, this._form);
+  // @ts-ignore
+  declare readonly unit: T | undefined;
+
+  withUnit(unit: T | undefined): Form<T, U> {
+    if (unit !== this.unit) {
+      return new UnitForm(this.form, unit);
+    } else if (unit === this.form.unit) {
+      return this.form;
     } else {
-      return this._form;
+      return this;
     }
   }
 
   mold(object: T | U, item?: Item): Item {
     if (arguments.length === 1) {
-      return this._form.mold(object);
+      return this.form.mold(object);
     } else {
-      return this._form.mold(object, item);
+      return this.form.mold(object, item);
     }
   }
 
   cast(item: Item, object?: T): T | undefined {
     if (arguments.length === 1) {
-      return this._form.cast(item);
+      return this.form.cast(item);
     } else {
-      return this._form.cast(item, object);
+      return this.form.cast(item, object);
     }
   }
 }

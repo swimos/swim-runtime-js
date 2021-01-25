@@ -18,21 +18,22 @@ import {Form} from "./Form";
 
 /** @hidden */
 export class StringForm extends Form<string> {
-  /** @hidden */
-  readonly _unit: string | undefined;
-
   constructor(unit?: string) {
     super();
-    this._unit = unit;
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  unit(): string | undefined;
-  unit(unit: string | undefined): Form<string>;
-  unit(unit?: string | undefined): string | undefined | Form<string> {
-    if (arguments.length === 0) {
-      return this._unit;
-    } else {
+  // @ts-ignore
+  declare readonly unit: string | undefined;
+
+  withUnit(unit: string | undefined): Form<string> {
+    if (unit !== this.unit) {
       return new StringForm(unit);
+    } else {
+      return this;
     }
   }
 

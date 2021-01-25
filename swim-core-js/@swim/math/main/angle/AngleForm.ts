@@ -17,27 +17,33 @@ import {AngleUnits, AnyAngle, Angle} from "./Angle";
 
 /** @hidden */
 export class AngleForm extends Form<Angle, AnyAngle> {
-  private readonly _defaultUnits: AngleUnits | undefined;
-  private readonly _unit: Angle | undefined;
-
-  constructor(defaultUnits?: AngleUnits, unit?: Angle) {
+  constructor(defaultUnits: AngleUnits | undefined, unit: Angle | undefined) {
     super();
-    this._defaultUnits = defaultUnits;
-    this._unit = unit;
+    Object.defineProperty(this, "defaultUnits", {
+      value: defaultUnits,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  unit(): Angle | undefined;
-  unit(unit: Angle | undefined): Form<Angle, AnyAngle>;
-  unit(unit?: Angle | undefined): Angle | undefined | Form<Angle, AnyAngle> {
-    if (arguments.length === 0) {
-      return this._unit !== void 0 ? this._unit : Angle.zero(this._defaultUnits);
+  declare readonly defaultUnits: AngleUnits | undefined;
+
+  // @ts-ignore
+  declare readonly unit: Angle | undefined;
+
+  withUnit(unit: Angle | undefined): Form<Angle, AnyAngle> {
+    if (unit !== this.unit) {
+      return new AngleForm(this.defaultUnits, unit);
     } else {
-      return new AngleForm(this._defaultUnits, unit);
+      return this;
     }
   }
 
   mold(angle: AnyAngle): Item {
-    angle = Angle.fromAny(angle, this._defaultUnits);
+    angle = Angle.fromAny(angle, this.defaultUnits);
     return Text.from(angle.toString());
   }
 
@@ -49,7 +55,7 @@ export class AngleForm extends Form<Angle, AnyAngle> {
       if (angle === void 0) {
         const string = value.stringValue(void 0);
         if (string !== void 0) {
-          angle = Angle.parse(string, this._defaultUnits);
+          angle = Angle.parse(string, this.defaultUnits);
         }
       }
     } catch (e) {

@@ -418,7 +418,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
   coerce<T, E = T>(form: Form<T, unknown>, orElse?: E): T | E {
     let object: T | E | undefined = form.cast(this);
     if (object === void 0) {
-      object = form.unit();
+      object = form.unit;
     }
     if (object === void 0) {
       object = orElse;

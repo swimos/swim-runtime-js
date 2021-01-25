@@ -282,17 +282,17 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
   }
 
   private static _form: Form<Length, AnyLength>;
-  static form(defaultUnits?: LengthUnits, node: Node | null = null, unit?: AnyLength): Form<Length, AnyLength> {
-    if (unit !== void 0) {
-      unit = Length.fromAny(unit);
-    }
-    if (defaultUnits !== void 0 || node !== null || unit !== void 0) {
-      return new Length.Form(defaultUnits, node, unit);
-    } else {
+  static form(defaultUnits?: LengthUnits, unit?: AnyLength): Form<Length, AnyLength> {
+    if (defaultUnits === void 0 && unit === void 0) {
       if (Length._form === void 0) {
-        Length._form = new Length.Form();
+        Length._form = new Length.Form(void 0, Length.zero());
       }
       return Length._form;
+    } else {
+      if (unit !== void 0) {
+        unit = Length.fromAny(unit);
+      }
+      return new Length.Form(defaultUnits, unit);
     }
   }
 

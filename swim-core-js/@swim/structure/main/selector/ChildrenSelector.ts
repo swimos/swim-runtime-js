@@ -20,17 +20,15 @@ import {Selector} from "./Selector";
 import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class ChildrenSelector extends Selector {
-  /** @hidden */
-  readonly _then: Selector;
-
   constructor(then: Selector) {
     super();
-    this._then = then;
+    Object.defineProperty(this, "then", {
+      value: then,
+      enumerable: true,
+    });
   }
 
-  then(): Selector {
-    return this._then;
-  }
+  declare readonly then: Selector;
 
   forSelected<T>(interpreter: Interpreter,
                  callback: (interpreter: Interpreter) => T | undefined): T | undefined;
@@ -42,7 +40,7 @@ export class ChildrenSelector extends Selector {
                     thisArg?: S): T | undefined {
     let selected: T | undefined;
     interpreter.willSelect(this);
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have children.
@@ -54,7 +52,7 @@ export class ChildrenSelector extends Selector {
           // Push the child onto the scope stack.
           interpreter.pushScope(child);
           // Subselect the child.
-          selected = this._then.forSelected(interpreter, callback, thisArg);
+          selected = this.then.forSelected(interpreter, callback, thisArg);
           // Pop the child off of the scope stack.
           interpreter.popScope();
         }
@@ -76,7 +74,7 @@ export class ChildrenSelector extends Selector {
                  thisArg?: S): Item {
     let result: Item;
     interpreter.willTransform(this);
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       // Only records can have children.
@@ -88,7 +86,7 @@ export class ChildrenSelector extends Selector {
           // Push the child onto the scope stack.
           interpreter.pushScope(oldChild);
           // Transform the child.
-          const newChild = this._then.mapSelected(interpreter, transform);
+          const newChild = this.then.mapSelected(interpreter, transform);
           // Pop the child off the scope stack.
           interpreter.popScope();
           if (newChild.isDefined()) {
@@ -114,15 +112,15 @@ export class ChildrenSelector extends Selector {
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    let then = this._then.substitute(interpreter);
+    let then = this.then.substitute(interpreter);
     if (!(then instanceof Selector)) {
-      then = this._then;
+      then = this.then;
     }
     return new ChildrenSelector(then as Selector);
   }
 
   andThen(then: Selector): Selector {
-    return new ChildrenSelector(this._then.andThen(then));
+    return new ChildrenSelector(this.then.andThen(then));
   }
 
   get typeOrder(): number {
@@ -131,7 +129,7 @@ export class ChildrenSelector extends Selector {
 
   compareTo(that: unknown): number {
     if (that instanceof ChildrenSelector) {
-      return this._then.compareTo(that._then);
+      return this.then.compareTo(that.then);
     } else if (that instanceof Item) {
       return Numbers.compare(this.typeOrder, that.typeOrder);
     }
@@ -142,7 +140,7 @@ export class ChildrenSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof ChildrenSelector) {
-      return this._then.equivalentTo(that._then, epsilon);
+      return this.then.equivalentTo(that.then, epsilon);
     }
     return false;
   }
@@ -151,21 +149,21 @@ export class ChildrenSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof ChildrenSelector) {
-      return this._then.equals(that._then);
+      return this.then.equals(that.then);
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(ChildrenSelector), this._then.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(ChildrenSelector), this.then.hashCode()));
   }
 
   debugThen(output: Output): void {
     output = output.write(46/*'.'*/).write("children").write(40/*'('*/).write(41/*')'*/);
-    this._then.debugThen(output);
+    this.then.debugThen(output);
   }
 
   clone(): Selector {
-    return new ChildrenSelector(this._then.clone());
+    return new ChildrenSelector(this.then.clone());
   }
 }

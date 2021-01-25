@@ -21,58 +21,61 @@ import type {Selector} from "../selector/Selector";
 export type AnyInterpreter = Interpreter | AnyItem;
 
 export class Interpreter {
-  /** @hidden */
-  _settings: InterpreterSettings;
-  /** @hidden */
-  _scopeStack: Item[] | null;
-  /** @hidden */
-  _scopeDepth: number;
-
-  constructor(settings: InterpreterSettings = InterpreterSettings.standard(),
-              scopeStack: Item[] | null = null, scopeDepth: number = 0) {
-    this._settings = settings;
-    this._scopeStack = scopeStack;
-    this._scopeDepth = scopeDepth;
+  constructor(settings?: InterpreterSettings, scopeStack?: Item[] | null, scopeDepth?: number) {
+    Object.defineProperty(this, "settings", {
+      value: settings !== void 0 ? settings : InterpreterSettings.standard(),
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "scopeStack", {
+      value: scopeStack !== void 0 ? scopeStack : null,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "scopeDepth", {
+      value: scopeDepth !== void 0 ? scopeDepth : 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  settings(): InterpreterSettings;
+  declare readonly settings: InterpreterSettings;
 
-  settings(settings: InterpreterSettings): this;
-
-  settings(settings?: InterpreterSettings): InterpreterSettings | this {
-    if (settings === void 0) {
-      return this._settings;
-    } else {
-      this._settings = settings;
-      return this;
-    }
+  withSettings(settings: InterpreterSettings): this {
+    Object.defineProperty(this, "settings", {
+      value: settings,
+      enumerable: true,
+      configurable: true,
+    });
+    return this;
   }
 
-  scopeDepth(): number {
-    return this._scopeDepth;
-  }
+  /** @hidden */
+  declare readonly scopeStack: Item[] | null;
+
+  declare readonly scopeDepth: number;
 
   peekScope(): Item {
-    const scopeDepth = this._scopeDepth;
+    const scopeDepth = this.scopeDepth;
     if (scopeDepth <= 0) {
       throw new InterpreterException("scope stack empty");
     }
-    return this._scopeStack![scopeDepth - 1]!;
+    return this.scopeStack![scopeDepth - 1]!;
   }
 
   getScope(index: number): Item {
-    if (index < 0 || index >= this._scopeDepth) {
+    if (index < 0 || index >= this.scopeDepth) {
       throw new RangeError("" + index);
     }
-    return this._scopeStack![index]!;
+    return this.scopeStack![index]!;
   }
 
   pushScope(scope: Item): void {
-    const scopeDepth = this._scopeDepth;
-    if (scopeDepth >= this._settings.maxScopeDepth) {
+    const scopeDepth = this.scopeDepth;
+    if (scopeDepth >= this.settings.maxScopeDepth) {
       throw new InterpreterException("scope stack overflow");
     }
-    const oldScopeStack = this._scopeStack;
+    const oldScopeStack = this.scopeStack;
     let newScopeStack;
     if (oldScopeStack === null || scopeDepth + 1 > oldScopeStack.length) {
       newScopeStack = new Array<Item>(Interpreter.expand(scopeDepth + 1));
@@ -81,32 +84,44 @@ export class Interpreter {
           newScopeStack[i] = oldScopeStack[i]!;
         }
       }
-      this._scopeStack = newScopeStack;
+      Object.defineProperty(this, "scopeStack", {
+        value: newScopeStack,
+        enumerable: true,
+        configurable: true,
+      });
     } else {
       newScopeStack = oldScopeStack;
     }
     newScopeStack[scopeDepth] = scope;
-    this._scopeDepth = scopeDepth + 1;
+    Object.defineProperty(this, "scopeDepth", {
+      value: scopeDepth + 1,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   popScope(): Item {
-    const scopeDepth = this._scopeDepth;
+    const scopeDepth = this.scopeDepth;
     if (scopeDepth <= 0) {
       throw new InterpreterException("scope stack empty");
     }
-    const scopeStack = this._scopeStack!;
+    const scopeStack = this.scopeStack!;
     const scope = scopeStack[scopeDepth - 1]!;
     scopeStack[scopeDepth - 1] = void 0 as any;
-    this._scopeDepth = scopeDepth - 1;
+    Object.defineProperty(this, "scopeDepth", {
+      value: scopeDepth - 1,
+      enumerable: true,
+      configurable: true,
+    });
     return scope;
   }
 
   swapScope(newScope: Item): Item {
-    const scopeDepth = this._scopeDepth;
+    const scopeDepth = this.scopeDepth;
     if (scopeDepth <= 0) {
       throw new InterpreterException("scope stack empty");
     }
-    const scopeStack = this._scopeStack!;
+    const scopeStack = this.scopeStack!;
     const oldScope = scopeStack[scopeDepth - 1]!;
     scopeStack[scopeDepth - 1] = newScope;
     return oldScope;

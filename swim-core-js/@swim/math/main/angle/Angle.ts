@@ -237,16 +237,16 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
 
   private static _form: Form<Angle, AnyAngle>;
   static form(defaultUnits?: AngleUnits, unit?: AnyAngle): Form<Angle, AnyAngle> {
-    if (unit !== void 0) {
-      unit = Angle.fromAny(unit);
-    }
-    if (defaultUnits !== void 0 || unit !== void 0) {
-      return new Angle.Form(defaultUnits, unit);
-    } else {
+    if (defaultUnits === void 0 && unit === void 0) {
       if (Angle._form === void 0) {
-        Angle._form = new Angle.Form();
+        Angle._form = new Angle.Form(void 0, Angle.zero());
       }
       return Angle._form;
+    } else {
+      if (unit !== void 0) {
+        unit = Angle.fromAny(unit);
+      }
+      return new Angle.Form(defaultUnits, unit);
     }
   }
 

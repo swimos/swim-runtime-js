@@ -21,24 +21,21 @@ import {Selector} from "./Selector";
 import {AnyInterpreter, Interpreter} from "../"; // forward import
 
 export class GetItemSelector extends Selector {
-  /** @hidden */
-  readonly _index: Num;
-  /** @hidden */
-  readonly _then: Selector;
-
   constructor(index: Num, then: Selector) {
     super();
-    this._index = index;
-    this._then = then;
+    Object.defineProperty(this, "accessor", {
+      value: index,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "then", {
+      value: then,
+      enumerable: true,
+    });
   }
 
-  accessor(): Num {
-    return this._index;
-  }
+  declare readonly accessor: Num;
 
-  then(): Selector {
-    return this._then;
-  }
+  declare readonly then: Selector;
 
   forSelected<T>(interpreter: Interpreter,
                  callback: (interpreter: Interpreter) => T | undefined): T | undefined;
@@ -50,8 +47,8 @@ export class GetItemSelector extends Selector {
                     thisArg?: S): T | undefined {
     let selected: T | undefined;
     interpreter.willSelect(this);
-    const index = this._index.numberValue();
-    if (interpreter.scopeDepth() !== 0) {
+    const index = this.accessor.numberValue();
+    if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       if (scope instanceof Record && index < scope.length) {
@@ -59,7 +56,7 @@ export class GetItemSelector extends Selector {
         // Push the item onto the scope stack.
         interpreter.pushScope(item);
         // Subselect the item.
-        selected = this._then.forSelected(interpreter, callback, thisArg);
+        selected = this.then.forSelected(interpreter, callback, thisArg);
         // Pop the item off of the scope stack.
         interpreter.popScope();
       }
@@ -80,16 +77,16 @@ export class GetItemSelector extends Selector {
                  thisArg?: S): Item {
     let result: Item;
     interpreter.willTransform(this);
-    if (interpreter.scopeDepth() !== 0) {
+    if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
-      const index = this._index.numberValue();
+      const index = this.accessor.numberValue();
       if (scope instanceof Record && index < scope.length) {
         const oldItem = scope.getItem(index);
         // Push the item onto the scope stack.
         interpreter.pushScope(oldItem);
         // Transform the item.
-        const newItem = this._then.mapSelected(interpreter, transform, thisArg);
+        const newItem = this.then.mapSelected(interpreter, transform, thisArg);
         // Pop the item off the scope stack.
         interpreter.popScope();
         if (newItem.isDefined()) {
@@ -110,8 +107,8 @@ export class GetItemSelector extends Selector {
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const index = this._index.numberValue();
-    if (interpreter.scopeDepth() !== 0) {
+    const index = this.accessor.numberValue();
+    if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
       let selected: Item | undefined;
@@ -126,15 +123,15 @@ export class GetItemSelector extends Selector {
         return selected;
       }
     }
-    let then = this._then.substitute(interpreter);
+    let then = this.then.substitute(interpreter);
     if (!(then instanceof Selector)) {
-      then = this._then;
+      then = this.then;
     }
-    return new GetItemSelector(this._index, then as Selector);
+    return new GetItemSelector(this.accessor, then as Selector);
   }
 
   andThen(then: Selector): Selector {
-    return new GetItemSelector(this._index, this._then.andThen(then));
+    return new GetItemSelector(this.accessor, this.then.andThen(then));
   }
 
   get typeOrder(): number {
@@ -143,9 +140,9 @@ export class GetItemSelector extends Selector {
 
   compareTo(that: unknown): number {
     if (that instanceof GetItemSelector) {
-      let order = this._index.compareTo(that._index);
+      let order = this.accessor.compareTo(that.accessor);
       if (order === 0) {
-        order = this._then.compareTo(that._then);
+        order = this.then.compareTo(that.then);
       }
       return order;
     } else if (that instanceof Item) {
@@ -158,7 +155,7 @@ export class GetItemSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof GetItemSelector) {
-      return this._index.equals(that._index) && this._then.equivalentTo(that._then, epsilon);
+      return this.accessor.equals(that.accessor) && this.then.equivalentTo(that.then, epsilon);
     }
     return false;
   }
@@ -167,22 +164,23 @@ export class GetItemSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof GetItemSelector) {
-      return this._index.equals(that._index) && this._then.equals(that._then);
+      return this.accessor.equals(that.accessor) && this.then.equals(that.then);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(GetItemSelector),
-        this._index.hashCode()), this._then.hashCode()));
+        this.accessor.hashCode()), this.then.hashCode()));
   }
 
   debugThen(output: Output): void {
-    output = output.write(46/*'.'*/).write("getItem").write(40/*'('*/).debug(this._index).write(41/*')'*/);
-    this._then.debugThen(output);
+    output = output.write(46/*'.'*/).write("getItem").write(40/*'('*/)
+      .debug(this.accessor).write(41/*')'*/);
+    this.then.debugThen(output);
   }
 
   clone(): Selector {
-    return new GetItemSelector(this._index, this._then.clone());
+    return new GetItemSelector(this.accessor, this.then.clone());
   }
 }

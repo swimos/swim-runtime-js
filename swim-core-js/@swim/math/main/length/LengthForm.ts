@@ -17,29 +17,33 @@ import {LengthUnits, AnyLength, Length} from "./Length";
 
 /** @hidden */
 export class LengthForm extends Form<Length, AnyLength> {
-  private readonly _defaultUnits: LengthUnits | undefined;
-  private readonly _node: Node | null;
-  private readonly _unit: Length | undefined;
-
-  constructor(defaultUnits?: LengthUnits, node: Node | null = null, unit?: Length) {
+  constructor(defaultUnits: LengthUnits | undefined, unit: Length | undefined) {
     super();
-    this._defaultUnits = defaultUnits;
-    this._node = node;
-    this._unit = unit;
+    Object.defineProperty(this, "defaultUnits", {
+      value: defaultUnits,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
   }
 
-  unit(): Length | undefined;
-  unit(unit: Length | undefined): Form<Length, AnyLength>;
-  unit(unit?: Length | undefined): Length | undefined | Form<Length, AnyLength> {
-    if (arguments.length === 0) {
-      return this._unit !== void 0 ? this._unit : Length.zero(this._defaultUnits, this._node);
+  declare readonly defaultUnits: LengthUnits | undefined;
+
+  // @ts-ignore
+  declare readonly unit: Length | undefined;
+
+  withUnit(unit: Length | undefined): Form<Length, AnyLength> {
+    if (unit !== this.unit) {
+      return new LengthForm(this.defaultUnits, unit);
     } else {
-      return new LengthForm(this._defaultUnits, this._node, unit);
+      return this;
     }
   }
 
   mold(length: AnyLength): Item {
-    length = Length.fromAny(length, this._defaultUnits);
+    length = Length.fromAny(length, this.defaultUnits);
     return Text.from(length.toString());
   }
 
@@ -47,11 +51,11 @@ export class LengthForm extends Form<Length, AnyLength> {
     const value = item.toValue();
     let length: Length | undefined;
     try {
-      length = Length.fromValue(value, this._node);
+      length = Length.fromValue(value);
       if (length !== void 0) {
         const string = value.stringValue(void 0);
         if (string !== void 0) {
-          length = Length.parse(string, this._defaultUnits, this._node);
+          length = Length.parse(string, this.defaultUnits);
         }
       }
     } catch (e) {

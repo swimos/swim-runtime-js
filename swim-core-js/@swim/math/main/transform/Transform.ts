@@ -280,13 +280,14 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
 
   private static _form?: Form<Transform, AnyTransform>;
   static form(unit?: AnyTransform): Form<Transform, AnyTransform> {
-    if (unit !== void 0) {
-      return new Transform.Form(Transform.fromAny(unit));
-    } else {
+    if (unit === void 0) {
       if (Transform._form === void 0) {
-        Transform._form = new Transform.Form();
+        Transform._form = new Transform.Form(Transform.identity());
       }
       return Transform._form;
+    } else {
+      unit = Transform.fromAny(unit);
+      return new Transform.Form(unit);
     }
   }
 

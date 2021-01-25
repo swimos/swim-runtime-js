@@ -33,13 +33,13 @@ export class NegativeOperator extends UnaryOperator {
 
   evaluate(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const argument = this._operand.evaluate(interpreter);
+    const argument = this.operand.evaluate(interpreter);
     return argument.negative();
   }
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const argument = this._operand.substitute(interpreter);
+    const argument = this.operand.substitute(interpreter);
     return argument.negative();
   }
 
@@ -49,7 +49,7 @@ export class NegativeOperator extends UnaryOperator {
 
   compareTo(that: unknown): number {
     if (that instanceof NegativeOperator) {
-      return this._operand.compareTo(that._operand);
+      return this.operand.compareTo(that.operand);
     } else if (that instanceof Item) {
       return Numbers.compare(this.typeOrder, that.typeOrder);
     }
@@ -60,7 +60,7 @@ export class NegativeOperator extends UnaryOperator {
     if (this === that) {
       return true;
     } else if (that instanceof NegativeOperator) {
-      return this._operand.equivalentTo(that._operand, epsilon);
+      return this.operand.equivalentTo(that.operand, epsilon);
     }
     return false;
   }
@@ -69,20 +69,20 @@ export class NegativeOperator extends UnaryOperator {
     if (this === that) {
       return true;
     } else if (that instanceof NegativeOperator) {
-      return this._operand.equals(that._operand);
+      return this.operand.equals(that.operand);
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(NegativeOperator), this._operand.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(NegativeOperator), this.operand.hashCode()));
   }
 
   debug(output: Output): void {
-    output.debug(this._operand).write(46/*'.'*/).write("negative").write(40/*'('*/).write(41/*')'*/);
+    output.debug(this.operand).write(46/*'.'*/).write("negative").write(40/*'('*/).write(41/*')'*/);
   }
 
   clone(): NegativeOperator {
-    return new NegativeOperator(this._operand.clone());
+    return new NegativeOperator(this.operand.clone());
   }
 }

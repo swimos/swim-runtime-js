@@ -287,7 +287,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
       object = form.cast(input);
     }
     if (object === void 0) {
-      object = form.unit();
+      object = form.unit;
     }
     if (object === void 0) {
       object = orElse;
