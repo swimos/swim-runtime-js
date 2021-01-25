@@ -243,7 +243,7 @@ Dataflow.compileIdentitySelector = function (scope: Outlet<Value>): Outlet<Value
 };
 
 Dataflow.compileGetSelector = function (selector: GetSelector, scope: Outlet<Value>): Outlet<Value> {
-  const key = selector.accessor;
+  const key = selector.item;
   if (key.isConstant()) {
     if (RecordOutlet.is(scope)) {
       const outlet = scope.outlet(key);

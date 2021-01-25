@@ -23,7 +23,7 @@ import {AnyInterpreter, Interpreter} from "../"; // forward import
 export class GetItemSelector extends Selector {
   constructor(index: Num, then: Selector) {
     super();
-    Object.defineProperty(this, "accessor", {
+    Object.defineProperty(this, "item", {
       value: index,
       enumerable: true,
     });
@@ -33,7 +33,7 @@ export class GetItemSelector extends Selector {
     });
   }
 
-  declare readonly accessor: Num;
+  declare readonly item: Num;
 
   declare readonly then: Selector;
 
@@ -47,7 +47,7 @@ export class GetItemSelector extends Selector {
                     thisArg?: S): T | undefined {
     let selected: T | undefined;
     interpreter.willSelect(this);
-    const index = this.accessor.numberValue();
+    const index = this.item.numberValue();
     if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
@@ -80,7 +80,7 @@ export class GetItemSelector extends Selector {
     if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
-      const index = this.accessor.numberValue();
+      const index = this.item.numberValue();
       if (scope instanceof Record && index < scope.length) {
         const oldItem = scope.getItem(index);
         // Push the item onto the scope stack.
@@ -107,7 +107,7 @@ export class GetItemSelector extends Selector {
 
   substitute(interpreter: AnyInterpreter): Item {
     interpreter = Interpreter.fromAny(interpreter);
-    const index = this.accessor.numberValue();
+    const index = this.item.numberValue();
     if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.
       const scope = interpreter.popScope().toValue();
@@ -127,11 +127,11 @@ export class GetItemSelector extends Selector {
     if (!(then instanceof Selector)) {
       then = this.then;
     }
-    return new GetItemSelector(this.accessor, then as Selector);
+    return new GetItemSelector(this.item, then as Selector);
   }
 
   andThen(then: Selector): Selector {
-    return new GetItemSelector(this.accessor, this.then.andThen(then));
+    return new GetItemSelector(this.item, this.then.andThen(then));
   }
 
   get typeOrder(): number {
@@ -140,7 +140,7 @@ export class GetItemSelector extends Selector {
 
   compareTo(that: unknown): number {
     if (that instanceof GetItemSelector) {
-      let order = this.accessor.compareTo(that.accessor);
+      let order = this.item.compareTo(that.item);
       if (order === 0) {
         order = this.then.compareTo(that.then);
       }
@@ -155,7 +155,7 @@ export class GetItemSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof GetItemSelector) {
-      return this.accessor.equals(that.accessor) && this.then.equivalentTo(that.then, epsilon);
+      return this.item.equals(that.item) && this.then.equivalentTo(that.then, epsilon);
     }
     return false;
   }
@@ -164,23 +164,23 @@ export class GetItemSelector extends Selector {
     if (this === that) {
       return true;
     } else if (that instanceof GetItemSelector) {
-      return this.accessor.equals(that.accessor) && this.then.equals(that.then);
+      return this.item.equals(that.item) && this.then.equals(that.then);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(GetItemSelector),
-        this.accessor.hashCode()), this.then.hashCode()));
+        this.item.hashCode()), this.then.hashCode()));
   }
 
   debugThen(output: Output): void {
     output = output.write(46/*'.'*/).write("getItem").write(40/*'('*/)
-      .debug(this.accessor).write(41/*')'*/);
+      .debug(this.item).write(41/*')'*/);
     this.then.debugThen(output);
   }
 
   clone(): Selector {
-    return new GetItemSelector(this.accessor, this.then.clone());
+    return new GetItemSelector(this.item, this.then.clone());
   }
 }

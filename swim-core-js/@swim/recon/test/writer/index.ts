@@ -12,17 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {StringInput} from "./StringInput";
-export {StringOutput} from "./StringOutput";
-export {StringWriter} from "./StringWriter";
-
-export {Unicode} from "./Unicode";
-
-export {UtfErrorMode} from "./UtfErrorMode";
-export {UtfErrorModeFatal} from "./UtfErrorModeFatal";
-export {UtfErrorModeReplacement} from "./UtfErrorModeReplacement";
-
-export {Utf8DecodedOutput} from "./Utf8DecodedOutput";
-export {Utf8EncodedOutput} from "./Utf8EncodedOutput";
-
-export {Utf8} from "./Utf8";
+export {ReconWriterSpec} from "./ReconWriterSpec";
+export {ReconOperatorWriterSpec} from "./ReconOperatorWriterSpec";
+export {ReconSelectorWriterSpec} from "./ReconSelectorWriterSpec";
+export {ReconFuncWriterSpec} from "./ReconFuncWriterSpec";
+export {ReconWriterSuite} from "./ReconWriterSuite";

@@ -13,18 +13,30 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
-import {ReconParserSuite} from "./parser/ReconParserSuite";
-import {ReconWriterSuite} from "./writer/ReconWriterSuite";
+import {ReconWriterSpec} from "./ReconWriterSpec";
+import {ReconOperatorWriterSpec} from "./ReconOperatorWriterSpec";
+import {ReconSelectorWriterSpec} from "./ReconSelectorWriterSpec";
+import {ReconFuncWriterSpec} from "./ReconFuncWriterSpec";
 
 @Unit
-export class ReconSuite extends Spec {
+export class ReconWriterSuite extends Spec {
   @Unit
-  reconParserSuite(): Spec {
-    return new ReconParserSuite();
+  reconWriterSpec(): Spec {
+    return new ReconWriterSpec();
   }
 
   @Unit
-  reconWriterSuite(): Spec {
-    return new ReconWriterSuite();
+  reconOperatorWriterSpec(): Spec {
+    return new ReconOperatorWriterSpec();
+  }
+
+  @Unit
+  reconSelectorWriterSpec(): Spec {
+    return new ReconSelectorWriterSpec();
+  }
+
+  @Unit
+  reconFuncWriterSpec(): Spec {
+    return new ReconFuncWriterSpec();
   }
 }

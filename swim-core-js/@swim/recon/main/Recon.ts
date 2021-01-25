@@ -14,20 +14,15 @@
 
 import {Output, Parser, Writer, Unicode, Utf8} from "@swim/codec";
 import {Item, Value, Data} from "@swim/structure";
-import type {ReconParser} from "./ReconParser";
-import {ReconStructureParser} from "./ReconStructureParser";
-import type {ReconWriter} from "./ReconWriter";
-import {ReconStructureWriter} from "./ReconStructureWriter";
+import type {ReconParser} from "./parser/ReconParser";
+import {ReconStructureParser} from "./"; // forward import
+import type {ReconWriter} from "./writer/ReconWriter";
+import {ReconStructureWriter} from "./"; // forward import
 
 /**
  * Factory for constructing Recon parsers and writers.
  */
 export const Recon = {} as {
-  /** @hidden */
-  _structureParser?: ReconParser<Item, Value>;
-  /** @hidden */
-  _structureWriter?: ReconWriter<Item, Value>;
-
   structureParser(): ReconParser<Item, Value>;
 
   structureWriter(): ReconWriter<Item, Value>;
@@ -68,19 +63,37 @@ export const Recon = {} as {
   isIdentChar(c: number): boolean;
 };
 
-Recon.structureParser = function (): ReconParser<Item, Value> {
-  if (Recon._structureParser === void 0) {
-    Recon._structureParser = new ReconStructureParser();
-  }
-  return Recon._structureParser;
-};
+Object.defineProperty(Recon, "structureParser", {
+  value: function (): ReconStructureParser {
+    const structureParser = new ReconStructureParser();
+    Object.defineProperty(Recon, "structureParser", {
+      value: function(): ReconStructureParser {
+        return structureParser;
+      },
+      enumerable: true,
+      configurable: true,
+    });
+    return structureParser;
+  },
+  enumerable: true,
+  configurable: true,
+});
 
-Recon.structureWriter = function (): ReconWriter<Item, Value> {
-  if (Recon._structureWriter === void 0) {
-    Recon._structureWriter = new ReconStructureWriter();
-  }
-  return Recon._structureWriter;
-};
+Object.defineProperty(Recon, "structureWriter", {
+  value: function(): ReconStructureWriter {
+    const structureWriter = new ReconStructureWriter();
+    Object.defineProperty(Recon, "structureWriter", {
+      value: function (): ReconStructureWriter {
+        return structureWriter;
+      },
+      enumerable: true,
+      configurable: true,
+    });
+    return structureWriter;
+  },
+  enumerable: true,
+  configurable: true,
+});
 
 Recon.parse = function (recon: string): Value {
   return Recon.structureParser().parseBlockString(recon);

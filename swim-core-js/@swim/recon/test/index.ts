@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {ReconParserSpec} from "./ReconParserSpec";
-export {ReconOperatorParserSpec} from "./ReconOperatorParserSpec";
-export {ReconSelectorParserSpec} from "./ReconSelectorParserSpec";
-export {ReconFuncParserSpec} from "./ReconFuncParserSpec";
-export {ReconWriterSpec} from "./ReconWriterSpec";
-export {ReconOperatorWriterSpec} from "./ReconOperatorWriterSpec";
-export {ReconSelectorWriterSpec} from "./ReconSelectorWriterSpec";
-export {ReconFuncWriterSpec} from "./ReconFuncWriterSpec";
+export {ReconExam} from "./ReconExam";
+export * from "./parser";
+export * from "./writer";
 export {ReconSuite} from "./ReconSuite";
 
 import {ReconSuite} from "./ReconSuite";
