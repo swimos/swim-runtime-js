@@ -51,7 +51,7 @@ export class ValueDownlinkRecordSpec extends Spec {
 
       class StateOutput extends AbstractInlet<Value> {
         didRecohereOutput(version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(state, Record.of("on"));
           resolve();
         }

@@ -17,10 +17,6 @@ import type {Value, Record} from "@swim/structure";
 import {Outlet, MapOutlet, StreamletScope} from "@swim/streamlet";
 import type {MapValueFunction, MapFieldValuesFunction} from "@swim/streamlet";
 import type {WatchValueFunction, WatchFieldsFunction} from "@swim/streamlet";
-import type {RecordStreamlet} from "./RecordStreamlet";
-import type {RecordModel} from "./RecordModel";
-import type {RecordScope} from "./RecordScope";
-import type {Dataflow} from "./Dataflow";
 
 export interface RecordOutlet extends Outlet<Record>, MapOutlet<Value, Value, Record>, StreamletScope<Value> {
   outlet(key: Value | string): Outlet<Value>;
@@ -39,16 +35,6 @@ export interface RecordOutlet extends Outlet<Record>, MapOutlet<Value, Value, Re
 
 export const RecordOutlet = {} as {
   is(object: unknown): object is RecordOutlet;
-
-  // Forward type declarations
-  /** @hidden */
-  Streamlet: typeof RecordStreamlet, // defined by RecordStreamlet
-  /** @hidden */
-  Model: typeof RecordModel, // defined by RecordModel
-  /** @hidden */
-  Scope: typeof RecordScope, // defined by RecordScope
-  /** @hidden */
-  Dataflow: typeof Dataflow, // defined by Dataflow
 };
 
 RecordOutlet.is = function (object: unknown): object is RecordOutlet {

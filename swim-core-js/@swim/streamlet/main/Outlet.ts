@@ -14,10 +14,8 @@
 
 import type {Iterator} from "@swim/util";
 import type {Inlet} from "./Inlet";
+import type {OutletCombinators} from "./OutletCombinators";
 import type {MapValueFunction, WatchValueFunction} from "./function";
-import type {MemoizeValueCombinator} from "./combinator/MemoizeValueCombinator";
-import type {MapValueCombinator} from "./combinator/MapValueCombinator";
-import type {WatchValueCombinator} from "./combinator/WatchValueCombinator";
 
 export type OutletType = "value" | "map";
 
@@ -35,7 +33,7 @@ export interface OutletOptions {
  * The [[bindOutput]] method "plugs" an `Inlet` into the `Outlet`.
  * The [[unbindOutput]] method "unplugs" an `Inlet` from the `Outlet`.
  */
-export interface Outlet<O = unknown> {
+export interface Outlet<O = unknown> extends OutletCombinators<O> {
   /**
    * Returns the current state of this `Outlet`.
    */
@@ -106,14 +104,6 @@ export interface Outlet<O = unknown> {
 
 export const Outlet = {} as {
   is<O>(object: unknown): object is Outlet<O>;
-
-  // Forward type declarations
-  /** @hidden */
-  MemoizeValueCombinator: typeof MemoizeValueCombinator, // defined by MemoizeValueCombinator
-  /** @hidden */
-  MapValueCombinator: typeof MapValueCombinator, // defined by MapValueCombinator
-  /** @hidden */
-  WatchValueCombinator: typeof WatchValueCombinator, // defined by WatchValueCombinator
 };
 
 Outlet.is = function <O>(object: unknown): object is Outlet<O> {

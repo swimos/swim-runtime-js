@@ -53,12 +53,12 @@ export class MapDownlinkRecordSpec extends Spec {
 
       class StateOutput extends AbstractMapInlet<Value, Value, Record> {
         didRecohereOutputKey(key: Value, version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(key, Text.from("the"));
           exam.equal(state.get(Text.from("the")), Text.from("definite article"));
         }
         didRecohereOutput(version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(state, Record.of(Slot.of("the", "definite article")));
           resolve();
         }

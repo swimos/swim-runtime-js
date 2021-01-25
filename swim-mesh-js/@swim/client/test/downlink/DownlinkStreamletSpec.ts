@@ -58,7 +58,7 @@ export class DownlinkStreamletSpec extends Spec {
 
       class StateOutput extends AbstractInlet<Value> {
         didRecohereOutput(version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(state, Text.from("on"));
           resolve();
         }
@@ -95,7 +95,7 @@ export class DownlinkStreamletSpec extends Spec {
 
       class StateOutput extends AbstractInlet<Map<Value, Value>> {
         didRecohereOutput(version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(state.get(Text.from("the")), Text.from("definite article"));
           resolve();
         }
@@ -127,7 +127,7 @@ export class DownlinkStreamletSpec extends Spec {
 
       class StateOutput extends AbstractInlet<Value> {
         didRecohereOutput(version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(state, Text.from("on"));
           resolve();
         }
@@ -161,7 +161,7 @@ export class DownlinkStreamletSpec extends Spec {
 
       class StateOutput extends AbstractInlet<Map<Value, Value>> {
         didRecohereOutput(version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(state.get(Text.from("the")), Text.from("definite article"));
           resolve();
         }
@@ -193,7 +193,7 @@ export class DownlinkStreamletSpec extends Spec {
 
       class StateOutput extends AbstractInlet<Value> {
         didRecohereOutput(version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(state, Text.from("on"));
           resolve();
         }
@@ -227,7 +227,7 @@ export class DownlinkStreamletSpec extends Spec {
 
       class StateOutput extends AbstractInlet<Map<Value, Value>> {
         didRecohereOutput(version: number): void {
-          const state = this._input!.get()!;
+          const state = this.input!.get()!;
           exam.equal(state.get(Text.from("the")), Text.from("definite article"));
           resolve();
         }

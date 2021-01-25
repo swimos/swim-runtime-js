@@ -51,7 +51,7 @@ import {
   PositiveOperator,
   InvokeOperator,
 } from "@swim/structure";
-import {Outlet, KeyOutlet, StreamletScope, ValueInput} from "@swim/streamlet";
+import {Outlet, MapOutlet, KeyOutlet, StreamletScope, ValueInput} from "@swim/streamlet";
 import {RecordOutlet} from "./RecordOutlet";
 import {GetOutlet} from "./selector/GetOutlet";
 import type {BinaryOutlet} from "./operator/BinaryOutlet";
@@ -197,7 +197,6 @@ export const Dataflow = {} as {
   /** @hidden */
   compileInvokeOperator(operator: InvokeOperator, scope: Outlet<Value>): Outlet<Value>;
 };
-RecordOutlet.Dataflow = Dataflow;
 
 Dataflow.compile = function (expr: Value, scope: Outlet<Value>): Outlet<Value> {
   if (scope instanceof KeyOutlet) {
@@ -263,8 +262,8 @@ Dataflow.compileGetSelector = function (selector: GetSelector, scope: Outlet<Val
   } else {
     const getOutlet = new GetOutlet();
     const outlet = Dataflow.compile(key, scope);
-    getOutlet.keyInlet().bindInput(outlet);
-    getOutlet.mapInlet().bindInput(scope);
+    getOutlet.keyInlet.bindInput(outlet);
+    getOutlet.mapInlet.bindInput(scope as MapOutlet<Value, Value, unknown>);
     return getOutlet;
   }
   return null as unknown as Outlet<Value>;
@@ -319,9 +318,9 @@ Dataflow.compileConditionalOperator = function (operator: ConditionalOperator, s
   const ifOutlet = Dataflow.compile(ifTerm, scope);
   const thenOutlet = Dataflow.compile(thenTerm, scope);
   const elseOutlet = Dataflow.compile(elseTerm, scope);
-  outlet.ifInlet().bindInput(ifOutlet);
-  outlet.thenInlet().bindInput(thenOutlet);
-  outlet.elseInlet().bindInput(elseOutlet);
+  outlet.ifInlet.bindInput(ifOutlet);
+  outlet.thenInlet.bindInput(thenOutlet);
+  outlet.elseInlet.bindInput(elseOutlet);
   return outlet;
 };
 
@@ -367,8 +366,8 @@ Dataflow.compileBinaryOutlet = function (operator: BinaryOperator, outlet: Binar
   const operand2 = operator.operand2.toValue();
   const operand1Outlet = Dataflow.compile(operand1, scope);
   const operand2Outlet = Dataflow.compile(operand2, scope);
-  outlet.operand1Inlet().bindInput(operand1Outlet);
-  outlet.operand2Inlet().bindInput(operand2Outlet);
+  outlet.operand1Inlet.bindInput(operand1Outlet);
+  outlet.operand2Inlet.bindInput(operand2Outlet);
   return outlet;
 };
 
@@ -378,8 +377,8 @@ Dataflow.compileOrOperator = function (operator: OrOperator, scope: Outlet<Value
   const operand2 = operator.operand2.toValue();
   const operand1Outlet = Dataflow.compile(operand1, scope);
   const operand2Outlet = Dataflow.compile(operand2, scope);
-  outlet.operand1Inlet().bindInput(operand1Outlet);
-  outlet.operand2Inlet().bindInput(operand2Outlet);
+  outlet.operand1Inlet.bindInput(operand1Outlet);
+  outlet.operand2Inlet.bindInput(operand2Outlet);
   return outlet;
 };
 
@@ -389,8 +388,8 @@ Dataflow.compileAndOperator = function (operator: AndOperator, scope: Outlet<Val
   const operand2 = operator.operand2.toValue();
   const operand1Outlet = Dataflow.compile(operand1, scope);
   const operand2Outlet = Dataflow.compile(operand2, scope);
-  outlet.operand1Inlet().bindInput(operand1Outlet);
-  outlet.operand2Inlet().bindInput(operand2Outlet);
+  outlet.operand1Inlet.bindInput(operand1Outlet);
+  outlet.operand2Inlet.bindInput(operand2Outlet);
   return outlet;
 };
 
@@ -466,7 +465,7 @@ Dataflow.compileUnaryOperator = function (operator: UnaryOperator, scope: Outlet
 Dataflow.compileUnaryOutlet = function (operator: UnaryOperator, outlet: UnaryOutlet, scope: Outlet<Value>): Outlet<Value> {
   const operand = operator.operand.toValue();
   const operandOutlet = Dataflow.compile(operand, scope);
-  outlet.operandInlet().bindInput(operandOutlet);
+  outlet.operandInlet.bindInput(operandOutlet);
   return outlet;
 };
 
@@ -492,7 +491,7 @@ Dataflow.compileInvokeOperator = function (operator: InvokeOperator, scope: Outl
   const invokeOutlet = new InvokeOutlet(scope as unknown as Record);
   const funcOutlet = Dataflow.compile(func, scope);
   const argsOutlet = Dataflow.compile(args, scope);
-  invokeOutlet.funcInlet().bindInput(funcOutlet);
-  invokeOutlet.argsInlet().bindInput(argsOutlet);
+  invokeOutlet.funcInlet.bindInput(funcOutlet);
+  invokeOutlet.argsInlet.bindInput(argsOutlet);
   return invokeOutlet;
 };

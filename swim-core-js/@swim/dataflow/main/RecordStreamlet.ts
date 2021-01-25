@@ -14,7 +14,6 @@
 
 import {Value, Record} from "@swim/structure";
 import {Inlet, Outlet, StreamletContext, StreamletScope, StreamletClass, Streamlet, AbstractStreamlet} from "@swim/streamlet";
-import {RecordOutlet} from "./RecordOutlet";
 
 export abstract class RecordStreamlet<I extends Value = Value, O extends Value = I> extends Record implements Streamlet<I, O> {
   isConstant(): boolean {
@@ -25,11 +24,11 @@ export abstract class RecordStreamlet<I extends Value = Value, O extends Value =
     return this.constructor as StreamletClass;
   }
 
-  abstract streamletScope(): StreamletScope<O> | null;
+  abstract readonly streamletScope: StreamletScope<O> | null;
 
   abstract setStreamletScope(parent: StreamletScope<O> | null): void;
 
-  abstract streamletContext(): StreamletContext | null;
+  abstract readonly streamletContext: StreamletContext | null;
 
   abstract setStreamletContext(context: StreamletContext | null): void;
 
@@ -51,14 +50,14 @@ export abstract class RecordStreamlet<I extends Value = Value, O extends Value =
 
   compile(): void {
     AbstractStreamlet.reflectEachInlet<I, O, void, this>(this, this.streamletClass, function (inlet: Inlet<I>, name: string): void {
-      if (inlet.input() === null) {
+      if (inlet.input === null) {
         this.compileInlet(inlet, name);
       }
     }, this);
   }
 
   compileInlet(inlet: Inlet<I>, name: string): void {
-    const scope = this.streamletScope();
+    const scope = this.streamletScope;
     if (scope !== null) {
       const input = scope.outlet(name);
       if (input !== null) {
@@ -68,4 +67,3 @@ export abstract class RecordStreamlet<I extends Value = Value, O extends Value =
     }
   }
 }
-RecordOutlet.Streamlet = RecordStreamlet;

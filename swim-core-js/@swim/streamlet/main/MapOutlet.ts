@@ -15,19 +15,15 @@
 import type {Iterator, Map} from "@swim/util";
 import {Outlet} from "./Outlet";
 import type {KeyEffect} from "./KeyEffect";
+import type {MapOutletCombinators} from "./MapOutletCombinators";
 import type {FilterFieldsFunction} from "./function";
 import type {MapValueFunction, MapFieldValuesFunction} from "./function";
 import type {WatchValueFunction, WatchFieldsFunction} from "./function";
-import type {MemoizeMapCombinator} from "./combinator/MemoizeMapCombinator";
-import type {FilterFieldsCombinator} from "./combinator/FilterFieldsCombinator";
-import type {MapFieldValuesCombinator} from "./combinator/MapFieldValuesCombinator";
-import type {ReduceFieldsCombinator} from "./combinator/ReduceFieldsCombinator";
-import type {WatchFieldsCombinator} from "./combinator/WatchFieldsCombinator";
 
 /**
  * Output connector from a [[Streamlet]] for a key-value map state.
  */
-export interface MapOutlet<K, V, O> extends Outlet<O> {
+export interface MapOutlet<K, V, O> extends Outlet<O>, MapOutletCombinators<K, V, O> {
   /**
    * Returns `true` if the current state of this `MapOutlet` contains the given
    * `key`; otherwise returns `false`.
@@ -90,18 +86,6 @@ export interface MapOutlet<K, V, O> extends Outlet<O> {
 
 export const MapOutlet = {} as {
   is<K, V, I>(object: unknown): object is MapOutlet<K, V, I>;
-
-  // Forward type declarations
-  /** @hidden */
-  MemoizeMapCombinator: typeof MemoizeMapCombinator, // defined by MemoizeMapCombinator
-  /** @hidden */
-  FilterFieldsCombinator: typeof FilterFieldsCombinator, // defined by FilterFieldsCombinator
-  /** @hidden */
-  MapFieldValuesCombinator: typeof MapFieldValuesCombinator, // defined by MapFieldValuesCombinator
-  /** @hidden */
-  ReduceFieldsCombinator: typeof ReduceFieldsCombinator, // defined by ReduceFieldsCombinator
-  /** @hidden */
-  WatchFieldsCombinator: typeof WatchFieldsCombinator, // defined by WatchFieldsCombinator
 };
 
 MapOutlet.is = function <K, V, I>(object: unknown): object is MapOutlet<K, V, I> {

@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Cursor} from "@swim/util";
+import {Arrays, Cursor} from "@swim/util";
 import {Value, Form} from "@swim/structure";
-import type {Inlet, Outlet} from "@swim/streamlet";
-import {MapValueFunction, MapValueCombinator} from "@swim/streamlet";
-import {WatchValueFunction, WatchValueCombinator} from "@swim/streamlet";
+import {Inlet, Outlet, OutletCombinators} from "@swim/streamlet";
 import type {Uri} from "@swim/uri";
 import type {DownlinkContext} from "./DownlinkContext";
 import type {DownlinkOwner} from "./DownlinkOwner";
@@ -44,12 +42,6 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   _valueForm: Form<V, VU>;
   /** @hidden */
   _state0: Value;
-  /** @hidden */
-  _input: Outlet<V> | null;
-  /** @hidden */
-  _outputs: ReadonlyArray<Inlet<V>> | null; // TODO: unify with observers
-  /** @hidden */
-  _version: number;
 
   /** @hidden */
   constructor(context: DownlinkContext, owner?: DownlinkOwner, init?: ValueDownlinkInit<V, VU>,
@@ -66,9 +58,21 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
     }
     this._valueForm = valueForm !== void 0 ? valueForm : Form.forValue() as any;
     this._state0 = state0;
-    this._input = null;
-    this._outputs = null;
-    this._version = -1;
+    Object.defineProperty(this, "input", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "outputs", {
+      value: Arrays.empty,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "version", {
+      value: -1,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   protected copy(context: DownlinkContext, owner: DownlinkOwner | undefined,
@@ -223,92 +227,100 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
     return this;
   }
 
-  input(): Outlet<V> | null {
-    return this._input;
-  }
+  declare readonly input: Outlet<V> | null;
 
-  bindInput(input: Outlet<V> | null): void {
-    if (this._input !== null) {
-      this._input.unbindOutput(this);
-    }
-    this._input = input;
-    if (this._input !== null) {
-      this._input.bindOutput(this);
+  /** @hidden */
+  declare readonly outputs: ReadonlyArray<Inlet<V>>;
+
+  /** @hidden */
+  declare readonly version: number;
+
+  bindInput(newInput: Outlet<V> | null): void {
+    const oldInput = this.input;
+    if (oldInput !== newInput) {
+      if (oldInput !== null) {
+        oldInput.unbindOutput(this);
+      }
+      Object.defineProperty(this, "input", {
+        value: newInput,
+        enumerable: true,
+        configurable: true,
+      });
+      if (newInput !== null) {
+        newInput.bindOutput(this);
+      }
     }
   }
 
   unbindInput(): void {
-    if (this._input !== null) {
-      this._input.unbindOutput(this);
+    const oldInput = this.input;
+    if (oldInput !== null) {
+      oldInput.unbindOutput(this);
+      Object.defineProperty(this, "input", {
+        value: null,
+        enumerable: true,
+        configurable: true,
+      });
     }
-    this._input = null;
   }
 
   disconnectInputs(): void {
-    const input = this._input;
-    if (input !== null) {
-      input.unbindOutput(this);
-      this._input = null;
-      input.disconnectInputs();
+    const oldInput = this.input;
+    if (oldInput !== null) {
+      oldInput.unbindOutput(this);
+      Object.defineProperty(this, "input", {
+        value: null,
+        enumerable: true,
+        configurable: true,
+      });
+      oldInput.disconnectInputs();
     }
   }
 
   outputIterator(): Cursor<Inlet<V>> {
-    return this._outputs !== null ? Cursor.array(this._outputs) : Cursor.empty();
+    return Cursor.array(this.outputs);
   }
 
   bindOutput(output: Inlet<V>): void {
-    const oldOutputs = this._outputs;
-    const n = oldOutputs !== null ? oldOutputs.length : 0;
-    const newOutputs = new Array<Inlet<V>>(n + 1);
-    for (let i = 0; i < n; i += 1) {
-      newOutputs[i] = oldOutputs![i]!;
-    }
-    newOutputs[n] = output;
-    this._outputs = newOutputs;
+    Object.defineProperty(this, "outputs", {
+      value: Arrays.inserted(output, this.outputs),
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   unbindOutput(output: Inlet<V>): void {
-    const oldOutputs = this._outputs;
-    const n = oldOutputs !== null ? oldOutputs.length : 0;
-    for (let i = 0; i < n; i += 1) {
-      if (oldOutputs![i] === output) {
-        if (n > 1) {
-          const newOutputs = new Array<Inlet<V>>(n - 1);
-          for (let j = 0; j < i; j += 1) {
-            newOutputs[j] = oldOutputs![j]!;
-          }
-          for (let j = i; j < n - 1; j += 1) {
-            newOutputs[j] = oldOutputs![j + 1]!;
-          }
-          this._outputs = newOutputs;
-        } else {
-          this._outputs = null;
-        }
-        break;
-      }
-    }
+    Object.defineProperty(this, "outputs", {
+      value: Arrays.removed(output, this.outputs),
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   unbindOutputs(): void {
-    const oldOutputs = this._outputs;
-    if (oldOutputs !== null) {
-      this._outputs = null;
-      for (let i = 0, n = oldOutputs.length; i < n; i += 1) {
-        oldOutputs[i]!.unbindInput();
-      }
+    const oldOutputs = this.outputs;
+    Object.defineProperty(this, "outputs", {
+      value: Arrays.empty,
+      enumerable: true,
+      configurable: true,
+    });
+    for (let i = 0, n = oldOutputs.length; i < n; i += 1) {
+      const output = oldOutputs[i]!;
+      output.unbindInput();
     }
   }
 
   disconnectOutputs(): void {
-    const outputs = this._outputs;
-    if (outputs !== null) {
-      this._outputs = null;
-      for (let i = 0, n = outputs.length; i < n; i += 1) {
-        const output = outputs[i]!;
-        output.unbindInput();
-        output.disconnectOutputs();
-      }
+    const oldOutputs = this.outputs;
+    Object.defineProperty(this, "outputs", {
+      value: Arrays.empty,
+      enumerable: true,
+      configurable: true,
+    });
+    for (let i = 0, n = oldOutputs.length; i < n; i += 1) {
+      const output = oldOutputs[i]!;
+      output.unbindInput();
+      output.disconnectOutputs();
     }
   }
 
@@ -321,13 +333,17 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   }
 
   decohere(): void {
-    if (this._version >= 0) {
+    if (this.version >= 0) {
       this.willDecohere();
-      this._version = -1;
+      Object.defineProperty(this, "version", {
+        value: -1,
+        enumerable: true,
+        configurable: true,
+      });
       this.onDecohere();
-      const n = this._outputs !== null ? this._outputs.length : 0;
-      for (let i = 0; i < n; i += 1) {
-        this._outputs![i]!.decohereOutput();
+      const outputs = this.outputs;
+      for (let i = 0, n = outputs.length; i < n; i += 1) {
+        outputs[i]!.decohereOutput();
       }
       this.didDecohere();
     }
@@ -342,16 +358,20 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   }
 
   recohere(version: number): void {
-    if (this._version < 0) {
+    if (this.version < 0) {
       this.willRecohere(version);
-      this._version = version;
-      if (this._input !== null) {
-        this._input.recohereInput(version);
+      Object.defineProperty(this, "version", {
+        value: version,
+        enumerable: true,
+        configurable: true,
+      });
+      if (this.input !== null) {
+        this.input.recohereInput(version);
       }
       this.onRecohere(version);
-      const n = this._outputs !== null ? this._outputs.length : 0;
-      for (let i = 0; i < n; i += 1) {
-        this._outputs![i]!.recohereOutput(version);
+      const outputs = this.outputs;
+      for (let i = 0, n = outputs.length; i < n; i += 1) {
+        outputs[i]!.recohereOutput(version);
       }
       this.didRecohere(version);
     }
@@ -374,8 +394,9 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   }
 
   protected onRecohere(version: number): void {
-    if (this._input !== null) {
-      const value = this._input.get();
+    const input = this.input;
+    if (input !== null) {
+      const value = input.get();
       if (value !== void 0) {
         this.set(value);
       }
@@ -385,20 +406,7 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   protected didRecohere(version: number): void {
     // hook
   }
-
-  memoize(): Outlet<V> {
-    return this;
-  }
-
-  map<V2>(func: MapValueFunction<V, V2>): Outlet<V2> {
-    const combinator = new MapValueCombinator<V, V2>(func);
-    combinator.bindInput(this);
-    return combinator;
-  }
-
-  watch(func: WatchValueFunction<V>): this {
-    const combinator = new WatchValueCombinator<V>(func);
-    combinator.bindInput(this);
-    return this;
-  }
 }
+export interface ValueDownlink<V, VU> extends OutletCombinators<V> {
+}
+OutletCombinators.define(ValueDownlink.prototype);

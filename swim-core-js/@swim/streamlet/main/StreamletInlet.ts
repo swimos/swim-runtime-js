@@ -22,27 +22,25 @@ import {AbstractInlet} from "./AbstractInlet";
  * `Inlet` recoheres.
  */
 export class StreamletInlet<I> extends AbstractInlet<I> {
-  /** @hidden */
-  protected readonly _streamlet: Streamlet<I, unknown>;
-
   constructor(streamlet: Streamlet<I, unknown>) {
     super();
-    this._streamlet = streamlet;
+    Object.defineProperty(this, "streamlet", {
+      value: streamlet,
+      enumerable: true,
+    });
   }
 
-  streamlet(): Streamlet<I, unknown> {
-    return this._streamlet;
-  }
+  declare readonly streamlet: Streamlet<I, unknown>;
 
   protected willDecohereOutput(): void {
-    const streamlet = this._streamlet as GenericStreamlet<I, unknown>;
+    const streamlet = this.streamlet as GenericStreamlet<I, unknown>;
     if (streamlet.willDecohereInlet !== void 0) {
       streamlet.willDecohereInlet(this);
     }
   }
 
   protected didDecohereOutput(): void {
-    const streamlet = this._streamlet as GenericStreamlet<I, unknown>;
+    const streamlet = this.streamlet as GenericStreamlet<I, unknown>;
     if (streamlet.didDecohereInlet !== void 0) {
       streamlet.didDecohereInlet(this);
     } else {
@@ -51,14 +49,14 @@ export class StreamletInlet<I> extends AbstractInlet<I> {
   }
 
   protected willRecohereOutput(version: number): void {
-    const streamlet = this._streamlet as GenericStreamlet<I, unknown>;
+    const streamlet = this.streamlet as GenericStreamlet<I, unknown>;
     if (streamlet.willRecohereInlet !== void 0) {
       streamlet.willRecohereInlet(this, version);
     }
   }
 
   protected didRecohereOutput(version: number): void {
-    const streamlet = this._streamlet as GenericStreamlet<I, unknown>;
+    const streamlet = this.streamlet as GenericStreamlet<I, unknown>;
     if (streamlet.didRecohereInlet !== void 0) {
       streamlet.didRecohereInlet(this, version);
     } else {

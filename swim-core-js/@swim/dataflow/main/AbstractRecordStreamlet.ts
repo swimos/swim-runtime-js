@@ -28,40 +28,53 @@ import {
 import {RecordStreamlet} from "./RecordStreamlet";
 
 export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends Value = I> extends RecordStreamlet<I, O> implements GenericStreamlet<I, O> {
-  protected scope: StreamletScope<O> | null;
-  protected context: StreamletContext | null;
-  /** @hidden */
-  protected _version: number;
-
   constructor(scope: StreamletScope<O> | null = null) {
     super();
-    this.scope = scope;
-    this.context = null;
-    this._version = -1;
+    Object.defineProperty(this, "streamletScope", {
+      value: scope,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "streamletContext", {
+      value: scope !== null ? scope.streamletContext : null,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "version", {
+      value: -1,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  streamletScope(): StreamletScope<O> | null {
-    return this.scope;
-  }
+  declare readonly streamletScope: StreamletScope<O> | null;
 
   setStreamletScope(scope: StreamletScope<O> | null): void {
-    this.scope = scope;
+    Object.defineProperty(this, "streamletScope", {
+      value: scope,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  streamletContext(): StreamletContext | null {
-    if (this.context !== null) {
-      return this.context;
-    }
-    const scope = this.streamletScope();
-    if (scope !== null) {
-      return scope.streamletContext();
-    }
-    return null;
-  }
+  declare readonly streamletContext: StreamletContext | null;
 
   setStreamletContext(context: StreamletContext | null): void {
-    this.context = context;
+    if (context === null) {
+      const streamletScope = this.streamletScope;
+      if (streamletScope !== null) {
+        context = streamletScope.streamletContext;
+      }
+    }
+    Object.defineProperty(this, "streamletContext", {
+      value: context,
+      enumerable: true,
+      configurable: true,
+    });
   }
+
+  /** @hidden */
+  declare readonly version: number;
 
   isEmpty(): boolean {
     return this.length !== 0;
@@ -225,9 +238,13 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
   }
 
   decohere(): void {
-    if (this._version >= 0) {
+    if (this.version >= 0) {
       this.willDecohere();
-      this._version = -1;
+      Object.defineProperty(this, "version", {
+        value: -1,
+        enumerable: true,
+        configurable: true,
+      });
       this.onDecohere();
       this.onDecohereOutlets();
       this.didDecohere();
@@ -235,9 +252,13 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
   }
 
   recohere(version: number): void {
-    if (this._version < 0) {
+    if (this.version < 0) {
       this.willRecohere(version);
-      this._version = version;
+      Object.defineProperty(this, "version", {
+        value: version,
+        enumerable: true,
+        configurable: true,
+      });
       this.onRecohereInlets(version);
       this.onRecohere(version);
       this.onRecohereOutlets(version);
@@ -253,7 +274,7 @@ export abstract class AbstractRecordStreamlet<I extends Value = Value, O extends
     }
     let object: I2 | E | undefined;
     if (inlet !== null) {
-      const input = inlet.input();
+      const input = inlet.input;
       if (input !== null) {
         object = input.get();
       }

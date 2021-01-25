@@ -17,15 +17,15 @@ import type {StreamletContext} from "./StreamletContext";
 
 export interface StreamletScope<O> {
   /**
-   * Returns the lexically scoped parent of this `StreamletScope`.
-   * Returns `null` if this `StreamletScope` has no lexical parent.
+   * The lexically scoped parent of this `StreamletScope`, or `null` if this
+   * `StreamletScope` has no lexical parent.
    */
-  streamletScope(): StreamletScope<O> | null;
+  readonly streamletScope: StreamletScope<O> | null;
 
   /**
-   * Returns the environment in which this `StreamletScope` operates.
+   * The environment in which this `StreamletScope` operates.
    */
-  streamletContext(): StreamletContext | null;
+  readonly streamletContext: StreamletContext | null;
 
   /**
    * Returns an `Outlet` that updates when the specified `key` updates.
@@ -40,8 +40,8 @@ export const StreamletScope = {} as {
 StreamletScope.is = function <O>(object: unknown): object is StreamletScope<O> {
   if (typeof object === "object" && object !== null) {
     const scope = object as StreamletScope<O>;
-    return typeof scope.streamletScope === "function"
-        && typeof scope.streamletContext === "function"
+    return "streamletScope" in scope
+        && "streamletContext" in scope
         && typeof scope.outlet === "function";
   }
   return false;

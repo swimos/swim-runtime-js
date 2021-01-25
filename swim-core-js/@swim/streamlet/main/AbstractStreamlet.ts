@@ -64,49 +64,62 @@ export class InoutletDescriptor {
 
 /** @hidden */
 export interface StreamletClass {
-  _inlets?: {[name: string]: InletDescriptor | InoutletDescriptor | undefined};
-  _outlets?: {[name: string]: OutletDescriptor | InoutletDescriptor | undefined};
-  _inoutlets?: {[name: string]: InoutletDescriptor | undefined};
+  inlets?: {[name: string]: InletDescriptor | InoutletDescriptor | undefined};
+  outlets?: {[name: string]: OutletDescriptor | InoutletDescriptor | undefined};
+  inoutlets?: {[name: string]: InoutletDescriptor | undefined};
 }
 
 export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericStreamlet<I, O> {
-  protected scope: StreamletScope<O> | null;
-  protected context: StreamletContext | null;
-  /** @hidden */
-  protected _version: number;
-
   constructor(scope: StreamletScope<O> | null = null) {
-    this.scope = scope;
-    this.context = null;
-    this._version = -1;
+    Object.defineProperty(this, "streamletScope", {
+      value: scope,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "streamletContext", {
+      value: scope !== null ? scope.streamletContext : null,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "version", {
+      value: -1,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   protected get streamletClass(): StreamletClass {
     return Object.getPrototypeOf(this);
   }
 
-  streamletScope(): StreamletScope<O> | null {
-    return this.scope;
-  }
+  declare readonly streamletScope: StreamletScope<O> | null;
 
   setStreamletScope(scope: StreamletScope<O> | null): void {
-    this.scope = scope;
+    Object.defineProperty(this, "streamletScope", {
+      value: scope,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  streamletContext(): StreamletContext | null {
-    if (this.context !== null) {
-      return this.context;
-    }
-    const scope = this.streamletScope();
-    if (scope !== null) {
-      return scope.streamletContext();
-    }
-    return null;
-  }
+  declare readonly streamletContext: StreamletContext | null;
 
   setStreamletContext(context: StreamletContext | null): void {
-    this.context = context;
+    if (context === null) {
+      const streamletScope = this.streamletScope;
+      if (streamletScope !== null) {
+        context = streamletScope.streamletContext;
+      }
+    }
+    Object.defineProperty(this, "streamletContext", {
+      value: context,
+      enumerable: true,
+      configurable: true,
+    });
   }
+
+  /** @hidden */
+  declare readonly version: number;
 
   inlet(key: string): Inlet<I> | null;
   inlet<I2 extends I>(): Inlet<I2>;
@@ -151,9 +164,13 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   decohere(): void {
-    if (this._version >= 0) {
+    if (this.version >= 0) {
       this.willDecohere();
-      this._version = -1;
+      Object.defineProperty(this, "version", {
+        value: -1,
+        enumerable: true,
+        configurable: true,
+      });
       this.onDecohere();
       this.onDecohereOutlets();
       this.didDecohere();
@@ -161,9 +178,13 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   recohere(version: number): void {
-    if (this._version < 0) {
+    if (this.version < 0) {
       this.willRecohere(version);
-      this._version = version;
+      Object.defineProperty(this, "version", {
+        value: version,
+        enumerable: true,
+        configurable: true,
+      });
       this.onRecohereInlets(version);
       this.onRecohere(version);
       this.onRecohereOutlets(version);
@@ -179,7 +200,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
     }
     let object: I2 | E | undefined;
     if (inlet !== null) {
-      const input = inlet.input();
+      const input = inlet.input;
       if (input !== null) {
         object = input.get();
       }
@@ -201,9 +222,9 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static disconnectInputs<I, O>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): void {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_inlets")) {
-        for (const name in streamletClass._inlets) {
-          const inletDescriptor = streamletClass._inlets[name]!;
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "inlets")) {
+        for (const name in streamletClass.inlets) {
+          const inletDescriptor = streamletClass.inlets[name]!;
           if (inletDescriptor instanceof InletDescriptor) {
             const inlet = AbstractStreamlet.reflectInletField(streamlet, inletDescriptor);
             inlet.disconnectInputs();
@@ -224,9 +245,9 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static disconnectOutputs<I, O>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): void {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_outlets")) {
-        for (const name in streamletClass._outlets) {
-          const outletDescriptor = streamletClass._outlets[name]!;
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "outlets")) {
+        for (const name in streamletClass.outlets) {
+          const outletDescriptor = streamletClass.outlets[name]!;
           if (outletDescriptor instanceof OutletDescriptor) {
             const outlet = AbstractStreamlet.reflectOutletField(streamlet, outletDescriptor);
             outlet.disconnectOutputs();
@@ -287,9 +308,9 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static decohereOutlets<I, O>(streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): void {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_outlets")) {
-        for (const name in streamletClass._outlets) {
-          const outletDescriptor = streamletClass._outlets[name]!;
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "outlets")) {
+        for (const name in streamletClass.outlets) {
+          const outletDescriptor = streamletClass.outlets[name]!;
           if (outletDescriptor instanceof OutletDescriptor) {
             const outlet = AbstractStreamlet.reflectOutletField(streamlet, outletDescriptor);
             outlet.decohereInput();
@@ -318,9 +339,9 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static recohereInlets<I, O>(version: number, streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): void {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_inlets")) {
-        for (const name in streamletClass._inlets) {
-          const inletDescriptor = streamletClass._inlets[name]!;
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "inlets")) {
+        for (const name in streamletClass.inlets) {
+          const inletDescriptor = streamletClass.inlets[name]!;
           if (inletDescriptor instanceof InletDescriptor) {
             const inlet = AbstractStreamlet.reflectInletField(streamlet, inletDescriptor);
             inlet.recohereOutput(version);
@@ -345,9 +366,9 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static recohereOutlets<I, O>(version: number, streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): void {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_outlets")) {
-        for (const name in streamletClass._outlets) {
-          const outletDescriptor = streamletClass._outlets[name]!;
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "outlets")) {
+        for (const name in streamletClass.outlets) {
+          const outletDescriptor = streamletClass.outlets[name]!;
           if (outletDescriptor instanceof OutletDescriptor) {
             const outlet = AbstractStreamlet.reflectOutletField(streamlet, outletDescriptor);
             outlet.recohereInput(version);
@@ -378,9 +399,9 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
                                       thisArg?: S): T | undefined {
     let index = 0;
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_inlets")) {
-        for (const name in streamletClass._inlets) {
-          const inletDescriptor = streamletClass._inlets[name]!;
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "inlets")) {
+        for (const name in streamletClass.inlets) {
+          const inletDescriptor = streamletClass.inlets[name]!;
           let inlet: Inlet<I> | null;
           if (inletDescriptor instanceof InletDescriptor) {
             inlet = AbstractStreamlet.reflectInletField(streamlet, inletDescriptor);
@@ -416,9 +437,9 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
                                        thisArg?: S): T | undefined {
     let index = 0;
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_outlets")) {
-        for (const name in streamletClass._outlets) {
-          const outletDescriptor = streamletClass._outlets[name]!;
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "outlets")) {
+        for (const name in streamletClass.outlets) {
+          const outletDescriptor = streamletClass.outlets[name]!;
           let outlet: Outlet<O> | null;
           if (outletDescriptor instanceof OutletDescriptor) {
             outlet = AbstractStreamlet.reflectOutletField(streamlet, outletDescriptor);
@@ -445,8 +466,8 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   static reflectInletCount(streamletClass: StreamletClass | null): number {
     let count = 0;
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_inlets")) {
-        for (const _ in streamletClass._inlets) {
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "inlets")) {
+        for (const _ in streamletClass.inlets) {
           count += 1;
         }
       }
@@ -459,8 +480,8 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   static reflectOutletCount(streamletClass: StreamletClass | null): number {
     let count = 0;
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_outlets")) {
-        for (const _ in streamletClass._outlets) {
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "outlets")) {
+        for (const _ in streamletClass.outlets) {
           count += 1;
         }
       }
@@ -472,10 +493,10 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static reflectInletIndex<I, O>(index: number, streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): [string, Inlet<I>] | null {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_inlets")) {
-        for (const name in streamletClass._inlets) {
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "inlets")) {
+        for (const name in streamletClass.inlets) {
           if (index === 0) {
-            const inletDescriptor = streamletClass._inlets[name]!;
+            const inletDescriptor = streamletClass.inlets[name]!;
             if (inletDescriptor instanceof InletDescriptor) {
               return [inletDescriptor.name, AbstractStreamlet.reflectInletField(streamlet, inletDescriptor)];
             } else if (inletDescriptor instanceof InoutletDescriptor) {
@@ -495,10 +516,10 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static reflectOutletIndex<I, O>(index: number, streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): [string, Outlet<O>] | null {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_outlets")) {
-        for (const name in streamletClass._outlets) {
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "outlets")) {
+        for (const name in streamletClass.outlets) {
           if (index === 0) {
-            const outletDescriptor = streamletClass._outlets[name]!;
+            const outletDescriptor = streamletClass.outlets[name]!;
             if (outletDescriptor instanceof OutletDescriptor) {
               return [outletDescriptor.name, AbstractStreamlet.reflectOutletField(streamlet, outletDescriptor)];
             } else if (outletDescriptor instanceof InoutletDescriptor) {
@@ -518,8 +539,8 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static reflectInletKey<I, O>(key: string, streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): Inlet<I> | null {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_inlets")) {
-        const inletDescriptor = streamletClass._inlets![key];
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "inlets")) {
+        const inletDescriptor = streamletClass.inlets![key];
         if (inletDescriptor !== void 0) {
           if (inletDescriptor instanceof InletDescriptor) {
             return AbstractStreamlet.reflectInletField(streamlet, inletDescriptor);
@@ -538,8 +559,8 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   /** @hidden */
   static reflectOutletKey<I, O>(key: string, streamlet: Streamlet<I, O>, streamletClass: StreamletClass | null): Outlet<O> | null {
     while (streamletClass !== null) {
-      if (Object.prototype.hasOwnProperty.call(streamletClass, "_outlets")) {
-        const outletDescriptor = streamletClass._outlets![key];
+      if (Object.prototype.hasOwnProperty.call(streamletClass, "outlets")) {
+        const outletDescriptor = streamletClass.outlets![key];
         if (outletDescriptor !== void 0) {
           if (outletDescriptor instanceof OutletDescriptor) {
             return AbstractStreamlet.reflectOutletField(streamlet, outletDescriptor);
@@ -647,14 +668,14 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
 
   /** @hidden */
   static init(streamletClass: StreamletClass): void {
-    if (!Object.prototype.hasOwnProperty.call(streamletClass, "_inlets")) {
-      streamletClass._inlets = {};
+    if (!Object.prototype.hasOwnProperty.call(streamletClass, "inlets")) {
+      streamletClass.inlets = {};
     }
-    if (!Object.prototype.hasOwnProperty.call(streamletClass, "_outlets")) {
-      streamletClass._outlets = {};
+    if (!Object.prototype.hasOwnProperty.call(streamletClass, "outlets")) {
+      streamletClass.outlets = {};
     }
-    if (!Object.prototype.hasOwnProperty.call(streamletClass, "_inoutlets")) {
-      streamletClass._inoutlets = {};
+    if (!Object.prototype.hasOwnProperty.call(streamletClass, "inoutlets")) {
+      streamletClass.inoutlets = {};
     }
   }
 
@@ -664,7 +685,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
     const name = options.name !== void 0 ? options.name : propertyKey.toString();
     const type = options.type !== void 0 ? options.type : "value";
     const inletDescriptor = new InletDescriptor(propertyKey.toString(), name, type);
-    target._inlets![name] = inletDescriptor;
+    target.inlets![name] = inletDescriptor;
   }
 
   /** @hidden */
@@ -673,7 +694,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
     const name = options.name !== void 0 ? options.name : propertyKey.toString();
     const type = options.type !== void 0 ? options.type : "value";
     const outletDescriptor = new OutletDescriptor(propertyKey.toString(), name, type);
-    target._outlets![name] = outletDescriptor;
+    target.outlets![name] = outletDescriptor;
   }
 
   /** @hidden */
@@ -682,8 +703,8 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
     const name = options.name !== void 0 ? options.name : propertyKey.toString();
     const type = options.type !== void 0 ? options.type : "value";
     const inoutletDescriptor = new InoutletDescriptor(propertyKey.toString(), name, type);
-    target._inlets![name] = inoutletDescriptor;
-    target._outlets![name] = inoutletDescriptor;
-    target._inoutlets![name] = inoutletDescriptor;
+    target.inlets![name] = inoutletDescriptor;
+    target.outlets![name] = inoutletDescriptor;
+    target.inoutlets![name] = inoutletDescriptor;
   }
 }
