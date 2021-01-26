@@ -45,7 +45,8 @@ export class TransformForm extends Form<Transform, AnyTransform> {
     const value = item.toValue();
     try {
       if (value instanceof Record) {
-        return Transform.fromValue(value);
+        const transform = Transform.fromValue(value);
+        return transform !== null ? transform : void 0;
       } else {
         const string = value.stringValue(void 0);
         if (string !== void 0) {
@@ -58,4 +59,3 @@ export class TransformForm extends Form<Transform, AnyTransform> {
     return void 0;
   }
 }
-Transform.Form = TransformForm;

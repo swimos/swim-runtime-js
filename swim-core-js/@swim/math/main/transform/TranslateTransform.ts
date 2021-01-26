@@ -15,82 +15,82 @@
 import {Murmur3, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
-import {Item, Attr, Slot, Value, Record} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
+import {Item, Value, Record} from "@swim/structure";
+import {Length} from "../length/Length";
+import {PointR2} from "../r2/PointR2";
 import {Transform} from "./Transform";
+import {IdentityTransform} from "./IdentityTransform";
 import {TranslateTransformInterpolator} from "../"; // forward import
-import type {AffineTransform} from "./AffineTransform";
+import {TranslateTransformParser} from "../"; // forward import
+import {AffineTransform} from "../"; // forward import
 
 export class TranslateTransform extends Transform {
-  /** @hidden */
-  readonly _x: Length;
-  /** @hidden */
-  readonly _y: Length;
-  /** @hidden */
-  _string?: string;
-
   constructor(x: Length, y: Length) {
     super();
-    this._x = x;
-    this._y = y;
+    Object.defineProperty(this, "x", {
+      value: x,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y", {
+      value: y,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "stringValue", {
+      value: void 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  get x(): Length {
-    return this._x;
-  }
+  declare readonly x: Length;
 
-  get y(): Length {
-    return this._y;
-  }
+  declare readonly y: Length;
 
   transform(that: Transform): Transform;
-  transform(point: [number, number]): [number, number];
-  transform(x: number, y: number): [number, number];
-  transform(point: [AnyLength, AnyLength]): [Length, Length];
-  transform(x: AnyLength, y: AnyLength): [Length, Length];
-  transform(x: Transform | [AnyLength, AnyLength] | AnyLength, y?: AnyLength): Transform | [number, number] | [Length, Length] {
-    if (x instanceof Transform) {
-      if (x instanceof Transform.Identity) {
+  transform(x: number, y: number): PointR2;
+  transform(x: Transform | number, y?: number): Transform | PointR2 {
+    if (arguments.length === 1) {
+      if (x instanceof IdentityTransform) {
         return this;
       } else if (x instanceof TranslateTransform) {
-        return new TranslateTransform(this._x.plus(x._x), this._y.plus(x._y));
+        return new TranslateTransform(this.x.plus(x.x), this.y.plus(x.y));
       } else {
-        return new Transform.List([this, x]);
+        return Transform.list(this, x as Transform);
       }
     } else {
-      if (Array.isArray(x)) {
-        y = x[1];
-        x = x[0];
-      }
-      if (typeof x === "number" && typeof y === "number") {
-        return [x + this._x.pxValue(), y + this._y.pxValue()];
-      } else {
-        x = Length.fromAny(x);
-        y = Length.fromAny(y!);
-        return [x.plus(this._x), y.plus(this._y)];
-      }
+      return new PointR2(this.x.pxValue() + (x as number), this.y.pxValue() + y!);
     }
   }
 
   transformX(x: number, y: number): number {
-    return x + this._x.pxValue();
+    return this.x.pxValue() + x;
   }
 
   transformY(x: number, y: number): number {
-    return y + this._y.pxValue();
+    return this.y.pxValue() + y;
   }
 
   inverse(): Transform {
-    return new TranslateTransform(this._x.opposite(), this._y.opposite());
+    return new TranslateTransform(this.x.opposite(), this.y.opposite());
   }
 
   toAffine(): AffineTransform {
-    return new Transform.Affine(1, 0, 0, 1, this._x.pxValue(), this._y.pxValue());
+    return new AffineTransform(1, 0, 0, 1, this.x.pxValue(), this.y.pxValue());
+  }
+
+  toCssTransformComponent(): CSSTransformComponent | null {
+    if (typeof CSSTranslate !== "undefined") {
+      const x = this.x.toCssValue();
+      const y = this.y.toCssValue();
+      return new CSSTranslate(x!, y!);
+    }
+    return null;
   }
 
   toValue(): Value {
-    return Record.of(Attr.of("translate", Record.of(Slot.of("x", this._x.toString()),
-                                                    Slot.of("y", this._y.toString()))));
+    return Record.create(1)
+                 .attr("translate", Record.create(2).slot("x", this.x.toValue())
+                                                    .slot("y", this.y.toValue()));
   }
 
   interpolateTo(that: TranslateTransform): Interpolator<TranslateTransform>;
@@ -110,73 +110,74 @@ export class TranslateTransform extends Transform {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof TranslateTransform) {
-      return this._x.equivalentTo(that._x, epsilon)
-          && this._y.equivalentTo(that._y, epsilon);
+      return this.x.equivalentTo(that.x, epsilon)
+          && this.y.equivalentTo(that.y, epsilon);
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof TranslateTransform) {
-      return this._x.equals(that._x) && this._y.equals(that._y);
+      return this.x.equals(that.x) && this.y.equals(that.y);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(TranslateTransform),
-        this._x.hashCode()), this._y.hashCode()));
+        this.x.hashCode()), this.y.hashCode()));
   }
 
   debug(output: Output): void {
     output = output.write("Transform").write(46/*'.'*/).write("translate");
-    if (this._x.isDefined() && !this._y.isDefined()) {
-      output = output.write("X").write(40/*'('*/).debug(this._x).write(41/*')'*/);
-    } else if (!this._x.isDefined() && this._y.isDefined()) {
-      output = output.write("Y").write(40/*'('*/).debug(this._y).write(41/*')'*/);
+    if (this.x.isDefined() && !this.y.isDefined()) {
+      output = output.write("X").write(40/*'('*/).debug(this.x).write(41/*')'*/);
+    } else if (!this.x.isDefined() && this.y.isDefined()) {
+      output = output.write("Y").write(40/*'('*/).debug(this.y).write(41/*')'*/);
     } else {
-      output = output.write(40/*'('*/).debug(this._x).write(", ").debug(this._y).write(41/*')'*/);
+      output = output.write(40/*'('*/).debug(this.x).write(", ").debug(this.y).write(41/*')'*/);
     }
   }
 
+  /** @hidden */
+  declare readonly stringValue: string | undefined;
+
   toString(): string {
-    let string = this._string;
-    if (string === void 0) {
-      if (this._x.isDefined() && !this._y.isDefined()) {
-        string = "translate(" + this._x + ",0)";
-      } else if (!this._x.isDefined() && this._y.isDefined()) {
-        string = "translate(0," + this._y + ")";
+    let stringValue = this.stringValue;
+    if (stringValue === void 0) {
+      if (this.x.isDefined() && !this.y.isDefined()) {
+        stringValue = "translate(" + this.x + ",0)";
+      } else if (!this.x.isDefined() && this.y.isDefined()) {
+        stringValue = "translate(0," + this.y + ")";
       } else {
-        string = "translate(" + this._x + "," + this._y + ")";
+        stringValue = "translate(" + this.x + "," + this.y + ")";
       }
-      this._string = string;
+      Object.defineProperty(this, "stringValue", {
+        value: stringValue,
+        enumerable: true,
+        configurable: true,
+      });
     }
-    return string;
+    return stringValue;
   }
 
   toAttributeString(): string {
-    if (this._x.isDefined() && !this._y.isDefined()) {
-      return "translate(" + this._x.pxValue() + ",0)";
-    } else if (!this._x.isDefined() && this._y.isDefined()) {
-      return "translate(0," + this._y.pxValue() + ")";
+    if (this.x.isDefined() && !this.y.isDefined()) {
+      return "translate(" + this.x.pxValue() + ",0)";
+    } else if (!this.x.isDefined() && this.y.isDefined()) {
+      return "translate(0," + this.y.pxValue() + ")";
     } else {
-      return "translate(" + this._x.pxValue() + "," + this._y.pxValue() + ")";
+      return "translate(" + this.x.pxValue() + "," + this.y.pxValue() + ")";
     }
-  }
-
-  static from(x: AnyLength, y: AnyLength): TranslateTransform {
-    x = Length.fromAny(x);
-    y = Length.fromAny(y);
-    return new TranslateTransform(x, y);
   }
 
   static fromCssTransformComponent(component: CSSTranslate): TranslateTransform {
     const x = typeof component.x === "number"
             ? Length.px(component.x)
-            : Length.fromCss(component.x);
+            : Length.fromCssValue(component.x);
     const y = typeof component.y === "number"
             ? Length.px(component.y)
-            : Length.fromCss(component.y);
+            : Length.fromCssValue(component.y);
     return new TranslateTransform(x, y);
   }
 
@@ -189,7 +190,7 @@ export class TranslateTransform extends Transform {
     throw new TypeError("" + value);
   }
 
-  static fromValue(value: Value): TranslateTransform | undefined {
+  static fromValue(value: Value): TranslateTransform | null {
     const header = value.header("translate");
     if (header.isDefined()) {
       let x = Length.zero();
@@ -212,7 +213,7 @@ export class TranslateTransform extends Transform {
       }, this);
       return new TranslateTransform(x, y);
     }
-    return void 0;
+    return null;
   }
 
   static parse(string: string): TranslateTransform {
@@ -220,7 +221,7 @@ export class TranslateTransform extends Transform {
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = Transform.TranslateParser.parse(input);
+    let parser = TranslateTransformParser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -232,11 +233,3 @@ export class TranslateTransform extends Transform {
     return parser.bind();
   }
 }
-if (typeof CSSTranslate !== "undefined") { // CSS Typed OM support
-  TranslateTransform.prototype.toCssTransformComponent = function (this: TranslateTransform): CSSTransformComponent | undefined {
-    const x = this._x.toCssValue();
-    const y = this._y.toCssValue();
-    return new CSSTranslate(x!, y!);
-  };
-}
-Transform.Translate = TranslateTransform;

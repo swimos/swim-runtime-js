@@ -21,12 +21,12 @@ export const RotateTransformInterpolator = function (f0: RotateTransform, f1: Ro
   const interpolator = function (u: number): RotateTransform {
     const f0 = interpolator[0];
     const f1 = interpolator[1];
-    const a = Angle.from(f0._a.value + u * (f1._a.value - f0._a.value), f1._a.units);
+    const a = Angle.create(f0.angle.value + u * (f1.angle.value - f0.angle.value), f1.angle.units);
     return new RotateTransform(a);
   } as Interpolator<RotateTransform>;
   Object.setPrototypeOf(interpolator, RotateTransformInterpolator.prototype);
   Object.defineProperty(interpolator, 0, {
-    value: f0._a.units === f1._a.units ? f0 : new RotateTransform(f0._a.to(f1._a.units)),
+    value: f0.angle.units === f1.angle.units ? f0 : new RotateTransform(f0.angle.to(f1.angle.units)),
     enumerable: true,
   });
   Object.defineProperty(interpolator, 1, {

@@ -19,30 +19,30 @@ import {PathR2} from "./PathR2";
 
 export class PathR2Builder implements PathR2Context {
   /** @hidden */
-  _splines: SplineR2[];
+  splines: SplineR2[];
   /** @hidden */
-  _builder: SplineR2Builder | null;
+  builder: SplineR2Builder | null;
 
   constructor() {
-    this._splines = [];
-    this._builder = null;
+    this.splines = [];
+    this.builder = null;
   }
 
   moveTo(x: number, y: number): void {
-    let builder = this._builder;
+    let builder = this.builder;
     if (builder !== null) {
       const spline = builder.bind();
       if (spline.isDefined()) {
-        this._splines.push(spline);
+        this.splines.push(spline);
       }
     }
     builder = new SplineR2Builder();
-    this._builder = builder;
+    this.builder = builder;
     builder.moveTo(x, y);
   }
 
   closePath(): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.closePath();
     } else {
@@ -51,7 +51,7 @@ export class PathR2Builder implements PathR2Context {
   }
 
   lineTo(x: number, y: number): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.lineTo(x, y);
     } else {
@@ -60,7 +60,7 @@ export class PathR2Builder implements PathR2Context {
   }
 
   quadraticCurveTo(x1: number, y1: number, x: number, y: number): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.quadraticCurveTo(x1, y1, x, y);
     } else {
@@ -69,7 +69,7 @@ export class PathR2Builder implements PathR2Context {
   }
 
   bezierCurveTo(x1: number, y1: number, x2: number, y2: number, x: number, y: number): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.bezierCurveTo(x1, y1, x2, y2, x, y);
     } else {
@@ -78,7 +78,7 @@ export class PathR2Builder implements PathR2Context {
   }
 
   arcTo(x1: number, y1: number, x2: number, y2: number, r: number): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.arcTo(x1, y1, x2, y2, r);
     } else {
@@ -87,7 +87,7 @@ export class PathR2Builder implements PathR2Context {
   }
 
   arc(cx: number, cy: number, r: number, a0: number, a1: number, ccw?: boolean): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.arc(cx, cy, r, a0, a1, ccw);
     } else {
@@ -96,7 +96,7 @@ export class PathR2Builder implements PathR2Context {
   }
 
   ellipse(cx: number, cy: number, rx: number, ry: number, phi: number, a0: number, a1: number, ccw?: boolean): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.ellipse(cx, cy, rx, ry, phi, a0, a1, ccw);
     } else {
@@ -105,7 +105,7 @@ export class PathR2Builder implements PathR2Context {
   }
 
   rect(x: number, y: number, w: number, h: number): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.rect(x, y, w, h);
     } else {
@@ -114,8 +114,8 @@ export class PathR2Builder implements PathR2Context {
   }
 
   bind(): PathR2 {
-    const splines = this._splines.slice(0);
-    const builder = this._builder;
+    const splines = this.splines.slice(0);
+    const builder = this.builder;
     if (builder !== null) {
       const spline = builder.bind();
       if (spline.isDefined()) {
@@ -125,4 +125,3 @@ export class PathR2Builder implements PathR2Context {
     return new PathR2(splines);
   }
 }
-PathR2.Builder = PathR2Builder;

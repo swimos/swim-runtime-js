@@ -18,4 +18,3 @@ import {CurveR2} from "./CurveR2";
 export abstract class BezierCurveR2 extends CurveR2 {
   abstract transform(f: R2Function): BezierCurveR2;
 }
-CurveR2.Bezier = BezierCurveR2;

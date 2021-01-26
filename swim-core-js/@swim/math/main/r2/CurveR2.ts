@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Swim inc.
+ // Copyright 2015-2020 Swim inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ import type {R2Function} from "./R2Function";
 import {ShapeR2} from "./ShapeR2";
 import type {PointR2} from "./PointR2";
 import type {CurveR2Context} from "./CurveR2Context";
-import type {BezierCurveR2} from "./BezierCurveR2";
-import type {SegmentR2} from "./SegmentR2";
-import type {QuadraticCurveR2} from "./QuadraticCurveR2";
-import type {CubicCurveR2} from "./CubicCurveR2";
-import type {EllipticCurveR2} from "./EllipticCurveR2";
-import type {CurveR2Parser} from "./CurveR2Parser";
+import {CurveR2Parser} from "../"; // forward import
+import {SegmentR2} from "../"; // forward import
+import {QuadraticCurveR2} from "../"; // forward import
+import {CubicCurveR2} from "../"; // forward import
+import {EllipticCurveR2} from "../"; // forward import
 
 export abstract class CurveR2 extends ShapeR2 implements Equals, Equivalent {
   abstract interpolateX(u: number): number;
@@ -74,21 +73,21 @@ export abstract class CurveR2 extends ShapeR2 implements Equals, Equivalent {
   abstract equals(that: unknown): boolean;
 
   static linear(x0: number, y0: number, x1: number, y1: number): CurveR2 {
-    return new CurveR2.Linear(x0, y0, x1, y1);
+    return new SegmentR2(x0, y0, x1, y1);
   }
 
   static quadratic(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number): CurveR2 {
-    return new CurveR2.Quadratic(x0, y0, x1, y1, x2, y2);
+    return new QuadraticCurveR2(x0, y0, x1, y1, x2, y2);
   }
 
   static cubic(x0: number, y0: number, x1: number, y1: number,
                x2: number, y2: number, x3: number, y3: number): CurveR2 {
-    return new CurveR2.Cubic(x0, y0, x1, y1, x2, y2, x3, y3);
+    return new CubicCurveR2(x0, y0, x1, y1, x2, y2, x3, y3);
   }
 
   static elliptic(cx: number, cy: number, rx: number, ry: number,
                   phi: number, a0: number, da: number): CurveR2 {
-    return new CurveR2.Elliptic(cx, cy, rx, ry, phi, a0, da);
+    return new EllipticCurveR2(cx, cy, rx, ry, phi, a0, da);
   }
 
   static parse(string: string): CurveR2 {
@@ -96,7 +95,7 @@ export abstract class CurveR2 extends ShapeR2 implements Equals, Equivalent {
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = CurveR2.CurveParser.parse(input);
+    let parser = CurveR2Parser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -107,18 +106,4 @@ export abstract class CurveR2 extends ShapeR2 implements Equals, Equivalent {
     }
     return parser.bind();
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Bezier: typeof BezierCurveR2; // defined by BezierCurveR2
-  /** @hidden */
-  static Linear: typeof SegmentR2; // defined by SegmentR2
-  /** @hidden */
-  static Quadratic: typeof QuadraticCurveR2; // defined by QuadraticCurveR2
-  /** @hidden */
-  static Cubic: typeof CubicCurveR2; // defined by CubicCurveR2
-  /** @hidden */
-  static Elliptic: typeof EllipticCurveR2; // defined by EllipticCurveR2
-  /** @hidden */
-  static CurveParser: typeof CurveR2Parser; // defined by CurveR2Parser
 }

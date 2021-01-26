@@ -15,27 +15,26 @@
 import {Input, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Angle} from "../angle/Angle";
 import {AngleParser} from "../angle/AngleParser";
-import {Transform} from "./Transform";
-import type {RotateTransform} from "./RotateTransform";
+import {RotateTransform} from "./RotateTransform";
 
 /** @hidden */
 export class RotateTransformParser extends Parser<RotateTransform> {
   private readonly identOutput: Output<string> | undefined;
-  private readonly aParser: Parser<Angle> | undefined;
+  private readonly angleParser: Parser<Angle> | undefined;
   private readonly step: number | undefined;
 
-  constructor(identOutput?: Output<string>, aParser?: Parser<Angle>, step?: number) {
+  constructor(identOutput?: Output<string>, angleParser?: Parser<Angle>, step?: number) {
     super();
     this.identOutput = identOutput;
-    this.aParser = aParser;
+    this.angleParser = angleParser;
     this.step = step;
   }
 
   feed(input: Input): Parser<RotateTransform> {
-    return RotateTransformParser.parse(input, this.identOutput, this.aParser, this.step);
+    return RotateTransformParser.parse(input, this.identOutput, this.angleParser, this.step);
   }
 
-  static parse(input: Input, identOutput?: Output<string>, aParser?: Parser<Angle>,
+  static parse(input: Input, identOutput?: Output<string>, angleParser?: Parser<Angle>,
                step: number = 1): Parser<RotateTransform> {
     let c = 0;
     if (step === 1) {
@@ -64,21 +63,21 @@ export class RotateTransformParser extends Parser<RotateTransform> {
       }
     }
     if (step === 3) {
-      if (aParser === void 0) {
+      if (angleParser === void 0) {
         while (input.isCont() && Unicode.isSpace(input.head())) {
           input.step();
         }
         if (!input.isEmpty()) {
-          aParser = AngleParser.parse(input, "deg");
+          angleParser = AngleParser.parse(input, "deg");
         }
       } else {
-        aParser = aParser.feed(input);
+        angleParser = angleParser.feed(input);
       }
-      if (aParser !== void 0) {
-        if (aParser.isDone()) {
+      if (angleParser !== void 0) {
+        if (angleParser.isDone()) {
           step = 4;
-        } else if (aParser.isError()) {
-          return aParser.asError();
+        } else if (angleParser.isError()) {
+          return angleParser.asError();
         }
       }
     }
@@ -90,14 +89,14 @@ export class RotateTransformParser extends Parser<RotateTransform> {
         input.step();
         const ident = identOutput!.bind();
         switch (ident) {
-          case "rotate": return Parser.done(Transform.rotate(aParser!.bind()));
+          case "rotate": return Parser.done(new RotateTransform(angleParser!.bind()));
           default: return Parser.error(Diagnostic.message("unknown transform function: " + ident, input));
         }
       } else if (!input.isEmpty()) {
         return Parser.error(Diagnostic.expected(")", input));
       }
     }
-    return new RotateTransformParser(identOutput, aParser, step);
+    return new RotateTransformParser(identOutput, angleParser, step);
   }
 
   /** @hidden */
@@ -105,4 +104,3 @@ export class RotateTransformParser extends Parser<RotateTransform> {
     return RotateTransformParser.parse(input, identOutput, void 0, 2);
   }
 }
-Transform.RotateParser = RotateTransformParser;

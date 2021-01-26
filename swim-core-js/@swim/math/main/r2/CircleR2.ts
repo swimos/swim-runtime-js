@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
+import {Equivalent, HashCode, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {R2Function} from "./R2Function";
@@ -31,59 +31,55 @@ export interface CircleR2Init {
 }
 
 export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode, Equivalent, Debug {
-  /** @hidden */
-  readonly _cx: number;
-  /** @hidden */
-  readonly _cy: number;
-  /** @hidden */
-  readonly _r: number;
-
-  constructor(x: number, y: number, r: number) {
+  constructor(cx: number, cy: number, r: number) {
     super();
-    this._cx = x;
-    this._cy = y;
-    this._r = r;
+    Object.defineProperty(this, "cx", {
+      value: cx,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "cy", {
+      value: cy,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "r", {
+      value: r,
+      enumerable: true,
+    });
   }
 
   isDefined(): boolean {
-    return this._cx !== 0 || this._cy !== 0 || this._r !== 0;
+    return isFinite(this.cx) && isFinite(this.cy) && isFinite(this.r);
   }
 
-  get cx(): number {
-    return this._cx;
-  }
+  declare readonly cx: number;
 
-  get cy(): number {
-    return this._cy;
-  }
+  declare readonly cy: number;
 
-  get r(): number {
-    return this._r;
-  }
+  declare readonly r: number;
 
   get xMin(): number {
-    return this._cx - this._r;
+    return this.cx - this.r;
   }
 
   get yMin(): number {
-    return this._cy - this._r;
+    return this.cy - this.r;
   }
 
   get xMax(): number {
-    return this._cx + this._r;
+    return this.cx + this.r;
   }
 
   get yMax(): number {
-    return this._cy + this._r;
+    return this.cy + this.r;
   }
 
   contains(that: AnyShapeR2): boolean;
   contains(x: number, y: number): boolean;
   contains(that: AnyShapeR2 | number, y?: number): boolean {
     if (typeof that === "number") {
-      const dx = that - this._cx;
-      const dy = y! - this._cy;
-      return dx * dx + dy * dy <= this._r * this._r;
+      const dx = that - this.cx;
+      const dy = y! - this.cy;
+      return dx * dx + dy * dy <= this.r * this.r;
     } else {
       that = ShapeR2.fromAny(that);
       if (that instanceof PointR2) {
@@ -101,29 +97,29 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
 
   /** @hidden */
   containsPoint(that: PointR2): boolean {
-    const dx = that._x - this._cx;
-    const dy = that._y - this._cy;
-    return dx * dx + dy * dy <= this._r * this._r;
+    const dx = that.x - this.cx;
+    const dy = that.y - this.cy;
+    return dx * dx + dy * dy <= this.r * this.r;
   }
 
   /** @hidden */
   containsSegment(that: SegmentR2): boolean {
-    const dx0 = that._x0 - this._cx;
-    const dy0 = that._y0 - this._cy;
-    const dx1 = that._x1 - this._cx;
-    const dy1 = that._y1 - this._cy;
-    const r2 = this._r * this._r;
+    const dx0 = that.x0 - this.cx;
+    const dy0 = that.y0 - this.cy;
+    const dx1 = that.x1 - this.cx;
+    const dy1 = that.y1 - this.cy;
+    const r2 = this.r * this.r;
     return dx0 * dx0 + dy0 * dy0 <= r2
         && dx1 * dx1 + dy1 * dy1 <= r2;
   }
 
   /** @hidden */
   containsBox(that: BoxR2): boolean {
-    const dxMin = that._xMin - this._cx;
-    const dyMin = that._yMin - this._cy;
-    const dxMax = that._xMax - this._cx;
-    const dyMax = that._yMax - this._cy;
-    const r2 = this._r * this._r;
+    const dxMin = that.xMin - this.cx;
+    const dyMin = that.yMin - this.cy;
+    const dxMax = that.xMax - this.cx;
+    const dyMax = that.yMax - this.cy;
+    const r2 = this.r * this.r;
     return dxMin * dxMin + dyMin * dyMin <= r2
         && dxMin * dxMin + dyMax * dyMax <= r2
         && dxMax * dxMax + dyMin * dyMin <= r2
@@ -132,9 +128,9 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
 
   /** @hidden */
   containsCircle(that: CircleR2): boolean {
-    const dx = that._cx - this._cx;
-    const dy = that._cy - this._cy;
-    return dx * dx + dy * dy + that._r * that._r <= this._r * this._r;
+    const dx = that.cx - this.cx;
+    const dy = that.cy - this.cy;
+    return dx * dx + dy * dy + that.r * that.r <= this.r * this.r;
   }
 
   intersects(that: AnyShapeR2): boolean {
@@ -155,20 +151,20 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
 
   /** @hidden */
   intersectsPoint(that: PointR2): boolean {
-    const dx = that._x - this._cx;
-    const dy = that._y - this._cy;
-    return dx * dx + dy * dy <= this._r * this._r;
+    const dx = that.x - this.cx;
+    const dy = that.y - this.cy;
+    return dx * dx + dy * dy <= this.r * this.r;
   }
 
   /** @hidden */
   intersectsSegment(that: SegmentR2): boolean {
-    const cx = this._cx;
-    const cy = this._cy;
-    const r = this._r;
-    const x0 = that._x0;
-    const y0 = that._y0;
-    const x1 = that._x1;
-    const y1 = that._y1;
+    const cx = this.cx;
+    const cy = this.cy;
+    const r = this.r;
+    const x0 = that.x0;
+    const y0 = that.y0;
+    const x1 = that.x1;
+    const y1 = that.y1;
     const dx = x1 - x0;
     const dy = y1 - y0;
     const l = Math.sqrt(dx * dx + dy * dy);
@@ -196,24 +192,24 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
 
   /** @hidden */
   intersectsBox(that: BoxR2): boolean {
-    const dx = (this._cx < that._xMin ? that._xMin : that._xMax < this._cx ? that._xMax : this._cx) - this._cx;
-    const dy = (this._cy < that._yMin ? that._yMin : that._yMax < this._cy ? that._yMax : this._cy) - this._cy;
-    return dx * dx + dy * dy <= this._r * this._r;
+    const dx = (this.cx < that.xMin ? that.xMin : that.xMax < this.cx ? that.xMax : this.cx) - this.cx;
+    const dy = (this.cy < that.yMin ? that.yMin : that.yMax < this.cy ? that.yMax : this.cy) - this.cy;
+    return dx * dx + dy * dy <= this.r * this.r;
   }
 
   /** @hidden */
   intersectsCircle(that: CircleR2): boolean {
-    const dx = that._cx - this._cx;
-    const dy = that._cy - this._cy;
-    const rr = this._r + that._r;
+    const dx = that.cx - this.cx;
+    const dy = that.cy - this.cy;
+    const rr = this.r + that.r;
     return dx * dx + dy * dy <= rr * rr;
   }
 
   transform(f: R2Function): CircleR2 {
-    const cx = f.transformX(this._cx, this._cy);
-    const cy = f.transformY(this._cx, this._cy);
-    const rx = f.transformX(this._cx + this._r, this._cy);
-    const ry = f.transformY(this._cx + this._r, this._cy);
+    const cx = f.transformX(this.cx, this.cy);
+    const cy = f.transformY(this.cx, this.cy);
+    const rx = f.transformX(this.cx + this.r, this.cy);
+    const ry = f.transformY(this.cx + this.r, this.cy);
     const dx = rx - cx;
     const dy = ry - cy;
     const r = Math.sqrt(dx * dx + dy * dy);
@@ -222,9 +218,9 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
 
   toAny(): CircleR2Init {
     return {
-      cx: this._cx,
-      cy: this._cy,
-      r: this._r,
+      cx: this.cx,
+      cy: this.cy,
+      r: this.r,
     };
   }
 
@@ -242,9 +238,9 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
     if (this === that) {
       return true;
     } else if (that instanceof CircleR2) {
-      return Numbers.equivalent(that._cx, this._cx, epsilon)
-          && Numbers.equivalent(that._cy, this._cy, epsilon)
-          && Numbers.equivalent(that._r, this._r, epsilon);
+      return Numbers.equivalent(this.cx, that.cx, epsilon)
+          && Numbers.equivalent(this.cy, that.cy, epsilon)
+          && Numbers.equivalent(this.r, that.r, epsilon);
     }
     return false;
   }
@@ -253,19 +249,19 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
     if (this === that) {
       return true;
     } else if (that instanceof CircleR2) {
-      return this._cx === that._cx && this._cy === that._cy && this._r === that._r;
+      return this.cx === that.cx && this.cy === that.cy && this.r === that.r;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(CircleR2),
-        Numbers.hash(this._cx)), Numbers.hash(this._cy)), Numbers.hash(this._r)));
+        Numbers.hash(this.cx)), Numbers.hash(this.cy)), Numbers.hash(this.r)));
   }
 
   debug(output: Output): void {
     output.write("CircleR2").write(46/*'.'*/).write("of").write(40/*'('*/)
-        .debug(this._cx).write(", ").debug(this._cy).write(", ").debug(this._r).write(41/*')'*/);
+        .debug(this.cx).write(", ").debug(this.cy).write(", ").debug(this.r).write(41/*')'*/);
   }
 
   toString(): string {
@@ -306,4 +302,3 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
         || CircleR2.isInit(value);
   }
 }
-ShapeR2.Circle = CircleR2;

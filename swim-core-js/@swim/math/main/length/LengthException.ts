@@ -12,22 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {LengthException} from "./LengthException";
-
-export {
-  LengthUnits,
-  LengthBasis,
-  AnyLength,
-  Length,
-} from "./Length";
-export {PxLength} from "./PxLength";
-export {EmLength} from "./EmLength";
-export {RemLength} from "./RemLength";
-export {PctLength} from "./PctLength";
-export {UnitlessLength} from "./UnitlessLength";
-
-export {LengthInterpolator} from "./LengthInterpolator";
-
-export {LengthForm} from "./LengthForm";
-
-export {LengthParser} from "./LengthParser";
+export class LengthException extends Error {
+  constructor(message?: string) {
+    super(message);
+    Object.setPrototypeOf(this, LengthException.prototype);
+  }
+}

@@ -15,85 +15,83 @@
 import {Murmur3, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
-import {Item, Attr, Slot, Value, Record} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
-import {AnyAngle, Angle} from "../angle/Angle";
+import {Item, Value, Record} from "@swim/structure";
+import {Angle} from "../angle/Angle";
+import {PointR2} from "../r2/PointR2";
 import {Transform} from "./Transform";
+import {IdentityTransform} from "./IdentityTransform";
 import {SkewTransformInterpolator} from "../"; // forward import
-import type {AffineTransform} from "./AffineTransform";
+import {SkewTransformParser} from "../"; // forward import
+import {AffineTransform} from "../"; // forward import
 
 export class SkewTransform extends Transform {
-  /** @hidden */
-  readonly _x: Angle;
-  /** @hidden */
-  readonly _y: Angle;
-  /** @hidden */
-  _string?: string;
-
   constructor(x: Angle, y: Angle) {
     super();
-    this._x = x;
-    this._y = y;
+    Object.defineProperty(this, "x", {
+      value: x,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y", {
+      value: y,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "stringValue", {
+      value: void 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  get x(): Angle {
-    return this._x;
-  }
+  declare readonly x: Angle;
 
-  get y(): Angle {
-    return this._y;
-  }
+  declare readonly y: Angle;
 
   transform(that: Transform): Transform;
-  transform(point: [number, number]): [number, number];
-  transform(x: number, y: number): [number, number];
-  transform(point: [AnyLength, AnyLength]): [Length, Length];
-  transform(x: AnyLength, y: AnyLength): [Length, Length];
-  transform(x: Transform | [AnyLength, AnyLength] | AnyLength, y?: AnyLength): Transform | [number, number] | [Length, Length] {
-    if (x instanceof Transform) {
-      if (x instanceof Transform.Identity) {
+  transform(x: number, y: number): PointR2;
+  transform(x: Transform | number, y?: number): Transform | PointR2 {
+    if (arguments.length === 1) {
+      if (x instanceof IdentityTransform) {
         return this;
       } else {
-        return new Transform.List([this, x]);
+        return Transform.list(this, x as Transform);
       }
     } else {
-      if (Array.isArray(x)) {
-        y = x[1];
-        x = x[0];
-      }
-      x = Length.fromAny(x);
-      y = Length.fromAny(y!);
-      if (typeof x === "number" && typeof y === "number") {
-        return [x + y * Math.tan(this._x.radValue()),
-                x * Math.tan(this._y.radValue()) + y];
-      } else {
-        return [x.plus(y.times(Math.tan(this._x.radValue()))),
-                x.times(Math.tan(this._y.radValue())).plus(y)];
-      }
+      return new PointR2(Math.tan(this.x.radValue()) * y! + (x as number),
+                         Math.tan(this.y.radValue()) * (x as number) + y!);
     }
   }
 
   transformX(x: number, y: number): number {
-    return x + y * Math.tan(this._x.radValue());
+    return Math.tan(this.x.radValue()) * y + x;
   }
 
   transformY(x: number, y: number): number {
-    return x * Math.tan(this._y.radValue()) + y;
+    return Math.tan(this.y.radValue()) * x + y;
   }
 
   inverse(): Transform {
-    return new SkewTransform(this._x.opposite(), this._y.opposite());
+    return new SkewTransform(this.x.opposite(), this.y.opposite());
   }
 
   toAffine(): AffineTransform {
-    const x = this._x.radValue();
-    const y = this._y.radValue();
-    return new Transform.Affine(1, Math.tan(y), Math.tan(x), 1, 0, 0);
+    const x = this.x.radValue();
+    const y = this.y.radValue();
+    return new AffineTransform(1, Math.tan(y), Math.tan(x), 1, 0, 0);
+  }
+
+  toCssTransformComponent(): CSSTransformComponent | null {
+    if (typeof CSSTranslate !== "undefined") {
+      const x = this.x.toCssValue();
+      const y = this.y.toCssValue();
+      return new CSSSkew(x!, y!);
+    }
+    return null;
   }
 
   toValue(): Value {
-    return Record.of(Attr.of("skew", Record.of(Slot.of("x", this._x.toString()),
-                                               Slot.of("y", this._y.toString()))));
+    return Record.create(1)
+                 .attr("skew", Record.create(2).slot("x", this.x.toValue())
+                                               .slot("y", this.y.toValue()));
   }
 
   interpolateTo(that: SkewTransform): Interpolator<SkewTransform>;
@@ -113,73 +111,74 @@ export class SkewTransform extends Transform {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof SkewTransform) {
-      return this._x.equivalentTo(that._x, epsilon)
-          && this._y.equivalentTo(that._y, epsilon);
+      return this.x.equivalentTo(that.x, epsilon)
+          && this.y.equivalentTo(that.y, epsilon);
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof SkewTransform) {
-      return this._x.equals(that._x) && this._y.equals(that._y);
+      return this.x.equals(that.x) && this.y.equals(that.y);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(SkewTransform),
-        this._x.hashCode()), this._y.hashCode()));
+        this.x.hashCode()), this.y.hashCode()));
   }
 
   debug(output: Output): void {
     output = output.write("Transform").write(46/*'.'*/).write("skew");
-    if (this._x.isDefined() && !this._y.isDefined()) {
-      output = output.write("X").write(40/*'('*/).debug(this._x).write(41/*')'*/);
-    } else if (!this._x.isDefined() && this._y.isDefined()) {
-      output = output.write("Y").write(40/*'('*/).debug(this._y).write(41/*')'*/);
+    if (this.x.isDefined() && !this.y.isDefined()) {
+      output = output.write("X").write(40/*'('*/).debug(this.x).write(41/*')'*/);
+    } else if (!this.x.isDefined() && this.y.isDefined()) {
+      output = output.write("Y").write(40/*'('*/).debug(this.y).write(41/*')'*/);
     } else {
-      output = output.write(40/*'('*/).debug(this._x).write(", ").debug(this._y).write(41/*')'*/);
+      output = output.write(40/*'('*/).debug(this.x).write(", ").debug(this.y).write(41/*')'*/);
     }
   }
 
+  /** @hidden */
+  declare readonly stringValue: string | undefined;
+
   toString(): string {
-    let string = this._string;
-    if (string === void 0) {
-      if (this._x.isDefined() && !this._y.isDefined()) {
-        string = "skewX(" + this._x + ")";
-      } else if (!this._x.isDefined() && this._y.isDefined()) {
-        string = "skewY(" + this._y + ")";
+    let stringValue = this.stringValue;
+    if (stringValue === void 0) {
+      if (this.x.isDefined() && !this.y.isDefined()) {
+        stringValue = "skewX(" + this.x + ")";
+      } else if (!this.x.isDefined() && this.y.isDefined()) {
+        stringValue = "skewY(" + this.y + ")";
       } else {
-        string = "skew(" + this._x + "," + this._y + ")";
+        stringValue = "skew(" + this.x + "," + this.y + ")";
       }
-      this._string = string;
+      Object.defineProperty(this, "stringValue", {
+        value: stringValue,
+        enumerable: true,
+        configurable: true,
+      });
     }
-    return string;
+    return stringValue;
   }
 
   toAttributeString(): string {
-    if (this._x.isDefined() && !this._y.isDefined()) {
-      return "skewX(" + this._x.degValue() + ")";
-    } else if (!this._x.isDefined() && this._y.isDefined()) {
-      return "skewY(" + this._y.degValue() + ")";
+    if (this.x.isDefined() && !this.y.isDefined()) {
+      return "skewX(" + this.x.degValue() + ")";
+    } else if (!this.x.isDefined() && this.y.isDefined()) {
+      return "skewY(" + this.y.degValue() + ")";
     } else {
-      return "skew(" + this._x.degValue() + "," + this._y.degValue() + ")";
+      return "skew(" + this.x.degValue() + "," + this.y.degValue() + ")";
     }
-  }
-
-  static from(x: AnyAngle, y: AnyAngle): SkewTransform {
-    x = Angle.fromAny(x, "deg");
-    y = Angle.fromAny(y, "deg");
-    return new SkewTransform(x, y);
   }
 
   static fromCssTransformComponent(component: CSSSkew): SkewTransform {
     const x = typeof component.ax === "number"
             ? Angle.rad(component.ax)
-            : Angle.fromCss(component.ax);
+            : Angle.fromCssValue(component.ax);
     const y = typeof component.ay === "number"
             ? Angle.rad(component.ay)
-            : Angle.fromCss(component.ay);
+            : Angle.fromCssValue(component.ay);
     return new SkewTransform(x, y);
   }
 
@@ -192,7 +191,7 @@ export class SkewTransform extends Transform {
     throw new TypeError("" + value);
   }
 
-  static fromValue(value: Value): SkewTransform | undefined {
+  static fromValue(value: Value): SkewTransform | null {
     const header = value.header("skew");
     if (header.isDefined()) {
       let x = Angle.zero();
@@ -215,7 +214,7 @@ export class SkewTransform extends Transform {
       }, this);
       return new SkewTransform(x, y);
     }
-    return void 0;
+    return null;
   }
 
   static parse(string: string): SkewTransform {
@@ -223,7 +222,7 @@ export class SkewTransform extends Transform {
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = Transform.SkewParser.parse(input);
+    let parser = SkewTransformParser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -235,11 +234,3 @@ export class SkewTransform extends Transform {
     return parser.bind();
   }
 }
-if (typeof CSSSkew !== "undefined") { // CSS Typed OM support
-  SkewTransform.prototype.toCssTransformComponent = function (this: SkewTransform): CSSTransformComponent | undefined {
-    const x = this._x.toCssValue();
-    const y = this._y.toCssValue();
-    return new CSSSkew(x!, y!);
-  };
-}
-Transform.Skew = SkewTransform;

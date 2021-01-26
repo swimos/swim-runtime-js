@@ -20,10 +20,10 @@ export const BoxR2Interpolator = function (s0: BoxR2, s1: BoxR2): Interpolator<B
   const interpolator = function (u: number): BoxR2 {
     const s0 = interpolator[0];
     const s1 = interpolator[1];
-    const xMin = s0._xMin + u * (s1._xMin - s0._xMin);
-    const yMin = s0._yMin + u * (s1._yMin - s0._yMin);
-    const xMax = s0._xMax + u * (s1._xMax - s0._xMax);
-    const yMax = s0._yMax + u * (s1._yMax - s0._yMax);
+    const xMin = s0.xMin + u * (s1.xMin - s0.xMin);
+    const yMin = s0.yMin + u * (s1.yMin - s0.yMin);
+    const xMax = s0.xMax + u * (s1.xMax - s0.xMax);
+    const yMax = s0.yMax + u * (s1.yMax - s0.yMax);
     return new BoxR2(xMin, yMin, xMax, yMax);
   } as Interpolator<BoxR2>;
   Object.setPrototypeOf(interpolator, BoxR2Interpolator.prototype);

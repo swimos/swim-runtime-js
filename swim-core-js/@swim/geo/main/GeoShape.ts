@@ -46,7 +46,7 @@ export abstract class GeoShape implements Equals {
 
   abstract project(f: GeoProjection): ShapeR2;
 
-  boundingBox(): GeoBox {
+  get bounds(): GeoBox {
     return new GeoShape.Box(this.lngMin, this.latMin, this.lngMax, this.latMax);
   }
 

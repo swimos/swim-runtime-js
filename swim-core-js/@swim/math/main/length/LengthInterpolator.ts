@@ -20,7 +20,7 @@ export const LengthInterpolator = function (l0: Length, l1: Length): Interpolato
   const interpolator = function (u: number): Length {
     const l0 = interpolator[0];
     const l1 = interpolator[1];
-    return Length.from(l0.value + u * (l1.value - l0.value), l1.units);
+    return Length.create(l0.value + u * (l1.value - l0.value), l1.units);
   } as Interpolator<Length>;
   Object.setPrototypeOf(interpolator, LengthInterpolator.prototype);
   Object.defineProperty(interpolator, 0, {

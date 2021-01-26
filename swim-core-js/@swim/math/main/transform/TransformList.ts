@@ -16,82 +16,76 @@ import {Murmur3, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {Item, Value, Record} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
-import {AnyTransform, Transform} from "./Transform";
+import {PointR2} from "../r2/PointR2";
+import {Transform} from "./Transform";
 import {AffineTransform} from "./AffineTransform";
+import {IdentityTransform} from "./IdentityTransform";
 import {TransformListInterpolator} from "../"; // forward import
 
 export class TransformList extends Transform {
-  /** @hidden */
-  readonly _transforms: ReadonlyArray<Transform>;
-  /** @hidden */
-  _string?: string;
-
   constructor(transforms: ReadonlyArray<Transform>) {
     super();
-    this._transforms = transforms;
+    Object.defineProperty(this, "transforms", {
+      value: transforms,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "stringValue", {
+      value: void 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  get transforms(): ReadonlyArray<Transform> {
-    return this._transforms;
-  }
+  declare readonly transforms: ReadonlyArray<Transform>;
 
   transform(that: Transform): Transform;
-  transform(point: [number, number]): [number, number];
-  transform(x: number, y: number): [number, number];
-  transform(point: [AnyLength, AnyLength]): [Length, Length];
-  transform(x: AnyLength, y: AnyLength): [Length, Length];
-  transform(x: Transform | [AnyLength, AnyLength] | AnyLength, y?: AnyLength): Transform | [number, number] | [Length, Length] {
-    if (x instanceof Transform) {
-      if (x instanceof Transform.Identity) {
+  transform(x: number, y: number): PointR2;
+  transform(x: Transform | number, y?: number): Transform | PointR2 {
+    if (arguments.length === 1) {
+      if (x instanceof IdentityTransform) {
         return this;
       } else {
-        return new Transform.List([this, x]);
+        return Transform.list(this, x as Transform);
       }
     } else {
-      if (Array.isArray(x)) {
-        y = x[1];
-        x = x[0];
+      const transforms = this.transforms;
+      for (let i = 0, n = transforms.length; i < n; i += 1) {
+        const transform = transforms[i]!;
+        const xi = transform.transformX(x as number, y!);
+        const yi = transform.transformY(x as number, y!);
+        x = xi;
+        y = yi;
       }
-      const transforms = this._transforms;
-      if (typeof x === "number" && typeof y === "number") {
-        let point: [number, number] = [x, y];
-        for (let i = 0, n = transforms.length; i < n; i += 1) {
-          point = transforms[i]!.transform(point);
-        }
-        return point;
-      } else {
-        let point: [Length, Length] = [Length.fromAny(x), Length.fromAny(y!)];
-        for (let i = 0, n = transforms.length; i < n; i += 1) {
-          point = transforms[i]!.transform(point);
-        }
-        return point;
-      }
+      return new PointR2(x as number, y!);
     }
   }
 
   transformX(x: number, y: number): number {
-    const transforms = this._transforms;
+    const transforms = this.transforms;
     for (let i = 0, n = transforms.length; i < n; i += 1) {
       const transform = transforms[i]!;
-      x = transform.transformX(x, y);
-      y = transform.transformY(x, y);
+      const xi = transform.transformX(x, y);
+      const yi = transform.transformY(x, y);
+      x = xi;
+      y = yi;
     }
     return x;
   }
 
   transformY(x: number, y: number): number {
-    const transforms = this._transforms;
+    const transforms = this.transforms;
     for (let i = 0, n = transforms.length; i < n; i += 1) {
       const transform = transforms[i]!;
-      x = transform.transformX(x, y);
-      y = transform.transformY(x, y);
+      const xi = transform.transformX(x, y);
+      const yi = transform.transformY(x, y);
+      x = xi;
+      y = yi;
     }
     return y;
   }
 
   inverse(): Transform {
-    const transforms = this._transforms;
+    const transforms = this.transforms;
     const n = transforms.length;
     const inverseTransforms = new Array<Transform>(n);
     for (let i = 0; i < n; i += 1) {
@@ -102,15 +96,41 @@ export class TransformList extends Transform {
 
   toAffine(): AffineTransform {
     let matrix = AffineTransform.identity();
-    const transforms = this._transforms;
+    const transforms = this.transforms;
     for (let i = 0, n = transforms.length; i < n; i += 1) {
       matrix = matrix.multiply(transforms[i]!.toAffine());
     }
     return matrix;
   }
 
+  toCssTransformComponent(): CSSTransformComponent | null {
+    if (typeof CSSTranslate !== "undefined") {
+      return new CSSMatrixComponent(this.toMatrix());
+    }
+    return null;
+  }
+
+  toCssValue(): CSSStyleValue | null {
+    if (typeof CSSTransformValue !== "undefined") {
+      const transforms = this.transforms;
+      const n = transforms.length;
+      const components = new Array<CSSTransformComponent>(n);
+      for (let i = 0, n = transforms.length; i < n; i += 1) {
+        const transform = transforms[i]!;
+        const component = transform.toCssTransformComponent();
+        if (component !== null) {
+          components[i] = component;
+        } else {
+          return null;
+        }
+      }
+      return new CSSTransformValue(components);
+    }
+    return null;
+  }
+
   toValue(): Value {
-    const transforms = this._transforms;
+    const transforms = this.transforms;
     const n = transforms.length;
     const record = Record.create(n);
     for (let i = 0; i < n; i += 1) {
@@ -132,10 +152,10 @@ export class TransformList extends Transform {
 
   conformsTo(that: Transform): boolean {
     if (that instanceof TransformList) {
-      const n = this._transforms.length;
-      if (n === that._transforms.length) {
+      const n = this.transforms.length;
+      if (n === that.transforms.length) {
         for (let i = 0; i < n; i += 1) {
-          if (!this._transforms[i]!.conformsTo(that._transforms[i]!)) {
+          if (!this.transforms[i]!.conformsTo(that.transforms[i]!)) {
             return false;
           }
         }
@@ -147,10 +167,10 @@ export class TransformList extends Transform {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof TransformList) {
-      const n = this._transforms.length;
-      if (n === that._transforms.length) {
+      const n = this.transforms.length;
+      if (n === that.transforms.length) {
         for (let i = 0; i < n; i += 1) {
-          if (!this._transforms[i]!.equivalentTo(that._transforms[i]!, epsilon)) {
+          if (!this.transforms[i]!.equivalentTo(that.transforms[i]!, epsilon)) {
             return false;
           }
         }
@@ -162,10 +182,10 @@ export class TransformList extends Transform {
 
   equals(that: unknown): boolean {
     if (that instanceof TransformList) {
-      const n = this._transforms.length;
-      if (n === that._transforms.length) {
+      const n = this.transforms.length;
+      if (n === that.transforms.length) {
         for (let i = 0; i < n; i += 1) {
-          if (!this._transforms[i]!.equals(that._transforms[i]!)) {
+          if (!this.transforms[i]!.equals(that.transforms[i]!)) {
             return false;
           }
         }
@@ -176,17 +196,17 @@ export class TransformList extends Transform {
   }
 
   hashCode(): number {
-    let code = Constructors.hash(TransformList);
-    const transforms = this._transforms;
+    let hashValue = Constructors.hash(TransformList);
+    const transforms = this.transforms;
     for (let i = 0, n = transforms.length; i < n; i += 1) {
-      code = Murmur3.mix(code, transforms[i]!.hashCode());
+      hashValue = Murmur3.mix(hashValue, transforms[i]!.hashCode());
     }
-    return Murmur3.mash(code);
+    return Murmur3.mash(hashValue);
   }
 
   debug(output: Output): void {
     output = output.write("Transform").write(46/*'.'*/).write("list").write(40/*'('*/);
-    const transforms = this._transforms;
+    const transforms = this.transforms;
     const n = transforms.length;
     if (n > 0) {
       output = output.debug(transforms[0]!);
@@ -197,27 +217,34 @@ export class TransformList extends Transform {
     output = output.write(41/*')'*/);
   }
 
+  /** @hidden */
+  declare readonly stringValue: string | undefined;
+
   toString(): string {
-    let string = this._string;
-    if (string === void 0) {
-      const transforms = this._transforms;
+    let stringValue = this.stringValue;
+    if (stringValue === void 0) {
+      const transforms = this.transforms;
       const n = transforms.length;
       if (n > 0) {
-        string = transforms[0]!.toString();
+        stringValue = transforms[0]!.toString();
         for (let i = 1; i < n; i += 1) {
-          string += " ";
-          string += transforms[i]!.toString();
+          stringValue += " ";
+          stringValue += transforms[i]!.toString();
         }
       } else {
-        string = "none";
+        stringValue = "none";
       }
-      this._string = string;
+      Object.defineProperty(this, "stringValue", {
+        value: stringValue,
+        enumerable: true,
+        configurable: true,
+      });
     }
-    return string;
+    return stringValue;
   }
 
   toAttributeString(): string {
-    const transforms = this._transforms;
+    const transforms = this.transforms;
     const n = transforms.length;
     if (n > 0) {
       let s = transforms[0]!.toAttributeString();
@@ -231,19 +258,6 @@ export class TransformList extends Transform {
     }
   }
 
-  static from(transforms: ReadonlyArray<AnyTransform>): TransformList {
-    const list: Transform[] = [];
-    for (let i = 0; i < transforms.length; i += 1) {
-      const transform = Transform.fromAny(transforms[i]!);
-      if (transform instanceof TransformList) {
-        list.push(...transform._transforms);
-      } else if (!(transform instanceof Transform.Identity)) {
-        list.push(transform);
-      }
-    }
-    return new TransformList(list);
-  }
-
   static fromAny(value: TransformList | string): TransformList {
     if (value instanceof TransformList) {
       return value;
@@ -253,18 +267,18 @@ export class TransformList extends Transform {
     throw new TypeError("" + value);
   }
 
-  static fromValue(value: Value): TransformList | undefined {
-    const transforms = [] as Transform[];
+  static fromValue(value: Value): TransformList | null {
+    const transforms: Transform[] = [];
     value.forEach(function (item: Item) {
       const transform = Transform.fromValue(item.toValue());
-      if (transform !== void 0) {
+      if (transform !== null) {
         transforms.push(transform);
       }
     }, this);
     if (transforms.length !== 0) {
       return new TransformList(transforms);
     }
-    return void 0;
+    return null;
   }
 
   static parse(string: string): TransformList {
@@ -276,25 +290,3 @@ export class TransformList extends Transform {
     }
   }
 }
-if (typeof CSSMatrixComponent !== "undefined") { // CSS Typed OM support
-  TransformList.prototype.toCssTransformComponent = function (this: TransformList): CSSTransformComponent | undefined {
-    return new CSSMatrixComponent(this.toMatrix());
-  };
-}
-if (typeof CSSTransformValue !== "undefined") { // CSS Typed OM support
-  TransformList.prototype.toCssValue = function (this: TransformList): CSSTransformValue | undefined {
-    const transforms = this._transforms;
-    const n = transforms.length;
-    const components = new Array<CSSTransformComponent>(n);
-    for (let i = 0, n = transforms.length; i < n; i += 1) {
-      const transform = transforms[i]!;
-      const component = transform.toCssTransformComponent();
-      if (component === void 0) {
-        return void 0;
-      }
-      components[i] = component;
-    }
-    return new CSSTransformValue(components);
-  };
-}
-Transform.List = TransformList;

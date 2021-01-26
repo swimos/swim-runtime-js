@@ -12,60 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Constructors} from "@swim/util";
+import {Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {LengthUnits, Length} from "./Length";
+import {LengthUnits, LengthBasis, Length} from "./Length";
 
 export class RemLength extends Length {
-  /** @hidden */
-  readonly _value: number;
-  /** @hidden */
-  readonly _node?: Node;
-
-  constructor(value: number, node: Node | null = null) {
+  constructor(value: number) {
     super();
-    this._value = value;
-    if (node !== null) {
-      this._node = node;
-    }
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
   }
 
-  isRelative(): boolean {
-    return false;
-  }
-
-  get value(): number {
-    return this._value;
-  }
+  declare readonly value: number;
 
   get units(): LengthUnits {
     return "rem";
   }
 
-  get node(): Node | null {
-    const node = this._node;
-    return node !== void 0 ? node : null;
+  pxValue(basis?: LengthBasis | number): number {
+    return this.value * Length.remUnit(basis);
   }
 
-  unitValue(): number {
-    return Length.remUnit();
+  remValue(basis?: LengthBasis | number): number {
+    return this.value;
   }
 
-  pxValue(): number {
-    return this.unitValue() * this._value;
-  }
-
-  remValue(): number {
-    return this._value;
-  }
-
-  rem(): RemLength {
+  rem(basis?: LengthBasis | number): RemLength {
     return this;
+  }
+
+  toCssValue(): CSSUnitValue | null {
+    if (typeof CSSUnitValue !== "undefined") {
+      return new CSSUnitValue(this.value, "rem");
+    } else {
+      return null;
+    }
   }
 
   compareTo(that: unknown): number {
     if (that instanceof RemLength) {
-      const x = this._value;
+      const x = this.value;
       const y = that.remValue();
       return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
     }
@@ -74,55 +62,33 @@ export class RemLength extends Length {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof RemLength) {
-      return Numbers.equivalent(this._value, that.remValue());
+      return Numbers.equivalent(this.value, that.remValue());
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof RemLength) {
-      return this._value === that._value && this._node === that._node;
+      return this.value === that.value;
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(RemLength), Numbers.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(RemLength), Numbers.hash(this.value)));
   }
 
   debug(output: Output): void {
-    output = output.write("Length").write(46/*'.'*/).write("rem").write(40/*'('*/).debug(this._value);
-    if (this._node !== void 0) {
-      output = output.write(", ").debug(this._node);
-    }
-    output = output.write(41/*')'*/);
+    output = output.write("Length").write(46/*'.'*/).write("rem")
+        .write(40/*'('*/).debug(this.value).write(41/*')'*/);
   }
 
   toString(): string {
-    return this._value + "rem";
+    return this.value + "rem";
   }
 
-  private static _zero: RemLength;
-  static zero(units?: "rem", node?: Node | null): RemLength;
-  static zero(node?: Node | null): RemLength;
-  static zero(units?: "rem" | Node | null, node?: Node | null): RemLength {
-    if (typeof units !== "string") {
-      node = units;
-      units = "rem";
-    }
-    if (node === void 0 || node === null) {
-      if (RemLength._zero === void 0) {
-        RemLength._zero = new RemLength(0);
-      }
-      return RemLength._zero;
-    } else {
-      return new RemLength(0, node);
-    }
+  @Lazy
+  static zero(): RemLength {
+    return new RemLength(0);
   }
 }
-if (typeof CSSUnitValue !== "undefined") { // CSS Typed OM support
-  RemLength.prototype.toCssValue = function (this: RemLength): CSSUnitValue | undefined {
-    return new CSSUnitValue(this._value, "rem");
-  };
-}
-Length.Rem = RemLength;

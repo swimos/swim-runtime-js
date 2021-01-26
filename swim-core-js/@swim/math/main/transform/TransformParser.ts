@@ -14,6 +14,11 @@
 
 import {Input, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import {Transform} from "./Transform";
+import {TranslateTransformParser} from "../"; // forward import
+import {ScaleTransformParser} from "../"; // forward import
+import {RotateTransformParser} from "../"; // forward import
+import {SkewTransformParser} from "../"; // forward import
+import {AffineTransformParser} from "../"; // forward import
 
 /** @hidden */
 export class TransformParser extends Parser<Transform> {
@@ -40,15 +45,15 @@ export class TransformParser extends Parser<Transform> {
       switch (ident) {
         case "translateX":
         case "translateY":
-        case "translate": return Transform.TranslateParser.parseRest(input, identOutput);
+        case "translate": return TranslateTransformParser.parseRest(input, identOutput);
         case "scaleX":
         case "scaleY":
-        case "scale": return Transform.ScaleParser.parseRest(input, identOutput);
-        case "rotate": return Transform.RotateParser.parseRest(input, identOutput);
+        case "scale": return ScaleTransformParser.parseRest(input, identOutput);
+        case "rotate": return RotateTransformParser.parseRest(input, identOutput);
         case "skewX":
         case "skewY":
-        case "skew": return Transform.SkewParser.parseRest(input, identOutput);
-        case "matrix": return Transform.AffineParser.parseRest(input, identOutput);
+        case "skew": return SkewTransformParser.parseRest(input, identOutput);
+        case "matrix": return AffineTransformParser.parseRest(input, identOutput);
         case "none": return Parser.done(Transform.identity());
         default: return Parser.error(Diagnostic.message("unknown transform function: " + ident, input));
       }
@@ -56,4 +61,3 @@ export class TransformParser extends Parser<Transform> {
     return new TransformParser(identOutput);
   }
 }
-Transform.Parser = TransformParser;

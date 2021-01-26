@@ -23,60 +23,68 @@ import {
   Unicode,
 } from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import {AnyShapeR2, ShapeR2} from "./ShapeR2";
+import type {AnyShapeR2} from "./ShapeR2";
 import {PointR2} from "./PointR2";
 import {CurveR2} from "./CurveR2";
 import type {SplineR2Context} from "./SplineR2Context";
-import type {SplineR2Builder} from "./SplineR2Builder";
-import type {BoxR2} from "./BoxR2";
-import type {SplineR2Parser} from "./SplineR2Parser";
+import {SplineR2Builder} from "../"; // forward import
+import {SplineR2Parser} from "../"; // forward import
+import {BoxR2} from "../"; // forward import
 
 export class SplineR2 extends CurveR2 implements Debug {
-  /** @hidden */
-  readonly _curves: ReadonlyArray<CurveR2>;
-  /** @hidden */
-  readonly _closed: boolean;
-  /** @hidden */
-  _boundingBox?: BoxR2;
-  /** @hidden */
-  _pathString?: string;
-
   constructor(curves: ReadonlyArray<CurveR2>, closed: boolean) {
     super();
-    this._curves = curves;
-    this._closed = closed;
+    Object.defineProperty(this, "curves", {
+      value: curves,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "closed", {
+      value: closed,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "boundingBox", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "pathString", {
+      value: void 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
+  declare readonly curves: ReadonlyArray<CurveR2>;
+
+  /** @hidden */
+  declare readonly closed: boolean;
+
   isDefined(): boolean {
-    return this._curves.length !== 0;
+    return this.curves.length !== 0;
   }
 
   isClosed(): boolean {
-    return this._closed;
-  }
-
-  get curves(): ReadonlyArray<CurveR2> {
-    return this._curves;
+    return this.closed;
   }
 
   get xMin(): number {
-    return this.boundingBox().xMin;
+    return this.bounds.xMin;
   }
 
   get yMin(): number {
-    return this.boundingBox().yMin;
+    return this.bounds.yMin;
   }
 
   get xMax(): number {
-    return this.boundingBox().xMax;
+    return this.bounds.xMax;
   }
 
   get yMax(): number {
-    return this.boundingBox().yMax;
+    return this.bounds.yMax;
   }
 
   interpolateX(u: number): number {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -89,7 +97,7 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   interpolateY(u: number): number {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -102,7 +110,7 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   interpolate(u: number): PointR2 {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -125,7 +133,7 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   split(u: number): [SplineR2, SplineR2] {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -149,7 +157,7 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   subdivide(u: number): SplineR2 {
-    const oldCurves = this._curves;
+    const oldCurves = this.curves;
     const n = oldCurves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -165,34 +173,37 @@ export class SplineR2 extends CurveR2 implements Debug {
       for (let i = k + 1; i < n; i += 1) {
         newCurves[i + 1] = oldCurves[i]!;
       }
-      return new SplineR2(newCurves, this._closed);
+      return new SplineR2(newCurves, this.closed);
     } else {
       return SplineR2.empty();
     }
   }
 
   transform(f: R2Function): SplineR2 {
-    const oldCurves = this._curves;
+    const oldCurves = this.curves;
     const n = oldCurves.length;
     if (n > 0) {
       const newCurves = new Array<CurveR2>(n);
       for (let i = 0; i < n; i += 1) {
         newCurves[i] = oldCurves[i]!.transform(f);
       }
-      return new SplineR2(newCurves, this._closed);
+      return new SplineR2(newCurves, this.closed);
     } else {
       return SplineR2.empty();
     }
   }
 
-  boundingBox(): BoxR2 {
-    let boundingBox = this._boundingBox;
-    if (boundingBox === void 0) {
+  /** @hidden */
+  declare readonly boundingBox: BoxR2 | null;
+
+  get bounds(): BoxR2 {
+    let boundingBox = this.boundingBox;
+    if (boundingBox === null) {
       let xMin = Infinity;
       let yMin = Infinity;
       let xMax = -Infinity;
       let yMax = -Infinity;
-      const curves = this._curves;
+      const curves = this.curves;
       for (let i = 0, n = curves.length; i < n; i += 1) {
         const curve = curves[i]!;
         xMin = Math.min(xMin, curve.xMin);
@@ -200,22 +211,26 @@ export class SplineR2 extends CurveR2 implements Debug {
         xMax = Math.max(curve.xMax, xMax);
         yMax = Math.max(curve.yMax, yMax);
       }
-      boundingBox = new ShapeR2.Box(xMin, yMin, xMax, yMax);
-      this._boundingBox = boundingBox;
+      boundingBox = new BoxR2(xMin, yMin, xMax, yMax);
+      Object.defineProperty(this, "boundingBox", {
+        value: boundingBox,
+        enumerable: true,
+        configurable: true,
+      });
     }
     return boundingBox;
   }
 
   drawMove(context: SplineR2Context): void {
-    const curves = this._curves;
+    const curves = this.curves;
     if (curves.length !== 0) {
       curves[0]!.drawMove(context);
     }
   }
 
   drawRest(context: SplineR2Context): void {
-    const curves = this._curves;
-    const closed = this._closed;
+    const curves = this.curves;
+    const closed = this.closed;
     const n = curves.length - (closed && context.closePath !== void 0 ? 1 : 0);
     for (let i = 0; i < n; i += 1) {
       curves[i]!.drawRest(context);
@@ -226,15 +241,15 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   transformDrawMove(context: SplineR2Context, f: R2Function): void {
-    const curves = this._curves;
+    const curves = this.curves;
     if (curves.length !== 0) {
       curves[0]!.transformDrawMove(context, f);
     }
   }
 
   transformDrawRest(context: SplineR2Context, f: R2Function): void {
-    const curves = this._curves;
-    const closed = this._closed;
+    const curves = this.curves;
+    const closed = this.closed;
     const n = curves.length - (closed && context.closePath !== void 0 ? 1 : 0);
     for (let i = 0; i < n; i += 1) {
       curves[i]!.transformDrawRest(context, f);
@@ -245,15 +260,15 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   writeMove(output: Output): void {
-    const curves = this._curves;
+    const curves = this.curves;
     if (curves.length !== 0) {
       curves[0]!.writeMove(output);
     }
   }
 
   writeRest(output: Output): void {
-    const curves = this._curves;
-    const closed = this._closed;
+    const curves = this.curves;
+    const closed = this.closed;
     const n = curves.length - (closed ? 1 : 0);
     for (let i = 0; i < n; i += 1) {
       curves[i]!.writeRest(output);
@@ -263,14 +278,21 @@ export class SplineR2 extends CurveR2 implements Debug {
     }
   }
 
+  /** @hidden */
+  declare readonly pathString: string | undefined;
+
   toPathString(outputSettings?: AnyOutputSettings): string {
     let pathString: string | undefined;
-    if (outputSettings !== void 0 || (pathString = this._pathString, pathString === void 0)) {
+    if (outputSettings !== void 0 || (pathString = this.pathString, pathString === void 0)) {
       const output = Unicode.stringOutput(outputSettings);
       this.writePath(output);
       pathString = output.bind();
       if (outputSettings === void 0) {
-        this._pathString = pathString;
+        Object.defineProperty(this, "pathString", {
+          value: pathString,
+          enumerable: true,
+          configurable: true,
+        });
       }
     }
     return pathString;
@@ -280,8 +302,8 @@ export class SplineR2 extends CurveR2 implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof SplineR2) {
-      return Arrays.equivalent(this._curves, that._curves, epsilon)
-          && this._closed === that._closed;
+      return Arrays.equivalent(this.curves, that.curves, epsilon)
+          && this.closed === that.closed;
     }
     return false;
   }
@@ -290,20 +312,20 @@ export class SplineR2 extends CurveR2 implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof SplineR2) {
-      return Arrays.equal(this._curves, that._curves)
-          && this._closed === that._closed;
+      return Arrays.equal(this.curves, that.curves)
+          && this.closed === that.closed;
     }
     return false;
   }
 
   debug(output: Output): void {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     output = output.write("SplineR2").write(46/*'.'*/);
     if (n === 0) {
       output = output.write("empty").write(40/*'('*/);
     } else if (n !== 0) {
-      output = output.write(this._closed ? "closed" : "open").write(40/*'('*/);
+      output = output.write(this.closed ? "closed" : "open").write(40/*'('*/);
       output = output.debug(curves[0]!);
       for (let i = 1; i < n; i += 1) {
         output = output.write(", ").debug(curves[i]!);
@@ -329,7 +351,7 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   static builder(): SplineR2Builder {
-    return new SplineR2.Builder();
+    return new SplineR2Builder();
   }
 
   static parse(string: string): SplineR2 {
@@ -337,7 +359,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = SplineR2.SplineParser.parse(input);
+    let parser = SplineR2Parser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -348,10 +370,4 @@ export class SplineR2 extends CurveR2 implements Debug {
     }
     return parser.bind();
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Builder: typeof SplineR2Builder; // defined by SplineR2Builder
-  /** @hidden */
-  static SplineParser: typeof SplineR2Parser; // defined by SplineR2Parser
 }

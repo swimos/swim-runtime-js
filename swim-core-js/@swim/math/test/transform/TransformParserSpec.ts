@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Spec, Test, Exam} from "@swim/unit";
-import {Transform} from "@swim/math";
+import {Transform, AffineTransform} from "@swim/math";
 
 export class TransformParserSpec extends Spec {
   @Test
@@ -97,11 +97,11 @@ export class TransformParserSpec extends Spec {
 
   @Test
   parseAffineTransforms(exam: Exam): void {
-    exam.equal(Transform.parse("matrix(1,0,0,1,0,0)"), Transform.Affine.identity());
-    exam.equal(Transform.parse("matrix(1,0,0,1)"), Transform.Affine.identity());
+    exam.equal(Transform.parse("matrix(1,0,0,1,0,0)"), AffineTransform.identity());
+    exam.equal(Transform.parse("matrix(1,0,0,1)"), AffineTransform.identity());
     exam.equal(Transform.parse("matrix(2,3,5,7,11,13)"), Transform.affine(2, 3, 5, 7, 11, 13));
-    exam.equal(Transform.parse("matrix  (  1  ,  0  ,  0  ,  1  ,  0  ,  0  )"), Transform.Affine.identity());
-    exam.equal(Transform.parse("matrix  (  1  ,  0  ,  0  ,  1  )"), Transform.Affine.identity());
+    exam.equal(Transform.parse("matrix  (  1  ,  0  ,  0  ,  1  ,  0  ,  0  )"), AffineTransform.identity());
+    exam.equal(Transform.parse("matrix  (  1  ,  0  ,  0  ,  1  )"), AffineTransform.identity());
     exam.equal(Transform.parse("matrix  (  2  ,  3  ,  5  ,  7  ,  11  ,  13  )"), Transform.affine(2, 3, 5, 7, 11, 13));
   }
 

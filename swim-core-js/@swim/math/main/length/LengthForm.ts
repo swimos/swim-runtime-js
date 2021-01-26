@@ -49,7 +49,7 @@ export class LengthForm extends Form<Length, AnyLength> {
 
   cast(item: Item): Length | undefined {
     const value = item.toValue();
-    let length: Length | undefined;
+    let length: Length | null = null;
     try {
       length = Length.fromValue(value);
       if (length !== void 0) {
@@ -61,7 +61,6 @@ export class LengthForm extends Form<Length, AnyLength> {
     } catch (e) {
       // swallow
     }
-    return length;
+    return length !== null ? length : void 0;
   }
 }
-Length.Form = LengthForm;

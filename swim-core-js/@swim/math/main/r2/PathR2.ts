@@ -29,51 +29,55 @@ import {PointR2} from "./PointR2";
 import type {CurveR2} from "./CurveR2";
 import {SplineR2} from "./SplineR2";
 import type {PathR2Context} from "./PathR2Context";
-import type {PathR2Builder} from "./PathR2Builder";
-import type {BoxR2} from "./BoxR2";
-import type {PathR2Parser} from "./PathR2Parser";
+import {PathR2Builder} from "../"; // forward import
+import {PathR2Parser} from "../"; // forward import
+import {BoxR2} from "../"; // forward import
 
 export type AnyPathR2 = PathR2 | string;
 
 export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
-  /** @hidden */
-  readonly _splines: ReadonlyArray<SplineR2>;
-  /** @hidden */
-  _boundingBox?: BoxR2;
-  /** @hidden */
-  _pathString?: string;
-
   constructor(splines: ReadonlyArray<SplineR2>) {
     super();
-    this._splines = splines;
+    Object.defineProperty(this, "splines", {
+      value: splines,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "boundingBox", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "pathString", {
+      value: void 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
+
+  declare readonly splines: ReadonlyArray<SplineR2>;
 
   isDefined(): boolean {
-    return this._splines.length !== 0;
-  }
-
-  get splines(): ReadonlyArray<SplineR2> {
-    return this._splines;
+    return this.splines.length !== 0;
   }
 
   get xMin(): number {
-    return this.boundingBox().xMin;
+    return this.bounds.xMin;
   }
 
   get yMin(): number {
-    return this.boundingBox().yMin;
+    return this.bounds.yMin;
   }
 
   get xMax(): number {
-    return this.boundingBox().xMax;
+    return this.bounds.xMax;
   }
 
   get yMax(): number {
-    return this.boundingBox().yMax;
+    return this.bounds.yMax;
   }
 
   interpolateX(u: number): number {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -86,7 +90,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   interpolateY(u: number): number {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -99,7 +103,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   interpolate(u: number): PointR2 {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -122,7 +126,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   split(u: number): [PathR2, PathR2] {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -146,7 +150,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   subdivide(u: number): PathR2 {
-    const oldSplines = this._splines;
+    const oldSplines = this.splines;
     const n = oldSplines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -167,7 +171,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   transform(f: R2Function): PathR2 {
-    const oldSplines = this._splines;
+    const oldSplines = this.splines;
     const n = oldSplines.length;
     if (n > 0) {
       const newSplines = new Array<SplineR2>(n);
@@ -180,14 +184,17 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     }
   }
 
-  boundingBox(): BoxR2 {
-    let boundingBox = this._boundingBox;
-    if (boundingBox === void 0) {
+  /** @hidden */
+  declare readonly boundingBox: BoxR2 | null;
+
+  get bounds(): BoxR2 {
+    let boundingBox = this.boundingBox;
+    if (boundingBox === null) {
       let xMin = Infinity;
       let yMin = Infinity;
       let xMax = -Infinity;
       let yMax = -Infinity;
-      const splines = this._splines;
+      const splines = this.splines;
       for (let i = 0, n = splines.length; i < n; i += 1) {
         const spline = splines[i]!;
         xMin = Math.min(xMin, spline.xMin);
@@ -195,28 +202,32 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
         xMax = Math.max(spline.xMax, xMax);
         yMax = Math.max(spline.yMax, yMax);
       }
-      boundingBox = new ShapeR2.Box(xMin, yMin, xMax, yMax);
-      this._boundingBox = boundingBox;
+      boundingBox = new BoxR2(xMin, yMin, xMax, yMax);
+      Object.defineProperty(this, "boundingBox", {
+        value: boundingBox,
+        enumerable: true,
+        configurable: true,
+      });
     }
     return boundingBox;
   }
 
   draw(context: PathR2Context): void {
-    const splines = this._splines;
+    const splines = this.splines;
     for (let i = 0, n = splines.length; i < n; i += 1) {
       splines[i]!.draw(context);
     }
   }
 
   transformDraw(context: PathR2Context, f: R2Function): void {
-    const splines = this._splines;
+    const splines = this.splines;
     for (let i = 0, n = splines.length; i < n; i += 1) {
       splines[i]!.transformDraw(context, f);
     }
   }
 
   writePath(output: Output): void {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (output.settings === OutputSettings.standard()) {
       for (let i = 0; i < n; i += 1) {
@@ -229,14 +240,21 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     }
   }
 
+  /** @hidden */
+  declare readonly pathString: string | undefined;
+
   toPathString(outputSettings?: AnyOutputSettings): string {
     let pathString: string | undefined;
-    if (outputSettings !== void 0 || (pathString = this._pathString, pathString === void 0)) {
+    if (outputSettings !== void 0 || (pathString = this.pathString, pathString === void 0)) {
       const output = Unicode.stringOutput(outputSettings);
       this.writePath(output);
       pathString = output.bind();
       if (outputSettings === void 0) {
-        this._pathString = pathString;
+        Object.defineProperty(this, "pathString", {
+          value: pathString,
+          enumerable: true,
+          configurable: true,
+        });
       }
     }
     return pathString;
@@ -246,7 +264,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     if (this === that) {
       return true;
     } else if (that instanceof PathR2) {
-      return Arrays.equivalent(this._splines, that._splines, epsilon);
+      return Arrays.equivalent(this.splines, that.splines, epsilon);
     }
     return false;
   }
@@ -255,21 +273,21 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     if (this === that) {
       return true;
     } else if (that instanceof PathR2) {
-      return Arrays.equal(this._splines, that._splines);
+      return Arrays.equal(this.splines, that.splines);
     }
     return false;
   }
 
   debug(output: Output): void {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     output = output.write("PathR2").write(46/*'.'*/);
     if (n === 0) {
       output = output.write("empty").write(40/*'('*/);
     } else if (n === 1) {
       const spline = splines[0]!;
-      output = output.write(spline._closed ? "closed" : "open").write(40/*'('*/);
-      const curves = spline._curves;
+      output = output.write(spline.closed ? "closed" : "open").write(40/*'('*/);
+      const curves = spline.curves;
       const m = curves.length;
       if (m !== 0) {
         output = output.debug(curves[0]!);
@@ -322,7 +340,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   static builder(): PathR2Builder {
-    return new PathR2.Builder();
+    return new PathR2Builder();
   }
 
   static parse(string: string): PathR2 {
@@ -330,7 +348,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = PathR2.PathParser.parse(input);
+    let parser = PathR2Parser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -341,10 +359,4 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     }
     return parser.bind();
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Builder: typeof PathR2Builder; // defined by PathR2Builder
-  /** @hidden */
-  static PathParser: typeof PathR2Parser; // defined by PathR2Parser
 }

@@ -14,7 +14,6 @@
 
 import {Input, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
 import {QuadraticCurveR2} from "./QuadraticCurveR2";
-import {CurveR2Parser} from "./CurveR2Parser";
 
 /** @hidden */
 export class QuadraticCurveR2Parser extends Parser<QuadraticCurveR2> {
@@ -218,4 +217,3 @@ export class QuadraticCurveR2Parser extends Parser<QuadraticCurveR2> {
                                         void 0, void 0, command, step);
   }
 }
-CurveR2Parser.Quadratic = QuadraticCurveR2Parser;

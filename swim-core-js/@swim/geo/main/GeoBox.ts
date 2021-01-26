@@ -177,10 +177,10 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
       return false;
     } else if (lng0 > lngMin && lng0 < lngMax && lat0 > latMin && lat0 < latMax) {
       return true;
-    } else if ((BoxR2.intersectsSegment(lng0 - lngMin, lng1 - lngMin, lng0, lat0, lng1, lat1) && BoxR2._hitY > latMin && BoxR2._hitY < latMax)
-            || (BoxR2.intersectsSegment(lat0 - latMin, lat1 - latMin, lng0, lat0, lng1, lat1) && BoxR2._hitX > lngMin && BoxR2._hitX < lngMax)
-            || (BoxR2.intersectsSegment(lng0 - lngMax, lng1 - lngMax, lng0, lat0, lng1, lat1) && BoxR2._hitY > latMin && BoxR2._hitY < latMax)
-            || (BoxR2.intersectsSegment(lat0 - latMax, lat1 - latMax, lng0, lat0, lng1, lat1) && BoxR2._hitX > lngMin && BoxR2._hitX < lngMax)) {
+    } else if ((BoxR2.intersectsSegment(lng0 - lngMin, lng1 - lngMin, lng0, lat0, lng1, lat1) && BoxR2.hitY > latMin && BoxR2.hitY < latMax)
+            || (BoxR2.intersectsSegment(lat0 - latMin, lat1 - latMin, lng0, lat0, lng1, lat1) && BoxR2.hitX > lngMin && BoxR2.hitX < lngMax)
+            || (BoxR2.intersectsSegment(lng0 - lngMax, lng1 - lngMax, lng0, lat0, lng1, lat1) && BoxR2.hitY > latMin && BoxR2.hitY < latMax)
+            || (BoxR2.intersectsSegment(lat0 - latMax, lat1 - latMax, lng0, lat0, lng1, lat1) && BoxR2.hitX > lngMin && BoxR2.hitX < lngMax)) {
       return true;
     } else {
       return false;
@@ -200,10 +200,10 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
   project(f: GeoProjection): BoxR2 {
     const bottomLeft = f.project(this._lngMin, this._latMin);
     const topRight = f.project(this._lngMax, this._latMax);
-    let xMin = bottomLeft._x;
-    let yMin = bottomLeft._y;
-    let xMax = topRight._x;
-    let yMax = topRight._y;
+    let xMin = bottomLeft.x;
+    let yMin = bottomLeft.y;
+    let xMax = topRight.x;
+    let yMax = topRight.y;
     if (xMin > xMax) {
       const x = xMin;
       xMin = xMax;
@@ -229,7 +229,7 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     return new BoxR2(xMin, yMin, xMax, yMax);
   }
 
-  boundingBox(): GeoBox {
+  get bounds(): GeoBox {
     return this;
   }
 

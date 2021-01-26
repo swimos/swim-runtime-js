@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
-import {Transform} from "./Transform";
-import type {ScaleTransform} from "./ScaleTransform";
+import {ScaleTransform} from "./ScaleTransform";
 
 /** @hidden */
 export class ScaleTransformParser extends Parser<ScaleTransform> {
@@ -95,8 +94,8 @@ export class ScaleTransformParser extends Parser<ScaleTransform> {
           input.step();
           const ident = identOutput!.bind();
           switch (ident) {
-            case "scaleX": return Parser.done(Transform.scaleX(xParser!.bind()));
-            case "scaleY": return Parser.done(Transform.scaleY(xParser!.bind()));
+            case "scaleX": return Parser.done(new ScaleTransform(xParser!.bind(), 1));
+            case "scaleY": return Parser.done(new ScaleTransform(1, xParser!.bind()));
             default: return Parser.error(Diagnostic.message("unknown transform function: " + ident, input));
           }
         } else if (c === 44/*','*/) {
@@ -136,7 +135,7 @@ export class ScaleTransformParser extends Parser<ScaleTransform> {
         input.step();
         const ident = identOutput!.bind();
         switch (ident) {
-          case "scale": return Parser.done(Transform.scale(xParser!.bind(), yParser!.bind()));
+          case "scale": return Parser.done(new ScaleTransform(xParser!.bind(), yParser!.bind()));
           default: return Parser.error(Diagnostic.message("unknown transform function: " + ident, input));
         }
       } else if (!input.isEmpty()) {
@@ -151,4 +150,3 @@ export class ScaleTransformParser extends Parser<ScaleTransform> {
     return ScaleTransformParser.parse(input, identOutput, void 0, void 0, 2);
   }
 }
-Transform.ScaleParser = ScaleTransformParser;

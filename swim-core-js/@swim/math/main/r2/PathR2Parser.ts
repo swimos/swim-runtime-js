@@ -14,8 +14,8 @@
 
 import {Input, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {SplineR2} from "./SplineR2";
-import {PathR2} from "./PathR2";
 import {SplineR2Parser} from "./SplineR2Parser";
+import {PathR2} from "./PathR2";
 
 /** @hidden */
 export class PathR2Parser extends Parser<PathR2> {
@@ -110,4 +110,3 @@ export class PathR2Parser extends Parser<PathR2> {
     return new PathR2Parser(splineParser, splines, step);
   }
 }
-PathR2.PathParser = PathR2Parser;

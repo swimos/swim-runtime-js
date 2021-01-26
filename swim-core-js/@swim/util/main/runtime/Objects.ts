@@ -130,13 +130,13 @@ Objects.compare = function (x: object | null | undefined, y: object | null | und
 
 Objects.hash = function (x: object | null | undefined): number {
   if (typeof x === "object" && x !== null) {
-    let code = 0;
+    let hashValue = 0;
     const keys = Object.keys(x);
     for (let i = 0, n = keys.length; i < n; i += 1) {
       const key = keys[i]!;
-      code = Murmur3.mix(Murmur3.mix(code, Strings.hash(key)), Values.hash((x as any)[key]));
+      hashValue = Murmur3.mix(Murmur3.mix(hashValue, Strings.hash(key)), Values.hash((x as any)[key]));
     }
-    return Murmur3.mash(code);
+    return Murmur3.mash(hashValue);
   } else if (x === null) {
     return 1;
   } else if (x === void 0) {

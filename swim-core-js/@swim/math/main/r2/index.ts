@@ -38,6 +38,7 @@ export {PointR2Interpolator} from "./PointR2Interpolator";
 export {CurveR2Context} from "./CurveR2Context";
 
 export {CurveR2} from "./CurveR2";
+export {CurveR2Parser} from "./CurveR2Parser";
 
 export {BezierCurveR2} from "./BezierCurveR2";
 
@@ -47,27 +48,29 @@ export {
   SegmentR2,
 } from "./SegmentR2";
 export {SegmentR2Interpolator} from "./SegmentR2Interpolator";
+export {SegmentR2Parser} from "./SegmentR2Parser";
 
 export {QuadraticCurveR2} from "./QuadraticCurveR2";
+export {QuadraticCurveR2Parser} from "./QuadraticCurveR2Parser";
 
 export {CubicCurveR2} from "./CubicCurveR2";
+export {CubicCurveR2Parser} from "./CubicCurveR2Parser";
 
 export {EllipticCurveR2} from "./EllipticCurveR2";
+export {EllipticCurveR2Parser} from "./EllipticCurveR2Parser";
 
 export {SplineR2Context} from "./SplineR2Context";
-
 export {SplineR2} from "./SplineR2";
-
 export {SplineR2Builder} from "./SplineR2Builder";
+export {SplineR2Parser} from "./SplineR2Parser";
 
 export {PathR2Context} from "./PathR2Context";
-
 export {
   AnyPathR2,
   PathR2,
 } from "./PathR2";
-
 export {PathR2Builder} from "./PathR2Builder";
+export {PathR2Parser} from "./PathR2Parser";
 
 export {
   AnyBoxR2,
@@ -84,11 +87,3 @@ export {
 export {CircleR2Interpolator} from "./CircleR2Interpolator";
 
 export {SetR2} from "./SetR2";
-
-export {CurveR2Parser} from "./CurveR2Parser";
-export {SegmentR2Parser} from "./SegmentR2Parser";
-export {QuadraticCurveR2Parser} from "./QuadraticCurveR2Parser";
-export {CubicCurveR2Parser} from "./CubicCurveR2Parser";
-export {EllipticCurveR2Parser} from "./EllipticCurveR2Parser";
-export {SplineR2Parser} from "./SplineR2Parser";
-export {PathR2Parser} from "./PathR2Parser";

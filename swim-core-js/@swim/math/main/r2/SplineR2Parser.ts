@@ -15,13 +15,13 @@
 import {Input, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
 import type {CurveR2} from "./CurveR2";
 import {SegmentR2} from "./SegmentR2";
-import {QuadraticCurveR2} from "./QuadraticCurveR2";
-import {CubicCurveR2} from "./CubicCurveR2";
-import {SplineR2} from "./SplineR2";
 import {SegmentR2Parser} from "./SegmentR2Parser";
+import {QuadraticCurveR2} from "./QuadraticCurveR2";
 import {QuadraticCurveR2Parser} from "./QuadraticCurveR2Parser";
+import {CubicCurveR2} from "./CubicCurveR2";
 import {CubicCurveR2Parser} from "./CubicCurveR2Parser";
 import {EllipticCurveR2Parser} from "./EllipticCurveR2Parser";
+import {SplineR2} from "./SplineR2";
 
 /** @hidden */
 export class SplineR2Parser extends Parser<SplineR2> {
@@ -357,4 +357,3 @@ export class SplineR2Parser extends Parser<SplineR2> {
                               curveParser, curves, command, step);
   }
 }
-SplineR2.SplineParser = SplineR2Parser;

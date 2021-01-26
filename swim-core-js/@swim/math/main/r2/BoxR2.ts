@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
+import {Equivalent, HashCode, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {R2Function} from "./R2Function";
@@ -32,86 +32,81 @@ export interface BoxR2Init {
 }
 
 export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equivalent, Debug {
-  /** @hidden */
-  readonly _xMin: number;
-  /** @hidden */
-  readonly _yMin: number;
-  /** @hidden */
-  readonly _xMax: number;
-  /** @hidden */
-  readonly _yMax: number;
-
   constructor(xMin: number, yMin: number, xMax: number, yMax: number) {
     super();
-    this._xMin = xMin;
-    this._yMin = yMin;
-    this._xMax = xMax;
-    this._yMax = yMax;
+    Object.defineProperty(this, "xMin", {
+      value: xMin,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "yMin", {
+      value: yMin,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "xMax", {
+      value: xMax,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "yMax", {
+      value: yMax,
+      enumerable: true,
+    });
   }
 
   isDefined(): boolean {
-    return isFinite(this._xMin) && isFinite(this._yMin)
-        && isFinite(this._xMax) && isFinite(this._yMax);
+    return isFinite(this.xMin) && isFinite(this.yMin)
+        && isFinite(this.xMax) && isFinite(this.yMax);
   }
 
-  get xMin(): number {
-    return this._xMin;
-  }
+  declare readonly xMin: number;
 
-  get yMin(): number {
-    return this._yMin;
-  }
+  declare readonly yMin: number;
 
-  get xMax(): number {
-    return this._xMax;
-  }
+  declare readonly xMax: number;
 
-  get yMax(): number {
-    return this._yMax;
-  }
+  declare readonly yMax: number;
 
   get x(): number {
-    return this._xMin;
+    return this.xMin;
   }
 
   get y(): number {
-    return this._yMin;
+    return this.yMin;
   }
 
   get width(): number {
-    return this._xMax - this._xMin;
+    return this.xMax - this.xMin;
   }
 
   get height(): number {
-    return this._yMax - this._yMin;
+    return this.yMax - this.yMin;
   }
 
   get top(): number {
-    return this._yMin;
+    return this.yMin;
   }
 
   get right(): number {
-    return this._xMax;
+    return this.xMax;
   }
 
   get bottom(): number {
-    return this._yMax;
+    return this.yMax;
   }
 
   get left(): number {
-    return this._xMin;
+    return this.xMin;
   }
 
   get center(): PointR2 {
-    return new PointR2((this._xMin + this._xMax) / 2, (this._yMin + this._yMax) / 2);
+    return new PointR2((this.xMin + this.xMax) / 2, (this.yMin + this.yMax) / 2);
   }
 
   contains(that: AnyShapeR2): boolean;
   contains(x: number, y: number): boolean;
   contains(that: AnyShapeR2 | number, y?: number): boolean {
     if (typeof that === "number") {
-      return this._xMin <= that && that <= this._xMax
-          && this._yMin <= y! && y! <= this._yMax;
+      return this.xMin <= that && that <= this.xMax
+          && this.yMin <= y! && y! <= this.yMax;
     } else {
       that = ShapeR2.fromAny(that);
       if (that instanceof ShapeR2) {
@@ -124,8 +119,8 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
         } else if (that instanceof CircleR2) {
           return this.containsCircle(that);
         } else {
-          return this._xMin <= that.xMin && that.xMax <= this._xMax
-              && this._yMin <= that.yMin && that.yMax <= this._yMax;
+          return this.xMin <= that.xMin && that.xMax <= this.xMax
+              && this.yMin <= that.yMin && that.yMax <= this.yMax;
         }
       }
       return false;
@@ -134,28 +129,28 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
 
   /** @hidden */
   containsPoint(that: PointR2): boolean {
-    return this._xMin <= that._x && that._x <= this._xMax
-        && this._yMin <= that._y && that._y <= this._yMax;
+    return this.xMin <= that.x && that.x <= this.xMax
+        && this.yMin <= that.y && that.y <= this.yMax;
   }
 
   /** @hidden */
   containsSegment(that: SegmentR2): boolean {
-    return this._xMin <= that._x0 && that._x0 <= this._xMax
-        && this._yMin <= that._y0 && that._y0 <= this._yMax
-        && this._xMin <= that._x1 && that._x1 <= this._xMax
-        && this._yMin <= that._y1 && that._y1 <= this._yMax;
+    return this.xMin <= that.x0 && that.x0 <= this.xMax
+        && this.yMin <= that.y0 && that.y0 <= this.yMax
+        && this.xMin <= that.x1 && that.x1 <= this.xMax
+        && this.yMin <= that.y1 && that.y1 <= this.yMax;
   }
 
   /** @hidden */
   containsBox(that: BoxR2): boolean {
-    return this._xMin <= that._xMin && that._xMax <= this._xMax
-        && this._yMin <= that._yMin && that._yMax <= this._yMax;
+    return this.xMin <= that.xMin && that.xMax <= this.xMax
+        && this.yMin <= that.yMin && that.yMax <= this.yMax;
   }
 
   /** @hidden */
   containsCircle(that: CircleR2): boolean {
-    return this._xMin <= that._cx - that._r && that._cx + that._r <= this._xMax
-        && this._yMin <= that._cy - that._r && that._cy + that._r <= this._yMax;
+    return this.xMin <= that.cx - that.r && that.cx + that.r <= this.xMax
+        && this.yMin <= that.cy - that.r && that.cy + that.r <= this.yMax;
   }
 
   intersects(that: AnyShapeR2): boolean {
@@ -176,42 +171,44 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
 
   /** @hidden */
   intersectsPoint(that: PointR2): boolean {
-    return this._xMin <= that._x && that._x <= this._xMax
-        && this._yMin <= that._y && that._y <= this._yMax;
+    return this.xMin <= that.x && that.x <= this.xMax
+        && this.yMin <= that.y && that.y <= this.yMax;
   }
 
   /** @hidden */
   intersectsSegment(that: SegmentR2): boolean {
-    const xMin = this._xMin;
-    const yMin = this._yMin;
-    const xMax = this._xMax;
-    const yMax = this._yMax;
-    const x0 = that._x0;
-    const y0 = that._y0;
-    const x1 = that._x1;
-    const y1 = that._y1;
+    const xMin = this.xMin;
+    const yMin = this.yMin;
+    const xMax = this.xMax;
+    const yMax = this.yMax;
+    const x0 = that.x0;
+    const y0 = that.y0;
+    const x1 = that.x1;
+    const y1 = that.y1;
     if (x0 < xMin && x1 < xMin || x0 > xMax && x1 > xMax ||
         y0 < yMin && y1 < yMin || y0 > yMax && y1 > yMax) {
       return false;
     } else if (x0 > xMin && x0 < xMax && y0 > yMin && y0 < yMax) {
       return true;
-    } else if ((BoxR2.intersectsSegment(x0 - xMin, x1 - xMin, x0, y0, x1, y1) && BoxR2._hitY > yMin && BoxR2._hitY < yMax)
-            || (BoxR2.intersectsSegment(y0 - yMin, y1 - yMin, x0, y0, x1, y1) && BoxR2._hitX > xMin && BoxR2._hitX < xMax)
-            || (BoxR2.intersectsSegment(x0 - xMax, x1 - xMax, x0, y0, x1, y1) && BoxR2._hitY > yMin && BoxR2._hitY < yMax)
-            || (BoxR2.intersectsSegment(y0 - yMax, y1 - yMax, x0, y0, x1, y1) && BoxR2._hitX > xMin && BoxR2._hitX < xMax)) {
+    } else if ((BoxR2.intersectsSegment(x0 - xMin, x1 - xMin, x0, y0, x1, y1) && BoxR2.hitY > yMin && BoxR2.hitY < yMax)
+            || (BoxR2.intersectsSegment(y0 - yMin, y1 - yMin, x0, y0, x1, y1) && BoxR2.hitX > xMin && BoxR2.hitX < xMax)
+            || (BoxR2.intersectsSegment(x0 - xMax, x1 - xMax, x0, y0, x1, y1) && BoxR2.hitY > yMin && BoxR2.hitY < yMax)
+            || (BoxR2.intersectsSegment(y0 - yMax, y1 - yMax, x0, y0, x1, y1) && BoxR2.hitX > xMin && BoxR2.hitX < xMax)) {
       return true;
     } else {
       return false;
     }
   }
 
-  static _hitX: number = 0; // stack local hit register
-  static _hitY: number = 0; // stack local hit register
+  /** @hidden */
+  static hitX: number = 0; // stack local hit register
+  /** @hidden */
+  static hitY: number = 0; // stack local hit register
   static intersectsSegment(d0: number, d1: number, x0: number, y0: number, x1: number, y1: number): boolean {
     if (d0 !== d1 || d0 * d1 < 0) {
       const scale = -d0 / (d1 - d0);
-      BoxR2._hitX = x0 + (x1 - x0) * scale;
-      BoxR2._hitY = y0 + (y1 - y0) * scale;
+      BoxR2.hitX = x0 + (x1 - x0) * scale;
+      BoxR2.hitY = y0 + (y1 - y0) * scale;
       return true;
     }
     return false;
@@ -219,15 +216,15 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
 
   /** @hidden */
   intersectsBox(that: BoxR2): boolean {
-    return this._xMin <= that._xMax && that._xMin <= this._xMax
-        && this._yMin <= that._yMax && that._yMin <= this._yMax;
+    return this.xMin <= that.xMax && that.xMin <= this.xMax
+        && this.yMin <= that.yMax && that.yMin <= this.yMax;
   }
 
   /** @hidden */
   intersectsCircle(that: CircleR2): boolean {
-    const dx = (that._cx < this._xMin ? this._xMin : this._xMax < that._cx ? this._xMax : that._cx) - that._cx;
-    const dy = (that._cy < this._yMin ? this._yMin : this._yMax < that._cy ? this._yMax : that._cy) - that._cy;
-    return dx * dx + dy * dy <= that._r * that._r;
+    const dx = (that.cx < this.xMin ? this.xMin : this.xMax < that.cx ? this.xMax : that.cx) - that.cx;
+    const dy = (that.cy < this.yMin ? this.yMin : this.yMax < that.cy ? this.yMax : that.cy) - that.cy;
+    return dx * dx + dy * dy <= that.r * that.r;
   }
 
   union(that: AnyShapeR2): BoxR2 {
@@ -235,20 +232,20 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
   }
 
   transform(f: R2Function): BoxR2 {
-    return new BoxR2(f.transformX(this._xMin, this._yMin), f.transformY(this._xMin, this._yMin),
-                     f.transformX(this._xMax, this._yMax), f.transformY(this._xMax, this._yMax));
+    return new BoxR2(f.transformX(this.xMin, this.yMin), f.transformY(this.xMin, this.yMin),
+                     f.transformX(this.xMax, this.yMax), f.transformY(this.xMax, this.yMax));
   }
 
-  boundingBox(): BoxR2 {
+  get bounds(): BoxR2 {
     return this;
   }
 
   toAny(): BoxR2Init {
     return {
-      xMin: this._xMin,
-      yMin: this._yMin,
-      xMax: this._xMax,
-      yMax: this._yMax,
+      xMin: this.xMin,
+      yMin: this.yMin,
+      xMax: this.xMax,
+      yMax: this.yMax,
     };
   }
 
@@ -266,10 +263,10 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
     if (this === that) {
       return true;
     } else if (that instanceof BoxR2) {
-      return Numbers.equivalent(that._xMin, this._xMin, epsilon)
-          && Numbers.equivalent(that._yMin, this._yMin, epsilon)
-          && Numbers.equivalent(that._xMax, this._xMax, epsilon)
-          && Numbers.equivalent(that._yMax, this._yMax, epsilon);
+      return Numbers.equivalent(this.xMin, that.xMin, epsilon)
+          && Numbers.equivalent(this.yMin, that.yMin, epsilon)
+          && Numbers.equivalent(this.xMax, that.xMax, epsilon)
+          && Numbers.equivalent(this.yMax, that.yMax, epsilon);
     }
     return false;
   }
@@ -278,34 +275,31 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
     if (this === that) {
       return true;
     } else if (that instanceof BoxR2) {
-      return this._xMin === that._xMin && this._yMin === that._yMin
-          && this._xMax === that._xMax && this._yMax === that._yMax;
+      return this.xMin === that.xMin && this.yMin === that.yMin
+          && this.xMax === that.xMax && this.yMax === that.yMax;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
-        Constructors.hash(BoxR2), Numbers.hash(this._xMin)), Numbers.hash(this._yMin)),
-        Numbers.hash(this._xMax)), Numbers.hash(this._yMax)));
+        Constructors.hash(BoxR2), Numbers.hash(this.xMin)), Numbers.hash(this.yMin)),
+        Numbers.hash(this.xMax)), Numbers.hash(this.yMax)));
   }
 
   debug(output: Output): void {
     output.write("BoxR2").write(46/*'.'*/).write("of").write(40/*'('*/)
-        .debug(this._xMin).write(", ").debug(this._yMin).write(", ")
-        .debug(this._xMax).write(", ").debug(this._yMax).write(41/*')'*/);
+        .debug(this.xMin).write(", ").debug(this.yMin).write(", ")
+        .debug(this.xMax).write(", ").debug(this.yMax).write(41/*')'*/);
   }
 
   toString(): string {
     return Format.debug(this);
   }
 
-  private static _undefined?: BoxR2;
+  @Lazy
   static undefined(): BoxR2 {
-    if (BoxR2._undefined === void 0) {
-      BoxR2._undefined = new BoxR2(Infinity, Infinity, -Infinity, -Infinity);
-    }
-    return BoxR2._undefined;
+    return new BoxR2(Infinity, Infinity, -Infinity, -Infinity);
   }
 
   static of(xMin: number, yMin: number, xMax?: number, yMax?: number): BoxR2 {
@@ -349,4 +343,3 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
         || BoxR2.isInit(value);
   }
 }
-ShapeR2.Box = BoxR2;

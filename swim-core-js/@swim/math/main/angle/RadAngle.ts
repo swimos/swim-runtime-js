@@ -12,50 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Constructors} from "@swim/util";
+import {Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {AngleUnits, Angle} from "./Angle";
 
 export class RadAngle extends Angle {
-  /** @hidden */
-  readonly _value: number;
-
   constructor(value: number) {
     super();
-    this._value = value;
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
   }
 
-  get value(): number {
-    return this._value;
-  }
+  declare readonly value: number;
 
   get units(): AngleUnits {
     return "rad";
   }
 
   degValue(): number {
-    return this._value * 180 / Angle.PI;
+    return this.value * 180 / Math.PI;
   }
 
   gradValue(): number {
-    return this._value * 200 / Angle.PI;
+    return this.value * 200 / Math.PI;
   }
 
   radValue(): number {
-    return this._value;
+    return this.value;
   }
 
   turnValue(): number {
-    return this._value / Angle.TAU;
+    return this.value / (2 * Math.PI);
   }
 
   rad(): RadAngle {
     return this;
   }
 
+  toCssValue(): CSSUnitValue | null {
+    if (typeof CSSUnitValue !== "undefined") {
+      return new CSSUnitValue(this.value, "rad");
+    } else {
+      return null;
+    }
+  }
+
   compareTo(that: unknown): number {
     if (that instanceof Angle) {
-      const x = this._value;
+      const x = this.value;
       const y = that.radValue();
       return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
     }
@@ -64,42 +70,33 @@ export class RadAngle extends Angle {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof Angle) {
-      return Numbers.equivalent(this._value, that.radValue());
+      return Numbers.equivalent(this.value, that.radValue());
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof RadAngle) {
-      return this._value === that._value;
+      return this.value === that.value;
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(RadAngle), Numbers.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(RadAngle), Numbers.hash(this.value)));
   }
 
   debug(output: Output): void {
-    output = output.write("Angle").write(46/*'.'*/).write("rad").write(40/*'('*/)
-        .debug(this._value).write(41/*')'*/);
+    output = output.write("Angle").write(46/*'.'*/).write("rad")
+        .write(40/*'('*/).debug(this.value).write(41/*')'*/);
   }
 
   toString(): string {
-    return this._value + "rad";
+    return this.value + "rad";
   }
 
-  private static _zero?: RadAngle;
-  static zero(units?: "rad"): RadAngle {
-    if (RadAngle._zero === void 0) {
-      RadAngle._zero = new RadAngle(0);
-    }
-    return RadAngle._zero;
+  @Lazy
+  static zero(): RadAngle {
+    return new RadAngle(0);
   }
 }
-if (typeof CSSUnitValue !== "undefined") { // CSS Typed OM support
-  RadAngle.prototype.toCssValue = function (this: RadAngle): CSSUnitValue | undefined {
-    return new CSSUnitValue(this._value, "rad");
-  };
-}
-Angle.Rad = RadAngle;

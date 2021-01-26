@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {HashCode, Equivalent, Compare} from "@swim/util";
+import {HashCode, Equivalent, Compare, Lazy} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
-import {Attr, Value, Form} from "@swim/structure";
+import {Attr, Value, Text, Form} from "@swim/structure";
+import {DegAngle} from "../"; // forward import
+import {RadAngle} from "../"; // forward import
+import {GradAngle} from "../"; // forward import
+import {TurnAngle} from "../"; // forward import
 import {AngleInterpolator} from "../"; // forward import
-import type {DegAngle} from "./DegAngle";
-import type {RadAngle} from "./RadAngle";
-import type {GradAngle} from "./GradAngle";
-import type {TurnAngle} from "./TurnAngle";
-import type {AngleParser} from "./AngleParser";
-import type {AngleForm} from "./AngleForm";
+import {AngleForm} from "../"; // forward import
+import {AngleParser} from "../"; // forward import
 
 export type AngleUnits = "deg" | "rad" | "grad" | "turn";
 
@@ -30,43 +30,43 @@ export type AnyAngle = Angle | string | number;
 
 export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent, Compare, Debug {
   isDefined(): boolean {
-    return this.value !== 0;
+    return isFinite(this.value);
   }
 
-  abstract get value(): number;
+  abstract readonly value: number;
 
-  abstract get units(): AngleUnits;
+  abstract readonly units: AngleUnits;
 
   plus(that: AnyAngle, units: AngleUnits = this.units): Angle {
     that = Angle.fromAny(that);
-    return Angle.from(this.toValue(units) + that.toValue(units), units);
+    return Angle.create(this.toValue(units) + that.toValue(units), units);
   }
 
   opposite(units: AngleUnits = this.units): Angle {
-    return Angle.from(-this.toValue(units), units);
+    return Angle.create(-this.toValue(units), units);
   }
 
   minus(that: AnyAngle, units: AngleUnits = this.units): Angle {
     that = Angle.fromAny(that);
-    return Angle.from(this.toValue(units) - that.toValue(units), units);
+    return Angle.create(this.toValue(units) - that.toValue(units), units);
   }
 
   times(scalar: number, units: AngleUnits = this.units): Angle {
-    return Angle.from(this.toValue(units) * scalar, units);
+    return Angle.create(this.toValue(units) * scalar, units);
   }
 
   divide(scalar: number, units: AngleUnits = this.units): Angle {
-    return Angle.from(this.toValue(units) / scalar, units);
+    return Angle.create(this.toValue(units) / scalar, units);
   }
 
   combine(that: AnyAngle, scalar: number = 1, units: AngleUnits = this.units): Angle {
     that = Angle.fromAny(that);
-    return Angle.from(this.toValue(units) + that.toValue(units) * scalar, units);
+    return Angle.create(this.toValue(units) + that.toValue(units) * scalar, units);
   }
 
   norm(total: AnyAngle, units: AngleUnits = this.units): Angle {
     total = Angle.fromAny(total);
-    return Angle.from(this.toValue(units) / total.toValue(units), units);
+    return Angle.create(this.toValue(units) / total.toValue(units), units);
   }
 
   abstract degValue(): number;
@@ -93,29 +93,33 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     return Angle.turn(this.turnValue());
   }
 
-  toValue(units: AngleUnits): number {
-    switch (units) {
-      case "deg": return this.degValue();
-      case "grad": return this.gradValue();
-      case "rad": return this.radValue();
-      case "turn": return this.turnValue();
-      default: throw new Error("unknown angle units: " + units);
+  toValue(): Value;
+  toValue(units: AngleUnits): number;
+  toValue(units?: AngleUnits): Value | number {
+    if (units === void 0) {
+      return Text.from(this.toString());
+    } else {
+      switch (units) {
+        case "deg": return this.degValue();
+        case "rad": return this.radValue();
+        case "grad": return this.gradValue();
+        case "turn": return this.turnValue();
+        default: throw new Error("unknown angle units: " + units);
+      }
     }
   }
 
   to(units: AngleUnits): Angle {
     switch (units) {
       case "deg": return this.deg();
-      case "grad": return this.grad();
       case "rad": return this.rad();
+      case "grad": return this.grad();
       case "turn": return this.turn();
       default: throw new Error("unknown angle units: " + units);
     }
   }
 
-  toCssValue(): CSSUnitValue | undefined {
-    return void 0; // conditionally overridden when CSS Typed OM is available
-  }
+  abstract toCssValue(): CSSUnitValue | null;
 
   interpolateTo(that: Angle): Interpolator<Angle>;
   interpolateTo(that: unknown): Interpolator<Angle> | null;
@@ -139,35 +143,37 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
 
   abstract toString(): string;
 
-  static zero(units: AngleUnits = "rad"): Angle {
+  static zero(units?: AngleUnits): Angle {
     switch (units) {
-      case "deg": return Angle.Deg.zero();
-      case "rad": return Angle.Rad.zero();
-      case "grad": return Angle.Grad.zero();
-      case "turn": return Angle.Turn.zero();
+      case "deg": return DegAngle.zero();
+      case void 0:
+      case "rad": return RadAngle.zero();
+      case "grad": return GradAngle.zero();
+      case "turn": return TurnAngle.zero();
       default: throw new Error("unknown angle units: " + units);
     }
   }
 
   static deg(value: number): DegAngle {
-    return new Angle.Deg(value);
+    return new DegAngle(value);
   }
 
   static rad(value: number): RadAngle {
-    return new Angle.Rad(value);
+    return new RadAngle(value);
   }
 
   static grad(value: number): GradAngle {
-    return new Angle.Grad(value);
+    return new GradAngle(value);
   }
 
   static turn(value: number): TurnAngle {
-    return new Angle.Turn(value);
+    return new TurnAngle(value);
   }
 
-  static from(value: number, units: AngleUnits = "rad"): Angle {
+  static create(value: number, units?: AngleUnits): Angle {
     switch (units) {
       case "deg": return Angle.deg(value);
+      case void 0:
       case "rad": return Angle.rad(value);
       case "grad": return Angle.grad(value);
       case "turn": return Angle.turn(value);
@@ -175,9 +181,9 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     }
   }
 
-  static fromCss(value: CSSStyleValue): Angle {
+  static fromCssValue(value: CSSStyleValue): Angle {
     if (value instanceof CSSUnitValue) {
-      return Angle.from(value.value, value.unit as AngleUnits);
+      return Angle.create(value.value, value.unit as AngleUnits);
     } else {
       throw new TypeError("" + value);
     }
@@ -187,14 +193,14 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     if (value instanceof Angle) {
       return value;
     } else if (typeof value === "number") {
-      return Angle.from(value, defaultUnits);
+      return Angle.create(value, defaultUnits);
     } else if (typeof value === "string") {
       return Angle.parse(value, defaultUnits);
     }
     throw new TypeError("" + value);
   }
 
-  static fromValue(value: Value): Angle | undefined {
+  static fromValue(value: Value): Angle | null {
     if (value.length === 2) {
       const num = value.getItem(0).numberValue();
       const units = value.getItem(1);
@@ -208,7 +214,7 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
         }
       }
     }
-    return void 0;
+    return null;
   }
 
   static parse(string: string, defaultUnits?: AngleUnits): Angle {
@@ -216,7 +222,7 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = Angle.Parser.parse(input, defaultUnits);
+    let parser = AngleParser.parse(input, defaultUnits);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -228,44 +234,15 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     return parser.bind();
   }
 
+  @Lazy
+  static form(): Form<Angle, AnyAngle> {
+    return new AngleForm(void 0, Angle.zero());
+  }
+
   /** @hidden */
   static isAny(value: unknown): value is AnyAngle {
     return value instanceof Angle
         || typeof value === "number"
         || typeof value === "string";
   }
-
-  private static _form: Form<Angle, AnyAngle>;
-  static form(defaultUnits?: AngleUnits, unit?: AnyAngle): Form<Angle, AnyAngle> {
-    if (defaultUnits === void 0 && unit === void 0) {
-      if (Angle._form === void 0) {
-        Angle._form = new Angle.Form(void 0, Angle.zero());
-      }
-      return Angle._form;
-    } else {
-      if (unit !== void 0) {
-        unit = Angle.fromAny(unit);
-      }
-      return new Angle.Form(defaultUnits, unit);
-    }
-  }
-
-  /** @hidden */
-  static readonly PI: number = Math.PI;
-  /** @hidden */
-  static readonly TAU: number = 2 * Angle.PI;
-
-  // Forward type declarations
-  /** @hidden */
-  static Deg: typeof DegAngle; // defined by DegAngle
-  /** @hidden */
-  static Rad: typeof RadAngle; // defined by RadAngle
-  /** @hidden */
-  static Grad: typeof GradAngle; // defined by GradAngle
-  /** @hidden */
-  static Turn: typeof TurnAngle; // defined by TurnAngle
-  /** @hidden */
-  static Parser: typeof AngleParser; // defined by AngleParser
-  /** @hidden */
-  static Form: typeof AngleForm; // defined by AngleForm
 }

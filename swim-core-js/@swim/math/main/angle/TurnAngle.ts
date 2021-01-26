@@ -12,50 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Constructors} from "@swim/util";
+import {Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {AngleUnits, Angle} from "./Angle";
 
 export class TurnAngle extends Angle {
-  /** @hidden */
-  readonly _value: number;
-
   constructor(value: number) {
     super();
-    this._value = value;
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
   }
 
-  get value(): number {
-    return this._value;
-  }
+  declare readonly value: number;
 
   get units(): AngleUnits {
     return "turn";
   }
 
   degValue(): number {
-    return this._value * 360;
+    return this.value * 360;
   }
 
   gradValue(): number {
-    return this._value * 400;
+    return this.value * 400;
   }
 
   radValue(): number {
-    return this._value * Angle.TAU;
+    return this.value * (2 * Math.PI);
   }
 
   turnValue(): number {
-    return this._value;
+    return this.value;
   }
 
   turn(): TurnAngle {
     return this;
   }
 
+  toCssValue(): CSSUnitValue | null {
+    if (typeof CSSUnitValue !== "undefined") {
+      return new CSSUnitValue(this.value, "turn");
+    } else {
+      return null;
+    }
+  }
+
   compareTo(that: unknown): number {
     if (that instanceof Angle) {
-      const x = this._value;
+      const x = this.value;
       const y = that.turnValue();
       return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
     }
@@ -64,42 +70,33 @@ export class TurnAngle extends Angle {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof Angle) {
-      return Numbers.equivalent(this._value, that.turnValue());
+      return Numbers.equivalent(this.value, that.turnValue());
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof TurnAngle) {
-      return this._value === that._value;
+      return this.value === that.value;
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(TurnAngle), Numbers.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(TurnAngle), Numbers.hash(this.value)));
   }
 
   debug(output: Output): void {
-    output = output.write("Angle").write(46/*'.'*/).write("turn").write(40/*'('*/)
-        .debug(this._value).write(41/*')'*/);
+    output = output.write("Angle").write(46/*'.'*/).write("turn")
+        .write(40/*'('*/).debug(this.value).write(41/*')'*/);
   }
 
   toString(): string {
-    return this._value + "turn";
+    return this.value + "turn";
   }
 
-  private static _zero?: TurnAngle;
-  static zero(units?: "turn"): TurnAngle {
-    if (TurnAngle._zero === void 0) {
-      TurnAngle._zero = new TurnAngle(0);
-    }
-    return TurnAngle._zero;
+  @Lazy
+  static zero(): TurnAngle {
+    return new TurnAngle(0);
   }
 }
-if (typeof CSSUnitValue !== "undefined") { // CSS Typed OM support
-  TurnAngle.prototype.toCssValue = function (this: TurnAngle): CSSUnitValue | undefined {
-    return new CSSUnitValue(this._value, "turn");
-  };
-}
-Angle.Turn = TurnAngle;

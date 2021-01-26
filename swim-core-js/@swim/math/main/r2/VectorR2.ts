@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
+import {Equivalent, HashCode, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
 import {VectorR2Interpolator} from "../"; // forward import
@@ -25,48 +25,45 @@ export interface VectorR2Init {
 }
 
 export class VectorR2 implements Interpolate<VectorR2>, HashCode, Equivalent, Debug {
-  /** @hidden */
-  readonly _x: number;
-  /** @hidden */
-  readonly _y: number;
-
   constructor(x: number, y: number) {
-    this._x = x;
-    this._y = y;
+    Object.defineProperty(this, "x", {
+      value: x,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y", {
+      value: y,
+      enumerable: true,
+    });
   }
 
   isDefined(): boolean {
-    return this._x !== 0 || this._y !== 0;
+    return isFinite(this.x) && isFinite(this.y);
   }
 
-  get x(): number {
-    return this._x;
-  }
+  declare readonly x: number;
 
-  get y(): number {
-    return this._y;
-  }
+  declare readonly y: number;
 
   plus(that: AnyVectorR2): VectorR2 {
-    return new VectorR2(this._x + that.x, this._y + that.y);
+    return new VectorR2(this.x + that.x, this.y + that.y);
   }
 
   opposite(): VectorR2 {
-    return new VectorR2(-this._x, -this._y);
+    return new VectorR2(-this.x, -this.y);
   }
 
   minus(that: AnyVectorR2): VectorR2 {
-    return new VectorR2(this._x - that.x, this._y - that.y);
+    return new VectorR2(this.x - that.x, this.y - that.y);
   }
 
   times(scalar: number): VectorR2 {
-    return new VectorR2(this._x * scalar, this._y * scalar);
+    return new VectorR2(this.x * scalar, this.y * scalar);
   }
 
   toAny(): VectorR2Init {
     return {
-      x: this._x,
-      y: this._y,
+      x: this.x,
+      y: this.y,
     };
   }
 
@@ -84,8 +81,8 @@ export class VectorR2 implements Interpolate<VectorR2>, HashCode, Equivalent, De
     if (this === that) {
       return true;
     } else if (that instanceof VectorR2) {
-      return Numbers.equivalent(that._x, this._x, epsilon)
-          && Numbers.equivalent(that._y, this._y, epsilon);
+      return Numbers.equivalent(this.x, that.x, epsilon)
+          && Numbers.equivalent(this.y, that.y, epsilon);
     }
     return false;
   }
@@ -94,40 +91,36 @@ export class VectorR2 implements Interpolate<VectorR2>, HashCode, Equivalent, De
     if (this === that) {
       return true;
     } else if (that instanceof VectorR2) {
-      return this._x === that._x && this._y === that._y;
+      return this.x === that.x && this.y === that.y;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(VectorR2),
-        Numbers.hash(this._x)), Numbers.hash(this._y)));
+        Numbers.hash(this.x)), Numbers.hash(this.y)));
   }
 
   debug(output: Output): void {
     output.write("VectorR2").write(46/*'.'*/).write("of").write(40/*'('*/)
-        .debug(this._x).write(", ").debug(this._y).write(41/*')'*/);
+        .debug(this.x).write(", ").debug(this.y).write(41/*')'*/);
   }
 
   toString(): string {
     return Format.debug(this);
   }
 
-  private static _zero?: VectorR2;
-
+  @Lazy
   static zero(): VectorR2 {
-    if (VectorR2._zero === void 0) {
-      VectorR2._zero = new VectorR2(0, 0);
-    }
-    return VectorR2._zero;
+    return new VectorR2(0, 0);
   }
 
   static of(x: number, y: number): VectorR2 {
     return new VectorR2(x, y);
   }
 
-  static fromInit(value: VectorR2Init): VectorR2 {
-    return new VectorR2(value.x, value.y);
+  static fromInit(init: VectorR2Init): VectorR2 {
+    return new VectorR2(init.x, init.y);
   }
 
   static fromAny(value: AnyVectorR2): VectorR2 {

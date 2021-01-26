@@ -14,6 +14,7 @@
 
 import {Input, Parser, Unicode} from "@swim/codec";
 import {Transform} from "./Transform";
+import {TransformParser} from "./TransformParser";
 
 /** @hidden */
 export class TransformListParser extends Parser<Transform> {
@@ -38,7 +39,7 @@ export class TransformListParser extends Parser<Transform> {
           input.step();
         }
         if (input.isCont()) {
-          transformParser = Transform.Parser.parse(input);
+          transformParser = TransformParser.parse(input);
         } else if (input.isDone()) {
           return Parser.done(transform);
         }
@@ -58,4 +59,3 @@ export class TransformListParser extends Parser<Transform> {
     return new TransformListParser(transform, transformParser);
   }
 }
-Transform.ListParser = TransformListParser;

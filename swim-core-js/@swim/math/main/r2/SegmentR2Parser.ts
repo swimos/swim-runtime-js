@@ -14,7 +14,6 @@
 
 import {Input, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
 import {SegmentR2} from "./SegmentR2";
-import {CurveR2Parser} from "./CurveR2Parser";
 
 /** @hidden */
 export class SegmentR2Parser extends Parser<SegmentR2> {
@@ -187,4 +186,3 @@ export class SegmentR2Parser extends Parser<SegmentR2> {
     return this.parse(input, x0Parser, y0Parser, x1Parser, y1Parser, command, step);
   }
 }
-CurveR2Parser.Linear = SegmentR2Parser;

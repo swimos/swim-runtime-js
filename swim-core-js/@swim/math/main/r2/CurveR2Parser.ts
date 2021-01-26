@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {Input, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
-import {CurveR2} from "./CurveR2";
-import type {SegmentR2Parser} from "./SegmentR2Parser";
-import type {QuadraticCurveR2Parser} from "./QuadraticCurveR2Parser";
-import type {CubicCurveR2Parser} from "./CubicCurveR2Parser";
-import type {EllipticCurveR2Parser} from "./EllipticCurveR2Parser";
+import type {CurveR2} from "./CurveR2";
+import {SegmentR2Parser} from "../"; // forward import
+import {QuadraticCurveR2Parser} from "../"; // forward import
+import {CubicCurveR2Parser} from "../"; // forward import
+import {EllipticCurveR2Parser} from "../"; // forward import
 
 /** @hidden */
 export class CurveR2Parser extends Parser<CurveR2> {
@@ -122,28 +122,28 @@ export class CurveR2Parser extends Parser<CurveR2> {
           case 104/*'h'*/:
           case 86/*'V'*/:
           case 118/*'v'*/:
-            return CurveR2Parser.Linear.parse(input, x0Parser, y0Parser);
+            return SegmentR2Parser.parse(input, x0Parser, y0Parser);
           case 81/*'Q'*/:
           case 113/*'q'*/:
-            return CurveR2Parser.Quadratic.parse(input, x0Parser, y0Parser);
+            return QuadraticCurveR2Parser.parse(input, x0Parser, y0Parser);
           case 84/*'T'*/:
-            return CurveR2Parser.Quadratic.parse(input, x0Parser, y0Parser,
-                                                 x0Parser, y0Parser);
+            return QuadraticCurveR2Parser.parse(input, x0Parser, y0Parser,
+                                                x0Parser, y0Parser);
           case 116/*'t'*/:
-            return CurveR2Parser.Quadratic.parse(input, x0Parser, y0Parser,
-                                                 Parser.done(0), Parser.done(0));
+            return QuadraticCurveR2Parser.parse(input, x0Parser, y0Parser,
+                                                Parser.done(0), Parser.done(0));
           case 67/*'C'*/:
           case 99/*'c'*/:
-            return CurveR2Parser.Cubic.parse(input, x0Parser, y0Parser);
+            return CubicCurveR2Parser.parse(input, x0Parser, y0Parser);
           case 83/*'S'*/:
-            return CurveR2Parser.Cubic.parse(input, x0Parser, y0Parser,
+            return CubicCurveR2Parser.parse(input, x0Parser, y0Parser,
                                              x0Parser, y0Parser);
           case 115/*'s'*/:
-            return CurveR2Parser.Cubic.parse(input, x0Parser, y0Parser,
+            return CubicCurveR2Parser.parse(input, x0Parser, y0Parser,
                                              Parser.done(0), Parser.done(0));
           case 65/*'A'*/:
           case 97/*'a'*/:
-            return CurveR2Parser.Elliptic.parse(input, x0Parser, y0Parser);
+            return EllipticCurveR2Parser.parse(input, x0Parser, y0Parser);
           case 44/*','*/:
             input = input.step();
           case 43/*'+'*/:
@@ -162,7 +162,7 @@ export class CurveR2Parser extends Parser<CurveR2> {
             switch (command) {
               case 77/*'M'*/:
               case 109/*'m'*/:
-                return CurveR2Parser.Linear.parseRest(input, command, x0Parser, y0Parser);
+                return SegmentR2Parser.parseRest(input, command, x0Parser, y0Parser);
             }
           default:
             return Parser.error(Diagnostic.expected("draw command", input));
@@ -173,15 +173,4 @@ export class CurveR2Parser extends Parser<CurveR2> {
     }
     return new CurveR2Parser(x0Parser, y0Parser, command, step);
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Linear: typeof SegmentR2Parser; // defined by SegmentR2Parser
-  /** @hidden */
-  static Quadratic: typeof QuadraticCurveR2Parser; // defined by QuadraticCurveR2Parser
-  /** @hidden */
-  static Cubic: typeof CubicCurveR2Parser; // defined by CubicCurveR2Parser
-  /** @hidden */
-  static Elliptic: typeof EllipticCurveR2Parser; // defined by EllipticCurveR2Parser
 }
-CurveR2.CurveParser = CurveR2Parser;

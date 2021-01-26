@@ -12,45 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals, Arrays} from "@swim/util";
+import {Equivalent, Equals, Lazy, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
-import type {BoxR2} from "./BoxR2";
+import {BoxR2} from "../"; // forward import
 
 export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equals, Equivalent, Debug {
-  /** @hidden */
-  readonly _shapes: ReadonlyArray<S>;
-  /** @hidden */
-  _boundingBox?: BoxR2;
-
   constructor(shapes: ReadonlyArray<S>) {
     super();
-    this._shapes = shapes;
+    Object.defineProperty(this, "shapes", {
+      value: shapes,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "boundingBox", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
   }
+
+  declare readonly shapes: ReadonlyArray<S>;
 
   isDefined(): boolean {
-    return this._shapes.length !== 0;
-  }
-
-  get shapes(): ReadonlyArray<S> {
-    return this._shapes;
+    return this.shapes.length !== 0;
   }
 
   get xMin(): number {
-    return this.boundingBox().xMin;
+    return this.bounds.xMin;
   }
 
   get yMin(): number {
-    return this.boundingBox().yMin;
+    return this.bounds.yMin;
   }
 
   get xMax(): number {
-    return this.boundingBox().xMax;
+    return this.bounds.xMax;
   }
 
   get yMax(): number {
-    return this.boundingBox().yMax;
+    return this.bounds.yMax;
   }
 
   contains(that: AnyShapeR2): boolean;
@@ -64,7 +65,7 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equal
   }
 
   transform(f: R2Function): SetR2 {
-    const oldShapes = this._shapes;
+    const oldShapes = this.shapes;
     const n = oldShapes.length;
     if (n > 0) {
       const newShapes = new Array<ShapeR2>(n);
@@ -77,14 +78,17 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equal
     }
   }
 
-  boundingBox(): BoxR2 {
-    let boundingBox = this._boundingBox;
-    if (boundingBox === void 0) {
+  /** @hidden */
+  declare readonly boundingBox: BoxR2 | null;
+
+  get bounds(): BoxR2 {
+    let boundingBox = this.boundingBox;
+    if (boundingBox === null) {
       let xMin = Infinity;
       let yMin = Infinity;
       let xMax = -Infinity;
       let yMax = -Infinity;
-      const shapes = this._shapes;
+      const shapes = this.shapes;
       for (let i = 0, n = shapes.length; i < n; i += 1) {
         const shape = shapes[i]!;
         xMin = Math.min(xMin, shape.xMin);
@@ -92,8 +96,12 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equal
         xMax = Math.max(shape.xMax, xMax);
         yMax = Math.max(shape.yMax, yMax);
       }
-      boundingBox = new ShapeR2.Box(xMin, yMin, xMax, yMax);
-      this._boundingBox = boundingBox;
+      boundingBox = new BoxR2(xMin, yMin, xMax, yMax);
+      Object.defineProperty(this, "boundingBox", {
+        value: boundingBox,
+        enumerable: true,
+        configurable: true,
+      });
     }
     return boundingBox;
   }
@@ -102,7 +110,7 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equal
     if (this === that) {
       return true;
     } else if (that instanceof SetR2) {
-      return Arrays.equivalent(this._shapes, that._shapes, epsilon);
+      return Arrays.equivalent(this.shapes, that.shapes, epsilon);
     }
     return false;
   }
@@ -111,13 +119,13 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equal
     if (this === that) {
       return true;
     } else if (that instanceof SetR2) {
-      return Arrays.equal(this._shapes, that._shapes);
+      return Arrays.equal(this.shapes, that.shapes);
     }
     return false;
   }
 
   debug(output: Output): void {
-    const shapes = this._shapes;
+    const shapes = this.shapes;
     const n = shapes.length;
     output = output.write("SetR2").write(46/*'.'*/);
     if (n === 0) {
@@ -136,8 +144,9 @@ export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equal
     return Format.debug(this);
   }
 
+  @Lazy
   static empty<S extends ShapeR2>(): SetR2<S> {
-    return new SetR2([]);
+    return new SetR2(Arrays.empty);
   }
 
   static of<S extends ShapeR2>(...shapes: S[]): SetR2<S> {

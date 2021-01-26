@@ -22,8 +22,8 @@ export {RadAngle} from "./RadAngle";
 export {GradAngle} from "./GradAngle";
 export {TurnAngle} from "./TurnAngle";
 
-export {AngleParser} from "./AngleParser";
-
 export {AngleInterpolator} from "./AngleInterpolator";
 
 export {AngleForm} from "./AngleForm";
+
+export {AngleParser} from "./AngleParser";

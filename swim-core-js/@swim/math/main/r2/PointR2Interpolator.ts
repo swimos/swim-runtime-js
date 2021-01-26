@@ -20,8 +20,8 @@ export const PointR2Interpolator = function (p0: PointR2, p1: PointR2): Interpol
   const interpolator = function (u: number): PointR2 {
     const p0 = interpolator[0];
     const p1 = interpolator[1];
-    const x = p0._x + u * (p1._x - p0._x);
-    const y = p0._y + u * (p1._y - p0._y);
+    const x = p0.x + u * (p1.x - p0.x);
+    const y = p0.y + u * (p1.y - p0.y);
     return new PointR2(x, y);
   } as Interpolator<PointR2>;
   Object.setPrototypeOf(interpolator, PointR2Interpolator.prototype);

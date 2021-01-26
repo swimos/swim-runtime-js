@@ -12,108 +12,92 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Constructors} from "@swim/util";
+import {Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
-import {Item, Attr, Value, Record} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
+import {Item, Value, Record} from "@swim/structure";
+import {PointR2} from "../r2/PointR2";
 import {Transform} from "./Transform";
+import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransformInterpolator} from "../"; // forward import
+import {AffineTransformParser} from "../"; // forward import
 
 export class AffineTransform extends Transform {
-  /** @hidden */
-  readonly _x0: number;
-  /** @hidden */
-  readonly _y0: number;
-  /** @hidden */
-  readonly _x1: number;
-  /** @hidden */
-  readonly _y1: number;
-  /** @hidden */
-  readonly _tx: number;
-  /** @hidden */
-  readonly _ty: number;
-  /** @hidden */
-  _string?: string;
-
   constructor(x0: number, y0: number, x1: number, y1: number, tx: number, ty: number) {
     super();
-    this._x0 = x0;
-    this._y0 = y0;
-    this._x1 = x1;
-    this._y1 = y1;
-    this._tx = tx;
-    this._ty = ty;
+    Object.defineProperty(this, "x0", {
+      value: x0,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y0", {
+      value: y0,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "x1", {
+      value: x1,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y1", {
+      value: y1,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "tx", {
+      value: tx,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "ty", {
+      value: ty,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "stringValue", {
+      value: void 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  get x0(): number {
-    return this._x0;
-  }
+  declare readonly x0: number;
 
-  get y0(): number {
-    return this._y0;
-  }
+  declare readonly y0: number;
 
-  get x1(): number {
-    return this._x1;
-  }
+  declare readonly x1: number;
 
-  get y1(): number {
-    return this._y1;
-  }
+  declare readonly y1: number;
 
-  get tx(): number {
-    return this._tx;
-  }
+  declare readonly tx: number;
 
-  get ty(): number {
-    return this._ty;
-  }
+  declare readonly ty: number;
 
   transform(that: Transform): Transform;
-  transform(point: [number, number]): [number, number];
-  transform(x: number, y: number): [number, number];
-  transform(point: [AnyLength, AnyLength]): [Length, Length];
-  transform(x: AnyLength, y: AnyLength): [Length, Length];
-  transform(x: Transform | [AnyLength, AnyLength] | AnyLength, y?: AnyLength): Transform | [number, number] | [Length, Length] {
-    if (x instanceof Transform) {
-      if (x instanceof Transform.Identity) {
+  transform(x: number, y: number): PointR2;
+  transform(x: Transform | number, y?: number): Transform | PointR2 {
+    if (arguments.length === 1) {
+      if (x instanceof IdentityTransform) {
         return this;
       } else {
-        return this.multiply(x.toAffine());
+        return this.multiply((x as Transform).toAffine());
       }
     } else {
-      if (Array.isArray(x)) {
-        y = x[1];
-        x = x[0];
-      }
-      x = Length.fromAny(x);
-      y = Length.fromAny(y!);
-      if (typeof x === "number" && typeof y === "number") {
-        return [x * this._x0 + y * this._x1 + this._tx,
-                x * this._y0 + y * this._y1 + this._ty];
-      } else {
-        return [x.times(this._x0).plus(y.times(this._x1)).plus(this._tx),
-                x.times(this._y0).plus(y.times(this._y1)).plus(this._ty)];
-      }
+      return new PointR2(this.x0 * (x as number) + this.x1 * y! + this.tx,
+                         this.y0 * (x as number) + this.y1 * y! + this.ty);
     }
   }
 
   transformX(x: number, y: number): number {
-    return x * this._x0 + y * this._x1 + this._tx;
+    return this.x0 * x + this.x1 * y + this.tx;
   }
 
   transformY(x: number, y: number): number {
-    return x * this._y0 + y * this._y1 + this._ty;
+    return this.y0 * x + this.y1 * y + this.ty;
   }
 
   inverse(): Transform {
-    const m00 = this._x0;
-    const m10 = this._y0;
-    const m01 = this._x1;
-    const m11 = this._y1;
-    const m02 = this._tx;
-    const m12 = this._ty;
+    const m00 = this.x0;
+    const m10 = this.y0;
+    const m01 = this.x1;
+    const m11 = this.y1;
+    const m02 = this.tx;
+    const m12 = this.ty;
     const det = m00 * m11 - m01 * m10;
     if (Math.abs(det) >= Number.MIN_VALUE) {
       return new AffineTransform( m11 / det, -m10 / det,
@@ -126,12 +110,12 @@ export class AffineTransform extends Transform {
   }
 
   multiply(that: AffineTransform): AffineTransform {
-    const x0 = this._x0 * that._x0 + this._x1 * that._y0;
-    const y0 = this._y0 * that._x0 + this._y1 * that._y0;
-    const x1 = this._x0 * that._x1 + this._x1 * that._y1;
-    const y1 = this._y0 * that._x1 + this._y1 * that._y1;
-    const tx = this._x0 * that._tx + this._x1 * that._ty;
-    const ty = this._y0 * that._tx + this._y1 * that._ty;
+    const x0 = this.x0 * that.x0 + this.x1 * that.y0;
+    const y0 = this.y0 * that.x0 + this.y1 * that.y0;
+    const x1 = this.x0 * that.x1 + this.x1 * that.y1;
+    const y1 = this.y0 * that.x1 + this.y1 * that.y1;
+    const tx = this.x0 * that.tx + this.x1 * that.ty;
+    const ty = this.y0 * that.tx + this.y1 * that.ty;
     return new AffineTransform(x0, y0, x1, y1, tx, ty);
   }
 
@@ -140,13 +124,21 @@ export class AffineTransform extends Transform {
   }
 
   toMatrix(): DOMMatrix {
-    return new DOMMatrix([this._x0, this._y0, this._x1, this._y1, this._tx, this._ty]);
+    return new DOMMatrix([this.x0, this.y0, this.x1, this.y1, this.tx, this.ty]);
+  }
+
+  toCssTransformComponent(): CSSTransformComponent | null {
+    if (typeof CSSTranslate !== "undefined") {
+      return new CSSMatrixComponent(this.toMatrix());
+    }
+    return null;
   }
 
   toValue(): Value {
-    return Record.of(Attr.of("matrix", Record.of(this._x0, this._y0,
-                                                 this._x1, this._y1,
-                                                 this._tx, this._ty)));
+    return Record.create(1)
+                 .attr("matrix", Record.create(6).item(this.x0).item(this.y0)
+                                                 .item(this.x1).item(this.y1)
+                                                 .item(this.tx).item(this.ty));
   }
 
   interpolateTo(that: AffineTransform): Interpolator<AffineTransform>;
@@ -166,21 +158,21 @@ export class AffineTransform extends Transform {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof AffineTransform) {
-      return Numbers.equivalent(this._x0, that._x0, epsilon)
-          && Numbers.equivalent(this._y0, that._y0, epsilon)
-          && Numbers.equivalent(this._x1, that._x1, epsilon)
-          && Numbers.equivalent(this._y1, that._y1, epsilon)
-          && Numbers.equivalent(this._tx, that._tx, epsilon)
-          && Numbers.equivalent(this._ty, that._ty, epsilon);
+      return Numbers.equivalent(this.x0, that.x0, epsilon)
+          && Numbers.equivalent(this.y0, that.y0, epsilon)
+          && Numbers.equivalent(this.x1, that.x1, epsilon)
+          && Numbers.equivalent(this.y1, that.y1, epsilon)
+          && Numbers.equivalent(this.tx, that.tx, epsilon)
+          && Numbers.equivalent(this.ty, that.ty, epsilon);
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof AffineTransform) {
-      return this._x0 === that._x0 && this._y0 === that._y0 &&
-             this._x1 === that._x1 && this._y1 === that._y1 &&
-             this._tx === that._tx && this._ty === that._ty;
+      return this.x0 === that.x0 && this.y0 === that.y0
+          && this.x1 === that.x1 && this.y1 === that.y1
+          && this.tx === that.tx && this.ty === that.ty;
     }
     return false;
   }
@@ -188,47 +180,39 @@ export class AffineTransform extends Transform {
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
         Murmur3.mix(Murmur3.mix(Constructors.hash(AffineTransform),
-        Numbers.hash(this._x0)), Numbers.hash(this._y0)),
-        Numbers.hash(this._x1)), Numbers.hash(this._y1)),
-        Numbers.hash(this._tx)), Numbers.hash(this._ty)));
+        Numbers.hash(this.x0)), Numbers.hash(this.y0)),
+        Numbers.hash(this.x1)), Numbers.hash(this.y1)),
+        Numbers.hash(this.tx)), Numbers.hash(this.ty)));
   }
 
   debug(output: Output): void {
     output = output.write("Transform").write(46/*'.'*/).write("affine").write(40/*'('*/)
-        .debug(this._x0).write(", ").debug(this._y0).write(", ")
-        .debug(this._x1).write(", ").debug(this._y1).write(", ")
-        .debug(this._tx).write(", ").debug(this._ty).write(41/*')'*/);
+        .debug(this.x0).write(", ").debug(this.y0).write(", ")
+        .debug(this.x1).write(", ").debug(this.y1).write(", ")
+        .debug(this.tx).write(", ").debug(this.ty).write(41/*')'*/);
   }
+
+  /** @hidden */
+  declare readonly stringValue: string | undefined;
 
   toString(): string {
-    let string = this._string;
-    if (string === void 0) {
-      string = "matrix(" + this._x0 + "," + this._y0 + ","
-                         + this._x1 + "," + this._y1 + ","
-                         + this._tx + "," + this._ty + ")";
-      this._string = string;
+    let stringValue = this.stringValue;
+    if (stringValue === void 0) {
+      stringValue = "matrix(" + this.x0 + "," + this.y0 + ","
+                              + this.x1 + "," + this.y1 + ","
+                              + this.tx + "," + this.ty + ")";
+      Object.defineProperty(this, "stringValue", {
+        value: stringValue,
+        enumerable: true,
+        configurable: true,
+      });
     }
-    return string;
+    return stringValue;
   }
 
-  private static _identityMatrix?: AffineTransform;
+  @Lazy
   static identity(): AffineTransform {
-    if (AffineTransform._identityMatrix === void 0) {
-      AffineTransform._identityMatrix = AffineTransform.from();
-    }
-    return AffineTransform._identityMatrix;
-  }
-
-  static from(x0: string | number = 1, y0: string | number = 0,
-              x1: string | number = 0, y1: string | number = 1,
-              tx: string | number = 0, ty: string | number = 0): AffineTransform {
-    x0 = +x0;
-    y0 = +y0;
-    x1 = +x1;
-    y1 = +y1;
-    tx = +tx;
-    ty = +ty;
-    return new AffineTransform(x0, y0, x1, y1, tx, ty);
+    return new AffineTransform(1, 0, 0, 1, 0, 0);
   }
 
   static fromAny(value: AffineTransform | string): AffineTransform {
@@ -248,7 +232,7 @@ export class AffineTransform extends Transform {
     return AffineTransform.fromMatrix(component.matrix);
   }
 
-  static fromValue(value: Value): AffineTransform | undefined {
+  static fromValue(value: Value): AffineTransform | null {
     const header = value.header("matrix");
     if (header.isDefined()) {
       let x0 = 0;
@@ -287,7 +271,7 @@ export class AffineTransform extends Transform {
       }, this);
       return new AffineTransform(x0, y0, x1, y1, tx, ty);
     }
-    return void 0;
+    return null;
   }
 
   static parse(string: string): AffineTransform {
@@ -295,7 +279,7 @@ export class AffineTransform extends Transform {
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = Transform.AffineParser.parse(input);
+    let parser = AffineTransformParser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -307,9 +291,3 @@ export class AffineTransform extends Transform {
     return parser.bind();
   }
 }
-if (typeof CSSMatrixComponent !== "undefined") { // CSS Typed OM support
-  AffineTransform.prototype.toCssTransformComponent = function (this: AffineTransform): CSSTransformComponent | undefined {
-    return new CSSMatrixComponent(this.toMatrix());
-  };
-}
-Transform.Affine = AffineTransform;

@@ -21,117 +21,109 @@ import type {CurveR2Context} from "./CurveR2Context";
 import {CurveR2} from "./CurveR2";
 
 export class EllipticCurveR2 extends CurveR2 implements Debug {
-  /** @hidden */
-  readonly _cx: number;
-  /** @hidden */
-  readonly _cy: number;
-  /** @hidden */
-  readonly _rx: number;
-  /** @hidden */
-  readonly _ry: number;
-  /** @hidden */
-  readonly _phi: number;
-  /** @hidden */
-  readonly _a0: number;
-  /** @hidden */
-  readonly _da: number;
-
   constructor(cx: number, cy: number, rx: number, ry: number,
               phi: number, a0: number, da: number) {
     super();
-    this._cx = cx;
-    this._cy = cy;
-    this._rx = rx;
-    this._ry = ry;
-    this._phi = phi;
-    this._a0 = a0;
-    this._da = da;
+    Object.defineProperty(this, "cx", {
+      value: cx,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "cy", {
+      value: cy,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "rx", {
+      value: rx,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "ry", {
+      value: ry,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "phi", {
+      value: phi,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "a0", {
+      value: a0,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "da", {
+      value: da,
+      enumerable: true,
+    });
   }
 
-  get cx(): number {
-    return this._cx;
-  }
+  declare readonly cx: number;
 
-  get cy(): number {
-    return this._cy;
-  }
+  declare readonly cy: number;
 
-  get rx(): number {
-    return this._rx;
-  }
+  declare readonly rx: number;
 
-  get ry(): number {
-    return this._ry;
-  }
+  declare readonly ry: number;
 
-  get phi(): number {
-    return this._phi;
-  }
+  declare readonly phi: number;
 
-  get a0(): number {
-    return this._a0;
-  }
+  declare readonly a0: number;
 
-  get da(): number {
-    return this._da;
-  }
+  declare readonly da: number;
 
   get xMin(): number {
-    return this._cx - Math.max(this._rx, this._ry);
+    return this.cx - Math.max(this.rx, this.ry);
   }
 
   get yMin(): number {
-    return this._cy - Math.max(this._rx, this._ry);
+    return this.cy - Math.max(this.rx, this.ry);
   }
 
   get xMax(): number {
-    return this._cx + Math.max(this._rx, this._ry);
+    return this.cx + Math.max(this.rx, this.ry);
   }
 
   get yMax(): number {
-    return this._cy + Math.max(this._rx, this._ry);
+    return this.cy + Math.max(this.rx, this.ry);
   }
 
   interpolateX(u: number): number {
-    const a0 = this._a0;
-    const da = this._da;
+    const a0 = this.a0;
+    const da = this.da;
     const a = a0 + u * da;
-    const dx = this._rx * Math.cos(a);
-    const dy = this._ry * Math.sin(a);
-    const phi = this._phi;
+    const dx = this.rx * Math.cos(a);
+    const dy = this.ry * Math.sin(a);
+    const phi = this.phi;
     if (phi === 0) {
-      return this._cx + dx;
+      return this.cx + dx;
     } else {
-      return this._cx + dx * Math.cos(phi) - dy * Math.sin(phi);
+      return this.cx + dx * Math.cos(phi) - dy * Math.sin(phi);
     }
   }
 
   interpolateY(u: number): number {
-    const a0 = this._a0;
-    const da = this._da;
+    const a0 = this.a0;
+    const da = this.da;
     const a = a0 + u * da;
-    const dx = this._rx * Math.cos(a);
-    const dy = this._ry * Math.sin(a);
-    const phi = this._phi;
+    const dx = this.rx * Math.cos(a);
+    const dy = this.ry * Math.sin(a);
+    const phi = this.phi;
     if (phi === 0) {
-      return this._cy + dy;
+      return this.cy + dy;
     } else {
-      return this._cy + dx * Math.sin(phi) + dy * Math.cos(phi);
+      return this.cy + dx * Math.sin(phi) + dy * Math.cos(phi);
     }
   }
 
   interpolate(u: number): PointR2 {
-    const a0 = this._a0;
-    const da = this._da;
+    const a0 = this.a0;
+    const da = this.da;
     const a = a0 + u * da;
-    const dx = this._rx * Math.cos(a);
-    const dy = this._ry * Math.sin(a);
-    const phi = this._phi;
+    const dx = this.rx * Math.cos(a);
+    const dy = this.ry * Math.sin(a);
+    const phi = this.phi;
     if (phi === 0) {
-      return new PointR2(this._cx + dx, this._cy + dy);
+      return new PointR2(this.cx + dx, this.cy + dy);
     } else {
-      return new PointR2(this._cx + dx * Math.cos(phi) - dy * Math.sin(phi),
-                         this._cy + dx * Math.sin(phi) + dy * Math.cos(phi));
+      return new PointR2(this.cx + dx * Math.cos(phi) - dy * Math.sin(phi),
+                         this.cy + dx * Math.sin(phi) + dy * Math.cos(phi));
     }
   }
 
@@ -146,19 +138,19 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
   }
 
   split(u: number): [EllipticCurveR2, EllipticCurveR2] {
-    const a0 = this._a0;
-    const da = this._da;
+    const a0 = this.a0;
+    const da = this.da;
     const a = a0 + u * da;
-    const c0 = new EllipticCurveR2(this._cx, this._cy, this._rx, this._ry,
-                                   this._phi, a0, a - a0);
-    const c1 = new EllipticCurveR2(this._cx, this._cy, this._rx, this._ry,
-                                   this._phi, a, a0 + da - a);
+    const c0 = new EllipticCurveR2(this.cx, this.cy, this.rx, this.ry,
+                                   this.phi, a0, a - a0);
+    const c1 = new EllipticCurveR2(this.cx, this.cy, this.rx, this.ry,
+                                   this.phi, a, a0 + da - a);
     return [c0, c1];
   }
 
   transform(f: R2Function): EllipticCurveR2 {
-    const a0 = this._a0;
-    const a1 = a0 + this._da;
+    const a0 = this.a0;
+    const a1 = a0 + this.da;
     const a0x = Math.cos(a0);
     const a0y = Math.sin(a0);
     const a1x = Math.cos(a1);
@@ -169,9 +161,9 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     const b1y = f.transformY(a1x, a1y);
     const b0 = Math.atan2(b0y, b0x);
     const b1 = Math.atan2(b1y, b1x);
-    return new EllipticCurveR2(f.transformX(this._cx, this._cy), f.transformY(this._cx, this._cy),
-                               f.transformX(this._rx, this._ry), f.transformY(this._rx, this._ry),
-                               this._phi, b0, b1 - b0);
+    return new EllipticCurveR2(f.transformX(this.cx, this.cy), f.transformY(this.cx, this.cy),
+                               f.transformX(this.rx, this.ry), f.transformY(this.rx, this.ry),
+                               this.phi, b0, b1 - b0);
   }
 
   drawMove(context: CurveR2Context): void {
@@ -180,8 +172,8 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
   }
 
   drawRest(context: CurveR2Context): void {
-    context.ellipse(this._cx, this._cy, this._rx, this._ry, this._phi,
-                    this._a0, this._a0 + this._da, this._da < 0);
+    context.ellipse(this.cx, this.cy, this.rx, this.ry, this.phi,
+                    this.a0, this.a0 + this.da, this.da < 0);
   }
 
   transformDrawMove(context: CurveR2Context, f: R2Function): void {
@@ -190,8 +182,8 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
   }
 
   transformDrawRest(context: CurveR2Context, f: R2Function): void {
-    const a0 = this._a0;
-    const a1 = a0 + this._da;
+    const a0 = this.a0;
+    const a1 = a0 + this.da;
     const a0x = Math.cos(a0);
     const a0y = Math.sin(a0);
     const a1x = Math.cos(a1);
@@ -202,9 +194,9 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     const b1y = f.transformY(a1x, a1y);
     const b0 = Math.atan2(b0y, b0x);
     const b1 = Math.atan2(b1y, b1x);
-    context.ellipse(f.transformX(this._cx, this._cy), f.transformY(this._cx, this._cy),
-                    f.transformX(this._rx, this._ry), f.transformY(this._rx, this._ry),
-                    this._phi, b0, b1, b1 - b0 < 0);
+    context.ellipse(f.transformX(this.cx, this.cy), f.transformY(this.cx, this.cy),
+                    f.transformX(this.rx, this.ry), f.transformY(this.rx, this.ry),
+                    this.phi, b0, b1, b1 - b0 < 0);
   }
 
   writeMove(output: Output): void {
@@ -235,13 +227,13 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
 
   toEndpoints(): {x0: number, y0: number, rx: number, ry: number, phi: number,
                   large: boolean, sweep: boolean, x1: number, y1: number} {
-    const cx = this._cx;
-    const cy = this._cy;
-    const rx = this._rx;
-    const ry = this._ry;
-    const phi = this._phi;
-    const a0 = this._a0;
-    const da = this._da;
+    const cx = this.cx;
+    const cy = this.cy;
+    const rx = this.rx;
+    const ry = this.ry;
+    const phi = this.phi;
+    const a0 = this.a0;
+    const da = this.da;
     const a1 = a0 + da;
 
     const cosPhi = Math.cos(phi);
@@ -263,13 +255,13 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof EllipticCurveR2) {
-      return Numbers.equivalent(this._cx, that._cx, epsilon)
-          && Numbers.equivalent(this._cy, that._cy, epsilon)
-          && Numbers.equivalent(this._rx, that._rx, epsilon)
-          && Numbers.equivalent(this._ry, that._ry, epsilon)
-          && Numbers.equivalent(this._phi, that._phi, epsilon)
-          && Numbers.equivalent(this._a0, that._a0, epsilon)
-          && Numbers.equivalent(this._da, that._da, epsilon);
+      return Numbers.equivalent(this.cx, that.cx, epsilon)
+          && Numbers.equivalent(this.cy, that.cy, epsilon)
+          && Numbers.equivalent(this.rx, that.rx, epsilon)
+          && Numbers.equivalent(this.ry, that.ry, epsilon)
+          && Numbers.equivalent(this.phi, that.phi, epsilon)
+          && Numbers.equivalent(this.a0, that.a0, epsilon)
+          && Numbers.equivalent(this.da, that.da, epsilon);
     }
     return false;
   }
@@ -278,20 +270,20 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof EllipticCurveR2) {
-      return this._cx === that._cx && this._cy === that._cy
-          && this._rx === that._rx && this._ry === that._ry
-          && this._phi === that._phi && this._a0 === that._a0
-          && this._da === that._da;
+      return this.cx === that.cx && this.cy === that.cy
+          && this.rx === that.rx && this.ry === that.ry
+          && this.phi === that.phi && this.a0 === that.a0
+          && this.da === that.da;
     }
     return false;
   }
 
   debug(output: Output): void {
     output.write("CurveR2").write(46/*'.'*/).write("elliptic").write(40/*'('*/)
-        .debug(this._cx).write(", ").debug(this._cy).write(", ")
-        .debug(this._rx).write(", ").debug(this._ry).write(", ")
-        .debug(this._phi).write(", ").debug(this._a0).write(", ")
-        .debug(this._da).write(41/*')'*/);
+        .debug(this.cx).write(", ").debug(this.cy).write(", ")
+        .debug(this.rx).write(", ").debug(this.ry).write(", ")
+        .debug(this.phi).write(", ").debug(this.a0).write(", ")
+        .debug(this.da).write(41/*')'*/);
   }
 
   toString(): string {
@@ -339,4 +331,3 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     return new EllipticCurveR2(cx, cy, rx, ry, phi, a0, da);
   }
 }
-CurveR2.Elliptic = EllipticCurveR2;

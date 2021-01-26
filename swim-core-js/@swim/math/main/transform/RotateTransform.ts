@@ -15,81 +15,80 @@
 import {Murmur3, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
-import {Item, Attr, Value, Record} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
-import {AnyAngle, Angle} from "../angle/Angle";
+import {Item, Value, Record} from "@swim/structure";
+import {Angle} from "../angle/Angle";
+import {PointR2} from "../r2/PointR2";
 import {Transform} from "./Transform";
+import {IdentityTransform} from "./IdentityTransform";
 import {RotateTransformInterpolator} from "../"; // forward import
-import type {AffineTransform} from "./AffineTransform";
+import {RotateTransformParser} from "../"; // forward import
+import {AffineTransform} from "../"; // forward import
 
 export class RotateTransform extends Transform {
-  /** @hidden */
-  readonly _a: Angle;
-  /** @hidden */
-  _string?: string;
-
-  constructor(a: Angle) {
+  constructor(angle: Angle) {
     super();
-    this._a = a;
+    Object.defineProperty(this, "angle", {
+      value: angle,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "stringValue", {
+      value: void 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  get angle(): Angle {
-    return this._a;
-  }
+  declare readonly angle: Angle;
 
   transform(that: Transform): Transform;
-  transform(point: [number, number]): [number, number];
-  transform(x: number, y: number): [number, number];
-  transform(point: [AnyLength, AnyLength]): [Length, Length];
-  transform(x: AnyLength, y: AnyLength): [Length, Length];
-  transform(x: Transform | [AnyLength, AnyLength] | AnyLength, y?: AnyLength): Transform | [number, number] | [Length, Length] {
-    if (x instanceof Transform) {
-      if (x instanceof Transform.Identity) {
+  transform(x: number, y: number): PointR2;
+  transform(x: Transform | number, y?: number): Transform | PointR2 {
+    if (arguments.length === 1) {
+      if (x instanceof IdentityTransform) {
         return this;
       } else {
-        return new Transform.List([this, x]);
+        return Transform.list(this, x as Transform);
       }
     } else {
-      if (Array.isArray(x)) {
-        y = x[1];
-        x = x[0];
-      }
-      x = Length.fromAny(x);
-      y = Length.fromAny(y!);
-      const a = this._a.radValue();
-      const cosA = Math.cos(a);
-      const sinA = Math.sin(a);
-      if (typeof x === "number" && typeof y === "number") {
-        return [x * cosA - y * sinA,
-                x * sinA + y * cosA];
-      } else {
-        return [x.times(cosA).minus(y.times(sinA)),
-                x.times(sinA).plus(y.times(cosA))];
-      }
+      const angle = this.angle.radValue();
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
+      return new PointR2((x as number) * cosA - y! * sinA,
+                         (x as number) * sinA + y! * cosA);
     }
   }
 
   transformX(x: number, y: number): number {
-    const a = this._a.radValue();
-    return x * Math.cos(a) - y * Math.sin(a);
+    const angle = this.angle.radValue();
+    return x * Math.cos(angle) - y * Math.sin(angle);
   }
 
   transformY(x: number, y: number): number {
-    const a = this._a.radValue();
-    return x * Math.sin(a) + y * Math.cos(a);
+    const angle = this.angle.radValue();
+    return x * Math.sin(angle) + y * Math.cos(angle);
   }
 
   inverse(): Transform {
-    return new RotateTransform(this._a.opposite());
+    return new RotateTransform(this.angle.opposite());
   }
 
   toAffine(): AffineTransform {
-    const a = this._a.radValue();
-    return new Transform.Affine(Math.cos(a), Math.sin(a), -Math.sin(a), Math.cos(a), 0, 0);
+    const angle = this.angle.radValue();
+    return new AffineTransform(Math.cos(angle), Math.sin(angle),
+                              -Math.sin(angle), Math.cos(angle),
+                               0, 0);
+  }
+
+  toCssTransformComponent(): CSSTransformComponent | null {
+    if (typeof CSSTranslate !== "undefined") {
+      const angle = this.angle.toCssValue();
+      return new CSSRotate(angle!);
+    }
+    return null;
   }
 
   toValue(): Value {
-    return Record.of(Attr.of("rotate", this._a.toString()));
+    return Record.create(1).attr("rotate", this.angle.toString());
   }
 
   interpolateTo(that: RotateTransform): Interpolator<RotateTransform>;
@@ -109,48 +108,50 @@ export class RotateTransform extends Transform {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof RotateTransform) {
-      return this._a.equivalentTo(that._a, epsilon);
+      return this.angle.equivalentTo(that.angle, epsilon);
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof RotateTransform) {
-      return this._a.equals(that._a);
+      return this.angle.equals(that.angle);
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(RotateTransform), this._a.hashCode()));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(RotateTransform), this.angle.hashCode()));
   }
 
   debug(output: Output): void {
     output = output.write("Transform").write(46/*'.'*/).write("rotate")
-        .write(40/*'('*/).debug(this._a).write(41/*')'*/);
+        .write(40/*'('*/).debug(this.angle).write(41/*')'*/);
   }
 
+  /** @hidden */
+  declare readonly stringValue: string | undefined;
+
   toString(): string {
-    let string = this._string;
-    if (string === void 0) {
-      string = "rotate(" + this._a + ")";
-      this._string = string;
+    let stringValue = this.stringValue;
+    if (stringValue === void 0) {
+      stringValue = "rotate(" + this.angle + ")";
+      Object.defineProperty(this, "stringValue", {
+        value: stringValue,
+        enumerable: true,
+        configurable: true,
+      });
     }
-    return string;
+    return stringValue;
   }
 
   toAttributeString(): string {
-    return "rotate(" + this._a.degValue() + ")";
-  }
-
-  static from(a: AnyAngle): RotateTransform {
-    a = Angle.fromAny(a, "deg");
-    return new RotateTransform(a);
+    return "rotate(" + this.angle.degValue() + ")";
   }
 
   static fromCssTransformComponent(component: CSSRotate): RotateTransform {
-    const a = Angle.fromCss(component.angle);
-    return new RotateTransform(a);
+    const angle = Angle.fromCssValue(component.angle);
+    return new RotateTransform(angle);
   }
 
   static fromAny(value: RotateTransform | string): RotateTransform {
@@ -162,21 +163,21 @@ export class RotateTransform extends Transform {
     throw new TypeError("" + value);
   }
 
-  static fromValue(value: Value): RotateTransform | undefined {
+  static fromValue(value: Value): RotateTransform | null {
     const header = value.header("rotate");
     if (header.isDefined()) {
-      let a = Angle.zero();
+      let angle = Angle.zero();
       header.forEach(function (item: Item, index: number) {
         const key = item.key.stringValue();
-        if (key === "a") {
-          a = item.toValue().cast(Angle.form(), a);
+        if (key === "angle") {
+          angle = item.toValue().cast(Angle.form(), angle);
         } else if (item instanceof Value && index === 0) {
-          a = item.cast(Angle.form(), a);
+          angle = item.cast(Angle.form(), angle);
         }
       }, this);
-      return new RotateTransform(a);
+      return new RotateTransform(angle);
     }
-    return void 0;
+    return null;
   }
 
   static parse(string: string): RotateTransform {
@@ -184,7 +185,7 @@ export class RotateTransform extends Transform {
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = Transform.RotateParser.parse(input);
+    let parser = RotateTransformParser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -196,10 +197,3 @@ export class RotateTransform extends Transform {
     return parser.bind();
   }
 }
-if (typeof CSSRotate !== "undefined") { // CSS Typed OM support
-  RotateTransform.prototype.toCssTransformComponent = function (this: RotateTransform): CSSTransformComponent | undefined {
-    const angle = this._a.toCssValue();
-    return new CSSRotate(angle!);
-  };
-}
-Transform.Rotate = RotateTransform;

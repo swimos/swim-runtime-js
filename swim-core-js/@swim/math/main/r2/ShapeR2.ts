@@ -13,21 +13,21 @@
 // limitations under the License.
 
 import type {R2Function} from "./R2Function";
-import type {PointR2Init, PointR2Tuple, PointR2} from "./PointR2";
-import type {SegmentR2Init, SegmentR2} from "./SegmentR2";
-import type {BoxR2Init, BoxR2} from "./BoxR2";
-import type {CircleR2Init, CircleR2} from "./CircleR2";
+import {PointR2Init, PointR2Tuple, PointR2} from "../"; // forward import
+import {SegmentR2Init, SegmentR2} from "../"; // forward import
+import {BoxR2Init, BoxR2} from "../"; // forward import
+import {CircleR2Init, CircleR2} from "../"; // forward import
 
 export type AnyShapeR2 = ShapeR2 | PointR2Init | PointR2Tuple | SegmentR2Init | BoxR2Init | CircleR2Init;
 
 export abstract class ShapeR2 {
-  abstract get xMin(): number;
+  abstract readonly xMin: number;
 
-  abstract get yMin(): number;
+  abstract readonly yMin: number;
 
-  abstract get xMax(): number;
+  abstract readonly xMax: number;
 
-  abstract get yMax(): number;
+  abstract readonly yMax: number;
 
   abstract contains(that: AnyShapeR2): boolean;
 
@@ -37,31 +37,31 @@ export abstract class ShapeR2 {
 
   union(that: AnyShapeR2): ShapeR2 {
     that = ShapeR2.fromAny(that);
-    return new ShapeR2.Box(Math.min(this.xMin, that.xMin),
-                           Math.min(this.yMin, that.yMin),
-                           Math.max(this.xMax, that.xMax),
-                           Math.max(this.yMax, that.yMax));
+    return new BoxR2(Math.min(this.xMin, that.xMin),
+                     Math.min(this.yMin, that.yMin),
+                     Math.max(this.xMax, that.xMax),
+                     Math.max(this.yMax, that.yMax));
   }
 
   abstract transform(f: R2Function): ShapeR2;
 
-  boundingBox(): BoxR2 {
-    return new ShapeR2.Box(this.xMin, this.yMin, this.xMax, this.yMax);
+  get bounds(): BoxR2 {
+    return new BoxR2(this.xMin, this.yMin, this.xMax, this.yMax);
   }
 
   static fromAny(value: AnyShapeR2): ShapeR2 {
     if (value instanceof ShapeR2) {
       return value;
-    } else if (ShapeR2.Point.isInit(value)) {
-      return ShapeR2.Point.fromInit(value);
-    } else if (ShapeR2.Point.isTuple(value)) {
-      return ShapeR2.Point.fromTuple(value);
-    } else if (ShapeR2.Segment.isInit(value)) {
-      return ShapeR2.Segment.fromInit(value);
-    } else if (ShapeR2.Box.isInit(value)) {
-      return ShapeR2.Box.fromInit(value);
-    } else if (ShapeR2.Circle.isInit(value)) {
-      return ShapeR2.Circle.fromInit(value);
+    } else if (PointR2.isInit(value)) {
+      return PointR2.fromInit(value);
+    } else if (PointR2.isTuple(value)) {
+      return PointR2.fromTuple(value);
+    } else if (SegmentR2.isInit(value)) {
+      return SegmentR2.fromInit(value);
+    } else if (BoxR2.isInit(value)) {
+      return BoxR2.fromInit(value);
+    } else if (CircleR2.isInit(value)) {
+      return CircleR2.fromInit(value);
     }
     throw new TypeError("" + value);
   }
@@ -69,20 +69,10 @@ export abstract class ShapeR2 {
   /** @hidden */
   static isAny(value: unknown): value is AnyShapeR2 {
     return value instanceof ShapeR2
-        || ShapeR2.Point.isInit(value)
-        || ShapeR2.Point.isTuple(value)
-        || ShapeR2.Segment.isInit(value)
-        || ShapeR2.Box.isInit(value)
-        || ShapeR2.Circle.isInit(value);
+        || PointR2.isInit(value)
+        || PointR2.isTuple(value)
+        || SegmentR2.isInit(value)
+        || BoxR2.isInit(value)
+        || CircleR2.isInit(value);
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Point: typeof PointR2; // defined by PointR2
-  /** @hidden */
-  static Segment: typeof SegmentR2; // defined by SegmentR2
-  /** @hidden */
-  static Box: typeof BoxR2; // defined by BoxR2
-  /** @hidden */
-  static Circle: typeof CircleR2; // defined by CircleR2
 }

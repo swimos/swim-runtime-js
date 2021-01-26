@@ -17,23 +17,23 @@ import {AngleUnits, Angle} from "./Angle";
 
 /** @hidden */
 export class AngleParser extends Parser<Angle> {
-  private readonly _defaultUnits: AngleUnits | undefined;
-  private readonly _valueParser: Parser<number> | undefined;
-  private readonly _unitsOutput: Output<string> | undefined;
-  private readonly _step: number | undefined;
+  private readonly defaultUnits: AngleUnits | undefined;
+  private readonly valueParser: Parser<number> | undefined;
+  private readonly unitsOutput: Output<string> | undefined;
+  private readonly step: number | undefined;
 
   constructor(defaultUnits?: AngleUnits, valueParser?: Parser<number>,
               unitsOutput?: Output<string>, step?: number) {
     super();
-    this._defaultUnits = defaultUnits;
-    this._valueParser = valueParser;
-    this._unitsOutput = unitsOutput;
-    this._step = step;
+    this.defaultUnits = defaultUnits;
+    this.valueParser = valueParser;
+    this.unitsOutput = unitsOutput;
+    this.step = step;
   }
 
   feed(input: Input): Parser<Angle> {
-    return AngleParser.parse(input, this._defaultUnits, this._valueParser,
-                             this._unitsOutput, this._step);
+    return AngleParser.parse(input, this.defaultUnits, this.valueParser,
+                             this.unitsOutput, this.step);
   }
 
   static parse(input: Input, defaultUnits?: AngleUnits, valueParser?: Parser<number>,
@@ -73,4 +73,3 @@ export class AngleParser extends Parser<Angle> {
     return new AngleParser(defaultUnits, valueParser, unitsOutput, step);
   }
 }
-Angle.Parser = AngleParser;

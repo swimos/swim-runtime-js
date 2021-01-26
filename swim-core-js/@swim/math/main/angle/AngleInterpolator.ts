@@ -20,7 +20,7 @@ export const AngleInterpolator = function (a0: Angle, a1: Angle): Interpolator<A
   const interpolator = function (u: number): Angle {
     const a0 = interpolator[0];
     const a1 = interpolator[1];
-    return Angle.from(a0.value + u * (a1.value - a0.value), a1.units);
+    return Angle.create(a0.value + u * (a1.value - a0.value), a1.units);
   } as Interpolator<Angle>;
   Object.setPrototypeOf(interpolator, AngleInterpolator.prototype);
   Object.defineProperty(interpolator, 0, {

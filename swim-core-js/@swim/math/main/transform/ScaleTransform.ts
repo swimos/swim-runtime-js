@@ -15,80 +15,77 @@
 import {Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
-import {Item, Attr, Slot, Value, Record} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
+import {Item, Value, Record} from "@swim/structure";
+import {PointR2} from "../r2/PointR2";
 import {Transform} from "./Transform";
+import {IdentityTransform} from "./IdentityTransform";
 import {ScaleTransformInterpolator} from "../"; // forward import
-import type {AffineTransform} from "./AffineTransform";
+import {ScaleTransformParser} from "../"; // forward import
+import {AffineTransform} from "../"; // forward import
 
 export class ScaleTransform extends Transform {
-  /** @hidden */
-  readonly _x: number;
-  /** @hidden */
-  readonly _y: number;
-  /** @hidden */
-  _string?: string;
-
   constructor(x: number, y: number) {
     super();
-    this._x = x;
-    this._y = y;
+    Object.defineProperty(this, "x", {
+      value: x,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y", {
+      value: y,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "stringValue", {
+      value: void 0,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  get x(): number {
-    return this._x;
-  }
+  declare readonly x: number;
 
-  get y(): number {
-    return this._y;
-  }
+  declare readonly y: number;
 
   transform(that: Transform): Transform;
-  transform(point: [number, number]): [number, number];
-  transform(x: number, y: number): [number, number];
-  transform(point: [AnyLength, AnyLength]): [Length, Length];
-  transform(x: AnyLength, y: AnyLength): [Length, Length];
-  transform(x: Transform | [AnyLength, AnyLength] | AnyLength, y?: AnyLength): Transform | [number, number] | [Length, Length] {
-    if (x instanceof Transform) {
-      if (x instanceof Transform.Identity) {
+  transform(x: number, y: number): PointR2;
+  transform(x: Transform | number, y?: number): Transform | PointR2 {
+    if (arguments.length === 1) {
+      if (x instanceof IdentityTransform) {
         return this;
       } else {
-        return new Transform.List([this, x]);
+        return Transform.list(this, x as Transform);
       }
     } else {
-      if (Array.isArray(x)) {
-        y = x[1];
-        x = x[0];
-      }
-      if (typeof x === "number" && typeof y === "number") {
-        return [x * this._x, y * this._y];
-      } else {
-        x = Length.fromAny(x);
-        y = Length.fromAny(y!);
-        return [x.times(this._x), y.times(this._y)];
-      }
+      return new PointR2(this.x * (x as number), this.y * y!);
     }
   }
 
   transformX(x: number, y: number): number {
-    return x * this._x;
+    return this.x * x;
   }
 
   transformY(x: number, y: number): number {
-    return y * this._y;
+    return this.y * y;
   }
 
   inverse(): Transform {
-    return new ScaleTransform(1 / (this._x || 1), 1 / (this._y || 1));
+    return new ScaleTransform(1 / (this.x || 1), 1 / (this.y || 1));
   }
 
   toAffine(): AffineTransform {
-    return new Transform.Affine(this._x, 0, 0, this._y, 0, 0);
+    return new AffineTransform(this.x, 0, 0, this.y, 0, 0);
+  }
+
+  toCssTransformComponent(): CSSTransformComponent | null {
+    if (typeof CSSTranslate !== "undefined") {
+      return new CSSScale(this.x, this.y);
+    }
+    return null;
   }
 
   toValue(): Value {
-    return Record.of(Attr.of("scale", Record.of(Slot.of("x", this._x),
-                                                Slot.of("y", this._y))));
+    return Record.create(1)
+                 .attr("scale", Record.create(2).slot("x", this.x)
+                                                .slot("y", this.y));
   }
 
   interpolateTo(that: ScaleTransform): Interpolator<ScaleTransform>;
@@ -108,54 +105,55 @@ export class ScaleTransform extends Transform {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof ScaleTransform) {
-      return Numbers.equivalent(this._x, that._x, epsilon)
-          && Numbers.equivalent(this._y, that._y, epsilon);
+      return Numbers.equivalent(this.x, that.x, epsilon)
+          && Numbers.equivalent(this.y, that.y, epsilon);
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof ScaleTransform) {
-      return this._x === that._x && this._y === that._y;
+      return this.x === that.x && this.y === that.y;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(ScaleTransform),
-        Numbers.hash(this._x)), Numbers.hash(this._y)));
+        Numbers.hash(this.x)), Numbers.hash(this.y)));
   }
 
   debug(output: Output): void {
     output = output.write("Transform").write(46/*'.'*/).write("scale");
-    if (this._x !== 0 && this._y === 0) {
-      output = output.write("X").write(40/*'('*/).debug(this._x).write(41/*')'*/);
-    } else if (this._x === 0 && this._y !== 0) {
-      output = output.write("Y").write(40/*'('*/).debug(this._y).write(41/*')'*/);
+    if (this.x !== 0 && this.y === 0) {
+      output = output.write("X").write(40/*'('*/).debug(this.x).write(41/*')'*/);
+    } else if (this.x === 0 && this.y !== 0) {
+      output = output.write("Y").write(40/*'('*/).debug(this.y).write(41/*')'*/);
     } else {
-      output = output.write(40/*'('*/).debug(this._x).write(", ").debug(this._y).write(41/*')'*/);
+      output = output.write(40/*'('*/).debug(this.x).write(", ").debug(this.y).write(41/*')'*/);
     }
   }
+
+  /** @hidden */
+  declare readonly stringValue: string | undefined;
 
   toString(): string {
-    let string = this._string;
-    if (string === void 0) {
-      if (this._x !== 0 && this._y === 0) {
-        string = "scaleX(" + this._x + ")";
-      } else if (this._x === 0 && this._y !== 0) {
-        string = "scaleY(" + this._y + ")";
+    let stringValue = this.stringValue;
+    if (stringValue === void 0) {
+      if (this.x !== 0 && this.y === 0) {
+        stringValue = "scaleX(" + this.x + ")";
+      } else if (this.x === 0 && this.y !== 0) {
+        stringValue = "scaleY(" + this.y + ")";
       } else {
-        string = "scale(" + this._x + "," + this._y + ")";
+        stringValue = "scale(" + this.x + "," + this.y + ")";
       }
-      this._string = string;
+      Object.defineProperty(this, "stringValue", {
+        value: stringValue,
+        enumerable: true,
+        configurable: true,
+      });
     }
-    return string;
-  }
-
-  static from(x: string | number, y: string | number): ScaleTransform {
-    x = +x;
-    y = +y;
-    return new ScaleTransform(x, y);
+    return stringValue;
   }
 
   static fromCssTransformComponent(component: CSSScale): ScaleTransform {
@@ -177,7 +175,7 @@ export class ScaleTransform extends Transform {
     throw new TypeError("" + value);
   }
 
-  static fromValue(value: Value): ScaleTransform | undefined {
+  static fromValue(value: Value): ScaleTransform | null {
     const header = value.header("scale");
     if (header.isDefined()) {
       let x = 0;
@@ -200,7 +198,7 @@ export class ScaleTransform extends Transform {
       }, this);
       return new ScaleTransform(x, y);
     }
-    return void 0;
+    return null;
   }
 
   static parse(string: string): ScaleTransform {
@@ -208,7 +206,7 @@ export class ScaleTransform extends Transform {
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = Transform.ScaleParser.parse(input);
+    let parser = ScaleTransformParser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -220,9 +218,3 @@ export class ScaleTransform extends Transform {
     return parser.bind();
   }
 }
-if (typeof CSSScale !== "undefined") { // CSS Typed OM support
-  ScaleTransform.prototype.toCssTransformComponent = function (this: ScaleTransform): CSSTransformComponent | undefined {
-    return new CSSScale(this._x, this._y);
-  };
-}
-Transform.Scale = ScaleTransform;

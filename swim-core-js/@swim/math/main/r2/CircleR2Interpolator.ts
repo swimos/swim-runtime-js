@@ -20,9 +20,9 @@ export const CircleR2Interpolator = function (s0: CircleR2, s1: CircleR2): Inter
   const interpolator = function (u: number): CircleR2 {
     const s0 = interpolator[0];
     const s1 = interpolator[1];
-    const cx = s0._cx + u * (s1._cx - s0._cx);
-    const cy = s0._cy + u * (s1._cy - s0._cy);
-    const r = s0._r + u * (s1._r - s0._r);
+    const cx = s0.cx + u * (s1.cx - s0.cx);
+    const cy = s0.cy + u * (s1.cy - s0.cy);
+    const r = s0.r + u * (s1.r - s0.r);
     return new CircleR2(cx, cy, r);
   } as Interpolator<CircleR2>;
   Object.setPrototypeOf(interpolator, CircleR2Interpolator.prototype);

@@ -122,4 +122,3 @@ export class AffineTransformParser extends Parser<AffineTransform> {
     return AffineTransformParser.parse(input, identOutput, void 0, void 0, 2);
   }
 }
-Transform.AffineParser = AffineTransformParser;

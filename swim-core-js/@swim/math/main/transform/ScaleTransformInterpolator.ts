@@ -20,8 +20,8 @@ export const ScaleTransformInterpolator = function (f0: ScaleTransform, f1: Scal
   const interpolator = function (u: number): ScaleTransform {
     const f0 = interpolator[0];
     const f1 = interpolator[1];
-    const x = f0._x + u * (f1._x - f0._x);
-    const y = f0._y + u * (f1._y - f0._y);
+    const x = f0.x + u * (f1.x - f0.x);
+    const y = f0.y + u * (f1.y - f0.y);
     return new ScaleTransform(x, y);
   } as Interpolator<ScaleTransform>;
   Object.setPrototypeOf(interpolator, ScaleTransformInterpolator.prototype);

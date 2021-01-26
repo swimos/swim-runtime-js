@@ -813,11 +813,11 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   hashCode(): number {
-    let code = Constructors.hash(Record);
+    let hashValue = Constructors.hash(Record);
     this.forEach(function (item: Item): void {
-      code = Murmur3.mix(code, item.hashCode());
+      hashValue = Murmur3.mix(hashValue, item.hashCode());
     }, this);
-    return code;
+    return hashValue;
   }
 
   debug(output: Output): void {

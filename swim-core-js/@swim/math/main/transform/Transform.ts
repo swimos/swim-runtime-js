@@ -12,45 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {HashCode, Equivalent} from "@swim/util";
+import {HashCode, Equivalent, Lazy} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {Value, Form} from "@swim/structure";
-import type {AnyLength, Length} from "../length/Length";
-import type {AnyAngle} from "../angle/Angle";
+import {AnyLength, Length} from "../length/Length";
+import {PxLength} from "../length/PxLength";
+import {AnyAngle, Angle} from "../angle/Angle";
+import {DegAngle} from "../angle/DegAngle";
 import type {R2Operator} from "../r2/R2Operator";
-import type {IdentityTransform} from "./IdentityTransform";
-import type {TranslateTransform} from "./TranslateTransform";
-import type {ScaleTransform} from "./ScaleTransform";
-import type {RotateTransform} from "./RotateTransform";
-import type {SkewTransform} from "./SkewTransform";
-import type {AffineTransform} from "./AffineTransform";
+import type {PointR2} from "../r2/PointR2";
+import {TransformForm} from "../"; // forward import
+import {IdentityTransform} from "../"; // forward import
+import {TranslateTransform} from "../"; // forward import
+import {ScaleTransform} from "../"; // forward import
+import {RotateTransform} from "../"; // forward import
+import {SkewTransform} from "../"; // forward import
+import {AffineTransform} from "../"; // forward import
 import {AffineTransformInterpolator} from "../"; // forward import
-import type {TransformList} from "./TransformList";
-import type {TranslateTransformParser} from "./TranslateTransformParser";
-import type {ScaleTransformParser} from "./ScaleTransformParser";
-import type {RotateTransformParser} from "./RotateTransformParser";
-import type {SkewTransformParser} from "./SkewTransformParser";
-import type {AffineTransformParser} from "./AffineTransformParser";
-import type {TransformListParser} from "./TransformListParser";
-import type {TransformParser} from "./TransformParser";
-import type {TransformForm} from "./TransformForm";
+import {TransformList} from "../"; // forward import
+import {TransformListParser} from "../"; // forward import
 
 export type AnyTransform = Transform | string;
 
-export interface Transformation {
-  transform(point: [number, number]): [number, number];
-  transform(x: number, y: number): [number, number];
-  transform(point: [AnyLength, AnyLength]): [Length, Length];
-  transform(x: AnyLength, y: AnyLength): [Length, Length];
-}
-
-export abstract class Transform implements Transformation, R2Operator, Interpolate<Transform>, HashCode, Equivalent, Debug {
+export abstract class Transform implements R2Operator, Interpolate<Transform>, HashCode, Equivalent, Debug {
   abstract transform(that: Transform): Transform;
-  abstract transform(point: [number, number]): [number, number];
-  abstract transform(x: number, y: number): [number, number];
-  abstract transform(point: [AnyLength, AnyLength]): [Length, Length];
-  abstract transform(x: AnyLength, y: AnyLength): [Length, Length];
+  abstract transform(x: number, y: number): PointR2;
 
   abstract transformX(x: number, y: number): number;
 
@@ -70,15 +57,15 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
     return this.transform(Transform.translateY(y));
   }
 
-  scale(x: string | number, y: string | number): Transform {
+  scale(x: number, y: number): Transform {
     return this.transform(Transform.scale(x, y));
   }
 
-  scaleX(x: string | number): Transform {
+  scaleX(x: number): Transform {
     return this.transform(Transform.scaleX(x));
   }
 
-  scaleY(y: string | number): Transform {
+  scaleY(y: number): Transform {
     return this.transform(Transform.scaleY(y));
   }
 
@@ -104,12 +91,18 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
     return this.toAffine().toMatrix();
   }
 
-  toCssTransformComponent(): CSSTransformComponent | undefined {
-    return void 0; // conditionally overridden when CSS Typed OM is available
+  toCssTransformComponent(): CSSTransformComponent | null {
+    return null
   }
 
-  toCssValue(): CSSStyleValue | undefined {
-    return void 0; // conditionally overridden when CSS Typed OM is available
+  toCssValue(): CSSStyleValue | null {
+    if (typeof CSSTransformValue !== "undefined") {
+      const component = this.toCssTransformComponent();
+      if (component !== null) {
+        return new CSSTransformValue([component]);
+      }
+    }
+    return null;
   }
 
   abstract toValue(): Value;
@@ -140,65 +133,80 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
     return this.toString();
   }
 
-  private static _identity?: IdentityTransform;
-  static identity(): IdentityTransform {
-    if (Transform._identity === void 0) {
-      Transform._identity = new Transform.Identity();
-    }
-    return Transform._identity;
+  @Lazy
+  static identity(): Transform {
+    return new IdentityTransform();
   }
 
   static translate(x: AnyLength, y: AnyLength): TranslateTransform {
-    return Transform.Translate.from(x, y);
+    x = Length.fromAny(x);
+    y = Length.fromAny(y);
+    return new TranslateTransform(x, y);
   }
 
   static translateX(x: AnyLength): TranslateTransform {
-    return Transform.Translate.from(x, 0);
+    x = Length.fromAny(x);
+    return new TranslateTransform(x, PxLength.zero());
   }
 
   static translateY(y: AnyLength): TranslateTransform {
-    return Transform.Translate.from(0, y);
+    y = Length.fromAny(y);
+    return new TranslateTransform(PxLength.zero(), y);
   }
 
-  static scale(x: string | number, y: string | number): ScaleTransform {
-    return Transform.Scale.from(x, y);
+  static scale(x: number, y: number): ScaleTransform {
+    return new ScaleTransform(x, y);
   }
 
-  static scaleX(x: string | number): ScaleTransform {
-    return Transform.Scale.from(x, 1);
+  static scaleX(x: number): ScaleTransform {
+    return new ScaleTransform(x, 1);
   }
 
-  static scaleY(y: string | number): ScaleTransform {
-    return Transform.Scale.from(1, y);
+  static scaleY(y: number): ScaleTransform {
+    return new ScaleTransform(1, y);
   }
 
   static rotate(a: AnyAngle): RotateTransform {
-    return Transform.Rotate.from(a);
+    a = Angle.fromAny(a, "deg");
+    return new RotateTransform(a);
   }
 
   static skew(x: AnyAngle, y: AnyAngle): SkewTransform {
-    return Transform.Skew.from(x, y);
+    x = Angle.fromAny(x, "deg");
+    y = Angle.fromAny(y, "deg");
+    return new SkewTransform(x, y);
   }
 
   static skewX(x: AnyAngle): SkewTransform {
-    return Transform.Skew.from(x, 0);
+    x = Angle.fromAny(x, "deg");
+    return new SkewTransform(x, DegAngle.zero());
   }
 
   static skewY(y: AnyAngle): SkewTransform {
-    return Transform.Skew.from(0, y);
+    y = Angle.fromAny(y, "deg");
+    return new SkewTransform(DegAngle.zero(), y);
   }
 
-  static affine(x0?: string | number, y0?: string | number,
-                x1?: string | number, y1?: string | number,
-                tx?: string | number, ty?: string | number): AffineTransform {
-    return Transform.Affine.from(x0, y0, x1, y1, tx, ty);
+  static affine(x0: number = 1, y0: number = 0,
+                x1: number = 0, y1: number = 1,
+                tx: number = 0, ty: number = 0): AffineTransform {
+    return new AffineTransform(x0, y0, x1, y1, tx, ty);
   }
 
   static list(...transforms: AnyTransform[]): TransformList {
-    return Transform.List.from(transforms);
+    const list: Transform[] = [];
+    for (let i = 0; i < transforms.length; i += 1) {
+      const transform = Transform.fromAny(transforms[i]!);
+      if (transform instanceof TransformList) {
+        list.push(...transform.transforms);
+      } else if (!(transform instanceof IdentityTransform)) {
+        list.push(transform);
+      }
+    }
+    return new TransformList(list);
   }
 
-  static fromCss(value: CSSStyleValue): Transform {
+  static fromCssValue(value: CSSStyleValue): Transform {
     if (value instanceof CSSTransformValue) {
       return Transform.fromCssTransform(value);
     } else {
@@ -209,24 +217,28 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
   /** @hidden */
   static fromCssTransform(value: CSSTransformValue): Transform {
     const n = value.length;
-    const transforms = new Array<Transform>(n);
-    for (let i = 0; i < n; i += 1) {
-      transforms[i] = Transform.fromCssTransformComponent(value[i]!);
+    if (n === 1) {
+      return Transform.fromCssTransformComponent(value[0]!);
+    } else {
+      const transforms = new Array<Transform>(n);
+      for (let i = 0; i < n; i += 1) {
+        transforms[i] = Transform.fromCssTransformComponent(value[i]!);
+      }
+      return new TransformList(transforms);
     }
-    return new Transform.List(transforms);
   }
 
   static fromCssTransformComponent(component: CSSTransformComponent): Transform {
     if (component instanceof CSSTranslate) {
-      return Transform.Translate.fromCssTransformComponent(component);
+      return TranslateTransform.fromCssTransformComponent(component);
     } else if (component instanceof CSSRotate) {
-      return Transform.Rotate.fromCssTransformComponent(component);
+      return RotateTransform.fromCssTransformComponent(component);
     } else if (component instanceof CSSScale) {
-      return Transform.Scale.fromCssTransformComponent(component);
+      return ScaleTransform.fromCssTransformComponent(component);
     } else if (component instanceof CSSSkew) {
-      return Transform.Skew.fromCssTransformComponent(component);
+      return SkewTransform.fromCssTransformComponent(component);
     } else if (component instanceof CSSMatrixComponent) {
-      return Transform.Affine.fromCssTransformComponent(component);
+      return AffineTransform.fromCssTransformComponent(component);
     } else {
       throw new TypeError("" + component);
     }
@@ -242,16 +254,16 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
     }
   }
 
-  static fromValue(value: Value): Transform | undefined {
+  static fromValue(value: Value): Transform | null {
     const tag = value.tag;
     switch (tag) {
-      case "identity": return Transform.Identity.fromValue(value);
-      case "translate": return Transform.Translate.fromValue(value);
-      case "scale": return Transform.Scale.fromValue(value);
-      case "rotate": return Transform.Rotate.fromValue(value);
-      case "skew": return Transform.Skew.fromValue(value);
-      case "matrix": return Transform.Affine.fromValue(value);
-      default: return Transform.List.fromValue(value);
+      case "identity": return IdentityTransform.fromValue(value);
+      case "translate": return TranslateTransform.fromValue(value);
+      case "scale": return ScaleTransform.fromValue(value);
+      case "rotate": return RotateTransform.fromValue(value);
+      case "skew": return SkewTransform.fromValue(value);
+      case "matrix": return AffineTransform.fromValue(value);
+      default: return TransformList.fromValue(value);
     }
   }
 
@@ -260,7 +272,7 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = Transform.ListParser.parse(input);
+    let parser = TransformListParser.parse(input);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -272,60 +284,14 @@ export abstract class Transform implements Transformation, R2Operator, Interpola
     return parser.bind();
   }
 
+  @Lazy
+  static form(): Form<Transform, AnyTransform> {
+    return new TransformForm(Transform.identity());
+  }
+
   /** @hidden */
   static isAny(value: unknown): value is AnyTransform {
     return value instanceof Transform
         || typeof value === "string";
   }
-
-  private static _form?: Form<Transform, AnyTransform>;
-  static form(unit?: AnyTransform): Form<Transform, AnyTransform> {
-    if (unit === void 0) {
-      if (Transform._form === void 0) {
-        Transform._form = new Transform.Form(Transform.identity());
-      }
-      return Transform._form;
-    } else {
-      unit = Transform.fromAny(unit);
-      return new Transform.Form(unit);
-    }
-  }
-
-  // Forward type declarations
-  /** @hidden */
-  static Identity: typeof IdentityTransform; // defined by IdentityTransform
-  /** @hidden */
-  static Translate: typeof TranslateTransform; // defined by TranslateTransform
-  /** @hidden */
-  static Scale: typeof ScaleTransform; // defined by ScaleTransform
-  /** @hidden */
-  static Rotate: typeof RotateTransform; // defined by RotateTransform
-  /** @hidden */
-  static Skew: typeof SkewTransform; // defined by SkewTransform
-  /** @hidden */
-  static Affine: typeof AffineTransform; // defined by AffineTransform
-  /** @hidden */
-  static List: typeof TransformList; // defined by TransformList
-  /** @hidden */
-  static TranslateParser: typeof TranslateTransformParser; // defined by TranslateTransformParser
-  /** @hidden */
-  static ScaleParser: typeof ScaleTransformParser; // defined by ScaleTransformParser
-  /** @hidden */
-  static RotateParser: typeof RotateTransformParser; // defined by RotateTransformParser
-  /** @hidden */
-  static SkewParser: typeof SkewTransformParser; // defined by SkewTransformParser
-  /** @hidden */
-  static AffineParser: typeof AffineTransformParser; // defined by AffineTransformParser
-  /** @hidden */
-  static ListParser: typeof TransformListParser; // defined by TransformListParser
-  /** @hidden */
-  static Parser: typeof TransformParser; // defined by TransformParser
-  /** @hidden */
-  static Form: typeof TransformForm; // defined by TransformForm
-}
-if (typeof CSSTransformValue !== "undefined") { // CSS Typed OM support
-  Transform.prototype.toCssValue = function (this: Transform): CSSTransformValue | undefined {
-    const component = this.toCssTransformComponent();
-    return component !== void 0 ? new CSSTransformValue([component]) : void 0;
-  };
 }

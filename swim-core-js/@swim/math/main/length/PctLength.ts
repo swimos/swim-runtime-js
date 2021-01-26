@@ -12,60 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Constructors} from "@swim/util";
+import {Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {LengthUnits, Length} from "./Length";
+import {LengthUnits, LengthBasis, Length} from "./Length";
 
 export class PctLength extends Length {
-  /** @hidden */
-  readonly _value: number;
-  /** @hidden */
-  readonly _node?: Node;
-
-  constructor(value: number, node: Node | null = null) {
+  constructor(value: number) {
     super();
-    this._value = value;
-    if (node !== null) {
-      this._node = node;
-    }
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
   }
 
-  isRelative(): boolean {
-    return true;
-  }
-
-  get value(): number {
-    return this._value;
-  }
+  declare readonly value: number;
 
   get units(): LengthUnits {
     return "%";
   }
 
-  get node(): Node | null {
-    const node = this._node;
-    return node !== void 0 ? node : null;
+  pxValue(basis?: LengthBasis | number): number {
+    return this.value * Length.pctUnit(basis) / 100;
   }
 
-  unitValue(): number {
-    return Length.widthUnit(this.node);
+  pctValue(basis?: LengthBasis | number): number {
+    return this.value;
   }
 
-  pxValue(unitValue: number = this.unitValue()): number {
-    return unitValue * this._value / 100;
-  }
-
-  pctValue(): number {
-    return this._value;
-  }
-
-  pct(): PctLength {
+  pct(basis?: LengthBasis | number): PctLength {
     return this;
+  }
+
+  toCssValue(): CSSUnitValue | null {
+    if (typeof CSSUnitValue !== "undefined") {
+      return new CSSUnitValue(this.value, "percent");
+    } else {
+      return null;
+    }
   }
 
   compareTo(that: unknown): number {
     if (that instanceof Length) {
-      const x = this._value;
+      const x = this.value;
       const y = that.pctValue();
       return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
     }
@@ -74,55 +62,33 @@ export class PctLength extends Length {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof Length) {
-      return Numbers.equivalent(this._value, that.pctValue());
+      return Numbers.equivalent(this.value, that.pctValue());
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof PctLength) {
-      return this._value === that._value && this._node === that._node;
+      return this.value === that.value;
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(PctLength), Numbers.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(PctLength), Numbers.hash(this.value)));
   }
 
   debug(output: Output): void {
-    output = output.write("Length").write(46/*'.'*/).write("pct").write(40/*'('*/).debug(this._value);
-    if (this._node !== void 0) {
-      output = output.write(", ").debug(this._node);
-    }
-    output = output.write(41/*')'*/);
+    output = output.write("Length").write(46/*'.'*/).write("pct")
+        .write(40/*'('*/).debug(this.value).write(41/*')'*/);
   }
 
   toString(): string {
-    return this._value + "%";
+    return this.value + "%";
   }
 
-  private static _zero: PctLength;
-  static zero(units?: "%", node?: Node | null): PctLength;
-  static zero(node?: Node | null): PctLength;
-  static zero(units?: "%" | Node | null, node?: Node | null): PctLength {
-    if (typeof units !== "string") {
-      node = units;
-      units = "%";
-    }
-    if (node === void 0 || node === null) {
-      if (PctLength._zero === void 0) {
-        PctLength._zero = new PctLength(0);
-      }
-      return PctLength._zero;
-    } else {
-      return new PctLength(0, node);
-    }
+  @Lazy
+  static zero(): PctLength {
+    return new PctLength(0);
   }
 }
-if (typeof CSSUnitValue !== "undefined") { // CSS Typed OM support
-  PctLength.prototype.toCssValue = function (this: PctLength): CSSUnitValue | undefined {
-    return new CSSUnitValue(this._value, "percent");
-  };
-}
-Length.Pct = PctLength;

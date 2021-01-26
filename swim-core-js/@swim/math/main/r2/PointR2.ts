@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
+import {Equivalent, HashCode, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {R2Function} from "./R2Function";
@@ -30,58 +30,53 @@ export interface PointR2Init {
 export type PointR2Tuple = [number, number];
 
 export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, Equivalent, Debug {
-  /** @hidden */
-  readonly _x: number;
-  /** @hidden */
-  readonly _y: number;
-
   constructor(x: number, y: number) {
     super();
-    this._x = x;
-    this._y = y;
+    Object.defineProperty(this, "x", {
+      value: x,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y", {
+      value: y,
+      enumerable: true,
+    });
   }
 
   isDefined(): boolean {
-    return isFinite(this._x) || isFinite(this._y);
+    return isFinite(this.x) && isFinite(this.y);
   }
 
-  get x(): number {
-    return this._x;
-  }
+  declare readonly x: number;
 
-  get y(): number {
-    return this._y;
-  }
+  declare readonly y: number;
 
   get xMin(): number {
-    return this._x;
+    return this.x;
   }
 
   get yMin(): number {
-    return this._y;
+    return this.y;
   }
 
   get xMax(): number {
-    return this._x;
+    return this.x;
   }
 
   get yMax(): number {
-    return this._y;
+    return this.y;
   }
 
   plus(vector: AnyVectorR2): PointR2 {
-    return new PointR2(this._x + vector.x, this._y + vector.y);
+    return new PointR2(this.x + vector.x, this.y + vector.y);
   }
 
   minus(vector: VectorR2): PointR2;
   minus(that: PointR2): VectorR2;
   minus(that: VectorR2 | PointR2): PointR2 | VectorR2 {
-    const x = this._x - that._x;
-    const y = this._y - that._y;
     if (that instanceof VectorR2) {
-      return new PointR2(x, y);
+      return new PointR2(this.x - that.x, this.y - that.y);
     } else {
-      return new VectorR2(x, y);
+      return new VectorR2(this.x - that.x, this.y - that.y);
     }
   }
 
@@ -89,14 +84,14 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
   contains(x: number, y: number): boolean;
   contains(that: AnyShapeR2 | number, y?: number): boolean {
     if (typeof that === "number") {
-      return this._x === that && this._y === y!;
+      return this.x === that && this.y === y!;
     } else {
       that = ShapeR2.fromAny(that);
       if (that instanceof PointR2) {
-        return this._x === that._x && this._y === that._y;
+        return this.x === that.x && this.y === that.y;
       } else if (that instanceof ShapeR2) {
-        return this._x <= that.xMin && that.xMax <= this._x
-            && this._y <= that.yMin && that.yMax <= this._y;
+        return this.x <= that.xMin && that.xMax <= this.x
+            && this.y <= that.yMin && that.yMax <= this.y;
       }
       return false;
     }
@@ -108,13 +103,13 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
   }
 
   transform(f: R2Function): PointR2 {
-    return new PointR2(f.transformX(this._x, this._y), f.transformY(this._x, this._y));
+    return new PointR2(f.transformX(this.x, this.y), f.transformY(this.x, this.y));
   }
 
   toAny(): PointR2Init {
     return {
-      x: this._x,
-      y: this._y,
+      x: this.x,
+      y: this.y,
     };
   }
 
@@ -132,8 +127,8 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
     if (this === that) {
       return true;
     } else if (that instanceof PointR2) {
-      return Numbers.equivalent(that._x, this._x, epsilon)
-          && Numbers.equivalent(that._y, this._y, epsilon);
+      return Numbers.equivalent(this.x, that.x, epsilon)
+          && Numbers.equivalent(this.y, that.y, epsilon);
     }
     return false;
   }
@@ -142,39 +137,33 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
     if (this === that) {
       return true;
     } else if (that instanceof PointR2) {
-      return this._x === that._x && this._y === that._y;
+      return this.x === that.x && this.y === that.y;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(PointR2),
-        Numbers.hash(this._x)), Numbers.hash(this._y)));
+        Numbers.hash(this.x)), Numbers.hash(this.y)));
   }
 
   debug(output: Output): void {
     output.write("PointR2").write(46/*'.'*/).write("of").write(40/*'('*/)
-        .debug(this._x).write(", ").debug(this._y).write(41/*')'*/);
+        .debug(this.x).write(", ").debug(this.y).write(41/*')'*/);
   }
 
   toString(): string {
     return Format.debug(this);
   }
 
-  private static _origin?: PointR2;
+  @Lazy
   static origin(): PointR2 {
-    if (PointR2._origin === void 0) {
-      PointR2._origin = new PointR2(0, 0);
-    }
-    return PointR2._origin;
+    return new PointR2(0, 0);
   }
 
-  private static _undefined?: PointR2;
+  @Lazy
   static undefined(): PointR2 {
-    if (PointR2._undefined === void 0) {
-      PointR2._undefined = new PointR2(NaN, NaN);
-    }
-    return PointR2._undefined;
+    return new PointR2(NaN, NaN);
   }
 
   static of(x: number, y: number): PointR2 {
@@ -225,4 +214,3 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
         || PointR2.isTuple(value);
   }
 }
-ShapeR2.Point = PointR2;

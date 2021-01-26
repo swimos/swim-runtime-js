@@ -15,32 +15,19 @@
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Interpolator, IdentityInterpolator} from "@swim/mapping";
-import {Attr, Value, Record} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
+import {Value, Record} from "@swim/structure";
+import {PointR2} from "../r2/PointR2";
 import {Transform} from "./Transform";
-import type {AffineTransform} from "./AffineTransform";
+import {AffineTransform} from "../"; // forward import
 
 export class IdentityTransform extends Transform {
   transform(that: Transform): Transform;
-  transform(point: [number, number]): [number, number];
-  transform(x: number, y: number): [number, number];
-  transform(point: [AnyLength, AnyLength]): [Length, Length];
-  transform(x: AnyLength, y: AnyLength): [Length, Length];
-  transform(x: Transform | [AnyLength, AnyLength] | AnyLength, y?: AnyLength): Transform | [number, number] | [Length, Length] {
-    if (x instanceof Transform) {
-      return x;
+  transform(x: number, y: number): PointR2;
+  transform(x: Transform | number, y?: number): Transform | PointR2 {
+    if (arguments.length === 1) {
+      return x as Transform;
     } else {
-      if (Array.isArray(x)) {
-        y = x[1];
-        x = x[0];
-      }
-      if (typeof x === "number" && typeof y === "number") {
-        return [x, y];
-      } else {
-        x = Length.fromAny(x);
-        y = Length.fromAny(y!);
-        return [x, y];
-      }
+      return new PointR2(x as number, y!);
     }
   }
 
@@ -57,11 +44,15 @@ export class IdentityTransform extends Transform {
   }
 
   toAffine(): AffineTransform {
-    return new Transform.Affine(1, 0, 0, 1, 0, 0);
+    return new AffineTransform(1, 0, 0, 1, 0, 0);
+  }
+
+  toCssValue(): CSSStyleValue | null {
+    return new CSSKeywordValue("identity");
   }
 
   toValue(): Value {
-    return Record.of(Attr.of("identity"));
+    return Record.create(1).attr("identity");
   }
 
   interpolateTo(that: IdentityTransform): Interpolator<IdentityTransform>;
@@ -100,16 +91,10 @@ export class IdentityTransform extends Transform {
     return "none";
   }
 
-  static fromValue(value: Value): IdentityTransform | undefined {
+  static fromValue(value: Value): IdentityTransform | null {
     if (value.tag === "identity") {
       return Transform.identity();
     }
-    return void 0;
+    return null;
   }
 }
-if (typeof CSSKeywordValue !== "undefined") { // CSS Typed OM support
-  IdentityTransform.prototype.toCssValue = function (this: IdentityTransform): CSSStyleValue | undefined {
-    return new CSSKeywordValue("identity");
-  };
-}
-Transform.Identity = IdentityTransform;

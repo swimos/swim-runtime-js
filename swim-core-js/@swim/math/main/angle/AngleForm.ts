@@ -49,7 +49,7 @@ export class AngleForm extends Form<Angle, AnyAngle> {
 
   cast(item: Item): Angle | undefined {
     const value = item.toValue();
-    let angle: Angle | undefined;
+    let angle: Angle | null = null;
     try {
       angle = Angle.fromValue(value);
       if (angle === void 0) {
@@ -61,7 +61,6 @@ export class AngleForm extends Form<Angle, AnyAngle> {
     } catch (e) {
       // swallow
     }
-    return angle;
+    return angle !== null ? angle : void 0;
   }
 }
-Angle.Form = AngleForm;

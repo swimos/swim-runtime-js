@@ -22,84 +22,84 @@ import {SplineR2} from "./SplineR2";
 
 export class SplineR2Builder implements SplineR2Context {
   /** @hidden */
-  _curves: CurveR2[];
+  curves: CurveR2[];
   /** @hidden */
-  _closed: boolean;
+  closed: boolean;
   /** @hidden */
-  _aliased: boolean;
+  aliased: boolean;
   /** @hidden */
-  _x0: number;
+  x0: number;
   /** @hidden */
-  _y0: number;
+  y0: number;
   /** @hidden */
-  _x: number;
+  x: number;
   /** @hidden */
-  _y: number;
+  y: number;
 
   constructor() {
-    this._curves = [];
-    this._closed = false;
-    this._aliased = false;
-    this._x0 = 0;
-    this._y0 = 0;
-    this._x = 0;
-    this._y = 0;
+    this.curves = [];
+    this.closed = false;
+    this.aliased = false;
+    this.x0 = 0;
+    this.y0 = 0;
+    this.x = 0;
+    this.y = 0;
   }
 
   private dealias(): void {
-    if (this._aliased) {
-      this._curves = this._curves.slice(0);
-      this._aliased = false;
+    if (this.aliased) {
+      this.curves = this.curves.slice(0);
+      this.aliased = false;
     }
   }
 
   moveTo(x: number, y: number): void {
-    if (this._aliased) {
-      this._curves = [];
-      this._aliased = false;
+    if (this.aliased) {
+      this.curves = [];
+      this.aliased = false;
     } else {
-      this._curves.length = 0;
+      this.curves.length = 0;
     }
-    this._closed = false;
-    this._x0 = x;
-    this._y0 = y;
-    this._x = x;
-    this._y = y;
+    this.closed = false;
+    this.x0 = x;
+    this.y0 = y;
+    this.x = x;
+    this.y = y;
   }
 
   closePath(): void {
     this.dealias();
-    this._curves.push(new SegmentR2(this._x, this._y, this._x0, this._y0));
-    this._closed = true;
-    this._x = this._x0;
-    this._y = this._y0;
+    this.curves.push(new SegmentR2(this.x, this.y, this.x0, this.y0));
+    this.closed = true;
+    this.x = this.x0;
+    this.y = this.y0;
   }
 
   lineTo(x: number, y: number): void {
     this.dealias();
-    this._curves.push(new SegmentR2(this._x, this._y, x, y));
-    this._x = x;
-    this._y = y;
+    this.curves.push(new SegmentR2(this.x, this.y, x, y));
+    this.x = x;
+    this.y = y;
   }
 
   quadraticCurveTo(x1: number, y1: number, x: number, y: number): void {
     this.dealias();
-    this._curves.push(new QuadraticCurveR2(this._x, this._y, x1, y1, x, y));
-    this._x = x;
-    this._y = y;
+    this.curves.push(new QuadraticCurveR2(this.x, this.y, x1, y1, x, y));
+    this.x = x;
+    this.y = y;
   }
 
   bezierCurveTo(x1: number, y1: number, x2: number, y2: number, x: number, y: number): void {
     this.dealias();
-    this._curves.push(new CubicCurveR2(this._x, this._y, x1, y1, x2, y2, x, y));
-    this._x = x;
-    this._y = y;
+    this.curves.push(new CubicCurveR2(this.x, this.y, x1, y1, x2, y2, x, y));
+    this.x = x;
+    this.y = y;
   }
 
   arcTo(x1: number, y1: number, x2: number, y2: number, r: number): void {
     this.dealias();
-    const x0 = this._x;
-    const y0 = this._y;
+    const x0 = this.x;
+    const y0 = this.y;
     const dx01 = x1 - x0;
     const dy01 = y1 - y0;
     const dx12 = x2 - x1;
@@ -123,9 +123,9 @@ export class SplineR2Builder implements SplineR2Context {
                                            r1x1, r1y1, r1x2 - r1x1, r1y2 - r1y1);
     const cx = r0x0 + u * (r0x1 - r0x0);
     const cy = r0y0 + u * (r0y1 - r0y0);
-    this._curves.push(new EllipticCurveR2(cx, cy, r, r, 0, a0, da));
-    this._x = x2;
-    this._y = y2;
+    this.curves.push(new EllipticCurveR2(cx, cy, r, r, 0, a0, da));
+    this.x = x2;
+    this.y = y2;
   }
 
   private static intersection(px: number, py: number, rx: number, ry: number,
@@ -167,10 +167,10 @@ export class SplineR2Builder implements SplineR2Context {
       da += 2 * Math.PI;
     }
     const curve = new EllipticCurveR2(cx, cy, r, r, 0, a0, da);
-    this._curves.push(curve);
+    this.curves.push(curve);
     const {x, y} = curve.interpolate(1);
-    this._x = x;
-    this._y = y;
+    this.x = x;
+    this.y = y;
   }
 
   ellipse(cx: number, cy: number, rx: number, ry: number, phi: number, a0: number, a1: number, ccw?: boolean): void {
@@ -182,25 +182,24 @@ export class SplineR2Builder implements SplineR2Context {
       da += 2 * Math.PI;
     }
     const curve = new EllipticCurveR2(cx, cy, rx, ry, phi, a0, da);
-    this._curves.push(curve);
+    this.curves.push(curve);
     const {x, y} = curve.interpolate(1);
-    this._x = x;
-    this._y = y;
+    this.x = x;
+    this.y = y;
   }
 
   rect(x: number, y: number, w: number, h: number): void {
     this.dealias();
-    this._curves.push(new SegmentR2(x, y, x + w, y),
-                      new SegmentR2(x + w, y, x + w, y + h),
-                      new SegmentR2(x + w, y + h, x, y + h),
-                      new SegmentR2(x, y + h, x, y));
-    this._x = x;
-    this._y = y;
+    this.curves.push(new SegmentR2(x, y, x + w, y),
+                     new SegmentR2(x + w, y, x + w, y + h),
+                     new SegmentR2(x + w, y + h, x, y + h),
+                     new SegmentR2(x, y + h, x, y));
+    this.x = x;
+    this.y = y;
   }
 
   bind(): SplineR2 {
-    this._aliased = true;
-    return new SplineR2(this._curves, this._closed);
+    this.aliased = true;
+    return new SplineR2(this.curves, this.closed);
   }
 }
-SplineR2.Builder = SplineR2Builder;

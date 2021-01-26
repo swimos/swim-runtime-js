@@ -20,10 +20,10 @@ export const SegmentR2Interpolator = function (s0: SegmentR2, s1: SegmentR2): In
   const interpolator = function (u: number): SegmentR2 {
     const s0 = interpolator[0];
     const s1 = interpolator[1];
-    const x0 = s0._x0 + u * (s1._x0 - s0._x0);
-    const y0 = s0._y0 + u * (s1._y0 - s0._y0);
-    const x1 = s0._x1 + u * (s1._x1 - s0._x1);
-    const y1 = s0._y1 + u * (s1._y1 - s0._y1);
+    const x0 = s0.x0 + u * (s1.x0 - s0.x0);
+    const y0 = s0.y0 + u * (s1.y0 - s0.y0);
+    const x1 = s0.x1 + u * (s1.x1 - s0.x1);
+    const y1 = s0.y1 + u * (s1.y1 - s0.y1);
     return new SegmentR2(x0, y0, x1, y1);
   } as Interpolator<SegmentR2>;
   Object.setPrototypeOf(interpolator, SegmentR2Interpolator.prototype);

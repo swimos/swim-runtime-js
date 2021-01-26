@@ -21,14 +21,14 @@ export const SkewTransformInterpolator = function (f0: SkewTransform, f1: SkewTr
   const interpolator = function (u: number): SkewTransform {
     const f0 = interpolator[0];
     const f1 = interpolator[1];
-    const x = Angle.from(f0._x.value + u * (f1._x.value - f0._x.value), f1._x.units);
-    const y = Angle.from(f0._y.value + u * (f1._y.value - f0._y.value), f1._y.units);
+    const x = Angle.create(f0.x.value + u * (f1.x.value - f0.x.value), f1.x.units);
+    const y = Angle.create(f0.y.value + u * (f1.y.value - f0.y.value), f1.y.units);
     return new SkewTransform(x, y);
   } as Interpolator<SkewTransform>;
   Object.setPrototypeOf(interpolator, SkewTransformInterpolator.prototype);
   Object.defineProperty(interpolator, 0, {
-    value: f0._x.units === f1._x.units && f0._y.units === f1._y.units
-         ? f0 : new SkewTransform(f0._x.to(f1._x.units), f0._y.to(f1._y.units)),
+    value: f0.x.units === f1.x.units && f0.y.units === f1.y.units
+         ? f0 : new SkewTransform(f0.x.to(f1.x.units), f0.y.to(f1.y.units)),
     enumerable: true,
   });
   Object.defineProperty(interpolator, 1, {

@@ -54,19 +54,19 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   get lngMin(): number {
-    return this.boundingBox().lngMin;
+    return this.bounds.lngMin;
   }
 
   get latMin(): number {
-    return this.boundingBox().latMin;
+    return this.bounds.latMin;
   }
 
   get lngMax(): number {
-    return this.boundingBox().lngMax;
+    return this.bounds.lngMax;
   }
 
   get latMax(): number {
-    return this.boundingBox().latMax;
+    return this.bounds.latMax;
   }
 
   interpolateLng(u: number): number {
@@ -204,7 +204,7 @@ export class GeoSpline extends GeoCurve implements Debug {
     }
   }
 
-  boundingBox(): GeoBox {
+  get bounds(): GeoBox {
     let boundingBox = this._boundingBox;
     if (boundingBox === void 0) {
       let lngMin = Infinity;

@@ -14,9 +14,9 @@
 
 import {Input, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Length} from "../length/Length";
+import {PxLength} from "../length/PxLength";
 import {LengthParser} from "../length/LengthParser";
-import {Transform} from "./Transform";
-import type {TranslateTransform} from "./TranslateTransform";
+import {TranslateTransform} from "./TranslateTransform";
 
 /** @hidden */
 export class TranslateTransformParser extends Parser<TranslateTransform> {
@@ -97,8 +97,8 @@ export class TranslateTransformParser extends Parser<TranslateTransform> {
           input.step();
           const ident = identOutput!.bind();
           switch (ident) {
-            case "translateX": return Parser.done(Transform.translateX(xParser!.bind()));
-            case "translateY": return Parser.done(Transform.translateY(xParser!.bind()));
+            case "translateX": return Parser.done(new TranslateTransform(xParser!.bind(), PxLength.zero()));
+            case "translateY": return Parser.done(new TranslateTransform(PxLength.zero(), xParser!.bind()));
             default: return Parser.error(Diagnostic.message("unknown transform function: " + ident, input));
           }
         } else if (c === 44/*','*/) {
@@ -138,7 +138,7 @@ export class TranslateTransformParser extends Parser<TranslateTransform> {
         input.step();
         const ident = identOutput!.bind();
         switch (ident) {
-          case "translate": return Parser.done(Transform.translate(xParser!.bind(), yParser!.bind()));
+          case "translate": return Parser.done(new TranslateTransform(xParser!.bind(), yParser!.bind()));
           default: return Parser.error(Diagnostic.message("unknown transform function: " + ident, input));
         }
       } else if (!input.isEmpty()) {
@@ -153,4 +153,3 @@ export class TranslateTransformParser extends Parser<TranslateTransform> {
     return TranslateTransformParser.parse(input, identOutput, void 0, void 0, 2);
   }
 }
-Transform.TranslateParser = TranslateTransformParser;

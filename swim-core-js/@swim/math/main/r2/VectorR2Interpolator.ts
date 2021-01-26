@@ -20,8 +20,8 @@ export const VectorR2Interpolator = function (v0: VectorR2, v1: VectorR2): Inter
   const interpolator = function (u: number): VectorR2 {
     const v0 = interpolator[0];
     const v1 = interpolator[1];
-    const x = v0._x + u * (v1._x - v0._x);
-    const y = v0._y + u * (v1._y - v0._y);
+    const x = v0.x + u * (v1.x - v0.x);
+    const y = v0.y + u * (v1.y - v0.y);
     return new VectorR2(x, y);
   } as Interpolator<VectorR2>;
   Object.setPrototypeOf(interpolator, VectorR2Interpolator.prototype);

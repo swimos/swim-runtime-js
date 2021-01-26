@@ -12,119 +12,123 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {HashCode, Equivalent, Compare} from "@swim/util";
+import {HashCode, Equivalent, Compare, Lazy} from "@swim/util";
 import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
-import {Attr, Value, Form} from "@swim/structure";
+import {Attr, Value, Text, Form} from "@swim/structure";
+import {LengthException} from "./LengthException";
+import {PxLength} from "../"; // forward import
+import {EmLength} from "../"; // forward import
+import {RemLength} from "../"; // forward import
+import {PctLength} from "../"; // forward import
+import {UnitlessLength} from "../"; // forward import
 import {LengthInterpolator} from "../"; // forward import
-import type {PxLength} from "./PxLength";
-import type {EmLength} from "./EmLength";
-import type {RemLength} from "./RemLength";
-import type {PctLength} from "./PctLength";
-import type {UnitlessLength} from "./UnitlessLength";
-import type {LengthParser} from "./LengthParser";
-import type {LengthForm} from "./LengthForm";
+import {LengthForm} from "../"; // forward import
+import {LengthParser} from "../"; // forward import
 
 export type LengthUnits = "px" | "em" | "rem" | "%" | "";
+
+export interface LengthBasis {
+  emUnit?: Node | number;
+  remUnit?: number;
+  pctUnit?: number;
+}
 
 export type AnyLength = Length | string | number;
 
 export abstract class Length implements Interpolate<Length>, HashCode, Equivalent, Compare, Debug {
   isDefined(): boolean {
-    return this.value !== 0;
+    return isFinite(this.value);
   }
 
-  abstract isRelative(): boolean;
+  abstract readonly value: number;
 
-  abstract get value(): number;
+  abstract readonly units: LengthUnits;
 
-  abstract get units(): LengthUnits;
-
-  abstract get node(): Node | null;
-
-  plus(that: AnyLength, units: LengthUnits = this.units): Length {
+  plus(that: AnyLength, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
     that = Length.fromAny(that);
-    return Length.from(this.toValue(units) + that.toValue(units), units);
+    return Length.create(this.toValue(units, basis) + that.toValue(units, basis), units);
   }
 
-  opposite(units: LengthUnits = this.units): Length {
-    return Length.from(-this.toValue(units), units);
+  opposite(units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
+    return Length.create(-this.toValue(units, basis), units);
   }
 
-  minus(that: AnyLength, units: LengthUnits = this.units): Length {
+  minus(that: AnyLength, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
     that = Length.fromAny(that);
-    return Length.from(this.toValue(units) - that.toValue(units), units);
+    return Length.create(this.toValue(units, basis) - that.toValue(units, basis), units);
   }
 
-  times(scalar: number, units: LengthUnits = this.units): Length {
-    return Length.from(this.toValue(units) * scalar, units);
+  times(scalar: number, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
+    return Length.create(this.toValue(units, basis) * scalar, units);
   }
 
-  divide(scalar: number, units: LengthUnits = this.units): Length {
-    return Length.from(this.toValue(units) / scalar, units);
+  divide(scalar: number, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
+    return Length.create(this.toValue(units, basis) / scalar, units);
   }
 
-  combine(that: AnyLength, scalar: number = 1, units: LengthUnits = this.units): Length {
+  combine(that: AnyLength, scalar: number = 1, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
     that = Length.fromAny(that);
-    return Length.from(this.toValue(units) + that.toValue(units) * scalar, units);
+    return Length.create(this.toValue(units, basis) + that.toValue(units, basis) * scalar, units);
   }
 
-  /** Returns the base unit value, in pixels. */
-  abstract unitValue(): number;
+  abstract pxValue(basis?: LengthBasis | number): number;
 
-  abstract pxValue(unitValue?: number): number;
-
-  emValue(): number {
-    return this.pxValue() / Length.emUnit(this.node);
+  emValue(basis?: LengthBasis | number): number {
+    return this.pxValue(basis) / Length.emUnit(basis);
   }
 
-  remValue(): number {
-    return this.pxValue() / Length.remUnit();
+  remValue(basis?: LengthBasis | number): number {
+    return this.pxValue(basis) / Length.remUnit(basis);
   }
 
-  pctValue(): number {
-    return this.px().value / this.unitValue();
+  pctValue(basis?: LengthBasis | number): number {
+    return this.pxValue(basis) / Length.pctUnit(basis);
   }
 
-  px(unitValue?: number): PxLength {
-    return Length.px(this.pxValue(unitValue), this.node);
+  px(basis?: LengthBasis | number): PxLength {
+    return Length.px(this.pxValue(basis));
   }
 
-  em(): EmLength {
-    return Length.em(this.emValue(), this.node);
+  em(basis?: LengthBasis | number): EmLength {
+    return Length.em(this.emValue(basis));
   }
 
-  rem(): RemLength {
-    return Length.rem(this.remValue(), this.node);
+  rem(basis?: LengthBasis | number): RemLength {
+    return Length.rem(this.remValue(basis));
   }
 
-  pct(): PctLength {
-    return Length.pct(this.pctValue(), this.node);
+  pct(basis?: LengthBasis | number): PctLength {
+    return Length.pct(this.pctValue(basis));
   }
 
-  toValue(units: LengthUnits): number {
-    switch (units) {
-      case "px": return this.pxValue();
-      case "em": return this.emValue();
-      case "rem": return this.remValue();
-      case "%": return this.pctValue();
-      default: throw new Error("unknown length units: " + units);
+  toValue(): Value;
+  toValue(units: LengthUnits, basis?: LengthBasis | number): number;
+  toValue(units?: LengthUnits, basis?: LengthBasis | number): Value | number {
+    if (units === void 0) {
+      return Text.from(this.toString());
+    } else {
+      switch (units) {
+        case "px": return this.pxValue(basis);
+        case "em": return this.emValue(basis);
+        case "rem": return this.remValue(basis);
+        case "%": return this.pctValue(basis);
+        default: throw new LengthException("unknown length units: " + units);
+      }
     }
   }
 
-  to(units: LengthUnits): Length {
+  to(units: LengthUnits, basis?: LengthBasis | number): Length {
     switch (units) {
-      case "px": return this.px();
-      case "em": return this.em();
-      case "rem": return this.rem();
-      case "%": return this.pct();
-      default: throw new Error("unknown length units: " + units);
+      case "px": return this.px(basis);
+      case "em": return this.em(basis);
+      case "rem": return this.rem(basis);
+      case "%": return this.pct(basis);
+      default: throw new LengthException("unknown length units: " + units);
     }
   }
 
-  toCssValue(): CSSUnitValue | undefined {
-    return void 0; // conditionally overridden when CSS Typed OM is available
-  }
+  abstract toCssValue(): CSSUnitValue | null;
 
   interpolateTo(that: Length): Interpolator<Length>;
   interpolateTo(that: unknown): Interpolator<Length> | null;
@@ -148,121 +152,92 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
 
   abstract toString(): string;
 
-  static zero(units?: LengthUnits, node?: Node | null): Length;
-  static zero(node?: Node | null): Length;
-  static zero(units?: LengthUnits | Node | null, node?: Node | null): Length {
-    if (typeof units !== "string") {
-      node = units;
-      units = "px";
-    }
+  static zero(units?: LengthUnits): Length {
     switch (units) {
-      case "px": return Length.Px.zero(node);
-      case "em": return Length.Em.zero(node);
-      case "rem": return Length.Rem.zero(node);
-      case "%": return Length.Pct.zero(node);
-      case "": return Length.Unitless.zero(node);
-      default: throw new Error("unknown length units: " + units);
+      case void 0:
+      case "px": return PxLength.zero();
+      case "em": return EmLength.zero();
+      case "rem": return RemLength.zero();
+      case "%": return PctLength.zero();
+      case "": return UnitlessLength.zero();
+      default: throw new LengthException("unknown length units: " + units);
     }
   }
 
-  static px(value: number, node?: Node | null): PxLength {
-    return new Length.Px(value, node);
+  static px(value: number): PxLength {
+    return new PxLength(value);
   }
 
-  static em(value: number, node?: Node | null): EmLength {
-    return new Length.Em(value, node);
+  static em(value: number): EmLength {
+    return new EmLength(value);
   }
 
-  static rem(value: number, node?: Node | null): RemLength {
-    return new Length.Rem(value, node);
+  static rem(value: number): RemLength {
+    return new RemLength(value);
   }
 
-  static pct(value: number, node?: Node | null): PctLength {
-    return new Length.Pct(value, node);
+  static pct(value: number): PctLength {
+    return new PctLength(value);
   }
 
-  static unitless(value: number, node?: Node | null): UnitlessLength {
-    return new Length.Unitless(value, node);
+  static unitless(value: number): UnitlessLength {
+    return new UnitlessLength(value);
   }
 
-  static from(value: number, units?: LengthUnits, node?: Node | null): Length;
-  static from(value: number, node?: Node | null): Length;
-  static from(value: number, units?: LengthUnits | Node | null, node?: Node | null): Length {
-    if (typeof units !== "string") {
-      node = units;
-      units = "px";
-    }
+  static create(value: number, units?: LengthUnits): Length {
     switch (units) {
-      case "px": return Length.px(value, node);
-      case "em": return Length.em(value, node);
-      case "rem": return Length.rem(value, node);
-      case "%": return Length.pct(value, node);
-      case "": return Length.unitless(value, node);
-      default: throw new Error("unknown length units: " + units);
+      case void 0:
+      case "px": return Length.px(value);
+      case "em": return Length.em(value);
+      case "rem": return Length.rem(value);
+      case "%": return Length.pct(value);
+      case "": return Length.unitless(value);
+      default: throw new LengthException("unknown length units: " + units);
     }
   }
 
-  static fromCss(value: CSSStyleValue, node?: Node | null): Length {
+  static fromCssValue(value: CSSStyleValue): Length {
     if (value instanceof CSSUnitValue) {
-      switch (value.unit) {
-        case "px": return Length.px(value.value, node);
-        case "em": return Length.em(value.value, node);
-        case "rem": return Length.rem(value.value, node);
-        case "percent": return Length.pct(value.value, node);
-        case "number": return Length.unitless(value.value, node);
-        default: throw new Error("unknown length units: " + value.unit);
-      }
+      return Length.create(value.value, value.unit as LengthUnits);
     } else {
       throw new TypeError("" + value);
     }
   }
 
-  static fromAny(value: AnyLength, defaultUnits?: LengthUnits, node?: Node | null): Length;
-  static fromAny(value: AnyLength, node?: Node | null): Length;
-  static fromAny(value: AnyLength, defaultUnits?: LengthUnits | Node | null, node?: Node | null): Length {
-    if (typeof defaultUnits !== "string") {
-      node = defaultUnits;
-      defaultUnits = void 0;
-    }
+  static fromAny(value: AnyLength, defaultUnits?: LengthUnits): Length {
     if (value instanceof Length) {
       return value;
     } else if (typeof value === "number") {
-      return Length.from(value, defaultUnits, node);
-    } else if (typeof value === "string" && typeof defaultUnits !== "string") {
-      return Length.parse(value, defaultUnits, node);
+      return Length.create(value, defaultUnits);
+    } else if (typeof value === "string") {
+      return Length.parse(value, defaultUnits);
     }
     throw new TypeError("" + value);
   }
 
-  static fromValue(value: Value, node?: Node | null): Length | undefined {
+  static fromValue(value: Value): Length | null {
     if (value.length === 2) {
       const num = value.getItem(0).numberValue(void 0);
       const units = value.getItem(1);
-      if (num !== void 0 && isFinite(num) && units instanceof Attr && units.toValue() === Value.extant()) {
+      if (num !== void 0 && isFinite(num) && units instanceof Attr && units.value === Value.extant()) {
         switch (units.key.value) {
-          case "px": return Length.px(num, node);
-          case "em": return Length.em(num, node);
-          case "rem": return Length.rem(num, node);
-          case "pct": return Length.pct(num, node);
+          case "px": return Length.px(num);
+          case "em": return Length.em(num);
+          case "rem": return Length.rem(num);
+          case "pct": return Length.pct(num);
           default:
         }
       }
     }
-    return void 0;
+    return null;
   }
 
-  static parse(string: string, defaultUnits?: LengthUnits, node?: Node | null): Length;
-  static parse(string: string, node?: Node | null): Length;
-  static parse(string: string, defaultUnits?: LengthUnits | Node | null, node?: Node | null): Length {
-    if (typeof defaultUnits !== "string") {
-      node = defaultUnits;
-      defaultUnits = void 0;
-    }
+  static parse(string: string, defaultUnits?: LengthUnits): Length {
     let input = Unicode.stringInput(string);
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();
     }
-    let parser = Length.Parser.parse(input, defaultUnits, node);
+    let parser = LengthParser.parse(input, defaultUnits);
     if (parser.isDone()) {
       while (input.isCont() && Unicode.isWhitespace(input.head())) {
         input = input.step();
@@ -274,6 +249,11 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     return parser.bind();
   }
 
+  @Lazy
+  static form(): Form<Length, AnyLength> {
+    return new LengthForm(void 0, Length.zero());
+  }
+
   /** @hidden */
   static isAny(value: unknown): value is AnyLength {
     return value instanceof Length
@@ -281,68 +261,45 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
         || typeof value === "string";
   }
 
-  private static _form: Form<Length, AnyLength>;
-  static form(defaultUnits?: LengthUnits, unit?: AnyLength): Form<Length, AnyLength> {
-    if (defaultUnits === void 0 && unit === void 0) {
-      if (Length._form === void 0) {
-        Length._form = new Length.Form(void 0, Length.zero());
-      }
-      return Length._form;
-    } else {
-      if (unit !== void 0) {
-        unit = Length.fromAny(unit);
-      }
-      return new Length.Form(defaultUnits, unit);
-    }
-  }
-
   /** @hidden */
-  static widthUnit(node: Node | null): number {
-    while (node !== null) {
-      if (node instanceof HTMLElement && node.offsetParent instanceof HTMLElement) {
-        return node.offsetParent.offsetWidth;
-      }
-      node = node.parentNode;
-    }
-    return 0;
-  }
-
-  /** @hidden */
-  static emUnit(node: Node | null): number {
-    while (node !== null) {
-      if (node instanceof Element) {
-        const fontSize = getComputedStyle(node).fontSize;
-        if (fontSize !== null) {
-          return parseFloat(fontSize);
+  static emUnit(basis?: LengthBasis | number): number {
+    if (typeof basis === "object" && typeof basis.emUnit === "number") {
+      return basis.emUnit;
+    } else if (typeof basis === "object" && basis.emUnit instanceof Node) {
+      let node: Node | null = basis.emUnit;
+      while (node !== null) {
+        if (node instanceof Element) {
+          const fontSize = getComputedStyle(node).fontSize;
+          if (typeof fontSize === "string") {
+            return parseFloat(fontSize);
+          }
         }
+        node = node.parentNode;
       }
-      node = node.parentNode;
     }
-    return 0;
+    throw new LengthException("unknown em unit");
   }
 
   /** @hidden */
-  static remUnit(): number {
-    const fontSize = getComputedStyle(document.documentElement).fontSize;
-    if (fontSize !== null) {
-      return parseFloat(fontSize);
+  static remUnit(basis?: LengthBasis | number): number {
+    if (typeof basis === "object" && typeof basis.remUnit === "number") {
+      return basis.remUnit;
+    } else {
+      const fontSize = getComputedStyle(document.documentElement).fontSize;
+      if (typeof fontSize === "string") {
+        return parseFloat(fontSize);
+      }
     }
-    return 0;
+    throw new LengthException("unknown rem unit");
   }
 
-  // Forward type declarations
   /** @hidden */
-  static Px: typeof PxLength; // defined by PxLength
-  /** @hidden */
-  static Em: typeof EmLength; // defined by EmLength
-  /** @hidden */
-  static Rem: typeof RemLength; // defined by RemLength
-  /** @hidden */
-  static Pct: typeof PctLength; // defined by PctLength
-  /** @hidden */
-  static Unitless: typeof UnitlessLength; // defined by UnitlessLength
-  /** @hidden */
-  static Parser: typeof LengthParser; // defined by LengthParser
-  /** @hidden */
-  static Form: typeof LengthForm; // defined by LengthForm
+  static pctUnit(basis?: LengthBasis | number): number {
+    if (typeof basis === "number") {
+      return basis;
+    } else if (typeof basis === "object" && typeof basis.pctUnit === "number") {
+      return basis.pctUnit;
+    }
+    throw new LengthException("unknown percentage unit");
+  }
 }

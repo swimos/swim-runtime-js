@@ -14,9 +14,9 @@
 
 import {Input, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Angle} from "../angle/Angle";
+import {DegAngle} from "../angle/DegAngle";
 import {AngleParser} from "../angle/AngleParser";
-import {Transform} from "./Transform";
-import type {SkewTransform} from "./SkewTransform";
+import {SkewTransform} from "./SkewTransform";
 
 /** @hidden */
 export class SkewTransformParser extends Parser<SkewTransform> {
@@ -97,8 +97,8 @@ export class SkewTransformParser extends Parser<SkewTransform> {
           input.step();
           const ident = identOutput!.bind();
           switch (ident) {
-            case "skewX": return Parser.done(Transform.skewX(xParser!.bind()));
-            case "skewY": return Parser.done(Transform.skewY(xParser!.bind()));
+            case "skewX": return Parser.done(new SkewTransform(xParser!.bind(), DegAngle.zero()));
+            case "skewY": return Parser.done(new SkewTransform(DegAngle.zero(), xParser!.bind()));
             default: return Parser.error(Diagnostic.message("unknown transform function: " + ident, input));
           }
         } else if (c === 44/*','*/) {
@@ -138,7 +138,7 @@ export class SkewTransformParser extends Parser<SkewTransform> {
         input.step();
         const ident = identOutput!.bind();
         switch (ident) {
-          case "skew": return Parser.done(Transform.skew(xParser!.bind(), yParser!.bind()));
+          case "skew": return Parser.done(new SkewTransform(xParser!.bind(), yParser!.bind()));
           default: return Parser.error(Diagnostic.message("unknown transform function: " + ident, input));
         }
       } else if (!input.isEmpty()) {
@@ -153,4 +153,3 @@ export class SkewTransformParser extends Parser<SkewTransform> {
     return SkewTransformParser.parse(input, identOutput, void 0, void 0, 2);
   }
 }
-Transform.SkewParser = SkewTransformParser;

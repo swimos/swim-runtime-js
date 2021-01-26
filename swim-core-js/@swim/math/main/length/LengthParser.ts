@@ -17,29 +17,27 @@ import {LengthUnits, Length} from "./Length";
 
 /** @hidden */
 export class LengthParser extends Parser<Length> {
-  private readonly _defaultUnits: LengthUnits | undefined;
-  private readonly _node: Node | null;
-  private readonly _valueParser: Parser<number> | undefined;
-  private readonly _unitsOutput: Output<string> | undefined;
-  private readonly _step: number | undefined;
+  private readonly defaultUnits: LengthUnits | undefined;
+  private readonly valueParser: Parser<number> | undefined;
+  private readonly unitsOutput: Output<string> | undefined;
+  private readonly step: number | undefined;
 
-  constructor(defaultUnits?: LengthUnits, node: Node | null = null,
-              valueParser?: Parser<number>, unitsOutput?: Output<string>, step?: number) {
+  constructor(defaultUnits?: LengthUnits, valueParser?: Parser<number>,
+              unitsOutput?: Output<string>, step?: number) {
     super();
-    this._defaultUnits = defaultUnits;
-    this._node = node;
-    this._valueParser = valueParser;
-    this._unitsOutput = unitsOutput;
-    this._step = step;
+    this.defaultUnits = defaultUnits;
+    this.valueParser = valueParser;
+    this.unitsOutput = unitsOutput;
+    this.step = step;
   }
 
   feed(input: Input): Parser<Length> {
-    return LengthParser.parse(input, this._defaultUnits, this._node, this._valueParser,
-                              this._unitsOutput, this._step);
+    return LengthParser.parse(input, this.defaultUnits, this.valueParser,
+                              this.unitsOutput, this.step);
   }
 
-  static parse(input: Input, defaultUnits?: LengthUnits, node: Node | null = null,
-               valueParser?: Parser<number>, unitsOutput?: Output<string>, step: number = 1): Parser<Length> {
+  static parse(input: Input, defaultUnits?: LengthUnits, valueParser?: Parser<number>,
+               unitsOutput?: Output<string>, step: number = 1): Parser<Length> {
     let c = 0;
     if (step === 1) {
       if (valueParser === void 0) {
@@ -63,17 +61,16 @@ export class LengthParser extends Parser<Length> {
         const value = valueParser!.bind();
         const units = unitsOutput.bind() || defaultUnits;
         switch (units) {
-          case "px": return Parser.done(Length.px(value, node));
-          case "em": return Parser.done(Length.em(value, node));
-          case "rem": return Parser.done(Length.rem(value, node));
-          case "%": return Parser.done(Length.pct(value, node));
+          case "px": return Parser.done(Length.px(value));
+          case "em": return Parser.done(Length.em(value));
+          case "rem": return Parser.done(Length.rem(value));
+          case "%": return Parser.done(Length.pct(value));
           case "":
-          case void 0: return Parser.done(Length.unitless(value, node));
-          default: return Parser.error(Diagnostic.message("unknown units: " + units, input));
+          case void 0: return Parser.done(Length.unitless(value));
+          default: return Parser.error(Diagnostic.message("unknown length units: " + units, input));
         }
       }
     }
-    return new LengthParser(defaultUnits, node, valueParser, unitsOutput, step);
+    return new LengthParser(defaultUnits, valueParser, unitsOutput, step);
   }
 }
-Length.Parser = LengthParser;

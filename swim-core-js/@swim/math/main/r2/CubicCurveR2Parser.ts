@@ -14,7 +14,6 @@
 
 import {Input, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
 import {CubicCurveR2} from "./CubicCurveR2";
-import {CurveR2Parser} from "./CurveR2Parser";
 
 /** @hidden */
 export class CubicCurveR2Parser extends Parser<CubicCurveR2> {
@@ -294,4 +293,3 @@ export class CubicCurveR2Parser extends Parser<CubicCurveR2> {
                                     void 0, void 0, void 0, void 0, command, step);
   }
 }
-CurveR2Parser.Cubic = CubicCurveR2Parser;

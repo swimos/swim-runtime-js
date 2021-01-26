@@ -178,11 +178,11 @@ Arrays.compare = function (x: ArrayLike<unknown> | null | undefined, y: ArrayLik
 
 Arrays.hash = function (x: ArrayLike<unknown> | null | undefined): number {
   if (typeof x === "object" && x !== null) {
-    let code = 0;
+    let hashValue = 0;
     for (let i = 0, n = x.length; i < n; i += 1) {
-      code = Murmur3.mix(code, Values.hash(x[i]));
+      hashValue = Murmur3.mix(hashValue, Values.hash(x[i]));
     }
-    return Murmur3.mash(code);
+    return Murmur3.mash(hashValue);
   } else if (x === null) {
     return 1;
   } else if (x === void 0) {

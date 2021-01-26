@@ -12,50 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Constructors} from "@swim/util";
+import {Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {AngleUnits, Angle} from "./Angle";
 
 export class DegAngle extends Angle {
-  /** @hidden */
-  readonly _value: number;
-
   constructor(value: number) {
     super();
-    this._value = value;
+    Object.defineProperty(this, "value", {
+      value: value,
+      enumerable: true,
+    });
   }
 
-  get value(): number {
-    return this._value;
-  }
+  declare readonly value: number;
 
   get units(): AngleUnits {
     return "deg";
   }
 
   degValue(): number {
-    return this._value;
+    return this.value;
   }
 
   gradValue(): number {
-    return this._value * 10 / 9;
+    return this.value * 10 / 9;
   }
 
   radValue(): number {
-    return this._value * Angle.PI / 180;
+    return this.value * Math.PI / 180;
   }
 
   turnValue(): number {
-    return this._value / 360;
+    return this.value / 360;
   }
 
   deg(): DegAngle {
     return this;
   }
 
+  toCssValue(): CSSUnitValue | null {
+    if (typeof CSSUnitValue !== "undefined") {
+      return new CSSUnitValue(this.value, "deg");
+    } else {
+      return null;
+    }
+  }
+
   compareTo(that: unknown): number {
     if (that instanceof Angle) {
-      const x = this._value;
+      const x = this.value;
       const y = that.degValue();
       return x < y ? -1 : x > y ? 1 : isNaN(y) ? (isNaN(x) ? 0 : -1) : isNaN(x) ? 1 : 0;
     }
@@ -64,42 +70,33 @@ export class DegAngle extends Angle {
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (that instanceof Angle) {
-      return Numbers.equivalent(this._value, that.degValue());
+      return Numbers.equivalent(this.value, that.degValue());
     }
     return false;
   }
 
   equals(that: unknown): boolean {
     if (that instanceof DegAngle) {
-      return this._value === that._value;
+      return this.value === that.value;
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(DegAngle), Numbers.hash(this._value)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(DegAngle), Numbers.hash(this.value)));
   }
 
   debug(output: Output): void {
-    output = output.write("Angle").write(46/*'.'*/).write("deg").write(40/*'('*/)
-        .debug(this._value).write(41/*')'*/);
+    output = output.write("Angle").write(46/*'.'*/).write("deg")
+        .write(40/*'('*/).debug(this.value).write(41/*')'*/);
   }
 
   toString(): string {
-    return this._value + "deg";
+    return this.value + "deg";
   }
 
-  private static _zero?: DegAngle;
-  static zero(units?: "deg"): DegAngle {
-    if (DegAngle._zero === void 0) {
-      DegAngle._zero = new DegAngle(0);
-    }
-    return DegAngle._zero;
+  @Lazy
+  static zero(): DegAngle {
+    return new DegAngle(0);
   }
 }
-if (typeof CSSUnitValue !== "undefined") { // CSS Typed OM support
-  DegAngle.prototype.toCssValue = function (this: DegAngle): CSSUnitValue | undefined {
-    return new CSSUnitValue(this._value, "deg");
-  };
-}
-Angle.Deg = DegAngle;

@@ -19,7 +19,6 @@ import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
 import {PointR2} from "./PointR2";
 import type {CurveR2Context} from "./CurveR2Context";
-import {CurveR2} from "./CurveR2";
 import {BezierCurveR2} from "./BezierCurveR2";
 import {SegmentR2Interpolator} from "../"; // forward import
 
@@ -33,72 +32,67 @@ export interface SegmentR2Init {
 }
 
 export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, HashCode, Debug {
-  /** @hidden */
-  readonly _x0: number;
-  /** @hidden */
-  readonly _y0: number;
-  /** @hidden */
-  readonly _x1: number;
-  /** @hidden */
-  readonly _y1: number;
-
   constructor(x0: number, y0: number, x1: number, y1: number) {
     super();
-    this._x0 = x0;
-    this._y0 = y0;
-    this._x1 = x1;
-    this._y1 = y1;
+    Object.defineProperty(this, "x0", {
+      value: x0,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y0", {
+      value: y0,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "x1", {
+      value: x1,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "y1", {
+      value: y1,
+      enumerable: true,
+    });
   }
 
   isDefined(): boolean {
-    return isFinite(this._x0) && isFinite(this._y0)
-        && isFinite(this._x1) && isFinite(this._y1);
+    return isFinite(this.x0) && isFinite(this.y0)
+        && isFinite(this.x1) && isFinite(this.y1);
   }
 
-  get x0(): number {
-    return this._x0;
-  }
+  declare readonly x0: number;
 
-  get y0(): number {
-    return this._y0;
-  }
+  declare readonly y0: number;
 
-  get x1(): number {
-    return this._x1;
-  }
+  declare readonly x1: number;
 
-  get y1(): number {
-    return this._y1;
-  }
+  declare readonly y1: number;
 
   get xMin(): number {
-    return Math.min(this._x0, this._x1);
+    return Math.min(this.x0, this.x1);
   }
 
   get yMin(): number {
-    return Math.min(this._y0, this._y1);
+    return Math.min(this.y0, this.y1);
   }
 
   get xMax(): number {
-    return Math.max(this._x0, this._x1);
+    return Math.max(this.x0, this.x1);
   }
 
   get yMax(): number {
-    return Math.max(this._y0, this._y1);
+    return Math.max(this.y0, this.y1);
   }
 
   interpolateX(u: number): number {
-    return (1.0 - u) * this._x0 + u * this._x1;
+    return (1.0 - u) * this.x0 + u * this.x1;
   }
 
   interpolateY(u: number): number {
-   return (1.0 - u) * this._y0 + u * this._y1;
+    return (1.0 - u) * this.y0 + u * this.y1;
   }
 
   interpolate(u: number): PointR2 {
     const v = 1.0 - u;
-    const x01 = v * this._x0 + u * this._x1;
-    const y01 = v * this._y0 + u * this._y1;
+    const x01 = v * this.x0 + u * this.x1;
+    const y01 = v * this.y0 + u * this.y1;
     return new PointR2(x01, y01);
   }
 
@@ -106,7 +100,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
   contains(x: number, y: number): boolean;
   contains(that: AnyShapeR2 | number, y?: number): boolean {
     if (typeof that === "number") {
-      return SegmentR2.contains(this._x0, this._y0, this._x1, this._y1, that, y!);
+      return SegmentR2.contains(this.x0, this.y0, this.x1, this.y1, that, y!);
     } else {
       that = ShapeR2.fromAny(that);
       if (that instanceof PointR2) {
@@ -120,13 +114,13 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
 
   /** @hidden */
   containsPoint(that: PointR2): boolean {
-    return SegmentR2.contains(this._x0, this._y0, this._x1, this._y1, that._x, that._y);
+    return SegmentR2.contains(this.x0, this.y0, this.x1, this.y1, that.x, that.y);
   }
 
   /** @hidden */
   containsSegment(that: SegmentR2): boolean {
-    return SegmentR2.contains(this._x0, this._y0, this._x1, this._y1, that._x0, that._y0)
-        && SegmentR2.contains(this._x0, this._y0, this._x1, this._y1, that._x1, that._y1);
+    return SegmentR2.contains(this.x0, this.y0, this.x1, this.y1, that.x0, that.y0)
+        && SegmentR2.contains(this.x0, this.y0, this.x1, this.y1, that.x1, that.y1);
   }
 
   /** @hidden */
@@ -150,13 +144,13 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
 
   /** @hidden */
   intersectsPoint(that: PointR2): boolean {
-    return SegmentR2.contains(this._x0, this._y0, this._x1, this._y1, that._x, that._y);
+    return SegmentR2.contains(this.x0, this.y0, this.x1, this.y1, that.x, that.y);
   }
 
   /** @hidden */
   intersectsSegment(that: SegmentR2): boolean {
-    return SegmentR2.intersects(this._x0, this._y0, this._x1 - this._x0, this._y1 - this._y0,
-                                that._x0, that._y0, that._x1 - that._x0, that._y1 - that._y0);
+    return SegmentR2.intersects(this.x0, this.y0, this.x1 - this.x0, this.y1 - this.y0,
+                                that.x0, that.y0, that.x1 - that.x0, that.y1 - that.y0);
   }
 
   /** @hidden */
@@ -184,55 +178,55 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
 
   split(u: number): [SegmentR2, SegmentR2] {
     const v = 1.0 - u;
-    const x01 = v * this._x0 + u * this._x1;
-    const y01 = v * this._y0 + u * this._y1;
-    const c0 = new SegmentR2(this._x0, this._y0, x01, y01);
-    const c1 = new SegmentR2(x01, y01, this._x1, this._y1);
+    const x01 = v * this.x0 + u * this.x1;
+    const y01 = v * this.y0 + u * this.y1;
+    const c0 = new SegmentR2(this.x0, this.y0, x01, y01);
+    const c1 = new SegmentR2(x01, y01, this.x1, this.y1);
     return [c0, c1];
   }
 
   transform(f: R2Function): SegmentR2 {
-    return new SegmentR2(f.transformX(this._x0, this._y0), f.transformY(this._x0, this._y0),
-                         f.transformX(this._x1, this._y1), f.transformY(this._x1, this._y1));
+    return new SegmentR2(f.transformX(this.x0, this.y0), f.transformY(this.x0, this.y0),
+                         f.transformX(this.x1, this.y1), f.transformY(this.x1, this.y1));
   }
 
   toAny(): SegmentR2Init {
     return {
-      x0: this._x0,
-      y0: this._y0,
-      x1: this._x1,
-      y1: this._y1,
+      x0: this.x0,
+      y0: this.y0,
+      x1: this.x1,
+      y1: this.y1,
     };
   }
 
   drawMove(context: CurveR2Context): void {
-    context.moveTo(this._x0, this._y0);
+    context.moveTo(this.x0, this.y0);
   }
 
   drawRest(context: CurveR2Context): void {
-    context.lineTo(this._x1, this._y1);
+    context.lineTo(this.x1, this.y1);
   }
 
   transformDrawMove(context: CurveR2Context, f: R2Function): void {
-    context.moveTo(f.transformX(this._x0, this._y0), f.transformY(this._x0, this._y0));
+    context.moveTo(f.transformX(this.x0, this.y0), f.transformY(this.x0, this.y0));
   }
 
   transformDrawRest(context: CurveR2Context, f: R2Function): void {
-    context.lineTo(f.transformX(this._x1, this._y1), f.transformY(this._x1, this._y1));
+    context.lineTo(f.transformX(this.x1, this.y1), f.transformY(this.x1, this.y1));
   }
 
   writeMove(output: Output): void {
     output.write(77/*'M'*/);
-    Format.displayNumber(this._x0, output)
+    Format.displayNumber(this.x0, output)
     output.write(44/*','*/)
-    Format.displayNumber(this._y0, output);
+    Format.displayNumber(this.y0, output);
   }
 
   writeRest(output: Output): void {
     output.write(76/*'L'*/);
-    Format.displayNumber(this._x1, output)
+    Format.displayNumber(this.x1, output)
     output.write(44/*','*/)
-    Format.displayNumber(this._y1, output);
+    Format.displayNumber(this.y1, output);
   }
 
   interpolateTo(that: SegmentR2): Interpolator<SegmentR2>;
@@ -249,10 +243,10 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
     if (this === that) {
       return true;
     } else if (that instanceof SegmentR2) {
-      return Numbers.equivalent(that._x0, this._x0, epsilon)
-          && Numbers.equivalent(that._y0, this._y0, epsilon)
-          && Numbers.equivalent(that._x1, this._x1, epsilon)
-          && Numbers.equivalent(that._y1, this._y1, epsilon);
+      return Numbers.equivalent(this.x0, that.x0, epsilon)
+          && Numbers.equivalent(this.y0, that.y0, epsilon)
+          && Numbers.equivalent(this.x1, that.x1, epsilon)
+          && Numbers.equivalent(this.y1, that.y1, epsilon);
     }
     return false;
   }
@@ -261,22 +255,22 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
     if (this === that) {
       return true;
     } else if (that instanceof SegmentR2) {
-      return this._x0 === that._x0 && this._y0 === that._y0
-          && this._x1 === that._x1 && this._y1 === that._y1;
+      return this.x0 === that.x0 && this.y0 === that.y0
+          && this.x1 === that.x1 && this.y1 === that.y1;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
-        Constructors.hash(SegmentR2), Numbers.hash(this._x0)), Numbers.hash(this._y0)),
-        Numbers.hash(this._x1)), Numbers.hash(this._y1)));
+        Constructors.hash(SegmentR2), Numbers.hash(this.x0)), Numbers.hash(this.y0)),
+        Numbers.hash(this.x1)), Numbers.hash(this.y1)));
   }
 
   debug(output: Output): void {
     output.write("SegmentR2").write(46/*'.'*/).write("of").write(40/*'('*/)
-        .debug(this._x0).write(", ").debug(this._y0).write(", ")
-        .debug(this._x1).write(", ").debug(this._y1).write(41/*')'*/);
+        .debug(this.x0).write(", ").debug(this.y0).write(", ")
+        .debug(this.x1).write(", ").debug(this.y1).write(41/*')'*/);
   }
 
   toString(): string {
@@ -318,5 +312,3 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
         || SegmentR2.isInit(value);
   }
 }
-ShapeR2.Segment = SegmentR2;
-CurveR2.Linear = SegmentR2;

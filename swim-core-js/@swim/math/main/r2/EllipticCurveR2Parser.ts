@@ -14,7 +14,6 @@
 
 import {Input, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
 import {EllipticCurveR2} from "./EllipticCurveR2";
-import {CurveR2Parser} from "./CurveR2Parser";
 
 /** @hidden */
 export class EllipticCurveR2Parser extends Parser<EllipticCurveR2> {
@@ -317,4 +316,3 @@ export class EllipticCurveR2Parser extends Parser<EllipticCurveR2> {
                                        void 0, void 0, void 0, void 0, command, 2);
   }
 }
-CurveR2Parser.Elliptic = EllipticCurveR2Parser;
