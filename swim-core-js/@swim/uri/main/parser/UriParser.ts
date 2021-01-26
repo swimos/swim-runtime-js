@@ -13,85 +13,85 @@
 // limitations under the License.
 
 import {Input, Parser, Diagnostic, Unicode} from "@swim/codec";
-import {Uri} from "./Uri";
-import type {UriScheme} from "./UriScheme";
-import type {UriAuthority} from "./UriAuthority";
-import type {UriUser} from "./UriUser";
-import type {UriHost} from "./UriHost";
-import type {UriPort} from "./UriPort";
-import type {UriPath} from "./UriPath";
-import type {UriPathBuilder} from "./UriPathBuilder";
-import type {UriQuery} from "./UriQuery";
-import type {UriQueryBuilder} from "./UriQueryBuilder";
-import type {UriFragment} from "./UriFragment";
-import type {UriAbsoluteParser} from "./UriAbsoluteParser";
-import type {UriSchemeParser} from "./UriSchemeParser";
-import type {UriAuthorityParser} from "./UriAuthorityParser";
-import type {UriUserParser} from "./UriUserParser";
-import type {UriHostParser} from "./UriHostParser";
-import type {UriHostAddressParser} from "./UriHostAddressParser";
-import type {UriHostLiteralParser} from "./UriHostLiteralParser";
-import type {UriPortParser} from "./UriPortParser";
-import type {UriPathParser} from "./UriPathParser";
-import type {UriQueryParser} from "./UriQueryParser";
-import type {UriFragmentParser} from "./UriFragmentParser";
+import {Uri} from "../Uri";
+import {UriScheme} from "../UriScheme";
+import {UriAuthority} from "../UriAuthority";
+import {UriUser} from "../UriUser";
+import {UriHost} from "../UriHost";
+import {UriPort} from "../UriPort";
+import {UriPath} from "../UriPath";
+import {UriPathBuilder} from "../UriPathBuilder";
+import type {UriQuery} from "../UriQuery";
+import {UriQueryBuilder} from "../UriQueryBuilder";
+import {UriFragment} from "../UriFragment";
+import {UriAbsoluteParser} from "../"; // forward import
+import {UriSchemeParser} from "../"; // forward import
+import {UriAuthorityParser} from "../"; // forward import
+import {UriUserParser} from "../"; // forward import
+import {UriHostParser} from "../"; // forward import
+import {UriHostAddressParser} from "../"; // forward import
+import {UriHostLiteralParser} from "../"; // forward import
+import {UriPortParser} from "../"; // forward import
+import {UriPathParser} from "../"; // forward import
+import {UriQueryParser} from "../"; // forward import
+import {UriFragmentParser} from "../"; // forward import
 
 export class UriParser {
   absolute(scheme?: UriScheme, authority?: UriAuthority, path?: UriPath,
            query?: UriQuery, fragment?: UriFragment): Uri {
-    return Uri.from(scheme, authority, path, query, fragment);
+    return Uri.create(scheme, authority, path, query, fragment);
   }
 
   scheme(name: string): UriScheme {
-    return Uri.Scheme.from(name);
+    return UriScheme.create(name);
   }
 
   authority(user?: UriUser, host?: UriHost, port?: UriPort): UriAuthority {
-    return Uri.Authority.from(user, host, port);
+    return UriAuthority.create(user, host, port);
   }
 
-  user(username: string | null, password?: string | null): UriUser {
-    return Uri.User.from(username, password);
+  user(username: string | undefined, password?: string | undefined): UriUser {
+    return UriUser.create(username, password);
   }
 
   hostName(address: string): UriHost {
-    return Uri.Host.from(address);
+    return UriHost.hostname(address);
   }
 
   hostIPv4(address: string): UriHost {
-    return Uri.Host.ipv4(address);
+    return UriHost.ipv4(address);
   }
 
   hostIPv6(address: string): UriHost {
-    return Uri.Host.ipv6(address);
+    return UriHost.ipv6(address);
   }
 
   port(number: number): UriPort {
-    return Uri.Port.from(number);
+    return UriPort.create(number);
   }
 
   pathEmpty(): UriPath {
-    return Uri.Path.empty();
+    return UriPath.empty();
   }
 
   pathBuilder(): UriPathBuilder {
-    return new Uri.PathBuilder();
+    return new UriPathBuilder();
   }
 
   queryBuilder(): UriQueryBuilder {
-    return new Uri.QueryBuilder();
+    return new UriQueryBuilder();
   }
 
-  fragment(identifier: string | null): UriFragment {
-    return Uri.Fragment.from(identifier);
+  fragment(identifier: string | undefined): UriFragment {
+    return UriFragment.create(identifier);
   }
 
   absoluteParser(): Parser<Uri> {
-    return new UriParser.AbsoluteParser(this);
+    return new UriAbsoluteParser(this);
   }
 
   parseAbsolute(input: Input): Parser<Uri> {
-    return UriParser.AbsoluteParser.parse(input, this);
+    return UriAbsoluteParser.parse(input, this);
   }
 
   parseAbsoluteString(string: string): Uri {
@@ -104,11 +104,11 @@ export class UriParser {
   }
 
   schemeParser(): Parser<UriScheme> {
-    return new UriParser.SchemeParser(this);
+    return new UriSchemeParser(this);
   }
 
   parseScheme(input: Input): Parser<UriScheme> {
-    return UriParser.SchemeParser.parse(input, this);
+    return UriSchemeParser.parse(input, this);
   }
 
   parseSchemeString(string: string): UriScheme {
@@ -121,11 +121,11 @@ export class UriParser {
   }
 
   authorityParser(): Parser<UriAuthority> {
-    return new UriParser.AuthorityParser(this);
+    return new UriAuthorityParser(this);
   }
 
   parseAuthority(input: Input): Parser<UriAuthority> {
-    return UriParser.AuthorityParser.parse(input, this);
+    return UriAuthorityParser.parse(input, this);
   }
 
   parseAuthorityString(string: string): UriAuthority {
@@ -138,11 +138,11 @@ export class UriParser {
   }
 
   userParser(): Parser<UriUser> {
-    return new UriParser.UserParser(this);
+    return new UriUserParser(this);
   }
 
   parseUser(input: Input): Parser<UriUser> {
-    return UriParser.UserParser.parse(input, this);
+    return UriUserParser.parse(input, this);
   }
 
   parseUserString(string: string): UriUser {
@@ -155,11 +155,11 @@ export class UriParser {
   }
 
   hostParser(): Parser<UriHost> {
-    return new UriParser.HostParser(this);
+    return new UriHostParser(this);
   }
 
   parseHost(input: Input): Parser<UriHost> {
-    return UriParser.HostParser.parse(input, this);
+    return UriHostParser.parse(input, this);
   }
 
   parseHostString(string: string): UriHost {
@@ -172,27 +172,27 @@ export class UriParser {
   }
 
   hostAddressParser(): Parser<UriHost> {
-    return new UriParser.HostAddressParser(this);
+    return new UriHostAddressParser(this);
   }
 
   parseHostAddress(input: Input): Parser<UriHost> {
-    return UriParser.HostAddressParser.parse(input, this);
+    return UriHostAddressParser.parse(input, this);
   }
 
   hostLiteralParser(): Parser<UriHost> {
-    return new UriParser.HostLiteralParser(this);
+    return new UriHostLiteralParser(this);
   }
 
   parseHostLiteral(input: Input): Parser<UriHost> {
-    return UriParser.HostLiteralParser.parse(input, this);
+    return UriHostLiteralParser.parse(input, this);
   }
 
   portParser(): Parser<UriPort> {
-    return new UriParser.PortParser(this);
+    return new UriPortParser(this);
   }
 
   parsePort(input: Input): Parser<UriPort> {
-    return UriParser.PortParser.parse(input, this);
+    return UriPortParser.parse(input, this);
   }
 
   parsePortString(string: string): UriPort {
@@ -205,11 +205,11 @@ export class UriParser {
   }
 
   pathParser(builder?: UriPathBuilder): Parser<UriPath> {
-    return new UriParser.PathParser(this, builder);
+    return new UriPathParser(this, builder);
   }
 
   parsePath(input: Input, builder?: UriPathBuilder): Parser<UriPath> {
-    return UriParser.PathParser.parse(input, this, builder);
+    return UriPathParser.parse(input, this, builder);
   }
 
   parsePathString(string: string): UriPath {
@@ -222,11 +222,11 @@ export class UriParser {
   }
 
   queryParser(builder?: UriQueryBuilder): Parser<UriQuery> {
-    return new UriParser.QueryParser(this, builder);
+    return new UriQueryParser(this, builder);
   }
 
   parseQuery(input: Input, builder?: UriQueryBuilder): Parser<UriQuery> {
-    return UriParser.QueryParser.parse(input, this, builder);
+    return UriQueryParser.parse(input, this, builder);
   }
 
   parseQueryString(string: string): UriQuery {
@@ -239,11 +239,11 @@ export class UriParser {
   }
 
   fragmentParser(): Parser<UriFragment> {
-    return new UriParser.FragmentParser(this);
+    return new UriFragmentParser(this);
   }
 
   parseFragment(input: Input): Parser<UriFragment> {
-    return UriParser.FragmentParser.parse(input, this);
+    return UriFragmentParser.parse(input, this);
   }
 
   parseFragmentString(string: string): UriFragment {
@@ -254,29 +254,4 @@ export class UriParser {
     }
     return parser.bind();
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static AbsoluteParser: typeof UriAbsoluteParser; // defined by UriAbsoluteParser
-  /** @hidden */
-  static SchemeParser: typeof UriSchemeParser; // defined by UriSchemeParser
-  /** @hidden */
-  static AuthorityParser: typeof UriAuthorityParser; // defined by UriAuthorityParser
-  /** @hidden */
-  static UserParser: typeof UriUserParser; // defined by UriUserParser
-  /** @hidden */
-  static HostParser: typeof UriHostParser; // defined by UriHostParser
-  /** @hidden */
-  static HostAddressParser: typeof UriHostAddressParser; // defined by UriHostAddressParser
-  /** @hidden */
-  static HostLiteralParser: typeof UriHostLiteralParser; // defined by UriHostLiteralParser
-  /** @hidden */
-  static PortParser: typeof UriPortParser; // defined by UriPortParser
-  /** @hidden */
-  static PathParser: typeof UriPathParser; // defined by UriPathParser
-  /** @hidden */
-  static QueryParser: typeof UriQueryParser; // defined by UriQueryParser
-  /** @hidden */
-  static FragmentParser: typeof UriFragmentParser; // defined by UriFragmentParser
 }
-Uri.Parser = UriParser;

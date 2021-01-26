@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic, Base16, Utf8} from "@swim/codec";
-import {Uri} from "./Uri";
-import type {UriFragment} from "./UriFragment";
-import {UriParser} from "./UriParser";
+import {Uri} from "../Uri";
+import type {UriFragment} from "../UriFragment";
+import type {UriParser} from "./UriParser";
 
 /** @hidden */
 export class UriFragmentParser extends Parser<UriFragment> {
@@ -78,4 +78,3 @@ export class UriFragmentParser extends Parser<UriFragment> {
     return new UriFragmentParser(uri, output, c1, step);
   }
 }
-UriParser.FragmentParser = UriFragmentParser;

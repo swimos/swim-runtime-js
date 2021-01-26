@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import {Input, Parser, Diagnostic} from "@swim/codec";
-import {Uri} from "./Uri";
-import type {UriScheme} from "./UriScheme";
-import type {UriAuthority} from "./UriAuthority";
-import type {UriPath} from "./UriPath";
-import type {UriQuery} from "./UriQuery";
-import type {UriFragment} from "./UriFragment";
-import {UriParser} from "./UriParser";
+import {Uri} from "../Uri";
+import type {UriScheme} from "../UriScheme";
+import type {UriAuthority} from "../UriAuthority";
+import {UriPath} from "../UriPath";
+import type {UriQuery} from "../UriQuery";
+import type {UriFragment} from "../UriFragment";
+import type {UriParser} from "./UriParser";
 
 /** @hidden */
 export class UriAbsoluteParser extends Parser<Uri> {
@@ -117,7 +117,7 @@ export class UriAbsoluteParser extends Parser<Uri> {
       } else if (input.isDone()) {
         return Parser.done(uri.absolute(schemeParser !== void 0 ? schemeParser.bind() : void 0,
                                         void 0,
-                                        Uri.Path.slash()));
+                                        UriPath.slash()));
       }
     }
     if (step === 5) {
@@ -208,4 +208,3 @@ export class UriAbsoluteParser extends Parser<Uri> {
                                  queryParser, fragmentParser, step);
   }
 }
-UriParser.AbsoluteParser = UriAbsoluteParser;

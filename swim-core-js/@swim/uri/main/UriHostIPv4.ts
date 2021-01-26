@@ -19,33 +19,30 @@ import {UriHost} from "./UriHost";
 /** @hidden */
 export class UriHostIPv4 extends UriHost {
   /** @hidden */
-  readonly _address: string;
-
-  /** @hidden */
   constructor(address: string) {
     super();
-    this._address = address;
+    Object.defineProperty(this, "address", {
+      value: address,
+      enumerable: true,
+    });
   }
 
-  address(): string {
-    return this._address;
-  }
+  declare readonly address: string;
 
-  ipv4(): string {
-    return this._address;
+  get ipv4(): string {
+    return this.address;
   }
 
   debug(output: Output): void {
     output = output.write("UriHost").write(46/*'.'*/).write("ipv4")
-        .write(40/*'('*/).debug(this._address).write(41/*')'*/);
+        .write(40/*'('*/).debug(this.address).write(41/*')'*/);
   }
 
   display(output: Output): void {
-    Uri.writeHost(this._address, output);
+    Uri.writeHost(this.address, output);
   }
 
   toString(): string {
-    return this._address;
+    return this.address;
   }
 }
-Uri.HostIPv4 = UriHostIPv4;

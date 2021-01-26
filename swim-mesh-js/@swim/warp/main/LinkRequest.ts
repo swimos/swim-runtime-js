@@ -35,7 +35,7 @@ export class LinkRequest extends LinkAddressed {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
-    return new LinkRequest(node, lane, prio, rate, body);
+    return new LinkRequest(node as Uri, lane as Uri, prio, rate, body);
   }
 
   static fromValue(value: Value): LinkRequest | undefined {

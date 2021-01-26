@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import {Item, Text, Form} from "@swim/structure";
-import {Uri} from "./Uri";
-import type {AnyUriPath, UriPath} from "./UriPath";
+import {AnyUriPath, UriPath} from "./UriPath";
 
 /** @hidden */
 export class UriPathForm extends Form<UriPath, AnyUriPath> {
@@ -38,7 +37,7 @@ export class UriPathForm extends Form<UriPath, AnyUriPath> {
   }
 
   mold(object: AnyUriPath, item?: Item): Item {
-    object = Uri.Path.fromAny(object);
+    object = UriPath.fromAny(object);
     if (item === void 0) {
       return Text.from(object.toString());
     } else {
@@ -51,7 +50,7 @@ export class UriPathForm extends Form<UriPath, AnyUriPath> {
     try {
       const string = value.stringValue();
       if (typeof string === "string") {
-        return Uri.Path.parse(string);
+        return UriPath.parse(string);
       }
     } catch (error) {
       // swallow
@@ -59,4 +58,3 @@ export class UriPathForm extends Form<UriPath, AnyUriPath> {
     return void 0;
   }
 }
-Uri.PathForm = UriPathForm;

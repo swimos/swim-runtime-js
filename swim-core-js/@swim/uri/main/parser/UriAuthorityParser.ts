@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import {Input, Diagnostic, Parser} from "@swim/codec";
-import type {UriAuthority} from "./UriAuthority";
-import type {UriUser} from "./UriUser";
-import type {UriHost} from "./UriHost";
-import type {UriPort} from "./UriPort";
-import {UriParser} from "./UriParser";
+import type {UriAuthority} from "../UriAuthority";
+import type {UriUser} from "../UriUser";
+import type {UriHost} from "../UriHost";
+import type {UriPort} from "../UriPort";
+import type {UriParser} from "./UriParser";
 
 /** @hidden */
 export class UriAuthorityParser extends Parser<UriAuthority> {
@@ -112,4 +112,3 @@ export class UriAuthorityParser extends Parser<UriAuthority> {
     return new UriAuthorityParser(uri, userParser, hostParser, portParser, step);
   }
 }
-UriParser.AuthorityParser = UriAuthorityParser;

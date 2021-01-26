@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic, Base16, Utf8} from "@swim/codec";
-import {Uri} from "./Uri";
-import type {UriPath} from "./UriPath";
-import type {UriPathBuilder} from "./UriPathBuilder";
-import {UriParser} from "./UriParser";
+import {Uri} from "../Uri";
+import type {UriPath} from "../UriPath";
+import type {UriPathBuilder} from "../UriPathBuilder";
+import type {UriParser} from "./UriParser";
 
 /** @hidden */
 export class UriPathParser extends Parser<UriPath> {
@@ -100,4 +100,3 @@ export class UriPathParser extends Parser<UriPath> {
     return new UriPathParser(uri, builder, output, c1, step);
   }
 }
-UriParser.PathParser = UriPathParser;

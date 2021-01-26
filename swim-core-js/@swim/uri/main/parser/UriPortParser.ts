@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {Input, Parser, Base10} from "@swim/codec";
-import type {UriPort} from "./UriPort";
-import {UriParser} from "./UriParser";
+import type {UriPort} from "../UriPort";
+import type {UriParser} from "./UriParser";
 
 /** @hidden */
 export class UriPortParser extends Parser<UriPort> {
@@ -43,4 +43,3 @@ export class UriPortParser extends Parser<UriPort> {
     return new UriPortParser(uri, number);
   }
 }
-UriParser.PortParser = UriPortParser;

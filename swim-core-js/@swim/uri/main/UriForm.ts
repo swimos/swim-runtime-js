@@ -58,4 +58,3 @@ export class UriForm extends Form<Uri, AnyUri> {
     return void 0;
   }
 }
-Uri.Form = UriForm;

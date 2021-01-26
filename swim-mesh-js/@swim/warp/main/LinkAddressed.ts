@@ -46,7 +46,7 @@ export abstract class LinkAddressed extends Envelope {
       return this._node;
     } else {
       node = Uri.fromAny(node);
-      return this.copy(node, this._lane, this._prio, this._rate, this._body);
+      return this.copy(node as Uri, this._lane, this._prio, this._rate, this._body);
     }
   }
 
@@ -57,7 +57,7 @@ export abstract class LinkAddressed extends Envelope {
       return this._lane;
     } else {
       lane = Uri.fromAny(lane);
-      return this.copy(this._node, lane, this._prio, this._rate, this._body);
+      return this.copy(this._node, lane as Uri, this._prio, this._rate, this._body);
     }
   }
 

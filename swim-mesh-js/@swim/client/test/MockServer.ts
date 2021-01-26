@@ -27,7 +27,7 @@ export class MockServer {
 
   constructor(hostUri: AnyUri = "ws://localhost:5619", client: WarpClient = new WarpClient()) {
     hostUri = Uri.fromAny(hostUri);
-    this._hostUri = hostUri;
+    this._hostUri = hostUri as Uri;
     this.client = client;
 
     this.onOpen = this.onOpen.bind(this);
@@ -64,7 +64,7 @@ export class MockServer {
                     reject: (reason?: unknown) => void) => void): Promise<T | void> {
     return new Promise((resolve: (result?: T) => void, reject: (reason?: unknown) => void): void => {
         this.httpServer = http.createServer();
-        this.httpServer.listen(this._hostUri.portNumber(), () => {
+        this.httpServer.listen(this._hostUri.portNumber, () => {
           try {
             this.wsServer = new ws.Server({port: void 0, server: this.httpServer});
             this.wsServer.on("connection", this.onOpen);

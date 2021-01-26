@@ -34,7 +34,7 @@ export class UnlinkedResponse extends LaneAddressed {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
-    return new UnlinkedResponse(node, lane, body);
+    return new UnlinkedResponse(node as Uri, lane as Uri, body);
   }
 
   static fromValue(value: Value): UnlinkedResponse | undefined {

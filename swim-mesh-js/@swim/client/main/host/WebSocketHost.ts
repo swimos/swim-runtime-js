@@ -56,11 +56,11 @@ export class WebSocketHost extends RemoteHost {
         throw new Error("WebSocket undefined");
       }
       let hostUri = this._hostUri;
-      const schemeName = hostUri.schemeName();
+      const schemeName = hostUri.schemeName;
       if (schemeName === "warp" || schemeName === "swim") {
-        hostUri = hostUri.scheme("ws");
+        hostUri = hostUri.withSchemeName("ws");
       } else if (schemeName === "warps" || schemeName === "swims") {
-        hostUri = hostUri.scheme("wss");
+        hostUri = hostUri.withSchemeName("wss");
       }
       if (this._options.protocols !== void 0) {
         this._socket = new WebSocket(hostUri.toString(), this._options.protocols);

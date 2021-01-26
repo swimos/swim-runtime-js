@@ -40,7 +40,7 @@ export abstract class LaneAddressed extends Envelope {
       return this._node;
     } else {
       node = Uri.fromAny(node);
-      return this.copy(node, this._lane, this._body);
+      return this.copy(node as Uri, this._lane, this._body);
     }
   }
 
@@ -51,7 +51,7 @@ export abstract class LaneAddressed extends Envelope {
       return this._lane;
     } else {
       lane = Uri.fromAny(lane);
-      return this.copy(this._node, lane, this._body);
+      return this.copy(this._node, lane as Uri, this._body);
     }
   }
 

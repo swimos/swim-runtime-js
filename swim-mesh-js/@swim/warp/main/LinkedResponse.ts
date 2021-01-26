@@ -35,7 +35,7 @@ export class LinkedResponse extends LinkAddressed {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
-    return new LinkedResponse(node, lane, prio, rate, body);
+    return new LinkedResponse(node as Uri, lane as Uri, prio, rate, body);
   }
 
   static fromValue(value: Value): LinkedResponse | undefined {

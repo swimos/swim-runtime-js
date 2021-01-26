@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Compare, Strings, HashGenCacheSet} from "@swim/util";
+import {HashCode, Compare, Lazy, Strings, HashGenCacheSet} from "@swim/util";
 import type {Output, Debug, Display} from "@swim/codec";
 import type {Form} from "@swim/structure";
 import {Uri} from "./Uri";
-import type {UriPathBuilder} from "./UriPathBuilder";
+import {UriPathSegment} from "./"; // forward import
+import {UriPathSlash} from "./"; // forward import
+import {UriPathEmpty} from "./"; // forward import
+import {UriPathBuilder} from "./"; // forward import
+import {UriPathForm} from "./"; // forward import
 
 export type AnyUriPath = UriPath | string[] | string;
 
 export abstract class UriPath implements HashCode, Compare, Debug, Display {
-  /** @hidden */
-  _hashCode?: number;
-
   /** @hidden */
   protected constructor() {
     // sealed
@@ -39,7 +40,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   get length(): number {
     let n = 0;
-    let path = this as UriPath;
+    let path: UriPath = this;
     while (!path.isEmpty()) {
       n += 1;
       path = path.tail();
@@ -49,7 +50,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   get(index: number): string | undefined {
     let i = 0;
-    let path = this as UriPath;
+    let path: UriPath = this;
     while (!path.isEmpty()) {
       if (i < index) {
         i += 1;
@@ -75,35 +76,33 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   abstract base(): UriPath;
 
-  name(): string;
-  name(name: string): UriPath;
-  name(name?: string): string | UriPath {
-    if (name === void 0) {
-      if (this.isEmpty()) {
-        return "";
-      }
-      let path = this as UriPath;
-      do {
-        const tail = path.tail();
-        if (tail.isEmpty()) {
-          return path.isRelative() ? path.head() : "";
-        } else {
-          path = tail;
-        }
-      } while (true);
-    } else {
-      const builder = new Uri.PathBuilder();
-      builder.addPath(this.base());
-      builder.addSegment(name);
-      return builder.bind();
+  get name(): string {
+    if (this.isEmpty()) {
+      return "";
     }
+    let path: UriPath = this;
+    do {
+      const tail = path.tail();
+      if (tail.isEmpty()) {
+        return path.isRelative() ? path.head() : "";
+      } else {
+        path = tail;
+      }
+    } while (true);
+  }
+
+  withName(name: string): UriPath {
+    const builder = new UriPathBuilder();
+    builder.addPath(this.base());
+    builder.addSegment(name);
+    return builder.bind();
   }
 
   foot(): UriPath {
     if (this.isEmpty()) {
       return this;
     }
-    let path = this as UriPath;
+    let path: UriPath = this;
     do {
       const tail = path.tail();
       if (tail.isEmpty()) {
@@ -116,7 +115,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   isSubpathOf(b: AnyUriPath): boolean {
     b = UriPath.fromAny(b);
-    let a = this as UriPath;
+    let a: UriPath = this;
     while (!a.isEmpty() && !b.isEmpty()) {
       if (a.head() !== b.head()) {
         return false;
@@ -129,7 +128,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   appended(...components: AnyUriPath[]): UriPath {
     if (arguments.length > 0) {
-      const builder = new Uri.PathBuilder();
+      const builder = new UriPathBuilder();
       builder.addPath(this);
       builder.push(...components);
       return builder.bind();
@@ -139,14 +138,14 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   }
 
   appendedSlash(): UriPath {
-    const builder = new Uri.PathBuilder();
+    const builder = new UriPathBuilder();
     builder.addPath(this);
     builder.addSlash();
     return builder.bind();
   }
 
   appendedSegment(segment: string): UriPath {
-    const builder = new Uri.PathBuilder();
+    const builder = new UriPathBuilder();
     builder.addPath(this);
     builder.addSegment(segment);
     return builder.bind();
@@ -154,7 +153,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   prepended(...components: AnyUriPath[]): UriPath {
     if (arguments.length > 0) {
-      const builder = new Uri.PathBuilder();
+      const builder = new UriPathBuilder();
       builder.push(...components);
       builder.addPath(this);
       return builder.bind();
@@ -164,14 +163,14 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   }
 
   prependedSlash(): UriPath {
-    return UriPath.slash(this);
+    return new UriPathSlash(this);
   }
 
   prependedSegment(segment: string): UriPath {
     if (this.isEmpty() || this.isAbsolute()) {
       return UriPath.segment(segment, this);
     } else {
-      return UriPath.segment(segment, UriPath.slash(this));
+      return UriPath.segment(segment, this.prependedSlash());
     }
   }
 
@@ -186,8 +185,8 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   }
 
   removeDotSegments(): UriPath {
-    let path = this as UriPath;
-    const builder = new Uri.PathBuilder();
+    let path: UriPath = this;
+    const builder = new UriPathBuilder();
     while (!path.isEmpty()) {
       const head = path.head();
       if (head === "." || head === "..") {
@@ -232,8 +231,8 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   merge(that: UriPath): UriPath {
     if (!this.isEmpty()) {
-      const builder = new Uri.PathBuilder();
-      let prev = this as UriPath;
+      const builder = new UriPathBuilder();
+      let prev: UriPath = this;
       do {
         const next = prev.tail();
         if (!next.isEmpty()) {
@@ -258,7 +257,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   }
 
   unmerge(relative: UriPath, root: UriPath = relative): UriPath {
-    let base = this as UriPath;
+    let base: UriPath = this;
     do {
       if (base.isEmpty()) {
         if (!relative.isEmpty() && !relative.tail().isEmpty()) {
@@ -269,7 +268,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       } else if (base.isRelative()) {
         return relative;
       } else if (relative.isRelative()) {
-        return UriPath.slash(relative);
+        return relative.prependedSlash();
       } else {
         let a = base.tail();
         let b = relative.tail();
@@ -293,7 +292,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   toAny(): string[] {
     const components = [];
-    let path = this as UriPath;
+    let path: UriPath = this;
     while (!path.isEmpty()) {
       components.push(path.head());
       path = path.tail();
@@ -318,16 +317,13 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   }
 
   hashCode(): number {
-    if (this._hashCode === void 0) {
-      this._hashCode = Strings.hash(this.toString());
-    }
-    return this._hashCode;
+    return Strings.hash(this.toString());
   }
 
   abstract debug(output: Output): void;
 
   display(output: Output): void {
-    let path = this as UriPath;
+    let path: UriPath = this;
     while (!path.isEmpty()) {
       if (path.isAbsolute()) {
         output = output.write(47/*'/'*/);
@@ -340,88 +336,70 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   abstract toString(): string;
 
-  private static _empty?: UriPath;
-
-  private static _slash?: UriPath;
-
-  private static _segmentCache?: HashGenCacheSet<string>;
-
-  static builder(): UriPathBuilder {
-    return new Uri.PathBuilder();
-  }
-
+  @Lazy
   static empty(): UriPath {
-    if (UriPath._empty === void 0) {
-      UriPath._empty = new Uri.PathEmpty();
-    }
-    return UriPath._empty;
+    return new UriPathEmpty();
   }
 
-  static slash(tail: UriPath = UriPath.empty()): UriPath {
-    if (tail === UriPath.empty()) {
-      if (UriPath._slash === void 0) {
-        UriPath._slash = new Uri.PathSlash(tail);
-      }
-      return UriPath._slash;
-    } else {
-      return new Uri.PathSlash(tail);
-    }
+  @Lazy
+  static slash(): UriPath {
+    return new UriPathSlash(UriPath.empty());
   }
 
-  static segment(segment: string, tail: UriPath = UriPath.empty()): UriPath {
+  static segment(segment: string, tail?: UriPath): UriPath {
+    if (tail === void 0) {
+      tail = UriPath.empty();
+    }
     segment = this.cacheSegment(segment);
-    return new Uri.PathSegment(segment, tail);
+    return new UriPathSegment(segment, tail);
   }
 
   static of(...components: AnyUriPath[]): UriPath {
-    const builder = new Uri.PathBuilder();
+    const builder = new UriPathBuilder();
     builder.push(...components);
     return builder.bind();
   }
 
-  static fromAny(path: AnyUriPath | null | undefined): UriPath {
-    if (path === null || path === void 0) {
+  static fromAny(value: AnyUriPath | null | undefined): UriPath {
+    if (value === void 0 || value === null) {
       return UriPath.empty();
-    } else if (path instanceof UriPath) {
-      return path;
-    } else if (Array.isArray(path)) {
-      return UriPath.of(...path);
-    } else if (typeof path === "string") {
-      return UriPath.parse(path);
+    } else if (value instanceof UriPath) {
+      return value;
+    } else if (Array.isArray(value)) {
+      return UriPath.of(...value);
+    } else if (typeof value === "string") {
+      return UriPath.parse(value);
     } else {
-      throw new TypeError("" + path);
+      throw new TypeError("" + value);
     }
   }
 
-  static parse(string: string): UriPath {
-    return Uri.standardParser().parsePathString(string);
+  static parse(pathPart: string): UriPath {
+    return Uri.standardParser.parsePathString(pathPart);
+  }
+
+  static builder(): UriPathBuilder {
+    return new UriPathBuilder();
+  }
+
+  @Lazy
+  static pathForm(): Form<UriPath, AnyUriPath> {
+    return new UriPathForm(UriPath.empty());
   }
 
   /** @hidden */
-  static segmentCache(): HashGenCacheSet<string> {
-    if (UriPath._segmentCache === void 0) {
-      const segmentCacheSize = 64;
-      UriPath._segmentCache = new HashGenCacheSet<string>(segmentCacheSize);
-    }
-    return UriPath._segmentCache;
+  @Lazy
+  static get segmentCache(): HashGenCacheSet<string> {
+    const segmentCacheSize = 64;
+    return new HashGenCacheSet<string>(segmentCacheSize);
   }
 
   /** @hidden */
   static cacheSegment(segment: string): string {
     if (segment.length <= 32) {
-      return this.segmentCache().put(segment);
+      return this.segmentCache.put(segment);
     } else {
       return segment;
     }
   }
-
-  private static _pathForm?: Form<UriPath, AnyUriPath>;
-
-  static pathForm(): Form<UriPath, AnyUriPath> {
-    if (UriPath._pathForm === void 0) {
-      UriPath._pathForm = new Uri.PathForm(UriPath.empty());
-    }
-    return UriPath._pathForm;
-  }
 }
-Uri.Path = UriPath;

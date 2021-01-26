@@ -34,7 +34,7 @@ export class UnlinkRequest extends LaneAddressed {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
-    return new UnlinkRequest(node, lane, body);
+    return new UnlinkRequest(node as Uri, lane as Uri, body);
   }
 
   static fromValue(value: Value): UnlinkRequest | undefined {

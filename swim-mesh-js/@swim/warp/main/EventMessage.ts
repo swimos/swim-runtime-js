@@ -34,7 +34,7 @@ export class EventMessage extends LaneAddressed {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
-    return new EventMessage(node, lane, body);
+    return new EventMessage(node as Uri, lane as Uri, body);
   }
 
   static fromValue(value: Value): EventMessage | undefined {

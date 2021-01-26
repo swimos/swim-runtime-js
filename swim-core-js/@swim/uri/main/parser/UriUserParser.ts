@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic, Base16, Utf8} from "@swim/codec";
-import {Uri} from "./Uri";
-import type {UriUser} from "./UriUser";
-import {UriParser} from "./UriParser";
+import {Uri} from "../Uri";
+import type {UriUser} from "../UriUser";
+import type {UriParser} from "./UriParser";
 
 /** @hidden */
 export class UriUserParser extends Parser<UriUser> {
@@ -118,4 +118,3 @@ export class UriUserParser extends Parser<UriUser> {
     return new UriUserParser(uri, usernameOutput, passwordOutput, c1, step);
   }
 }
-UriParser.UserParser = UriUserParser;

@@ -52,17 +52,17 @@ export class LaneRef extends BaseRef {
 
   hostRef(hostUri: AnyUri): HostRef {
     hostUri = Uri.fromAny(hostUri);
-    return new HostRef(this._context, hostUri);
+    return new HostRef(this._context, hostUri as Uri);
   }
 
   nodeRef(nodeUri: AnyUri): NodeRef {
     nodeUri = Uri.fromAny(nodeUri);
-    return new NodeRef(this._context, this._hostUri, nodeUri);
+    return new NodeRef(this._context, this._hostUri, nodeUri as Uri);
   }
 
   laneRef(laneUri: AnyUri): LaneRef {
     laneUri = Uri.fromAny(laneUri);
-    return new LaneRef(this._context, this._hostUri, this._nodeUri, laneUri);
+    return new LaneRef(this._context, this._hostUri, this._nodeUri, laneUri as Uri);
   }
 
   downlink(init?: EventDownlinkInit): EventDownlink {

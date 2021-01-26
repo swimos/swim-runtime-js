@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Output} from "@swim/codec";
-import {Uri} from "./Uri";
 import {AnyUriPath, UriPath} from "./UriPath";
 
 /** @hidden */
@@ -40,16 +39,16 @@ export class UriPathEmpty extends UriPath {
   }
 
   head(): string {
-    throw new Error("Empty UriPath");
+    throw new Error("empty path");
   }
 
   tail(): UriPath {
-    throw new Error("Empty UriPath");
+    throw new Error("empty path");
   }
 
   /** @hidden */
   setTail(tail: UriPath): void {
-    throw new Error("Empty UriPath");
+    throw new Error("empty path");
   }
 
   /** @hidden */
@@ -106,4 +105,3 @@ export class UriPathEmpty extends UriPath {
     return "";
   }
 }
-Uri.PathEmpty = UriPathEmpty;

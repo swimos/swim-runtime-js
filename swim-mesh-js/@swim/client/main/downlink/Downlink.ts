@@ -156,7 +156,7 @@ export abstract class Downlink {
       return this._hostUri;
     } else {
       hostUri = Uri.fromAny(hostUri);
-      return this.copy(this._context, this._owner, hostUri, this._nodeUri, this._laneUri,
+      return this.copy(this._context, this._owner, hostUri as Uri, this._nodeUri, this._laneUri,
                        this._prio, this._rate, this._body, this._flags, this._observers);
     }
   }
@@ -168,7 +168,7 @@ export abstract class Downlink {
       return this._nodeUri;
     } else {
       nodeUri = Uri.fromAny(nodeUri);
-      return this.copy(this._context, this._owner, this._hostUri, nodeUri, this._laneUri,
+      return this.copy(this._context, this._owner, this._hostUri, nodeUri as Uri, this._laneUri,
                        this._prio, this._rate, this._body, this._flags, this._observers);
     }
   }
@@ -180,7 +180,7 @@ export abstract class Downlink {
       return this._laneUri;
     } else {
       laneUri = Uri.fromAny(laneUri);
-      return this.copy(this._context, this._owner, this._hostUri, this._nodeUri, laneUri,
+      return this.copy(this._context, this._owner, this._hostUri, this._nodeUri, laneUri as Uri,
                        this._prio, this._rate, this._body, this._flags, this._observers);
     }
   }

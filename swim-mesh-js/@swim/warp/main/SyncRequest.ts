@@ -35,7 +35,7 @@ export class SyncRequest extends LinkAddressed {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
-    return new SyncRequest(node, lane, prio, rate, body);
+    return new SyncRequest(node as Uri, lane as Uri, prio, rate, body);
   }
 
   static fromValue(value: Value): SyncRequest | undefined {

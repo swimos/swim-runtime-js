@@ -130,16 +130,16 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
   /** @hidden */
   getHost(hostUri: AnyUri): Host | undefined {
     hostUri = Uri.fromAny(hostUri);
-    return this._hosts.get(hostUri);
+    return this._hosts.get(hostUri as Uri);
   }
 
   /** @hidden */
   openHost(hostUri: AnyUri): Host {
     hostUri = Uri.fromAny(hostUri);
-    let host = this._hosts.get(hostUri);
+    let host = this._hosts.get(hostUri as Uri);
     if (host === void 0) {
-      host = new WebSocketHost(this, hostUri, this._options);
-      this._hosts.set(hostUri, host);
+      host = new WebSocketHost(this, hostUri as Uri, this._options);
+      this._hosts.set(hostUri as Uri, host);
     }
     return host;
   }
@@ -262,7 +262,7 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
 
   hostRef(hostUri: AnyUri): HostRef {
     hostUri = Uri.fromAny(hostUri);
-    return new HostRef(this, hostUri);
+    return new HostRef(this, hostUri as Uri);
   }
 
   nodeRef(hostUri: AnyUri, nodeUri: AnyUri): NodeRef;
@@ -271,12 +271,12 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     hostUri = Uri.fromAny(hostUri);
     if (nodeUri === void 0) {
       nodeUri = hostUri;
-      hostUri = nodeUri.endpoint();
-      nodeUri = hostUri.unresolve(nodeUri);
+      hostUri = (nodeUri as Uri).endpoint();
+      nodeUri = (hostUri as Uri).unresolve(nodeUri);
     } else {
       nodeUri = Uri.fromAny(nodeUri);
     }
-    return new NodeRef(this, hostUri, nodeUri);
+    return new NodeRef(this, hostUri as Uri, nodeUri as Uri);
   }
 
   laneRef(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri): LaneRef;
@@ -287,12 +287,12 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
     if (laneUri === void 0) {
       laneUri = nodeUri;
       nodeUri = hostUri;
-      hostUri = nodeUri.endpoint();
-      nodeUri = hostUri.unresolve(nodeUri);
+      hostUri = (nodeUri as Uri).endpoint();
+      nodeUri = (hostUri as Uri).unresolve(nodeUri);
     } else {
       laneUri = Uri.fromAny(laneUri);
     }
-    return new LaneRef(this, hostUri, nodeUri, laneUri);
+    return new LaneRef(this, hostUri as Uri, nodeUri as Uri, laneUri as Uri);
   }
 
   authenticate(hostUri: AnyUri, credentials: AnyValue): void {
@@ -311,8 +311,8 @@ export class WarpClient implements HostContext, RefContext, WarpRef {
       body = laneUri as Value;
       laneUri = nodeUri;
       nodeUri = hostUri;
-      hostUri = nodeUri.endpoint();
-      nodeUri = hostUri.unresolve(nodeUri);
+      hostUri = (nodeUri as Uri).endpoint();
+      nodeUri = (hostUri as Uri).unresolve(nodeUri);
     } else {
       laneUri = Uri.fromAny(laneUri as AnyUri);
     }

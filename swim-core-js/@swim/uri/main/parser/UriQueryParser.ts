@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic, Base16, Utf8} from "@swim/codec";
-import {Uri} from "./Uri";
-import type {UriQuery} from "./UriQuery";
-import type {UriQueryBuilder} from "./UriQueryBuilder";
-import {UriParser} from "./UriParser";
+import {Uri} from "../Uri";
+import type {UriQuery} from "../UriQuery";
+import type {UriQueryBuilder} from "../UriQueryBuilder";
+import type {UriParser} from "./UriParser";
 
 /** @hidden */
 export class UriQueryParser extends Parser<UriQuery> {
@@ -139,4 +139,3 @@ export class UriQueryParser extends Parser<UriQuery> {
     return new UriQueryParser(uri, builder, keyOutput, valueOutput, c1, step);
   }
 }
-UriParser.QueryParser = UriQueryParser;
