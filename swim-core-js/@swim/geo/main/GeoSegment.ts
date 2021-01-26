@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
+import {HashCode, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
 import {SegmentR2} from "@swim/math";
@@ -32,72 +32,67 @@ export interface GeoSegmentInit {
 }
 
 export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, HashCode, Debug {
-  /** @hidden */
-  readonly _lng0: number;
-  /** @hidden */
-  readonly _lat0: number;
-  /** @hidden */
-  readonly _lng1: number;
-  /** @hidden */
-  readonly _lat1: number;
-
   constructor(lng0: number, lat0: number, lng1: number, lat1: number) {
     super();
-    this._lng0 = lng0;
-    this._lat0 = lat0;
-    this._lng1 = lng1;
-    this._lat1 = lat1;
+    Object.defineProperty(this, "lng0", {
+      value: lng0,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "lat0", {
+      value: lat0,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "lng1", {
+      value: lng1,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "lat1", {
+      value: lat1,
+      enumerable: true,
+    });
   }
 
   isDefined(): boolean {
-    return isFinite(this._lng0) && isFinite(this._lat0)
-        && isFinite(this._lng1) && isFinite(this._lat1);
+    return isFinite(this.lng0) && isFinite(this.lat0)
+        && isFinite(this.lng1) && isFinite(this.lat1);
   }
 
-  get lng0(): number {
-    return this._lng0;
-  }
+  declare readonly lng0: number;
 
-  get lat0(): number {
-    return this._lat0;
-  }
+  declare readonly lat0: number;
 
-  get lng1(): number {
-    return this._lng1;
-  }
+  declare readonly lng1: number;
 
-  get lat1(): number {
-    return this._lat1;
-  }
+  declare readonly lat1: number;
 
   get lngMin(): number {
-    return Math.min(this._lng0, this._lng1);
+    return Math.min(this.lng0, this.lng1);
   }
 
   get latMin(): number {
-    return Math.min(this._lat0, this._lat1);
+    return Math.min(this.lat0, this.lat1);
   }
 
   get lngMax(): number {
-    return Math.max(this._lng0, this._lng1);
+    return Math.max(this.lng0, this.lng1);
   }
 
   get latMax(): number {
-    return Math.max(this._lat0, this._lat1);
+    return Math.max(this.lat0, this.lat1);
   }
 
   interpolateLng(u: number): number {
-    return (1.0 - u) * this._lng0 + u * this._lng1;
+    return (1.0 - u) * this.lng0 + u * this.lng1;
   }
 
   interpolateLat(u: number): number {
-   return (1.0 - u) * this._lat0 + u * this._lat1;
+   return (1.0 - u) * this.lat0 + u * this.lat1;
   }
 
   interpolate(u: number): GeoPoint {
     const v = 1.0 - u;
-    const lng01 = v * this._lng0 + u * this._lng1;
-    const lat01 = v * this._lat0 + u * this._lat1;
+    const lng01 = v * this.lng0 + u * this.lng1;
+    const lat01 = v * this.lat0 + u * this.lat1;
     return new GeoPoint(lng01, lat01);
   }
 
@@ -105,7 +100,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   contains(lng: number, lat: number): boolean;
   contains(that: AnyGeoShape | number, lat?: number): boolean {
     if (typeof that === "number") {
-      return SegmentR2.contains(this._lng0, this._lat0, this._lng1, this._lat1, that, lat!);
+      return SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that, lat!);
     } else {
       that = GeoShape.fromAny(that);
       if (that instanceof GeoPoint) {
@@ -119,13 +114,13 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
 
   /** @hidden */
   containsPoint(that: GeoPoint): boolean {
-    return SegmentR2.contains(this._lng0, this._lat0, this._lng1, this._lat1, that._lng, that._lat);
+    return SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng, that.lat);
   }
 
   /** @hidden */
   containsSegment(that: GeoSegment): boolean {
-    return SegmentR2.contains(this._lng0, this._lat0, this._lng1, this._lat1, that._lng0, that._lat0)
-        && SegmentR2.contains(this._lng0, this._lat0, this._lng1, this._lat1, that._lng1, that._lat1);
+    return SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng0, that.lat0)
+        && SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng1, that.lat1);
   }
 
   intersects(that: AnyGeoShape): boolean {
@@ -142,27 +137,27 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
 
   /** @hidden */
   intersectsPoint(that: GeoPoint): boolean {
-    return SegmentR2.contains(this._lng0, this._lat0, this._lng1, this._lat1, that._lng, that._lat);
+    return SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng, that.lat);
   }
 
   /** @hidden */
   intersectsSegment(that: GeoSegment): boolean {
-    return SegmentR2.intersects(this._lng0, this._lat0, this._lng1 - this._lat0, this._lng1 - this._lat0,
-                                that._lng0, that._lat0, that._lng1 - that._lat0, that._lng1 - that._lat0);
+    return SegmentR2.intersects(this.lng0, this.lat0, this.lng1 - this.lat0, this.lng1 - this.lat0,
+                                that.lng0, that.lat0, that.lng1 - that.lat0, that.lng1 - that.lat0);
   }
 
   split(u: number): [GeoSegment, GeoSegment] {
     const v = 1.0 - u;
-    const lng01 = v * this._lng0 + u * this._lng1;
-    const lat01 = v * this._lat0 + u * this._lat1;
-    const c0 = new GeoSegment(this._lng0, this._lat0, lng01, lat01);
-    const c1 = new GeoSegment(lng01, lat01, this._lng1, this._lat1);
+    const lng01 = v * this.lng0 + u * this.lng1;
+    const lat01 = v * this.lat0 + u * this.lat1;
+    const c0 = new GeoSegment(this.lng0, this.lat0, lng01, lat01);
+    const c1 = new GeoSegment(lng01, lat01, this.lng1, this.lat1);
     return [c0, c1];
   }
 
   project(f: GeoProjection): SegmentR2 {
-    const p0 = f.project(this._lng0, this._lat0);
-    const p1 = f.project(this._lng1, this._lat1);
+    const p0 = f.project(this.lng0, this.lat0);
+    const p1 = f.project(this.lng1, this.lat1);
     return new SegmentR2(p0.x, p0.y, p1.x, p1.y);
   }
 
@@ -172,11 +167,11 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | undefined,
                      thisArg?: S): R | undefined {
     let result: R | void;
-    result = callback.call(thisArg, this._lng0, this._lat0);
+    result = callback.call(thisArg, this.lng0, this.lat0);
     if (result !== void 0) {
       return result;
     }
-    result = callback.call(thisArg, this._lng1, this._lat1);
+    result = callback.call(thisArg, this.lng1, this.lat1);
     if (result !== void 0) {
       return result;
     }
@@ -188,7 +183,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
                          thisArg: S): R | undefined;
   forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
                          thisArg?: S): R | undefined {
-    const result = callback.call(thisArg, this._lng1, this._lat1);
+    const result = callback.call(thisArg, this.lng1, this.lat1);
     if (result !== void 0) {
       return result;
     }
@@ -197,10 +192,10 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
 
   toAny(): GeoSegmentInit {
     return {
-      lng0: this._lng0,
-      lat0: this._lat0,
-      lng1: this._lng1,
-      lat1: this._lat1,
+      lng0: this.lng0,
+      lat0: this.lat0,
+      lng1: this.lng1,
+      lat1: this.lat1,
     };
   }
 
@@ -218,10 +213,10 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     if (this === that) {
       return true;
     } else if (that instanceof GeoSegment) {
-      return Numbers.equivalent(that._lng0, this._lng0, epsilon)
-          && Numbers.equivalent(that._lat0, this._lat0, epsilon)
-          && Numbers.equivalent(that._lng1, this._lng1, epsilon)
-          && Numbers.equivalent(that._lat1, this._lat1, epsilon);
+      return Numbers.equivalent(this.lng0, that.lng0, epsilon)
+          && Numbers.equivalent(this.lat0, that.lat0, epsilon)
+          && Numbers.equivalent(this.lng1, that.lng1, epsilon)
+          && Numbers.equivalent(this.lat1, that.lat1, epsilon);
     }
     return false;
   }
@@ -230,22 +225,22 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     if (this === that) {
       return true;
     } else if (that instanceof GeoSegment) {
-      return this._lng0 === that._lng0 && this._lat0 === that._lat0
-          && this._lng1 === that._lng1 && this._lat1 === that._lat1;
+      return this.lng0 === that.lng0 && this.lat0 === that.lat0
+          && this.lng1 === that.lng1 && this.lat1 === that.lat1;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
-        Constructors.hash(GeoSegment), Numbers.hash(this._lng0)), Numbers.hash(this._lat0)),
-        Numbers.hash(this._lng1)), Numbers.hash(this._lat1)));
+        Constructors.hash(GeoSegment), Numbers.hash(this.lng0)), Numbers.hash(this.lat0)),
+        Numbers.hash(this.lng1)), Numbers.hash(this.lat1)));
   }
 
   debug(output: Output): void {
     output.write("GeoSegment").write(46/*'.'*/).write("of").write(40/*'('*/)
-        .debug(this._lng0).write(", ").debug(this._lat0).write(", ")
-        .debug(this._lng1).write(", ").debug(this._lat1).write(41/*')'*/);
+        .debug(this.lng0).write(", ").debug(this.lat0).write(", ")
+        .debug(this.lng1).write(", ").debug(this.lat1).write(41/*')'*/);
   }
 
   toString(): string {
@@ -287,4 +282,3 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
         || GeoSegment.isInit(value);
   }
 }
-GeoShape.Segment = GeoSegment;

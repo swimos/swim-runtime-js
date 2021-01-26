@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Equivalent, HashCode, Numbers, Constructors} from "@swim/util";
+import {Equivalent, HashCode, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Debug, Format} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
 import type {PointR2} from "@swim/math";
@@ -33,57 +33,54 @@ export type GeoPointTuple = [number, number];
  * A geographic point represented by a WGS84 longitude and latitude.
  */
 export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCode, Equivalent, Debug {
-  /** @hidden */
-  readonly _lng: number;
-  /** @hidden */
-  readonly _lat: number;
-
   constructor(lng: number, lat: number) {
     super();
-    this._lng = lng;
-    this._lat = lat;
+    Object.defineProperty(this, "lng", {
+      value: lng,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "lat", {
+      value: lat,
+      enumerable: true,
+    });
   }
 
   isDefined(): boolean {
-    return isFinite(this._lng) && isFinite(this._lat);
+    return isFinite(this.lng) && isFinite(this.lat);
   }
 
-  get lng(): number {
-    return this._lng;
-  }
+  declare readonly lng: number;
 
-  get lat(): number {
-    return this._lat;
-  }
+  declare readonly lat: number;
 
   get lngMin(): number {
-    return this._lng;
+    return this.lng;
   }
 
   get latMin(): number {
-    return this._lat;
+    return this.lat;
   }
 
   get lngMax(): number {
-    return this._lng;
+    return this.lng;
   }
 
   get latMax(): number {
-    return this._lat;
+    return this.lat;
   }
 
   contains(that: AnyGeoShape): boolean;
   contains(lng: number, lat: number): boolean;
   contains(that: AnyGeoShape | number, lat?: number): boolean {
     if (typeof that === "number") {
-      return this._lng === that && this._lat === lat!;
+      return this.lng === that && this.lat === lat!;
     } else {
       that = GeoShape.fromAny(that);
       if (that instanceof GeoPoint) {
-        return this._lng === that._lng && this._lat === that._lat;
+        return this.lng === that.lng && this.lat === that.lat;
       } else if (that instanceof GeoShape) {
-        return this._lng <= that.lngMin && that.lngMax <= this._lng
-            && this._lat <= that.latMin && that.latMax <= this._lat;
+        return this.lng <= that.lngMin && that.lngMax <= this.lng
+            && this.lat <= that.latMin && that.latMax <= this.lat;
       }
       return false;
     }
@@ -100,8 +97,8 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
 
   toAny(): GeoPointInit {
     return {
-      lng: this._lng,
-      lat: this._lat,
+      lng: this.lng,
+      lat: this.lat,
     };
   }
 
@@ -119,8 +116,8 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     if (this === that) {
       return true;
     } else if (that instanceof GeoPoint) {
-      return Numbers.equivalent(that._lng, this._lng, epsilon)
-          && Numbers.equivalent(that._lat, this._lat, epsilon);
+      return Numbers.equivalent(this.lng, that.lng, epsilon)
+          && Numbers.equivalent(this.lat, that.lat, epsilon);
     }
     return false;
   }
@@ -129,39 +126,33 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     if (this === that) {
       return true;
     } else if (that instanceof GeoPoint) {
-      return this._lng === that._lng && this._lat === that._lat;
+      return this.lng === that.lng && this.lat === that.lat;
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(GeoPoint),
-        Numbers.hash(this._lng)), Numbers.hash(this._lat)));
+        Numbers.hash(this.lng)), Numbers.hash(this.lat)));
   }
 
   debug(output: Output): void {
     output = output.write("GeoPoint").write(46/*'.'*/).write("of").write(40/*'('*/)
-        .debug(this._lng).write(", ").debug(this._lat).write(41/*')'*/);
+        .debug(this.lng).write(", ").debug(this.lat).write(41/*')'*/);
   }
 
   toString(): string {
     return Format.debug(this);
   }
 
-  private static _origin?: GeoPoint;
+  @Lazy
   static origin(): GeoPoint {
-    if (GeoPoint._origin === void 0) {
-      GeoPoint._origin = new GeoPoint(0, 0);
-    }
-    return GeoPoint._origin;
+    return new GeoPoint(0, 0);
   }
 
-  private static _undefined?: GeoPoint;
+  @Lazy
   static undefined(): GeoPoint {
-    if (GeoPoint._undefined === void 0) {
-      GeoPoint._undefined = new GeoPoint(NaN, NaN);
-    }
-    return GeoPoint._undefined;
+    return new GeoPoint(NaN, NaN);
   }
 
   static of(lng: number, lat: number): GeoPoint {
@@ -212,4 +203,3 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
         || GeoPoint.isTuple(value);
   }
 }
-GeoShape.Point = GeoPoint;

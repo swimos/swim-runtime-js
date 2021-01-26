@@ -14,21 +14,21 @@
 
 import type {Equals} from "@swim/util";
 import type {ShapeR2} from "@swim/math";
-import type {GeoPoint, GeoPointInit, GeoPointTuple} from "./GeoPoint";
 import type {GeoProjection} from "./GeoProjection";
-import type {GeoSegmentInit, GeoSegment} from "./GeoSegment";
-import type {GeoBoxInit, GeoBox} from "./GeoBox";
+import {GeoPointInit, GeoPointTuple, GeoPoint} from "./"; // forward import
+import {GeoSegmentInit, GeoSegment} from "./"; // forward import
+import {GeoBoxInit, GeoBox} from "./"; // forward import
 
 export type AnyGeoShape = GeoShape | GeoPointInit | GeoPointTuple | GeoSegmentInit | GeoBoxInit;
 
 export abstract class GeoShape implements Equals {
-  abstract get lngMin(): number;
+  abstract readonly lngMin: number;
 
-  abstract get latMin(): number;
+  abstract readonly latMin: number;
 
-  abstract get lngMax(): number;
+  abstract readonly lngMax: number;
 
-  abstract get latMax(): number;
+  abstract readonly latMax: number;
 
   abstract contains(that: AnyGeoShape): boolean;
 
@@ -38,16 +38,16 @@ export abstract class GeoShape implements Equals {
 
   union(that: AnyGeoShape): GeoShape {
     that = GeoShape.fromAny(that);
-    return new GeoShape.Box(Math.min(this.lngMin, that.lngMin),
-                            Math.min(this.latMin, that.latMin),
-                            Math.max(this.lngMax, that.lngMax),
-                            Math.max(this.latMax, that.latMax));
+    return new GeoBox(Math.min(this.lngMin, that.lngMin),
+                      Math.min(this.latMin, that.latMin),
+                      Math.max(this.lngMax, that.lngMax),
+                      Math.max(this.latMax, that.latMax));
   }
 
   abstract project(f: GeoProjection): ShapeR2;
 
   get bounds(): GeoBox {
-    return new GeoShape.Box(this.lngMin, this.latMin, this.lngMax, this.latMax);
+    return new GeoBox(this.lngMin, this.latMin, this.lngMax, this.latMax);
   }
 
   abstract equals(that: unknown): boolean;
@@ -55,14 +55,14 @@ export abstract class GeoShape implements Equals {
   static fromAny(value: AnyGeoShape): GeoShape {
     if (value instanceof GeoShape) {
       return value;
-    } else if (GeoShape.Point.isInit(value)) {
-      return GeoShape.Point.fromInit(value);
-    } else if (GeoShape.Point.isTuple(value)) {
-      return GeoShape.Point.fromTuple(value);
-    } else if (GeoShape.Segment.isInit(value)) {
-      return GeoShape.Segment.fromInit(value);
-    } else if (GeoShape.Box.isInit(value)) {
-      return GeoShape.Box.fromInit(value);
+    } else if (GeoPoint.isInit(value)) {
+      return GeoPoint.fromInit(value);
+    } else if (GeoPoint.isTuple(value)) {
+      return GeoPoint.fromTuple(value);
+    } else if (GeoSegment.isInit(value)) {
+      return GeoSegment.fromInit(value);
+    } else if (GeoBox.isInit(value)) {
+      return GeoBox.fromInit(value);
     }
     throw new TypeError("" + value);
   }
@@ -70,17 +70,9 @@ export abstract class GeoShape implements Equals {
   /** @hidden */
   static isAny(value: unknown): value is AnyGeoShape {
     return value instanceof GeoShape
-        || GeoShape.Point.isInit(value)
-        || GeoShape.Point.isTuple(value)
-        || GeoShape.Segment.isInit(value)
-        || GeoShape.Box.isInit(value);
+        || GeoPoint.isInit(value)
+        || GeoPoint.isTuple(value)
+        || GeoSegment.isInit(value)
+        || GeoBox.isInit(value);
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Point: typeof GeoPoint; // defined by GeoPoint
-  /** @hidden */
-  static Segment: typeof GeoSegment; // defined by GeoSegment
-  /** @hidden */
-  static Box: typeof GeoBox; // defined by GeoBox
 }

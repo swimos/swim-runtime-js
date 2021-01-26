@@ -20,10 +20,10 @@ export const GeoSegmentInterpolator = function (s0: GeoSegment, s1: GeoSegment):
   const interpolator = function (u: number): GeoSegment {
     const s0 = interpolator[0];
     const s1 = interpolator[1];
-    const lng0 = s0._lng0 + u * (s1._lng0 - s0._lng0);
-    const lat0 = s0._lat0 + u * (s1._lat0 - s0._lat0);
-    const lng1 = s0._lng1 + u * (s1._lng1 - s0._lng1);
-    const lat1 = s0._lat1 + u * (s1._lat1 - s0._lat1);
+    const lng0 = s0.lng0 + u * (s1.lng0 - s0.lng0);
+    const lat0 = s0.lat0 + u * (s1.lat0 - s0.lat0);
+    const lng1 = s0.lng1 + u * (s1.lng1 - s0.lng1);
+    const lat1 = s0.lat1 + u * (s1.lat1 - s0.lat1);
     return new GeoSegment(lng0, lat0, lng1, lat1);
   } as Interpolator<GeoSegment>;
   Object.setPrototypeOf(interpolator, GeoSegmentInterpolator.prototype);

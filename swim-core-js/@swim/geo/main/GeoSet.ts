@@ -12,31 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals, Arrays} from "@swim/util";
+import {Equivalent, Equals, Lazy, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import {ShapeR2, SetR2} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
-import type {GeoBox} from "./GeoBox";
+import {GeoBox} from "./GeoBox";
 
 export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements Equals, Equivalent, Debug {
-  /** @hidden */
-  readonly _shapes: ReadonlyArray<S>;
-  /** @hidden */
-  _boundingBox?: GeoBox;
-
   constructor(shapes: ReadonlyArray<S>) {
     super();
-    this._shapes = shapes;
+    Object.defineProperty(this, "shapes", {
+      value: shapes,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "boundingBox", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   isDefined(): boolean {
-    return this._shapes.length !== 0;
+    return this.shapes.length !== 0;
   }
 
-  get shapes(): ReadonlyArray<S> {
-    return this._shapes;
-  }
+  declare readonly shapes: ReadonlyArray<S>;
 
   get lngMin(): number {
     return this.bounds.lngMin;
@@ -65,7 +66,7 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
   }
 
   project(f: GeoProjection): SetR2 {
-    const oldShapes = this._shapes;
+    const oldShapes = this.shapes;
     const n = oldShapes.length;
     if (n > 0) {
       const newShapes = new Array<ShapeR2>(n);
@@ -78,14 +79,17 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
     }
   }
 
+  /** @hidden */
+  declare readonly boundingBox: GeoBox | null;
+
   get bounds(): GeoBox {
-    let boundingBox = this._boundingBox;
-    if (boundingBox === void 0) {
+    let boundingBox = this.boundingBox;
+    if (boundingBox === null) {
       let lngMin = Infinity;
       let latMin = Infinity;
       let lngMax = -Infinity;
       let latMax = -Infinity;
-      const shapes = this._shapes;
+      const shapes = this.shapes;
       for (let i = 0, n = shapes.length; i < n; i += 1) {
         const shape = shapes[i]!;
         lngMin = Math.min(lngMin, shape.lngMin);
@@ -93,8 +97,12 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
         lngMax = Math.max(shape.lngMax, lngMax);
         latMax = Math.max(shape.latMax, latMax);
       }
-      boundingBox = new GeoShape.Box(lngMin, latMin, lngMax, latMax);
-      this._boundingBox = boundingBox;
+      boundingBox = new GeoBox(lngMin, latMin, lngMax, latMax);
+      Object.defineProperty(this, "boundingBox", {
+        value: boundingBox,
+        enumerable: true,
+        configurable: true,
+      });
     }
     return boundingBox;
   }
@@ -103,7 +111,7 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
     if (this === that) {
       return true;
     } else if (that instanceof GeoSet) {
-      return Arrays.equivalent(this._shapes, that._shapes, epsilon);
+      return Arrays.equivalent(this.shapes, that.shapes, epsilon);
     }
     return false;
   }
@@ -112,13 +120,13 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
     if (this === that) {
       return true;
     } else if (that instanceof GeoSet) {
-      return Arrays.equal(this._shapes, that._shapes);
+      return Arrays.equal(this.shapes, that.shapes);
     }
     return false;
   }
 
   debug(output: Output): void {
-    const shapes = this._shapes;
+    const shapes = this.shapes;
     const n = shapes.length;
     output = output.write("GeoSet").write(46/*'.'*/);
     if (n === 0) {
@@ -137,8 +145,9 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
     return Format.debug(this);
   }
 
+  @Lazy
   static empty<S extends GeoShape>(): GeoSet<S> {
-    return new GeoSet([]);
+    return new GeoSet(Arrays.empty);
   }
 
   static of<S extends GeoShape>(...shapes: S[]): GeoSet<S> {

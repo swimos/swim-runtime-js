@@ -39,23 +39,19 @@ export {
 export {GeoSegmentInterpolator} from "./GeoSegmentInterpolator";
 
 export {GeoSplineContext} from "./GeoSplineContext";
-
 export {
   AnyGeoSpline,
   GeoSplinePoints,
   GeoSpline,
 } from "./GeoSpline";
-
 export {GeoSplineBuilder} from "./GeoSplineBuilder";
 
 export {GeoPathContext} from "./GeoPathContext";
-
 export {
   AnyGeoPath,
   GeoPathSplines,
   GeoPath,
 } from "./GeoPath";
-
 export {GeoPathBuilder} from "./GeoPathBuilder";
 
 export {

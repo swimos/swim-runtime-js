@@ -19,69 +19,68 @@ import {GeoSpline} from "./GeoSpline";
 
 export class GeoSplineBuilder implements GeoSplineContext {
   /** @hidden */
-  _curves: GeoCurve[];
+  curves: GeoCurve[];
   /** @hidden */
-  _closed: boolean;
+  closed: boolean;
   /** @hidden */
-  _aliased: boolean;
+  aliased: boolean;
   /** @hidden */
-  _lng0: number;
+  lng0: number;
   /** @hidden */
-  _lat0: number;
+  lat0: number;
   /** @hidden */
-  _lng: number;
+  lng: number;
   /** @hidden */
-  _lat: number;
+  lat: number;
 
   constructor() {
-    this._curves = [];
-    this._closed = false;
-    this._aliased = false;
-    this._lng0 = 0;
-    this._lat0 = 0;
-    this._lng = 0;
-    this._lat = 0;
+    this.curves = [];
+    this.closed = false;
+    this.aliased = false;
+    this.lng0 = 0;
+    this.lat0 = 0;
+    this.lng = 0;
+    this.lat = 0;
   }
 
   private dealias(): void {
-    if (this._aliased) {
-      this._curves = this._curves.slice(0);
-      this._aliased = false;
+    if (this.aliased) {
+      this.curves = this.curves.slice(0);
+      this.aliased = false;
     }
   }
 
   moveTo(lng: number, lat: number): void {
-    if (this._aliased) {
-      this._curves = [];
-      this._aliased = false;
+    if (this.aliased) {
+      this.curves = [];
+      this.aliased = false;
     } else {
-      this._curves.length = 0;
+      this.curves.length = 0;
     }
-    this._closed = false;
-    this._lng0 = lng;
-    this._lat0 = lat;
-    this._lng = lng;
-    this._lat = lat;
+    this.closed = false;
+    this.lng0 = lng;
+    this.lat0 = lat;
+    this.lng = lng;
+    this.lat = lat;
   }
 
   closePath(): void {
     this.dealias();
-    this._curves.push(new GeoSegment(this._lng, this._lat, this._lng0, this._lat0));
-    this._closed = true;
-    this._lng = this._lng0;
-    this._lat = this._lat0;
+    this.curves.push(new GeoSegment(this.lng, this.lat, this.lng0, this.lat0));
+    this.closed = true;
+    this.lng = this.lng0;
+    this.lat = this.lat0;
   }
 
   lineTo(lng: number, lat: number): void {
     this.dealias();
-    this._curves.push(new GeoSegment(this._lng, this._lat, lng, lat));
-    this._lng = lng;
-    this._lat = lat;
+    this.curves.push(new GeoSegment(this.lng, this.lat, lng, lat));
+    this.lng = lng;
+    this.lat = lat;
   }
 
   bind(): GeoSpline {
-    this._aliased = true;
-    return new GeoSpline(this._curves, this._closed);
+    this.aliased = true;
+    return new GeoSpline(this.curves, this.closed);
   }
 }
-GeoSpline.Builder = GeoSplineBuilder;

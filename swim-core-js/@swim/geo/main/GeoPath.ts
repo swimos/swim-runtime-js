@@ -20,31 +20,32 @@ import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import type {GeoCurve} from "./GeoCurve";
 import {AnyGeoSpline, GeoSplinePoints, GeoSpline} from "./GeoSpline";
-import type {GeoPathBuilder} from "./GeoPathBuilder";
-import type {GeoBox} from "./GeoBox";
+import {GeoPathBuilder} from "./"; // forward import
+import {GeoBox} from "./"; // forward import
 
 export type AnyGeoPath = GeoPath | GeoPathSplines | AnyGeoSpline;
 
 export type GeoPathSplines = ReadonlyArray<AnyGeoSpline>;
 
 export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
-  /** @hidden */
-  readonly _splines: ReadonlyArray<GeoSpline>;
-  /** @hidden */
-  _boundingBox?: GeoBox;
-
   constructor(splines: ReadonlyArray<GeoSpline>) {
     super();
-    this._splines = splines;
+    Object.defineProperty(this, "splines", {
+      value: splines,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "boundingBox", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   isDefined(): boolean {
-    return this._splines.length !== 0;
+    return this.splines.length !== 0;
   }
 
-  get splines(): ReadonlyArray<GeoSpline> {
-    return this._splines;
-  }
+  declare readonly splines: ReadonlyArray<GeoSpline>;
 
   get lngMin(): number {
     return this.bounds.lngMin;
@@ -63,7 +64,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   }
 
   interpolateLng(u: number): number {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -76,7 +77,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   }
 
   interpolateLat(u: number): number {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -89,7 +90,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   }
 
   interpolate(u: number): GeoPoint {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -112,7 +113,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   }
 
   split(u: number): [GeoPath, GeoPath] {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -136,7 +137,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   }
 
   subdivide(u: number): GeoPath {
-    const oldSplines = this._splines;
+    const oldSplines = this.splines;
     const n = oldSplines.length;
     if (n > 0) {
       const l = 1 / n;
@@ -157,7 +158,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   }
 
   project(f: GeoProjection): PathR2 {
-    const oldSplines = this._splines;
+    const oldSplines = this.splines;
     const n = oldSplines.length;
     if (n > 0) {
       const newSplines = new Array<SplineR2>(n);
@@ -170,14 +171,17 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     }
   }
 
+  /** @hidden */
+  declare readonly boundingBox: GeoBox | null;
+
   get bounds(): GeoBox {
-    let boundingBox = this._boundingBox;
-    if (boundingBox === void 0) {
+    let boundingBox = this.boundingBox;
+    if (boundingBox === null) {
       let lngMin = Infinity;
       let latMin = Infinity;
       let lngMax = -Infinity;
       let latMax = -Infinity;
-      const splines = this._splines;
+      const splines = this.splines;
       for (let i = 0, n = splines.length; i < n; i += 1) {
         const spline = splines[i]!;
         lngMin = Math.min(lngMin, spline.lngMin);
@@ -185,8 +189,12 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
         lngMax = Math.max(spline.lngMax, lngMax);
         latMax = Math.max(spline.latMax, latMax);
       }
-      boundingBox = new GeoShape.Box(lngMin, latMin, lngMax, latMax);
-      this._boundingBox = boundingBox;
+      boundingBox = new GeoBox(lngMin, latMin, lngMax, latMax);
+      Object.defineProperty(this, "boundingBox", {
+        value: boundingBox,
+        enumerable: true,
+        configurable: true,
+      });
     }
     return boundingBox;
   }
@@ -212,7 +220,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
                      thisArg: S): R | undefined;
   forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
                      thisArg?: S): R | undefined {
-    const splines = this._splines;
+    const splines = this.splines;
     for (let i = 0, n = splines.length; i < n; i += 1) {
       const spline = splines[i]!;
       const result = spline.forEachCoord(callback, thisArg);
@@ -227,7 +235,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     if (this === that) {
       return true;
     } else if (that instanceof GeoPath) {
-      return Arrays.equivalent(this._splines, that._splines, epsilon);
+      return Arrays.equivalent(this.splines, that.splines, epsilon);
     }
     return false;
   }
@@ -236,21 +244,21 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     if (this === that) {
       return true;
     } else if (that instanceof GeoPath) {
-      return Arrays.equal(this._splines, that._splines);
+      return Arrays.equal(this.splines, that.splines);
     }
     return false;
   }
 
   debug(output: Output): void {
-    const splines = this._splines;
+    const splines = this.splines;
     const n = splines.length;
     output = output.write("GeoPath").write(46/*'.'*/);
     if (n === 0) {
       output = output.write("empty").write(40/*'('*/);
     } else if (n === 1) {
       const spline = splines[0]!;
-      output = output.write(spline._closed ? "closed" : "open").write(40/*'('*/);
-      const curves = spline._curves;
+      output = output.write(spline.closed ? "closed" : "open").write(40/*'('*/);
+      const curves = spline.curves;
       const m = curves.length;
       if (m !== 0) {
         output = output.debug(curves[0]!);
@@ -316,7 +324,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   }
 
   static builder(): GeoPathBuilder {
-    return new GeoPath.Builder();
+    return new GeoPathBuilder();
   }
 
   /** @hidden */
@@ -331,8 +339,4 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     return value instanceof GeoPath
         || GeoPath.isSplines(value);
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Builder: typeof GeoPathBuilder; // defined by GeoPathBuilder
 }

@@ -16,7 +16,7 @@ import {Equivalent, Equals, Lazy, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {R2Function} from "./R2Function";
 import {AnyShapeR2, ShapeR2} from "./ShapeR2";
-import {BoxR2} from "../"; // forward import
+import {BoxR2} from "./BoxR2";
 
 export class SetR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equals, Equivalent, Debug {
   constructor(shapes: ReadonlyArray<S>) {

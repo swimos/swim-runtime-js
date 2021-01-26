@@ -20,37 +20,42 @@ import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
 import {GeoCurve} from "./GeoCurve";
 import {GeoSegment} from "./GeoSegment";
-import type {GeoSplineBuilder} from "./GeoSplineBuilder";
-import type {GeoBox} from "./GeoBox";
+import {GeoSplineBuilder} from "./"; // forward import
+import {GeoBox} from "./"; // forward import
 
 export type AnyGeoSpline = GeoSpline | GeoSplinePoints;
 
 export type GeoSplinePoints = ReadonlyArray<AnyGeoPoint>;
 
 export class GeoSpline extends GeoCurve implements Debug {
-  /** @hidden */
-  readonly _curves: ReadonlyArray<GeoCurve>;
-  /** @hidden */
-  readonly _closed: boolean;
-  /** @hidden */
-  _boundingBox?: GeoBox;
-
   constructor(curves: ReadonlyArray<GeoCurve>, closed: boolean) {
     super();
-    this._curves = curves;
-    this._closed = closed;
+    Object.defineProperty(this, "curves", {
+      value: curves,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "closed", {
+      value: closed,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "boundingBox", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
+  declare readonly curves: ReadonlyArray<GeoCurve>;
+
+  /** @hidden */
+  declare readonly closed: boolean;
+
   isDefined(): boolean {
-    return this._curves.length !== 0;
+    return this.curves.length !== 0;
   }
 
   isClosed(): boolean {
-    return this._closed;
-  }
-
-  get curves(): ReadonlyArray<GeoCurve> {
-    return this._curves;
+    return this.closed;
   }
 
   get lngMin(): number {
@@ -70,7 +75,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   interpolateLng(u: number): number {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -83,7 +88,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   interpolateLat(u: number): number {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -96,7 +101,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   interpolate(u: number): GeoPoint {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -119,7 +124,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   split(u: number): [GeoSpline, GeoSpline] {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -143,7 +148,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   subdivide(u: number): GeoSpline {
-    const oldCurves = this._curves;
+    const oldCurves = this.curves;
     const n = oldCurves.length;
     if (n > 0) {
       const l = 1 / n;
@@ -159,14 +164,14 @@ export class GeoSpline extends GeoCurve implements Debug {
       for (let i = k + 1; i < n; i += 1) {
         newCurves[i + 1] = oldCurves[i]!;
       }
-      return new GeoSpline(newCurves, this._closed);
+      return new GeoSpline(newCurves, this.closed);
     } else {
       return GeoSpline.empty();
     }
   }
 
   project(f: GeoProjection): SplineR2 {
-    const oldCurves = this._curves;
+    const oldCurves = this.curves;
     const n = oldCurves.length;
     if (n > 0) {
       let i = 0;
@@ -176,12 +181,12 @@ export class GeoSpline extends GeoCurve implements Debug {
       let curve = oldCurves[0]!;
       if (curve instanceof GeoSegment) {
         // project first point
-        let p0 = f.project(curve._lng0, curve._lat0);
+        let p0 = f.project(curve.lng0, curve.lat0);
         while (i < n) {
           curve = oldCurves[i]!;
           if (curve instanceof GeoSegment) {
             // project next point
-            const p1 = f.project(curve._lng1, curve._lat1);
+            const p1 = f.project(curve.lng1, curve.lat1);
             newCurves[i] = new SegmentR2(p0.x, p0.y, p1.x, p1.y);
             p0 = p1;
             i += 1;
@@ -198,20 +203,23 @@ export class GeoSpline extends GeoCurve implements Debug {
         i += 1;
       }
 
-      return new SplineR2(newCurves, this._closed);
+      return new SplineR2(newCurves, this.closed);
     } else {
       return SplineR2.empty();
     }
   }
 
+  /** @hidden */
+  declare readonly boundingBox: GeoBox | null;
+
   get bounds(): GeoBox {
-    let boundingBox = this._boundingBox;
-    if (boundingBox === void 0) {
+    let boundingBox = this.boundingBox;
+    if (boundingBox === null) {
       let lngMin = Infinity;
       let latMin = Infinity;
       let lngMax = -Infinity;
       let latMax = -Infinity;
-      const curves = this._curves;
+      const curves = this.curves;
       for (let i = 0, n = curves.length; i < n; i += 1) {
         const curve = curves[i]!;
         lngMin = Math.min(lngMin, curve.lngMin);
@@ -219,8 +227,12 @@ export class GeoSpline extends GeoCurve implements Debug {
         lngMax = Math.max(curve.lngMax, lngMax);
         latMax = Math.max(curve.latMax, latMax);
       }
-      boundingBox = new GeoShape.Box(lngMin, latMin, lngMax, latMax);
-      this._boundingBox = boundingBox;
+      boundingBox = new GeoBox(lngMin, latMin, lngMax, latMax);
+      Object.defineProperty(this, "boundingBox", {
+        value: boundingBox,
+        enumerable: true,
+        configurable: true,
+      });
     }
     return boundingBox;
   }
@@ -230,7 +242,7 @@ export class GeoSpline extends GeoCurve implements Debug {
                      thisArg: S): R | undefined;
   forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
                      thisArg?: S): R | undefined {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
       let curve = curves[0]!;
@@ -254,7 +266,7 @@ export class GeoSpline extends GeoCurve implements Debug {
                          thisArg: S): R | undefined;
   forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
                          thisArg?: S): R | undefined {
-    const curves = this._curves;
+    const curves = this.curves;
     for (let i = 0, n = curves.length; i < n; i += 1) {
       const curve = curves[i]!;
       const result = curve.forEachCoordRest(callback, thisArg);
@@ -269,8 +281,8 @@ export class GeoSpline extends GeoCurve implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof GeoSpline) {
-      return Arrays.equivalent(this._curves, that._curves, epsilon)
-          && this._closed === that._closed;
+      return Arrays.equivalent(this.curves, that.curves, epsilon)
+          && this.closed === that.closed;
     }
     return false;
   }
@@ -279,20 +291,20 @@ export class GeoSpline extends GeoCurve implements Debug {
     if (this === that) {
       return true;
     } else if (that instanceof GeoSpline) {
-      return Arrays.equal(this._curves, that._curves)
-          && this._closed === that._closed;
+      return Arrays.equal(this.curves, that.curves)
+          && this.closed === that.closed;
     }
     return false;
   }
 
   debug(output: Output): void {
-    const curves = this._curves;
+    const curves = this.curves;
     const n = curves.length;
     output = output.write("GeoSpline").write(46/*'.'*/);
     if (n === 0) {
       output = output.write("empty").write(40/*'('*/);
     } else if (n !== 0) {
-      output = output.write(this._closed ? "closed" : "open").write(40/*'('*/);
+      output = output.write(this.closed ? "closed" : "open").write(40/*'('*/);
       output = output.debug(curves[0]!);
       for (let i = 1; i < n; i += 1) {
         output = output.write(", ").debug(curves[i]!);
@@ -348,7 +360,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   static builder(): GeoSplineBuilder {
-    return new GeoSpline.Builder();
+    return new GeoSplineBuilder();
   }
 
   /** @hidden */
@@ -363,8 +375,4 @@ export class GeoSpline extends GeoCurve implements Debug {
     return value instanceof GeoSpline
         || GeoSpline.isPoints(value);
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Builder: typeof GeoSplineBuilder; // defined by GeoSplineBuilder
 }

@@ -19,30 +19,30 @@ import {GeoPath} from "./GeoPath";
 
 export class GeoPathBuilder implements GeoPathContext {
   /** @hidden */
-  _splines: GeoSpline[];
+  splines: GeoSpline[];
   /** @hidden */
-  _builder: GeoSplineBuilder | null;
+  builder: GeoSplineBuilder | null;
 
   constructor() {
-    this._splines = [];
-    this._builder = null;
+    this.splines = [];
+    this.builder = null;
   }
 
   moveTo(lng: number, lat: number): void {
-    let builder = this._builder;
+    let builder = this.builder;
     if (builder !== null) {
       const spline = builder.bind();
       if (spline.isDefined()) {
-        this._splines.push(spline);
+        this.splines.push(spline);
       }
     }
     builder = new GeoSplineBuilder();
-    this._builder = builder;
+    this.builder = builder;
     builder.moveTo(lng, lat);
   }
 
   closePath(): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.closePath();
     } else {
@@ -51,7 +51,7 @@ export class GeoPathBuilder implements GeoPathContext {
   }
 
   lineTo(lng: number, lat: number): void {
-    const builder = this._builder;
+    const builder = this.builder;
     if (builder !== null) {
       builder.lineTo(lng, lat);
     } else {
@@ -60,8 +60,8 @@ export class GeoPathBuilder implements GeoPathContext {
   }
 
   bind(): GeoPath {
-    const splines = this._splines.slice(0);
-    const builder = this._builder;
+    const splines = this.splines.slice(0);
+    const builder = this.builder;
     if (builder !== null) {
       const spline = builder.bind();
       if (spline.isDefined()) {
@@ -71,4 +71,3 @@ export class GeoPathBuilder implements GeoPathContext {
     return new GeoPath(splines);
   }
 }
-GeoPath.Builder = GeoPathBuilder;

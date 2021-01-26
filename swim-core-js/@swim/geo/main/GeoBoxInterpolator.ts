@@ -20,10 +20,10 @@ export const GeoBoxInterpolator = function (s0: GeoBox, s1: GeoBox): Interpolato
   const interpolator = function (u: number): GeoBox {
     const s0 = interpolator[0];
     const s1 = interpolator[1];
-    const lngMin = s0._lngMin + u * (s1._lngMin - s0._lngMin);
-    const latMin = s0._latMin + u * (s1._latMin - s0._latMin);
-    const lngMax = s0._lngMax + u * (s1._lngMax - s0._lngMax);
-    const latMax = s0._latMax + u * (s1._latMax - s0._latMax);
+    const lngMin = s0.lngMin + u * (s1.lngMin - s0.lngMin);
+    const latMin = s0.latMin + u * (s1.latMin - s0.latMin);
+    const lngMax = s0.lngMax + u * (s1.lngMax - s0.lngMax);
+    const latMax = s0.latMax + u * (s1.latMax - s0.latMax);
     return new GeoBox(lngMin, latMin, lngMax, latMax);
   } as Interpolator<GeoBox>;
   Object.setPrototypeOf(interpolator, GeoBoxInterpolator.prototype);

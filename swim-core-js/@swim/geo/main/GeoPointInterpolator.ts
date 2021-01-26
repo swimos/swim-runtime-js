@@ -20,8 +20,8 @@ export const GeoPointInterpolator = function (p0: GeoPoint, p1: GeoPoint): Inter
   const interpolator = function (u: number): GeoPoint {
     const p0 = interpolator[0];
     const p1 = interpolator[1];
-    const lng = p0._lng + u * (p1._lng - p0._lng);
-    const lat = p0._lat + u * (p1._lat - p0._lat);
+    const lng = p0.lng + u * (p1.lng - p0.lng);
+    const lat = p0.lat + u * (p1.lat - p0.lat);
     return new GeoPoint(lng, lat);
   } as Interpolator<GeoPoint>;
   Object.setPrototypeOf(interpolator, GeoPointInterpolator.prototype);
