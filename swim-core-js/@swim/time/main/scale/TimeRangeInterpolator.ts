@@ -25,8 +25,8 @@ export const TimeRangeInterpolator = function (y0: TimeRange, y1: TimeRange): In
     const y1 = interpolator[1];
     const y10 = y1[0];
     const y11 = y1[1];
-    return TimeRange(new DateTime(y00._time + u * (y10._time - y00._time), u === 0 ? y00._zone : y10._zone),
-                     new DateTime(y01._time + u * (y11._time - y01._time), u === 0 ? y01._zone : y11._zone));
+    return TimeRange(new DateTime(y00.time + u * (y10.time - y00.time), u === 0 ? y00.zone : y10.zone),
+                     new DateTime(y01.time + u * (y11.time - y01.time), u === 0 ? y01.zone : y11.zone));
   } as Interpolator<TimeRange>;
   Object.setPrototypeOf(interpolator, TimeRangeInterpolator.prototype);
   Object.defineProperty(interpolator, 0, {

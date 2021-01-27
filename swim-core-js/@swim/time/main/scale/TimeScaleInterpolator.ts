@@ -23,13 +23,13 @@ export const TimeScaleInterpolator = function (s0: TimeScale, s1: TimeScale): In
     const s0 = interpolator[0];
     const s1 = interpolator[1];
     const x0 = s0.domain;
-    const x00 = x0[0]._time;
-    const x01 = x0[1]._time;
+    const x00 = x0[0].time;
+    const x01 = x0[1].time;
     const x1 = s1.domain;
-    const x10 = x1[0]._time;
-    const x11 = x1[1]._time;
-    const domain = TimeDomain(new DateTime(x00 + u * (x10 - x00), u === 0 ? x0[0]._zone : x1[0]._zone),
-                              new DateTime(x01 + u * (x11 - x01), u === 0 ? x0[1]._zone : x1[1]._zone));
+    const x10 = x1[0].time;
+    const x11 = x1[1].time;
+    const domain = TimeDomain(new DateTime(x00 + u * (x10 - x00), u === 0 ? x0[0].zone : x1[0].zone),
+                              new DateTime(x01 + u * (x11 - x01), u === 0 ? x0[1].zone : x1[1].zone));
     const y0 = s0.range;
     const y00 = y0[0];
     const y01 = y0[1];

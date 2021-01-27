@@ -107,10 +107,10 @@ TimeScale.prototype.clampDomain = function (xMin: DateTime | undefined, xMax: Da
   }
   const x0 = this.domain[0];
   const x1 = this.domain[1];
-  let t0 = x0._time;
-  let t1 = x1._time;
-  const tMin = xMin !== void 0 ? xMin._time : void 0;
-  const tMax = xMax !== void 0 ? xMax._time : void 0;
+  let t0 = x0.time;
+  let t1 = x1.time;
+  const tMin = xMin !== void 0 ? xMin.time : void 0;
+  const tMax = xMax !== void 0 ? xMax.time : void 0;
   if (tMin !== void 0 && tMax !== void 0 && Math.abs(t1 - t0) > tMax - tMin) {
     if (t0 < t1) {
       t0 = tMin;
@@ -156,10 +156,10 @@ TimeScale.prototype.clampDomain = function (xMin: DateTime | undefined, xMax: Da
     t1 = (tSum + dz) / 2;
   }
 
-  if (Math.abs(t0 - x0._time) < epsilon && Math.abs(t1 - x1._time) < epsilon) {
+  if (Math.abs(t0 - x0.time) < epsilon && Math.abs(t1 - x1.time) < epsilon) {
     return this;
   } else {
-    return TimeScale(TimeDomain(new DateTime(t0, x0._zone), new DateTime(t1, x1._zone)), this.range);
+    return TimeScale(TimeDomain(new DateTime(t0, x0.zone), new DateTime(t1, x1.zone)), this.range);
   }
 };
 
@@ -168,11 +168,11 @@ TimeScale.prototype.solveDomain = function (x1: DateTime, y1: number, x2?: DateT
   if (epsilon === void 0) {
     epsilon = Equivalent.Epsilon;
   }
-  const dt = this.domain[1]._time - this.domain[0]._time;
+  const dt = this.domain[1].time - this.domain[0].time;
   const y0 = this.range[0];
   const y3 = this.range[1];
-  const t1 = x1._time;
-  const t2 = x2 !== void 0 ? x2._time : void 0;
+  const t1 = x1.time;
+  const t2 = x2 !== void 0 ? x2.time : void 0;
   let m: number;
   if (t2 === void 0 || y2 === void 0 || Math.abs(t2 - t1) < epsilon || Math.abs(y2 - y1) < epsilon) {
     m = (y3 - y0) / (dt !== 0 ? dt : epsilon);
@@ -186,10 +186,10 @@ TimeScale.prototype.solveDomain = function (x1: DateTime, y1: number, x2?: DateT
   const t0 = (y0 - b) / m;
   const t3 = (y3 - b) / m;
 
-  if (Math.abs(t0 - this.domain[0]._time) < epsilon && Math.abs(t3 - this.domain[1]._time) < epsilon) {
+  if (Math.abs(t0 - this.domain[0].time) < epsilon && Math.abs(t3 - this.domain[1].time) < epsilon) {
     return this;
   } else {
-    return TimeScale(TimeDomain(new DateTime(t0, this.domain[0]._zone), new DateTime(t3, this.domain[1]._zone)), this.range);
+    return TimeScale(TimeDomain(new DateTime(t0, this.domain[0].zone), new DateTime(t3, this.domain[1].zone)), this.range);
   }
 };
 

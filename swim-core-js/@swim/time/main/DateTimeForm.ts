@@ -42,7 +42,7 @@ export class DateTimeForm extends Form<DateTime, AnyDateTime> {
   }
 
   cast(value: Value): DateTime | undefined {
-    let date: DateTime | undefined;
+    let date: DateTime | null = null;
     try {
       date = DateTime.fromValue(value);
       if (date === void 0) {
@@ -59,7 +59,6 @@ export class DateTimeForm extends Form<DateTime, AnyDateTime> {
     } catch (e) {
       // swallow
     }
-    return date;
+    return date !== null ? date : void 0;
   }
 }
-DateTime.Form = DateTimeForm;

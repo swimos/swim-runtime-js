@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import type {Input, Output, Parser} from "@swim/codec";
-import type {DateTimeLocale} from "../DateTimeLocale";
 import type {DateTimeInit, DateTime} from "../DateTime";
-import {DateTimeFormat} from "../DateTimeFormat";
+import type {DateTimeLocale} from "./DateTimeLocale";
+import {DateTimeFormat} from "./DateTimeFormat";
+import {MonthParser} from "../"; // forward import
 
 /** @hidden */
 export class MonthFormat extends DateTimeFormat {
@@ -26,12 +27,19 @@ export class MonthFormat extends DateTimeFormat {
     this.locale = locale;
   }
 
+  withLocale(locale: DateTimeLocale): DateTimeFormat {
+    if (locale !== this.locale) {
+      return new MonthFormat(locale);
+    } else {
+      return this;
+    }
+  }
+
   writeDate(date: DateTime, output: Output): void {
-    output.write(this.locale.months[date.month()]!);
+    output.write(this.locale.months[date.month]!);
   }
 
   parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
-    return DateTimeFormat.MonthParser.parse(input, this.locale, date);
+    return MonthParser.parse(input, this.locale, date);
   }
 }
-DateTimeFormat.Month = MonthFormat;

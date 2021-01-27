@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {AnyDateTime, DateTime} from "../DateTime";
-import {UnitTimeInterval, TimeInterval} from "../TimeInterval";
+import {UnitTimeInterval, TimeInterval} from "./TimeInterval";
+import {FilterTimeInterval} from "./FilterTimeInterval";
 
 /** @hidden */
 export class HourInterval extends UnitTimeInterval {
@@ -30,7 +31,7 @@ export class HourInterval extends UnitTimeInterval {
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     d += k * TimeInterval.MillisPerHour;
-    let dtz = z.offset() * TimeInterval.MillisPerMinute % TimeInterval.MillisPerHour;
+    let dtz = z.offset * TimeInterval.MillisPerMinute % TimeInterval.MillisPerHour;
     if (dtz < 0) {
       dtz += TimeInterval.MillisPerHour;
     }
@@ -41,7 +42,7 @@ export class HourInterval extends UnitTimeInterval {
   floor(d: AnyDateTime): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
-    let dtz = z.offset() * TimeInterval.MillisPerMinute % TimeInterval.MillisPerHour;
+    let dtz = z.offset * TimeInterval.MillisPerMinute % TimeInterval.MillisPerHour;
     if (dtz < 0) {
       dtz += TimeInterval.MillisPerHour;
     }
@@ -53,7 +54,7 @@ export class HourInterval extends UnitTimeInterval {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     d -= 1;
-    let dtz = z.offset() * TimeInterval.MillisPerMinute % TimeInterval.MillisPerHour;
+    let dtz = z.offset * TimeInterval.MillisPerMinute % TimeInterval.MillisPerHour;
     if (dtz < 0) {
       dtz += TimeInterval.MillisPerHour;
     }
@@ -66,15 +67,14 @@ export class HourInterval extends UnitTimeInterval {
     if (k === 1) {
       return this;
     } else if (isFinite(k) && k >= 1) {
-      return new TimeInterval.Filter(this, HourInterval.modulo.bind(void 0, k));
+      return new FilterTimeInterval(this, HourInterval.modulo.bind(void 0, k));
     } else {
       throw new Error("" + k);
     }
   }
 
   private static modulo(k: number, d: DateTime): boolean {
-    const hour = d.hour();
+    const hour = d.hour;
     return isFinite(hour) && hour % k === 0;
   }
 }
-TimeInterval.Hour = HourInterval;

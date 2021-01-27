@@ -14,16 +14,16 @@
 
 import type {Input, Output, Parser} from "@swim/codec";
 import type {DateTimeInit, DateTime} from "../DateTime";
-import {DateTimeFormat} from "../DateTimeFormat";
+import {DateTimeFormat} from "./DateTimeFormat";
+import {Hour12Parser} from "../"; // forward import
 
 /** @hidden */
 export class Hour12Format extends DateTimeFormat {
   writeDate(date: DateTime, output: Output): void {
-    DateTimeFormat.writeDateNumber2(date.hour() % 12 || 12, output);
+    DateTimeFormat.writeDateNumber2(date.hour % 12 || 12, output);
   }
 
   parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
-    return DateTimeFormat.Hour12Parser.parse(input, date);
+    return Hour12Parser.parse(input, date);
   }
 }
-DateTimeFormat.Hour12 = Hour12Format;

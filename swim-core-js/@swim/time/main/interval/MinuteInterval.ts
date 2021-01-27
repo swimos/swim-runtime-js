@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {AnyDateTime, DateTime} from "../DateTime";
-import {UnitTimeInterval, TimeInterval} from "../TimeInterval";
+import {UnitTimeInterval, TimeInterval} from "./TimeInterval";
+import {FilterTimeInterval} from "./FilterTimeInterval";
 
 /** @hidden */
 export class MinuteInterval extends UnitTimeInterval {
@@ -51,15 +52,14 @@ export class MinuteInterval extends UnitTimeInterval {
     if (k === 1) {
       return this;
     } else if (isFinite(k) && k >= 1) {
-      return new TimeInterval.Filter(this, MinuteInterval.modulo.bind(void 0, k));
+      return new FilterTimeInterval(this, MinuteInterval.modulo.bind(void 0, k));
     } else {
       throw new Error("" + k);
     }
   }
 
   private static modulo(k: number, d: DateTime): boolean {
-    const minute = d.minute();
+    const minute = d.minute;
     return isFinite(minute) && minute % k === 0;
   }
 }
-TimeInterval.Minute = MinuteInterval;

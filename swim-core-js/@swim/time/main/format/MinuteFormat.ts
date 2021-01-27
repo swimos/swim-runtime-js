@@ -14,16 +14,16 @@
 
 import type {Input, Output, Parser} from "@swim/codec";
 import type {DateTimeInit, DateTime} from "../DateTime";
-import {DateTimeFormat} from "../DateTimeFormat";
+import {DateTimeFormat} from "./DateTimeFormat";
+import {MinuteParser} from "../"; // forward import
 
 /** @hidden */
 export class MinuteFormat extends DateTimeFormat {
   writeDate(date: DateTime, output: Output): void {
-    DateTimeFormat.writeDateNumber2(date.minute(), output);
+    DateTimeFormat.writeDateNumber2(date.minute, output);
   }
 
   parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
-    return DateTimeFormat.MinuteParser.parse(input, date);
+    return MinuteParser.parse(input, date);
   }
 }
-DateTimeFormat.Minute = MinuteFormat;

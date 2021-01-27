@@ -36,10 +36,10 @@ export interface TimeDomain extends Domain<DateTime>, Interpolate<TimeDomain> {
 
 export const TimeDomain = function (x0: DateTime, x1: DateTime): TimeDomain {
   const domain = function (x: DateTime): number {
-    const t0 = domain[0]._time;
-    const t1 = domain[1]._time;
+    const t0 = domain[0].time;
+    const t1 = domain[1].time;
     const dt = t1 - t0;
-    return dt !== 0 ? (x._time - t0) / dt : 0;
+    return dt !== 0 ? (x.time - t0) / dt : 0;
   } as TimeDomain;
   Object.setPrototypeOf(domain, TimeDomain.prototype);
   Object.defineProperty(domain, 0, {

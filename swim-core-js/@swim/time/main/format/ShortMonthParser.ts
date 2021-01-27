@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import {Input, Output, Parser, Diagnostic} from "@swim/codec";
-import type {DateTimeLocale} from "../DateTimeLocale";
 import type {DateTimeInit} from "../DateTime";
-import {DateTimeFormat} from "../DateTimeFormat";
+import type {DateTimeLocale} from "./DateTimeLocale";
+import {DateTimeFormat} from "./DateTimeFormat";
 
 /** @hidden */
 export class ShortMonthParser extends Parser<DateTimeInit> {
@@ -53,4 +53,3 @@ export class ShortMonthParser extends Parser<DateTimeInit> {
     return new ShortMonthParser(locale, date, output);
   }
 }
-DateTimeFormat.ShortMonthParser = ShortMonthParser;

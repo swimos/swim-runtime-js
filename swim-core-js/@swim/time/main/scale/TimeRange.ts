@@ -36,9 +36,9 @@ export interface TimeRange extends Range<DateTime>, Interpolate<TimeRange> {
 
 export const TimeRange = function (y0: DateTime, y1: DateTime): TimeRange {
   const range = function (u: number): DateTime {
-    const t0 = range[0]._time;
-    const t1 = range[1]._time;
-    return new DateTime(t0 + u * (t1 - t0), u === 0 ? range[0]._zone : range[1]._zone);
+    const t0 = range[0].time;
+    const t1 = range[1].time;
+    return new DateTime(t0 + u * (t1 - t0), u === 0 ? range[0].zone : range[1].zone);
   } as TimeRange;
   Object.setPrototypeOf(range, TimeRange.prototype);
   Object.defineProperty(range, 0, {

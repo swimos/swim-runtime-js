@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import type {Input, Output, Parser} from "@swim/codec";
-import type {DateTimeLocale} from "../DateTimeLocale";
 import type {DateTimeInit, DateTime} from "../DateTime";
-import {DateTimeFormat} from "../DateTimeFormat";
+import type {DateTimeLocale} from "./DateTimeLocale";
+import {DateTimeFormat} from "./DateTimeFormat";
+import {PeriodParser} from "../"; // forward import
 
 /** @hidden */
 export class PeriodFormat extends DateTimeFormat {
@@ -26,12 +27,19 @@ export class PeriodFormat extends DateTimeFormat {
     this.locale = locale;
   }
 
+  withLocale(locale: DateTimeLocale): DateTimeFormat {
+    if (locale !== this.locale) {
+      return new PeriodFormat(locale);
+    } else {
+      return this;
+    }
+  }
+
   writeDate(date: DateTime, output: Output): void {
-    output.write(this.locale.periods[+(date.hour() >= 12)]!);
+    output.write(this.locale.periods[+(date.hour >= 12)]!);
   }
 
   parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
-    return DateTimeFormat.PeriodParser.parse(input, this.locale, date);
+    return PeriodParser.parse(input, this.locale, date);
   }
 }
-DateTimeFormat.Period = PeriodFormat;

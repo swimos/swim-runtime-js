@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
+
 export class DateTimeLocale {
   readonly periods: ReadonlyArray<string>;
   readonly weekdays: ReadonlyArray<string>;
@@ -31,12 +33,9 @@ export class DateTimeLocale {
     this.shortMonths = shortMonths;
   }
 
-  private static _standard?: DateTimeLocale;
+  @Lazy
   static standard(): DateTimeLocale {
-    if (DateTimeLocale._standard === void 0) {
-      DateTimeLocale._standard = new DateTimeLocale();
-    }
-    return DateTimeLocale._standard;
+    return new DateTimeLocale();
   }
 
   private static readonly Periods: ReadonlyArray<string> = [

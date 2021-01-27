@@ -25,8 +25,8 @@ export const TimeDomainInterpolator = function (x0: TimeDomain, x1: TimeDomain):
     const x1 = interpolator[1];
     const x10 = x1[0];
     const x11 = x1[1];
-    return TimeDomain(new DateTime(x00._time + u * (x10._time - x00._time), u === 0 ? x00._zone : x10._zone),
-                      new DateTime(x01._time + u * (x11._time - x01._time), u === 0 ? x01._zone : x11._zone));
+    return TimeDomain(new DateTime(x00.time + u * (x10.time - x00.time), u === 0 ? x00.zone : x10.zone),
+                      new DateTime(x01.time + u * (x11.time - x01.time), u === 0 ? x01.zone : x11.zone));
   } as Interpolator<TimeDomain>;
   Object.setPrototypeOf(interpolator, TimeDomainInterpolator.prototype);
   Object.defineProperty(interpolator, 0, {

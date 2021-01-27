@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, HashCode, Equivalent, Compare, Numbers, Constructors} from "@swim/util";
+import {HashCode, Equivalent, Compare, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import type {Display, Output} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
 import {Item, Value, Form} from "@swim/structure";
 import {AnyTimeZone, TimeZone} from "./TimeZone";
 import {DateTimeInterpolator} from "./"; // forward import
-import type {DateTimeParser} from "./DateTimeParser";
-import type {DateTimeForm} from "./DateTimeForm";
-import type {DateTimeFormat} from "./DateTimeFormat";
+import {DateTimeForm} from "./"; // forward import
+import {DateTimeFormat} from "./"; // forward import
 
 export type AnyDateTime = DateTime | DateTimeInit | Date | string | number;
 
@@ -36,194 +35,162 @@ export interface DateTimeInit {
 }
 
 export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Compare, Display {
-  /** @hidden */
-  readonly _time: number;
-  /** @hidden */
-  readonly _zone: TimeZone;
-
-  constructor(time: number, zone: TimeZone = TimeZone.utc()) {
-    this._time = time;
-    this._zone = zone;
+  constructor(time: number, zone: TimeZone = TimeZone.utc) {
+    Object.defineProperty(this, "time", {
+      value: time,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "zone", {
+      value: zone,
+      enumerable: true,
+    });
   }
 
   isDefined(): boolean {
-    return isFinite(new Date(this._time).getTime());
+    return isFinite(new Date(this.time).getTime());
   }
 
-  time(): number;
-  time(time: number): DateTime;
-  time(time?: number): number | DateTime {
-    if (time === void 0) {
-      return this._time;
-    } else {
-      return new DateTime(time, this._zone);
-    }
+  declare readonly time: number;
+
+  declare readonly zone: TimeZone;
+
+  get year(): number {
+    return this.toUTCLocalDate().getUTCFullYear();
   }
 
-  zone(): TimeZone;
-  zone(zone: TimeZone): DateTime;
-  zone(zone?: TimeZone): TimeZone | DateTime {
-    if (zone === void 0) {
-      return this._zone;
-    } else {
-      return new DateTime(this._time, zone);
-    }
-  }
-
-  year(): number;
-  year(year: number, month?: number, day?: number, hour?: number, minute?: number,
-       second?: number, millisecond?: number): DateTime;
-  year(year?: number, month?: number, day?: number, hour?: number, minute?: number,
-       second?: number, millisecond?: number): number | DateTime {
+  withYear(year: number, month?: number, day?: number, hour?: number, minute?: number,
+           second?: number, millisecond?: number): DateTime {
     const date = this.toUTCLocalDate();
-    if (year === void 0) {
-      return date.getUTCFullYear();
-    } else {
-      date.setUTCFullYear(year);
-      if (month !== void 0) {
-        date.setUTCMonth(month);
-      }
-      if (day !== void 0) {
-        date.setUTCDate(day);
-      }
-      if (hour !== void 0) {
-        date.setUTCHours(hour);
-      }
-      if (minute !== void 0) {
-        date.setUTCMinutes(minute);
-      }
-      if (second !== void 0) {
-        date.setUTCSeconds(second);
-      }
-      if (millisecond !== void 0) {
-        date.setUTCMilliseconds(millisecond);
-      }
-      return DateTime.fromUTCLocalDate(date, this._zone);
-    }
-  }
-
-  month(): number;
-  month(month: number, day?: number, hour?: number, minute?: number,
-        second?: number, millisecond?: number): DateTime;
-  month(month?: number, day?: number, hour?: number, minute?: number,
-        second?: number, millisecond?: number): number | DateTime {
-    const date = this.toUTCLocalDate();
-    if (month === void 0) {
-      return date.getUTCMonth();
-    } else {
+    date.setUTCFullYear(year);
+    if (month !== void 0) {
       date.setUTCMonth(month);
-      if (day !== void 0) {
-        date.setUTCDate(day);
-      }
-      if (hour !== void 0) {
-        date.setUTCHours(hour);
-      }
-      if (minute !== void 0) {
-        date.setUTCMinutes(minute);
-      }
-      if (second !== void 0) {
-        date.setUTCSeconds(second);
-      }
-      if (millisecond !== void 0) {
-        date.setUTCMilliseconds(millisecond);
-      }
-      return DateTime.fromUTCLocalDate(date, this._zone);
     }
-  }
-
-  day(): number;
-  day(day: number, hour?: number, minute?: number, second?: number,
-      millisecond?: number): DateTime;
-  day(day?: number, hour?: number, minute?: number, second?: number,
-      millisecond?: number): number | DateTime {
-    const date = this.toUTCLocalDate();
-    if (day === void 0) {
-      return date.getUTCDate();
-    } else {
+    if (day !== void 0) {
       date.setUTCDate(day);
-      if (hour !== void 0) {
-        date.setUTCHours(hour);
-      }
-      if (minute !== void 0) {
-        date.setUTCMinutes(minute);
-      }
-      if (second !== void 0) {
-        date.setUTCSeconds(second);
-      }
-      if (millisecond !== void 0) {
-        date.setUTCMilliseconds(millisecond);
-      }
-      return DateTime.fromUTCLocalDate(date, this._zone);
     }
-  }
-
-  hour(): number;
-  hour(hour: number, minute?: number, second?: number, millisecond?: number): DateTime;
-  hour(hour?: number, minute?: number, second?: number, millisecond?: number): number | DateTime {
-    const date = this.toUTCLocalDate();
-    if (hour === void 0) {
-      return date.getUTCHours();
-    } else {
+    if (hour !== void 0) {
       date.setUTCHours(hour);
-      if (minute !== void 0) {
-        date.setUTCMinutes(minute);
-      }
-      if (second !== void 0) {
-        date.setUTCSeconds(second);
-      }
-      if (millisecond !== void 0) {
-        date.setUTCMilliseconds(millisecond);
-      }
-      return DateTime.fromUTCLocalDate(date, this._zone);
     }
-  }
-
-  minute(): number;
-  minute(minute: number, second?: number, millisecond?: number): DateTime;
-  minute(minute?: number, second?: number, millisecond?: number): number | DateTime {
-    const date = this.toUTCLocalDate();
-    if (minute === void 0) {
-      return date.getUTCMinutes();
-    } else {
+    if (minute !== void 0) {
       date.setUTCMinutes(minute);
-      if (second !== void 0) {
-        date.setUTCSeconds(second);
-      }
-      if (millisecond !== void 0) {
-        date.setUTCMilliseconds(millisecond);
-      }
-      return DateTime.fromUTCLocalDate(date, this._zone);
     }
-  }
-
-  second(): number;
-  second(second: number, millisecond?: number): DateTime;
-  second(second?: number, millisecond?: number): number | DateTime {
-    const date = this.toUTCLocalDate();
-    if (second === void 0) {
-      return date.getUTCSeconds();
-    } else {
+    if (second !== void 0) {
       date.setUTCSeconds(second);
-      if (millisecond !== void 0) {
-        date.setUTCMilliseconds(millisecond);
-      }
-      return DateTime.fromUTCLocalDate(date, this._zone);
     }
-  }
-
-  millisecond(): number;
-  millisecond(millisecond: number): DateTime;
-  millisecond(millisecond?: number): number | DateTime {
-    const date = this.toUTCLocalDate();
-    if (millisecond === void 0) {
-      return date.getUTCMilliseconds();
-    } else {
+    if (millisecond !== void 0) {
       date.setUTCMilliseconds(millisecond);
-      return DateTime.fromUTCLocalDate(date, this._zone);
     }
+    return DateTime.fromUTCLocalDate(date, this.zone);
   }
 
-  weekday(): number {
+  get month(): number {
+    return this.toUTCLocalDate().getUTCMonth();
+  }
+
+  withMonth(month: number, day?: number, hour?: number, minute?: number,
+            second?: number, millisecond?: number): DateTime {
+    const date = this.toUTCLocalDate();
+    date.setUTCMonth(month);
+    if (day !== void 0) {
+      date.setUTCDate(day);
+    }
+    if (hour !== void 0) {
+      date.setUTCHours(hour);
+    }
+    if (minute !== void 0) {
+      date.setUTCMinutes(minute);
+    }
+    if (second !== void 0) {
+      date.setUTCSeconds(second);
+    }
+    if (millisecond !== void 0) {
+      date.setUTCMilliseconds(millisecond);
+    }
+    return DateTime.fromUTCLocalDate(date, this.zone);
+  }
+
+  get day(): number {
+    return this.toUTCLocalDate().getUTCDate();
+  }
+
+  withDay(day: number, hour?: number, minute?: number, second?: number,
+          millisecond?: number): DateTime {
+    const date = this.toUTCLocalDate();
+    date.setUTCDate(day);
+    if (hour !== void 0) {
+      date.setUTCHours(hour);
+    }
+    if (minute !== void 0) {
+      date.setUTCMinutes(minute);
+    }
+    if (second !== void 0) {
+      date.setUTCSeconds(second);
+    }
+    if (millisecond !== void 0) {
+      date.setUTCMilliseconds(millisecond);
+    }
+    return DateTime.fromUTCLocalDate(date, this.zone);
+  }
+
+  get hour(): number {
+    return this.toUTCLocalDate().getUTCHours();
+  }
+
+  withHour(hour: number, minute?: number, second?: number, millisecond?: number): DateTime {
+    const date = this.toUTCLocalDate();
+    date.setUTCHours(hour);
+    if (minute !== void 0) {
+      date.setUTCMinutes(minute);
+    }
+    if (second !== void 0) {
+      date.setUTCSeconds(second);
+    }
+    if (millisecond !== void 0) {
+      date.setUTCMilliseconds(millisecond);
+    }
+    return DateTime.fromUTCLocalDate(date, this.zone);
+  }
+
+  get minute(): number {
+    return this.toUTCLocalDate().getUTCMinutes();
+  }
+
+  withMinute(minute: number, second?: number, millisecond?: number): DateTime {
+    const date = this.toUTCLocalDate();
+    date.setUTCMinutes(minute);
+    if (second !== void 0) {
+      date.setUTCSeconds(second);
+    }
+    if (millisecond !== void 0) {
+      date.setUTCMilliseconds(millisecond);
+    }
+    return DateTime.fromUTCLocalDate(date, this.zone);
+  }
+
+  get second(): number {
+    return this.toUTCLocalDate().getUTCSeconds();
+  }
+
+  withSecond(second: number, millisecond?: number): DateTime {
+    const date = this.toUTCLocalDate();
+    date.setUTCSeconds(second);
+    if (millisecond !== void 0) {
+      date.setUTCMilliseconds(millisecond);
+    }
+    return DateTime.fromUTCLocalDate(date, this.zone);
+  }
+
+  get millisecond(): number {
+    return this.toUTCLocalDate().getUTCMilliseconds();
+  }
+
+  withMillisecond(millisecond: number): DateTime {
+    const date = this.toUTCLocalDate();
+    date.setUTCMilliseconds(millisecond);
+    return DateTime.fromUTCLocalDate(date, this.zone);
+  }
+
+  get weekday(): number {
     return this.toUTCLocalDate().getUTCDay();
   }
 
@@ -232,15 +199,15 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
    * @hidden
    */
   toUTCLocalDate(): Date {
-    return new Date(this._time + 60000 * this._zone._offset);
+    return new Date(this.time + 60000 * this.zone.offset);
   }
 
   toDate(): Date {
-    return new Date(this._time);
+    return new Date(this.time);
   }
 
   valueOf(): number {
-    return this._time;
+    return this.time;
   }
 
   interpolateTo(that: DateTime): Interpolator<DateTime>;
@@ -255,8 +222,8 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
 
   compareTo(that: unknown): number {
     if (that instanceof DateTime) {
-      const x = this._time;
-      const y = that._time;
+      const x = this.time;
+      const y = that.time;
       return x < y ? -1 : x > y ? 1 : x === y ? 0 : NaN;
     }
     return NaN;
@@ -266,7 +233,7 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     if (this === that) {
       return true;
     } else if (that instanceof DateTime) {
-      return Numbers.equivalent(this._time, that._time, epsilon);
+      return Numbers.equivalent(this.time, that.time, epsilon);
     }
     return false;
   }
@@ -275,26 +242,26 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     if (this === that) {
       return true;
     } else if (that instanceof DateTime) {
-      return this._time === that._time && this._zone.equals(that._zone);
+      return this.time === that.time && this.zone.equals(that.zone);
     }
     return false;
   }
 
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(DateTime),
-        Numbers.hash(this._time)), this._zone.hashCode()));
+        Numbers.hash(this.time)), this.zone.hashCode()));
   }
 
-  display(output: Output, format: DateTimeFormat = DateTime.Format.iso8601()): void {
+  display(output: Output, format: DateTimeFormat = DateTimeFormat.iso8601): void {
     format.writeDate(this, output);
   }
 
-  toString(format: DateTimeFormat = DateTime.Format.iso8601()): string {
+  toString(format: DateTimeFormat = DateTimeFormat.iso8601): string {
     return format.format(this);
   }
 
   static current(zone?: AnyTimeZone): DateTime {
-    zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.local();
+    zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.local;
     return new DateTime(Date.now(), zone);
   }
 
@@ -303,7 +270,7 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
    * @hidden
    */
   static fromUTCLocalDate(date: Date, zone: TimeZone): DateTime {
-    return new DateTime(date.getTime() - 60000 * zone._offset, zone);
+    return new DateTime(date.getTime() - 60000 * zone.offset, zone);
   }
 
   static fromInit(init: DateTimeInit, zone?: AnyTimeZone): DateTime {
@@ -319,9 +286,9 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     }
     if (zone !== void 0) {
       zone = TimeZone.fromAny(zone);
-      time += 60000 * zone._offset;
+      time += 60000 * zone.offset;
     } else {
-      zone = TimeZone.utc();
+      zone = TimeZone.utc;
     }
     return new DateTime(time, zone);
   }
@@ -330,10 +297,10 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     if (date instanceof DateTime) {
       return date;
     } else if (date instanceof Date) {
-      zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc();
+      zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc;
       return new DateTime(date.getTime(), zone);
     } else if (typeof date === "number") {
-      zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc();
+      zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc;
       return new DateTime(date, zone);
     } else if (typeof date === "string") {
       return DateTime.parse(date, zone);
@@ -343,7 +310,7 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     throw new TypeError("" + date);
   }
 
-  static fromValue(value: Value): DateTime | undefined {
+  static fromValue(value: Value): DateTime | null {
     let positional: boolean;
     const header = value.header("date");
     if (header.isDefined()) {
@@ -352,7 +319,7 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     } else {
       positional = false;
     }
-    const init = {} as DateTimeInit;
+    const init: DateTimeInit = {};
     value.forEach(function (item: Item, index: number) {
       const key = item.key.stringValue(void 0);
       if (key !== void 0) {
@@ -396,33 +363,33 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     if (DateTime.isInit(init)) {
       return DateTime.fromInit(init);
     }
-    return void 0;
+    return null;
   }
 
   static parse(date: string, zone?: AnyTimeZone): DateTime {
-    return DateTime.Format.iso8601().parse(date);
+    return DateTimeFormat.iso8601.parse(date);
   }
 
   static time(date: AnyDateTime): number {
     if (date instanceof DateTime) {
-      return date._time;
+      return date.time;
     } else if (date instanceof Date) {
       return date.getTime();
     } else if (typeof date === "number") {
       return date;
     } else if (typeof date === "string") {
-      return DateTime.parse(date).time();
+      return DateTime.parse(date).time;
     } else if (DateTime.isInit(date)) {
-      return DateTime.fromInit(date).time();
+      return DateTime.fromInit(date).time;
     }
     throw new TypeError("" + date);
   }
 
   static zone(date: AnyDateTime): TimeZone {
     if (date instanceof DateTime) {
-      return date._zone;
+      return date.zone;
     } else {
-      return TimeZone.utc();
+      return TimeZone.utc;
     }
   }
 
@@ -458,24 +425,8 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
         || DateTime.isInit(value);
   }
 
-  private static _form: Form<DateTime, AnyDateTime>;
-  static form(unit?: AnyDateTime): Form<DateTime, AnyDateTime> {
-    if (unit === void 0) {
-      if (DateTime._form === void 0) {
-        DateTime._form = new DateTime.Form(new DateTime(0));
-      }
-      return DateTime._form;
-    } else {
-      unit = DateTime.fromAny(unit);
-      return new DateTime.Form(unit);
-    }
+  @Lazy
+  static form(): Form<DateTime, AnyDateTime> {
+    return new DateTimeForm(new DateTime(0));
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Parser: typeof DateTimeParser; // defined by DateTimeParser
-  /** @hidden */
-  static Form: typeof DateTimeForm; // defined by DateTimeForm
-  /** @hidden */
-  static Format: typeof DateTimeFormat; // defined by DateTimeFormat
 }

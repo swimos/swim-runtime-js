@@ -14,7 +14,7 @@
 
 import {Input, Parser} from "@swim/codec";
 import type {DateTimeInit} from "../DateTime";
-import {DateTimeFormat} from "../DateTimeFormat";
+import {DateTimeFormat} from "./DateTimeFormat";
 
 /** @hidden */
 export class DayOfMonthParser extends Parser<DateTimeInit> {
@@ -46,4 +46,3 @@ export class DayOfMonthParser extends Parser<DateTimeInit> {
     return new DayOfMonthParser(date, month, step);
   }
 }
-DateTimeFormat.DayOfMonthParser = DayOfMonthParser;

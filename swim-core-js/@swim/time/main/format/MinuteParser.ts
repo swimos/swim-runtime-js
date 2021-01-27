@@ -14,7 +14,7 @@
 
 import {Input, Parser} from "@swim/codec";
 import type {DateTimeInit} from "../DateTime";
-import {DateTimeFormat} from "../DateTimeFormat";
+import {DateTimeFormat} from "./DateTimeFormat";
 
 /** @hidden */
 export class MinuteParser extends Parser<DateTimeInit> {
@@ -46,4 +46,3 @@ export class MinuteParser extends Parser<DateTimeInit> {
     return new MinuteParser(date, minute, step);
   }
 }
-DateTimeFormat.MinuteParser = MinuteParser;

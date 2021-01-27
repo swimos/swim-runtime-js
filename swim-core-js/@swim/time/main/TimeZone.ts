@@ -12,64 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
+import {HashCode, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {Value, Form} from "@swim/structure";
-import type {TimeZoneForm} from "./TimeZoneForm";
+import {TimeZoneForm} from "./"; // forward import
 
 export type AnyTimeZone = TimeZone | string | number;
 
 export class TimeZone implements HashCode, Debug {
   /** @hidden */
-  readonly _name: string | undefined;
-  /** @hidden */
-  readonly _offset: number;
-
-  /** @hidden */
   private constructor(name: string | undefined, offset: number) {
-    this._name = name;
-    this._offset = offset;
+    Object.defineProperty(this, "name", {
+      value: name,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "offset", {
+      value: offset,
+      enumerable: true,
+    });
   }
 
+  declare readonly name: string | undefined;
+
+  declare readonly offset: number;
+
   isUTC(): boolean {
-    return this._offset === 0;
+    return this.offset === 0;
   }
 
   isLocal(): boolean {
-    return this._offset === -new Date().getTimezoneOffset();
-  }
-
-  name(): string | undefined {
-    return this._name;
-  }
-
-  offset(): number {
-    return this._offset;
+    return this.offset === -new Date().getTimezoneOffset();
   }
 
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof TimeZone) {
-      return this._offset === that._offset;
+      return this.offset === that.offset;
     }
     return false;
   }
 
   hashCode(): number {
-    return Murmur3.mash(Murmur3.mix(Constructors.hash(TimeZone), Numbers.hash(this._offset)));
+    return Murmur3.mash(Murmur3.mix(Constructors.hash(TimeZone), Numbers.hash(this.offset)));
   }
 
   debug(output: Output): void {
     output = output.write("TimeZone").write(46/*'.'*/);
-    if (this._name === "UTC" && this._offset === 0) {
+    if (this.name === "UTC" && this.offset === 0) {
       output = output.write("utc").write(40/*'('*/).write(41/*')'*/);
-    } else if (this._name === void 0) {
+    } else if (this.name === void 0) {
       output = output.write("forOffset").write(40/*'('*/)
-          .debug(this._offset).write(41/*')'*/);
+          .debug(this.offset).write(41/*')'*/);
     } else {
       output = output.write("from").write(40/*'('*/)
-          .debug(this._name).write(", ").debug(this._offset).write(41/*')'*/);
+          .debug(this.name).write(", ").debug(this.offset).write(41/*')'*/);
     }
   }
 
@@ -77,41 +74,27 @@ export class TimeZone implements HashCode, Debug {
     return Format.debug(this);
   }
 
-  private static _utc?: TimeZone;
-  static utc(): TimeZone {
-    if (TimeZone._utc === void 0) {
-      TimeZone._utc = new TimeZone("UTC", 0);
-    }
-    return TimeZone._utc;
+  @Lazy
+  static get utc(): TimeZone {
+    return new TimeZone("UTC", 0);
   }
 
-  private static _local?: TimeZone;
-  static local(): TimeZone {
-    if (TimeZone._local === void 0) {
-      TimeZone._local = TimeZone.forOffset(-new Date().getTimezoneOffset());
-    }
-    return TimeZone._local;
+  @Lazy
+  static get local(): TimeZone {
+    return TimeZone.forOffset(-new Date().getTimezoneOffset());
   }
 
-  static forName(name: string): TimeZone | undefined {
+  static forName(name: string): TimeZone | null {
     switch (name) {
-      case "UTC": return TimeZone.utc();
-      default: return void 0;
+      case "UTC": return TimeZone.utc;
+      default: return null;
     }
   }
 
   static forOffset(offset: number): TimeZone {
     switch (offset) {
-      case 0: return TimeZone.utc();
+      case 0: return TimeZone.utc;
       default: return new TimeZone(void 0, offset);
-    }
-  }
-
-  static from(name: string, offset: number): TimeZone {
-    if (name === "UTC" && offset === 0) {
-      return TimeZone.utc();
-    } else {
-      return new TimeZone(name, offset);
     }
   }
 
@@ -120,7 +103,7 @@ export class TimeZone implements HashCode, Debug {
       return value;
     } else if (typeof value === "string") {
       const zone = TimeZone.forName(value);
-      if (zone !== void 0) {
+      if (zone !== null) {
         return zone;
       }
     } else if (typeof value === "number") {
@@ -129,7 +112,7 @@ export class TimeZone implements HashCode, Debug {
     throw new TypeError("" + value);
   }
 
-  static fromValue(value: Value): TimeZone | undefined {
+  static fromValue(value: Value): TimeZone | null {
     const name = value.stringValue(void 0);
     if (name !== void 0) {
       return TimeZone.forName(name);
@@ -138,7 +121,7 @@ export class TimeZone implements HashCode, Debug {
     if (offset !== void 0) {
       return TimeZone.forOffset(offset);
     }
-    return void 0;
+    return null;
   }
 
   /** @hidden */
@@ -148,22 +131,8 @@ export class TimeZone implements HashCode, Debug {
         || typeof value === "number";
   }
 
-  private static _form: Form<TimeZone, AnyTimeZone>;
-  static form(unit?: AnyTimeZone): Form<TimeZone, AnyTimeZone> {
-    if (unit !== void 0) {
-      unit = TimeZone.fromAny(unit);
-    }
-    if (unit === void 0 || unit === TimeZone.utc()) {
-      if (TimeZone._form === void 0) {
-        TimeZone._form = new TimeZone.Form(TimeZone.utc());
-      }
-      return TimeZone._form;
-    } else {
-      return new TimeZone.Form(unit);
-    }
+  @Lazy
+  static form(): Form<TimeZone, AnyTimeZone> {
+    return new TimeZoneForm(TimeZone.utc);
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static Form: typeof TimeZoneForm; // defined by TimeZoneForm
 }

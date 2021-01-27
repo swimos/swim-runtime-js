@@ -20,7 +20,7 @@ export const DateTimeInterpolator = function (d0: DateTime, d1: DateTime): Inter
   const interpolator = function (u: number): DateTime {
     const d0 = interpolator[0];
     const d1 = interpolator[1];
-    return new DateTime(d0._time + u * (d1._time - d0._time), d1._zone);
+    return new DateTime(d0.time + u * (d1.time - d0.time), d1.zone);
   } as Interpolator<DateTime>;
   Object.setPrototypeOf(interpolator, DateTimeInterpolator.prototype);
   Object.defineProperty(interpolator, 0, {

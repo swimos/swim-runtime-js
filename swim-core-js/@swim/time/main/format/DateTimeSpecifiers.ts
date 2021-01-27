@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {DateTimeLocale} from "./DateTimeLocale";
-import {DateTimeFormat} from "./DateTimeFormat";
+import {DateTimeFormat} from "../"; // forward import
 
 export interface DateTimeSpecifiers {
   [symbol: string]: DateTimeFormat | undefined;
@@ -38,26 +38,29 @@ export const DateTimeSpecifiers = {} as {
   standard(locale?: DateTimeLocale): DateTimeSpecifiers;
 };
 
-DateTimeSpecifiers.standard = function (locale: DateTimeLocale = DateTimeLocale.standard()): DateTimeSpecifiers {
+DateTimeSpecifiers.standard = function (locale?: DateTimeLocale): DateTimeSpecifiers {
   let specifiers: DateTimeSpecifiers | undefined;
+  if (locale === void 0) {
+    locale = DateTimeLocale.standard();
+  }
   if (locale === DateTimeLocale.standard()) {
     specifiers = DateTimeSpecifiers._standard;
   }
   if (specifiers === void 0) {
     specifiers = {
-      Y: DateTimeFormat.year(),
-      m: DateTimeFormat.monthOfYear(),
-      B: DateTimeFormat.month(locale),
-      b: DateTimeFormat.shortMonth(locale),
-      d: DateTimeFormat.dayOfMonth(),
-      A: DateTimeFormat.weekday(locale),
-      a: DateTimeFormat.shortWeekday(locale),
-      H: DateTimeFormat.hour24(),
-      I: DateTimeFormat.hour12(),
-      p: DateTimeFormat.period(locale),
-      M: DateTimeFormat.minute(),
-      S: DateTimeFormat.second(),
-      L: DateTimeFormat.millisecond(),
+      Y: DateTimeFormat.year,
+      m: DateTimeFormat.monthOfYear,
+      B: DateTimeFormat.month.withLocale(locale),
+      b: DateTimeFormat.shortMonth.withLocale(locale),
+      d: DateTimeFormat.dayOfMonth,
+      A: DateTimeFormat.weekday.withLocale(locale),
+      a: DateTimeFormat.shortWeekday.withLocale(locale),
+      H: DateTimeFormat.hour24,
+      I: DateTimeFormat.hour12,
+      p: DateTimeFormat.period.withLocale(locale),
+      M: DateTimeFormat.minute,
+      S: DateTimeFormat.second,
+      L: DateTimeFormat.millisecond,
     };
     if (locale === DateTimeLocale.standard()) {
       DateTimeSpecifiers._standard = specifiers;
