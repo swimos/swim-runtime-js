@@ -14,31 +14,25 @@
 
 import {AnyValue, Value} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
-import {Envelope} from "./Envelope";
 import {LaneAddressed} from "./LaneAddressed";
 
-export class EventMessage extends LaneAddressed {
+export class EventMessage extends LaneAddressed<EventMessage> {
   constructor(node: Uri, lane: Uri, body: Value) {
     super(node, lane, body);
   }
 
-  protected copy(node: Uri, lane: Uri, body: Value): this {
-    return new EventMessage(node, lane, body) as this;
+  protected copy(node: Uri, lane: Uri, body: Value): EventMessage {
+    return new EventMessage(node, lane, body);
   }
 
-  static tag(): string {
+  static get tag(): string {
     return "event";
   }
 
-  static of(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): EventMessage {
+  static create(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): EventMessage {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new EventMessage(node as Uri, lane as Uri, body);
   }
-
-  static fromValue(value: Value): EventMessage | undefined {
-    return LaneAddressed.fromValue(value, EventMessage) as EventMessage | undefined;
-  }
 }
-Envelope.EventMessage = EventMessage;

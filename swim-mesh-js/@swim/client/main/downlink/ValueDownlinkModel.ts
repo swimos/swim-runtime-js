@@ -56,7 +56,7 @@ export class ValueDownlinkModel extends DownlinkModel {
 
   onEventMessage(message: EventMessage, host: Host): void {
     super.onEventMessage(message, host);
-    this.onSetEvent(message.body());
+    this.onSetEvent(message.body);
   }
 
   protected onSetEvent(newValue: Value): void {

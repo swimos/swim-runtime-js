@@ -14,31 +14,25 @@
 
 import {AnyValue, Value} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
-import {Envelope} from "./Envelope";
 import {LaneAddressed} from "./LaneAddressed";
 
-export class UnlinkRequest extends LaneAddressed {
+export class UnlinkRequest extends LaneAddressed<UnlinkRequest> {
   constructor(node: Uri, lane: Uri, body: Value) {
     super(node, lane, body);
   }
 
-  protected copy(node: Uri, lane: Uri, body: Value): this {
-    return new UnlinkRequest(node, lane, body) as this;
+  protected copy(node: Uri, lane: Uri, body: Value): UnlinkRequest {
+    return new UnlinkRequest(node, lane, body);
   }
 
-  static tag(): string {
+  static get tag(): string {
     return "unlink";
   }
 
-  static of(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): UnlinkRequest {
+  static create(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): UnlinkRequest {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new UnlinkRequest(node as Uri, lane as Uri, body);
   }
-
-  static fromValue(value: Value): UnlinkRequest | undefined {
-    return LaneAddressed.fromValue(value, UnlinkRequest) as UnlinkRequest | undefined;
-  }
 }
-Envelope.UnlinkRequest = UnlinkRequest;

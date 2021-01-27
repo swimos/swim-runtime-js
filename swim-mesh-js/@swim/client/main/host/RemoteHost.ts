@@ -134,7 +134,7 @@ export abstract class RemoteHost extends Host {
     if (!credentials.equals(this._options.credentials)) {
       this._options.credentials = credentials;
       if (this.isConnected()) {
-        const request = AuthRequest.of(credentials);
+        const request = new AuthRequest(credentials);
         this.push(request);
       } else {
         this.open();
@@ -170,7 +170,7 @@ export abstract class RemoteHost extends Host {
     const laneUri = downlink.laneUri();
     const nodeDownlinks = this._downlinks.get(nodeUri);
     if (nodeDownlinks !== void 0 && nodeDownlinks.get(laneUri) && this.isConnected()) {
-      const request = UnlinkRequest.of(this.unresolve(nodeUri), laneUri);
+      const request = new UnlinkRequest(this.unresolve(nodeUri), laneUri, Value.absent());
       downlink.onUnlinkRequest(request, this);
       this.push(request);
     }
@@ -200,7 +200,7 @@ export abstract class RemoteHost extends Host {
     nodeUri = this.resolve(nodeUri);
     laneUri = Uri.fromAny(laneUri);
     body = Value.fromAny(body);
-    const message = CommandMessage.of(this.unresolve(nodeUri), laneUri, body);
+    const message = new CommandMessage(this.unresolve(nodeUri), laneUri as Uri, body);
     this.push(message);
   }
 
@@ -235,13 +235,13 @@ export abstract class RemoteHost extends Host {
   }
 
   protected onEventMessage(message: EventMessage): void {
-    const nodeUri = this.resolve(message.node());
-    const laneUri = message.lane();
+    const nodeUri = this.resolve(message.node);
+    const laneUri = message.lane;
     const nodeDownlinks = this._downlinks.get(nodeUri);
     if (nodeDownlinks !== void 0) {
       const downlink = nodeDownlinks.get(laneUri);
       if (downlink !== void 0) {
-        const resolvedMessage = message.node(nodeUri);
+        const resolvedMessage = message.withNode(nodeUri);
         downlink.onEventMessage(resolvedMessage, this);
       }
     }
@@ -256,13 +256,13 @@ export abstract class RemoteHost extends Host {
   }
 
   protected onLinkedResponse(response: LinkedResponse): void {
-    const nodeUri = this.resolve(response.node());
-    const laneUri = response.lane();
+    const nodeUri = this.resolve(response.node);
+    const laneUri = response.lane;
     const nodeDownlinks = this._downlinks.get(nodeUri);
     if (nodeDownlinks !== void 0) {
       const downlink = nodeDownlinks.get(laneUri);
       if (downlink !== void 0) {
-        const resolvedResponse = response.node(nodeUri);
+        const resolvedResponse = response.withNode(nodeUri);
         downlink.onLinkedResponse(resolvedResponse, this);
       }
     }
@@ -273,13 +273,13 @@ export abstract class RemoteHost extends Host {
   }
 
   protected onSyncedResponse(response: SyncedResponse): void {
-    const nodeUri = this.resolve(response.node());
-    const laneUri = response.lane();
+    const nodeUri = this.resolve(response.node);
+    const laneUri = response.lane;
     const nodeDownlinks = this._downlinks.get(nodeUri);
     if (nodeDownlinks !== void 0) {
       const downlink = nodeDownlinks.get(laneUri);
       if (downlink !== void 0) {
-        const resolvedResponse = response.node(nodeUri);
+        const resolvedResponse = response.withNode(nodeUri);
         downlink.onSyncedResponse(resolvedResponse, this);
       }
     }
@@ -290,13 +290,13 @@ export abstract class RemoteHost extends Host {
   }
 
   protected onUnlinkedResponse(response: UnlinkedResponse): void {
-    const nodeUri = this.resolve(response.node());
-    const laneUri = response.lane();
+    const nodeUri = this.resolve(response.node);
+    const laneUri = response.lane;
     const nodeDownlinks = this._downlinks.get(nodeUri);
     if (nodeDownlinks !== void 0) {
       const downlink = nodeDownlinks.get(laneUri);
       if (downlink !== void 0) {
-        const resolvedResponse = response.node(nodeUri);
+        const resolvedResponse = response.withNode(nodeUri);
         downlink.onUnlinkedResponse(resolvedResponse, this);
       }
     }
@@ -308,8 +308,8 @@ export abstract class RemoteHost extends Host {
 
   protected onAuthedResponse(response: AuthedResponse): void {
     this._authenticated = true;
-    this._session = response.body();
-    this._context.hostDidAuthenticate(response.body(), this);
+    this._session = response.body;
+    this._context.hostDidAuthenticate(response.body, this);
   }
 
   protected onDeauthRequest(request: DeauthRequest): void {
@@ -319,7 +319,7 @@ export abstract class RemoteHost extends Host {
   protected onDeauthedResponse(response: DeauthedResponse): void {
     this._authenticated = false;
     this._session = Value.absent();
-    this._context.hostDidDeauthenticate(response.body(), this);
+    this._context.hostDidDeauthenticate(response.body, this);
   }
 
   protected onUnknownEnvelope(envelope: Envelope | string): void {

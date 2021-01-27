@@ -38,9 +38,9 @@ export class DownlinkStreamletSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(), Text.from('on')));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
+          server.send(EventMessage.create(envelope.node, envelope.lane, Text.from('on')));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       const hostUri = new ValueInput(Text.from(server.hostUri().toString()));
@@ -73,11 +73,11 @@ export class DownlinkStreamletSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
           const header = Record.of(Slot.of("key", "the"));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(),
+          server.send(EventMessage.create(envelope.node, envelope.lane,
                       Attr.of("update", header).concat("definite article")));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       const hostUri = new ValueInput(Text.from(server.hostUri().toString()));
@@ -110,9 +110,9 @@ export class DownlinkStreamletSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(), Text.from('on')));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
+          server.send(EventMessage.create(envelope.node, envelope.lane, Text.from('on')));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       const streamlet = new DownlinkStreamlet();
@@ -142,11 +142,11 @@ export class DownlinkStreamletSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
           const header = Record.of(Slot.of("key", "the"));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(),
+          server.send(EventMessage.create(envelope.node, envelope.lane,
                       Attr.of("update", header).concat("definite article")));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       const streamlet = new DownlinkStreamlet();
@@ -176,9 +176,9 @@ export class DownlinkStreamletSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(), Text.from('on')));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
+          server.send(EventMessage.create(envelope.node, envelope.lane, Text.from('on')));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       const record = RecordScope.of(Slot.of("hostUri", server.hostUri().toString()),
@@ -208,11 +208,11 @@ export class DownlinkStreamletSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
           const header = Record.of(Slot.of("key", "the"));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(),
+          server.send(EventMessage.create(envelope.node, envelope.lane,
                       Attr.of("update", header).concat("definite article")));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       const record = RecordScope.of(Slot.of("hostUri", server.hostUri().toString()),

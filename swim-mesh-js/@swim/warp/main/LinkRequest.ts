@@ -14,32 +14,26 @@
 
 import {AnyValue, Value} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
-import {Envelope} from "./Envelope";
 import {LinkAddressed} from "./LinkAddressed";
 
-export class LinkRequest extends LinkAddressed {
+export class LinkRequest extends LinkAddressed<LinkRequest> {
   constructor(node: Uri, lane: Uri, prio: number, rate: number, body: Value) {
     super(node, lane, prio, rate, body);
   }
 
-  protected copy(node: Uri, lane: Uri, prio: number, rate: number, body: Value): this {
-    return new LinkRequest(node, lane, prio, rate, body) as this;
+  protected copy(node: Uri, lane: Uri, prio: number, rate: number, body: Value): LinkRequest {
+    return new LinkRequest(node, lane, prio, rate, body);
   }
 
-  static tag(): string {
+  static get tag(): string {
     return "link";
   }
 
-  static of(node: AnyUri, lane: AnyUri, prio: number = 0, rate: number = 0,
-            body: AnyValue = Value.absent()): LinkRequest {
+  static create(node: AnyUri, lane: AnyUri, prio: number = 0, rate: number = 0,
+                body: AnyValue = Value.absent()): LinkRequest {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new LinkRequest(node as Uri, lane as Uri, prio, rate, body);
   }
-
-  static fromValue(value: Value): LinkRequest | undefined {
-    return LinkAddressed.fromValue(value, LinkRequest) as LinkRequest | undefined;
-  }
 }
-Envelope.LinkRequest = LinkRequest;

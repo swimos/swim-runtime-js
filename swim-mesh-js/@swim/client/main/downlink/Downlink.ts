@@ -365,7 +365,7 @@ export abstract class Downlink {
     for (let i = 0; i < n; i += 1) {
       const observer = observers![i]!;
       if (observer.onEvent !== void 0) {
-        observer.onEvent(message.body(), this);
+        observer.onEvent(message.body, this);
       }
     }
   }

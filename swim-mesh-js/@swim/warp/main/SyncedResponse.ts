@@ -14,31 +14,25 @@
 
 import {AnyValue, Value} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
-import {Envelope} from "./Envelope";
 import {LaneAddressed} from "./LaneAddressed";
 
-export class SyncedResponse extends LaneAddressed {
+export class SyncedResponse extends LaneAddressed<SyncedResponse> {
   constructor(node: Uri, lane: Uri, body: Value) {
     super(node, lane, body);
   }
 
-  protected copy(node: Uri, lane: Uri, body: Value): this {
-    return new SyncedResponse(node, lane, body) as this;
+  protected copy(node: Uri, lane: Uri, body: Value): SyncedResponse {
+    return new SyncedResponse(node, lane, body);
   }
 
-  static tag(): string {
+  static get tag(): string {
     return "synced";
   }
 
-  static of(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): SyncedResponse {
+  static create(node: AnyUri, lane: AnyUri, body: AnyValue = Value.absent()): SyncedResponse {
     node = Uri.fromAny(node);
     lane = Uri.fromAny(lane);
     body = Value.fromAny(body);
     return new SyncedResponse(node as Uri, lane as Uri, body);
   }
-
-  static fromValue(value: Value): SyncedResponse | undefined {
-    return LaneAddressed.fromValue(value, SyncedResponse) as SyncedResponse | undefined;
-  }
 }
-Envelope.SyncedResponse = SyncedResponse;

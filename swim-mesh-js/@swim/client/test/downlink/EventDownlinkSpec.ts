@@ -35,7 +35,7 @@ export class EventDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof LinkRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
         }
       };
       let linkCount = 0;
@@ -63,7 +63,7 @@ export class EventDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof LinkRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
         }
       };
       let linkCount = 0;
@@ -97,9 +97,9 @@ export class EventDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node(), Uri.parse("house/kitchen"));
-          exam.equal(envelope.lane(), Uri.parse("light"));
-          exam.equal(envelope.body(), Text.from("on"));
+          exam.equal(envelope.node, Uri.parse("house/kitchen"));
+          exam.equal(envelope.lane, Uri.parse("light"));
+          exam.equal(envelope.body, Text.from("on"));
           resolve();
         }
       };

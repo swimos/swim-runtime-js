@@ -252,7 +252,7 @@ export class ListDownlinkModel extends DownlinkModel {
 
   onEventMessage(message: EventMessage, host: Host): void {
     super.onEventMessage(message, host);
-    const event = message.body();
+    const event = message.body;
     const tag = event.tag;
     if (tag === "update") {
       const header = event.head().toValue();

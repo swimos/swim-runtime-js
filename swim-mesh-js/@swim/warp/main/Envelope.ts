@@ -17,52 +17,51 @@ import {Output, Debug, Format} from "@swim/codec";
 import type {AnyValue, Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
 import type {AnyUri, Uri} from "@swim/uri";
-import type {EventMessage} from "./EventMessage";
-import type {CommandMessage} from "./CommandMessage";
-import type {LinkRequest} from "./LinkRequest";
-import type {LinkedResponse} from "./LinkedResponse";
-import type {SyncRequest} from "./SyncRequest";
-import type {SyncedResponse} from "./SyncedResponse";
-import type {UnlinkRequest} from "./UnlinkRequest";
-import type {UnlinkedResponse} from "./UnlinkedResponse";
-import type {AuthRequest} from "./AuthRequest";
-import type {AuthedResponse} from "./AuthedResponse";
-import type {DeauthRequest} from "./DeauthRequest";
-import type {DeauthedResponse} from "./DeauthedResponse";
+import {EventMessage} from "./"; // forward import
+import {CommandMessage} from "./"; // forward import
+import {LinkRequest} from "./"; // forward import
+import {LinkedResponse} from "./"; // forward import
+import {SyncRequest} from "./"; // forward import
+import {SyncedResponse} from "./"; // forward import
+import {UnlinkRequest} from "./"; // forward import
+import {UnlinkedResponse} from "./"; // forward import
+import {AuthRequest} from "./"; // forward import
+import {AuthedResponse} from "./"; // forward import
+import {DeauthRequest} from "./"; // forward import
+import {DeauthedResponse} from "./"; // forward import
 
 export abstract class Envelope implements HashCode, Debug {
-  tag(): string {
-    return (this.constructor as typeof Envelope).tag();
+  get tag(): string {
+    return (this.constructor as unknown as {readonly tag: string}).tag;
   }
 
-  abstract node(): Uri;
-  abstract node(node: AnyUri): this;
+  abstract readonly node: Uri;
 
-  abstract lane(): Uri;
-  abstract lane(lane: AnyUri): this;
+  abstract withNode(node: AnyUri): Envelope;
 
-  prio(): number;
-  prio(prio: number): this;
-  prio(prio?: number): number | this {
-    if (prio === void 0) {
-      return 0;
-    } else {
-      return this;
-    }
+  abstract readonly lane: Uri;
+
+  abstract withLane(lane: AnyUri): Envelope;
+
+  get prio(): number {
+    return 0;
   }
 
-  rate(): number;
-  rate(rate: number): this;
-  rate(rate?: number): number | this {
-    if (rate === void 0) {
-      return 0;
-    } else {
-      return this;
-    }
+  withPrio(prio: number): Envelope {
+    return this;
   }
 
-  abstract body(): Value;
-  abstract body(body: AnyValue): this;
+  get rate(): number {
+    return 0;
+  }
+
+  withRate(rate: number): Envelope {
+    return this;
+  }
+
+  abstract readonly body: Value;
+
+  abstract withBody(body: AnyValue): Envelope;
 
   abstract toValue(): Value;
 
@@ -80,56 +79,25 @@ export abstract class Envelope implements HashCode, Debug {
     return Format.debug(this);
   }
 
-  /** @hidden */
-  static tag(): string {
-    return void 0 as any;
-  }
-
-  static fromValue(value: Value): Envelope | undefined {
+  static fromValue(value: Value): Envelope | null {
     switch (value.tag) {
-      case "event": return Envelope.EventMessage.fromValue(value);
-      case "command": return Envelope.CommandMessage.fromValue(value);
-      case "link": return Envelope.LinkRequest.fromValue(value);
-      case "linked": return Envelope.LinkedResponse.fromValue(value);
-      case "sync": return Envelope.SyncRequest.fromValue(value);
-      case "synced": return Envelope.SyncedResponse.fromValue(value);
-      case "unlink": return Envelope.UnlinkRequest.fromValue(value);
-      case "unlinked": return Envelope.UnlinkedResponse.fromValue(value);
-      case "auth": return Envelope.AuthRequest.fromValue(value);
-      case "authed": return Envelope.AuthedResponse.fromValue(value);
-      case "deauth": return Envelope.DeauthRequest.fromValue(value);
-      case "deauthed": return Envelope.DeauthedResponse.fromValue(value);
-      default: return void 0;
+      case "event": return EventMessage.fromValue(value);
+      case "command": return CommandMessage.fromValue(value);
+      case "link": return LinkRequest.fromValue(value);
+      case "linked": return LinkedResponse.fromValue(value);
+      case "sync": return SyncRequest.fromValue(value);
+      case "synced": return SyncedResponse.fromValue(value);
+      case "unlink": return UnlinkRequest.fromValue(value);
+      case "unlinked": return UnlinkedResponse.fromValue(value);
+      case "auth": return AuthRequest.fromValue(value);
+      case "authed": return AuthedResponse.fromValue(value);
+      case "deauth": return DeauthRequest.fromValue(value);
+      case "deauthed": return DeauthedResponse.fromValue(value);
+      default: return null;
     }
   }
 
-  static parseRecon(input: string): Envelope | undefined {
+  static parseRecon(input: string): Envelope | null {
     return Envelope.fromValue(Recon.parse(input));
   }
-
-  // Forward type declarations
-  /** @hidden */
-  static EventMessage: typeof EventMessage; // defined by EventMessage
-  /** @hidden */
-  static CommandMessage: typeof CommandMessage; // defined by CommandMessage
-  /** @hidden */
-  static LinkRequest: typeof LinkRequest; // defined by LinkRequest
-  /** @hidden */
-  static LinkedResponse: typeof LinkedResponse; // defined by LinkedResponse
-  /** @hidden */
-  static SyncRequest: typeof SyncRequest; // defined by SyncRequest
-  /** @hidden */
-  static SyncedResponse: typeof SyncedResponse; // defined by SyncedResponse
-  /** @hidden */
-  static UnlinkRequest: typeof UnlinkRequest; // defined by UnlinkRequest
-  /** @hidden */
-  static UnlinkedResponse: typeof UnlinkedResponse; // defined by UnlinkedResponse
-  /** @hidden */
-  static AuthRequest: typeof AuthRequest; // defined by AuthRequest
-  /** @hidden */
-  static AuthedResponse: typeof AuthedResponse; // defined by AuthedResponse
-  /** @hidden */
-  static DeauthRequest: typeof DeauthRequest; // defined by DeauthRequest
-  /** @hidden */
-  static DeauthedResponse: typeof DeauthedResponse; // defined by DeauthedResponse
 }

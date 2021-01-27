@@ -125,7 +125,7 @@ export class WebSocketHost extends RemoteHost {
     const data = message.data;
     if (typeof data === "string") {
       const envelope = Envelope.parseRecon(data);
-      if (envelope !== void 0) {
+      if (envelope !== null) {
         this.onEnvelope(envelope);
       } else {
         this.onUnknownEnvelope(data);

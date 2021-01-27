@@ -38,10 +38,10 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node(), Uri.parse("todo"));
-          exam.equal(envelope.lane(), Uri.parse("list"));
+          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.lane, Uri.parse("list"));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
-          exam.equal(envelope.body(), Attr.of("update", header).concat("test"));
+          exam.equal(envelope.body, Attr.of("update", header).concat("test"));
           resolve();
         }
       };
@@ -67,11 +67,11 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(),
+          server.send(EventMessage.create(envelope.node, envelope.lane,
                       Attr.of("update", header).concat("test")));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       client.downlinkList()
@@ -107,10 +107,10 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node(), Uri.parse("todo"));
-          exam.equal(envelope.lane(), Uri.parse("list"));
+          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.lane, Uri.parse("list"));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
-          exam.equal(envelope.body(), Attr.of("update", header).concat("retest"));
+          exam.equal(envelope.body, Attr.of("update", header).concat("retest"));
           resolve();
         }
       };
@@ -138,11 +138,11 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(),
+          server.send(EventMessage.create(envelope.node, envelope.lane,
                       Attr.of("update", header).concat("retest")));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       client.downlinkList()
@@ -180,10 +180,10 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node(), Uri.parse("todo"));
-          exam.equal(envelope.lane(), Uri.parse("list"));
+          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.lane, Uri.parse("list"));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
-          exam.equal(envelope.body(), Record.of(Attr.of("remove", header)));
+          exam.equal(envelope.body, Record.of(Attr.of("remove", header)));
           resolve();
         }
       };
@@ -210,11 +210,11 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(),
+          server.send(EventMessage.create(envelope.node, envelope.lane,
                       Record.of(Attr.of("remove", header))));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       client.downlinkList()
@@ -249,10 +249,10 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node(), Uri.parse("todo"));
-          exam.equal(envelope.lane(), Uri.parse("list"));
+          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.lane, Uri.parse("list"));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("from", 0), Slot.of("to", 2));
-          exam.equal(envelope.body(), Record.of(Attr.of("move", header)));
+          exam.equal(envelope.body, Record.of(Attr.of("move", header)));
           resolve();
         }
       };
@@ -284,11 +284,11 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("from", 0), Slot.of("to", 2));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(),
+          server.send(EventMessage.create(envelope.node, envelope.lane,
                       Record.of(Attr.of("move", header))));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       client.downlinkList()
@@ -335,9 +335,9 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node(), Uri.parse("todo"));
-          exam.equal(envelope.lane(), Uri.parse("list"));
-          exam.equal(envelope.body(), Record.of(Attr.of("clear")));
+          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.lane, Uri.parse("list"));
+          exam.equal(envelope.body, Record.of(Attr.of("clear")));
           resolve();
         }
       };
@@ -363,9 +363,9 @@ export class ListDownlinkSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(), Record.of(Attr.of("clear"))));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
+          server.send(EventMessage.create(envelope.node, envelope.lane, Record.of(Attr.of("clear"))));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       client.downlinkList()

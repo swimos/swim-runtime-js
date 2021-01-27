@@ -261,14 +261,14 @@ export abstract class DownlinkModel implements HostDownlink {
 
   sync(): void {
     const nodeUri = this._host!.unresolve(this._nodeUri);
-    const request = SyncRequest.of(nodeUri, this._laneUri, this._prio, this._rate, this._body);
+    const request = new SyncRequest(nodeUri, this._laneUri, this._prio, this._rate, this._body);
     this.onSyncRequest(request);
     this._host!.push(request);
   }
 
   link(): void {
     const nodeUri = this._host!.unresolve(this._nodeUri);
-    const request = LinkRequest.of(nodeUri, this._laneUri, this._prio, this._rate, this._body);
+    const request = new LinkRequest(nodeUri, this._laneUri, this._prio, this._rate, this._body);
     this.onLinkRequest(request);
     this._host!.push(request);
   }

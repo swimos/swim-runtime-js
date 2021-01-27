@@ -69,8 +69,8 @@ export class WarpClientSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.true(envelope instanceof AuthRequest);
-        exam.equal(envelope.body(), Record.of(Slot.of("key", 1234)));
-        server.send(AuthedResponse.of(Record.of(Slot.of("id", 5678))));
+        exam.equal(envelope.body, Record.of(Slot.of("key", 1234)));
+        server.send(AuthedResponse.create(Record.of(Slot.of("id", 5678))));
       };
       client.didAuthenticate(function (body: Value, host: Host): void {
         exam.comment("didAuthenticate");
@@ -87,8 +87,8 @@ export class WarpClientSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.true(envelope instanceof AuthRequest);
-        exam.equal(envelope.body(), Record.of(Slot.of("key", 1234)));
-        server.send(DeauthedResponse.of(Record.of(Attr.of("denied"))));
+        exam.equal(envelope.body, Record.of(Slot.of("key", 1234)));
+        server.send(DeauthedResponse.create(Record.of(Attr.of("denied"))));
       };
       client.didAuthenticate(function (body: Value, host: Host): void {
         exam.fail("didAuthenticate");
@@ -108,10 +108,10 @@ export class WarpClientSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.true(envelope instanceof LinkRequest);
-        exam.equal(envelope.node(), Uri.parse("house/kitchen"));
-        exam.equal(envelope.lane(), Uri.parse("light"));
-        server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
-        server.send(EventMessage.of(envelope.node(), envelope.lane(), "on"));
+        exam.equal(envelope.node, Uri.parse("house/kitchen"));
+        exam.equal(envelope.lane, Uri.parse("light"));
+        server.send(LinkedResponse.create(envelope.node, envelope.lane));
+        server.send(EventMessage.create(envelope.node, envelope.lane, "on"));
       };
       client.downlink()
         .hostUri(server.hostUri())
@@ -138,14 +138,14 @@ export class WarpClientSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof LinkRequest) {
-          exam.equal(envelope.node(), Uri.parse("house/kitchen"));
-          exam.equal(envelope.lane(), Uri.parse("light"));
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(), "on"));
+          exam.equal(envelope.node, Uri.parse("house/kitchen"));
+          exam.equal(envelope.lane, Uri.parse("light"));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
+          server.send(EventMessage.create(envelope.node, envelope.lane, "on"));
         } else if (envelope instanceof UnlinkRequest) {
-          exam.equal(envelope.node(), Uri.parse("house/kitchen"));
-          exam.equal(envelope.lane(), Uri.parse("light"));
-          server.send(UnlinkedResponse.of(envelope.node(), envelope.lane()));
+          exam.equal(envelope.node, Uri.parse("house/kitchen"));
+          exam.equal(envelope.lane, Uri.parse("light"));
+          server.send(UnlinkedResponse.create(envelope.node, envelope.lane));
         }
       };
       client.downlink()
@@ -189,9 +189,9 @@ export class WarpClientSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.true(envelope instanceof CommandMessage);
-        exam.equal(envelope.node(), Uri.parse("house/kitchen"));
-        exam.equal(envelope.lane(), Uri.parse("light"));
-        exam.equal(envelope.body(), Text.from("on"));
+        exam.equal(envelope.node, Uri.parse("house/kitchen"));
+        exam.equal(envelope.lane, Uri.parse("light"));
+        exam.equal(envelope.body, Text.from("on"));
         resolve();
       };
       client.command(server.hostUri(), "house/kitchen", "light", "on");

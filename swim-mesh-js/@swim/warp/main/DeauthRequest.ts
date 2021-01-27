@@ -13,29 +13,23 @@
 // limitations under the License.
 
 import {AnyValue, Value} from "@swim/structure";
-import {Envelope} from "./Envelope";
 import {HostAddressed} from "./HostAddressed";
 
-export class DeauthRequest extends HostAddressed {
+export class DeauthRequest extends HostAddressed<DeauthRequest> {
   constructor(body: Value) {
     super(body);
   }
 
-  protected copy(body: Value): this {
-    return new DeauthRequest(body) as this;
-  }
-
-  static tag(): string {
-    return "deauth";
-  }
-
-  static of(body: AnyValue = Value.absent()): DeauthRequest {
-    body = Value.fromAny(body);
+  protected copy(body: Value): DeauthRequest {
     return new DeauthRequest(body);
   }
 
-  static fromValue(value: Value): DeauthRequest | undefined {
-    return HostAddressed.fromValue(value, DeauthRequest) as DeauthRequest | undefined;
+  static get tag(): string {
+    return "deauth";
+  }
+
+  static create(body: AnyValue = Value.absent()): DeauthRequest {
+    body = Value.fromAny(body);
+    return new DeauthRequest(body);
   }
 }
-Envelope.DeauthRequest = DeauthRequest;

@@ -95,7 +95,7 @@ export class NodeRefSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof AuthRequest) {
-          exam.equal(envelope.body(), Record.of(Slot.of("key", 1234)));
+          exam.equal(envelope.body, Record.of(Slot.of("key", 1234)));
           server.send(new AuthedResponse(Record.of(Slot.of("id", 5678))));
         }
       };
@@ -116,7 +116,7 @@ export class NodeRefSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof AuthRequest) {
-          exam.equal(envelope.body(), Record.of(Slot.of("key", 1234)));
+          exam.equal(envelope.body, Record.of(Slot.of("key", 1234)));
           server.send(new DeauthedResponse(Record.of(Attr.of("denied"))));
         }
       };
@@ -140,10 +140,10 @@ export class NodeRefSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.true(envelope instanceof LinkRequest);
-        exam.equal(envelope.node(), Uri.parse("house/kitchen"));
-        exam.equal(envelope.lane(), Uri.parse("light"));
-        server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
-        server.send(EventMessage.of(envelope.node(), envelope.lane(), Text.from("on")));
+        exam.equal(envelope.node, Uri.parse("house/kitchen"));
+        exam.equal(envelope.lane, Uri.parse("light"));
+        server.send(LinkedResponse.create(envelope.node, envelope.lane));
+        server.send(EventMessage.create(envelope.node, envelope.lane, Text.from("on")));
       };
       const nodeRef = client.nodeRef(server.hostUri(), "house/kitchen");
       nodeRef.downlink().laneUri("light").keepLinked(false)
@@ -166,9 +166,9 @@ export class NodeRefSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.true(envelope instanceof CommandMessage);
-        exam.equal(envelope.node(), Uri.parse("house/kitchen"));
-        exam.equal(envelope.lane(), Uri.parse("light"));
-        exam.equal(envelope.body(), Text.from("on"));
+        exam.equal(envelope.node, Uri.parse("house/kitchen"));
+        exam.equal(envelope.lane, Uri.parse("light"));
+        exam.equal(envelope.body, Text.from("on"));
         resolve();
       };
       const nodeRef = client.nodeRef(server.hostUri(), "house/kitchen");
@@ -181,7 +181,7 @@ export class NodeRefSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof LinkRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
         }
       };
       const nodeRef = client.nodeRef(server.hostUri(), "house/kitchen");

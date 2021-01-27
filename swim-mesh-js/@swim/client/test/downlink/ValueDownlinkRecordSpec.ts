@@ -36,9 +36,9 @@ export class ValueDownlinkRecordSpec extends Spec {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof SyncRequest) {
-          server.send(LinkedResponse.of(envelope.node(), envelope.lane()));
-          server.send(EventMessage.of(envelope.node(), envelope.lane(), Text.from('on')));
-          server.send(SyncedResponse.of(envelope.node(), envelope.lane()));
+          server.send(LinkedResponse.create(envelope.node, envelope.lane));
+          server.send(EventMessage.create(envelope.node, envelope.lane, Text.from('on')));
+          server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
       const downlink = client.downlinkValue()
