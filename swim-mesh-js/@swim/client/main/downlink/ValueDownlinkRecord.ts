@@ -18,21 +18,19 @@ import {DownlinkRecord} from "./DownlinkRecord";
 import type {ValueDownlink} from "./ValueDownlink";
 
 export class ValueDownlinkRecord extends DownlinkRecord {
-  /** @hidden */
-  readonly _downlink: ValueDownlink<Value, AnyValue>;
-
   constructor(downlink: ValueDownlink<Value, AnyValue>) {
     super();
-    this._downlink = downlink;
-    this._downlink.observe(this);
+    Object.defineProperty(this, "downlink", {
+      value: downlink,
+      enumerable: true,
+    });
+    downlink.observe(this);
   }
 
-  get downlink(): ValueDownlink<Value, AnyValue> {
-    return this._downlink;
-  }
+  declare readonly downlink: ValueDownlink<Value, AnyValue>;
 
   isEmpty(): boolean {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.isEmpty();
     } else {
@@ -41,7 +39,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   isArray(): boolean {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.isArray();
     } else {
@@ -50,7 +48,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   isObject(): boolean {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.isObject();
     } else {
@@ -59,7 +57,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   get length(): number {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.length;
     } else if (value.isDefined()) {
@@ -70,7 +68,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   has(key: AnyValue): boolean {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.has(key);
     } else {
@@ -84,7 +82,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
     if (key === void 0) {
       return this;
     } else {
-      const value = this._downlink.get();
+      const value = this.downlink.get();
       if (value instanceof Record) {
         return value.get(key);
       } else {
@@ -94,7 +92,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   getAttr(key: AnyText): Value {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.getAttr(key);
     } else {
@@ -103,7 +101,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   getSlot(key: AnyValue): Value {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.getSlot(key);
     } else {
@@ -112,7 +110,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   getField(key: AnyValue): Field | undefined {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.getField(key);
     } else {
@@ -121,7 +119,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   getItem(index: AnyNum): Item {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.getItem(index);
     } else {
@@ -130,7 +128,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   set(key: AnyValue, newValue: AnyValue): this {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       value.set(key, newValue);
     } else {
@@ -140,7 +138,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   setAttr(key: AnyText, newValue: AnyValue): this {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       value.setAttr(key, newValue);
     } else {
@@ -150,7 +148,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   setSlot(key: AnyValue, newValue: AnyValue): this {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       value.setSlot(key, newValue);
     } else {
@@ -160,17 +158,17 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   setItem(index: number, newItem: AnyItem): this {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       value.setItem(index, newItem);
     } else {
-      this._downlink.set(Item.fromAny(newItem).toValue());
+      this.downlink.set(Item.fromAny(newItem).toValue());
     }
     return this;
   }
 
   push(...newItems: AnyItem[]): number {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.push(...newItems);
     } else {
@@ -179,7 +177,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   splice(start: number, deleteCount?: number, ...newItems: AnyItem[]): Item[] {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.splice(start, deleteCount, ...newItems);
     } else {
@@ -188,7 +186,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   delete(key: AnyValue): Item {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       return value.delete(key);
     } else {
@@ -197,7 +195,7 @@ export class ValueDownlinkRecord extends DownlinkRecord {
   }
 
   clear(): void {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       value.clear();
     } else {
@@ -210,12 +208,12 @@ export class ValueDownlinkRecord extends DownlinkRecord {
                 thisArg: S): T | undefined;
   forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
                 thisArg?: S): T | undefined {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     return value.forEach(callback, thisArg);
   }
 
   keyIterator(): Cursor<Value> {
-    const value = this._downlink.get();
+    const value = this.downlink.get();
     if (value instanceof Record) {
       throw new Error(); // TODO
     } else {

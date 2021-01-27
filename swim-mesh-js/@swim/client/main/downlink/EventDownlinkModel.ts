@@ -21,15 +21,14 @@ import type {EventDownlink} from "./EventDownlink";
 
 /** @hidden */
 export class EventDownlinkModel extends DownlinkModel {
-  /** @hidden */
-  declare _views: EventDownlink[];
-
   constructor(context: DownlinkContext, hostUri: Uri, nodeUri: Uri, laneUri: Uri,
               prio?: number, rate?: number, body?: Value) {
     super(context, hostUri, nodeUri, laneUri, prio, rate, body);
   }
 
-  type(): DownlinkType {
+  declare views: ReadonlyArray<EventDownlink>;
+
+  get type(): DownlinkType {
     return "event";
   }
 }

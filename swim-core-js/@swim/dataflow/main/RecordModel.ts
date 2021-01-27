@@ -423,6 +423,9 @@ export class RecordModel extends AbstractRecordOutlet {
   }
 
   reifyItem(item: Item, reifier: Reifier | null): Item {
+    if (reifier !== null) {
+      item = reifier.reify(item);
+    }
     const scope = this.streamletScope;
     if (scope instanceof RecordModel) {
       return scope.reifyItem(item, reifier);

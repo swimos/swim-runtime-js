@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {InoutletOptions} from "./Inoutlet";
-import {StreamletClass, AbstractStreamlet} from "./AbstractStreamlet";
+import {StreamletPrototype, AbstractStreamlet} from "./AbstractStreamlet";
 
 export function Inout(name: string): PropertyDecorator;
 export function Inout(options: InoutletOptions): PropertyDecorator;
@@ -25,6 +25,6 @@ export function Inout(target: unknown, key?: string): PropertyDecorator | void {
     }
     return AbstractStreamlet.decorateInoutlet.bind(void 0, target as InoutletOptions);
   } else {
-    AbstractStreamlet.decorateInoutlet({}, target as StreamletClass, key!);
+    AbstractStreamlet.decorateInoutlet({}, target as StreamletPrototype, key!);
   }
 }

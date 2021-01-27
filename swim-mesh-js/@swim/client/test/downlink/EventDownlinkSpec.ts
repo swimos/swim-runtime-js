@@ -40,7 +40,7 @@ export class EventDownlinkSpec extends Spec {
       };
       let linkCount = 0;
       client.downlink()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("house/kitchen")
         .laneUri("light")
         .didLink(function (downlink: Downlink): void {
@@ -68,7 +68,7 @@ export class EventDownlinkSpec extends Spec {
       };
       let linkCount = 0;
       client.downlink()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("house/kitchen")
         .laneUri("light")
         .didLink(function (downlink: Downlink): void {
@@ -104,7 +104,7 @@ export class EventDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlink()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("house/kitchen")
         .laneUri("light")
         .keepLinked(false)

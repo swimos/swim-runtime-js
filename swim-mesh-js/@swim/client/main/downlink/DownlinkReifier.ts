@@ -19,12 +19,12 @@ import type {WarpRef} from "../WarpRef";
 
 /** @hidden */
 export class DownlinkReifier extends Reifier {
-  warp: WarpRef | undefined;
-
-  constructor(warp?: WarpRef) {
+  constructor(warp: WarpRef | null = null) {
     super();
     this.warp = warp;
   }
+
+  warp: WarpRef | null;
 
   reify(item: Item): Item {
     if (item instanceof Field) {

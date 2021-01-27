@@ -44,7 +44,7 @@ export class ValueDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkValue()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("house/kitchen")
         .laneUri("light")
         .keepLinked(false)
@@ -66,7 +66,7 @@ export class ValueDownlinkSpec extends Spec {
         }
       };
       client.downlinkValue()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("house/kitchen")
         .laneUri("light")
         .keepLinked(false)

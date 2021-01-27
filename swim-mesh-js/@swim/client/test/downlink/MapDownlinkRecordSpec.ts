@@ -44,7 +44,7 @@ export class MapDownlinkRecordSpec extends Spec {
         }
       };
       const downlink = client.downlinkMap()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("dictionary/english")
         .laneUri("definitions")
         .keepLinked(false)

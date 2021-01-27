@@ -43,7 +43,7 @@ export class DownlinkStreamletSpec extends Spec {
           server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
-      const hostUri = new ValueInput(Text.from(server.hostUri().toString()));
+      const hostUri = new ValueInput(Text.from(server.hostUri.toString()));
       const nodeUri = new ValueInput(Text.from("house/kitchen"));
       const laneUri = new ValueInput(Text.from("light"));
       const type = new ValueInput(Text.from("value"));
@@ -80,7 +80,7 @@ export class DownlinkStreamletSpec extends Spec {
           server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
-      const hostUri = new ValueInput(Text.from(server.hostUri().toString()));
+      const hostUri = new ValueInput(Text.from(server.hostUri.toString()));
       const nodeUri = new ValueInput(Text.from("dictionary/english"));
       const laneUri = new ValueInput(Text.from("definitions"));
       const type = new ValueInput(Text.from("map"));
@@ -117,7 +117,7 @@ export class DownlinkStreamletSpec extends Spec {
       };
       const streamlet = new DownlinkStreamlet();
       streamlet.warp = client;
-      const record = RecordScope.of(Slot.of("hostUri", server.hostUri().toString()),
+      const record = RecordScope.of(Slot.of("hostUri", server.hostUri.toString()),
                                     Slot.of("nodeUri", "house/kitchen"),
                                     Slot.of("laneUri", "light"),
                                     Slot.of("type", "value"),
@@ -151,7 +151,7 @@ export class DownlinkStreamletSpec extends Spec {
       };
       const streamlet = new DownlinkStreamlet();
       streamlet.warp = client;
-      const record = RecordScope.of(Slot.of("hostUri", server.hostUri().toString()),
+      const record = RecordScope.of(Slot.of("hostUri", server.hostUri.toString()),
                                     Slot.of("nodeUri", "dictionary/english"),
                                     Slot.of("laneUri", "definitions"),
                                     Slot.of("type", "map"),
@@ -181,7 +181,7 @@ export class DownlinkStreamletSpec extends Spec {
           server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
-      const record = RecordScope.of(Slot.of("hostUri", server.hostUri().toString()),
+      const record = RecordScope.of(Slot.of("hostUri", server.hostUri.toString()),
                                     Slot.of("nodeUri", "house/kitchen"),
                                     Slot.of("data", Record.of(Attr.of("link"),
                                                               Slot.of("laneUri", "light"),
@@ -215,7 +215,7 @@ export class DownlinkStreamletSpec extends Spec {
           server.send(SyncedResponse.create(envelope.node, envelope.lane));
         }
       };
-      const record = RecordScope.of(Slot.of("hostUri", server.hostUri().toString()),
+      const record = RecordScope.of(Slot.of("hostUri", server.hostUri.toString()),
                                     Slot.of("nodeUri", "dictionary/english"),
                                     Slot.of("data", Record.of(Attr.of("link"),
                                                               Slot.of("laneUri", "definitions"),

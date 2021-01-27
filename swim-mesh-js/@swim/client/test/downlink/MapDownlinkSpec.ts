@@ -46,7 +46,7 @@ export class MapDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkMap()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("dictionary/english")
         .laneUri("definitions")
         .keepLinked(false)
@@ -72,7 +72,7 @@ export class MapDownlinkSpec extends Spec {
         }
       };
       client.downlinkMap()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("dictionary/english")
         .laneUri("definitions")
         .keepLinked(false)
@@ -109,7 +109,7 @@ export class MapDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkMap()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("dictionary/english")
         .laneUri("definitions")
         .keepLinked(false)
@@ -135,7 +135,7 @@ export class MapDownlinkSpec extends Spec {
         }
       };
       client.downlinkMap()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("dictionary/english")
         .laneUri("definitions")
         .keepLinked(false)
@@ -170,7 +170,7 @@ export class MapDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkMap()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("dictionary/english")
         .laneUri("definitions")
         .keepLinked(false)
@@ -198,7 +198,7 @@ export class MapDownlinkSpec extends Spec {
         }
       };
       client.downlinkMap()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("dictionary/english")
         .laneUri("definitions")
         .keepLinked(false)

@@ -27,15 +27,15 @@ export interface HostOptions {
 
 /** @hidden */
 export abstract class Host {
-  abstract hostUri(): Uri;
+  abstract readonly hostUri: Uri;
 
-  abstract unlinkDelay(): number;
+  abstract readonly unlinkDelay: number;
 
   abstract isConnected(): boolean;
 
   abstract isAuthenticated(): boolean;
 
-  abstract session(): Value;
+  abstract readonly session: Value;
 
   abstract resolve(relative: AnyUri): Uri;
 

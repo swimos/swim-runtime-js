@@ -13,15 +13,11 @@
 // limitations under the License.
 
 import {Value, Record} from "@swim/structure";
-import {Inlet, Outlet, StreamletContext, StreamletScope, StreamletClass, Streamlet, AbstractStreamlet} from "@swim/streamlet";
+import {Inlet, Outlet, StreamletContext, StreamletScope, Streamlet, AbstractStreamlet} from "@swim/streamlet";
 
 export abstract class RecordStreamlet<I extends Value = Value, O extends Value = I> extends Record implements Streamlet<I, O> {
   isConstant(): boolean {
     return false;
-  }
-
-  protected get streamletClass(): StreamletClass {
-    return this.constructor as StreamletClass;
   }
 
   abstract readonly streamletScope: StreamletScope<O> | null;
@@ -49,7 +45,7 @@ export abstract class RecordStreamlet<I extends Value = Value, O extends Value =
   abstract recohere(version: number): void;
 
   compile(): void {
-    AbstractStreamlet.reflectEachInlet<I, O, void, this>(this, this.streamletClass, function (inlet: Inlet<I>, name: string): void {
+    AbstractStreamlet.reflectEachInlet<I, O, void, this>(this, Object.getPrototypeOf(this), function (inlet: Inlet<I>, name: string): void {
       if (inlet.input === null) {
         this.compileInlet(inlet, name);
       }

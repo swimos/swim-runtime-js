@@ -23,35 +23,43 @@ import type {ValueDownlink} from "./ValueDownlink";
 
 /** @hidden */
 export class ValueDownlinkModel extends DownlinkModel {
-  /** @hidden */
-  declare _views: ValueDownlink<unknown>[];
-  /** @hidden */
-  _state: Value;
-
   constructor(context: DownlinkContext, hostUri: Uri, nodeUri: Uri, laneUri: Uri,
               prio?: number, rate?: number, body?: Value, state: Value = Value.absent()) {
     super(context, hostUri, nodeUri, laneUri, prio, rate, body);
-    this._state = state;
+    Object.defineProperty(this, "state", {
+      value: state,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  type(): DownlinkType {
+  declare readonly views: ReadonlyArray<ValueDownlink<unknown>>;
+
+  /** @hidden */
+  declare readonly state: Value;
+
+  get type(): DownlinkType {
     return "value";
   }
 
   get(): Value {
-    return this._state;
+    return this.state;
   }
 
   set(newValue: Value): void {
     newValue = this.valueWillSet(newValue);
-    const oldValue = this._state;
+    const oldValue = this.state;
     this.setState(newValue);
     this.valueDidSet(newValue, oldValue);
     this.command(newValue);
   }
 
   setState(state: Value): void {
-    this._state = state;
+    Object.defineProperty(this, "state", {
+      value: state,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
   onEventMessage(message: EventMessage, host: Host): void {
@@ -61,21 +69,23 @@ export class ValueDownlinkModel extends DownlinkModel {
 
   protected onSetEvent(newValue: Value): void {
     newValue = this.valueWillSet(newValue);
-    const oldValue = this._state;
+    const oldValue = this.state;
     this.setState(newValue);
     this.valueDidSet(newValue, oldValue);
   }
 
   protected valueWillSet(newValue: Value): Value {
-    for (let i = 0; i < this._views.length; i += 1) {
-      newValue = this._views[i]!.valueWillSet(newValue);
+    const views = this.views;
+    for (let i = 0, n = views.length; i < n; i += 1) {
+      newValue = views[i]!.valueWillSet(newValue);
     }
     return newValue;
   }
 
   protected valueDidSet(newValue: Value, oldValue: Value): void {
-    for (let i = 0; i < this._views.length; i += 1) {
-      this._views[i]!.valueDidSet(newValue, oldValue);
+    const views = this.views;
+    for (let i = 0, n = views.length; i < n; i += 1) {
+      views[i]!.valueDidSet(newValue, oldValue);
     }
   }
 }

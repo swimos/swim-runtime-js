@@ -46,7 +46,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -75,7 +75,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -115,7 +115,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -146,7 +146,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -188,7 +188,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -218,7 +218,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -257,7 +257,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -292,7 +292,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -342,7 +342,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       const downlink = client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)
@@ -369,7 +369,7 @@ export class ListDownlinkSpec extends Spec {
         }
       };
       client.downlinkList()
-        .hostUri(server.hostUri())
+        .hostUri(server.hostUri)
         .nodeUri("todo")
         .laneUri("list")
         .keepLinked(false)

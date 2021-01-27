@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Arrays} from "@swim/util";
 import {AnyValue, Value} from "@swim/structure";
 import type {AnyUri, Uri} from "@swim/uri";
 import type {Host} from "../host/Host";
@@ -36,38 +37,59 @@ import type {
 } from "../WarpObserver";
 
 export abstract class BaseRef implements DownlinkOwner, WarpRef {
-  /** @hidden */
-  readonly _context: RefContext;
-  /** @hidden */
-  _host: Host | undefined;
-  /** @hidden */
-  _downlinks: Downlink[];
-  /** @hidden */
-  _observers: ReadonlyArray<WarpObserver> | null;
-
   constructor(context: RefContext) {
-    this._context = context;
-    this._host = void 0;
-    this._downlinks = [];
-    this._observers = null;
+    Object.defineProperty(this, "context", {
+      value: context,
+      enumerable: true,
+    });
+    Object.defineProperty(this, "host", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "downlinks", {
+      value: [],
+      enumerable: true,
+      configurable: true,
+    });
+    Object.defineProperty(this, "observers", {
+      value: Arrays.empty,
+      enumerable: true,
+      configurable: true,
+    });
   }
 
-  abstract hostUri(): Uri;
+  /** @hidden */
+  declare readonly context: RefContext;
+
+  /** @hidden */
+  declare readonly host: Host | null;
+
+  /** @hidden */
+  declare readonly downlinks: Downlink[];
+
+  /** @hidden */
+  declare readonly observers: ReadonlyArray<WarpObserver>;
+
+  abstract readonly hostUri: Uri;
 
   isConnected(): boolean {
-    return this._host !== void 0 ? this._host.isConnected() : false;
+    const host = this.host;
+    return host !== null && host.isConnected();
   }
 
   isAuthenticated(): boolean {
-    return this._host !== void 0 ? this._host.isAuthenticated() : false;
+    const host = this.host;
+    return host !== null && host.isAuthenticated();
   }
 
-  session(): Value {
-    return this._host !== void 0 ? this._host.session() : Value.absent();
+  get session(): Value {
+    const host = this.host;
+    return host !== null ? host.session : Value.absent();
   }
 
   authenticate(credentials: AnyValue): void {
-    this._context.authenticate(this.hostUri(), credentials);
+    this.context.authenticate(this.hostUri, credentials);
   }
 
   abstract downlink(init?: EventDownlinkInit): EventDownlink;
@@ -91,57 +113,60 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
 
   /** @hidden */
   addDownlink(downlink: Downlink): void {
-    if (this._downlinks.length === 0) {
+    const downlinks = this.downlinks;
+    if (downlinks.length === 0) {
       this.open();
     }
-    this._downlinks.push(downlink);
+    downlinks.push(downlink);
   }
 
   /** @hidden */
   removeDownlink(downlink: Downlink): void {
-    const i = this._downlinks.indexOf(downlink);
+    const downlinks = this.downlinks;
+    const i = downlinks.indexOf(downlink);
     if (i >= 0) {
-      this._downlinks.splice(i, 1);
-      if (this._downlinks.length === 0) {
+      downlinks.splice(i, 1);
+      if (downlinks.length === 0) {
         this.close();
       }
     }
   }
 
   open(): void {
-    this._context.openRef(this);
+    this.context.openRef(this);
   }
 
   close(): void {
-    this._context.closeRef(this);
+    this.context.closeRef(this);
   }
 
   /** @hidden */
   closeUp(): void {
-    const downlinks = this._downlinks;
-    this._downlinks = [];
+    const downlinks = this.downlinks;
+    Object.defineProperty(this, "downlinks", {
+      value: [],
+      enumerable: true,
+      configurable: true,
+    });
     for (let i = 0, n = downlinks.length; i < n; i += 1) {
       downlinks[i]!.close();
     }
   }
 
   observe(observer: WarpObserver): this {
-    const oldObservers = this._observers;
-    const n = oldObservers !== null ? oldObservers.length : 0;
-    const newObservers = new Array<WarpObserver>(n + 1);
-    for (let i = 0; i < n; i += 1) {
-      newObservers[i] = oldObservers![i]!;
-    }
-    newObservers[n] = observer;
-    this._observers = newObservers;
+    Object.defineProperty(this, "observers", {
+      value: Arrays.inserted(observer, this.observers),
+      enumerable: true,
+      configurable: true,
+    });
     return this;
   }
 
   unobserve(observer: unknown): this {
-    const oldObservers = this._observers;
-    const n = oldObservers !== null ? oldObservers.length : 0;
+    const oldObservers = this.observers;
+    const n = oldObservers.length;
     for (let i = 0; i < n; i += 1) {
-      const oldObserver = oldObservers![i]! as {[key: string]: unknown};
+      const oldObserver = oldObservers[i]! as {[key: string]: unknown};
       let found = oldObserver === observer; // check object identity
       if (!found) {
         for (const key in oldObserver) { // check property identity
@@ -155,14 +180,22 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
         if (n > 1) {
           const newObservers = new Array<WarpObserver>(n - 1);
           for (let j = 0; j < i; j += 1) {
-            newObservers[j] = oldObservers![j]!;
+            newObservers[j] = oldObservers[j]!;
           }
           for (let j = i + 1; j < n; j += 1) {
-            newObservers[j - 1] = oldObservers![j]!;
+            newObservers[j - 1] = oldObservers[j]!;
           }
-          this._observers = newObservers;
+          Object.defineProperty(this, "observers", {
+            value: newObservers,
+            enumerable: true,
+            configurable: true,
+          });
         } else {
-          this._observers = null;
+          Object.defineProperty(this, "observers", {
+            value: Arrays.empty,
+            enumerable: true,
+            configurable: true,
+          });
         }
         break;
       }
@@ -192,11 +225,14 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
 
   /** @hidden */
   hostDidConnect(host: Host): void {
-    this._host = host;
-    const observers = this._observers;
-    const n = observers !== null ? observers.length : 0;
-    for (let i = 0; i < n; i += 1) {
-      const observer = observers![i]!;
+    Object.defineProperty(this, "host", {
+      value: host,
+      enumerable: true,
+      configurable: true,
+    });
+    const observers = this.observers;
+    for (let i = 0, n = observers.length; i < n; i += 1) {
+      const observer = observers[i]!;
       if (observer.didConnect !== void 0) {
         observer.didConnect(host, this);
       }
@@ -205,10 +241,9 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
 
   /** @hidden */
   hostDidAuthenticate(body: Value, host: Host): void {
-    const observers = this._observers;
-    const n = observers !== null ? observers.length : 0;
-    for (let i = 0; i < n; i += 1) {
-      const observer = observers![i]!;
+    const observers = this.observers;
+    for (let i = 0, n = observers.length; i < n; i += 1) {
+      const observer = observers[i]!;
       if (observer.didAuthenticate !== void 0) {
         observer.didAuthenticate(body, host, this);
       }
@@ -217,10 +252,9 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
 
   /** @hidden */
   hostDidDeauthenticate(body: Value, host: Host): void {
-    const observers = this._observers;
-    const n = observers !== null ? observers.length : 0;
-    for (let i = 0; i < n; i += 1) {
-      const observer = observers![i]!;
+    const observers = this.observers;
+    for (let i = 0, n = observers.length; i < n; i += 1) {
+      const observer = observers[i]!;
       if (observer.didDeauthenticate !== void 0) {
         observer.didDeauthenticate(body, host, this);
       }
@@ -229,11 +263,14 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
 
   /** @hidden */
   hostDidDisconnect(host: Host): void {
-    this._host = void 0;
-    const observers = this._observers;
-    const n = observers !== null ? observers.length : 0;
-    for (let i = 0; i < n; i += 1) {
-      const observer = observers![i]!;
+    Object.defineProperty(this, "host", {
+      value: null,
+      enumerable: true,
+      configurable: true,
+    });
+    const observers = this.observers;
+    for (let i = 0, n = observers.length; i < n; i += 1) {
+      const observer = observers[i]!;
       if (observer.didDisconnect !== void 0) {
         observer.didDisconnect(host, this);
       }
@@ -242,10 +279,9 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
 
   /** @hidden */
   hostDidFail(error: unknown, host: Host): void {
-    const observers = this._observers;
-    const n = observers !== null ? observers.length : 0;
-    for (let i = 0; i < n; i += 1) {
-      const observer = observers![i]!;
+    const observers = this.observers;
+    for (let i = 0, n = observers.length; i < n; i += 1) {
+      const observer = observers[i]!;
       if (observer.didFail !== void 0) {
         observer.didFail(error, host, this);
       }

@@ -16,5 +16,5 @@ import {AbstractRecordOutlet} from "@swim/dataflow";
 import type {Downlink} from "./Downlink";
 
 export abstract class DownlinkRecord extends AbstractRecordOutlet {
-  abstract get downlink(): Downlink;
+  abstract readonly downlink: Downlink;
 }

@@ -37,8 +37,8 @@ export class HostRefSpec extends Spec {
   @Test
   clientHostRef(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
-      const hostRef = client.hostRef(server.hostUri());
-      exam.equal(hostRef.hostUri(), server.hostUri());
+      const hostRef = client.hostRef(server.hostUri);
+      exam.equal(hostRef.hostUri, server.hostUri);
       resolve();
     });
   }
@@ -46,10 +46,10 @@ export class HostRefSpec extends Spec {
   @Test
   hostRefDidConnect(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
-      const hostRef = client.hostRef(server.hostUri())
+      const hostRef = client.hostRef(server.hostUri)
         .didConnect(function (host: Host): void {
           exam.comment("didConnect");
-          exam.equal(host.hostUri(), server.hostUri());
+          exam.equal(host.hostUri, server.hostUri);
           exam.true(hostRef.isConnected());
           resolve();
         });
@@ -60,14 +60,14 @@ export class HostRefSpec extends Spec {
   @Test
   hostRefDidDisconnect(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
-      const hostRef = client.hostRef(server.hostUri())
+      const hostRef = client.hostRef(server.hostUri)
         .didConnect(function (host: Host): void {
           exam.comment("didConnect");
           server.close();
         })
         .didDisconnect(function (host: Host): void {
           exam.comment("didDisconnect");
-          exam.equal(host.hostUri(), server.hostUri());
+          exam.equal(host.hostUri, server.hostUri);
           exam.false(hostRef.isConnected());
           resolve();
         });
@@ -84,10 +84,10 @@ export class HostRefSpec extends Spec {
           server.send(AuthedResponse.create(Record.of(Slot.of("id", 5678))));
         }
       };
-      const hostRef = client.hostRef(server.hostUri())
+      const hostRef = client.hostRef(server.hostUri)
         .didAuthenticate(function (body: Value, host: Host): void {
           exam.comment("didAuthenticate");
-          exam.equal(host.hostUri(), server.hostUri());
+          exam.equal(host.hostUri, server.hostUri);
           exam.equal(body, Record.of(Slot.of("id", 5678)));
           resolve();
         });
@@ -105,13 +105,13 @@ export class HostRefSpec extends Spec {
           server.send(DeauthedResponse.create(Record.of(Attr.of("denied"))));
         }
       };
-      const hostRef = client.hostRef(server.hostUri())
+      const hostRef = client.hostRef(server.hostUri)
         .didAuthenticate(function (body: Value, host: Host) {
           exam.fail("didAuthenticate");
         })
         .didDeauthenticate(function (body: Value, host: Host) {
           exam.comment("didDeauthenticate");
-          exam.equal(host.hostUri(), server.hostUri());
+          exam.equal(host.hostUri, server.hostUri);
           exam.equal(body, Record.of(Attr.of("denied")));
           resolve();
         });
@@ -124,13 +124,13 @@ export class HostRefSpec extends Spec {
   hostRefDownlink(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
-        exam.true(envelope instanceof LinkRequest);
+        exam.instanceOf(envelope, LinkRequest);
         exam.equal(envelope.node, Uri.parse("house/kitchen"));
         exam.equal(envelope.lane, Uri.parse("light"));
         server.send(LinkedResponse.create(envelope.node, envelope.lane));
         server.send(EventMessage.create(envelope.node, envelope.lane, "on"));
       };
-      const hostRef = client.hostRef(server.hostUri());
+      const hostRef = client.hostRef(server.hostUri);
       hostRef.downlink().nodeUri("house/kitchen").laneUri("light").keepLinked(false)
         .willLink(function (): void {
           exam.comment("willLink");
@@ -150,13 +150,13 @@ export class HostRefSpec extends Spec {
   hostRefCommand(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
-        exam.true(envelope instanceof CommandMessage);
+        exam.instanceOf(envelope, CommandMessage);
         exam.equal(envelope.node, Uri.parse("house/kitchen"));
         exam.equal(envelope.lane, Uri.parse("light"));
         exam.equal(envelope.body, Text.from("on"));
         resolve();
       };
-      const hostRef = client.hostRef(server.hostUri());
+      const hostRef = client.hostRef(server.hostUri);
       hostRef.command("house/kitchen", "light", "on");
     });
   }
@@ -169,7 +169,7 @@ export class HostRefSpec extends Spec {
           server.send(LinkedResponse.create(envelope.node, envelope.lane));
         }
       };
-      const hostRef = client.hostRef(server.hostUri());
+      const hostRef = client.hostRef(server.hostUri);
       let linkCount = 0;
       let closeCount = 0;
       function didLink(): void {
