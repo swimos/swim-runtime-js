@@ -32,7 +32,7 @@ export class EmLength extends Length {
   }
 
   pxValue(basis?: LengthBasis | number): number {
-    return this.value * Length.emUnit(basis);
+    return this.value !== 0 ? this.value * Length.emUnit(basis) : 0;
   }
 
   emValue(basis?: LengthBasis | number): number {

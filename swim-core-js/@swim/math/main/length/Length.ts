@@ -75,15 +75,15 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
   abstract pxValue(basis?: LengthBasis | number): number;
 
   emValue(basis?: LengthBasis | number): number {
-    return this.pxValue(basis) / Length.emUnit(basis);
+    return this.value !== 0 ? this.pxValue(basis) / Length.emUnit(basis) : 0;
   }
 
   remValue(basis?: LengthBasis | number): number {
-    return this.pxValue(basis) / Length.remUnit(basis);
+    return this.value !== 0 ? this.pxValue(basis) / Length.remUnit(basis) : 0;
   }
 
   pctValue(basis?: LengthBasis | number): number {
-    return this.pxValue(basis) / Length.pctUnit(basis);
+    return this.value !== 0 ? this.pxValue(basis) / Length.pctUnit(basis) : 0;
   }
 
   px(basis?: LengthBasis | number): PxLength {

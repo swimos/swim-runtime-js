@@ -32,7 +32,7 @@ export class PctLength extends Length {
   }
 
   pxValue(basis?: LengthBasis | number): number {
-    return this.value * Length.pctUnit(basis) / 100;
+    return this.value !== 0 ? this.value * Length.pctUnit(basis) / 100 : 0;
   }
 
   pctValue(basis?: LengthBasis | number): number {

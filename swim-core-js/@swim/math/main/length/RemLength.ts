@@ -32,7 +32,7 @@ export class RemLength extends Length {
   }
 
   pxValue(basis?: LengthBasis | number): number {
-    return this.value * Length.remUnit(basis);
+    return this.value !== 0 ? this.value * Length.remUnit(basis) : 0;
   }
 
   remValue(basis?: LengthBasis | number): number {
