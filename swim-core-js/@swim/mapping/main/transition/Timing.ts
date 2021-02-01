@@ -15,8 +15,17 @@
 import {Values} from "@swim/util";
 import {Domain} from "../mapping/Domain";
 import {Interpolator} from "../interpolate/Interpolator";
-import type {Easing} from "./Easing";
+import {AnyEasing, EasingType, Easing} from "../"; // forward import
 import {Tweening} from "../"; // forward import
+
+export type AnyTiming = Timing | EasingType;
+
+export interface TimingInit {
+  easing?: AnyEasing;
+  t0?: number;
+  t1?: number;
+  dt?: number;
+}
 
 export interface Timing extends Domain<number> {
   readonly 0: number;
@@ -28,6 +37,8 @@ export interface Timing extends Domain<number> {
   readonly easing: Easing;
 
   withDomain(t0: number, t1: number): Timing;
+
+  withDuration(dt: number): Timing;
 
   overRange<Y>(range: Interpolator<Y>): Tweening<Y>;
   overRange<Y>(y0: Y, y1: Y): Tweening<Y>;
@@ -64,6 +75,11 @@ export const Timing = function (easing: Easing, t0: number, t1: number): Timing 
 
   /** @hidden */
   prototype: Timing;
+
+  fromInit(init: TimingInit): Timing;
+
+  fromAny(value: AnyTiming): Timing;
+  fromAny(value: AnyTiming | boolean | null | undefined): Timing | boolean;
 };
 
 Timing.prototype = Object.create(Domain.prototype);
@@ -78,6 +94,11 @@ Object.defineProperty(Timing.prototype, "duration", {
 
 Timing.prototype.withDomain = function (t0: number, t1: number): Timing {
   return Timing(this.easing, t0, t1);
+};
+
+Timing.prototype.withDuration = function (dt: number): Timing {
+  const t0 = this[0];
+  return Timing(this.easing, t0, t0 + dt);
 };
 
 Timing.prototype.overRange = function <Y>(this: Timing, y0: Interpolator<Y> | Y, y1: Y): Tweening<Y> {
@@ -109,3 +130,39 @@ Timing.prototype.equals = function (that: unknown): boolean {
 Timing.prototype.toString = function (): string {
   return "Timing(" + this.easing + ", " + this[0] + ", " + this[1] + ")";
 };
+
+Timing.fromInit = function (init: TimingInit): Timing {
+  let easing = init.easing;
+  if (easing === void 0) {
+    easing = Easing.linear;
+  } else if (typeof easing === "string") {
+    easing = Easing(easing);
+  }
+  let t0 = init.t0;
+  if (t0 === void 0) {
+    t0 = 0;
+  }
+  let t1 = init.t1;
+  if (t1 === void 0) {
+    const dt = init.dt;
+    if (dt !== void 0) {
+      t1 = t0 + dt;
+    } else {
+      t1 = t0;
+    }
+  }
+  return Timing(easing, t0, t1);
+};
+
+Timing.fromAny = function (value: AnyTiming | boolean | null | undefined): Timing | boolean {
+  if (value === void 0 || value === null) {
+    return false;
+  } else if (value instanceof Timing || typeof value === "boolean") {
+    return value;
+  } else if (typeof value === "string") {
+    return Easing(value);
+  } else if (typeof value === "object") {
+    return Timing.fromInit(value);
+  }
+  throw new TypeError("" + value);
+} as typeof Timing.fromAny;

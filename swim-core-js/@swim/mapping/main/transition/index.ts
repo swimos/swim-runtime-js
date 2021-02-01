@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {Timing} from "./Timing";
+export {
+  AnyTiming,
+  TimingInit,
+  Timing,
+} from "./Timing";
 
 export {
   AnyEasing,
