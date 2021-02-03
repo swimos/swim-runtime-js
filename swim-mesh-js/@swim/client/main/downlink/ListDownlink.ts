@@ -77,7 +77,7 @@ export class ListDownlink<V, VU = never> extends Downlink {
       observer.didClear = init.didClear ?? observer.didClear;
       valueForm = init.valueForm !== void 0 ? init.valueForm : valueForm;
     }
-    Object.defineProperty(this, "_valueForm", {
+    Object.defineProperty(this, "ownValueForm", {
       value: valueForm !== void 0 ? valueForm : Form.forValue() as unknown as Form<V, VU>,
       enumerable: true,
     });
@@ -95,7 +95,7 @@ export class ListDownlink<V, VU = never> extends Downlink {
   declare readonly observers: ReadonlyArray<ListDownlinkObserver<V, VU>>;
 
   /** @hidden */
-  declare readonly _valueForm: Form<V, VU>;
+  declare readonly ownValueForm: Form<V, VU>;
 
   /** @hidden */
   declare readonly state0: STree<Value, Value> | null;
@@ -109,7 +109,7 @@ export class ListDownlink<V, VU = never> extends Downlink {
                         body: Value, flags: number, observers: ReadonlyArray<ListDownlinkObserver<V, VU>>,
                         valueForm?: Form<V, VU>, state0?: STree<Value, Value> | null): ListDownlink<V, VU> {
     if (arguments.length === 10) {
-      valueForm = this._valueForm as unknown as Form<V, VU>;
+      valueForm = this.ownValueForm as unknown as Form<V, VU>;
       state0 = this.state0;
     }
     return new ListDownlink(context, owner, void 0, hostUri, nodeUri, laneUri,
@@ -120,10 +120,10 @@ export class ListDownlink<V, VU = never> extends Downlink {
   valueForm<V2, V2U = never>(valueForm: Form<V2, V2U>): ListDownlink<V2, V2U>;
   valueForm<V2, V2U = never>(valueForm?: Form<V2, V2U>): Form<V, VU> | ListDownlink<V2, V2U> {
     if (valueForm === void 0) {
-      return this._valueForm;
+      return this.ownValueForm;
     } else {
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       this._prio, this._rate, this._body, this.flags, this.observers as any,
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, this.ownBody, this.flags, this.observers as any,
                        valueForm, this.state0);
     }
   }
@@ -138,25 +138,25 @@ export class ListDownlink<V, VU = never> extends Downlink {
 
   get(index: number, id?: Value): V {
     const value = this.model!.get(index, id);
-    return value.coerce(this._valueForm);
+    return value.coerce(this.ownValueForm);
   }
 
   getEntry(index: number, id?: Value): [V, Value] | undefined {
     const entry = this.model!.getEntry(index, id);
     if (entry !== void 0) {
-      return [entry[0].coerce(this._valueForm), entry[1]];
+      return [entry[0].coerce(this.ownValueForm), entry[1]];
     }
     return void 0;
   }
 
   set(index: number, newObject: V | VU, id?: Value): this {
-    const newValue = this._valueForm.mold(newObject);
+    const newValue = this.ownValueForm.mold(newObject);
     this.model!.set(index, newValue, id);
     return this;
   }
 
   insert(index: number, newObject: V | VU, id?: Value): this {
-    const newValue = this._valueForm.mold(newObject);
+    const newValue = this.ownValueForm.mold(newObject);
     this.model!.insert(index, newValue, id);
     return this;
   }
@@ -169,27 +169,27 @@ export class ListDownlink<V, VU = never> extends Downlink {
   push(...newObjects: (V | VU)[]): number {
     const newValues = new Array(newObjects.length);
     for (let i = 0; i < newObjects.length; i += 1) {
-      newValues[i] = this._valueForm.mold(newObjects[i]!);
+      newValues[i] = this.ownValueForm.mold(newObjects[i]!);
     }
     return this.model!.push.apply(this.model, newValues);
   }
 
   pop(): V {
     const value = this.model!.pop();
-    return value.coerce(this._valueForm);
+    return value.coerce(this.ownValueForm);
   }
 
   unshift(...newObjects: (V | VU)[]): number {
     const newValues = new Array(newObjects.length);
     for (let i = 0; i < newObjects.length; i += 1) {
-      newValues[i] = this._valueForm.mold(newObjects[i]!);
+      newValues[i] = this.ownValueForm.mold(newObjects[i]!);
     }
     return this.model!.unshift.apply(this.model, newValues);
   }
 
   shift(): V {
     const value = this.model!.shift();
-    return value.coerce(this._valueForm);
+    return value.coerce(this.ownValueForm);
   }
 
   move(fromIndex: number, toIndex: number, id?: Value): this {
@@ -200,12 +200,12 @@ export class ListDownlink<V, VU = never> extends Downlink {
   splice(start: number, deleteCount?: number, ...newObjects: (V | VU)[]): V[] {
     const newValues = new Array(newObjects.length);
     for (let i = 0; i < newObjects.length; i += 1) {
-      newValues[i] = this._valueForm.mold(newObjects[i]!);
+      newValues[i] = this.ownValueForm.mold(newObjects[i]!);
     }
     const oldValues = this.model!.splice(start, deleteCount, ...newValues);
     const oldObjects = new Array(oldValues.length);
     for (let i = 0; i < oldValues.length; i += 1) {
-      oldObjects[i] = oldValues[i]!.coerce(this._valueForm);
+      oldObjects[i] = oldValues[i]!.coerce(this.ownValueForm);
     }
     return oldObjects;
   }
@@ -219,11 +219,11 @@ export class ListDownlink<V, VU = never> extends Downlink {
                 thisArg: S): T | undefined;
   forEach<T, S>(callback: (this: S | undefined, value: V, index: number, id: Value) => T | void,
                 thisArg?: S): T | undefined {
-    if (this._valueForm as unknown === Form.forValue()) {
+    if (this.ownValueForm as unknown === Form.forValue()) {
       return this.model!.state.forEach(callback as any, thisArg);
     } else {
       return this.model!.state.forEach(function (value: Value, index: number, id: Value): T | void {
-        const object = value.coerce(this._valueForm);
+        const object = value.coerce(this.ownValueForm);
         return callback.call(thisArg, object, index, id);
       }, this);
     }
@@ -231,10 +231,10 @@ export class ListDownlink<V, VU = never> extends Downlink {
 
   values(): Cursor<V> {
     const cursor = this.model!.values();
-    if (this._valueForm as unknown === Form.forValue()) {
+    if (this.ownValueForm as unknown === Form.forValue()) {
       return cursor as unknown as Cursor<V>;
     } else {
-      return new ValueCursor(cursor, this._valueForm);
+      return new ValueCursor(cursor, this.ownValueForm);
     }
   }
 
@@ -244,10 +244,10 @@ export class ListDownlink<V, VU = never> extends Downlink {
 
   entries(): Cursor<[Value, V]> {
     const cursor = this.model!.entries();
-    if (this._valueForm as unknown === Form.forValue()) {
+    if (this.ownValueForm as unknown === Form.forValue()) {
       return cursor as unknown as Cursor<[Value, V]>;
     } else {
-      return new ValueEntryCursor(cursor, Form.forValue(), this._valueForm);
+      return new ValueEntryCursor(cursor, Form.forValue(), this.ownValueForm);
     }
   }
 
@@ -319,12 +319,12 @@ export class ListDownlink<V, VU = never> extends Downlink {
       const observer = observers[i]!;
       if (observer.willUpdate !== void 0) {
         if (newObject === void 0) {
-          newObject = newValue.coerce(this._valueForm);
+          newObject = newValue.coerce(this.ownValueForm);
         }
         const newResult = observer.willUpdate(index, newObject, this);
         if (newResult !== void 0) {
           newObject = newResult;
-          newValue = this._valueForm.mold(newObject);
+          newValue = this.ownValueForm.mold(newObject);
         }
       }
     }
@@ -340,10 +340,10 @@ export class ListDownlink<V, VU = never> extends Downlink {
       const observer = observers[i]!;
       if (observer.didUpdate !== void 0) {
         if (newObject === void 0) {
-          newObject = newValue.coerce(this._valueForm);
+          newObject = newValue.coerce(this.ownValueForm);
         }
         if (oldObject === void 0) {
-          oldObject = oldValue.coerce(this._valueForm);
+          oldObject = oldValue.coerce(this.ownValueForm);
         }
         observer.didUpdate(index, newObject, oldObject, this);
       }
@@ -358,7 +358,7 @@ export class ListDownlink<V, VU = never> extends Downlink {
       const observer = observers[i]!;
       if (observer.willMove !== void 0) {
         if (object === void 0) {
-          object = value.coerce(this._valueForm);
+          object = value.coerce(this.ownValueForm);
         }
         observer.willMove(fromIndex, toIndex, object, this);
       }
@@ -373,7 +373,7 @@ export class ListDownlink<V, VU = never> extends Downlink {
       const observer = observers[i]!;
       if (observer.didMove !== void 0) {
         if (object === void 0) {
-          object = value.coerce(this._valueForm);
+          object = value.coerce(this.ownValueForm);
         }
         observer.didMove(fromIndex, toIndex, object, this);
       }
@@ -399,7 +399,7 @@ export class ListDownlink<V, VU = never> extends Downlink {
       const observer = observers[i]!;
       if (observer.didRemove !== void 0) {
         if (oldObject === void 0) {
-          oldObject = oldValue.coerce(this._valueForm);
+          oldObject = oldValue.coerce(this.ownValueForm);
         }
         observer.didRemove(index, oldObject, this);
       }
@@ -478,9 +478,9 @@ export class ListDownlink<V, VU = never> extends Downlink {
     if (state0 === void 0) {
       return this.state0;
     } else {
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       this._prio, this._rate, this._body, this.flags, this.observers,
-                       this._valueForm, state0);
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, this.ownBody, this.flags, this.observers,
+                       this.ownValueForm, state0);
     }
   }
 
@@ -494,15 +494,15 @@ export class ListDownlink<V, VU = never> extends Downlink {
   }
 
   open(): this {
-    const laneUri = this._laneUri;
+    const laneUri = this.ownLaneUri;
     if (laneUri.isEmpty()) {
       throw new Error("no lane");
     }
-    let nodeUri = this._nodeUri;
+    let nodeUri = this.ownNodeUri;
     if (nodeUri.isEmpty()) {
       throw new Error("no node");
     }
-    let hostUri = this._hostUri;
+    let hostUri = this.ownHostUri;
     if (hostUri.isEmpty()) {
       hostUri = nodeUri.endpoint();
       nodeUri = hostUri.unresolve(nodeUri);
@@ -520,8 +520,8 @@ export class ListDownlink<V, VU = never> extends Downlink {
       });
       setTimeout(this.didAliasModel.bind(this));
     } else {
-      model = new ListDownlinkModel(this.context, hostUri, nodeUri, laneUri, this._prio,
-                                    this._rate, this._body, this.state0 ?? void 0);
+      model = new ListDownlinkModel(this.context, hostUri, nodeUri, laneUri, this.ownPrio,
+                                    this.ownRate, this.ownBody, this.state0 ?? void 0);
       model.addDownlink(this);
       this.context.openDownlink(model);
       Object.defineProperty(this, "model", {

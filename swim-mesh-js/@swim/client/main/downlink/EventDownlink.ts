@@ -56,15 +56,15 @@ export class EventDownlink extends Downlink {
   }
 
   open(): this {
-    const laneUri = this._laneUri;
+    const laneUri = this.ownLaneUri;
     if (laneUri.isEmpty()) {
       throw new Error("no lane");
     }
-    let nodeUri = this._nodeUri;
+    let nodeUri = this.ownNodeUri;
     if (nodeUri.isEmpty()) {
       throw new Error("no node");
     }
-    let hostUri = this._hostUri;
+    let hostUri = this.ownHostUri;
     if (hostUri.isEmpty()) {
       hostUri = nodeUri.endpoint();
       nodeUri = hostUri.unresolve(nodeUri);
@@ -77,7 +77,7 @@ export class EventDownlink extends Downlink {
       model.addDownlink(this);
     } else {
       model = new EventDownlinkModel(this.context, hostUri, nodeUri, laneUri,
-                                     this._prio, this._rate, this._body);
+                                     this.ownPrio, this.ownRate, this.ownBody);
       model.addDownlink(this);
       this.context.openDownlink(model);
     }

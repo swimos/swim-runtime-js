@@ -47,7 +47,7 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
       observer.didSet = init.didSet ?? observer.didSet;
       valueForm = init.valueForm !== void 0 ? init.valueForm : valueForm;
     }
-    Object.defineProperty(this, "_valueForm", {
+    Object.defineProperty(this, "ownValueForm", {
       value: valueForm !== void 0 ? valueForm : Form.forValue() as unknown as Form<V, VU>,
       enumerable: true,
     });
@@ -80,7 +80,7 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   declare observers: ReadonlyArray<ValueDownlinkObserver<V, VU>>;
 
   /** @hidden */
-  declare readonly _valueForm: Form<V, VU>;
+  declare readonly ownValueForm: Form<V, VU>;
 
   /** @hidden */
   declare readonly state0: Value;
@@ -95,7 +95,7 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
                         valueForm?: Form<V, VU>, state0?: Value): ValueDownlink<V, VU> {
     if (arguments.length === 10) {
       state0 = this.state0;
-      valueForm = this._valueForm as unknown as Form<V, VU>;
+      valueForm = this.ownValueForm as unknown as Form<V, VU>;
     }
     return new ValueDownlink(context, owner, void 0, hostUri, nodeUri, laneUri,
                              prio, rate, body, flags, observers, valueForm, state0);
@@ -105,22 +105,22 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   valueForm<V2, V2U = never>(valueForm: Form<V2, V2U>): ValueDownlink<V2, V2U>;
   valueForm<V2, V2U = never>(valueForm?: Form<V2, V2U>): Form<V, VU> | ValueDownlink<V2, V2U> {
     if (valueForm === void 0) {
-      return this._valueForm;
+      return this.ownValueForm;
     } else {
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       this._prio, this._rate, this._body, this.flags, this.observers as any,
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, this.ownBody, this.flags, this.observers as any,
                        valueForm, this.state0);
     }
   }
 
   get(): V {
     const value = this.model!.get();
-    const object = value.coerce(this._valueForm);
+    const object = value.coerce(this.ownValueForm);
     return object;
   }
 
   set(newObject: V | VU): void {
-    const newValue = this._valueForm.mold(newObject);
+    const newValue = this.ownValueForm.mold(newObject);
     this.model!.set(newValue);
   }
 
@@ -148,12 +148,12 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
       const observer = observers[i]!;
       if (observer.willSet !== void 0) {
         if (newObject === void 0) {
-          newObject = newValue.coerce(this._valueForm);
+          newObject = newValue.coerce(this.ownValueForm);
         }
         const newResult = observer.willSet(newObject, this);
         if (newResult !== void 0) {
           newObject = newResult;
-          newValue = this._valueForm.mold(newObject);
+          newValue = this.ownValueForm.mold(newObject);
         }
       }
     }
@@ -169,10 +169,10 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
       const observer = observers[i]!;
       if (observer.didSet !== void 0) {
         if (newObject === void 0) {
-          newObject = newValue.coerce(this._valueForm);
+          newObject = newValue.coerce(this.ownValueForm);
         }
         if (oldObject === void 0) {
-          oldObject = oldValue.coerce(this._valueForm);
+          oldObject = oldValue.coerce(this.ownValueForm);
         }
         observer.didSet(newObject, oldObject, this);
       }
@@ -187,9 +187,9 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
     if (state0 === void 0) {
       return this.state0;
     } else {
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       this._prio, this._rate, this._body, this.flags, this.observers,
-                       this._valueForm, state0);
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, this.ownBody, this.flags, this.observers,
+                       this.ownValueForm, state0);
     }
   }
 
@@ -201,15 +201,15 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   }
 
   open(): this {
-    const laneUri = this._laneUri;
+    const laneUri = this.ownLaneUri;
     if (laneUri.isEmpty()) {
       throw new Error("no lane");
     }
-    let nodeUri = this._nodeUri;
+    let nodeUri = this.ownNodeUri;
     if (nodeUri.isEmpty()) {
       throw new Error("no node");
     }
-    let hostUri = this._hostUri;
+    let hostUri = this.ownHostUri;
     if (hostUri.isEmpty()) {
       hostUri = nodeUri.endpoint();
       nodeUri = hostUri.unresolve(nodeUri);
@@ -227,8 +227,8 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
       });
       setTimeout(this.didAliasModel.bind(this));
     } else {
-      model = new ValueDownlinkModel(this.context, hostUri, nodeUri, laneUri, this._prio,
-                                     this._rate, this._body, this.state0);
+      model = new ValueDownlinkModel(this.context, hostUri, nodeUri, laneUri, this.ownPrio,
+                                     this.ownRate, this.ownBody, this.state0);
       model.addDownlink(this);
       this.context.openDownlink(model);
       Object.defineProperty(this, "model", {

@@ -118,27 +118,27 @@ export abstract class Downlink {
       value: owner,
       enumerable: true,
     });
-    Object.defineProperty(this, "_hostUri", {
+    Object.defineProperty(this, "ownHostUri", {
       value: hostUri,
       enumerable: true,
     });
-    Object.defineProperty(this, "_nodeUri", {
+    Object.defineProperty(this, "ownNodeUri", {
       value: nodeUri,
       enumerable: true,
     });
-    Object.defineProperty(this, "_laneUri", {
+    Object.defineProperty(this, "ownLaneUri", {
       value: laneUri,
       enumerable: true,
     });
-    Object.defineProperty(this, "_prio", {
+    Object.defineProperty(this, "ownPrio", {
       value: prio,
       enumerable: true,
     });
-    Object.defineProperty(this, "_rate", {
+    Object.defineProperty(this, "ownRate", {
       value: rate,
       enumerable: true,
     });
-    Object.defineProperty(this, "_body", {
+    Object.defineProperty(this, "ownBody", {
       value: body,
       enumerable: true,
     });
@@ -166,22 +166,22 @@ export abstract class Downlink {
   declare readonly owner: DownlinkOwner | null;
   
   /** @hidden */
-  declare readonly _hostUri: Uri;
+  declare readonly ownHostUri: Uri;
   
   /** @hidden */
-  declare readonly _nodeUri: Uri;
+  declare readonly ownNodeUri: Uri;
   
   /** @hidden */
-  declare readonly _laneUri: Uri;
+  declare readonly ownLaneUri: Uri;
   
   /** @hidden */
-  declare readonly _prio: number;
+  declare readonly ownPrio: number;
   
   /** @hidden */
-  declare readonly _rate: number;
+  declare readonly ownRate: number;
   
   /** @hidden */
-  declare readonly _body: Value;
+  declare readonly ownBody: Value;
 
   /** @hidden */
   declare readonly flags: number;
@@ -202,11 +202,11 @@ export abstract class Downlink {
   hostUri(hostUri: AnyUri): Downlink;
   hostUri(hostUri?: AnyUri): Uri | Downlink {
     if (hostUri === void 0) {
-      return this._hostUri;
+      return this.ownHostUri;
     } else {
       hostUri = Uri.fromAny(hostUri);
-      return this.copy(this.context, this.owner, hostUri as Uri, this._nodeUri, this._laneUri,
-                       this._prio, this._rate, this._body, this.flags, this.observers);
+      return this.copy(this.context, this.owner, hostUri as Uri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, this.ownBody, this.flags, this.observers);
     }
   }
 
@@ -214,11 +214,11 @@ export abstract class Downlink {
   nodeUri(nodeUri: AnyUri): Downlink;
   nodeUri(nodeUri?: AnyUri): Uri | Downlink {
     if (nodeUri === void 0) {
-      return this._nodeUri;
+      return this.ownNodeUri;
     } else {
       nodeUri = Uri.fromAny(nodeUri);
-      return this.copy(this.context, this.owner, this._hostUri, nodeUri as Uri, this._laneUri,
-                       this._prio, this._rate, this._body, this.flags, this.observers);
+      return this.copy(this.context, this.owner, this.ownHostUri, nodeUri as Uri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, this.ownBody, this.flags, this.observers);
     }
   }
 
@@ -226,11 +226,11 @@ export abstract class Downlink {
   laneUri(laneUri: AnyUri): Downlink;
   laneUri(laneUri?: AnyUri): Uri | Downlink {
     if (laneUri === void 0) {
-      return this._laneUri;
+      return this.ownLaneUri;
     } else {
       laneUri = Uri.fromAny(laneUri);
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, laneUri as Uri,
-                       this._prio, this._rate, this._body, this.flags, this.observers);
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, laneUri as Uri,
+                       this.ownPrio, this.ownRate, this.ownBody, this.flags, this.observers);
     }
   }
 
@@ -238,10 +238,10 @@ export abstract class Downlink {
   prio(prio: number): Downlink;
   prio(prio?: number): number | Downlink {
     if (prio === void 0) {
-      return this._prio;
+      return this.ownPrio;
     } else {
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       prio, this._rate, this._body, this.flags, this.observers);
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       prio, this.ownRate, this.ownBody, this.flags, this.observers);
     }
   }
 
@@ -249,10 +249,10 @@ export abstract class Downlink {
   rate(rate: number): Downlink;
   rate(rate?: number): number | Downlink {
     if (rate === void 0) {
-      return this._rate;
+      return this.ownRate;
     } else {
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       this._prio, rate, this._body, this.flags, this.observers);
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, rate, this.ownBody, this.flags, this.observers);
     }
   }
 
@@ -260,11 +260,11 @@ export abstract class Downlink {
   body(body: AnyValue): Downlink;
   body(body?: AnyValue): Value | Downlink {
     if (body === void 0) {
-      return this._body;
+      return this.ownBody;
     } else {
       body = Value.fromAny(body);
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       this._prio, this._rate, body, this.flags, this.observers);
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, body, this.flags, this.observers);
     }
   }
 
@@ -275,8 +275,8 @@ export abstract class Downlink {
       return (this.flags & DownlinkFlags.KeepLinked) !== 0;
     } else {
       const flags = keepLinked ? this.flags | DownlinkFlags.KeepLinked : this.flags & ~DownlinkFlags.KeepLinked;
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       this._prio, this._rate, this._body, flags, this.observers);
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, this.ownBody, flags, this.observers);
     }
   }
 
@@ -287,8 +287,8 @@ export abstract class Downlink {
       return (this.flags & DownlinkFlags.KeepSynced) !== 0;
     } else {
       const flags = keepSynced ? this.flags | DownlinkFlags.KeepSynced : this.flags & ~DownlinkFlags.KeepSynced;
-      return this.copy(this.context, this.owner, this._hostUri, this._nodeUri, this._laneUri,
-                       this._prio, this._rate, this._body, flags, this.observers);
+      return this.copy(this.context, this.owner, this.ownHostUri, this.ownNodeUri, this.ownLaneUri,
+                       this.ownPrio, this.ownRate, this.ownBody, flags, this.observers);
     }
   }
 
