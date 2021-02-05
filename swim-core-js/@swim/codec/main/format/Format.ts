@@ -114,6 +114,8 @@ export const Format = {} as {
    */
   prefix(value: number, precision?: number): string;
 
+  decimal(value: number, precision?: number): string;
+
   /** @hidden */
   trimTrailingZeros(s: string): string;
 
@@ -282,16 +284,7 @@ Format.displayNumber = function (value: number, output: Output): void {
       }
     }
   } else {
-    const precision = output.settings.precision;
-    if (precision >= 0) {
-      let s = Format.trimTrailingZeros(Math.abs(value).toFixed(precision));
-      if (value < 0 && +s !== 0) {
-        s = "-" + s;
-      }
-      output = output.write(s);
-    } else {
-      output = output.write("" + value);
-    }
+    output = output.write(Format.decimal(value, output.settings.precision));
   }
 };
 
@@ -382,6 +375,18 @@ Format.prefix = (function () {
     }
   }
 })();
+
+Format.decimal = function (value: number, precision: number = -1): string {
+  if (precision >= 0) {
+    let s = Format.trimTrailingZeros(Math.abs(value).toFixed(precision));
+    if (value < 0 && +s !== 0) {
+      s = "-" + s;
+    }
+    return s;
+  } else {
+    return "" + value;
+  }
+};
 
 Format.trimTrailingZeros = function (s: string): string {
   let i0 = -1;
