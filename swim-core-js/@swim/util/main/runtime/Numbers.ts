@@ -49,19 +49,11 @@ export const Numbers = {} as {
 };
 
 Numbers.equal = function (x: number | null | undefined, y: number | null | undefined): boolean {
-  if (typeof x === "number" && typeof y === "number") {
-    return x === y || isNaN(x) && isNaN(y);
-  } else {
-    return x === y;
-  }
+  return x === y || typeof x === "number" && typeof y === "number" && isNaN(x) && isNaN(y);
 };
 
 Numbers.equivalent = function (x: number | null | undefined, y: number | null | undefined, epsilon?: number): boolean {
-  if (typeof x === "number" && typeof y === "number") {
-    return x === y || isNaN(x) && isNaN(y) || Math.abs(y - x) < (epsilon !== void 0 ? epsilon : Equivalent.Epsilon);
-  } else {
-    return x === y;
-  }
+  return x === y || typeof x === "number" && typeof y === "number" && (isNaN(x) && isNaN(y) || Math.abs(y - x) < (epsilon !== void 0 ? epsilon : Equivalent.Epsilon));
 };
 
 Numbers.compare = function (x: number | null | undefined, y: number | null | undefined): number {

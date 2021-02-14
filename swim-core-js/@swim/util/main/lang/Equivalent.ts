@@ -24,11 +24,12 @@ export interface Equivalent {
 }
 
 export const Equivalent = function (x:unknown, y: unknown, epsilon?: number): boolean {
-  if (x !== void 0 && x !== null && typeof (x as Equivalent).equivalentTo === "function") {
+  if (x === y) {
+    return true;
+  } else if (x !== void 0 && x !== null && typeof (x as Equivalent).equivalentTo === "function") {
     return (x as Equivalent).equivalentTo(y, epsilon);
-  } else {
-    return x === y;
   }
+  return false;
 } as {
   /**
    * Returns `true` if `x` conforms to [[Equivalent]] and is

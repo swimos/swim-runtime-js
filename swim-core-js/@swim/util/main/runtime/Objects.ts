@@ -51,47 +51,45 @@ export const Objects = {} as {
 };
 
 Objects.equal = function (x: object | null | undefined, y: object | null | undefined): boolean {
-  if (typeof x === "object" && x !== null && typeof y === "object" && y !== null) {
-    if (x !== y) {
-      const xKeys = Object.keys(x);
-      const yKeys = Object.keys(y);
-      const n = xKeys.length;
-      if (n !== yKeys.length) {
+  if (x === y) {
+    return true;
+  } else if (typeof x === "object" && x !== null && typeof y === "object" && y !== null) {
+    const xKeys = Object.keys(x);
+    const yKeys = Object.keys(y);
+    const n = xKeys.length;
+    if (n !== yKeys.length) {
+      return false;
+    }
+    for (let i = 0; i < n; i += 1) {
+      const key = xKeys[i]!;
+      if (key !== yKeys[i] || !Values.equal((x as any)[key], (y as any)[key])) {
         return false;
-      }
-      for (let i = 0; i < n; i += 1) {
-        const key = xKeys[i]!;
-        if (key !== yKeys[i] || !Values.equal((x as any)[key], (y as any)[key])) {
-          return false;
-        }
       }
     }
     return true;
-  } else {
-    return x === y;
   }
+  return false;
 };
 
 Objects.equivalent = function (x: object | null | undefined, y: object | null | undefined, epsilon?: number): boolean {
-  if (typeof x === "object" && x !== null && typeof y === "object" && y !== null) {
-    if (x !== y) {
-      const xKeys = Object.keys(x);
-      const yKeys = Object.keys(y);
-      const n = xKeys.length;
-      if (n !== yKeys.length) {
+  if (x === y) {
+    return true;
+  } else if (typeof x === "object" && x !== null && typeof y === "object" && y !== null) {
+    const xKeys = Object.keys(x);
+    const yKeys = Object.keys(y);
+    const n = xKeys.length;
+    if (n !== yKeys.length) {
+      return false;
+    }
+    for (let i = 0; i < n; i += 1) {
+      const key = xKeys[i]!;
+      if (key !== yKeys[i] || !Values.equivalent((x as any)[key], (y as any)[key], epsilon)) {
         return false;
-      }
-      for (let i = 0; i < n; i += 1) {
-        const key = xKeys[i]!;
-        if (key !== yKeys[i] || !Values.equivalent((x as any)[key], (y as any)[key], epsilon)) {
-          return false;
-        }
       }
     }
     return true;
-  } else {
-    return x === y;
   }
+  return false;
 };
 
 Objects.compare = function (x: object | null | undefined, y: object | null | undefined): number {

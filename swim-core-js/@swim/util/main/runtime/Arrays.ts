@@ -113,41 +113,39 @@ Arrays.removed = function <T>(oldElement: T, oldArray: ReadonlyArray<T> | null |
 };
 
 Arrays.equal = function (x: ArrayLike<unknown> | null | undefined, y: ArrayLike<unknown> | null | undefined): boolean {
-  if (typeof x === "object" && x !== null && typeof y === "object" && y !== null) {
-    if (x !== y) {
-      const n = x.length;
-      if (n !== y.length) {
+  if (x === y) {
+    return true;
+  } else if (typeof x === "object" && x !== null && typeof y === "object" && y !== null) {
+    const n = x.length;
+    if (n !== y.length) {
+      return false;
+    }
+    for (let i = 0; i < n; i += 1) {
+      if (!Values.equal(x[i], y[i])) {
         return false;
-      }
-      for (let i = 0; i < n; i += 1) {
-        if (!Values.equal(x[i], y[i])) {
-          return false;
-        }
       }
     }
     return true;
-  } else {
-    return x === y;
   }
+  return false;
 };
 
 Arrays.equivalent = function (x: ArrayLike<unknown> | null | undefined, y: ArrayLike<unknown> | null | undefined, epsilon?: number): boolean {
-  if (typeof x === "object" && x !== null && typeof y === "object" && y !== null) {
-    if (x !== y) {
-      const n = x.length;
-      if (n !== y.length) {
+  if (x === y) {
+    return true;
+  } else if (typeof x === "object" && x !== null && typeof y === "object" && y !== null) {
+    const n = x.length;
+    if (n !== y.length) {
+      return false;
+    }
+    for (let i = 0; i < n; i += 1) {
+      if (!Values.equivalent(x[i], y[i], epsilon)) {
         return false;
-      }
-      for (let i = 0; i < n; i += 1) {
-        if (!Values.equivalent(x[i], y[i], epsilon)) {
-          return false;
-        }
       }
     }
     return true;
-  } else {
-    return x === y;
   }
+  return false;
 };
 
 Arrays.compare = function (x: ArrayLike<unknown> | null | undefined, y: ArrayLike<unknown> | null | undefined): number {

@@ -23,11 +23,12 @@ export interface Equals {
 }
 
 export const Equals = function (x: unknown, y: unknown): boolean {
-  if (x !== void 0 && x !== null && typeof (x as Equals).equals === "function") {
+  if (x === y) {
+    return true;
+  } else if (x !== void 0 && x !== null && typeof (x as Equals).equals === "function") {
     return (x as Equals).equals(y);
-  } else {
-    return x === y;
   }
+  return false;
 } as {
   /**
    * Returns `true` if `x` conforms to [[Equals]] and is [[Equals.equals
