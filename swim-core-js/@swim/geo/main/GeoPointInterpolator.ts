@@ -19,18 +19,47 @@ import {GeoPoint} from "./GeoPoint";
 export const GeoPointInterpolator = function (p0: GeoPoint, p1: GeoPoint): Interpolator<GeoPoint> {
   const interpolator = function (u: number): GeoPoint {
     const p0 = interpolator[0];
+    const lng0 = p0.lng;
+    const lat0 = p0.lat;
     const p1 = interpolator[1];
-    const lng = p0.lng + u * (p1.lng - p0.lng);
-    const lat = p0.lat + u * (p1.lat - p0.lat);
+    const lng1 = p1.lng;
+    const lat1 = p1.lat;
+    let lng: number;
+    if (lng0 > 0 && lng1 < 0 && lng0 - lng1 > 180) {
+      // east across anti-meridian
+      const w = 180 - lng0;
+      const e = 180 + lng1;
+      const uw = w / (w + e);
+      if (u < uw) {
+        lng = lng0 + (u / uw) * w;
+      } else {
+        const ue = 1 - uw;
+        lng = -180 + ((u - uw) / ue) * e;
+      }
+    } else if (lng0 < 0 && lng1 > 0 && lng1 - lng0 > 180) {
+      // west across anti-meridian
+      const e = 180 + lng0;
+      const w = 180 - lng1;
+      const ue = e / (e + w);
+      if (u < ue) {
+        lng = lng0 - (u / ue) * e;
+      } else {
+        const uw = 1 - ue;
+        lng = 180 - ((u - ue) / uw) * w;
+      }
+    } else {
+      lng = lng0 + u * (lng1 - lng0);
+    }
+    const lat = lat0 + u * (lat1 - lat0);
     return new GeoPoint(lng, lat);
   } as Interpolator<GeoPoint>;
   Object.setPrototypeOf(interpolator, GeoPointInterpolator.prototype);
   Object.defineProperty(interpolator, 0, {
-    value: p0,
+    value: p0.normalized(),
     enumerable: true,
   });
   Object.defineProperty(interpolator, 1, {
-    value: p1,
+    value: p1.normalized(),
     enumerable: true,
   });
   return interpolator;

@@ -95,6 +95,18 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return f.project(this);
   }
 
+  normalized(): GeoPoint {
+    const oldLng = this.lng;
+    const oldLat = this.lat;
+    const newLng = GeoPoint.normalizeLng(oldLng);
+    const newLat = GeoPoint.normalizeLat(oldLat);
+    if (oldLng === newLng && oldLat === newLat) {
+      return this;
+    } else {
+      return new GeoPoint(newLng, newLat);
+    }
+  }
+
   toAny(): GeoPointInit {
     return {
       lng: this.lng,
@@ -176,6 +188,28 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
       return GeoPoint.fromTuple(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static normalized(lng: number, lat: number): GeoPoint {
+    lng = GeoPoint.normalizeLng(lng);
+    lat = GeoPoint.normalizeLat(lat);
+    return new GeoPoint(lng, lat);
+  }
+
+  /** @hidden */
+  static normalizeLng(lng: number): number {
+    if (lng < -180) {
+      lng = 180 - (-lng + 180) % 360;
+    } else if (lng > 180) {
+      lng = -180 + (lng - 180) % 360;
+    }
+    return lng;
+  }
+
+  /** @hidden */
+  static normalizeLat(lat: number): number {
+    lat = Math.min(Math.max(-90, lat), 90);
+    return lat;
   }
 
   /** @hidden */

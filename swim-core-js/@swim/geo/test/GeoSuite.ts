@@ -13,12 +13,18 @@
 // limitations under the License.
 
 import {Spec, Unit} from "@swim/unit";
+import {GeoPointSpec} from "./GeoPointSpec";
 import {GeoSplineBuilderSpec} from "./GeoSplineBuilderSpec";
 import {GeoPathBuilderSpec} from "./GeoPathBuilderSpec";
 import {GeoJsonSpec} from "./GeoJsonSpec";
 
 @Unit
 export class GeoSuite extends Spec {
+  @Unit
+  geoPointSpec(): Spec {
+    return new GeoPointSpec();
+  }
+
   @Unit
   geoSplineBuilderSpec(): Spec {
     return new GeoSplineBuilderSpec();
