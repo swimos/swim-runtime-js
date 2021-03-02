@@ -50,7 +50,7 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     return Length.create(this.toValue(units, basis) + that.toValue(units, basis), units);
   }
 
-  opposite(units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
+  negative(units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
     return Length.create(-this.toValue(units, basis), units);
   }
 

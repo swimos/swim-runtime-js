@@ -71,7 +71,7 @@ export class TranslateTransform extends Transform {
   }
 
   inverse(): Transform {
-    return new TranslateTransform(this.x.opposite(), this.y.opposite());
+    return new TranslateTransform(this.x.negative(), this.y.negative());
   }
 
   toAffine(): AffineTransform {

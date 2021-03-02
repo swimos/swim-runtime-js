@@ -48,7 +48,7 @@ export class VectorR2 implements Interpolate<VectorR2>, HashCode, Equivalent, De
     return new VectorR2(this.x + that.x, this.y + that.y);
   }
 
-  opposite(): VectorR2 {
+  negative(): VectorR2 {
     return new VectorR2(-this.x, -this.y);
   }
 

@@ -70,7 +70,7 @@ export class SkewTransform extends Transform {
   }
 
   inverse(): Transform {
-    return new SkewTransform(this.x.opposite(), this.y.opposite());
+    return new SkewTransform(this.x.negative(), this.y.negative());
   }
 
   toAffine(): AffineTransform {

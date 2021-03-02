@@ -69,7 +69,7 @@ export class RotateTransform extends Transform {
   }
 
   inverse(): Transform {
-    return new RotateTransform(this.angle.opposite());
+    return new RotateTransform(this.angle.negative());
   }
 
   toAffine(): AffineTransform {

@@ -42,7 +42,7 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     return Angle.create(this.toValue(units) + that.toValue(units), units);
   }
 
-  opposite(units: AngleUnits = this.units): Angle {
+  negative(units: AngleUnits = this.units): Angle {
     return Angle.create(-this.toValue(units), units);
   }
 
