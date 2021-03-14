@@ -36,6 +36,8 @@ The **Swim Core** framework consists of the following component libraries:
 - [**@swim/collections**](@swim/collections) –
   immutable, structure sharing collections, including B-trees and S-trees
   (sequence trees).
+- [**@swim/constraint**](@swim/constraint) –
+  incremental solver for systems of linear constraint equations.
 - [**@swim/structure**](@swim/structure) –
   generic structured data model, with support for selectors, expressions,
   and lambda functions.  Used as a common abstract syntax tree for Recon,

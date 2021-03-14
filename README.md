@@ -45,6 +45,8 @@ and strongly typed baseline on which to build higher level libraries.
 - [**@swim/collections**](swim-core-js/@swim/collections) –
   immutable, structure sharing collections, including B-trees and S-trees
   (sequence trees).
+- [**@swim/constraint**](swim-core-js/@swim/constraint) –
+  incremental solver for systems of linear constraint equations.
 - [**@swim/structure**](swim-core-js/@swim/structure) –
   generic structured data model, with support for selectors, expressions,
   and lambda functions.  Used as a common abstract syntax tree for Recon,

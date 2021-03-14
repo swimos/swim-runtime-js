@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "@swim/util";
-export * from "@swim/codec";
-export * from "@swim/mapping";
-export * from "@swim/collections";
-export * from "@swim/constraint";
-export * from "@swim/structure";
-export * from "@swim/streamlet";
-export * from "@swim/dataflow";
-export * from "@swim/recon";
-export * from "@swim/uri";
-export * from "@swim/math";
-export * from "@swim/geo";
-export * from "@swim/time";
+import type {ConstraintSymbol} from "./ConstraintSymbol";
+import type {ConstraintTerm} from "./ConstraintTerm";
+import type {ConstraintStrength} from "./ConstraintStrength";
+
+export interface ConstraintVariable extends ConstraintSymbol, ConstraintTerm {
+  readonly name: string;
+
+  readonly strength: ConstraintStrength;
+
+  evaluateConstraintVariable(): void;
+}

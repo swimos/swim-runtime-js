@@ -75,6 +75,20 @@ const core = [
     ],
   },
   {
+    id: "constraint",
+    name: "@swim/constraint",
+    targets: [
+      {
+        id: "main",
+        deps: ["util", "codec"],
+      },
+      {
+        id: "test",
+        deps: ["util", "codec", "unit", "constraint"],
+      },
+    ],
+  },
+  {
     id: "mapping",
     name: "@swim/mapping",
     targets: [
@@ -208,7 +222,7 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "mapping", "collections", "structure", "streamlet", "dataflow", "recon", "uri", "math", "geo", "time"],
+        deps: ["util", "codec", "mapping", "collections", "constraint", "structure", "streamlet", "dataflow", "recon", "uri", "math", "geo", "time"],
       },
     ],
   },

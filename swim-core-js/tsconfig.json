@@ -8,6 +8,7 @@
     {"path": "./@swim/unit"},
     {"path": "./@swim/mapping"},
     {"path": "./@swim/collections"},
+    {"path": "./@swim/constraint"},
     {"path": "./@swim/structure"},
     {"path": "./@swim/streamlet"},
     {"path": "./@swim/dataflow"},

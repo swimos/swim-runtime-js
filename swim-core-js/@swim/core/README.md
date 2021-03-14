@@ -39,6 +39,10 @@ component libraries:
   [doc](https://docs.swimos.org/js/latest/modules/_swim_collections.html)) –
   immutable, structure sharing collections, including B-trees and S-trees
   (sequence trees).
+- [**@swim/constraint**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/constraint)
+  ([npm](https://www.npmjs.com/package/@swim/constraint),
+  [doc](https://docs.swimos.org/js/latest/modules/_swim_constraint.html)) –
+  incremental solver for systems of linear constraint equations.
 - [**@swim/structure**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/structure)
   ([npm](https://www.npmjs.com/package/@swim/structure),
   [doc](https://docs.swimos.org/js/latest/modules/_swim_structure.html)) –

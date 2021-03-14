@@ -66,6 +66,21 @@ const core = [
     ],
   },
   {
+    id: "mapping",
+    name: "@swim/mapping",
+    path: "swim-core-js/@swim/mapping",
+    targets: [
+      {
+        id: "main",
+        deps: ["util"],
+      },
+      {
+        id: "test",
+        deps: ["util", "codec", "unit", "mapping"],
+      },
+    ],
+  },
+  {
     id: "collections",
     name: "@swim/collections",
     path: "swim-core-js/@swim/collections",
@@ -81,17 +96,17 @@ const core = [
     ],
   },
   {
-    id: "mapping",
-    name: "@swim/mapping",
-    path: "swim-core-js/@swim/mapping",
+    id: "constraint",
+    name: "@swim/constraint",
+    path: "swim-core-js/@swim/constraint",
     targets: [
       {
         id: "main",
-        deps: ["util"],
+        deps: ["util", "codec"],
       },
       {
         id: "test",
-        deps: ["util", "codec", "unit", "mapping"],
+        deps: ["util", "codec", "unit", "constraint"],
       },
     ],
   },
@@ -224,7 +239,7 @@ const core = [
     targets: [
       {
         id: "main",
-        deps: ["util", "codec", "mapping", "collections", "structure", "streamlet", "dataflow", "recon", "uri", "math", "geo", "time"],
+        deps: ["util", "codec", "mapping", "collections", "constraint", "structure", "streamlet", "dataflow", "recon", "uri", "math", "geo", "time"],
       },
     ],
   },
