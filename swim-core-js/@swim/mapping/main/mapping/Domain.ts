@@ -29,6 +29,10 @@ export interface Domain<X> extends Mapping<X, number> {
 
   readonly range: LinearRange;
 
+  contains(x: X): boolean;
+
+  equivalentTo(that: unknown, epsilon?: number): boolean;
+
   canEqual(that: unknown): boolean;
 
   equals(that: unknown): boolean;
@@ -76,6 +80,20 @@ Object.defineProperty(Domain.prototype, "range", {
   enumerable: true,
   configurable: true,
 });
+
+Domain.prototype.contains = function (x: unknown): boolean {
+  return Values.compare(this[0], x) <= 0 && Values.compare(x, this[1]) <= 0;
+};
+
+Domain.prototype.equivalentTo = function (that: unknown, epsilon?: number): boolean {
+  if (this === that) {
+    return true;
+  } else if (that instanceof Domain) {
+    return Values.equivalent(this[0], that[0], epsilon)
+        && Values.equivalent(this[1], that[1], epsilon);
+  }
+  return false;
+};
 
 Domain.prototype.canEqual = function (that: unknown): boolean {
   return that instanceof Domain;

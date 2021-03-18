@@ -14,7 +14,7 @@
 
 import {Equivalent} from "@swim/util";
 import {Mapping, Interpolate, Interpolator, LinearRange, ContinuousScale} from "@swim/mapping";
-import {DateTime} from "../DateTime";
+import {AnyDateTime, DateTime} from "../DateTime";
 import {TimeDomain} from "./TimeDomain";
 import {TimeScaleInterpolator} from "./"; // forward import
 
@@ -26,7 +26,7 @@ export interface TimeScale extends ContinuousScale<DateTime, number>, Interpolat
   readonly inverse: Mapping<number, DateTime>;
 
   withDomain(domain: TimeDomain): TimeScale;
-  withDomain(x0: DateTime, x1: DateTime): TimeScale;
+  withDomain(x0: AnyDateTime, x1: AnyDateTime): TimeScale;
 
   overRange(range: LinearRange): TimeScale;
   overRange(y0: number, y1: number): TimeScale;
@@ -79,12 +79,14 @@ Object.defineProperty(TimeScale.prototype, "inverse", {
   configurable: true,
 });
 
-TimeScale.prototype.withDomain = function (x0: TimeDomain | DateTime, x1?: DateTime): TimeScale {
+TimeScale.prototype.withDomain = function (x0: TimeDomain | AnyDateTime, x1?: AnyDateTime): TimeScale {
   let domain: TimeDomain;
   if (arguments.length === 1) {
     domain = x0 as TimeDomain;
   } else {
-    domain = TimeDomain(x0 as DateTime, x1!);
+    x0 = DateTime.fromAny(x0 as AnyDateTime);
+    x1 = DateTime.fromAny(x1!);
+    domain = TimeDomain(x0 as DateTime, x1 as DateTime);
   }
   return TimeScale(domain, this.range);
 };

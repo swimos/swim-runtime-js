@@ -36,12 +36,16 @@ export interface Timing extends Domain<number> {
 
   readonly easing: Easing;
 
+  contains(t: number): boolean;
+
   withDomain(t0: number, t1: number): Timing;
 
   withDuration(dt: number): Timing;
 
   overRange<Y>(range: Interpolator<Y>): Tweening<Y>;
   overRange<Y>(y0: Y, y1: Y): Tweening<Y>;
+
+  equivalentTo(that: unknown, epsilon?: number): boolean;
 
   canEqual(that: unknown): boolean;
 
@@ -92,6 +96,10 @@ Object.defineProperty(Timing.prototype, "duration", {
   configurable: true,
 });
 
+Timing.prototype.contains = function (t: number): boolean {
+  return this[0] <= t && t <= this[1];
+};
+
 Timing.prototype.withDomain = function (t0: number, t1: number): Timing {
   return Timing(this.easing, t0, t1);
 };
@@ -110,6 +118,17 @@ Timing.prototype.overRange = function <Y>(this: Timing, y0: Interpolator<Y> | Y,
   }
   return Tweening(this, range);
 } as typeof Timing.prototype.overRange;
+
+Timing.prototype.equivalentTo = function (that: unknown, epsilon?: number): boolean {
+  if (this === that) {
+    return true;
+  } else if (that instanceof Timing) {
+    return this.easing.equivalentTo(that.easing, epsilon)
+        && Values.equivalent(this[0], that[0], epsilon)
+        && Values.equivalent(this[1], that[1], epsilon);
+  }
+  return false;
+};
 
 Timing.prototype.canEqual = function (that: unknown): boolean {
   return that instanceof Timing;

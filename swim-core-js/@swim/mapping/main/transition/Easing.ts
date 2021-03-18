@@ -34,6 +34,8 @@ export interface Easing extends Timing {
 
   readonly easing: this;
 
+  equivalentTo(that: unknown, epsilon?: number): boolean;
+
   canEqual(that: unknown): boolean;
 
   equals(that: unknown): boolean;
@@ -123,6 +125,10 @@ Object.defineProperty(Easing.prototype, "easing", {
   },
   enumerable: true,
 });
+
+Easing.prototype.equivalentTo = function (that: unknown, epsilon?: number): boolean {
+  return this === that;
+};
 
 Easing.prototype.canEqual = function (that: unknown): boolean {
   return that instanceof Easing;

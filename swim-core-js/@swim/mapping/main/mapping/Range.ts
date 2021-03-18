@@ -29,6 +29,8 @@ export interface Range<Y> extends Mapping<number, Y> {
 
   readonly range: this;
 
+  equivalentTo(that: unknown, epsilon?: number): boolean;
+
   canEqual(that: unknown): boolean;
 
   equals(that: unknown): boolean;
@@ -76,6 +78,16 @@ Object.defineProperty(Range.prototype, "range", {
   enumerable: true,
   configurable: true,
 });
+
+Range.prototype.equivalentTo = function (that: unknown, epsilon?: number): boolean {
+  if (this === that) {
+    return true;
+  } else if (that instanceof Range) {
+    return Values.equivalent(this[0], that[0], epsilon)
+        && Values.equivalent(this[1], that[1], epsilon);
+  }
+  return false;
+};
 
 Range.prototype.canEqual = function (that: unknown): boolean {
   return that instanceof Range;

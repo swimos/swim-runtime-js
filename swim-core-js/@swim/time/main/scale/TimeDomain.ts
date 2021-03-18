@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Domain, Interpolate, Interpolator} from "@swim/mapping";
-import type {DateTime} from "../DateTime";
+import {AnyDateTime, DateTime} from "../DateTime";
 import {TimeDomainInterpolator} from "./"; // forward import
 import {TimeRange} from "./"; // forward import
 
@@ -23,6 +23,8 @@ export interface TimeDomain extends Domain<DateTime>, Interpolate<TimeDomain> {
   readonly 1: DateTime;
 
   readonly inverse: TimeRange;
+
+  contains(t: AnyDateTime): boolean;
 
   interpolateTo(that: TimeDomain): Interpolator<TimeDomain>;
   interpolateTo(that: unknown): Interpolator<TimeDomain> | null;
@@ -35,11 +37,11 @@ export interface TimeDomain extends Domain<DateTime>, Interpolate<TimeDomain> {
 }
 
 export const TimeDomain = function (x0: DateTime, x1: DateTime): TimeDomain {
-  const domain = function (x: DateTime): number {
+  const domain = function (t: DateTime): number {
     const t0 = domain[0].time;
     const t1 = domain[1].time;
     const dt = t1 - t0;
-    return dt !== 0 ? (x.time - t0) / dt : 0;
+    return dt !== 0 ? (t.time - t0) / dt : 0;
   } as TimeDomain;
   Object.setPrototypeOf(domain, TimeDomain.prototype);
   Object.defineProperty(domain, 0, {
@@ -67,6 +69,11 @@ Object.defineProperty(TimeDomain.prototype, "inverse", {
   enumerable: true,
   configurable: true,
 });
+
+TimeDomain.prototype.contains = function (t: AnyDateTime): boolean {
+  t = DateTime.time(t);
+  return this[0].time <= t && t <= this[1].time;
+};
 
 TimeDomain.prototype.interpolateTo = function (this: TimeDomain, that: unknown): Interpolator<TimeDomain> | null {
   if (that instanceof TimeDomain) {

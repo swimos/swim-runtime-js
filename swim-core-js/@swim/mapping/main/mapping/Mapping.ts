@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Equals} from "@swim/util";
+import type {Equals, Equivalent} from "@swim/util";
 import type {Domain} from "./Domain";
 import type {Range} from "./Range";
  
-export interface Mapping<X, Y> extends Equals {
+export interface Mapping<X, Y> extends Equals, Equivalent {
   (x: X): Y;
 
   readonly domain: Domain<X>;
 
   readonly range: Range<Y>;
+
+  equivalentTo(that: unknown, epsilon?: number): boolean;
 
   canEqual(that: unknown): boolean;
 
@@ -52,6 +54,16 @@ export const Mapping = function <X, Y>(domain: Domain<X>, range: Range<Y>): Mapp
 };
 
 Mapping.prototype = Object.create(Object.prototype);
+
+Mapping.prototype.equivalentTo = function (that: unknown, epsilon?: number): boolean {
+  if (this === that) {
+    return true;
+  } else if (that instanceof Mapping) {
+    return this.domain.equivalentTo(that.domain, epsilon)
+        && this.range.equivalentTo(that.range, epsilon);
+  }
+  return false;
+};
 
 Mapping.prototype.canEqual = function (that: unknown): boolean {
   return that instanceof Mapping;

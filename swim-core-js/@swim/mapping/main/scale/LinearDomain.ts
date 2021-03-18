@@ -25,6 +25,8 @@ export interface LinearDomain extends Domain<number>, Interpolate<LinearDomain> 
 
   readonly inverse: LinearRange;
 
+  contains(x: number): boolean;
+
   interpolateTo(that: LinearDomain): Interpolator<LinearDomain>;
   interpolateTo(that: unknown): Interpolator<LinearDomain> | null;
 
@@ -68,6 +70,10 @@ Object.defineProperty(LinearDomain.prototype, "inverse", {
   enumerable: true,
   configurable: true,
 });
+
+LinearDomain.prototype.contains = function (x: number): boolean {
+  return this[0] <= x && x <= this[1];
+};
 
 LinearDomain.prototype.interpolateTo = function (this: LinearDomain, that: unknown): Interpolator<LinearDomain> | null {
   if (that instanceof LinearDomain) {
