@@ -205,7 +205,7 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
   }
 
   static fromAny(value: AnyLength, defaultUnits?: LengthUnits): Length {
-    if (value instanceof Length) {
+    if (value === void 0 || value === null || value instanceof Length) {
       return value;
     } else if (typeof value === "number") {
       return Length.create(value, defaultUnits);

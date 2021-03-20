@@ -53,7 +53,7 @@ export abstract class GeoShape implements Equals {
   abstract equals(that: unknown): boolean;
 
   static fromAny(value: AnyGeoShape): GeoShape {
-    if (value instanceof GeoShape) {
+    if (value === void 0 || value === null || value instanceof GeoShape) {
       return value;
     } else if (GeoPoint.isInit(value)) {
       return GeoPoint.fromInit(value);

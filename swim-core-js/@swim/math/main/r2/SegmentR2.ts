@@ -286,7 +286,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
   }
 
   static fromAny(value: AnySegmentR2): SegmentR2 {
-    if (value instanceof SegmentR2) {
+    if (value === void 0 || value === null || value instanceof SegmentR2) {
       return value;
     } else if (SegmentR2.isInit(value)) {
       return SegmentR2.fromInit(value);

@@ -293,21 +293,21 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     return new DateTime(time, zone);
   }
 
-  static fromAny(date: AnyDateTime, zone?: AnyTimeZone): DateTime {
-    if (date instanceof DateTime) {
-      return date;
-    } else if (date instanceof Date) {
+  static fromAny(value: AnyDateTime, zone?: AnyTimeZone): DateTime {
+    if (value === void 0 || value === null || value instanceof DateTime) {
+      return value;
+    } else if (value instanceof Date) {
       zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc;
-      return new DateTime(date.getTime(), zone);
-    } else if (typeof date === "number") {
+      return new DateTime(value.getTime(), zone);
+    } else if (typeof value === "number") {
       zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc;
-      return new DateTime(date, zone);
-    } else if (typeof date === "string") {
-      return DateTime.parse(date, zone);
-    } else if (DateTime.isInit(date)) {
-      return DateTime.fromInit(date, zone);
+      return new DateTime(value, zone);
+    } else if (typeof value === "string") {
+      return DateTime.parse(value, zone);
+    } else if (DateTime.isInit(value)) {
+      return DateTime.fromInit(value, zone);
     }
-    throw new TypeError("" + date);
+    throw new TypeError("" + value);
   }
 
   static fromValue(value: Value): DateTime | null {

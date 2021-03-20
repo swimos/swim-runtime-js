@@ -245,7 +245,7 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
   }
 
   static fromAny(value: AnyTransform): Transform {
-    if (value instanceof Transform) {
+    if (value === void 0 || value === null || value instanceof Transform) {
       return value;
     } else if (typeof value === "string") {
       return Transform.parse(value);

@@ -259,7 +259,7 @@ export class TransformList extends Transform {
   }
 
   static fromAny(value: TransformList | string): TransformList {
-    if (value instanceof TransformList) {
+    if (value === void 0 || value === null || value instanceof TransformList) {
       return value;
     } else if (typeof value === "string") {
       return TransformList.parse(value);

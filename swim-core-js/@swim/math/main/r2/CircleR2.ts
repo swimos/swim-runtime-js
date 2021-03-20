@@ -277,7 +277,7 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
   }
 
   static fromAny(value: AnyCircleR2): CircleR2 {
-    if (value instanceof CircleR2) {
+    if (value === void 0 || value === null || value instanceof CircleR2) {
       return value;
     } else if (CircleR2.isInit(value)) {
       return CircleR2.fromInit(value);

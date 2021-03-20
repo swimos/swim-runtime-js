@@ -179,7 +179,7 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
   }
 
   static fromAny(value: AnyPointR2): PointR2 {
-    if (value instanceof PointR2) {
+    if (value === void 0 || value === null || value instanceof PointR2) {
       return value;
     } else if (PointR2.isInit(value)) {
       return PointR2.fromInit(value);

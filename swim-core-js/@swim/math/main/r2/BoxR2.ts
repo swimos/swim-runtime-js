@@ -317,7 +317,7 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
   }
 
   static fromAny(value: AnyBoxR2): BoxR2 {
-    if (value instanceof BoxR2) {
+    if (value === void 0 || value === null || value instanceof BoxR2) {
       return value;
     } else if (BoxR2.isInit(value)) {
       return BoxR2.fromInit(value);

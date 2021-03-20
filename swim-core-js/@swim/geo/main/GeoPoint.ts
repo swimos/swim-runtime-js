@@ -180,7 +180,7 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
   }
 
   static fromAny(value: AnyGeoPoint): GeoPoint {
-    if (value instanceof GeoPoint) {
+    if (value === void 0 || value === null || value instanceof GeoPoint) {
       return value;
     } else if (GeoPoint.isInit(value)) {
       return GeoPoint.fromInit(value);

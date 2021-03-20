@@ -350,7 +350,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   static fromAny(value: AnyGeoSpline): GeoSpline;
   static fromAny(value: AnyGeoShape): GeoShape;
   static fromAny(value: AnyGeoSpline | AnyGeoShape): GeoShape {
-    if (value instanceof GeoSpline) {
+    if (value === void 0 || value === null || value instanceof GeoSpline) {
       return value;
     } else if (GeoSpline.isPoints(value)) {
       return GeoSpline.fromPoints(value);

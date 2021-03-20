@@ -256,7 +256,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   }
 
   static fromAny(value: AnyGeoSegment): GeoSegment {
-    if (value instanceof GeoSegment) {
+    if (value === void 0 || value === null || value instanceof GeoSegment) {
       return value;
     } else if (GeoSegment.isInit(value)) {
       return GeoSegment.fromInit(value);

@@ -50,7 +50,7 @@ export abstract class ShapeR2 {
   }
 
   static fromAny(value: AnyShapeR2): ShapeR2 {
-    if (value instanceof ShapeR2) {
+    if (value === void 0 || value === null || value instanceof ShapeR2) {
       return value;
     } else if (PointR2.isInit(value)) {
       return PointR2.fromInit(value);

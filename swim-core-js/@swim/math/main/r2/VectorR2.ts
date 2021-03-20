@@ -124,7 +124,7 @@ export class VectorR2 implements Interpolate<VectorR2>, HashCode, Equivalent, De
   }
 
   static fromAny(value: AnyVectorR2): VectorR2 {
-    if (value instanceof VectorR2) {
+    if (value === void 0 || value === null || value instanceof VectorR2) {
       return value;
     } else if (VectorR2.isInit(value)) {
       return VectorR2.fromInit(value);

@@ -312,7 +312,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   static fromAny(value: AnyGeoPath): GeoPath;
   static fromAny(value: AnyGeoShape): GeoShape;
   static fromAny(value: AnyGeoPath | AnyGeoShape): GeoShape {
-    if (value instanceof GeoPath) {
+    if (value === void 0 || value === null || value instanceof GeoPath) {
       return value;
     } else if (GeoPath.isSplines(value)) {
       return GeoPath.fromSplines(value);

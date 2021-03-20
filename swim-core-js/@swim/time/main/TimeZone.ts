@@ -99,7 +99,7 @@ export class TimeZone implements HashCode, Debug {
   }
 
   static fromAny(value: AnyTimeZone): TimeZone {
-    if (value instanceof TimeZone) {
+    if (value === void 0 || value === null || value instanceof TimeZone) {
       return value;
     } else if (typeof value === "string") {
       const zone = TimeZone.forName(value);

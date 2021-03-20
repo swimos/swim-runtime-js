@@ -167,7 +167,7 @@ export class ScaleTransform extends Transform {
   }
 
   static fromAny(value: ScaleTransform | string): ScaleTransform {
-    if (value instanceof ScaleTransform) {
+    if (value === void 0 || value === null || value instanceof ScaleTransform) {
       return value;
     } else if (typeof value === "string") {
       return ScaleTransform.parse(value);

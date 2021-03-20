@@ -310,7 +310,7 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
   }
 
   static fromAny(value: AnyGeoBox): GeoBox {
-    if (value instanceof GeoBox) {
+    if (value === void 0 || value === null || value instanceof GeoBox) {
       return value;
     } else if (GeoBox.isInit(value)) {
       return GeoBox.fromInit(value);

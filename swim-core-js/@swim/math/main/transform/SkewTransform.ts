@@ -183,7 +183,7 @@ export class SkewTransform extends Transform {
   }
 
   static fromAny(value: SkewTransform | string): SkewTransform {
-    if (value instanceof SkewTransform) {
+    if (value === void 0 || value === null || value instanceof SkewTransform) {
       return value;
     } else if (typeof value === "string") {
       return SkewTransform.parse(value);

@@ -330,7 +330,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   static fromAny(value: AnyPathR2 | AnyShapeR2): PathR2 {
-    if (value instanceof PathR2) {
+    if (value === void 0 || value === null || value instanceof PathR2) {
       return value;
     } else if (typeof value === "string") {
       return PathR2.parse(value);

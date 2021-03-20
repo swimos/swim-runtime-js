@@ -155,7 +155,7 @@ export class RotateTransform extends Transform {
   }
 
   static fromAny(value: RotateTransform | string): RotateTransform {
-    if (value instanceof RotateTransform) {
+    if (value === void 0 || value === null || value instanceof RotateTransform) {
       return value;
     } else if (typeof value === "string") {
       return RotateTransform.parse(value);

@@ -190,7 +190,7 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
   }
 
   static fromAny(value: AnyAngle, defaultUnits?: AngleUnits): Angle {
-    if (value instanceof Angle) {
+    if (value === void 0 || value === null || value instanceof Angle) {
       return value;
     } else if (typeof value === "number") {
       return Angle.create(value, defaultUnits);

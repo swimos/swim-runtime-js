@@ -182,7 +182,7 @@ export class TranslateTransform extends Transform {
   }
 
   static fromAny(value: TranslateTransform | string): TranslateTransform {
-    if (value instanceof TranslateTransform) {
+    if (value === void 0 || value === null || value instanceof TranslateTransform) {
       return value;
     } else if (typeof value === "string") {
       return TranslateTransform.parse(value);

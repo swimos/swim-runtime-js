@@ -216,7 +216,7 @@ export class AffineTransform extends Transform {
   }
 
   static fromAny(value: AffineTransform | string): AffineTransform {
-    if (value instanceof AffineTransform) {
+    if (value === void 0 || value === null || value instanceof AffineTransform) {
       return value;
     } else if (typeof value === "string") {
       return AffineTransform.parse(value);
