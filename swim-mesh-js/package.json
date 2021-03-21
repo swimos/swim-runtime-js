@@ -28,12 +28,12 @@
     "@typescript-eslint/eslint-plugin": "4",
     "@typescript-eslint/parser": "4",
     "eslint": "7",
-    "rollup": "2.39",
+    "rollup": "2.42",
     "rollup-plugin-sourcemaps": "0.6",
     "terser": "5",
     "tslib": "2",
     "typedoc": "0.20",
-    "typescript": "4.1",
+    "typescript": "4.2",
     "ws": "7"
   },
   "scripts": {

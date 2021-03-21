@@ -15,10 +15,10 @@
 import {Values} from "@swim/util";
 import {Domain} from "../mapping/Domain";
 import {Interpolator} from "../interpolate/Interpolator";
-import {AnyEasing, EasingType, Easing} from "../"; // forward import
+import {AnyEasing, Easing} from "../"; // forward import
 import {Tweening} from "../"; // forward import
 
-export type AnyTiming = Timing | EasingType;
+export type AnyTiming = Timing | TimingInit;
 
 export interface TimingInit {
   easing?: AnyEasing;
@@ -178,8 +178,6 @@ Timing.fromAny = function (value: AnyTiming | boolean | null | undefined): Timin
     return false;
   } else if (value instanceof Timing || typeof value === "boolean") {
     return value;
-  } else if (typeof value === "string") {
-    return Easing(value);
   } else if (typeof value === "object") {
     return Timing.fromInit(value);
   }
