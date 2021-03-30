@@ -18,7 +18,7 @@ import type {GeoCurve} from "./GeoCurve";
 import {GeoSegment} from "./GeoSegment";
 import {GeoSpline} from "./GeoSpline";
 import {GeoPath} from "./GeoPath";
-import {GeoSet} from "./GeoSet";
+import {GeoGroup} from "./GeoGroup";
 
 export type GeoJson = GeoJsonGeometry
                     | GeoJsonFeature
@@ -193,7 +193,7 @@ GeoJsonPoint.toShape = function (object: GeoJsonPoint): GeoPoint {
 
 export const GeoJsonMultiPoint = {} as {
   is(value: unknown): value is GeoJsonMultiPoint;
-  toShape(object: GeoJsonMultiPoint): GeoSet<GeoPoint>;
+  toShape(object: GeoJsonMultiPoint): GeoGroup<GeoPoint>;
 };
 
 GeoJsonMultiPoint.is = function (value: unknown): value is GeoJsonMultiPoint {
@@ -205,7 +205,7 @@ GeoJsonMultiPoint.is = function (value: unknown): value is GeoJsonMultiPoint {
   return false;
 };
 
-GeoJsonMultiPoint.toShape = function (object: GeoJsonMultiPoint): GeoSet<GeoPoint> {
+GeoJsonMultiPoint.toShape = function (object: GeoJsonMultiPoint): GeoGroup<GeoPoint> {
   const positions = object.coordinates;
   const n = positions.length;
   const shapes = new Array<GeoPoint>(n);
@@ -213,7 +213,7 @@ GeoJsonMultiPoint.toShape = function (object: GeoJsonMultiPoint): GeoSet<GeoPoin
     const position = positions[i]!;
     shapes[i] = new GeoPoint(position[0], position[1]);
   }
-  return new GeoSet(shapes);
+  return new GeoGroup(shapes);
 };
 
 export const GeoJsonLineString = {} as {
@@ -250,7 +250,7 @@ GeoJsonLineString.toShape = function (object: GeoJsonLineString): GeoSpline {
 
 export const GeoJsonMultiLineString = {} as {
   is(value: unknown): value is GeoJsonMultiLineString;
-  toShape(object: GeoJsonMultiLineString): GeoSet<GeoSpline>;
+  toShape(object: GeoJsonMultiLineString): GeoGroup<GeoSpline>;
 };
 
 GeoJsonMultiLineString.is = function (value: unknown): value is GeoJsonMultiLineString {
@@ -262,7 +262,7 @@ GeoJsonMultiLineString.is = function (value: unknown): value is GeoJsonMultiLine
   return false;
 };
 
-GeoJsonMultiLineString.toShape = function (object: GeoJsonMultiLineString): GeoSet<GeoSpline> {
+GeoJsonMultiLineString.toShape = function (object: GeoJsonMultiLineString): GeoGroup<GeoSpline> {
   const multiLineString = object.coordinates;
   const n = multiLineString.length;
   const shapes = new Array<GeoSpline>(n);
@@ -283,7 +283,7 @@ GeoJsonMultiLineString.toShape = function (object: GeoJsonMultiLineString): GeoS
       shapes[i] = GeoSpline.empty();
     }
   }
-  return new GeoSet(shapes);
+  return new GeoGroup(shapes);
 };
 
 export const GeoJsonPolygon = {} as {
@@ -326,7 +326,7 @@ GeoJsonPolygon.toShape = function (object: GeoJsonPolygon): GeoPath {
 
 export const GeoJsonMultiPolygon = {} as {
   is(value: unknown): value is GeoJsonMultiPolygon;
-  toShape(object: GeoJsonMultiPolygon): GeoSet<GeoPath>;
+  toShape(object: GeoJsonMultiPolygon): GeoGroup<GeoPath>;
 };
 
 GeoJsonMultiPolygon.is = function (value: unknown): value is GeoJsonMultiPolygon {
@@ -338,7 +338,7 @@ GeoJsonMultiPolygon.is = function (value: unknown): value is GeoJsonMultiPolygon
   return false;
 };
 
-GeoJsonMultiPolygon.toShape = function (object: GeoJsonMultiPolygon): GeoSet<GeoPath> {
+GeoJsonMultiPolygon.toShape = function (object: GeoJsonMultiPolygon): GeoGroup<GeoPath> {
   const multiPolygon = object.coordinates;
   const n = multiPolygon.length;
   const shapes = new Array<GeoPath>(n);
@@ -365,12 +365,12 @@ GeoJsonMultiPolygon.toShape = function (object: GeoJsonMultiPolygon): GeoSet<Geo
     }
     shapes[i] = new GeoPath(splines);
   }
-  return new GeoSet(shapes);
+  return new GeoGroup(shapes);
 };
 
 export const GeoJsonGeometryCollection = {} as {
   is(value: unknown): value is GeoJsonGeometryCollection;
-  toShape(object: GeoJsonGeometryCollection): GeoSet;
+  toShape(object: GeoJsonGeometryCollection): GeoGroup;
 };
 
 GeoJsonGeometryCollection.is = function (value: unknown): value is GeoJsonGeometryCollection {
@@ -382,14 +382,14 @@ GeoJsonGeometryCollection.is = function (value: unknown): value is GeoJsonGeomet
   return false;
 };
 
-GeoJsonGeometryCollection.toShape = function (object: GeoJsonGeometryCollection): GeoSet {
+GeoJsonGeometryCollection.toShape = function (object: GeoJsonGeometryCollection): GeoGroup {
   const geometries = object.geometries;
   const n = geometries.length;
   const shapes = new Array<GeoShape>(n);
   for (let i = 0; i < n; i += 1) {
     shapes[i] = GeoJsonGeometry.toShape(geometries[i]!);
   }
-  return new GeoSet(shapes);
+  return new GeoGroup(shapes);
 };
 
 export const GeoJsonFeature = {} as {

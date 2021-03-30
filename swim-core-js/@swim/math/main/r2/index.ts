@@ -86,4 +86,4 @@ export {
 } from "./CircleR2";
 export {CircleR2Interpolator} from "./CircleR2Interpolator";
 
-export {SetR2} from "./SetR2";
+export {GroupR2} from "./GroupR2";

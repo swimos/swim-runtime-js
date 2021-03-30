@@ -14,12 +14,11 @@
 
 import {Equivalent, Equals, Lazy, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {ShapeR2, SetR2} from "@swim/math";
-import type {GeoProjection} from "./GeoProjection";
-import {AnyGeoShape, GeoShape} from "./GeoShape";
-import {GeoBox} from "./GeoBox";
+import type {R2Function} from "./R2Function";
+import {AnyShapeR2, ShapeR2} from "./ShapeR2";
+import {BoxR2} from "./BoxR2";
 
-export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements Equals, Equivalent, Debug {
+export class GroupR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equals, Equivalent, Debug {
   constructor(shapes: ReadonlyArray<S>) {
     super();
     Object.defineProperty(this, "shapes", {
@@ -33,71 +32,71 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
     });
   }
 
+  declare readonly shapes: ReadonlyArray<S>;
+
   isDefined(): boolean {
     return this.shapes.length !== 0;
   }
 
-  declare readonly shapes: ReadonlyArray<S>;
-
-  get lngMin(): number {
-    return this.bounds.lngMin;
+  get xMin(): number {
+    return this.bounds.xMin;
   }
 
-  get latMin(): number {
-    return this.bounds.latMin;
+  get yMin(): number {
+    return this.bounds.yMin;
   }
 
-  get lngMax(): number {
-    return this.bounds.lngMax;
+  get xMax(): number {
+    return this.bounds.xMax;
   }
 
-  get latMax(): number {
-    return this.bounds.latMax;
+  get yMax(): number {
+    return this.bounds.yMax;
   }
 
-  contains(that: AnyGeoShape): boolean;
+  contains(that: AnyShapeR2): boolean;
   contains(x: number, y: number): boolean;
-  contains(that: AnyGeoShape | number, y?: number): boolean {
+  contains(that: AnyShapeR2 | number, y?: number): boolean {
     return false; // TODO
   }
 
-  intersects(that: AnyGeoShape): boolean {
+  intersects(that: AnyShapeR2): boolean {
     return false; // TODO
   }
 
-  project(f: GeoProjection): SetR2 {
+  transform(f: R2Function): GroupR2 {
     const oldShapes = this.shapes;
     const n = oldShapes.length;
     if (n > 0) {
       const newShapes = new Array<ShapeR2>(n);
       for (let i = 0; i < n; i += 1) {
-        newShapes[i] = oldShapes[i]!.project(f);
+        newShapes[i] = oldShapes[i]!.transform(f);
       }
-      return new SetR2(newShapes);
+      return new GroupR2(newShapes);
     } else {
-      return SetR2.empty();
+      return GroupR2.empty();
     }
   }
 
   /** @hidden */
-  declare readonly boundingBox: GeoBox | null;
+  declare readonly boundingBox: BoxR2 | null;
 
-  get bounds(): GeoBox {
+  get bounds(): BoxR2 {
     let boundingBox = this.boundingBox;
     if (boundingBox === null) {
-      let lngMin = Infinity;
-      let latMin = Infinity;
-      let lngMax = -Infinity;
-      let latMax = -Infinity;
+      let xMin = Infinity;
+      let yMin = Infinity;
+      let xMax = -Infinity;
+      let yMax = -Infinity;
       const shapes = this.shapes;
       for (let i = 0, n = shapes.length; i < n; i += 1) {
         const shape = shapes[i]!;
-        lngMin = Math.min(lngMin, shape.lngMin);
-        latMin = Math.min(latMin, shape.latMin);
-        lngMax = Math.max(shape.lngMax, lngMax);
-        latMax = Math.max(shape.latMax, latMax);
+        xMin = Math.min(xMin, shape.xMin);
+        yMin = Math.min(yMin, shape.yMin);
+        xMax = Math.max(shape.xMax, xMax);
+        yMax = Math.max(shape.yMax, yMax);
       }
-      boundingBox = new GeoBox(lngMin, latMin, lngMax, latMax);
+      boundingBox = new BoxR2(xMin, yMin, xMax, yMax);
       Object.defineProperty(this, "boundingBox", {
         value: boundingBox,
         enumerable: true,
@@ -110,7 +109,7 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
-    } else if (that instanceof GeoSet) {
+    } else if (that instanceof GroupR2) {
       return Arrays.equivalent(this.shapes, that.shapes, epsilon);
     }
     return false;
@@ -119,7 +118,7 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
-    } else if (that instanceof GeoSet) {
+    } else if (that instanceof GroupR2) {
       return Arrays.equal(this.shapes, that.shapes);
     }
     return false;
@@ -128,7 +127,7 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
   debug(output: Output): void {
     const shapes = this.shapes;
     const n = shapes.length;
-    output = output.write("GeoSet").write(46/*'.'*/);
+    output = output.write("GroupR2").write(46/*'.'*/);
     if (n === 0) {
       output = output.write("empty").write(40/*'('*/);
     } else {
@@ -146,11 +145,11 @@ export class GeoSet<S extends GeoShape = GeoShape> extends GeoShape implements E
   }
 
   @Lazy
-  static empty<S extends GeoShape>(): GeoSet<S> {
-    return new GeoSet(Arrays.empty);
+  static empty<S extends ShapeR2>(): GroupR2<S> {
+    return new GroupR2(Arrays.empty);
   }
 
-  static of<S extends GeoShape>(...shapes: S[]): GeoSet<S> {
-    return new GeoSet(shapes);
+  static of<S extends ShapeR2>(...shapes: S[]): GroupR2<S> {
+    return new GroupR2(shapes);
   }
 }

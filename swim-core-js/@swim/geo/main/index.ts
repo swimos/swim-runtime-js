@@ -61,6 +61,6 @@ export {
 } from "./GeoBox";
 export {GeoBoxInterpolator} from "./GeoBoxInterpolator";
 
-export {GeoSet} from "./GeoSet";
+export {GeoGroup} from "./GeoGroup";
 
 export * from "./GeoJson";

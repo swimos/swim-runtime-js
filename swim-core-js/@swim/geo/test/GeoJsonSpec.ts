@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Spec, Test, Exam} from "@swim/unit";
-import {GeoJson, GeoShape, GeoPoint, GeoSegment, GeoSpline, GeoPath, GeoSet} from "@swim/geo";
+import {GeoJson, GeoShape, GeoPoint, GeoSegment, GeoSpline, GeoPath, GeoGroup} from "@swim/geo";
 
 export class GeoJsonSpec extends Spec {
   @Test
@@ -25,7 +25,7 @@ export class GeoJsonSpec extends Spec {
   @Test
   decodeGeoJsonMultiPoints(exam: Exam): void {
     exam.equal(GeoJson.toShape({type: "MultiPoint", coordinates: [[100.0, 0.0], [101.0, 1.0]]}),
-               GeoSet.of(GeoPoint.of(100.0, 0.0), GeoPoint.of(101.0, 1.0)));
+               GeoGroup.of(GeoPoint.of(100.0, 0.0), GeoPoint.of(101.0, 1.0)));
   }
 
   @Test
@@ -37,8 +37,8 @@ export class GeoJsonSpec extends Spec {
   @Test
   decodeGeoJsonMultiLineStrings(exam: Exam): void {
     exam.equal(GeoJson.toShape({type: "MultiLineString", coordinates: [[[100.0, 0.0], [101.0, 1.0]], [[102.0, 2.0], [103.0, 3.0]]]}),
-               GeoSet.of(GeoSpline.open(GeoSegment.of(100.0, 0.0, 101.0, 1.0)),
-                         GeoSpline.open(GeoSegment.of(102.0, 2.0, 103.0, 3.0))));
+               GeoGroup.of(GeoSpline.open(GeoSegment.of(100.0, 0.0, 101.0, 1.0)),
+                           GeoSpline.open(GeoSegment.of(102.0, 2.0, 103.0, 3.0))));
   }
 
   @Test
@@ -60,16 +60,16 @@ export class GeoJsonSpec extends Spec {
     exam.equal(GeoJson.toShape({type: "MultiPolygon", coordinates: [[[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],
                                                                     [[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],
                                                                      [[100.8, 0.8], [100.8, 0.2], [100.2, 0.2], [100.2, 0.8], [100.8, 0.8]]]]}),
-               GeoSet.of(GeoPath.closed(GeoSegment.of(102.0, 2.0, 103.0, 2.0), GeoSegment.of(103.0, 2.0, 103.0, 3.0), GeoSegment.of(103.0, 3.0, 102.0, 3.0), GeoSegment.of(102.0, 3.0, 102.0, 2.0)),
-                         GeoPath.of(GeoSpline.closed(GeoSegment.of(100.0, 0.0, 101.0, 0.0), GeoSegment.of(101.0, 0.0, 101.0, 1.0), GeoSegment.of(101.0, 1.0, 100.0, 1.0), GeoSegment.of(100.0, 1.0, 100.0, 0.0)),
-                                    GeoSpline.closed(GeoSegment.of(100.8, 0.8, 100.8, 0.2), GeoSegment.of(100.8, 0.2, 100.2, 0.2), GeoSegment.of(100.2, 0.2, 100.2, 0.8), GeoSegment.of(100.2, 0.8, 100.8, 0.8)))));
+               GeoGroup.of(GeoPath.closed(GeoSegment.of(102.0, 2.0, 103.0, 2.0), GeoSegment.of(103.0, 2.0, 103.0, 3.0), GeoSegment.of(103.0, 3.0, 102.0, 3.0), GeoSegment.of(102.0, 3.0, 102.0, 2.0)),
+                           GeoPath.of(GeoSpline.closed(GeoSegment.of(100.0, 0.0, 101.0, 0.0), GeoSegment.of(101.0, 0.0, 101.0, 1.0), GeoSegment.of(101.0, 1.0, 100.0, 1.0), GeoSegment.of(100.0, 1.0, 100.0, 0.0)),
+                                      GeoSpline.closed(GeoSegment.of(100.8, 0.8, 100.8, 0.2), GeoSegment.of(100.8, 0.2, 100.2, 0.2), GeoSegment.of(100.2, 0.2, 100.2, 0.8), GeoSegment.of(100.2, 0.8, 100.8, 0.8)))));
   }
 
   @Test
   decodeGeoJsonGeometryCollections(exam: Exam): void {
     exam.equal(GeoJson.toShape({type: "GeometryCollection", geometries: [{type: "Point", coordinates: [100.0, 0.0]},
                                                                          {type: "LineString", coordinates: [[101.0, 0.0], [102.0, 1.0]]}]}),
-               GeoSet.of<GeoShape>(GeoPoint.of(100.0, 0.0),
-                                   GeoSpline.open(GeoSegment.of(101.0, 0.0, 102.0, 1.0))));
+               GeoGroup.of<GeoShape>(GeoPoint.of(100.0, 0.0),
+                                     GeoSpline.open(GeoSegment.of(101.0, 0.0, 102.0, 1.0))));
   }
 }
