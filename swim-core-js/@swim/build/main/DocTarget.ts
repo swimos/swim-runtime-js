@@ -58,7 +58,8 @@ export class DocTarget extends ConverterComponent {
       const fileName = sources[0]!.fileName;
       for (let i = 0; i < this.frameworkTargets.length; i += 1) {
         const target = this.frameworkTargets[i]!;
-        if (fileName.startsWith(target.project.baseDir)) {
+        const relativePath = Path.relative(target.project.baseDir, fileName);
+        if (!relativePath.startsWith("..") && !Path.isAbsolute(relativePath)) {
           this.onTargetDeclaration(target, context, reflection);
         }
       }

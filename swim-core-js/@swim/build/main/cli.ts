@@ -111,10 +111,10 @@ function runPublish(this: Cmd, args: {[name: string]: string | undefined}): void
       };
       return project.publish(options);
     }
-    if (args.recursive === void 0) {
-      build.forEachProject(args.projects!, publishProject);
-    } else {
+    if ("recursive" in args) {
       build.forEachTransitiveProject(args.projects!, publishProject, "main");
+    } else {
+      build.forEachProject(args.projects!, publishProject);
     }
   }, (reason: any): void => {
     console.log(reason);
