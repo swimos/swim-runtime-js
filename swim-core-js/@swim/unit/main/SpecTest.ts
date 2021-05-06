@@ -111,7 +111,12 @@ export class SpecTest {
       }
     } catch (error) {
       if (!(error instanceof TestException)) {
-        exam.proove(Proof.error(error));
+        try {
+          exam.proove(Proof.error(error));
+        } catch (failure) {
+          exam.proove(Proof.error(failure));
+          throw failure;
+        }
       }
       this.didRunTest(report, spec, exam, error);
       return Promise.resolve(exam);

@@ -47,7 +47,7 @@ export class StringParser<I, V> extends Parser<V> {
         input = input.step();
       }
       if (input.isCont()) {
-        if (c === 34/*'"'*/ || c === 39/*'\''*/ && (quote === c || quote === 0)) {
+        if ((c === 34/*'"'*/ || c === 39/*'\''*/) && (quote === c || quote === 0)) {
           input = input.step();
           output = output || recon.textOutput();
           quote = c;
@@ -65,7 +65,7 @@ export class StringParser<I, V> extends Parser<V> {
           c = input.head();
           if (c >= 0x20 && c !== quote && c !== 92/*'\\'*/) {
             input = input.step();
-            output!.write(c);
+            output = output!.write(c);
           } else {
             break;
           }
@@ -91,32 +91,32 @@ export class StringParser<I, V> extends Parser<V> {
               || c === 64/*'@'*/ || c === 91/*'['*/ || c === 92/*'\\'*/ || c === 93/*']'*/
               || c === 123/*'{'*/ || c === 125/*'}'*/) {
             input = input.step();
-            output!.write(c);
+            output = output!.write(c);
             step = 2;
             continue;
           } else if (c === 98/*'b'*/) {
             input = input.step();
-            output!.write(8/*'\b'*/);
+            output = output!.write(8/*'\b'*/);
             step = 2;
             continue;
           } else if (c === 102/*'f'*/) {
             input = input.step();
-            output!.write(12/*'\f'*/);
+            output = output!.write(12/*'\f'*/);
             step = 2;
             continue;
           } else if (c === 110/*'n'*/) {
             input = input.step();
-            output!.write(10/*'\n'*/);
+            output = output!.write(10/*'\n'*/);
             step = 2;
             continue;
           } else if (c === 114/*'r'*/) {
             input = input.step();
-            output!.write(13/*'\r'*/);
+            output = output!.write(13/*'\r'*/);
             step = 2;
             continue;
           } else if (c === 116/*'t'*/) {
             input = input.step();
-            output!.write(9/*'\t'*/);
+            output = output!.write(9/*'\t'*/);
             step = 2;
             continue;
           } else if (c === 117/*'u'*/) {
@@ -140,7 +140,7 @@ export class StringParser<I, V> extends Parser<V> {
                 step += 1;
                 continue;
               } else {
-                output!.write(code);
+                output = output!.write(code);
                 code = 0;
                 step = 2;
                 continue string;

@@ -37,6 +37,10 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     super();
   }
 
+  isDefinite(): boolean {
+    return !this.isEmpty();
+  }
+
   /**
    * Returns `true` if this `Record` has no members.
    */

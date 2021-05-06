@@ -202,6 +202,7 @@ export class Diagnostic implements Display {
                     note?: Diagnostic | null | string | undefined, cause?: Diagnostic | null): Diagnostic {
     if (arguments.length === 1) { // (input)
       cause = null;
+      severity = Severity.error();
     } else if (arguments.length === 2) {
       if (severity === null || severity instanceof Diagnostic) { // (input, cause)
         cause = severity;
@@ -250,9 +251,10 @@ export class Diagnostic implements Display {
   static expected(expected: string | number, input: Input, severity?: Severity, note?: string, cause?: Diagnostic | null): Diagnostic;
   static expected(expected: string | number, input: Input, severity?: Diagnostic | null | Severity | string | undefined,
                   note?: Diagnostic | null | string | undefined, cause?: Diagnostic | null): Diagnostic {
-    if (arguments.length === 1) { // (excpected, input)
+    if (arguments.length === 2) { // (excpected, input)
       cause = null;
-    } else if (arguments.length === 2) {
+      severity = Severity.error();
+    } else if (arguments.length === 3) {
       if (severity === null || severity instanceof Diagnostic) { // (excpected, input, cause)
         cause = severity;
         severity = Severity.error();
@@ -263,7 +265,7 @@ export class Diagnostic implements Display {
       } else { // (expected, input, severity)
         cause = null;
       }
-    } else if (arguments.length === 3) {
+    } else if (arguments.length === 4) {
       if (typeof severity === "string") { // (excpected, input, note, cause)
         cause = note as Diagnostic | null;
         note = severity;

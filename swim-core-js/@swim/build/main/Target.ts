@@ -864,9 +864,8 @@ export class Target {
     if (scriptPath !== void 0 && FS.existsSync(scriptPath)) {
       return new Promise<void>((resolve, reject): void => {
         const args: string[] = [];
-
         const t0 = Date.now();
-        const proc = ChildProcess.fork(scriptPath, args);
+        const proc = ChildProcess.fork(scriptPath, args, {cwd: this.project.baseDir});
         proc.on("exit", (code: number): void => {
           const dt = Date.now() - t0;
           if (code === 0) {

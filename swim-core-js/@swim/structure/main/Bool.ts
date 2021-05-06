@@ -31,6 +31,10 @@ export class Bool extends Value {
     });
   }
 
+  isDefinite(): boolean {
+    return this.value;
+  }
+
   isConstant(): boolean {
     return true;
   }

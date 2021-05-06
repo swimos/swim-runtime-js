@@ -48,6 +48,14 @@ export abstract class Field extends Item {
   }
 
   /**
+   * Always returns `true` because a `Field` cannot be one of:
+   * an empty `Record`, `False`, `Extant`, or `Absent`.
+   */
+  isDefinite(): boolean {
+    return true;
+  }
+
+  /**
    * Returns the key component of this `Field`.
    */
   abstract readonly key: Value;

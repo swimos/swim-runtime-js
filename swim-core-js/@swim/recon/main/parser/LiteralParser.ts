@@ -62,6 +62,9 @@ export class LiteralParser<I, V> extends Parser<V> {
         } else if (c === 34/*'"'*/ || c === 39/*'\''*/) {
           valueParser = recon.parseString(input);
           step = 2;
+        } else if (c === 96/*'`'*/) {
+          valueParser = recon.parseRawString(input);
+          step = 2;
         } else if (c === 45/*'-'*/ || c >= 48/*'0'*/ && c <= 57/*'9'*/) {
           valueParser = recon.parseNumber(input);
           step = 2;

@@ -74,6 +74,14 @@ export abstract class Value extends Item {
   }
 
   /**
+   * Returns `true` if this `Value` is not one of: an empty `Record`, `False`,
+   * `Extant`, or `Absent`.
+   */
+  isDefinite(): boolean {
+    return true;
+  }
+
+  /**
    * Always returns [[Absent]] because a `Value` can't be a `Field`, so it
    * can't have a key component.
    */

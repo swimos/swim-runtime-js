@@ -36,7 +36,7 @@ export class OrOperator extends BinaryOperator {
     interpreter.willOperate(this);
     let result: Item;
     const argument1 = this.operand1.evaluate(interpreter);
-    if (argument1.booleanValue(false)) {
+    if (argument1.isDefinite()) {
       result = argument1;
     } else {
       const argument2 = this.operand2.evaluate(interpreter);

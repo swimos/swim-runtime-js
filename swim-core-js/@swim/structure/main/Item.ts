@@ -52,9 +52,15 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
   abstract isDefined(): boolean;
 
   /**
-   * Returns `true` if this `Item is neither [[Extant]] nor [[Absent]].
+   * Returns `true` if this `Item` is neither [[Extant]] nor [[Absent]].
    */
   abstract isDistinct(): boolean;
+
+  /**
+   * Returns `true` if this `Item` is not one of: an empty `Record`, `False`,
+   * `Extant`, or `Absent`.
+   */
+  abstract isDefinite(): boolean;
 
   /**
    * Returns `true` if this `Item` always [[Item.evaluate evaluates]] to the

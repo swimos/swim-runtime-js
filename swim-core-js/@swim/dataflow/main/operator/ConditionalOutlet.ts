@@ -43,7 +43,7 @@ export class ConditionalOutlet extends AbstractOutlet<Value> {
     if (ifInput !== null) {
       const ifTerm = ifInput.get();
       if (ifTerm !== void 0) {
-        if (ifTerm.booleanValue(false)) {
+        if (ifTerm.isDefinite()) {
           const thenInput = this.thenInlet.input;
           if (thenInput !== null) {
             const thenTerm = thenInput.get();

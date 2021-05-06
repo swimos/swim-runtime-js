@@ -36,7 +36,7 @@ export class AndOutlet extends AbstractOutlet<Value> {
     const operand1Input = this.operand1Inlet.input;
     const argument1 = operand1Input !== null ? operand1Input.get() : void 0;
     if (argument1 !== void 0) {
-      if (argument1.booleanValue(false)) {
+      if (argument1.isDefinite()) {
         const operand2Input = this.operand2Inlet.input;
         const argument2 = operand2Input !== null ? operand2Input.get() : void 0;
         if (argument2 !== void 0) {

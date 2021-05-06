@@ -94,6 +94,35 @@ export class ReconParserSpec extends Spec {
   }
 
   @Test
+  parseEmptyRawStrings(exam: ReconExam): void {
+    exam.parses("``", Text.empty());
+    exam.parses(" `` ", Text.empty());
+    exam.parses("``````", Text.empty());
+    exam.parses(" `````` ", Text.empty());
+  }
+
+  @Test
+  parseNonEmptyRawStrings(exam: ReconExam): void {
+    exam.parses("`test`", Text.from("test"));
+    exam.parses("```test```", Text.from("test"));
+  }
+
+  @Test
+  parseRawStringsWithBackticks(exam: ReconExam): void {
+    exam.parses("``` ` ```", Text.from(" ` "));
+    exam.parses("``` `` ```", Text.from(" `` "));
+    exam.parses("``` \\` ```", Text.from(" ` "));
+    exam.parses("``` \\`\\` ```", Text.from(" `` "));
+    exam.parses("``` \\`\\`\\` ```", Text.from(" ``` "));
+  }
+
+  @Test
+  parseRawStringsWithBackslashes(exam: ReconExam): void {
+    exam.parses("``` \\ ```", Text.from(" \\ "));
+    exam.parses("``` \\\\` ```", Text.from(" \\` "));
+  }
+
+  @Test
   parseIdentifiers(exam: ReconExam): void {
     exam.parses("test", Text.from("test"));
   }

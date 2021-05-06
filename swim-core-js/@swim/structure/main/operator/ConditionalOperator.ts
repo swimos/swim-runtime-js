@@ -57,7 +57,7 @@ export class ConditionalOperator extends Operator {
     interpreter.willOperate(this);
     let result;
     const ifTerm = this.ifTerm.evaluate(interpreter);
-    if (ifTerm.booleanValue(false)) {
+    if (ifTerm.isDefinite()) {
       const theTerm = this.thenTerm.evaluate(interpreter);
       result = theTerm;
     } else {

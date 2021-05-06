@@ -44,6 +44,13 @@ export class Absent extends Value {
     return false;
   }
 
+  /**
+   * Always returns `false` because `Absent` is not a definite value.
+   */
+  isDefinite(): boolean {
+    return false;
+  }
+
   isConstant(): boolean {
     return true;
   }

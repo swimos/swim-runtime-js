@@ -35,10 +35,16 @@ export class Extant extends Value {
   }
 
   /**
-   * Always returns `false` because `Extant` is not a distinct
-   * value.
+   * Always returns `false` because `Extant` is not a distinct value.
    */
   isDistinct(): boolean {
+    return false;
+  }
+
+  /**
+   * Always returns `false` because `Extant` is not a definite value.
+   */
+  isDefinite(): boolean {
     return false;
   }
 
