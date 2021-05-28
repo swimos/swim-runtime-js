@@ -31,7 +31,7 @@ export class LengthParser extends Parser<Length> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<Length> {
+  override feed(input: Input): Parser<Length> {
     return LengthParser.parse(input, this.defaultUnits, this.valueParser,
                               this.unitsOutput, this.step);
   }

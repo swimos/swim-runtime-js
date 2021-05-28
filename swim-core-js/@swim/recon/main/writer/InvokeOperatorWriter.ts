@@ -32,7 +32,7 @@ export class InvokeOperatorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return InvokeOperatorWriter.write(output, this.recon, this.func, this.args,
                                       this.part, this.step);
   }

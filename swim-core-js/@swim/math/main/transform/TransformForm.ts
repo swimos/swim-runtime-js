@@ -25,9 +25,9 @@ export class TransformForm extends Form<Transform, AnyTransform> {
     });
   }
 
-  declare readonly unit: Transform | undefined;
+  override readonly unit!: Transform | undefined;
 
-  withUnit(unit: Transform | undefined): Form<Transform, AnyTransform> {
+  override withUnit(unit: Transform | undefined): Form<Transform, AnyTransform> {
     if (unit !== this.unit) {
       return new TransformForm(unit);
     } else {
@@ -35,12 +35,12 @@ export class TransformForm extends Form<Transform, AnyTransform> {
     }
   }
 
-  mold(transform: AnyTransform): Item {
+  override mold(transform: AnyTransform): Item {
     transform = Transform.fromAny(transform);
     return transform.toValue();
   }
 
-  cast(item: Item): Transform | undefined {
+  override cast(item: Item): Transform | undefined {
     const value = item.toValue();
     try {
       if (value instanceof Record) {

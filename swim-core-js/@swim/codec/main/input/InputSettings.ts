@@ -32,15 +32,15 @@ export interface InputSettingsInit {
  * configuration parameters to input consumers, such as [[Parser Parsers]].
  */
 export class InputSettings implements HashCode, Debug {
-  /** @hidden */
-  declare readonly stripped: boolean;
-
   protected constructor(stripped: boolean) {
     Object.defineProperty(this, "stripped", {
       value: stripped,
       enumerable: true,
     });
   }
+
+  /** @hidden */
+  readonly stripped!: boolean;
 
   /**
    * Returns `true` if input consumers should not include diagnostic metadata

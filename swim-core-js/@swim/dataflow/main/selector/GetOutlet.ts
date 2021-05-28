@@ -29,11 +29,11 @@ export class GetOutlet extends AbstractOutlet<Value> {
     });
   }
 
-  declare readonly keyInlet: OutletInlet<Value>;
+  readonly keyInlet!: OutletInlet<Value>;
 
-  declare readonly mapInlet: OutletMapInlet<Value, Value, unknown>;
+  readonly mapInlet!: OutletMapInlet<Value, Value, unknown>;
 
-  get(): Value {
+  override get(): Value {
     const keyInput = this.keyInlet.input;
     if (keyInput !== null) {
       const key = keyInput.get();

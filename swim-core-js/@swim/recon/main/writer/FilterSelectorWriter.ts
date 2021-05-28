@@ -33,7 +33,7 @@ export class FilterSelectorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return FilterSelectorWriter.write(output, this.recon, this.predicate,
                                       this.then, this.part, this.step);
   }

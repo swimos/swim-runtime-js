@@ -24,7 +24,7 @@ export class DateTimeParser extends Parser<DateTime> {
     this.dateParser = dateParser;
   }
 
-  feed(input: Input): Parser<DateTime> {
+  override feed(input: Input): Parser<DateTime> {
     return DateTimeParser.parse(input, this.dateParser);
   }
 

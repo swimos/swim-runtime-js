@@ -22,27 +22,27 @@ export class WriterEnd extends Writer<unknown, never> {
     super();
   }
 
-  isCont(): boolean {
+  override isCont(): boolean {
     return false;
   }
 
-  isDone(): boolean {
+  override isDone(): boolean {
     return true;
   }
 
-  pull(output: Output): Writer<unknown, never> {
+  override pull(output: Output): Writer<unknown, never> {
     return this;
   }
 
-  bind(): never {
+  override bind(): never {
     throw new WriterException();
   }
 
-  asDone<I2>(): Writer<I2, never> {
+  override asDone<I2>(): Writer<I2, never> {
     return this;
   }
 
-  andThen<O2>(that: Writer<unknown, O2>): Writer<unknown, O2> {
+  override andThen<O2>(that: Writer<unknown, O2>): Writer<unknown, O2> {
     return that;
   }
 }

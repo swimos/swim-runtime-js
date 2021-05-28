@@ -20,7 +20,7 @@ export class DeauthedResponse extends HostAddressed<DeauthedResponse> {
     super(body);
   }
 
-  protected copy(body: Value): DeauthedResponse {
+  protected override copy(body: Value): DeauthedResponse {
     return new DeauthedResponse(body);
   }
 

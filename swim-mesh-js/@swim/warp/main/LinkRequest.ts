@@ -21,7 +21,7 @@ export class LinkRequest extends LinkAddressed<LinkRequest> {
     super(node, lane, prio, rate, body);
   }
 
-  protected copy(node: Uri, lane: Uri, prio: number, rate: number, body: Value): LinkRequest {
+  protected override copy(node: Uri, lane: Uri, prio: number, rate: number, body: Value): LinkRequest {
     return new LinkRequest(node, lane, prio, rate, body);
   }
 

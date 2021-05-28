@@ -44,15 +44,15 @@ export class Constraint implements ConstraintKey, Debug {
     });
   }
 
-  declare readonly id: number;
+  readonly id!: number;
 
-  declare readonly scope: ConstraintScope;
+  readonly scope!: ConstraintScope;
 
-  declare readonly expression: ConstraintExpression;
+  readonly expression!: ConstraintExpression;
 
-  declare readonly relation: ConstraintRelation;
+  readonly relation!: ConstraintRelation;
 
-  declare readonly strength: ConstraintStrength;
+  readonly strength!: ConstraintStrength;
 
   isConstrained(): boolean {
     return this.scope.hasConstraint(this);

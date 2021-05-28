@@ -34,7 +34,7 @@ export class LambdaFuncParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return LambdaFuncParser.parse(input, this.recon, this.builder, this.bindingsParser,
                                   this.templateParser, this.step);
   }

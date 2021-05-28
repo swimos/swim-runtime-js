@@ -31,7 +31,7 @@ export class ScaleTransformParser extends Parser<ScaleTransform> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<ScaleTransform> {
+  override feed(input: Input): Parser<ScaleTransform> {
     return ScaleTransformParser.parse(input, this.identOutput, this.xParser, this.yParser, this.step);
   }
 

@@ -17,7 +17,7 @@ import {Item, Attr, Slot, Value, Record} from "@swim/structure";
 import {Converter} from "./Converter";
 
 export class HtmlConverter extends Converter {
-  convert<O>(model: Item, output: Output<O>): O {
+  override convert<O>(model: Item, output: Output<O>): O {
     if (model instanceof Record) {
       output = this.writeDocument(model, output);
     }

@@ -24,9 +24,9 @@ export abstract class UnaryOutlet extends AbstractOutlet<Value> {
     });
   }
 
-  declare readonly operandInlet: Inlet<Value>;
+  readonly operandInlet!: Inlet<Value>;
 
-  get(): Value {
+  override get(): Value {
     const operandInput = this.operandInlet.input;
     if (operandInput !== null) {
       const argument = operandInput.get();

@@ -17,7 +17,7 @@ import type {ProcessorContext} from "../processor/ProcessorContext";
 import {Directive} from "./Directive";
 
 export class TemplateDirective extends Directive {
-  evaluate(model: Item, params: Value, context: ProcessorContext): Item {
+  override evaluate(model: Item, params: Value, context: ProcessorContext): Item {
     params = context.evaluate(params);
 
     let path: Value | string | undefined = params.get("path");

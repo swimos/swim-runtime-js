@@ -26,7 +26,7 @@ export class DownlinkReifier extends Reifier {
 
   warp: WarpRef | null;
 
-  reify(item: Item): Item {
+  override reify(item: Item): Item {
     if (item instanceof Field) {
       return this.reifyField(item);
     } else {

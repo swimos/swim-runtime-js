@@ -18,11 +18,11 @@ import {Item} from "../Item";
 import {Func} from "./Func";
 
 export abstract class BridgeFunc extends Func {
-  get typeOrder(): number {
+  override get typeOrder(): number {
     return 51;
   }
 
-  compareTo(that: unknown): number {
+  override compareTo(that: unknown): number {
     if (that instanceof BridgeFunc) {
       return Constructors.compare(this.constructor, that.constructor);
     } else if (that instanceof Item) {
@@ -31,19 +31,19 @@ export abstract class BridgeFunc extends Func {
     return NaN;
   }
 
-  equivalentTo(that: unknown): boolean {
+  override equivalentTo(that: unknown): boolean {
     return this === that;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     return this === that;
   }
 
-  hashCode(): number {
+  override hashCode(): number {
     return Constructors.hash(this.constructor);
   }
 
-  debug(output: Output): void {
+  override debug(output: Output): void {
     output = output.write(this.constructor.name);
   }
 }

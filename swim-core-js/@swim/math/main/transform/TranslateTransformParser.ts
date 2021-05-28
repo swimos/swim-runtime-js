@@ -34,7 +34,7 @@ export class TranslateTransformParser extends Parser<TranslateTransform> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<TranslateTransform> {
+  override feed(input: Input): Parser<TranslateTransform> {
     return TranslateTransformParser.parse(input, this.identOutput, this.xParser, this.yParser, this.step);
   }
 

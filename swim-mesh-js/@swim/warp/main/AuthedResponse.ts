@@ -20,7 +20,7 @@ export class AuthedResponse extends HostAddressed<AuthedResponse> {
     super(body);
   }
 
-  protected copy(body: Value): AuthedResponse {
+  protected override copy(body: Value): AuthedResponse {
     return new AuthedResponse(body);
   }
 

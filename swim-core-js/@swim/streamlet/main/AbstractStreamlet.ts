@@ -88,7 +88,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
     });
   }
 
-  declare readonly streamletScope: StreamletScope<O> | null;
+  readonly streamletScope!: StreamletScope<O> | null;
 
   setStreamletScope(scope: StreamletScope<O> | null): void {
     Object.defineProperty(this, "streamletScope", {
@@ -98,7 +98,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
     });
   }
 
-  declare readonly streamletContext: StreamletContext | null;
+  readonly streamletContext!: StreamletContext | null;
 
   setStreamletContext(context: StreamletContext | null): void {
     Object.defineProperty(this, "streamletContext", {
@@ -109,7 +109,7 @@ export abstract class AbstractStreamlet<I = unknown, O = I> implements GenericSt
   }
 
   /** @hidden */
-  declare readonly version: number;
+  readonly version!: number;
 
   inlet(key: string): Inlet<I> | null;
   inlet<I2 extends I>(): Inlet<I2>;

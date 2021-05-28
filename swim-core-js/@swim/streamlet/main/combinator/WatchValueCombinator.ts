@@ -25,9 +25,9 @@ export class WatchValueCombinator<I> extends WatchValueOperator<I> {
   }
 
   /** @hidden */
-  declare readonly func: WatchValueFunction<I>;
+  readonly func!: WatchValueFunction<I>;
 
-  evaluate(value: I | undefined): void {
+  override evaluate(value: I | undefined): void {
     if (value !== void 0) {
       const func = this.func;
       return func(value);

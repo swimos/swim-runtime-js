@@ -27,22 +27,22 @@ export class UriHostIPv4 extends UriHost {
     });
   }
 
-  declare readonly address: string;
+  override readonly address!: string;
 
-  get ipv4(): string {
+  override get ipv4(): string {
     return this.address;
   }
 
-  debug(output: Output): void {
+  override debug(output: Output): void {
     output = output.write("UriHost").write(46/*'.'*/).write("ipv4")
         .write(40/*'('*/).debug(this.address).write(41/*')'*/);
   }
 
-  display(output: Output): void {
+  override display(output: Output): void {
     Uri.writeHost(this.address, output);
   }
 
-  toString(): string {
+  override toString(): string {
     return this.address;
   }
 }

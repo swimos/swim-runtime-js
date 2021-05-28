@@ -63,33 +63,33 @@ export class Diagnostic implements Display {
   }
 
   /** @hidden */
-  declare readonly input: Input;
+  readonly input!: Input;
 
   /**
    * The location in the `input` to which this diagnostic is attached.
    */
-  declare readonly tag: Tag;
+  readonly tag!: Tag;
 
   /**
    * The level of importance of this diagnostic.
    */
-  declare readonly severity: Severity;
+  readonly severity!: Severity;
 
   /**
    * The help message that describes this diagnostic.
    */
-  declare readonly message: string | undefined;
+  readonly message!: string | undefined;
 
   /**
    * An informative comment on the source context to which this diagnostic is attached.
    */
-  declare readonly note: string | undefined;
+  readonly note!: string | undefined;
 
   /**
    * The `Diagnostic` cause of this diagnostic, forming a linked chain of
    * diagnostics, or `null` if this diagnostic has no cause.
    */
-  declare readonly cause: Diagnostic | null;
+  readonly cause!: Diagnostic | null;
 
   private lineDigits(): number {
     let digits = Base10.countDigits(this.tag.end.line);

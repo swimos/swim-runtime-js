@@ -30,9 +30,9 @@ export class StreamletOutlet<O> extends AbstractOutlet<O> {
     });
   }
 
-  declare readonly streamlet: Streamlet<unknown, O>;
+  readonly streamlet!: Streamlet<unknown, O>;
 
-  get(): O | undefined {
+  override get(): O | undefined {
     const streamlet = this.streamlet as GenericStreamlet<unknown, O>;
     if (streamlet.getOutput !== void 0) {
       return streamlet.getOutput(this);
@@ -41,14 +41,14 @@ export class StreamletOutlet<O> extends AbstractOutlet<O> {
     }
   }
 
-  protected willDecohereInput(): void {
+  protected override willDecohereInput(): void {
     const streamlet = this.streamlet as GenericStreamlet<unknown, O>;
     if (streamlet.willDecohereOutlet !== void 0) {
       streamlet.willDecohereOutlet(this);
     }
   }
 
-  protected didDecohereInput(): void {
+  protected override didDecohereInput(): void {
     const streamlet = this.streamlet as GenericStreamlet<unknown, O>;
     if (streamlet.didDecohereOutlet !== void 0) {
       streamlet.didDecohereOutlet(this);
@@ -57,14 +57,14 @@ export class StreamletOutlet<O> extends AbstractOutlet<O> {
     }
   }
 
-  protected willRecohereInput(version: number): void {
+  protected override willRecohereInput(version: number): void {
     const streamlet = this.streamlet as GenericStreamlet<unknown, O>;
     if (streamlet.willRecohereOutlet !== void 0) {
       streamlet.willRecohereOutlet(this, version);
     }
   }
 
-  protected didRecohereInput(version: number): void {
+  protected override didRecohereInput(version: number): void {
     const streamlet = this.streamlet as GenericStreamlet<unknown, O>;
     if (streamlet.didRecohereOutlet !== void 0) {
       streamlet.didRecohereOutlet(this, version);

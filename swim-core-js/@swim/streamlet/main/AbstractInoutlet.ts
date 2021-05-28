@@ -37,13 +37,13 @@ export abstract class AbstractInoutlet<I, O> implements Inoutlet<I, O> {
     });
   }
 
-  declare readonly input: Outlet<I> | null;
+  readonly input!: Outlet<I> | null;
 
   /** @hidden */
-  declare readonly outputs: ReadonlyArray<Inlet<O>>;
+  readonly outputs!: ReadonlyArray<Inlet<O>>;
 
   /** @hidden */
-  declare readonly version: number;
+  readonly version!: number;
 
   bindInput(newInput: Outlet<I> | null): void {
     const oldInput = this.input;

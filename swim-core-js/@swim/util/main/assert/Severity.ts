@@ -42,12 +42,12 @@ export class Severity implements HashCode, Compare {
    * One of `TRACE_LEVEL`, `DEBUG_LEVEL`, `INFO_LEVEL`, `NOTE_LEVEL`,
    * `WARNING_LEVEL`, `ERROR_LEVEL`, `ALERT_LEVEL`, `FATAL_LEVEL`.
    */
-  declare readonly level: number;
+  readonly level!: number;
 
   /**
    * A descriptive label for this `Severity`.
    */
-  declare readonly label: string;
+  readonly label!: string;
 
   /**
    * Returns `true` if this `Severity` has `TRACE_LEVEL` of importance.

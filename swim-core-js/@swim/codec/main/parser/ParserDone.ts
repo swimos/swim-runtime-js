@@ -18,7 +18,7 @@ import {Parser} from "./Parser";
 /** @hidden */
 export class ParserDone<O> extends Parser<O> {
   /** @hidden */
-  declare readonly value: O;
+  readonly value!: O;
 
   constructor(value: O) {
     super();
@@ -28,19 +28,19 @@ export class ParserDone<O> extends Parser<O> {
     });
   }
 
-  isCont(): boolean {
+  override isCont(): boolean {
     return false;
   }
 
-  isDone(): boolean {
+  override isDone(): boolean {
     return true;
   }
 
-  feed(input: Input): Parser<O> {
+  override feed(input: Input): Parser<O> {
     return this;
   }
 
-  bind(): O {
+  override bind(): O {
     return this.value;
   }
 }

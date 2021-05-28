@@ -16,7 +16,7 @@ import type {Item, Value} from "@swim/structure";
 import {BinaryOutlet} from "./BinaryOutlet";
 
 export class BitwiseOrOutlet extends BinaryOutlet {
-  protected evaluate(argument1: Value, argument2: Value): Item {
+  protected override evaluate(argument1: Value, argument2: Value): Item {
     return argument1.bitwiseOr(argument2);
   }
 }

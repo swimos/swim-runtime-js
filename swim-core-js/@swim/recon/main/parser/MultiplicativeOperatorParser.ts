@@ -37,7 +37,7 @@ export class MultiplicativeOperatorParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return MultiplicativeOperatorParser.parse(input, this.recon, this.builder, this.lhsParser,
                                               this.operator, this.rhsParser, this.step);
   }

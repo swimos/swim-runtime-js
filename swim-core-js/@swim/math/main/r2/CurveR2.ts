@@ -33,7 +33,7 @@ export abstract class CurveR2 extends ShapeR2 implements Equals, Equivalent {
 
   abstract split(u: number): [CurveR2, CurveR2];
 
-  abstract transform(f: R2Function): CurveR2;
+  abstract override transform(f: R2Function): CurveR2;
 
   abstract drawMove(context: CurveR2Context): void;
 

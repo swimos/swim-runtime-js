@@ -35,7 +35,7 @@ export class UriUserParser extends Parser<UriUser> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<UriUser> {
+  override feed(input: Input): Parser<UriUser> {
     return UriUserParser.parse(input, this.uri, this.usernameOutput,
                                this.passwordOutput, this.c1, this.step);
   }

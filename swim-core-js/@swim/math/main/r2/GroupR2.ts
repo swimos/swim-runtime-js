@@ -32,39 +32,39 @@ export class GroupR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equ
     });
   }
 
-  declare readonly shapes: ReadonlyArray<S>;
+  readonly shapes!: ReadonlyArray<S>;
 
   isDefined(): boolean {
     return this.shapes.length !== 0;
   }
 
-  get xMin(): number {
+  override get xMin(): number {
     return this.bounds.xMin;
   }
 
-  get yMin(): number {
+  override get yMin(): number {
     return this.bounds.yMin;
   }
 
-  get xMax(): number {
+  override get xMax(): number {
     return this.bounds.xMax;
   }
 
-  get yMax(): number {
+  override get yMax(): number {
     return this.bounds.yMax;
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     return false; // TODO
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     return false; // TODO
   }
 
-  transform(f: R2Function): GroupR2 {
+  override transform(f: R2Function): GroupR2 {
     const oldShapes = this.shapes;
     const n = oldShapes.length;
     if (n > 0) {
@@ -79,9 +79,9 @@ export class GroupR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equ
   }
 
   /** @hidden */
-  declare readonly boundingBox: BoxR2 | null;
+  readonly boundingBox!: BoxR2 | null;
 
-  get bounds(): BoxR2 {
+  override get bounds(): BoxR2 {
     let boundingBox = this.boundingBox;
     if (boundingBox === null) {
       let xMin = Infinity;
@@ -140,7 +140,7 @@ export class GroupR2<S extends ShapeR2 = ShapeR2> extends ShapeR2 implements Equ
     output = output.write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 

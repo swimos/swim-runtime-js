@@ -25,13 +25,13 @@ export class ValueOutput<I> extends AbstractInlet<I> {
   }
 
   /** @hidden */
-  declare readonly state: I | undefined;
+  readonly state!: I | undefined;
 
   get(): I | undefined {
     return this.state;
   }
 
-  protected onRecohereOutput(version: number): void {
+  protected override onRecohereOutput(version: number): void {
     const input = this.input;
     if (input !== null) {
       Object.defineProperty(this, "state", {

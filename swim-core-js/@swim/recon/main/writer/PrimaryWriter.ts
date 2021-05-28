@@ -40,7 +40,7 @@ export class PrimaryWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return PrimaryWriter.write(output, this.recon, this.items, this.inParens, this.first,
                                this.item, this.next, this.part, this.step);
   }

@@ -27,7 +27,7 @@ export class UriPortParser extends Parser<UriPort> {
     this.number = number;
   }
 
-  feed(input: Input): Parser<UriPort> {
+  override feed(input: Input): Parser<UriPort> {
     return UriPortParser.parse(input, this.uri, this.number);
   }
 

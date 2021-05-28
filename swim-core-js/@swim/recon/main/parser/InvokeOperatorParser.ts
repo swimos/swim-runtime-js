@@ -35,7 +35,7 @@ export class InvokeOperatorParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return InvokeOperatorParser.parse(input, this.recon, this.builder,
                                       this.exprParser, this.argsParser, this.step);
   }

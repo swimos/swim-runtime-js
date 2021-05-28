@@ -27,7 +27,7 @@ export class MillisecondsInterval extends TimeInterval {
     this.stride = stride;
   }
 
-  offset(d: AnyDateTime, k?: number): DateTime {
+  override offset(d: AnyDateTime, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -35,7 +35,7 @@ export class MillisecondsInterval extends TimeInterval {
     return new DateTime(d, z);
   }
 
-  next(d: AnyDateTime, k?: number): DateTime {
+  override next(d: AnyDateTime, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -44,7 +44,7 @@ export class MillisecondsInterval extends TimeInterval {
     return new DateTime(d, z);
   }
 
-  floor(d: AnyDateTime): DateTime {
+  override floor(d: AnyDateTime): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     const stride = this.stride;
@@ -52,7 +52,7 @@ export class MillisecondsInterval extends TimeInterval {
     return new DateTime(d, z);
   }
 
-  ceil(d: AnyDateTime): DateTime {
+  override ceil(d: AnyDateTime): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     const stride = this.stride;

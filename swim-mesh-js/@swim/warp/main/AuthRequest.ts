@@ -20,7 +20,7 @@ export class AuthRequest extends HostAddressed<AuthRequest> {
     super(body);
   }
 
-  protected copy(body: Value): AuthRequest {
+  protected override copy(body: Value): AuthRequest {
     return new AuthRequest(body);
   }
 

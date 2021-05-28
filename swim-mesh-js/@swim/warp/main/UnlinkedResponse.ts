@@ -21,7 +21,7 @@ export class UnlinkedResponse extends LaneAddressed<UnlinkedResponse> {
     super(node, lane, body);
   }
 
-  protected copy(node: Uri, lane: Uri, body: Value): UnlinkedResponse {
+  protected override copy(node: Uri, lane: Uri, body: Value): UnlinkedResponse {
     return new UnlinkedResponse(node, lane, body);
   }
 

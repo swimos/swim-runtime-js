@@ -23,15 +23,15 @@ export class BTreeNodeCursor<K, V, U> extends NodeCursor<[K, V], BTreePage<K, V,
     super(pages, index, childIndex, childCursor);
   }
 
-  protected pageSize(page: BTreePage<K, V, U>): number {
+  protected override pageSize(page: BTreePage<K, V, U>): number {
     return page.size;
   }
 
-  protected pageCursor(page: BTreePage<K, V, U>): Cursor<[K, V]> {
+  protected override pageCursor(page: BTreePage<K, V, U>): Cursor<[K, V]> {
     return page.entries();
   }
 
-  protected reversePageCursor(page: BTreePage<K, V, U>): Cursor<[K, V]> {
+  protected override reversePageCursor(page: BTreePage<K, V, U>): Cursor<[K, V]> {
     return page.reverseEntries();
   }
 }

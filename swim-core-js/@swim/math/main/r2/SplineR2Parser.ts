@@ -49,7 +49,7 @@ export class SplineR2Parser extends Parser<SplineR2> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<SplineR2> {
+  override feed(input: Input): Parser<SplineR2> {
     return SplineR2Parser.parse(input, this.x0Parser, this.y0Parser,
                                 this.xParser, this.yParser,
                                 this.curveParser, this.curves,

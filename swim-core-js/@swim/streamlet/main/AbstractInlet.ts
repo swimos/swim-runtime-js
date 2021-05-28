@@ -29,10 +29,10 @@ export abstract class AbstractInlet<I> implements Inlet<I> {
     });
   }
 
-  declare readonly input: Outlet<I> | null;
+  readonly input!: Outlet<I> | null;
 
   /** @hidden */
-  declare readonly version: number;
+  readonly version!: number;
 
   bindInput(newInput: Outlet<I> | null): void {
     const oldInput = this.input;

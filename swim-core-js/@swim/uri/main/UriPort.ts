@@ -31,7 +31,7 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return this.number !== 0;
   }
 
-  declare readonly number: number;
+  readonly number!: number;
 
   valueOf(): number {
     return this.number;

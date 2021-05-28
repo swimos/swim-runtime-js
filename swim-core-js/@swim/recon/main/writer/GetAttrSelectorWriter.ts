@@ -32,7 +32,7 @@ export class GetAttrSelectorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return GetAttrSelectorWriter.write(output, this.recon, this.key, this.then,
                                        this.part, this.step);
   }

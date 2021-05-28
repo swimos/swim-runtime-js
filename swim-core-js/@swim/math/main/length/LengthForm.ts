@@ -29,11 +29,11 @@ export class LengthForm extends Form<Length, AnyLength> {
     });
   }
 
-  declare readonly defaultUnits: LengthUnits | undefined;
+  readonly defaultUnits!: LengthUnits | undefined;
 
-  declare readonly unit: Length | undefined;
+  override readonly unit!: Length | undefined;
 
-  withUnit(unit: Length | undefined): Form<Length, AnyLength> {
+  override withUnit(unit: Length | undefined): Form<Length, AnyLength> {
     if (unit !== this.unit) {
       return new LengthForm(this.defaultUnits, unit);
     } else {
@@ -41,12 +41,12 @@ export class LengthForm extends Form<Length, AnyLength> {
     }
   }
 
-  mold(length: AnyLength): Item {
+  override mold(length: AnyLength): Item {
     length = Length.fromAny(length, this.defaultUnits);
     return Text.from(length.toString());
   }
 
-  cast(item: Item): Length | undefined {
+  override cast(item: Item): Length | undefined {
     const value = item.toValue();
     let length: Length | null = null;
     try {

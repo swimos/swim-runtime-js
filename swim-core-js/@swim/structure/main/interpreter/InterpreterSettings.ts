@@ -36,7 +36,7 @@ export class InterpreterSettings implements Debug, HashCode {
     });
   }
 
-  declare readonly maxScopeDepth: number;
+  readonly maxScopeDepth!: number;
 
   withMaxScopeDepth(maxScopeDepth: number): InterpreterSettings {
     return this.copy(maxScopeDepth);

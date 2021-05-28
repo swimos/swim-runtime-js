@@ -30,7 +30,7 @@ export class RotateTransformParser extends Parser<RotateTransform> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<RotateTransform> {
+  override feed(input: Input): Parser<RotateTransform> {
     return RotateTransformParser.parse(input, this.identOutput, this.angleParser, this.step);
   }
 

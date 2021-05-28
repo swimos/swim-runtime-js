@@ -32,7 +32,7 @@ export class UriFragmentParser extends Parser<UriFragment> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<UriFragment> {
+  override feed(input: Input): Parser<UriFragment> {
     return UriFragmentParser.parse(input, this.uri, this.output, this.c1, this.step);
   }
 

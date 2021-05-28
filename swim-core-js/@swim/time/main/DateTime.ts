@@ -50,9 +50,9 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     return isFinite(new Date(this.time).getTime());
   }
 
-  declare readonly time: number;
+  readonly time!: number;
 
-  declare readonly zone: TimeZone;
+  readonly zone!: TimeZone;
 
   get year(): number {
     return this.toUTCLocalDate().getUTCFullYear();

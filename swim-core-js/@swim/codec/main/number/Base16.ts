@@ -39,7 +39,7 @@ export class Base16 {
    * Returns a 16 character string, where the character at index `i` is the
    * encoding of the base-16 digit `i`.
    */
-  declare readonly alphabet: string;
+  readonly alphabet!: string;
 
   /**
    * Returns the Unicode code point of the base-16 digit that encodes the given

@@ -18,7 +18,7 @@ import type {ProcessorContext} from "../processor/ProcessorContext";
 import {Directive} from "./Directive";
 
 export class ExportDirective extends Directive {
-  evaluate(model: Item, params: Value, context: ProcessorContext): Item {
+  override evaluate(model: Item, params: Value, context: ProcessorContext): Item {
     params = context.evaluate(params);
     const exportPath = params.stringValue();
     if (exportPath !== void 0) {

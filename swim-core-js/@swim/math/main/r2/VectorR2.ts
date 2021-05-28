@@ -40,9 +40,9 @@ export class VectorR2 implements Interpolate<VectorR2>, HashCode, Equivalent, De
     return isFinite(this.x) && isFinite(this.y);
   }
 
-  declare readonly x: number;
+  readonly x!: number;
 
-  declare readonly y: number;
+  readonly y!: number;
 
   plus(that: AnyVectorR2): VectorR2 {
     return new VectorR2(this.x + that.x, this.y + that.y);

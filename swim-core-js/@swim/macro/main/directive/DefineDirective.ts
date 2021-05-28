@@ -18,7 +18,7 @@ import {Directive} from "./Directive";
 import {ExpandDirective} from "./ExpandDirective";
 
 export class DefineDirective extends Directive {
-  evaluate(model: Item, params: Value, context: ProcessorContext): Item {
+  override evaluate(model: Item, params: Value, context: ProcessorContext): Item {
     const name = params.stringValue();
     if (name !== void 0) {
       const directive = new ExpandDirective(model);

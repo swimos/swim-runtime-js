@@ -37,35 +37,35 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     return this.shapes.length !== 0;
   }
 
-  declare readonly shapes: ReadonlyArray<S>;
+  readonly shapes!: ReadonlyArray<S>;
 
-  get lngMin(): number {
+  override get lngMin(): number {
     return this.bounds.lngMin;
   }
 
-  get latMin(): number {
+  override get latMin(): number {
     return this.bounds.latMin;
   }
 
-  get lngMax(): number {
+  override get lngMax(): number {
     return this.bounds.lngMax;
   }
 
-  get latMax(): number {
+  override get latMax(): number {
     return this.bounds.latMax;
   }
 
-  contains(that: AnyGeoShape): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyGeoShape | number, y?: number): boolean {
+  override contains(that: AnyGeoShape): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyGeoShape | number, y?: number): boolean {
     return false; // TODO
   }
 
-  intersects(that: AnyGeoShape): boolean {
+  override intersects(that: AnyGeoShape): boolean {
     return false; // TODO
   }
 
-  project(f: GeoProjection): GroupR2 {
+  override project(f: GeoProjection): GroupR2 {
     const oldShapes = this.shapes;
     const n = oldShapes.length;
     if (n > 0) {
@@ -80,9 +80,9 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
   }
 
   /** @hidden */
-  declare readonly boundingBox: GeoBox | null;
+  readonly boundingBox!: GeoBox | null;
 
-  get bounds(): GeoBox {
+  override get bounds(): GeoBox {
     let boundingBox = this.boundingBox;
     if (boundingBox === null) {
       let lngMin = Infinity;
@@ -116,7 +116,7 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoGroup) {
@@ -141,7 +141,7 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     output = output.write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 

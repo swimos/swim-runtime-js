@@ -17,7 +17,7 @@ import {Item, Attr, Slot, Value, Record, Text, Num} from "@swim/structure";
 import {Converter} from "./Converter";
 
 export class CssConverter extends Converter {
-  convert<O>(model: Item, output: Output<O>): O {
+  override convert<O>(model: Item, output: Output<O>): O {
     if (model instanceof Record) {
       output = this.writeStylesheet(model, output);
     } else if (model instanceof Text) {

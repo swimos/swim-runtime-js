@@ -21,7 +21,7 @@ export class CommandMessage extends LaneAddressed<CommandMessage> {
     super(node, lane, body);
   }
 
-  protected copy(node: Uri, lane: Uri, body: Value): CommandMessage {
+  protected override copy(node: Uri, lane: Uri, body: Value): CommandMessage {
     return new CommandMessage(node, lane, body);
   }
 

@@ -35,7 +35,7 @@ export class CurveR2Parser extends Parser<CurveR2> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<CurveR2> {
+  override feed(input: Input): Parser<CurveR2> {
     return CurveR2Parser.parse(input, this.x0Parser, this.y0Parser,
                                this.command, this.step);
   }

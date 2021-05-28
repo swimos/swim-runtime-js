@@ -29,7 +29,7 @@ export class StringWriter extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return StringWriter.write(output, this.string, this.index, this.escape, this.step);
   }
 

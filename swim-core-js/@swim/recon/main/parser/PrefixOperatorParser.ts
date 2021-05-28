@@ -35,7 +35,7 @@ export class PrefixOperatorParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return PrefixOperatorParser.parse(input, this.recon, this.builder,
                                       this.operator, this.operandParser, this.step);
   }

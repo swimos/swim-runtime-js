@@ -29,13 +29,13 @@ export class OutletInlet<I> extends AbstractInlet<I> {
     });
   }
 
-  declare readonly outlet: Outlet<unknown>;
+  readonly outlet!: Outlet<unknown>;
 
-  protected onDecohereOutput(): void {
+  protected override onDecohereOutput(): void {
     this.outlet.decohereInput();
   }
 
-  protected onRecohereOutput(version: number): void {
+  protected override onRecohereOutput(version: number): void {
     this.outlet.recohereInput(version);
   }
 }

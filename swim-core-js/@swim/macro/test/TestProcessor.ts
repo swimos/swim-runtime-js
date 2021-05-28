@@ -28,7 +28,7 @@ export class TestProcessor extends Processor {
     });
   }
 
-  declare readonly inputs: {readonly [path: string]: Item | undefined};
+  readonly inputs!: {readonly [path: string]: Item | undefined};
 
   getInput(path: string): Item | null {
     const input = this.inputs[path];
@@ -45,7 +45,7 @@ export class TestProcessor extends Processor {
     delete inputs[path];
   }
 
-  includeFile(path: string, type?: string): Item {
+  override includeFile(path: string, type?: string): Item {
     const input = this.getInput(path);
     if (input !== null) {
       return input;
@@ -54,7 +54,7 @@ export class TestProcessor extends Processor {
     }
   }
 
-  declare readonly outputs: {readonly [path: string]: string | undefined};
+  readonly outputs!: {readonly [path: string]: string | undefined};
 
   getOutput(path: string): string | null {
     const output = this.outputs[path];
@@ -71,7 +71,7 @@ export class TestProcessor extends Processor {
     delete outputs[path];
   }
 
-  exportFile(path: string, output: string): void {
+  override exportFile(path: string, output: string): void {
     this.addOutput(path, output);
   }
 }

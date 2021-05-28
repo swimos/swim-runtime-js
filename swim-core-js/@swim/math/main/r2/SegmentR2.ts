@@ -57,48 +57,48 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
         && isFinite(this.x1) && isFinite(this.y1);
   }
 
-  declare readonly x0: number;
+  readonly x0!: number;
 
-  declare readonly y0: number;
+  readonly y0!: number;
 
-  declare readonly x1: number;
+  readonly x1!: number;
 
-  declare readonly y1: number;
+  readonly y1!: number;
 
-  get xMin(): number {
+  override get xMin(): number {
     return Math.min(this.x0, this.x1);
   }
 
-  get yMin(): number {
+  override get yMin(): number {
     return Math.min(this.y0, this.y1);
   }
 
-  get xMax(): number {
+  override get xMax(): number {
     return Math.max(this.x0, this.x1);
   }
 
-  get yMax(): number {
+  override get yMax(): number {
     return Math.max(this.y0, this.y1);
   }
 
-  interpolateX(u: number): number {
+  override interpolateX(u: number): number {
     return (1.0 - u) * this.x0 + u * this.x1;
   }
 
-  interpolateY(u: number): number {
+  override interpolateY(u: number): number {
     return (1.0 - u) * this.y0 + u * this.y1;
   }
 
-  interpolate(u: number): PointR2 {
+  override interpolate(u: number): PointR2 {
     const v = 1.0 - u;
     const x01 = v * this.x0 + u * this.x1;
     const y01 = v * this.y0 + u * this.y1;
     return new PointR2(x01, y01);
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     if (typeof that === "number") {
       return SegmentR2.contains(this.x0, this.y0, this.x1, this.y1, that, y!);
     } else {
@@ -130,7 +130,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
         && (bx - ax) * (cy - ay) === (cx - ax) * (by - ay);
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     that = ShapeR2.fromAny(that);
     if (that instanceof PointR2) {
       return this.intersectsPoint(that);
@@ -176,7 +176,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
     }
   }
 
-  split(u: number): [SegmentR2, SegmentR2] {
+  override split(u: number): [SegmentR2, SegmentR2] {
     const v = 1.0 - u;
     const x01 = v * this.x0 + u * this.x1;
     const y01 = v * this.y0 + u * this.y1;
@@ -185,7 +185,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
     return [c0, c1];
   }
 
-  transform(f: R2Function): SegmentR2 {
+  override transform(f: R2Function): SegmentR2 {
     return new SegmentR2(f.transformX(this.x0, this.y0), f.transformY(this.x0, this.y0),
                          f.transformX(this.x1, this.y1), f.transformY(this.x1, this.y1));
   }
@@ -199,30 +199,30 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
     };
   }
 
-  drawMove(context: CurveR2Context): void {
+  override drawMove(context: CurveR2Context): void {
     context.moveTo(this.x0, this.y0);
   }
 
-  drawRest(context: CurveR2Context): void {
+  override drawRest(context: CurveR2Context): void {
     context.lineTo(this.x1, this.y1);
   }
 
-  transformDrawMove(context: CurveR2Context, f: R2Function): void {
+  override transformDrawMove(context: CurveR2Context, f: R2Function): void {
     context.moveTo(f.transformX(this.x0, this.y0), f.transformY(this.x0, this.y0));
   }
 
-  transformDrawRest(context: CurveR2Context, f: R2Function): void {
+  override transformDrawRest(context: CurveR2Context, f: R2Function): void {
     context.lineTo(f.transformX(this.x1, this.y1), f.transformY(this.x1, this.y1));
   }
 
-  writeMove(output: Output): void {
+  override writeMove(output: Output): void {
     output.write(77/*'M'*/);
     Format.displayNumber(this.x0, output)
     output.write(44/*','*/)
     Format.displayNumber(this.y0, output);
   }
 
-  writeRest(output: Output): void {
+  override writeRest(output: Output): void {
     output.write(76/*'L'*/);
     Format.displayNumber(this.x1, output)
     output.write(44/*','*/)
@@ -239,7 +239,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
     }
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof SegmentR2) {
@@ -251,7 +251,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof SegmentR2) {
@@ -273,7 +273,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
         .debug(this.x1).write(", ").debug(this.y1).write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 
@@ -285,7 +285,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
     return new SegmentR2(value.x0, value.y0, value.x1, value.y1);
   }
 
-  static fromAny(value: AnySegmentR2): SegmentR2 {
+  static override fromAny(value: AnySegmentR2): SegmentR2 {
     if (value === void 0 || value === null || value instanceof SegmentR2) {
       return value;
     } else if (SegmentR2.isInit(value)) {
@@ -307,7 +307,7 @@ export class SegmentR2 extends BezierCurveR2 implements Interpolate<SegmentR2>, 
   }
 
   /** @hidden */
-  static isAny(value: unknown): value is AnySegmentR2 {
+  static override isAny(value: unknown): value is AnySegmentR2 {
     return value instanceof SegmentR2
         || SegmentR2.isInit(value);
   }

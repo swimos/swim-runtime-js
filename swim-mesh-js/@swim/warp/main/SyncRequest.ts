@@ -21,7 +21,7 @@ export class SyncRequest extends LinkAddressed<SyncRequest> {
     super(node, lane, prio, rate, body);
   }
 
-  protected copy(node: Uri, lane: Uri, prio: number, rate: number, body: Value): SyncRequest {
+  protected override copy(node: Uri, lane: Uri, prio: number, rate: number, body: Value): SyncRequest {
     return new SyncRequest(node, lane, prio, rate, body);
   }
 

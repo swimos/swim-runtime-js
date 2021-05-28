@@ -48,7 +48,7 @@ export class EllipticCurveR2Parser extends Parser<EllipticCurveR2> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<EllipticCurveR2> {
+  override feed(input: Input): Parser<EllipticCurveR2> {
     return EllipticCurveR2Parser.parse(input, this.x0Parser, this.y0Parser,
                                        this.rxParser, this.ryParser,
                                        this.phiParser, this.large, this.sweep,

@@ -18,9 +18,9 @@ import {Writer} from "./Writer";
 /** @hidden */
 export class WriterSequence<O> extends Writer<never, O> {
   /** @hidden */
-  declare readonly head: Writer<unknown, unknown>;
+  readonly head!: Writer<unknown, unknown>;
   /** @hidden */
-  declare readonly tail: Writer<unknown, O>;
+  readonly tail!: Writer<unknown, O>;
 
   constructor(head: Writer<unknown, unknown>, tail: Writer<unknown, O>) {
     super();
@@ -34,7 +34,7 @@ export class WriterSequence<O> extends Writer<never, O> {
     });
   }
 
-  pull(output: Output): Writer<never, O> {
+  override pull(output: Output): Writer<never, O> {
     let head = this.head;
     if (head.isCont()) {
       head = head.pull(output);

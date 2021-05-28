@@ -32,10 +32,10 @@ export abstract class AbstractOutlet<O> implements Outlet<O> {
   }
 
   /** @hidden */
-  declare readonly outputs: ReadonlyArray<Inlet<O>>;
+  readonly outputs!: ReadonlyArray<Inlet<O>>;
 
   /** @hidden */
-  declare readonly version: number;
+  readonly version!: number;
 
   abstract get(): O | undefined;
 

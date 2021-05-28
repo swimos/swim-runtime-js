@@ -28,11 +28,11 @@ export class AndOutlet extends AbstractOutlet<Value> {
     });
   }
 
-  declare readonly operand1Inlet: Inlet<Value>;
+  readonly operand1Inlet!: Inlet<Value>;
 
-  declare readonly operand2Inlet: Inlet<Value>;
+  readonly operand2Inlet!: Inlet<Value>;
 
-  get(): Value {
+  override get(): Value {
     const operand1Input = this.operand1Inlet.input;
     const argument1 = operand1Input !== null ? operand1Input.get() : void 0;
     if (argument1 !== void 0) {

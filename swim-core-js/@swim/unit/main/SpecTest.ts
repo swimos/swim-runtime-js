@@ -44,17 +44,17 @@ export class SpecTest {
   /**
    * The name of this test–typically the name of the underlying test function.
    */
-  declare readonly name: string;
+  readonly name!: string;
 
   /**
    * The function used to evaluate this test.
    */
-  declare readonly func: TestFunc;
+  readonly func!: TestFunc;
 
   /**
    * The options that govern the evaluation of this test.
    */
-  declare readonly options: TestOptions;
+  readonly options!: TestOptions;
 
   /**
    * Lifecycle callback invoked before each evaluation of the test function.

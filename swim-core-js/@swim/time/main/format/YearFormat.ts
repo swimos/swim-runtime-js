@@ -19,11 +19,11 @@ import {YearParser} from "../"; // forward import
 
 /** @hidden */
 export class YearFormat extends DateTimeFormat {
-  writeDate(date: DateTime, output: Output): void {
+  override writeDate(date: DateTime, output: Output): void {
     DateTimeFormat.writeDateNumber4(date.year, output);
   }
 
-  parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
+  override parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
     return YearParser.parse(input, date);
   }
 }

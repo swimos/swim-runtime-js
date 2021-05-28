@@ -33,13 +33,13 @@ export class UriCache {
     });
   }
 
-  declare readonly base: Uri;
+  readonly base!: Uri;
 
   /** @hidden */
-  declare readonly resolveCache: HashGenCacheMap<Uri, Uri>;
+  readonly resolveCache!: HashGenCacheMap<Uri, Uri>;
 
   /** @hidden */
-  declare readonly unresolveCache: HashGenCacheMap<Uri, Uri>;
+  readonly unresolveCache!: HashGenCacheMap<Uri, Uri>;
 
   resolve(relative: AnyUri): Uri {
     relative = Uri.fromAny(relative);

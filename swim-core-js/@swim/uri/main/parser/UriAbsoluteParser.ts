@@ -44,7 +44,7 @@ export class UriAbsoluteParser extends Parser<Uri> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<Uri> {
+  override feed(input: Input): Parser<Uri> {
     return UriAbsoluteParser.parse(input, this.uri, this.schemeParser, this.authorityParser,
                                    this.pathParser, this.queryParser, this.fragmentParser, this.step);
   }

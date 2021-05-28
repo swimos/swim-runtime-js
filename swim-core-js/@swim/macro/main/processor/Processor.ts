@@ -44,7 +44,7 @@ export class Processor {
     this.initConverters();
   }
 
-  declare readonly directives: {readonly [name: string]: Directive | undefined};
+  readonly directives!: {readonly [name: string]: Directive | undefined};
 
   protected initDirectives(): void {
     this.addDirective("define", new DefineDirective());
@@ -86,7 +86,7 @@ export class Processor {
     delete directives[name];
   }
 
-  declare readonly converters: {readonly [name: string]: Converter | undefined};
+  readonly converters!: {readonly [name: string]: Converter | undefined};
 
   protected initConverters(): void {
     this.addConverter("recon", new ReconConverter());

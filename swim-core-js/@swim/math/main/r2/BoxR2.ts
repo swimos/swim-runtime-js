@@ -57,13 +57,13 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
         && isFinite(this.xMax) && isFinite(this.yMax);
   }
 
-  declare readonly xMin: number;
+  override readonly xMin!: number;
 
-  declare readonly yMin: number;
+  override readonly yMin!: number;
 
-  declare readonly xMax: number;
+  override readonly xMax!: number;
 
-  declare readonly yMax: number;
+  override readonly yMax!: number;
 
   get x(): number {
     return this.xMin;
@@ -101,9 +101,9 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
     return new PointR2((this.xMin + this.xMax) / 2, (this.yMin + this.yMax) / 2);
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     if (typeof that === "number") {
       return this.xMin <= that && that <= this.xMax
           && this.yMin <= y! && y! <= this.yMax;
@@ -153,7 +153,7 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
         && this.yMin <= that.cy - that.r && that.cy + that.r <= this.yMax;
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     that = ShapeR2.fromAny(that);
     if (that instanceof PointR2) {
       return this.intersectsPoint(that);
@@ -227,16 +227,16 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
     return dx * dx + dy * dy <= that.r * that.r;
   }
 
-  union(that: AnyShapeR2): BoxR2 {
+  override union(that: AnyShapeR2): BoxR2 {
     return super.union(that) as BoxR2;
   }
 
-  transform(f: R2Function): BoxR2 {
+  override transform(f: R2Function): BoxR2 {
     return new BoxR2(f.transformX(this.xMin, this.yMin), f.transformY(this.xMin, this.yMin),
                      f.transformX(this.xMax, this.yMax), f.transformY(this.xMax, this.yMax));
   }
 
-  get bounds(): BoxR2 {
+  override get bounds(): BoxR2 {
     return this;
   }
 
@@ -293,7 +293,7 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
         .debug(this.xMax).write(", ").debug(this.yMax).write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 
@@ -316,7 +316,7 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
     return new BoxR2(value.xMin, value.yMin, value.xMax, value.yMax);
   }
 
-  static fromAny(value: AnyBoxR2): BoxR2 {
+  static override fromAny(value: AnyBoxR2): BoxR2 {
     if (value === void 0 || value === null || value instanceof BoxR2) {
       return value;
     } else if (BoxR2.isInit(value)) {
@@ -338,7 +338,7 @@ export class BoxR2 extends ShapeR2 implements Interpolate<BoxR2>, HashCode, Equi
   }
 
   /** @hidden */
-  static isAny(value: unknown): value is AnyBoxR2 {
+  static override isAny(value: unknown): value is AnyBoxR2 {
     return value instanceof BoxR2
         || BoxR2.isInit(value);
   }

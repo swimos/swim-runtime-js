@@ -32,7 +32,7 @@ export class AffineTransformParser extends Parser<AffineTransform> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<AffineTransform> {
+  override feed(input: Input): Parser<AffineTransform> {
     return AffineTransformParser.parse(input, this.identOutput, this.entries, this.entryParser, this.step);
   }
 

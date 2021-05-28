@@ -35,7 +35,7 @@ export class SelectorParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return SelectorParser.parse(input, this.recon, this.builder,
                                 this.selector, this.valueParser, this.step);
   }

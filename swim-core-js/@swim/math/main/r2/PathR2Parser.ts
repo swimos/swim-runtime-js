@@ -30,7 +30,7 @@ export class PathR2Parser extends Parser<PathR2> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<PathR2> {
+  override feed(input: Input): Parser<PathR2> {
     return PathR2Parser.parse(input, this.splineParser, this.splines, this.step);
   }
 

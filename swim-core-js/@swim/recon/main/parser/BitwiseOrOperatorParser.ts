@@ -35,7 +35,7 @@ export class BitwiseOrOperatorParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return BitwiseOrOperatorParser.parse(input, this.recon, this.builder,
                                          this.lhsParser, this.rhsParser, this.step);
   }

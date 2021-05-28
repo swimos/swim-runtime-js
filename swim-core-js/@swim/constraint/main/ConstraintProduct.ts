@@ -35,9 +35,9 @@ export class ConstraintProduct implements ConstraintTerm, Debug {
     return false;
   }
 
-  declare readonly coefficient: number;
+  readonly coefficient!: number;
 
-  declare readonly variable: ConstraintVariable;
+  readonly variable!: ConstraintVariable;
 
   get terms(): ConstraintMap<ConstraintVariable, number> {
     const terms = new ConstraintMap<ConstraintVariable, number>();

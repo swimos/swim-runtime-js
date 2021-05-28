@@ -25,9 +25,9 @@ export class AnyForm extends Form<AnyItem> {
     });
   }
 
-  declare readonly unit: AnyItem | undefined;
+  override readonly unit!: AnyItem | undefined;
 
-  withUnit(unit: AnyItem | undefined): Form<AnyItem> {
+  override withUnit(unit: AnyItem | undefined): Form<AnyItem> {
     if (unit !== this.unit) {
       return new AnyForm(unit);
     } else {
@@ -35,7 +35,7 @@ export class AnyForm extends Form<AnyItem> {
     }
   }
 
-  mold(object: AnyItem, item?: Item): Item {
+  override mold(object: AnyItem, item?: Item): Item {
     object = Item.fromAny(object);
     if (item !== void 0) {
       object = item.concat(object);
@@ -43,7 +43,7 @@ export class AnyForm extends Form<AnyItem> {
     return object;
   }
 
-  cast(item: Item, object?: AnyItem): AnyItem | undefined {
+  override cast(item: Item, object?: AnyItem): AnyItem | undefined {
     return item.toAny();
   }
 }

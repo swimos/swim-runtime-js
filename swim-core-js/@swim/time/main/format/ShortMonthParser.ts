@@ -30,7 +30,7 @@ export class ShortMonthParser extends Parser<DateTimeInit> {
     this.output = output;
   }
 
-  feed(input: Input): Parser<DateTimeInit> {
+  override feed(input: Input): Parser<DateTimeInit> {
     return ShortMonthParser.parse(input, this.locale, this.date, this.output);
   }
 
@@ -39,7 +39,7 @@ export class ShortMonthParser extends Parser<DateTimeInit> {
     return DateTimeFormat.parseDateString(input, ShortMonthParser, locale, date, output);
   }
 
-  static bind(locale: DateTimeLocale, value: string, date: DateTimeInit, input: Input): Parser<DateTimeInit> {
+  static term(locale: DateTimeLocale, value: string, date: DateTimeInit, input: Input): Parser<DateTimeInit> {
     const month = locale.shortMonths.indexOf(value);
     if (month >= 0) {
       date.month = month;

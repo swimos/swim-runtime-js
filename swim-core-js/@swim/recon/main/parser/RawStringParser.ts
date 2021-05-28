@@ -31,7 +31,7 @@ export class RawStringParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return RawStringParser.parse(input, this.recon, this.output, this.count, this.step);
   }
 

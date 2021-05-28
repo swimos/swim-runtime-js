@@ -21,11 +21,11 @@ import {Base16} from "./Base16";
 /** @hidden */
 export class Base16Parser<O> extends Parser<O> {
   /** @hidden */
-  declare readonly output: Output<O>;
+  readonly output!: Output<O>;
   /** @hidden */
-  declare readonly p: number;
+  readonly p!: number;
   /** @hidden */
-  declare readonly step: number;
+  readonly step!: number;
 
   constructor(output: Output<O>, p: number = 0, step: number = 1) {
     super();
@@ -43,7 +43,7 @@ export class Base16Parser<O> extends Parser<O> {
     });
   }
 
-  feed(input: Input): Parser<O> {
+  override feed(input: Input): Parser<O> {
     return Base16Parser.parse(input, this.output.clone(), this.p, this.step);
   }
 

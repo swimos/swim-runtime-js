@@ -34,7 +34,7 @@ export class SkewTransformParser extends Parser<SkewTransform> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<SkewTransform> {
+  override feed(input: Input): Parser<SkewTransform> {
     return SkewTransformParser.parse(input, this.identOutput, this.xParser, this.yParser, this.step);
   }
 

@@ -51,31 +51,31 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
     return isFinite(this.cx) && isFinite(this.cy) && isFinite(this.r);
   }
 
-  declare readonly cx: number;
+  readonly cx!: number;
 
-  declare readonly cy: number;
+  readonly cy!: number;
 
-  declare readonly r: number;
+  readonly r!: number;
 
-  get xMin(): number {
+  override get xMin(): number {
     return this.cx - this.r;
   }
 
-  get yMin(): number {
+  override get yMin(): number {
     return this.cy - this.r;
   }
 
-  get xMax(): number {
+  override get xMax(): number {
     return this.cx + this.r;
   }
 
-  get yMax(): number {
+  override get yMax(): number {
     return this.cy + this.r;
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     if (typeof that === "number") {
       const dx = that - this.cx;
       const dy = y! - this.cy;
@@ -133,7 +133,7 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
     return dx * dx + dy * dy + that.r * that.r <= this.r * this.r;
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     that = ShapeR2.fromAny(that);
     if (that instanceof PointR2) {
       return this.intersectsPoint(that);
@@ -205,7 +205,7 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
     return dx * dx + dy * dy <= rr * rr;
   }
 
-  transform(f: R2Function): CircleR2 {
+  override transform(f: R2Function): CircleR2 {
     const cx = f.transformX(this.cx, this.cy);
     const cy = f.transformY(this.cx, this.cy);
     const rx = f.transformX(this.cx + this.r, this.cy);
@@ -264,7 +264,7 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
         .debug(this.cx).write(", ").debug(this.cy).write(", ").debug(this.r).write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 
@@ -276,7 +276,7 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
     return new CircleR2(value.cx, value.cy, value.r);
   }
 
-  static fromAny(value: AnyCircleR2): CircleR2 {
+  static override fromAny(value: AnyCircleR2): CircleR2 {
     if (value === void 0 || value === null || value instanceof CircleR2) {
       return value;
     } else if (CircleR2.isInit(value)) {
@@ -297,7 +297,7 @@ export class CircleR2 extends ShapeR2 implements Interpolate<CircleR2>, HashCode
   }
 
   /** @hidden */
-  static isAny(value: unknown): value is AnyCircleR2 {
+  static override isAny(value: unknown): value is AnyCircleR2 {
     return value instanceof CircleR2
         || CircleR2.isInit(value);
   }

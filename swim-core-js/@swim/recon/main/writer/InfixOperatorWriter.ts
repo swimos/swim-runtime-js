@@ -37,7 +37,7 @@ export class InfixOperatorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return InfixOperatorWriter.write(output, this.recon, this.lhs, this.operator, this.rhs,
                                      this.precedence, this.part, this.step);
   }

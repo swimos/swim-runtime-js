@@ -37,7 +37,7 @@ export class ConditionalOperatorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return ConditionalOperatorWriter.write(output, this.recon, this.ifTerm, this.thenTerm,
                                            this.elseTerm, this.precedence, this.part, this.step);
   }

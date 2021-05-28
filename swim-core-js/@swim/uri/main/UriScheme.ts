@@ -31,7 +31,7 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     return this.name.length !== 0;
   }
 
-  declare readonly name: string;
+  readonly name!: string;
 
   toAny(): string | undefined {
     return this.name.length !== 0 ? this.name : void 0;

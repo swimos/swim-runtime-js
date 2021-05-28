@@ -15,7 +15,7 @@
 import {AbstractInoutlet} from "../AbstractInoutlet";
 
 export abstract class MapValueOperator<I, O> extends AbstractInoutlet<I, O> {
-  get(): O | undefined {
+  override get(): O | undefined {
     const input = this.input;
     if (input !== null) {
       return this.evaluate(input.get());

@@ -315,9 +315,9 @@ export class Build {
       const target = targets[i]!;
       const result = callback(target);
       if (result !== void 0) {
-        return result.then(this.forEachTransitiveTarget.bind(this, targets, callback, i + 1));
+        return result.then(this.forEachTarget.bind(this, targets, callback, i + 1));
       } else {
-        return Promise.resolve(void 0).then(this.forEachTransitiveTarget.bind(this, targets, callback, i + 1));
+        return Promise.resolve(void 0).then(this.forEachTarget.bind(this, targets, callback, i + 1));
       }
     } else {
       return Promise.resolve(void 0);

@@ -27,7 +27,7 @@ export abstract class GeoCurve extends GeoShape implements Equals, Equivalent {
 
   abstract split(u: number): [GeoCurve, GeoCurve];
 
-  abstract project(f: GeoProjection): CurveR2;
+  abstract override project(f: GeoProjection): CurveR2;
 
   abstract forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
   abstract forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
@@ -39,5 +39,5 @@ export abstract class GeoCurve extends GeoShape implements Equals, Equivalent {
 
   abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
-  abstract equals(that: unknown): boolean;
+  abstract override equals(that: unknown): boolean;
 }

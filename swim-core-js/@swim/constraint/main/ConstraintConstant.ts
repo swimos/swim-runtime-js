@@ -43,7 +43,7 @@ export class ConstraintConstant implements ConstraintTerm, Debug {
     return new ConstraintMap<ConstraintVariable, number>();
   }
 
-  declare readonly constant: number;
+  readonly constant!: number;
 
   plus(that: AnyConstraintExpression): ConstraintExpression {
     that = ConstraintExpression.fromAny(that);

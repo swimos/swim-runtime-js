@@ -35,27 +35,27 @@ export class EventDownlink extends Downlink {
   }
 
   /** @hidden */
-  declare readonly model: EventDownlinkModel | null;
+  override readonly model!: EventDownlinkModel | null;
 
   /** @hidden */
-  declare readonly observers: ReadonlyArray<EventDownlinkObserver>;
+  override readonly observers!: ReadonlyArray<EventDownlinkObserver>;
 
-  get type(): DownlinkType {
+  override get type(): DownlinkType {
     return "event";
   }
 
-  protected copy(context: DownlinkContext, owner: DownlinkOwner | null,
-                 hostUri: Uri, nodeUri: Uri, laneUri: Uri, prio: number, rate: number,
-                 body: Value, flags: number, observers: ReadonlyArray<EventDownlinkObserver>): EventDownlink {
+  protected override copy(context: DownlinkContext, owner: DownlinkOwner | null,
+                          hostUri: Uri, nodeUri: Uri, laneUri: Uri, prio: number, rate: number,
+                          body: Value, flags: number, observers: ReadonlyArray<EventDownlinkObserver>): EventDownlink {
     return new EventDownlink(context, owner, void 0, hostUri, nodeUri, laneUri,
                              prio, rate, body, flags, observers);
   }
 
-  observe(observer: EventDownlinkObserver): this {
+  override observe(observer: EventDownlinkObserver): this {
     return super.observe(observer);
   }
 
-  open(): this {
+  override open(): this {
     const laneUri = this.ownLaneUri;
     if (laneUri.isEmpty()) {
       throw new Error("no lane");

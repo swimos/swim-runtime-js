@@ -20,7 +20,7 @@ export class DeauthRequest extends HostAddressed<DeauthRequest> {
     super(body);
   }
 
-  protected copy(body: Value): DeauthRequest {
+  protected override copy(body: Value): DeauthRequest {
     return new DeauthRequest(body);
   }
 

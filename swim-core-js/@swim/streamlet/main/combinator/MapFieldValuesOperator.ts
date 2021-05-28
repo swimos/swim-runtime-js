@@ -17,7 +17,7 @@ import {BTree} from "@swim/collections";
 import {AbstractMapInoutlet} from "../AbstractMapInoutlet";
 
 export abstract class MapFieldValuesOperator<K, VI, VO, I> extends AbstractMapInoutlet<K, VI, VO, I, Map<K, VO>> {
-  has(key: K): boolean {
+  override has(key: K): boolean {
     const input = this.input;
     if (input !== null) {
       return input.has(key);
@@ -26,9 +26,9 @@ export abstract class MapFieldValuesOperator<K, VI, VO, I> extends AbstractMapIn
     }
   }
 
-  get(): Map<K, VO>;
-  get(key: K): VO | undefined;
-  get(key?: K): Map<K, VO> | VO | undefined {
+  override get(): Map<K, VO>;
+  override get(key: K): VO | undefined;
+  override get(key?: K): Map<K, VO> | VO | undefined {
     if (key === void 0) {
       const output = new BTree<K, VO>();
       const keys = this.keyIterator();
@@ -55,7 +55,7 @@ export abstract class MapFieldValuesOperator<K, VI, VO, I> extends AbstractMapIn
     }
   }
 
-  keyIterator(): Iterator<K> {
+  override keyIterator(): Iterator<K> {
     const input = this.input;
     if (input !== null) {
       return input.keyIterator(); // TODO: filter keys

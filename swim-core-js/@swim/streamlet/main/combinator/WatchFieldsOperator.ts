@@ -16,7 +16,7 @@ import {KeyEffect} from "../KeyEffect";
 import {AbstractMapInlet} from "../AbstractMapInlet";
 
 export abstract class WatchFieldsOperator<K, V, O> extends AbstractMapInlet<K, V, O> {
-  protected onRecohereOutputKey(key: K, effect: KeyEffect, version: number): void {
+  protected override onRecohereOutputKey(key: K, effect: KeyEffect, version: number): void {
     if (effect === KeyEffect.Update) {
       const input = this.input;
       if (input !== null) {

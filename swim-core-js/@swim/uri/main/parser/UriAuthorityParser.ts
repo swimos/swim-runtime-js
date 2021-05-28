@@ -37,7 +37,7 @@ export class UriAuthorityParser extends Parser<UriAuthority> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<UriAuthority> {
+  override feed(input: Input): Parser<UriAuthority> {
     return UriAuthorityParser.parse(input, this.uri, this.userParser, this.hostParser,
                                     this.portParser, this.step);
   }

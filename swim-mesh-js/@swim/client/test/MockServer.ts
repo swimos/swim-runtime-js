@@ -51,18 +51,18 @@ export class MockServer {
     this.onError = this.onError.bind(this);
   }
 
-  declare readonly hostUri: Uri;
+  readonly hostUri!: Uri;
 
-  declare readonly client: WarpClient;
-
-  /** @hidden */
-  declare readonly httpServer: http.Server | null;
+  readonly client!: WarpClient;
 
   /** @hidden */
-  declare readonly wsServer: ws.Server | null;
+  readonly httpServer!: http.Server | null;
 
   /** @hidden */
-  declare readonly socket: ws | null;
+  readonly wsServer!: ws.Server | null;
+
+  /** @hidden */
+  readonly socket!: ws | null;
 
   resolve(relative: AnyUri): Uri {
     relative = Uri.fromAny(relative);

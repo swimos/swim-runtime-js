@@ -30,7 +30,7 @@ export class UriSchemeParser extends Parser<UriScheme> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<UriScheme> {
+  override feed(input: Input): Parser<UriScheme> {
     return UriSchemeParser.parse(input, this.uri, this.output, this.step);
   }
 

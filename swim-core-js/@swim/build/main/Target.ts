@@ -50,7 +50,7 @@ export class Target {
 
   readonly compilerOptions: ts.CompilerOptions;
   readonly emittedSourceFiles: ts.SourceFile[];
-  program: ts.Program | undefined;
+  program: ts.Program | null;
   linter: ESLint | null;
 
   selected: boolean;
@@ -77,7 +77,7 @@ export class Target {
 
     this.compilerOptions = config.compilerOptions || this.project.compilerOptions;
     this.emittedSourceFiles = [];
-    this.program = void 0;
+    this.program = null;
     this.linter = null;
 
     this.selected = false;
@@ -276,10 +276,10 @@ export class Target {
       rootNames.push(this.baseDir);
       const solutionBuilderHost = ts.createSolutionBuilderHost(ts.sys, this.createProgram as ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram>,
                                                                this.onCompileError, this.onCompileUpdate);
-      const solutionBuilder = ts.createSolutionBuilder(solutionBuilderHost, rootNames, {incremental: true, watch: true});
+      const solutionBuilder = ts.createSolutionBuilder(solutionBuilderHost, rootNames, {incremental: true});
 
       this.compileStart = Date.now();
-      solutionBuilder.build();
+      solutionBuilder.build(this.baseDir);
 
       return this.lint()
         .then((): Promise<unknown> => {
@@ -292,7 +292,7 @@ export class Target {
           } else {
             this.onCompileFailure();
           }
-          this.program = void 0;
+          this.program = null;
           return Promise.resolve(void 0);
         });
     }
@@ -319,10 +319,11 @@ export class Target {
     rootNames.push(this.baseDir);
     const solutionBuilderHost = ts.createSolutionBuilderWithWatchHost(ts.sys, this.createProgram as ts.CreateProgram<ts.EmitAndSemanticDiagnosticsBuilderProgram>,
                                                                       this.onCompileError, this.onCompileUpdate, this.onCompileResult);
-    const solutionBuilder = ts.createSolutionBuilderWithWatch(solutionBuilderHost, rootNames, {incremental: true, watch: true});
+    const solutionBuilder = ts.createSolutionBuilderWithWatch(solutionBuilderHost, rootNames, {incremental: true});
 
     this.watching = true;
-    solutionBuilder.build();
+    this.compileStart = Date.now();
+    solutionBuilder.build(this.baseDir);
   }
 
   private createProgram(rootNames: ReadonlyArray<string>,
@@ -346,7 +347,7 @@ export class Target {
   }
 
   protected onEmitSourceFile(sourceFile: ts.SourceFile): void {
-    if (this.program !== void 0 && !this.program.isSourceFileFromExternalLibrary(sourceFile)
+    if (this.program !== null && !this.program.isSourceFileFromExternalLibrary(sourceFile)
         && !this.program.isSourceFileDefaultLibrary(sourceFile)
         && sourceFile.fileName.indexOf(".d.ts") < 0
         && this.emittedSourceFiles.indexOf(sourceFile) < 0) {

@@ -60,16 +60,16 @@ export abstract class BaseRef implements DownlinkOwner, WarpRef {
   }
 
   /** @hidden */
-  declare readonly context: RefContext;
+  readonly context!: RefContext;
 
   /** @hidden */
-  declare readonly host: Host | null;
+  readonly host!: Host | null;
 
   /** @hidden */
-  declare readonly downlinks: Downlink[];
+  readonly downlinks!: Downlink[];
 
   /** @hidden */
-  declare readonly observers: ReadonlyArray<WarpObserver>;
+  readonly observers!: ReadonlyArray<WarpObserver>;
 
   abstract readonly hostUri: Uri;
 

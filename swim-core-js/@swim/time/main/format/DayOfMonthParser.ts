@@ -29,7 +29,7 @@ export class DayOfMonthParser extends Parser<DateTimeInit> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<DateTimeInit> {
+  override feed(input: Input): Parser<DateTimeInit> {
     return DayOfMonthParser.parse(input, this.date, this.day, this.step);
   }
 
@@ -37,7 +37,7 @@ export class DayOfMonthParser extends Parser<DateTimeInit> {
     return DateTimeFormat.parseDateNumber(input, DayOfMonthParser, "day of month", 2, 2, date, day, step);
   }
 
-  static bind(day: number, date: DateTimeInit): Parser<DateTimeInit> {
+  static term(day: number, date: DateTimeInit): Parser<DateTimeInit> {
     date.day = day;
     return Parser.done(date);
   }

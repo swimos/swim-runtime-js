@@ -27,7 +27,7 @@ export class TransformListParser extends Parser<Transform> {
     this.transformParser = transformParser;
   }
 
-  feed(input: Input): Parser<Transform> {
+  override feed(input: Input): Parser<Transform> {
     return TransformListParser.parse(input, this.transform, this.transformParser);
   }
 

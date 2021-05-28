@@ -17,7 +17,7 @@ import type {ProcessorContext} from "../processor/ProcessorContext";
 import {Directive} from "./Directive";
 
 export class IfDirective extends Directive {
-  evaluate(model: Item, params: Value, context: ProcessorContext): Item {
+  override evaluate(model: Item, params: Value, context: ProcessorContext): Item {
     if (model instanceof Record) {
       const n = model.length;
       let i = 0;

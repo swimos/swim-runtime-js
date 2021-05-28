@@ -29,7 +29,7 @@ export class MillisecondParser extends Parser<DateTimeInit> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<DateTimeInit> {
+  override feed(input: Input): Parser<DateTimeInit> {
     return MillisecondParser.parse(input, this.date, this.millisecond, this.step);
   }
 
@@ -37,7 +37,7 @@ export class MillisecondParser extends Parser<DateTimeInit> {
     return DateTimeFormat.parseDateNumber(input, MillisecondParser, "millisecond", 1, 3, date, millisecond, step);
   }
 
-  static bind(millisecond: number, date: DateTimeInit): Parser<DateTimeInit> {
+  static term(millisecond: number, date: DateTimeInit): Parser<DateTimeInit> {
     date.millisecond = millisecond;
     return Parser.done(date);
   }

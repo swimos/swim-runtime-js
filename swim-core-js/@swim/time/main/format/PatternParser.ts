@@ -34,7 +34,7 @@ export class PatternParser extends Parser<DateTimeInit> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<DateTimeInit> {
+  override feed(input: Input): Parser<DateTimeInit> {
     return PatternParser.parse(input, this.pattern, this.specifiers, this.date,
                                      this.dateParser, this.step);
   }

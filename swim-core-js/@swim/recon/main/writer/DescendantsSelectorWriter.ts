@@ -28,7 +28,7 @@ export class DescendantsSelectorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return DescendantsSelectorWriter.write(output, this.recon, this.then, this.step);
   }
 

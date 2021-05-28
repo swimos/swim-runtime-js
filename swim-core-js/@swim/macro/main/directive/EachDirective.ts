@@ -17,7 +17,7 @@ import type {ProcessorContext} from "../processor/ProcessorContext";
 import {Directive} from "./Directive";
 
 export class EachDirective extends Directive {
-  evaluate(model: Item, params: Value, context: ProcessorContext): Item {
+  override evaluate(model: Item, params: Value, context: ProcessorContext): Item {
     if (params instanceof Record) {
       return this.evaluateEach(model, params, context);
     }

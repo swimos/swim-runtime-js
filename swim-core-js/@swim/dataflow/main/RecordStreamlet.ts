@@ -16,7 +16,7 @@ import {Value, Record} from "@swim/structure";
 import {Inlet, Outlet, StreamletContext, StreamletScope, Streamlet, AbstractStreamlet} from "@swim/streamlet";
 
 export abstract class RecordStreamlet<I extends Value = Value, O extends Value = I> extends Record implements Streamlet<I, O> {
-  isConstant(): boolean {
+  override isConstant(): boolean {
     return false;
   }
 

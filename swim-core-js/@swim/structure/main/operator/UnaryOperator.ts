@@ -26,18 +26,18 @@ export abstract class UnaryOperator extends Operator {
     });
   }
 
-  declare readonly operand: Item;
+  readonly operand!: Item;
 
   abstract readonly operator: string;
 
-  isConstant(): boolean {
+  override isConstant(): boolean {
     return this.operand.isConstant();
   }
 
-  interpolateTo(that: UnaryOperator): Interpolator<UnaryOperator>;
-  interpolateTo(that: Item): Interpolator<Item>;
-  interpolateTo(that: unknown): Interpolator<Item> | null;
-  interpolateTo(that: unknown): Interpolator<Item> | null {
+  override interpolateTo(that: UnaryOperator): Interpolator<UnaryOperator>;
+  override interpolateTo(that: Item): Interpolator<Item>;
+  override interpolateTo(that: unknown): Interpolator<Item> | null;
+  override interpolateTo(that: unknown): Interpolator<Item> | null {
     if (that instanceof UnaryOperator && this.operator === that.operator) {
       return UnaryOperatorInterpolator(this, that);
     } else {

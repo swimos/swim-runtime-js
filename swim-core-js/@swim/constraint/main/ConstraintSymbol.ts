@@ -50,7 +50,7 @@ export class ConstraintSlack implements ConstraintSymbol {
     });
   }
 
-  declare readonly id: number;
+  readonly id!: number;
 
   isExternal(): boolean {
     return false;
@@ -86,7 +86,7 @@ export class ConstraintDummy implements ConstraintSymbol {
     });
   }
 
-  declare readonly id: number;
+  readonly id!: number;
 
   isExternal(): boolean {
     return false;
@@ -122,7 +122,7 @@ export class ConstraintError implements ConstraintSymbol {
     });
   }
 
-  declare readonly id: number;
+  readonly id!: number;
 
   isExternal(): boolean {
     return false;

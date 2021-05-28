@@ -29,7 +29,7 @@ export class MarkupTextWriter extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return MarkupTextWriter.write(output, this.text, this.index, this.escape, this.step);
   }
 

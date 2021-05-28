@@ -30,7 +30,7 @@ export class PeriodParser extends Parser<DateTimeInit> {
     this.output = output;
   }
 
-  feed(input: Input): Parser<DateTimeInit> {
+  override feed(input: Input): Parser<DateTimeInit> {
     return PeriodParser.parse(input, this.locale, this.date, this.output);
   }
 
@@ -39,7 +39,7 @@ export class PeriodParser extends Parser<DateTimeInit> {
     return DateTimeFormat.parseDateString(input, PeriodParser, locale, date, output);
   }
 
-  static bind(locale: DateTimeLocale, value: string, date: DateTimeInit, input: Input): Parser<DateTimeInit> {
+  static term(locale: DateTimeLocale, value: string, date: DateTimeInit, input: Input): Parser<DateTimeInit> {
     const period = locale.months.indexOf(value);
     if (period >= 0) {
       date.hour = (date.hour || 0) + 12 * period;

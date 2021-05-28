@@ -30,7 +30,7 @@ export class UriHostLiteralParser extends Parser<UriHost> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<UriHost> {
+  override feed(input: Input): Parser<UriHost> {
     return UriHostLiteralParser.parse(input, this.uri, this.output, this.step);
   }
 

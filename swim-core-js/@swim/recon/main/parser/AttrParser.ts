@@ -32,7 +32,7 @@ export class AttrParser<I, V> extends Parser<I> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<I> {
+  override feed(input: Input): Parser<I> {
     return AttrParser.parse(input, this.recon, this.keyParser,
                             this.valueParser, this.step);
   }

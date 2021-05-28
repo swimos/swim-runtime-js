@@ -25,9 +25,9 @@ export class MapValueCombinator<I, O> extends MapValueOperator<I, O> {
   }
 
   /** @hidden */
-  declare readonly func: MapValueFunction<I, O>;
+  readonly func!: MapValueFunction<I, O>;
 
-  evaluate(value: I | undefined): O | undefined {
+  override evaluate(value: I | undefined): O | undefined {
     if (value !== void 0) {
       const func = this.func;
       return func(value);

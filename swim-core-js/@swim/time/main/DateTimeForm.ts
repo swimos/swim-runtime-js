@@ -25,9 +25,9 @@ export class DateTimeForm extends Form<DateTime, AnyDateTime> {
     });
   }
 
-  declare readonly unit: DateTime | undefined;
+  override readonly unit: DateTime | undefined;
 
-  withUnit(unit: DateTime | undefined): Form<DateTime, AnyDateTime> {
+  override withUnit(unit: DateTime | undefined): Form<DateTime, AnyDateTime> {
     if (unit !== this.unit) {
       return new DateTimeForm(unit);
     } else {
@@ -35,12 +35,12 @@ export class DateTimeForm extends Form<DateTime, AnyDateTime> {
     }
   }
 
-  mold(date: AnyDateTime): Item {
+  override mold(date: AnyDateTime): Item {
     date = DateTime.fromAny(date);
     return Text.from(date.toString());
   }
 
-  cast(value: Value): DateTime | undefined {
+  override cast(value: Value): DateTime | undefined {
     let date: DateTime | null = null;
     try {
       date = DateTime.fromValue(value);

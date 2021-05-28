@@ -34,7 +34,7 @@ export class UriHostAddressParser extends Parser<UriHost> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<UriHost> {
+  override feed(input: Input): Parser<UriHost> {
     return UriHostAddressParser.parse(input, this.uri, this.output, this.c1, this.x, this.step);
   }
 

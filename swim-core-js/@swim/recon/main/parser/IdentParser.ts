@@ -29,7 +29,7 @@ export class IdentParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return IdentParser.parse(input, this.recon, this.output, this.step);
   }
 

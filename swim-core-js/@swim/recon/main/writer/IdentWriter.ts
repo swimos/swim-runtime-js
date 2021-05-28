@@ -26,7 +26,7 @@ export class IdentWriter extends Writer {
     this.index = index;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return IdentWriter.write(output, this.ident, this.index);
   }
 

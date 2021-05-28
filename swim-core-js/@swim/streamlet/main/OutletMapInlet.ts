@@ -30,21 +30,21 @@ export class OutletMapInlet<K, V, O> extends AbstractMapInlet<K, V, O> {
     });
   }
 
-  declare readonly outlet: Outlet<unknown>;
+  readonly outlet!: Outlet<unknown>;
 
-  protected onDecohereOutputKey(key: K, effect: KeyEffect): void {
+  protected override onDecohereOutputKey(key: K, effect: KeyEffect): void {
     this.outlet.decohereInput();
   }
 
-  protected onDecohereOutput(): void {
+  protected override onDecohereOutput(): void {
     this.outlet.decohereInput();
   }
 
-  protected onRecohereOutputKey(key: K, effect: KeyEffect, version: number): void {
+  protected override onRecohereOutputKey(key: K, effect: KeyEffect, version: number): void {
     this.outlet.recohereInput(version);
   }
 
-  protected onRecohereOutput(version: number): void {
+  protected override onRecohereOutput(version: number): void {
     this.outlet.recohereInput(version);
   }
 }

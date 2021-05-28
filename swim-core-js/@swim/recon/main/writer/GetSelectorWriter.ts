@@ -32,7 +32,7 @@ export class GetSelectorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return GetSelectorWriter.write(output, this.recon, this.key, this.then, this.part, this.step);
   }
 

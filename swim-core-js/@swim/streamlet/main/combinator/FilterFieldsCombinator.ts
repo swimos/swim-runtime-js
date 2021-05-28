@@ -25,9 +25,9 @@ export class FilterFieldsCombinator<K, V, I> extends FilterFieldsOperator<K, V, 
   }
 
   /** @hidden */
-  declare readonly func: FilterFieldsFunction<K, V>;
+  readonly func!: FilterFieldsFunction<K, V>;
 
-  evaluate(key: K, value: V): boolean {
+  override evaluate(key: K, value: V): boolean {
     const func = this.func;
     return func(key, value);
   }

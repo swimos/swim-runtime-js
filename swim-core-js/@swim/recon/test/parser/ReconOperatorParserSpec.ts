@@ -17,7 +17,7 @@ import {Slot, Value, Record, Num, Selector} from "@swim/structure";
 import {ReconExam} from "../ReconExam";
 
 export class ReconOperatorParserSpec extends Spec {
-  createExam(report: Report, name: string, options: TestOptions): ReconExam {
+  override createExam(report: Report, name: string, options: TestOptions): ReconExam {
     return new ReconExam(report, this, name, options);
   }
 

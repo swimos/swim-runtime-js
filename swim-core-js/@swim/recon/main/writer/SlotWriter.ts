@@ -32,7 +32,7 @@ export class SlotWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return SlotWriter.write(output, this.recon, this.key, this.value, this.part, this.step);
   }
 

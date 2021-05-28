@@ -44,16 +44,16 @@ export abstract class AbstractMapInletOutlet<K, V, I, O> implements MapInletOutl
     });
   }
 
-  declare readonly input: MapOutlet<K, V, I> | null;
+  readonly input!: MapOutlet<K, V, I> | null;
 
   /** @hidden */
-  declare readonly effects: BTree<K, KeyEffect>;
+  readonly effects!: BTree<K, KeyEffect>;
 
   /** @hidden */
-  declare readonly outputs: ReadonlyArray<Inlet<O>>;
+  readonly outputs!: ReadonlyArray<Inlet<O>>;
 
   /** @hidden */
-  declare readonly version: number;
+  readonly version!: number;
 
   bindInput(newInput: MapOutlet<K, V, I>): void {
     if (!MapOutlet.is(newInput)) {

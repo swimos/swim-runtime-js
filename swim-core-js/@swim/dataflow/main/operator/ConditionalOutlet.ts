@@ -32,13 +32,13 @@ export class ConditionalOutlet extends AbstractOutlet<Value> {
     });
   }
 
-  declare readonly ifInlet: Inlet<Value>;
+  readonly ifInlet!: Inlet<Value>;
 
-  declare readonly thenInlet: Inlet<Value>;
+  readonly thenInlet!: Inlet<Value>;
 
-  declare readonly elseInlet: Inlet<Value>;
+  readonly elseInlet!: Inlet<Value>;
 
-  get(): Value {
+  override get(): Value {
     const ifInput = this.ifInlet.input;
     if (ifInput !== null) {
       const ifTerm = ifInput.get();

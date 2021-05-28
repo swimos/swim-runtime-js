@@ -54,37 +54,37 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     });
   }
 
-  declare readonly cx: number;
+  readonly cx!: number;
 
-  declare readonly cy: number;
+  readonly cy!: number;
 
-  declare readonly rx: number;
+  readonly rx!: number;
 
-  declare readonly ry: number;
+  readonly ry!: number;
 
-  declare readonly phi: number;
+  readonly phi!: number;
 
-  declare readonly a0: number;
+  readonly a0!: number;
 
-  declare readonly da: number;
+  readonly da!: number;
 
-  get xMin(): number {
+  override get xMin(): number {
     return this.cx - Math.max(this.rx, this.ry);
   }
 
-  get yMin(): number {
+  override get yMin(): number {
     return this.cy - Math.max(this.rx, this.ry);
   }
 
-  get xMax(): number {
+  override get xMax(): number {
     return this.cx + Math.max(this.rx, this.ry);
   }
 
-  get yMax(): number {
+  override get yMax(): number {
     return this.cy + Math.max(this.rx, this.ry);
   }
 
-  interpolateX(u: number): number {
+  override interpolateX(u: number): number {
     const a0 = this.a0;
     const da = this.da;
     const a = a0 + u * da;
@@ -98,7 +98,7 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     }
   }
 
-  interpolateY(u: number): number {
+  override interpolateY(u: number): number {
     const a0 = this.a0;
     const da = this.da;
     const a = a0 + u * da;
@@ -112,7 +112,7 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     }
   }
 
-  interpolate(u: number): PointR2 {
+  override interpolate(u: number): PointR2 {
     const a0 = this.a0;
     const da = this.da;
     const a = a0 + u * da;
@@ -127,17 +127,17 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     }
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     return false; // TODO
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     return false; // TODO
   }
 
-  split(u: number): [EllipticCurveR2, EllipticCurveR2] {
+  override split(u: number): [EllipticCurveR2, EllipticCurveR2] {
     const a0 = this.a0;
     const da = this.da;
     const a = a0 + u * da;
@@ -148,7 +148,7 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     return [c0, c1];
   }
 
-  transform(f: R2Function): EllipticCurveR2 {
+  override transform(f: R2Function): EllipticCurveR2 {
     const a0 = this.a0;
     const a1 = a0 + this.da;
     const a0x = Math.cos(a0);
@@ -166,22 +166,22 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
                                this.phi, b0, b1 - b0);
   }
 
-  drawMove(context: CurveR2Context): void {
+  override drawMove(context: CurveR2Context): void {
     const {x0, y0} = this.toEndpoints();
     context.moveTo(x0, y0);
   }
 
-  drawRest(context: CurveR2Context): void {
+  override drawRest(context: CurveR2Context): void {
     context.ellipse(this.cx, this.cy, this.rx, this.ry, this.phi,
                     this.a0, this.a0 + this.da, this.da < 0);
   }
 
-  transformDrawMove(context: CurveR2Context, f: R2Function): void {
+  override transformDrawMove(context: CurveR2Context, f: R2Function): void {
     const {x0, y0} = this.toEndpoints();
     context.moveTo(f.transformX(x0, y0), f.transformY(x0, y0));
   }
 
-  transformDrawRest(context: CurveR2Context, f: R2Function): void {
+  override transformDrawRest(context: CurveR2Context, f: R2Function): void {
     const a0 = this.a0;
     const a1 = a0 + this.da;
     const a0x = Math.cos(a0);
@@ -199,7 +199,7 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
                     this.phi, b0, b1, b1 - b0 < 0);
   }
 
-  writeMove(output: Output): void {
+  override writeMove(output: Output): void {
     const {x0, y0} = this.toEndpoints();
     output.write(77/*'M'*/);
     Format.displayNumber(x0, output)
@@ -207,7 +207,7 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     Format.displayNumber(y0, output);
   }
 
-  writeRest(output: Output): void {
+  override writeRest(output: Output): void {
     const {rx, ry, phi, large, sweep, x1, y1} = this.toEndpoints();
     output.write(65/*'A'*/);
     Format.displayNumber(rx, output)
@@ -251,7 +251,7 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     return {x0, y0, rx, ry, phi, large, sweep, x1, y1};
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof EllipticCurveR2) {
@@ -266,7 +266,7 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof EllipticCurveR2) {
@@ -286,7 +286,7 @@ export class EllipticCurveR2 extends CurveR2 implements Debug {
         .debug(this.da).write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 

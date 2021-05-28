@@ -27,7 +27,7 @@ export class WeekdayFormat extends DateTimeFormat {
     this.locale = locale;
   }
 
-  withLocale(locale: DateTimeLocale): DateTimeFormat {
+  override withLocale(locale: DateTimeLocale): DateTimeFormat {
     if (locale !== this.locale) {
       return new WeekdayFormat(locale);
     } else {
@@ -35,11 +35,11 @@ export class WeekdayFormat extends DateTimeFormat {
     }
   }
 
-  writeDate(date: DateTime, output: Output): void {
+  override writeDate(date: DateTime, output: Output): void {
     output.write(this.locale.weekdays[date.weekday]!);
   }
 
-  parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
+  override parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
     return WeekdayParser.parse(input, this.locale, date);
   }
 }

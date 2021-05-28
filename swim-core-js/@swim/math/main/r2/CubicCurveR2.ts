@@ -65,39 +65,39 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
         && isFinite(this.x3) && isFinite(this.y3);
   }
 
-  declare readonly x0: number;
+  readonly x0!: number;
 
-  declare readonly y0: number;
+  readonly y0!: number;
 
-  declare readonly x1: number;
+  readonly x1!: number;
 
-  declare readonly y1: number;
+  readonly y1!: number;
 
-  declare readonly x2: number;
+  readonly x2!: number;
 
-  declare readonly y2: number;
+  readonly y2!: number;
 
-  declare readonly x3: number;
+  readonly x3!: number;
 
-  declare readonly y3: number;
+  readonly y3!: number;
 
-  get xMin(): number {
+  override get xMin(): number {
     return Math.min(this.x0, this.x1, this.x2, this.x3);
   }
 
-  get yMin(): number {
+  override get yMin(): number {
     return Math.min(this.y0, this.y1, this.y2, this.y3);
   }
 
-  get xMax(): number {
+  override get xMax(): number {
     return Math.max(this.x0, this.x1, this.x2, this.x3);
   }
 
-  get yMax(): number {
+  override get yMax(): number {
     return Math.max(this.y0, this.y1, this.y2, this.y3);
   }
 
-  interpolateX(u: number): number {
+  override interpolateX(u: number): number {
     const v = 1.0 - u;
     const x01 = v * this.x0 + u * this.x1;
     const x12 = v * this.x1 + u * this.x2;
@@ -107,7 +107,7 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
     return v * x02 + u * x13;
   }
 
-  interpolateY(u: number): number {
+  override interpolateY(u: number): number {
     const v = 1.0 - u;
     const y01 = v * this.y0 + u * this.y1;
     const y12 = v * this.y1 + u * this.y2;
@@ -117,7 +117,7 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
     return v * y02 + u * y13;
   }
 
-  interpolate(u: number): PointR2 {
+  override interpolate(u: number): PointR2 {
     const v = 1.0 - u;
     const x01 = v * this.x0 + u * this.x1;
     const y01 = v * this.y0 + u * this.y1;
@@ -134,17 +134,17 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
     return new PointR2(x03, y03);
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     return false; // TODO
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     return false; // TODO
   }
 
-  split(u: number): [CubicCurveR2, CubicCurveR2] {
+  override split(u: number): [CubicCurveR2, CubicCurveR2] {
     const v = 1.0 - u;
     const x01 = v * this.x0 + u * this.x1;
     const y01 = v * this.y0 + u * this.y1;
@@ -163,39 +163,39 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
     return [c0, c1];
   }
 
-  transform(f: R2Function): CubicCurveR2 {
+  override transform(f: R2Function): CubicCurveR2 {
     return new CubicCurveR2(f.transformX(this.x0, this.y0), f.transformY(this.x0, this.y0),
                             f.transformX(this.x1, this.y1), f.transformY(this.x1, this.y1),
                             f.transformX(this.x2, this.y2), f.transformY(this.x2, this.y2),
                             f.transformX(this.x3, this.y3), f.transformY(this.x3, this.y3));
   }
 
-  drawMove(context: CurveR2Context): void {
+  override drawMove(context: CurveR2Context): void {
     context.moveTo(this.x0, this.y0);
   }
 
-  drawRest(context: CurveR2Context): void {
+  override drawRest(context: CurveR2Context): void {
     context.bezierCurveTo(this.x1, this.y1, this.x2, this.y2, this.x3, this.y3);
   }
 
-  transformDrawMove(context: CurveR2Context, f: R2Function): void {
+  override transformDrawMove(context: CurveR2Context, f: R2Function): void {
     context.moveTo(f.transformX(this.x0, this.y0), f.transformY(this.x0, this.y0));
   }
 
-  transformDrawRest(context: CurveR2Context, f: R2Function): void {
+  override transformDrawRest(context: CurveR2Context, f: R2Function): void {
     context.bezierCurveTo(f.transformX(this.x1, this.y1), f.transformY(this.x1, this.y1),
                           f.transformX(this.x2, this.y2), f.transformY(this.x2, this.y2),
                           f.transformX(this.x3, this.y3), f.transformY(this.x3, this.y3));
   }
 
-  writeMove(output: Output): void {
+  override writeMove(output: Output): void {
     output.write(77/*'M'*/);
     Format.displayNumber(this.x0, output)
     output.write(44/*','*/)
     Format.displayNumber(this.y0, output);
   }
 
-  writeRest(output: Output): void {
+  override writeRest(output: Output): void {
     output.write(67/*'C'*/);
     Format.displayNumber(this.x1, output)
     output.write(44/*','*/)
@@ -210,7 +210,7 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
     Format.displayNumber(this.y3, output);
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof CubicCurveR2) {
@@ -226,7 +226,7 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof CubicCurveR2) {
@@ -246,7 +246,7 @@ export class CubicCurveR2 extends BezierCurveR2 implements Debug {
         .debug(this.x3).write(", ").debug(this.y3).write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 }

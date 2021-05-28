@@ -55,27 +55,27 @@ export class Exam implements Assert {
   /**
    * The unit test `Report` to which this `Exam` sends results.
    */
-  declare readonly report: Report;
+  readonly report!: Report;
 
   /**
    * The `Spec` that created this `Exam`.
    */
-  declare readonly spec: Spec;
+  readonly spec!: Spec;
 
   /**
    * The name of the test that this `Exam` is evaluating.
    */
-  declare readonly name: string;
+  readonly name!: string;
 
   /**
    * Returns the options that govern the behavior of this `Exam`.
    */
-  declare readonly options: TestOptions;
+  readonly options!: TestOptions;
 
   /**
    * Returns the current `Passing`/`Failing`/`Pending` status of this `Exam`.
    */
-  declare readonly status: ExamStatus;
+  readonly status!: ExamStatus;
 
   /**
    * Makes a comment about the circumstances of the test case.

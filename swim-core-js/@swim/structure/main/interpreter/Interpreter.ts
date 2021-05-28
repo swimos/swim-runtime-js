@@ -39,7 +39,7 @@ export class Interpreter {
     });
   }
 
-  declare readonly settings: InterpreterSettings;
+  readonly settings!: InterpreterSettings;
 
   withSettings(settings: InterpreterSettings): this {
     Object.defineProperty(this, "settings", {
@@ -51,9 +51,9 @@ export class Interpreter {
   }
 
   /** @hidden */
-  declare readonly scopeStack: Item[] | null;
+  readonly scopeStack!: Item[] | null;
 
-  declare readonly scopeDepth: number;
+  readonly scopeDepth!: number;
 
   peekScope(): Item {
     const scopeDepth = this.scopeDepth;

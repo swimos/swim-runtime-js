@@ -46,7 +46,7 @@ export class CubicCurveR2Parser extends Parser<CubicCurveR2> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<CubicCurveR2> {
+  override feed(input: Input): Parser<CubicCurveR2> {
     return CubicCurveR2Parser.parse(input, this.x0Parser, this.y0Parser,
                                     this.x1Parser, this.y1Parser,
                                     this.x2Parser, this.y2Parser,

@@ -65,7 +65,7 @@ export class AbstractStreamletSpec extends Spec {
       bar: Inlet<number> = this.inlet();
       @Out
       baz: Outlet<number> = this.outlet();
-      getOutput(outlet: Outlet<number>): number | undefined {
+      override getOutput(outlet: Outlet<number>): number | undefined {
         if (outlet === this.baz) {
           return this.getInput(this.foo)! + this.getInput(this.bar)!;
         }

@@ -31,7 +31,7 @@ export class AngleParser extends Parser<Angle> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<Angle> {
+  override feed(input: Input): Parser<Angle> {
     return AngleParser.parse(input, this.defaultUnits, this.valueParser,
                              this.unitsOutput, this.step);
   }

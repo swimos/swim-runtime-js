@@ -54,10 +54,10 @@ export class SplineR2 extends CurveR2 implements Debug {
     });
   }
 
-  declare readonly curves: ReadonlyArray<CurveR2>;
+  readonly curves!: ReadonlyArray<CurveR2>;
 
   /** @hidden */
-  declare readonly closed: boolean;
+  readonly closed!: boolean;
 
   isDefined(): boolean {
     return this.curves.length !== 0;
@@ -67,23 +67,23 @@ export class SplineR2 extends CurveR2 implements Debug {
     return this.closed;
   }
 
-  get xMin(): number {
+  override get xMin(): number {
     return this.bounds.xMin;
   }
 
-  get yMin(): number {
+  override get yMin(): number {
     return this.bounds.yMin;
   }
 
-  get xMax(): number {
+  override get xMax(): number {
     return this.bounds.xMax;
   }
 
-  get yMax(): number {
+  override get yMax(): number {
     return this.bounds.yMax;
   }
 
-  interpolateX(u: number): number {
+  override interpolateX(u: number): number {
     const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
@@ -96,7 +96,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     }
   }
 
-  interpolateY(u: number): number {
+  override interpolateY(u: number): number {
     const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
@@ -109,7 +109,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     }
   }
 
-  interpolate(u: number): PointR2 {
+  override interpolate(u: number): PointR2 {
     const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
@@ -122,17 +122,17 @@ export class SplineR2 extends CurveR2 implements Debug {
     }
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     return false; // TODO
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     return false; // TODO
   }
 
-  split(u: number): [SplineR2, SplineR2] {
+  override split(u: number): [SplineR2, SplineR2] {
     const curves = this.curves;
     const n = curves.length;
     if (n > 0) {
@@ -179,7 +179,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     }
   }
 
-  transform(f: R2Function): SplineR2 {
+  override transform(f: R2Function): SplineR2 {
     const oldCurves = this.curves;
     const n = oldCurves.length;
     if (n > 0) {
@@ -194,9 +194,9 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   /** @hidden */
-  declare readonly boundingBox: BoxR2 | null;
+  readonly boundingBox!: BoxR2 | null;
 
-  get bounds(): BoxR2 {
+  override get bounds(): BoxR2 {
     let boundingBox = this.boundingBox;
     if (boundingBox === null) {
       let xMin = Infinity;
@@ -221,14 +221,14 @@ export class SplineR2 extends CurveR2 implements Debug {
     return boundingBox;
   }
 
-  drawMove(context: SplineR2Context): void {
+  override drawMove(context: SplineR2Context): void {
     const curves = this.curves;
     if (curves.length !== 0) {
       curves[0]!.drawMove(context);
     }
   }
 
-  drawRest(context: SplineR2Context): void {
+  override drawRest(context: SplineR2Context): void {
     const curves = this.curves;
     const closed = this.closed;
     const n = curves.length - (closed && context.closePath !== void 0 ? 1 : 0);
@@ -240,14 +240,14 @@ export class SplineR2 extends CurveR2 implements Debug {
     }
   }
 
-  transformDrawMove(context: SplineR2Context, f: R2Function): void {
+  override transformDrawMove(context: SplineR2Context, f: R2Function): void {
     const curves = this.curves;
     if (curves.length !== 0) {
       curves[0]!.transformDrawMove(context, f);
     }
   }
 
-  transformDrawRest(context: SplineR2Context, f: R2Function): void {
+  override transformDrawRest(context: SplineR2Context, f: R2Function): void {
     const curves = this.curves;
     const closed = this.closed;
     const n = curves.length - (closed && context.closePath !== void 0 ? 1 : 0);
@@ -259,14 +259,14 @@ export class SplineR2 extends CurveR2 implements Debug {
     }
   }
 
-  writeMove(output: Output): void {
+  override writeMove(output: Output): void {
     const curves = this.curves;
     if (curves.length !== 0) {
       curves[0]!.writeMove(output);
     }
   }
 
-  writeRest(output: Output): void {
+  override writeRest(output: Output): void {
     const curves = this.curves;
     const closed = this.closed;
     const n = curves.length - (closed ? 1 : 0);
@@ -279,9 +279,9 @@ export class SplineR2 extends CurveR2 implements Debug {
   }
 
   /** @hidden */
-  declare readonly pathString: string | undefined;
+  readonly pathString!: string | undefined;
 
-  toPathString(outputSettings?: AnyOutputSettings): string {
+  override toPathString(outputSettings?: AnyOutputSettings): string {
     let pathString: string | undefined;
     if (outputSettings !== void 0 || (pathString = this.pathString, pathString === void 0)) {
       const output = Unicode.stringOutput(outputSettings);
@@ -298,7 +298,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     return pathString;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof SplineR2) {
@@ -308,7 +308,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof SplineR2) {
@@ -334,7 +334,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     output = output.write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 
@@ -354,7 +354,7 @@ export class SplineR2 extends CurveR2 implements Debug {
     return new SplineR2Builder();
   }
 
-  static parse(string: string): SplineR2 {
+  static override parse(string: string): SplineR2 {
     let input = Unicode.stringInput(string);
     while (input.isCont() && Unicode.isWhitespace(input.head())) {
       input = input.step();

@@ -39,11 +39,11 @@ export class ProcessorContext {
     });
   }
 
-  declare readonly processor: Processor;
+  readonly processor!: Processor;
 
-  declare readonly interpreter: Interpreter;
+  readonly interpreter!: Interpreter;
 
-  declare readonly directives: {readonly [name: string]: Directive | undefined};
+  readonly directives!: {readonly [name: string]: Directive | undefined};
 
   getDirective(name: string): Directive | null {
     const directive = this.directives[name];
@@ -60,7 +60,7 @@ export class ProcessorContext {
     delete directives[name];
   }
 
-  declare readonly converters: {readonly [name: string]: Converter | undefined};
+  readonly converters!: {readonly [name: string]: Converter | undefined};
 
   getConverter(name: string): Converter | null {
     const converter = this.converters[name];

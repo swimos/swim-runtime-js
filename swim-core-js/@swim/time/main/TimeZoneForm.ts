@@ -25,9 +25,9 @@ export class TimeZoneForm extends Form<TimeZone, AnyTimeZone> {
     });
   }
 
-  declare readonly unit: TimeZone | undefined;
+  override readonly unit!: TimeZone | undefined;
 
-  withUnit(unit: TimeZone | undefined): Form<TimeZone, AnyTimeZone> {
+  override withUnit(unit: TimeZone | undefined): Form<TimeZone, AnyTimeZone> {
     if (unit !== this.unit) {
       return new TimeZoneForm(unit);
     } else {
@@ -35,7 +35,7 @@ export class TimeZoneForm extends Form<TimeZone, AnyTimeZone> {
     }
   }
 
-  mold(zone: AnyTimeZone): Item {
+  override mold(zone: AnyTimeZone): Item {
     zone = TimeZone.fromAny(zone);
     const name = zone.name;
     if (name !== void 0) {
@@ -45,7 +45,7 @@ export class TimeZoneForm extends Form<TimeZone, AnyTimeZone> {
     }
   }
 
-  cast(item: Item): TimeZone | undefined {
+  override cast(item: Item): TimeZone | undefined {
     const value = item.toValue();
     const zone = TimeZone.fromValue(value);
     return zone !== null ? zone : void 0;

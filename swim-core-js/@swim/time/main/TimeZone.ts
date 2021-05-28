@@ -32,9 +32,9 @@ export class TimeZone implements HashCode, Debug {
     });
   }
 
-  declare readonly name: string | undefined;
+  readonly name!: string | undefined;
 
-  declare readonly offset: number;
+  readonly offset!: number;
 
   isUTC(): boolean {
     return this.offset === 0;

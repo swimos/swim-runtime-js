@@ -21,7 +21,7 @@ export class UnlinkRequest extends LaneAddressed<UnlinkRequest> {
     super(node, lane, body);
   }
 
-  protected copy(node: Uri, lane: Uri, body: Value): UnlinkRequest {
+  protected override copy(node: Uri, lane: Uri, body: Value): UnlinkRequest {
     return new UnlinkRequest(node, lane, body);
   }
 

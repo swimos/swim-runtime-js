@@ -33,13 +33,13 @@ export class InvokeOutlet extends AbstractOutlet<Value> {
   }
 
   /** @hidden */
-  declare readonly scope: Record;
+  readonly scope!: Record;
 
-  declare readonly funcInlet: Inlet<Value>;
+  readonly funcInlet!: Inlet<Value>;
 
-  declare readonly argsInlet: Inlet<Value>;
+  readonly argsInlet!: Inlet<Value>;
 
-  get(): Value {
+  override get(): Value {
     const funcInput = this.funcInlet.input;
     const argsInput = this.argsInlet.input;
     if (funcInput !== null && argsInput !== null) {

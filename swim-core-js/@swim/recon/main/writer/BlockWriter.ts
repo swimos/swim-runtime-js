@@ -49,7 +49,7 @@ export class BlockWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return BlockWriter.write(output, this.recon, this.items, this.inBlock, this.inMarkup,
                              this.inBraces, this.inBrackets, this.first, this.markupSafe,
                              this.item, this.next, this.part, this.step);

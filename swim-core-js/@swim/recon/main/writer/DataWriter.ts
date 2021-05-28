@@ -27,7 +27,7 @@ export class DataWriter extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return DataWriter.write(output, this.array, this.part, this.step);
   }
 

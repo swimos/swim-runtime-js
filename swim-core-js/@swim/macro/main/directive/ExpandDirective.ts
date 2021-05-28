@@ -25,9 +25,9 @@ export class ExpandDirective extends Directive {
     });
   }
 
-  declare readonly template: Item;
+  readonly template!: Item;
 
-  evaluate(model: Item, params: Value, context: ProcessorContext): Item {
+  override evaluate(model: Item, params: Value, context: ProcessorContext): Item {
     return this.expand(this.template, model, params, context);
   }
 

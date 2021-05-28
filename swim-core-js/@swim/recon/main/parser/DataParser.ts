@@ -28,7 +28,7 @@ export class DataParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return DataParser.parse(input, this.recon, this.base64Parser, this.step);
   }
 

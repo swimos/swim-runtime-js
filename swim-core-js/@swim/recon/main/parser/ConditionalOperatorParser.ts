@@ -37,7 +37,7 @@ export class ConditionalOperatorParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return ConditionalOperatorParser.parse(input, this.recon, this.builder, this.ifParser,
                                            this.thenParser, this.elseParser, this.step);
   }

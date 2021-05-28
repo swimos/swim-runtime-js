@@ -38,7 +38,7 @@ export class UriQueryParser extends Parser<UriQuery> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<UriQuery> {
+  override feed(input: Input): Parser<UriQuery> {
     return UriQueryParser.parse(input, this.uri, this.builder, this.keyOutput,
                                 this.valueOutput, this.c1, this.step);
   }

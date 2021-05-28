@@ -26,9 +26,9 @@ export class EventDownlinkModel extends DownlinkModel {
     super(context, hostUri, nodeUri, laneUri, prio, rate, body);
   }
 
-  declare views: ReadonlyArray<EventDownlink>;
+  override views!: ReadonlyArray<EventDownlink>;
 
-  get type(): DownlinkType {
+  override get type(): DownlinkType {
     return "event";
   }
 }

@@ -47,16 +47,16 @@ export abstract class AbstractMapOutlet<K, V, O> implements MapOutlet<K, V, O> {
   }
 
   /** @hidden */
-  declare readonly effects: BTree<K, KeyEffect>;
+  readonly effects!: BTree<K, KeyEffect>;
 
   /** @hidden */
-  declare readonly outlets: BTree<K, KeyOutlet<K, V>>;
+  readonly outlets!: BTree<K, KeyOutlet<K, V>>;
 
   /** @hidden */
-  declare readonly outputs: ReadonlyArray<Inlet<O>>;
+  readonly outputs!: ReadonlyArray<Inlet<O>>;
 
   /** @hidden */
-  declare readonly version: number;
+  readonly version!: number;
 
   abstract has(key: K): boolean;
 

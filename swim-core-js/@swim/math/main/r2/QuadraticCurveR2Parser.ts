@@ -41,7 +41,7 @@ export class QuadraticCurveR2Parser extends Parser<QuadraticCurveR2> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<QuadraticCurveR2> {
+  override feed(input: Input): Parser<QuadraticCurveR2> {
     return QuadraticCurveR2Parser.parse(input, this.x0Parser, this.y0Parser,
                                         this.x1Parser, this.y1Parser,
                                         this.x2Parser, this.y2Parser,

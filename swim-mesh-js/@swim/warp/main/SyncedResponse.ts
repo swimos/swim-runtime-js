@@ -21,7 +21,7 @@ export class SyncedResponse extends LaneAddressed<SyncedResponse> {
     super(node, lane, body);
   }
 
-  protected copy(node: Uri, lane: Uri, body: Value): SyncedResponse {
+  protected override copy(node: Uri, lane: Uri, body: Value): SyncedResponse {
     return new SyncedResponse(node, lane, body);
   }
 

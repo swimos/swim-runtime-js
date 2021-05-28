@@ -29,7 +29,7 @@ export class Hour24Parser extends Parser<DateTimeInit> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<DateTimeInit> {
+  override feed(input: Input): Parser<DateTimeInit> {
     return Hour24Parser.parse(input, this.date, this.hour, this.step);
   }
 
@@ -37,7 +37,7 @@ export class Hour24Parser extends Parser<DateTimeInit> {
     return DateTimeFormat.parseDateNumber(input, Hour24Parser, "hour (24)", 2, 2, date, hour, step);
   }
 
-  static bind(hour: number, date: DateTimeInit): Parser<DateTimeInit> {
+  static term(hour: number, date: DateTimeInit): Parser<DateTimeInit> {
     date.hour = hour;
     return Parser.done(date);
   }

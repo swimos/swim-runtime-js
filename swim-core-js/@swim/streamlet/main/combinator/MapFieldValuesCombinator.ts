@@ -25,9 +25,9 @@ export class MapFieldValuesCombinator<K, VI, VO, I> extends MapFieldValuesOperat
   }
 
   /** @hidden */
-  declare readonly func: MapFieldValuesFunction<K, VI, VO>;
+  readonly func!: MapFieldValuesFunction<K, VI, VO>;
 
-  evaluate(key: K, value: VI | undefined): VO | undefined {
+  override evaluate(key: K, value: VI | undefined): VO | undefined {
     if (value !== void 0) {
       const func = this.func;
       return func(key, value);

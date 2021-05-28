@@ -35,7 +35,7 @@ export class RecordParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return RecordParser.parse(input, this.recon, this.builder, this.keyParser,
                               this.valueParser, this.step);
   }

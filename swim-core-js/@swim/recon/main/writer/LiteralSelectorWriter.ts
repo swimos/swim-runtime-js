@@ -32,7 +32,7 @@ export class LiteralSelectorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return LiteralSelectorWriter.write(output, this.recon, this.item, this.then,
                                        this.part, this.step);
   }

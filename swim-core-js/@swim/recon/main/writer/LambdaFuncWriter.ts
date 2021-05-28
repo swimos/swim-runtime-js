@@ -33,7 +33,7 @@ export class LambdaFuncWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return LambdaFuncWriter.write(output, this.recon, this.bindings, this.template,
                                   this.part, this.step);
   }

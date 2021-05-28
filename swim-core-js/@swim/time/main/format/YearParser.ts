@@ -29,7 +29,7 @@ export class YearParser extends Parser<DateTimeInit> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<DateTimeInit> {
+  override feed(input: Input): Parser<DateTimeInit> {
     return YearParser.parse(input, this.date, this.year, this.step);
   }
 
@@ -37,7 +37,7 @@ export class YearParser extends Parser<DateTimeInit> {
     return DateTimeFormat.parseDateNumber(input, YearParser, "full year", 4, 4, date, year, step);
   }
 
-  static bind(year: number, date: DateTimeInit): Parser<DateTimeInit> {
+  static term(year: number, date: DateTimeInit): Parser<DateTimeInit> {
     date.year = year;
     return Parser.done(date);
   }

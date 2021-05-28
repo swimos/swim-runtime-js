@@ -29,7 +29,7 @@ export class TransformParser extends Parser<Transform> {
     this.identOutput = identOutput;
   }
 
-  feed(input: Input): Parser<Transform> {
+  override feed(input: Input): Parser<Transform> {
     return TransformParser.parse(input, this.identOutput);
   }
 

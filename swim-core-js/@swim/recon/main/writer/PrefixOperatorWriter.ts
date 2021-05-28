@@ -35,7 +35,7 @@ export class PrefixOperatorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return PrefixOperatorWriter.write(output, this.recon, this.operator, this.rhs,
                                       this.precedence, this.part, this.step);
   }

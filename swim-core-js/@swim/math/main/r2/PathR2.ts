@@ -54,25 +54,25 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     });
   }
 
-  declare readonly splines: ReadonlyArray<SplineR2>;
+  readonly splines!: ReadonlyArray<SplineR2>;
 
   isDefined(): boolean {
     return this.splines.length !== 0;
   }
 
-  get xMin(): number {
+  override get xMin(): number {
     return this.bounds.xMin;
   }
 
-  get yMin(): number {
+  override get yMin(): number {
     return this.bounds.yMin;
   }
 
-  get xMax(): number {
+  override get xMax(): number {
     return this.bounds.xMax;
   }
 
-  get yMax(): number {
+  override get yMax(): number {
     return this.bounds.yMax;
   }
 
@@ -115,13 +115,13 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     }
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     return false; // TODO
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     return false; // TODO
   }
 
@@ -170,7 +170,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     }
   }
 
-  transform(f: R2Function): PathR2 {
+  override transform(f: R2Function): PathR2 {
     const oldSplines = this.splines;
     const n = oldSplines.length;
     if (n > 0) {
@@ -185,9 +185,9 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   /** @hidden */
-  declare readonly boundingBox: BoxR2 | null;
+  readonly boundingBox!: BoxR2 | null;
 
-  get bounds(): BoxR2 {
+  override get bounds(): BoxR2 {
     let boundingBox = this.boundingBox;
     if (boundingBox === null) {
       let xMin = Infinity;
@@ -241,7 +241,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
   }
 
   /** @hidden */
-  declare readonly pathString: string | undefined;
+  readonly pathString!: string | undefined;
 
   toPathString(outputSettings?: AnyOutputSettings): string {
     let pathString: string | undefined;
@@ -309,7 +309,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     return this.toPathString();
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 
@@ -329,7 +329,7 @@ export class PathR2 extends ShapeR2 implements Equals, Equivalent, Debug {
     return new PathR2([new SplineR2(curves, true)]);
   }
 
-  static fromAny(value: AnyPathR2 | AnyShapeR2): PathR2 {
+  static override fromAny(value: AnyPathR2 | AnyShapeR2): PathR2 {
     if (value === void 0 || value === null || value instanceof PathR2) {
       return value;
     } else if (typeof value === "string") {

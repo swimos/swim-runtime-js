@@ -19,11 +19,11 @@ import {DayOfMonthParser} from "../"; // forward import
 
 /** @hidden */
 export class DayOfMonthFormat extends DateTimeFormat {
-  writeDate(date: DateTime, output: Output): void {
+  override writeDate(date: DateTime, output: Output): void {
     DateTimeFormat.writeDateNumber2(date.day, output);
   }
 
-  parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
+  override parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
     return DayOfMonthParser.parse(input, date);
   }
 }

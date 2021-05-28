@@ -29,10 +29,10 @@ export class ConstraintMap<K extends ConstraintKey, V> {
   }
 
   /** @hidden */
-  declare readonly index: {[id: number]: number | undefined};
+  readonly index!: {[id: number]: number | undefined};
 
   /** @hidden */
-  declare readonly array: Array<[K, V]>;
+  readonly array!: Array<[K, V]>;
 
   get size(): number {
     return this.array.length;

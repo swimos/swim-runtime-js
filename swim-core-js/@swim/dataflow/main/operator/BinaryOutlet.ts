@@ -28,11 +28,11 @@ export abstract class BinaryOutlet extends AbstractOutlet<Value> {
     });
   }
 
-  declare readonly operand1Inlet: Inlet<Value>;
+  readonly operand1Inlet!: Inlet<Value>;
 
-  declare readonly operand2Inlet: Inlet<Value>;
+  readonly operand2Inlet!: Inlet<Value>;
 
-  get(): Value {
+  override get(): Value {
     const operand1Input = this.operand1Inlet.input;
     const operand2Input = this.operand2Inlet.input;
     if (operand1Input !== null && operand2Input !== null) {

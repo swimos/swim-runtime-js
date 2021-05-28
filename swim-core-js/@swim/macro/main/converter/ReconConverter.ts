@@ -18,7 +18,7 @@ import {Recon} from "@swim/recon";
 import {Converter} from "./Converter";
 
 export class ReconConverter extends Converter {
-  convert<O>(model: Item, output: Output<O>): O {
+  override convert<O>(model: Item, output: Output<O>): O {
     const writer = Recon.writeBlock(model, output);
     if (writer.isError()) {
       writer.bind();

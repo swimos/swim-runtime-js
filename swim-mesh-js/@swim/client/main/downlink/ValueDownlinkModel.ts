@@ -33,12 +33,12 @@ export class ValueDownlinkModel extends DownlinkModel {
     });
   }
 
-  declare readonly views: ReadonlyArray<ValueDownlink<unknown>>;
+  override readonly views!: ReadonlyArray<ValueDownlink<unknown>>;
 
   /** @hidden */
-  declare readonly state: Value;
+  readonly state!: Value;
 
-  get type(): DownlinkType {
+  override get type(): DownlinkType {
     return "value";
   }
 
@@ -62,7 +62,7 @@ export class ValueDownlinkModel extends DownlinkModel {
     });
   }
 
-  onEventMessage(message: EventMessage, host: Host): void {
+  override onEventMessage(message: EventMessage, host: Host): void {
     super.onEventMessage(message, host);
     this.onSetEvent(message.body);
   }

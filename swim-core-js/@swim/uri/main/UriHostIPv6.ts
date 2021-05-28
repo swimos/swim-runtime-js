@@ -32,18 +32,18 @@ export class UriHostIPv6 extends UriHost {
     });
   }
 
-  declare readonly address: string;
+  override readonly address!: string;
 
-  get ipv6(): string {
+  override get ipv6(): string {
     return this.address;
   }
 
-  debug(output: Output): void {
+  override debug(output: Output): void {
     output = output.write("UriHost").write(46/*'.'*/).write("ipv6")
         .write(40/*'('*/).debug(this.address).write(41/*')'*/);
   }
 
-  display(output: Output): void {
+  override display(output: Output): void {
     const stringValue = this.stringValue;
     if (stringValue !== void 0) {
       output = output.write(stringValue);
@@ -55,9 +55,9 @@ export class UriHostIPv6 extends UriHost {
   }
 
   /** @hidden */
-  declare readonly stringValue: string | undefined;
+  readonly stringValue!: string | undefined;
 
-  toString(): string {
+  override toString(): string {
     let stringValue = this.stringValue;
     if (stringValue === void 0) {
       stringValue = "[" + this.address + "]";

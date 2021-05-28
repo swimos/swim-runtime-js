@@ -22,24 +22,24 @@ export class UriHostUndefined extends UriHost {
     super();
   }
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return false;
   }
 
-  get address(): string {
+  override get address(): string {
     return "";
   }
 
-  debug(output: Output): void {
+  override debug(output: Output): void {
     output = output.write("UriHost").write(46/*'.'*/).write("undefined")
         .write(40/*'('*/).write(41/*')'*/);
   }
 
-  display(output: Output): void {
+  override display(output: Output): void {
     // nop
   }
 
-  toString(): string {
+  override toString(): string {
     return "";
   }
 }

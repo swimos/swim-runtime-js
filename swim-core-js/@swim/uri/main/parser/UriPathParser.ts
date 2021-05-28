@@ -36,7 +36,7 @@ export class UriPathParser extends Parser<UriPath> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<UriPath> {
+  override feed(input: Input): Parser<UriPath> {
     return UriPathParser.parse(input, this.uri, this.builder, this.output, this.c1, this.step);
   }
 

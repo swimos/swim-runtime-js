@@ -36,7 +36,7 @@ export class SegmentR2Parser extends Parser<SegmentR2> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<SegmentR2> {
+  override feed(input: Input): Parser<SegmentR2> {
     return SegmentR2Parser.parse(input, this.x0Parser, this.y0Parser,
                                  this.x1Parser, this.y1Parser,
                                  this.command, this.step);

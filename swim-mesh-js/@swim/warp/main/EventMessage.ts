@@ -21,7 +21,7 @@ export class EventMessage extends LaneAddressed<EventMessage> {
     super(node, lane, body);
   }
 
-  protected copy(node: Uri, lane: Uri, body: Value): EventMessage {
+  protected override copy(node: Uri, lane: Uri, body: Value): EventMessage {
     return new EventMessage(node, lane, body);
   }
 

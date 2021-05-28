@@ -29,7 +29,7 @@ import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
 export class MapDownlinkSpec extends Spec {
-  createExam(report: Report, name: string, options: TestOptions): ClientExam {
+  override createExam(report: Report, name: string, options: TestOptions): ClientExam {
     return new ClientExam(report, this, name, options);
   }
 

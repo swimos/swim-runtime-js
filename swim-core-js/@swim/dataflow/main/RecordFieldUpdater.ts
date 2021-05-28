@@ -29,18 +29,18 @@ export class RecordFieldUpdater extends AbstractInlet<Value> {
     });
   }
 
-  declare readonly record: Record;
+  readonly record!: Record;
 
-  declare readonly key: Value;
+  readonly key!: Value;
 
-  protected onDecohereOutput(): void {
+  protected override onDecohereOutput(): void {
     const record = this.record;
     if (RecordOutlet.is(record)) {
       record.decohereInputKey(this.key, KeyEffect.Update);
     }
   }
 
-  protected onRecohereOutput(version: number): void {
+  protected override onRecohereOutput(version: number): void {
     const input = this.input;
     if (input !== null) {
       const value = input.get();

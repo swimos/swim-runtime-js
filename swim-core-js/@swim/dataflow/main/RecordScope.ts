@@ -26,16 +26,16 @@ export class RecordScope extends RecordModel {
     });
   }
 
-  declare readonly streamletScope: StreamletScope<Value> | null;
+  override readonly streamletScope!: StreamletScope<Value> | null;
 
-  static from(record: Record): RecordScope {
+  static override from(record: Record): RecordScope {
     const scope = new RecordScope(RecordScope.globalScope());
     scope.materialize(record);
     scope.compile(record);
     return scope;
   }
 
-  static of(...items: AnyItem[]): RecordScope {
+  static override of(...items: AnyItem[]): RecordScope {
     return RecordScope.from(Record.of(...items));
   }
 }

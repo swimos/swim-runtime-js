@@ -29,7 +29,7 @@ export class PatternFormat extends DateTimeFormat {
     this.specifiers = specifiers;
   }
 
-  writeDate(date: DateTime, output: Output): void {
+  override writeDate(date: DateTime, output: Output): void {
     const pattern = this.pattern;
     const specifiers = this.specifiers;
     let i = 0;
@@ -56,7 +56,7 @@ export class PatternFormat extends DateTimeFormat {
     }
   }
 
-  parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
+  override parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
     return PatternParser.parse(input, this.pattern, this.specifiers, date);
   }
 }

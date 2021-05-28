@@ -35,7 +35,7 @@ export class AttrExpressionParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return AttrExpressionParser.parse(input, this.recon, this.builder,
                                       this.fieldParser, this.valueParser, this.step);
   }

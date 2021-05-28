@@ -33,7 +33,7 @@ export class PrimaryParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return PrimaryParser.parse(input, this.recon, this.builder,
                                this.exprParser, this.step);
   }

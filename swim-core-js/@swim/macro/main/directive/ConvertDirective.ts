@@ -19,7 +19,7 @@ import type {Converter} from "../converter/Converter";
 import {Directive} from "./Directive";
 
 export class ConvertDirective extends Directive {
-  evaluate(model: Item, params: Value, context: ProcessorContext): Item {
+  override evaluate(model: Item, params: Value, context: ProcessorContext): Item {
     const converterName = params.stringValue();
     if (converterName !== void 0) {
       const converter = context.getConverter(converterName);

@@ -213,7 +213,7 @@ export abstract class Base64 {
 /** @hidden */
 class Base64Standard extends Base64 {
   /** @hidden */
-  declare readonly padded: boolean;
+  readonly padded!: boolean;
 
   constructor(padded: boolean) {
     super();
@@ -250,7 +250,7 @@ class Base64Standard extends Base64 {
 /** @hidden */
 class Base64Url extends Base64 {
   /** @hidden */
-  declare readonly padded: boolean;
+  readonly padded!: boolean;
 
   constructor(padded: boolean) {
     super();

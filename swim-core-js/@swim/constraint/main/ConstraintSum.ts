@@ -34,9 +34,9 @@ export class ConstraintSum implements ConstraintExpression, Debug {
     return this.terms.isEmpty();
   }
 
-  declare readonly terms: ConstraintMap<ConstraintVariable, number>;
+  readonly terms!: ConstraintMap<ConstraintVariable, number>;
 
-  declare readonly constant: number;
+  readonly constant!: number;
 
   plus(that: AnyConstraintExpression): ConstraintExpression {
     return ConstraintExpression.sum(this, that);

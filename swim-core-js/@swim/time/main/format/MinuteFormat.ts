@@ -19,11 +19,11 @@ import {MinuteParser} from "../"; // forward import
 
 /** @hidden */
 export class MinuteFormat extends DateTimeFormat {
-  writeDate(date: DateTime, output: Output): void {
+  override writeDate(date: DateTime, output: Output): void {
     DateTimeFormat.writeDateNumber2(date.minute, output);
   }
 
-  parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
+  override parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
     return MinuteParser.parse(input, date);
   }
 }

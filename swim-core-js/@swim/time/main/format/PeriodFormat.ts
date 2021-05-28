@@ -27,7 +27,7 @@ export class PeriodFormat extends DateTimeFormat {
     this.locale = locale;
   }
 
-  withLocale(locale: DateTimeLocale): DateTimeFormat {
+  override withLocale(locale: DateTimeLocale): DateTimeFormat {
     if (locale !== this.locale) {
       return new PeriodFormat(locale);
     } else {
@@ -35,11 +35,11 @@ export class PeriodFormat extends DateTimeFormat {
     }
   }
 
-  writeDate(date: DateTime, output: Output): void {
+  override writeDate(date: DateTime, output: Output): void {
     output.write(this.locale.periods[+(date.hour >= 12)]!);
   }
 
-  parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
+  override parseDateTime(input: Input, date: DateTimeInit): Parser<DateTimeInit> {
     return PeriodParser.parse(input, this.locale, date);
   }
 }

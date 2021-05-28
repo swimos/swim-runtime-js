@@ -28,11 +28,11 @@ export class KeyOutlet<K, V> extends AbstractOutlet<V> {
     });
   }
 
-  declare readonly input: MapOutlet<K, V, unknown>;
+  readonly input!: MapOutlet<K, V, unknown>;
 
-  declare readonly key: K;
+  readonly key!: K;
 
-  get(): V | undefined {
+  override get(): V | undefined {
     return this.input.get(this.key);
   }
 }

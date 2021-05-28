@@ -28,7 +28,7 @@ export class KeysSelectorWriter<I, V> extends Writer {
     this.step = step;
   }
 
-  pull(output: Output): Writer {
+  override pull(output: Output): Writer {
     return KeysSelectorWriter.write(output, this.recon, this.then, this.step);
   }
 

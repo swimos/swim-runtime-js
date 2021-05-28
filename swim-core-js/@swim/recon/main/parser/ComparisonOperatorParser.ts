@@ -37,7 +37,7 @@ export class ComparisonOperatorParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return ComparisonOperatorParser.parse(input, this.recon, this.builder, this.lhsParser,
                                           this.operator, this.rhsParser, this.step);
   }

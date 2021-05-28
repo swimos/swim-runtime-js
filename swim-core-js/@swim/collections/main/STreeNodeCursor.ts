@@ -23,15 +23,15 @@ export class STreeNodeCursor<V, I> extends NodeCursor<[I, V], STreePage<V, I>> {
     super(pages, index, childIndex, childCursor);
   }
 
-  protected pageSize(page: STreePage<V, I>): number {
+  protected override pageSize(page: STreePage<V, I>): number {
     return page.size;
   }
 
-  protected pageCursor(page: STreePage<V, I>): Cursor<[I, V]> {
+  protected override pageCursor(page: STreePage<V, I>): Cursor<[I, V]> {
     return page.entries();
   }
 
-  protected reversePageCursor(page: STreePage<V, I>): Cursor<[I, V]> {
+  protected override reversePageCursor(page: STreePage<V, I>): Cursor<[I, V]> {
     return page.reverseEntries();
   }
 }

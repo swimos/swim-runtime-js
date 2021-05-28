@@ -18,7 +18,7 @@ import {AuthedResponse} from "@swim/warp";
 import {WarpExam} from "./WarpExam";
 
 export class AuthedResponseSpec extends Spec {
-  createExam(report: Report, name: string, options: TestOptions): WarpExam {
+  override createExam(report: Report, name: string, options: TestOptions): WarpExam {
     return new WarpExam(report, this, name, options);
   }
 

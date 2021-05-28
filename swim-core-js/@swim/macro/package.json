@@ -21,5 +21,8 @@
     "@swim/mapping": "3.11.0-dev.20210415",
     "@swim/structure": "3.11.0-dev.20210415",
     "@swim/recon": "3.11.0-dev.20210415"
+  },
+  "bin": {
+    "swim-macro": "./dist/cli/swim-macro.js"
   }
 }

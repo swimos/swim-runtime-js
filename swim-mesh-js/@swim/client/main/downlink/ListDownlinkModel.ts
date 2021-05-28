@@ -35,12 +35,12 @@ export class ListDownlinkModel extends DownlinkModel {
     });
   }
 
-  declare readonly views: ReadonlyArray<ListDownlink<unknown>>;
+  override readonly views!: ReadonlyArray<ListDownlink<unknown>>;
 
   /** @hidden */
-  declare readonly state: STree<Value, Value>;
+  readonly state!: STree<Value, Value>;
 
-  get type(): DownlinkType {
+  override get type(): DownlinkType {
     return "list";
   }
 
@@ -258,7 +258,7 @@ export class ListDownlinkModel extends DownlinkModel {
     });
   }
 
-  onEventMessage(message: EventMessage, host: Host): void {
+  override onEventMessage(message: EventMessage, host: Host): void {
     super.onEventMessage(message, host);
     const event = message.body;
     const tag = event.tag;

@@ -33,7 +33,7 @@ export class NumberParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return NumberParser.parse(input, this.recon, this.sign, this.value, this.mode, this.step);
   }
 
@@ -140,7 +140,7 @@ export class DecimalParser<I, V> extends Parser<V> {
     this.step = step;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return DecimalParser.parse(input, this.recon, this.output, this.mode, this.step);
   }
 
@@ -266,7 +266,7 @@ class HexadecimalParser<I, V> extends Parser<V> {
     this.size = size;
   }
 
-  feed(input: Input): Parser<V> {
+  override feed(input: Input): Parser<V> {
     return HexadecimalParser.parse(input, this.recon, this.value, this.size);
   }
 

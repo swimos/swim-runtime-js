@@ -22,11 +22,11 @@ export class ByteOutputUint8Array extends ByteOutput<Uint8Array> {
     super(array, size, settings);
   }
 
-  bind(): Uint8Array {
+  override bind(): Uint8Array {
     return this.toUint8Array();
   }
 
-  clone(): Output<Uint8Array> {
+  override clone(): Output<Uint8Array> {
     return new ByteOutputUint8Array(this.cloneArray(), this.size, this.settings);
   }
 }

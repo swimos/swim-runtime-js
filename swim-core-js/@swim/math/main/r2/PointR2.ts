@@ -46,23 +46,23 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
     return isFinite(this.x) && isFinite(this.y);
   }
 
-  declare readonly x: number;
+  readonly x!: number;
 
-  declare readonly y: number;
+  readonly y!: number;
 
-  get xMin(): number {
+  override get xMin(): number {
     return this.x;
   }
 
-  get yMin(): number {
+  override get yMin(): number {
     return this.y;
   }
 
-  get xMax(): number {
+  override get xMax(): number {
     return this.x;
   }
 
-  get yMax(): number {
+  override get yMax(): number {
     return this.y;
   }
 
@@ -80,9 +80,9 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
     }
   }
 
-  contains(that: AnyShapeR2): boolean;
-  contains(x: number, y: number): boolean;
-  contains(that: AnyShapeR2 | number, y?: number): boolean {
+  override contains(that: AnyShapeR2): boolean;
+  override contains(x: number, y: number): boolean;
+  override contains(that: AnyShapeR2 | number, y?: number): boolean {
     if (typeof that === "number") {
       return this.x === that && this.y === y!;
     } else {
@@ -97,12 +97,12 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
     }
   }
 
-  intersects(that: AnyShapeR2): boolean {
+  override intersects(that: AnyShapeR2): boolean {
     that = ShapeR2.fromAny(that);
     return (that as ShapeR2).intersects(this);
   }
 
-  transform(f: R2Function): PointR2 {
+  override transform(f: R2Function): PointR2 {
     return new PointR2(f.transformX(this.x, this.y), f.transformY(this.x, this.y));
   }
 
@@ -152,7 +152,7 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
         .debug(this.x).write(", ").debug(this.y).write(41/*')'*/);
   }
 
-  toString(): string {
+  override toString(): string {
     return Format.debug(this);
   }
 
@@ -178,7 +178,7 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
     return new PointR2(value[0], value[1]);
   }
 
-  static fromAny(value: AnyPointR2): PointR2 {
+  static override fromAny(value: AnyPointR2): PointR2 {
     if (value === void 0 || value === null || value instanceof PointR2) {
       return value;
     } else if (PointR2.isInit(value)) {
@@ -208,7 +208,7 @@ export class PointR2 extends ShapeR2 implements Interpolate<PointR2>, HashCode, 
   }
 
   /** @hidden */
-  static isAny(value: unknown): value is AnyPointR2 {
+  static override isAny(value: unknown): value is AnyPointR2 {
     return value instanceof PointR2
         || PointR2.isInit(value)
         || PointR2.isTuple(value);

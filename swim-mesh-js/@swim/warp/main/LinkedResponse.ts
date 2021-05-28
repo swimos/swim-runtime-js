@@ -21,7 +21,7 @@ export class LinkedResponse extends LinkAddressed<LinkedResponse> {
     super(node, lane, prio, rate, body);
   }
 
-  protected copy(node: Uri, lane: Uri, prio: number, rate: number, body: Value): LinkedResponse {
+  protected override copy(node: Uri, lane: Uri, prio: number, rate: number, body: Value): LinkedResponse {
     return new LinkedResponse(node, lane, prio, rate, body);
   }
 

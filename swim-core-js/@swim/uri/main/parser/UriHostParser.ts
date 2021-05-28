@@ -25,7 +25,7 @@ export class UriHostParser extends Parser<UriHost> {
     this.uri = uri;
   }
 
-  feed(input: Input): Parser<UriHost> {
+  override feed(input: Input): Parser<UriHost> {
     return UriHostParser.parse(input, this.uri);
   }
 
