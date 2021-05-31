@@ -55,6 +55,7 @@ const cli = {
     sourcemap: true,
     interop: false,
     extend: true,
+    banner: "#!/usr/bin/env node",
   },
   external: [
     "fs",
