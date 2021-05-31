@@ -36,13 +36,14 @@ export class TransformParser extends Parser<Transform> {
   static parse(input: Input, identOutput?: Output<string>): Parser<Transform> {
     let c = 0;
     identOutput = identOutput || Unicode.stringOutput();
-    while (input.isCont() && (c = input.head(), Unicode.isAlpha(c))) {
+    while (input.isCont() && (c = input.head(), Unicode.isAlpha(c) || Unicode.isDigit(c) || c === 45/*'-'*/)) {
       input = input.step();
       identOutput.write(c);
     }
     if (!input.isEmpty()) {
       const ident = identOutput.bind();
       switch (ident) {
+        case "translate3d":
         case "translateX":
         case "translateY":
         case "translate": return TranslateTransformParser.parseRest(input, identOutput);

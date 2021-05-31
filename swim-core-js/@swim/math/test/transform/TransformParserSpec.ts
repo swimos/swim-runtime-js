@@ -46,6 +46,14 @@ export class TransformParserSpec extends Spec {
   }
 
   @Test
+  parseTranslate3dTransforms(exam: Exam): void {
+    exam.equal(Transform.parse("translate3d(5,7,0)"), Transform.translate(5, 7));
+    exam.equal(Transform.parse("translate3d(5px,7px,0px)"), Transform.translate(5, 7));
+    exam.equal(Transform.parse("translate3d  (  5  ,  7  ,  0  )"), Transform.translate(5, 7));
+    exam.equal(Transform.parse("translate3d  (  5px  ,  7px  ,  0px  )"), Transform.translate(5, 7));
+  }
+
+  @Test
   parseScaleXTransforms(exam: Exam): void {
     exam.equal(Transform.parse("scaleX(2)"), Transform.scaleX(2));
     exam.equal(Transform.parse("scaleX  (  2  )"), Transform.scaleX(2));
