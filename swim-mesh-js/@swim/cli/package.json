@@ -35,7 +35,7 @@
     "@swim/client": "3.11.0-dev.20210415"
   },
   "dependencies": {
-    "ws": "7"
+    "ws": ">= 7.4.6"
   },
   "bin": {
     "swim-cli": "./dist/main/swim-cli.js"
