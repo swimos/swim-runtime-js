@@ -14,7 +14,7 @@
 
 import {Equivalent, Equals, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {SplineR2, PathR2} from "@swim/math";
+import {R2Spline, R2Path} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
@@ -157,17 +157,17 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     }
   }
 
-  override project(f: GeoProjection): PathR2 {
+  override project(f: GeoProjection): R2Path {
     const oldSplines = this.splines;
     const n = oldSplines.length;
     if (n > 0) {
-      const newSplines = new Array<SplineR2>(n);
+      const newSplines = new Array<R2Spline>(n);
       for (let i = 0; i < n; i += 1) {
         newSplines[i] = oldSplines[i]!.project(f);
       }
-      return new PathR2(newSplines);
+      return new R2Path(newSplines);
     } else {
-      return PathR2.empty();
+      return R2Path.empty();
     }
   }
 

@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {R2CurveParserSpec} from "./R2CurveParserSpec";
-export {R2SplineBuilderSpec} from "./R2SplineBuilderSpec";
-export {R2SplineParserSpec} from "./R2SplineParserSpec";
-export {R2PathBuilderSpec} from "./R2PathBuilderSpec";
-export {R2PathParserSpec} from "./R2PathParserSpec";
-export {R2PathWriterSpec} from "./R2PathWriterSpec";
-export {R2Suite} from "./R2Suite";
+import type {R2Function} from "./R2Function";
+import {R2Curve} from "./R2Curve";
+
+export abstract class R2BezierCurve extends R2Curve {
+  abstract override transform(f: R2Function): R2BezierCurve;
+}

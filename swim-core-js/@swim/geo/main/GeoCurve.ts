@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Equivalent, Equals} from "@swim/util";
-import type {CurveR2} from "@swim/math";
+import type {R2Curve} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {GeoShape} from "./GeoShape";
 import type {GeoPoint} from "./GeoPoint";
@@ -27,7 +27,7 @@ export abstract class GeoCurve extends GeoShape implements Equals, Equivalent {
 
   abstract split(u: number): [GeoCurve, GeoCurve];
 
-  abstract override project(f: GeoProjection): CurveR2;
+  abstract override project(f: GeoProjection): R2Curve;
 
   abstract forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
   abstract forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void,

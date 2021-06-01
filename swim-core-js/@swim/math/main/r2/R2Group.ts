@@ -14,12 +14,11 @@
 
 import {Equivalent, Equals, Lazy, Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {R2Shape, R2Group} from "@swim/math";
-import type {GeoProjection} from "./GeoProjection";
-import {AnyGeoShape, GeoShape} from "./GeoShape";
-import {GeoBox} from "./GeoBox";
+import type {R2Function} from "./R2Function";
+import {AnyR2Shape, R2Shape} from "./R2Shape";
+import {R2Box} from "./R2Box";
 
-export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements Equals, Equivalent, Debug {
+export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equals, Equivalent, Debug {
   constructor(shapes: ReadonlyArray<S>) {
     super();
     Object.defineProperty(this, "shapes", {
@@ -33,45 +32,45 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     });
   }
 
+  readonly shapes!: ReadonlyArray<S>;
+
   isDefined(): boolean {
     return this.shapes.length !== 0;
   }
 
-  readonly shapes!: ReadonlyArray<S>;
-
-  override get lngMin(): number {
-    return this.bounds.lngMin;
+  override get xMin(): number {
+    return this.bounds.xMin;
   }
 
-  override get latMin(): number {
-    return this.bounds.latMin;
+  override get yMin(): number {
+    return this.bounds.yMin;
   }
 
-  override get lngMax(): number {
-    return this.bounds.lngMax;
+  override get xMax(): number {
+    return this.bounds.xMax;
   }
 
-  override get latMax(): number {
-    return this.bounds.latMax;
+  override get yMax(): number {
+    return this.bounds.yMax;
   }
 
-  override contains(that: AnyGeoShape): boolean;
+  override contains(that: AnyR2Shape): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyGeoShape | number, y?: number): boolean {
+  override contains(that: AnyR2Shape | number, y?: number): boolean {
     return false; // TODO
   }
 
-  override intersects(that: AnyGeoShape): boolean {
+  override intersects(that: AnyR2Shape): boolean {
     return false; // TODO
   }
 
-  override project(f: GeoProjection): R2Group {
+  override transform(f: R2Function): R2Group {
     const oldShapes = this.shapes;
     const n = oldShapes.length;
     if (n > 0) {
       const newShapes = new Array<R2Shape>(n);
       for (let i = 0; i < n; i += 1) {
-        newShapes[i] = oldShapes[i]!.project(f);
+        newShapes[i] = oldShapes[i]!.transform(f);
       }
       return new R2Group(newShapes);
     } else {
@@ -80,24 +79,24 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
   }
 
   /** @hidden */
-  readonly boundingBox!: GeoBox | null;
+  readonly boundingBox!: R2Box | null;
 
-  override get bounds(): GeoBox {
+  override get bounds(): R2Box {
     let boundingBox = this.boundingBox;
     if (boundingBox === null) {
-      let lngMin = Infinity;
-      let latMin = Infinity;
-      let lngMax = -Infinity;
-      let latMax = -Infinity;
+      let xMin = Infinity;
+      let yMin = Infinity;
+      let xMax = -Infinity;
+      let yMax = -Infinity;
       const shapes = this.shapes;
       for (let i = 0, n = shapes.length; i < n; i += 1) {
         const shape = shapes[i]!;
-        lngMin = Math.min(lngMin, shape.lngMin);
-        latMin = Math.min(latMin, shape.latMin);
-        lngMax = Math.max(shape.lngMax, lngMax);
-        latMax = Math.max(shape.latMax, latMax);
+        xMin = Math.min(xMin, shape.xMin);
+        yMin = Math.min(yMin, shape.yMin);
+        xMax = Math.max(shape.xMax, xMax);
+        yMax = Math.max(shape.yMax, yMax);
       }
-      boundingBox = new GeoBox(lngMin, latMin, lngMax, latMax);
+      boundingBox = new R2Box(xMin, yMin, xMax, yMax);
       Object.defineProperty(this, "boundingBox", {
         value: boundingBox,
         enumerable: true,
@@ -110,16 +109,16 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
-    } else if (that instanceof GeoGroup) {
+    } else if (that instanceof R2Group) {
       return Arrays.equivalent(this.shapes, that.shapes, epsilon);
     }
     return false;
   }
 
-  override equals(that: unknown): boolean {
+  equals(that: unknown): boolean {
     if (this === that) {
       return true;
-    } else if (that instanceof GeoGroup) {
+    } else if (that instanceof R2Group) {
       return Arrays.equal(this.shapes, that.shapes);
     }
     return false;
@@ -128,7 +127,7 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
   debug(output: Output): void {
     const shapes = this.shapes;
     const n = shapes.length;
-    output = output.write("GeoGroup").write(46/*'.'*/);
+    output = output.write("R2Group").write(46/*'.'*/);
     if (n === 0) {
       output = output.write("empty").write(40/*'('*/);
     } else {
@@ -146,11 +145,11 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
   }
 
   @Lazy
-  static empty<S extends GeoShape>(): GeoGroup<S> {
-    return new GeoGroup(Arrays.empty);
+  static empty<S extends R2Shape>(): R2Group<S> {
+    return new R2Group(Arrays.empty);
   }
 
-  static of<S extends GeoShape>(...shapes: S[]): GeoGroup<S> {
-    return new GeoGroup(shapes);
+  static of<S extends R2Shape>(...shapes: S[]): R2Group<S> {
+    return new R2Group(shapes);
   }
 }

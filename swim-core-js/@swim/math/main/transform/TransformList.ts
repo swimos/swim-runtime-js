@@ -16,7 +16,7 @@ import {Murmur3, Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {Item, Value, Record} from "@swim/structure";
-import {PointR2} from "../r2/PointR2";
+import {R2Point} from "../r2/R2Point";
 import {Transform} from "./Transform";
 import {AffineTransform} from "./AffineTransform";
 import {IdentityTransform} from "./IdentityTransform";
@@ -39,8 +39,8 @@ export class TransformList extends Transform {
   readonly transforms!: ReadonlyArray<Transform>;
 
   override transform(that: Transform): Transform;
-  override transform(x: number, y: number): PointR2;
-  override transform(x: Transform | number, y?: number): Transform | PointR2 {
+  override transform(x: number, y: number): R2Point;
+  override transform(x: Transform | number, y?: number): Transform | R2Point {
     if (arguments.length === 1) {
       if (x instanceof IdentityTransform) {
         return this;
@@ -56,7 +56,7 @@ export class TransformList extends Transform {
         x = xi;
         y = yi;
       }
-      return new PointR2(x as number, y!);
+      return new R2Point(x as number, y!);
     }
   }
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Equals} from "@swim/util";
-import type {ShapeR2} from "@swim/math";
+import type {R2Shape} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {GeoPointInit, GeoPointTuple, GeoPoint} from "./"; // forward import
 import {GeoSegmentInit, GeoSegment} from "./"; // forward import
@@ -44,7 +44,7 @@ export abstract class GeoShape implements Equals {
                       Math.max(this.latMax, that.latMax));
   }
 
-  abstract project(f: GeoProjection): ShapeR2;
+  abstract project(f: GeoProjection): R2Shape;
 
   get bounds(): GeoBox {
     return new GeoBox(this.lngMin, this.latMin, this.lngMax, this.latMax);

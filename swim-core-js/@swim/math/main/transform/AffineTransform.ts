@@ -16,7 +16,7 @@ import {Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {Item, Value, Record} from "@swim/structure";
-import {PointR2} from "../r2/PointR2";
+import {R2Point} from "../r2/R2Point";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransformInterpolator} from "../"; // forward import
@@ -69,8 +69,8 @@ export class AffineTransform extends Transform {
   readonly ty!: number;
 
   override transform(that: Transform): Transform;
-  override transform(x: number, y: number): PointR2;
-  override transform(x: Transform | number, y?: number): Transform | PointR2 {
+  override transform(x: number, y: number): R2Point;
+  override transform(x: Transform | number, y?: number): Transform | R2Point {
     if (arguments.length === 1) {
       if (x instanceof IdentityTransform) {
         return this;
@@ -78,7 +78,7 @@ export class AffineTransform extends Transform {
         return this.multiply((x as Transform).toAffine());
       }
     } else {
-      return new PointR2(this.x0 * (x as number) + this.x1 * y! + this.tx,
+      return new R2Point(this.x0 * (x as number) + this.x1 * y! + this.tx,
                          this.y0 * (x as number) + this.y1 * y! + this.ty);
     }
   }

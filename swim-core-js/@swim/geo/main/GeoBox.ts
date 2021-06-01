@@ -15,7 +15,7 @@
 import {Equivalent, HashCode, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
-import {BoxR2} from "@swim/math";
+import {R2Box} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
@@ -172,10 +172,10 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
       return false;
     } else if (lng0 > lngMin && lng0 < lngMax && lat0 > latMin && lat0 < latMax) {
       return true;
-    } else if ((BoxR2.intersectsSegment(lng0 - lngMin, lng1 - lngMin, lng0, lat0, lng1, lat1) && BoxR2.hitY > latMin && BoxR2.hitY < latMax)
-            || (BoxR2.intersectsSegment(lat0 - latMin, lat1 - latMin, lng0, lat0, lng1, lat1) && BoxR2.hitX > lngMin && BoxR2.hitX < lngMax)
-            || (BoxR2.intersectsSegment(lng0 - lngMax, lng1 - lngMax, lng0, lat0, lng1, lat1) && BoxR2.hitY > latMin && BoxR2.hitY < latMax)
-            || (BoxR2.intersectsSegment(lat0 - latMax, lat1 - latMax, lng0, lat0, lng1, lat1) && BoxR2.hitX > lngMin && BoxR2.hitX < lngMax)) {
+    } else if ((R2Box.intersectsSegment(lng0 - lngMin, lng1 - lngMin, lng0, lat0, lng1, lat1) && R2Box.hitY > latMin && R2Box.hitY < latMax)
+            || (R2Box.intersectsSegment(lat0 - latMin, lat1 - latMin, lng0, lat0, lng1, lat1) && R2Box.hitX > lngMin && R2Box.hitX < lngMax)
+            || (R2Box.intersectsSegment(lng0 - lngMax, lng1 - lngMax, lng0, lat0, lng1, lat1) && R2Box.hitY > latMin && R2Box.hitY < latMax)
+            || (R2Box.intersectsSegment(lat0 - latMax, lat1 - latMax, lng0, lat0, lng1, lat1) && R2Box.hitX > lngMin && R2Box.hitX < lngMax)) {
       return true;
     } else {
       return false;
@@ -192,7 +192,7 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     return super.union(that) as GeoBox;
   }
 
-  override project(f: GeoProjection): BoxR2 {
+  override project(f: GeoProjection): R2Box {
     const bottomLeft = f.project(this.lngMin, this.latMin);
     const topRight = f.project(this.lngMax, this.latMax);
     let xMin = bottomLeft.x;
@@ -221,7 +221,7 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     if (!isFinite(yMax)) {
       yMax = Infinity;
     }
-    return new BoxR2(xMin, yMin, xMax, yMax);
+    return new R2Box(xMin, yMin, xMax, yMax);
   }
 
   override get bounds(): GeoBox {

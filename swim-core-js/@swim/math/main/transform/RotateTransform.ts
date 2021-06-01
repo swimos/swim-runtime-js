@@ -17,7 +17,7 @@ import {Output, Parser, Diagnostic, Unicode} from "@swim/codec";
 import type {Interpolator} from "@swim/mapping";
 import {Item, Value, Record} from "@swim/structure";
 import {Angle} from "../angle/Angle";
-import {PointR2} from "../r2/PointR2";
+import {R2Point} from "../r2/R2Point";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {RotateTransformInterpolator} from "../"; // forward import
@@ -41,8 +41,8 @@ export class RotateTransform extends Transform {
   readonly angle!: Angle;
 
   override transform(that: Transform): Transform;
-  override transform(x: number, y: number): PointR2;
-  override transform(x: Transform | number, y?: number): Transform | PointR2 {
+  override transform(x: number, y: number): R2Point;
+  override transform(x: Transform | number, y?: number): Transform | R2Point {
     if (arguments.length === 1) {
       if (x instanceof IdentityTransform) {
         return this;
@@ -53,7 +53,7 @@ export class RotateTransform extends Transform {
       const angle = this.angle.radValue();
       const cosA = Math.cos(angle);
       const sinA = Math.sin(angle);
-      return new PointR2((x as number) * cosA - y! * sinA,
+      return new R2Point((x as number) * cosA - y! * sinA,
                          (x as number) * sinA + y! * cosA);
     }
   }

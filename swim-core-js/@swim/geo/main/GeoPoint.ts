@@ -15,7 +15,7 @@
 import {Equivalent, HashCode, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Output, Debug, Format} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
-import type {PointR2} from "@swim/math";
+import type {R2Point} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {GeoPointInterpolator} from "./"; // forward import
@@ -91,7 +91,7 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return (that as GeoShape).intersects(this);
   }
 
-  override project(f: GeoProjection): PointR2 {
+  override project(f: GeoProjection): R2Point {
     return f.project(this);
   }
 

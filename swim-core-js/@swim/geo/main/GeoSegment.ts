@@ -15,7 +15,7 @@
 import {HashCode, Murmur3, Numbers, Constructors} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
 import type {Interpolate, Interpolator} from "@swim/mapping";
-import {SegmentR2} from "@swim/math";
+import {R2Segment} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
@@ -100,7 +100,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   override contains(lng: number, lat: number): boolean;
   override contains(that: AnyGeoShape | number, lat?: number): boolean {
     if (typeof that === "number") {
-      return SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that, lat!);
+      return R2Segment.contains(this.lng0, this.lat0, this.lng1, this.lat1, that, lat!);
     } else {
       that = GeoShape.fromAny(that);
       if (that instanceof GeoPoint) {
@@ -114,13 +114,13 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
 
   /** @hidden */
   containsPoint(that: GeoPoint): boolean {
-    return SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng, that.lat);
+    return R2Segment.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng, that.lat);
   }
 
   /** @hidden */
   containsSegment(that: GeoSegment): boolean {
-    return SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng0, that.lat0)
-        && SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng1, that.lat1);
+    return R2Segment.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng0, that.lat0)
+        && R2Segment.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng1, that.lat1);
   }
 
   override intersects(that: AnyGeoShape): boolean {
@@ -137,12 +137,12 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
 
   /** @hidden */
   intersectsPoint(that: GeoPoint): boolean {
-    return SegmentR2.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng, that.lat);
+    return R2Segment.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng, that.lat);
   }
 
   /** @hidden */
   intersectsSegment(that: GeoSegment): boolean {
-    return SegmentR2.intersects(this.lng0, this.lat0, this.lng1 - this.lat0, this.lng1 - this.lat0,
+    return R2Segment.intersects(this.lng0, this.lat0, this.lng1 - this.lat0, this.lng1 - this.lat0,
                                 that.lng0, that.lat0, that.lng1 - that.lat0, that.lng1 - that.lat0);
   }
 
@@ -155,10 +155,10 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     return [c0, c1];
   }
 
-  override project(f: GeoProjection): SegmentR2 {
+  override project(f: GeoProjection): R2Segment {
     const p0 = f.project(this.lng0, this.lat0);
     const p1 = f.project(this.lng1, this.lat1);
-    return new SegmentR2(p0.x, p0.y, p1.x, p1.y);
+    return new R2Segment(p0.x, p0.y, p1.x, p1.y);
   }
 
   override forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;

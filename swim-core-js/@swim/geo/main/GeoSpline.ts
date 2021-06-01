@@ -14,7 +14,7 @@
 
 import {Arrays} from "@swim/util";
 import {Debug, Format, Output} from "@swim/codec";
-import {CurveR2, SegmentR2, SplineR2} from "@swim/math";
+import {R2Curve, R2Segment, R2Spline} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {AnyGeoShape, GeoShape} from "./GeoShape";
 import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
@@ -170,12 +170,12 @@ export class GeoSpline extends GeoCurve implements Debug {
     }
   }
 
-  override project(f: GeoProjection): SplineR2 {
+  override project(f: GeoProjection): R2Spline {
     const oldCurves = this.curves;
     const n = oldCurves.length;
     if (n > 0) {
       let i = 0;
-      const newCurves = new Array<CurveR2>(n);
+      const newCurves = new Array<R2Curve>(n);
 
       // project leading adjacent segments
       let curve = oldCurves[0]!;
@@ -187,7 +187,7 @@ export class GeoSpline extends GeoCurve implements Debug {
           if (curve instanceof GeoSegment) {
             // project next point
             const p1 = f.project(curve.lng1, curve.lat1);
-            newCurves[i] = new SegmentR2(p0.x, p0.y, p1.x, p1.y);
+            newCurves[i] = new R2Segment(p0.x, p0.y, p1.x, p1.y);
             p0 = p1;
             i += 1;
           } else {
@@ -203,9 +203,9 @@ export class GeoSpline extends GeoCurve implements Debug {
         i += 1;
       }
 
-      return new SplineR2(newCurves, this.closed);
+      return new R2Spline(newCurves, this.closed);
     } else {
-      return SplineR2.empty();
+      return R2Spline.empty();
     }
   }
 
