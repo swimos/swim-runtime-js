@@ -247,6 +247,6 @@ const core = [
 ];
 
 export default {
-  version: "3.11.0",
+  version: "4.0.0-dev.20210826",
   projects: core,
 };

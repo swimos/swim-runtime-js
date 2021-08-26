@@ -264,11 +264,11 @@ const core = [
   },
 ];
 
-const mesh = [
+const host = [
   {
     id: "warp",
     name: "@swim/warp",
-    path: "swim-mesh-js/@swim/warp",
+    path: "swim-host-js/@swim/warp",
     targets: [
       {
         id: "main",
@@ -283,7 +283,7 @@ const mesh = [
   {
     id: "client",
     name: "@swim/client",
-    path: "swim-mesh-js/@swim/client",
+    path: "swim-host-js/@swim/client",
     targets: [
       {
         id: "main",
@@ -298,7 +298,7 @@ const mesh = [
   {
     id: "cli",
     name: "@swim/cli",
-    path: "swim-mesh-js/@swim/cli",
+    path: "swim-host-js/@swim/cli",
     targets: [
       {
         id: "main",
@@ -307,10 +307,10 @@ const mesh = [
     ],
   },
   {
-    id: "mesh",
-    name: "@swim/mesh",
-    path: "swim-mesh-js/@swim/mesh",
-    title: "Swim Mesh",
+    id: "host",
+    name: "@swim/host",
+    path: "swim-host-js/@swim/host",
+    title: "Swim Host",
     framework: true,
     targets: [
       {
@@ -321,23 +321,23 @@ const mesh = [
   },
 ];
 
-const system = [
+const runtime = [
   {
-    id: "system",
-    name: "@swim/system",
-    title: "Swim System",
+    id: "runtime",
+    name: "@swim/runtime",
+    title: "Swim Runtime",
     framework: true,
     targets: [
       {
         id: "main",
-        deps: ["core", "mesh"],
+        deps: ["core", "host"],
       },
     ],
   },
 ];
 
 export default {
-  version: "3.11.0",
-  projects: core.concat(mesh).concat(system),
+  version: "4.0.0-dev.20210826",
+  projects: core.concat(host).concat(runtime),
   gaID: "UA-79441805-2",
 };

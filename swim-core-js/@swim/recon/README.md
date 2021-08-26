@@ -1,23 +1,16 @@
-# @swim/recon
+# <a href="https://www.swimos.org"><img src="https://docs.swimos.org/readme/breach-marlin-blue-wide.svg"></a> Swim Recon Library
 
-[![package](https://img.shields.io/npm/v/@swim/recon.svg)](https://www.npmjs.com/package/@swim/recon)
-[![documentation](https://img.shields.io/badge/doc-TypeDoc-blue.svg)](https://docs.swimos.org/js/latest/modules/_swim_recon.html)
-[![chat](https://img.shields.io/badge/chat-Gitter-green.svg)](https://gitter.im/swimos/community)
-
-<a href="https://www.swimos.org"><img src="https://docs.swimos.org/readme/marlin-blue.svg" align="left"></a>
-
-Recon is object notation with attributes, like if JSON and XML had a baby.
-Attributes facilitate uniformly disambiguating polymorphic structures.  And
+Recon is object notation with attributes—like if JSON and XML had a baby.
+Attributes facilitate uniformly disambiguating polymorphic structures. And
 first-class language extensions for selectors, expressions, and functions make
-Recon a highly expressive format for domain specific languages.  **@swim/recon**
-is part of the [**@swim/core**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/core) framework.
+Recon a highly expressive format for domain specific languages.
 
 ## Language Overview
 
-Recon combines the simplicity of JSON with the expressiveness of XML.  As shown
-in the example below, Recon looks a bit like a hybrid of the two.  Yet Recon is
+Recon combines the simplicity of JSON with the expressiveness of XML. As shown
+in the example below, Recon looks a bit like a hybrid of the two. Yet Recon is
 deceptively simple: the grammar for Recon is scarcely larger than the grammar
-for JSON.  And this underlying uniformity makes Recon more expressive, and more
+for JSON. And this underlying uniformity makes Recon more expressive, and more
 consistent to work with, than either XML or JSON.
 
 ```recon
@@ -28,12 +21,12 @@ consistent to work with, than either XML or JSON.
   @body {
     @h1 "Introduction"
     @p [I have @a(href:"https://en.wikipedia.org/wiki/Markup_language")[markup syntax]
-        for when you need it.  But I'm not a text chauvinist.  I'm a structured object
-        notation first and foremost.  The numbers {1, 2, 3} are parsed as numbers,
-        not strings.  Any my attributes make it easy to define, embed, and
+        for when you need it. But I'm not a text chauvinist. I'm a structured object
+        notation first and foremost. The numbers {1, 2, 3} are parsed as numbers,
+        not strings. Any my attributes make it easy to define, embed, and
         disambiguate microformats and domain specific languages.]
     @p [Need a microformat for time?  You'll find it falls out naturally after
-        {{10 @minutes}} of using Recon.  Need to build a DSL for real-time GUI
+        {{10 @minutes}} of using Recon. Need to build a DSL for real-time GUI
         widgets?  Recon helps you do so cleanly and concisely, like this:]
     @pie {
       title: "Events"
@@ -57,9 +50,9 @@ consistent to work with, than either XML or JSON.
 }
 ```
 
-The name Recon is shorthand for **Reco**rd **n**otation.  Record Notation has
+The name Recon is shorthand for **Reco**rd **n**otation. Record Notation has
 six primitive data types: _text_, _data_, _num_, _bool_ _extant_, and _absent_;
-and one aggregate data type: _record_.  Read on to learn about the underlying
+and one aggregate data type: _record_. Read on to learn about the underlying
 structure of the language.
 
 ### Text Values
@@ -111,16 +104,16 @@ foo: # value of foo slot is extant
 
 ### Absent Values
 
-Absent represents something that does not exist.  Its only direct
+Absent represents something that does not exist. Its only direct
 representation in Record Notation is an empty document.
 
 ### Record Values
 
-Record Notation has a single aggregate data type, called _record_.  Records
-play the combined role of array and associative array.  Think of a record as
+Record Notation has a single aggregate data type, called _record_. Records
+play the combined role of array and associative array. Think of a record as
 a partially keyed list—a sequence where some items may have keys, and other
-items may lack keys.  An array is a record in which no items have keys.  An
-associative array is a record in which every item has a key.  An object is a
+items may lack keys. An array is a record in which no items have keys. An
+associative array is a record in which every item has a key. An object is a
 record where every item has a text key.
 
 The example below contains a record with two ordered items, first a "subject"
@@ -153,9 +146,9 @@ Records support arbitrary values as slot keys.
 ### Blocks
 
 Top-level documents can omit the curly braces around their root record.
-The content of a record, sans curly braces, is called a _block_.  When a block
+The content of a record, sans curly braces, is called a _block_. When a block
 contains only a single item, the value of the block reduces to the value of
-the item it contains.  The example block below is equivalent to the example
+the item it contains. The example block below is equivalent to the example
 record with curly braces above.
 
 ```recon
@@ -164,15 +157,15 @@ subject: "Re: Greetings"
 ```
 ### Markup
 
-Square brackets denote _markup_.  Markup offers an inverted syntax for records,
-with values embedded in text, as opposed to text embedded in records.  Markup
+Square brackets denote _markup_. Markup offers an inverted syntax for records,
+with values embedded in text, as opposed to text embedded in records. Markup
 looks like this:
 
 ```recon
 [Hello, @em[world]!]
 ```
 
-Markup is really just syntactic sugar for records.  The above example expresses
+Markup is really just syntactic sugar for records. The above example expresses
 the exact same structure as the example below.
 
 ```recon
@@ -180,14 +173,14 @@ the exact same structure as the example below.
 ```
 
 Curly braces splice blocks into markup, lifting the enclosed block into the
-markup's record.  The following records are equivalent.
+markup's record. The following records are equivalent.
 
 ```recon
 [Answer: {42}.]
 { "Answer", 42, "." }
 ```
 
-Square brackets lift nested markup into the enclosing record.  Make sure to
+Square brackets lift nested markup into the enclosing record. Make sure to
 backslash escape square brackets if you want to include them verbatim.
 
 ```recon
@@ -214,9 +207,9 @@ markup.
 { "Goals: ", @select(max:2){fast,good,cheap}, "." }
 ```
 
-Beware that whitespace inside markup is significant.  There can be no
+Beware that whitespace inside markup is significant. There can be no
 whitespace between markup-embedded attributes and the blocks they're intended
-to modify.  Notice how the single space added to the example below completely
+to modify. Notice how the single space added to the example below completely
 changes its meaning, when compared to the previous example.
 
 ```recon
@@ -226,8 +219,8 @@ changes its meaning, when compared to the previous example.
 
 ### Attributes
 
-The `@` sigil introduces an attribute.  Attributes call out key fields of
-a record.  The markup `[Hello, @em[world]!]` further reduces to the form below.
+The `@` sigil introduces an attribute. Attributes call out key fields of
+a record. The markup `[Hello, @em[world]!]` further reduces to the form below.
 
 ```recon
 {
@@ -240,11 +233,11 @@ a record.  The markup `[Hello, @em[world]!]` further reduces to the form below.
 }
 ```
 
-Note that the `@em` field above has no explicit value.  Recon models
-unspecified–but existent–values as _extant_.  We say that the record
+Note that the `@em` field above has no explicit value. Recon models
+unspecified–but existent–values as _extant_. We say that the record
 `@em[world]` has an _extant attribute_ named `em`.
 
-Of course, attributes can have specific associated values too.  Place attribute
+Of course, attributes can have specific associated values too. Place attribute
 parameters in parentheses following the attribute's name.
 
 ```recon
@@ -260,7 +253,7 @@ The above attributes are structurally equivalent to:
 ```
 
 Attribute parentheses enclose a block, meaning attribute values construct an
-implicit record when needed.  An example, with its desugared equivalent:
+implicit record when needed. An example, with its desugared equivalent:
 
 ```recon
 @img(src: "tesseract.png", width: 10, height: 10, depth: 10, time: -1)
@@ -276,8 +269,8 @@ implicit record when needed.  An example, with its desugared equivalent:
 }
 ```
 
-Attributes _modify_ adjacent values.  Modified values interpolate into the
-record formed by their adjacent attributes.  Here are some examples of values
+Attributes _modify_ adjacent values. Modified values interpolate into the
+record formed by their adjacent attributes. Here are some examples of values
 with prefix, postfix, and circumfix attributes:
 
 ```recon
@@ -314,12 +307,12 @@ TODO.
 
 ## API Overview
 
-**@swim/recon** uses [**@swim/structure**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/structure)
-as its default abstract syntax tree.  Refer to the documentation for
-**@swim/structure** to learn how to manipulate parsed Recon structures.
+**@swim/recon** uses [**@swim/structure**][structure] as its default abstract
+syntax tree. Refer to the documentation for **@swim/structure** to learn how
+to manipulate parsed Recon structures.
 
 The `Recon` factory class provides static methods for parsing and serializing
-Recon structures.  Use `Recon.parse` to parse a **@swim/structure** `Value` from
+Recon structures. Use `Recon.parse` to parse a **@swim/structure** `Value` from
 a string:
 
 ```typescript
@@ -371,14 +364,13 @@ Value.parseRecon("[Hello, @em[world]!]").toAny();
 // ["Hello, ",{"@em":null,"$1":"world"},"!"]
 ```
 
-`Recon` also provides methods to get composable
-[**@swim/codec**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/codec)
+`Recon` also provides methods to get composable [**@swim/codec**][codec]
 `Parser`s and `Writer`s for low-level parsing and serialization needs, such as
 incremental parsing out of arbitrary `Input` streams.
 
 The exported `ReconParser` and `ReconWriter` classes can be extended to
 directly generate and serialize alternative syntax trees, or to extend the
-Recon language itself by overriding parse methods.  `ReconStructureParser` and
+Recon language itself by overriding parse methods. `ReconStructureParser` and
 `ReconStructureWriter` provide the standard **@swim/structure**-based
 `ReconParser` and `ReconWriter` implementations, with full support for Recon
 selectors, expressions, and functions.
@@ -504,66 +496,5 @@ InvokeOperator ::= Primary ('(' Block ')')*
 Primary ::= Literal | '(' BlockExpression (',' BlockExpression)* ')'
 ```
 
-## Installation
-
-### npm
-
-For an npm-managed project, `npm install @swim/recon` to make it a dependency.
-TypeScript sources will be installed into `node_modules/@swim/recon/main`.
-Transpiled JavaScript and TypeScript definition files install into
-`node_modules/@swim/recon/lib/main`.  And a pre-built UMD script can
-be found in `node_modules/@swim/recon/dist/main/swim-recon.js`.
-
-### Browser
-
-Browser applications can load `swim-core.js`, which comes bundled with the
-**@swim/recon** library, directly from the SwimOS CDN.
-
-```html
-<!-- Development -->
-<script src="https://cdn.swimos.org/js/latest/swim-core.js"></script>
-
-<!-- Production -->
-<script src="https://cdn.swimos.org/js/latest/swim-core.min.js"></script>
-```
-
-Alternatively, the standalone `swim-system.js` script may be loaded
-from the SwimOS CDN, which bundles **@swim/recon** together with all other
-[**@swim/system**](https://github.com/swimos/swim/tree/master/swim-system-js/@swim/system)
-libraries.
-
-```html
-<!-- Development -->
-<script src="https://cdn.swimos.org/js/latest/swim-system.js"></script>
-
-<!-- Production -->
-<script src="https://cdn.swimos.org/js/latest/swim-system.min.js"></script>
-```
-
-## Usage
-
-### ES6/TypeScript
-
-**@swim/recon** can be imported as an ES6 module from TypeScript and other
-ES6-compatible environments.
-
-```typescript
-import * as recon from "@swim/recon";
-```
-
-### CommonJS/Node.js
-
-**@swim/recon** can also be used as a CommonJS module in Node.js applications.
-
-```javascript
-var recon = require("@swim/recon");
-```
-
-### Browser
-
-When loaded by a web browser, the `swim-core.js` script adds all
-**@swim/recon** library exports to the global `swim` namespace.
-
-The `swim-system.js` script also adds all **@swim/recon** library exports
-to the global `swim` namespace, making it a drop-in replacement for
-`swim-core.js` when additional **@swim/system** libraries are needed.
+[codec]: https://github.com/swimos/swim/tree/main/swim-js/swim-runtime-js/swim-core-js/@swim/codec
+[structure]: https://github.com/swimos/swim/tree/main/swim-js/swim-runtime-js/swim-core-js/@swim/structure

@@ -1,54 +1,45 @@
-# @swim/uri
+# <a href="https://www.swimos.org"><img src="https://docs.swimos.org/readme/breach-marlin-blue-wide.svg"></a> Swim URI Library
 
-[![package](https://img.shields.io/npm/v/@swim/uri.svg)](https://www.npmjs.com/package/@swim/uri)
-[![documentation](https://img.shields.io/badge/doc-TypeDoc-blue.svg)](https://docs.swimos.org/js/latest/modules/_swim_uri.html)
-[![chat](https://img.shields.io/badge/chat-Gitter-green.svg)](https://gitter.im/swimos/community)
-
-<a href="https://www.swimos.org"><img src="https://docs.swimos.org/readme/marlin-blue.svg" align="left"></a>
-
-**@swim/uri** provides a rich object model for working with Uniform Resource
-Identifiers and URI subcomponents, including an efficient and safe codec for
-parsing and writing compliant URI strings.  Rich APIs for paths and queries
-simplify deconstruction and manipulation of parsed URI objects.  **@swim/uri**
-is part of the [**@swim/core**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/core)
-framework.
+The Swim URI library implements a rich object model for working with Uniform
+Resource Identifiers and URI subcomponents, including an efficient and safe
+codec for parsing and writing compliant URI strings. Comprehensive APIs for
+paths and queries simplify deconstruction and manipulation of parsed URI objects.
 
 ## Overview
 
-**@swim/uri** models each URI component as an immutable class, with rich methods
-for manipulating and destructuring the component.  The `Uri` class combines a
+Swim URI models each URI component as an immutable class, with rich methods
+for manipulating and destructuring the component. The `Uri` class combines a
 `UriScheme`, `UriAuthority`, `UriPath`, `UriQuery`, and `UriFragment` into a
-complete model of a URI.  The `UriAuthority` class composes a `UriUser`,
+complete model of a URI. The `UriAuthority` class composes a `UriUser`,
 `UriHost`, and `UriPort` into a standalone model of the authority component of
 a URI.
 
 The `UriPath` class represents URI paths as an immutable linked list, making it
-efficient to incrementally deconstruct.  The `UriQuery` class uses a similar
+efficient to incrementally deconstruct. The `UriQuery` class uses a similar
 linked list structure to represent query parameters, while providing a
 convenient `Map`-like API.
 
-The `Uri` class has an expressive API for transforming URI subcomponents.  And
+The `Uri` class has an expressive API for transforming URI subcomponents. And
 provides standards-compliant methods to resolve and unresolve URIs relative to
 base URIs.
 
-All **@swim/uri** classes are immutable, which facilitates caching and instance
-sharing.  All manipulation methods return a new URI component, instead of
-mutating the receiver.  URI classes are also typically used non-nullably,
-enabling fluent API use without pervasive `null` checks.  Undefined URI
+All Swim URI classes are immutable, which facilitates caching and instance
+sharing. All manipulation methods return a new URI component, instead of
+mutating the receiver. URI classes are also typically used non-nullably,
+enabling fluent API use without pervasive `null` checks. Undefined URI
 components are modeled as particular instances of their respective component
 classes for which an `isDefined` method returns `false`, rather than as `null`
 or `undefined` JavaScript values.
 
-**@swim/uri** implements [**@swim/codec**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/codec)-based
-`Parser`s and `Writer`s for efficiently and safely decoding and encoding URI
-strings.  And aggressive internal caching and memoization minimizes runtime
-overhead, without compromising the API.
+Swim URI implements [Swim Codec][codec]-based `Parser`s and `Writer`s for
+efficiently and safely decoding and encoding URI strings. Aggressive internal
+caching and memoization minimizes runtime overhead, without compromising the API.
 
 ### Uri
 
 The `Uri.parse` static method parses an encoded URI string into a structured
-`Uri` object.  The `Uri.toString` instance method reverses the process,
-returning a properly URI-encoded string.  `Uri.toString` is memoized—repeated
+`Uri` object. The `Uri.toString` instance method reverses the process,
+returning a properly URI-encoded string. `Uri.toString` is memoized—repeated
 calls return the same string instance–making it efficient to store references
 to structured `Uri` objects even when they're frequently converted to strings.
 
@@ -89,7 +80,7 @@ Uri.parse("http://user:pass@127.0.0.1:8080/foo?a=1&b=2#bar").toAny();
 ```
 
 The `Uri.empty` static method returns a singleton `Uri` instance with undefined
-scheme, authority, path, query, and fragment components.  Keep in mind that
+scheme, authority, path, query, and fragment components. Keep in mind that
 undefined URI components are valid instances of their respective component
 classes.
 
@@ -116,10 +107,10 @@ ommitted arguments replaced by their respective undefined component instances.
 
 Use the `Uri.scheme`, `Uri.authority`, `Uri.user`, `Uri.host`, `Uri.port`,
 `Uri.path`, `Uri.query`, and `Uri.fragment` static methods to construct new
-`Uri` instances with a single defined component.  Strings passed to these
-factory methods will be treated as unencoded URI components.  `Uri.path` treats
+`Uri` instances with a single defined component. Strings passed to these
+factory methods will be treated as unencoded URI components. `Uri.path` treats
 string arguments as encoded URI path components, and accepts multiple arguments
-for safe and convenient path interpolation.  `Uri.query` also accepts a hash of
+for safe and convenient path interpolation. `Uri.query` also accepts a hash of
 key-value query parameters.
 
 ```typescript
@@ -158,10 +149,10 @@ Uri.pathPart("/foo/bar");
 
 Use the `Uri.scheme`, `Uri.authority`, `Uri.user`, `Uri.host`, `Uri.port`,
 `Uri.path`, `Uri.query`, and `Uri.fragment` instance methods access and update
-URI subcomponents.  To access and update URI-encoded string subcomponents, use
+URI subcomponents. To access and update URI-encoded string subcomponents, use
 the `Uri.schemePart`, `Uri.authorityPart`, `Uri.userPart`, `Uri.hostPart`,
 `Uri.portPart`, `Uri.pathPart`, `Uri.queryPart`, and `Uri.fragmentPart`
-instance methods.  Because `Uri` instances are immutable, update methods
+instance methods. Because `Uri` instances are immutable, update methods
 return a copy of the `Uri` with the updated subcomponent.
 
 Here are some examples showing how to access `Uri` subcomponents:
@@ -226,9 +217,9 @@ Uri.parse("http://example.com").fragment("toc");
 Use the `Uri.appendedPath` and `Uri.prependedPath` instance methods to append
 or prepend a sequence of unencoded path components to the existing URI path.
 Use the `Uri.appendedSlash` and `Uri.prependedSlash` instance methods to append
-or prepend a single slash to the existing path.  And use the
+or prepend a single slash to the existing path. And use the
 `Uri.appendedSegment` and `Uri.prependedSegment` instance methods to append or
-prepend a single unencoded path segment.  Note that adjacent path segments are
+prepend a single unencoded path segment. Note that adjacent path segments are
 automatically separated by slashes, as required.
 
 ```typescript
@@ -258,10 +249,10 @@ Uri.parse("bar").prependedSegment("/");
 ```
 
 Use the `Uri.updatedQuery` instance method to update a query parameter,
-inserting a new parameter if the key is not currently defined.  Use the
+inserting a new parameter if the key is not currently defined. Use the
 `Uri.removedQuery` instance method to remove a parameter from the query,
-if defined.  The `Uri.appendedQuery` and `Uri.prependedQuery` instance
-methods unconditionally append or prepend query parameters.  A `null` key
+if defined. The `Uri.appendedQuery` and `Uri.prependedQuery` instance
+methods unconditionally append or prepend query parameters. A `null` key
 in a query parameter indicates that the parameter is a literal string value,
 i.e. it contains no `'='` sign in its encoded form.
 
@@ -295,7 +286,7 @@ Uri.parse("?b=1&c=2").prependedQuery("alpha");
 ```
 
 Use the `Uri.resolve` instance method to resolve a relative URI argument
-against a base URI.  Use the `Uri.unresolve` instance method to obatin the
+against a base URI. Use the `Uri.unresolve` instance method to obatin the
 relative components of a URI argument with respect to a base URI.
 
 ```typescript
@@ -312,16 +303,16 @@ Uri.parse("http://example.com/foo/").unresolve("http://example.com/foo/bar/baz")
 ### UriScheme
 
 The `UriScheme` class wraps a valid URI scheme name, giving it a meaningful
-type, and a consistent set of methods.  The `UriScheme.undefined` static method
-returns the singleton undefined `UriScheme` instance.  The `UriScheme.create`
+type, and a consistent set of methods. The `UriScheme.undefined` static method
+returns the singleton undefined `UriScheme` instance. The `UriScheme.create`
 static method returns a cached `UriScheme` instance with the given scheme name.
 The `UriScheme.parse` static method parses a URI scheme component to ensure it
 is valid.
 
 The `UriScheme.isDefined` instance method returns `false` if the `UriScheme`
-instance represents an undefined URI scheme component.  The `UriScheme.name`
+instance represents an undefined URI scheme component. The `UriScheme.name`
 instance method returns the underlying scheme name, or the empty string if the
-scheme is not defined.  The `UriScheme.toAny` method returns the underlying
+scheme is not defined. The `UriScheme.toAny` method returns the underlying
 scheme name, or `undefined` if the scheme is not defined.
 
 ```typescript
@@ -347,7 +338,7 @@ UriScheme.undefined().toAny()
 ### UriAuthority
 
 The `UriAuthority` class combines a `UriUser`, `UriHost`, and `UriPort`,
-modeling the authority component of a URI.  The `UriAuthority.parse` static
+modeling the authority component of a URI. The `UriAuthority.parse` static
 method parses an encoded URI authority into a structured `UriAuthority` object.
 The `UriAuthority.toString` instance method returns a memoized URI-encoded
 authority string.
@@ -362,7 +353,7 @@ authority.toString();
 
 Use the `UriAuthority.fromAny` static method to coerce a plain old JavaScript
 object, of type `UriAuthorityInit`, or a URI-encoded authority string, to a
-structured `UriAuthority` instance.  Use the `UriAuthority.toAny` instance
+structured `UriAuthority` instance. Use the `UriAuthority.toAny` instance
 method to convert a `UriAuthority` instance into a plain old JavaScript object.
 
 ```typescript
@@ -414,7 +405,7 @@ UriAuthority.parse("example.com").isDefined();
 
 Use the `UriAuthority.user`, `UriAuthority.host`, and `UriAuthority.port`
 static methods to construct new `UriAuthority` instances with a single defined
-component.  Strings passed to these factory methods will be treated as
+component. Strings passed to these factory methods will be treated as
 unencoded authority components.
 
 ```typescript
@@ -429,7 +420,7 @@ UriAuthority.port(8080);
 ```
 
 Use the `UriAuthority.host`, `UriAuthority.user`, and `UriAuthority.port`,
-instance methods access and update authority subcomponents.  Because
+instance methods access and update authority subcomponents. Because
 `UriAuthority` instances are immutable, update methods return a copy of the
 `UriAuthority` with the updated subcomponent.
 
@@ -461,10 +452,10 @@ UriAuthority.parse("user:pass@example.com:80").withPort(8080);
 
 #### UriUser
 
-The `UriUser` class wraps a username and optional password string.  The
+The `UriUser` class wraps a username and optional password string. The
 `UriUser.undefined` static method returns a singleton `UriUser` with an
-undefined username and password.  The `UriUser.create` static method constructs
-a new `UriUser` from a username and optional password string.  The
+undefined username and password. The `UriUser.create` static method constructs
+a new `UriUser` from a username and optional password string. The
 `UriUser.fromAny` static method coerces a plain old JavaScript object, of type
 `UriUserInit`, or a URI-encoded user string, to a structured `UriUser` instance.
 
@@ -507,11 +498,11 @@ UriUser.parse("user:pass").withPassword("secret");
 #### UriHost
 
 The `UriHost` class models a URI host component, which is either a DNS name,
-an IPv4 address, an IPv6 address, or an undefined host component.  The
+an IPv4 address, an IPv6 address, or an undefined host component. The
 `UriHost.parse` static method parses a URI-encoded host component to a strongly
-typed UriHost instance.  The `UriHost.hostname` static method constructs a new
-`UriHost` from a host name string.  The `UriHost.ipv4` static method constructs
-a new `UriHost` from an IPv4 address.  And the `UriHost.ipv6` static method
+typed UriHost instance. The `UriHost.hostname` static method constructs a new
+`UriHost` from a host name string. The `UriHost.ipv4` static method constructs
+a new `UriHost` from an IPv4 address. And the `UriHost.ipv6` static method
 constructs a new `UriHost` from an IPv6 address.
 
 ```typescript
@@ -526,7 +517,7 @@ UriHost.parse("[::1]");
 ```
 
 The `UriHost.undefined` static method returns the singleton undefined `UriHost`
-instance.  And the `UriHost.isDefined` instance method returns `false` if the
+instance. And the `UriHost.isDefined` instance method returns `false` if the
 `UriHost` instance represents an undefined URI host component.
 
 ```typescript
@@ -540,13 +531,13 @@ UriHost.parse("example.com").isDefined();
 #### UriPort
 
 The `UriPort` class wraps a network port number, giving it a meaningful type,
-and a consistent set of methods.  The `UriPort.undefined` static method returns
-the singleton undefined `UriPort` instance.  The `UriPort.create` static method
-returns a cached `UriPort` instance with the given port number.  And the
+and a consistent set of methods. The `UriPort.undefined` static method returns
+the singleton undefined `UriPort` instance. The `UriPort.create` static method
+returns a cached `UriPort` instance with the given port number. And the
 `UriPort.parse` static method parses a URI port number.
 
 The `UriPort.isDefined` instance method returns `false` if the `UriPort`
-instance represents an undefined URI port number.  The `UriPort.number`
+instance represents an undefined URI port number. The `UriPort.number`
 instance method returns the underlying port number, or zero if the port
 is not defined.
 
@@ -567,13 +558,13 @@ UriPort.undefined().number;
 ### UriPath
 
 The `UriPath` class models the path component of a URI as an immutable linked
-list of segments and slashes.  This linked list structure makes it efficient to
-incrementally deconstruct URI paths by prefix.  Despite being implemented as a
+list of segments and slashes. This linked list structure makes it efficient to
+incrementally deconstruct URI paths by prefix. Despite being implemented as a
 linked list, `UriPath` provides a familiar array-like interface.
 
 The `UriPath.parse` static method parses a URI-encoded path string to a
-structured `UriPath` list.  The `UriPath.of` static method constructs a
-`UriPath` instance from a sequence of unencoded URI path components.  The
+structured `UriPath` list. The `UriPath.of` static method constructs a
+`UriPath` instance from a sequence of unencoded URI path components. The
 `UriPath.toString` instance method returns a memoized URI-encoded path string.
 
 ```typescript
@@ -588,7 +579,7 @@ UriPath.of("/", "foo/bar");
 ```
 
 Use the `UriPath.fromAny` static method to construct a `UriPath` from an array
-of unencoded string components, or from a URI-encoded path string.  Use the
+of unencoded string components, or from a URI-encoded path string. Use the
 `UriPath.toAny` instance method to convert a `UriPath` list to an array of
 unencoded string components.
 
@@ -602,7 +593,7 @@ UriPath.parse("/foo/bar%2fbaz").toAny();
 
 The `UriPath.head` instance method returns the first component of the path.
 The `UriPath.tail` instance method returns the `UriPath` containing all but the
-first component of the path.  The `UriPath.empty` static method returns the
+first component of the path. The `UriPath.empty` static method returns the
 singleton empty `UriPath` instance, which serves as the nil element of all
 `UriPath` linked lists.
 
@@ -652,7 +643,7 @@ UriPath.parse("c").prepended("a", "b");
 The `UriPath.isDefined` instance method returns `true` if the path is non-empty,
 whereas `UriPath.isEmpty` instance method returns `true` if the path is empty.
 The `UriPath.isAbsolute` instance method returns `true` if and only if the path
-begins with a slash component.  The `UriPath.isRelative` instance method
+begins with a slash component. The `UriPath.isRelative` instance method
 returns `true` if the path does not begin with a slash component.
 
 ```typescript
@@ -698,7 +689,7 @@ UriPath.parse("/foo/").withName("script.js");
 ```
 
 The `UriPath.parent` instance method returns the directory that contains the
-path.  The `UriPath.base` instance method truncates any trailing segment off
+path. The `UriPath.base` instance method truncates any trailing segment off
 the path.
 
 ```typescript
@@ -729,23 +720,23 @@ UriPath.parse("/x/b/c").isSubpathOf("/a/b");
 #### UriPathBuilder
 
 The `UriPathBuilder` class provides an efficient way to incrementally construct
-`UriPath` objects by appending path components.  `UriPathBuilder` implements
-the **@swim/util** `Builder` interface, enabling path components to be `push`ed
-onto the end of the path, like an array.  Appends to `UriPathBuilder` instances
-take constant time.
+`UriPath` objects by appending path components. `UriPathBuilder` implements
+the [Swim Util][util] `Builder` interface, enabling path components to be
+`push`ed onto the end of the path, like an array. Appends to `UriPathBuilder`
+instances take constant time.
 
 The `UriPath.builder` method returns a new `UriPathBuilder` instance.
 
 ### UriQuery
 
 The `UriQuery` class models the query component of a URI as an immutable linked
-list of query parameters.  This linked list structure makes it efficient to
-incrementally deconstruct URI queries.  Despite being implemented as a linked
+list of query parameters. This linked list structure makes it efficient to
+incrementally deconstruct URI queries. Despite being implemented as a linked
 list, `UriQuery` provides a familiar Map-like interface for accessing query
 parameters by key.
 
 The `UriQuery.parse` static method parses a URI-encoded query string to a
-structured `UriQuery` instance.  The `UriQuery.toString` instance method
+structured `UriQuery` instance. The `UriQuery.toString` instance method
 returns a memoized URI-encoded query string.
 
 ```typescript
@@ -758,7 +749,7 @@ query.toString();
 
 Use the `UriQuery.fromAny` static method to construct a `UriQuery` from a plain
 old JavaScript object containing key-value query parameters, or from a
-URI-encoded query string.  Use the `UriQuery.toAny` instance method to convert
+URI-encoded query string. Use the `UriQuery.toAny` instance method to convert
 a `UriQuery` instance to a plain old JavaScript object containing key-value
 query parameters.
 
@@ -771,9 +762,9 @@ UriQuery.parse("a=alpha&b=beta").toAny();
 ```
 
 The `UriQuery.head` instance method returns a [key, value] tuple containing the
-first parameter of the query.  The `UriQuery.key` instance method returns the
-key of the first parameter, if defined.  And the `UriQuery.value` instance
-method returns the value of the first parameter.  The `UriPath.undefined`
+first parameter of the query. The `UriQuery.key` instance method returns the
+key of the first parameter, if defined. And the `UriQuery.value` instance
+method returns the value of the first parameter. The `UriPath.undefined`
 static method returns the singleton undefined `UriQuery` instance, which serves
 as the nil element of all `UriQuery` linked lists.
 
@@ -793,7 +784,7 @@ UriQuery.parse("foo&bar=baz").tail().tail();
 
 The `UriQuery.length` property returns the number of parameters in the query.
 The `UriQuery.has` instance method returns `true` if the query has a parameter
-with the given key.  And the `UriQuery.get` instance method returns the value
+with the given key. And the `UriQuery.get` instance method returns the value
 associated with the given key, or `undefined` if no parameter with the given
 key exists in the query.
 
@@ -815,10 +806,10 @@ UriQuery.parse("foo&bar=baz").get("foo");
 ```
 
 Use the `UriQuery.updated` instance method to update a query parameter,
-inserting a new parameter if the key is not currently defined.  Use the
+inserting a new parameter if the key is not currently defined. Use the
 `UriQuery.removed` instance method to remove a parameter from the query, if
-defined.  The `UriQuery.appended` and `UriQuery.prepended` instance methods
-unconditionally append or prepend query parameters.  A `null` key in a query
+defined. The `UriQuery.appended` and `UriQuery.prepended` instance methods
+unconditionally append or prepend query parameters. A `null` key in a query
 parameter indicates that the parameter is a literal string value, i.e. it
 contains no `'='` sign in its encoded form.
 
@@ -854,9 +845,9 @@ UriQuery.parse("b=1&c=2").prepended("alpha");
 #### UriQueryBuilder
 
 The `UriQueryBuilder` class provides an efficient way to incrementally
-construct `UriQuery` objects by appending query parameters.  `UriQueryBuilder`
-implements the **@swim/util** `PairBuilder` interface, enabling query parameters
-to be `push`ed onto the end of the query, like an array.  Appends to
+construct `UriQuery` objects by appending query parameters. `UriQueryBuilder`
+implements the [Swim Util][util] `PairBuilder` interface, enabling query
+parameters to be `push`ed onto the end of the query, like an array. Appends to
 `UriQueryBuilder` instances take constant time.
 
 The `UriQuery.builder` method returns a new `UriQueryBuilder` instance.
@@ -864,14 +855,14 @@ The `UriQuery.builder` method returns a new `UriQueryBuilder` instance.
 ### UriFragment
 
 The `UriFragment` class wraps a URI fragment identifier, giving it a meaningful
-type, and a consistent set of methods.  The `UriFragment.undefined` static
-method returns the singleton undefined `UriFragment` instance.  The
+type, and a consistent set of methods. The `UriFragment.undefined` static
+method returns the singleton undefined `UriFragment` instance. The
 `UriFragment.create` static method returns a cached `UriFragment` instance with
-the given fragment identifier.  The `UriFragment.parse` static method decodes
+the given fragment identifier. The `UriFragment.parse` static method decodes
 an encoded URI fragment component.
 
 The `UriFragment.isDefined` instance method returns `false` if the `UriFragment`
-instance represents an undefined URI fragment component.  The
+instance represents an undefined URI fragment component. The
 `UriFragment.identifier` instance method returns the underlying fragment
 identifier, or the `null` if the fragment is not defined.
 
@@ -897,74 +888,13 @@ UriFragment.undefined().identifier;
 
 ### UriCache
 
-The `UriCache` class implements an efficient URI resolution cache, relative to
-a fixed base URI, backed by a [**@swim/util**](https://github.com/swimos/swim/tree/master/swim-system-js/swim-core-js/@swim/util)
-`HashGenCacheMap`.  The `resolve` instance method resolves its URI argument
-relative to the cache's base URI, returning a cached instance of the resolved
-URI when possible.  The `unresolve` instance method returns the relative
-components of its URI argument, with respect to the cache's base URI, returning
-a cached instance of the unresolved URI when possibl.
+The `UriCache` class implements an efficient URI resolution cache, relative
+to a fixed base URI, backed by a [Swim Util][util] `HashGenCacheMap`.
+The `resolve` instance method resolves its URI argument relative to the cache's
+base URI, returning a cached instance of the resolved URI when possible.
+The `unresolve` instance method returns the relative components of its URI
+argument, with respect to the cache's base URI, returning a cached instance
+of the unresolved URI when possible.
 
-## Installation
-
-### npm
-
-For an npm-managed project, `npm install @swim/uri` to make it a dependency.
-TypeScript sources will be installed into `node_modules/@swim/uri/main`.
-Transpiled JavaScript and TypeScript definition files install into
-`node_modules/@swim/uri/lib/main`.  And a pre-built UMD script can
-be found in `node_modules/@swim/uri/dist/main/swim-uri.js`.
-
-### Browser
-
-Browser applications can load `swim-core.js`, which comes bundled with the
-**@swim/uri** library, directly from the SwimOS CDN.
-
-```html
-<!-- Development -->
-<script src="https://cdn.swimos.org/js/latest/swim-core.js"></script>
-
-<!-- Production -->
-<script src="https://cdn.swimos.org/js/latest/swim-core.min.js"></script>
-```
-
-Alternatively, the standalone `swim-system.js` script may be loaded
-from the SwimOS CDN, which bundles **@swim/uri** together with all other
-[**@swim/system**](https://github.com/swimos/swim/tree/master/swim-system-js/@swim/system)
-libraries.
-
-```html
-<!-- Development -->
-<script src="https://cdn.swimos.org/js/latest/swim-system.js"></script>
-
-<!-- Production -->
-<script src="https://cdn.swimos.org/js/latest/swim-system.min.js"></script>
-```
-
-## Usage
-
-### ES6/TypeScript
-
-**@swim/uri** can be imported as an ES6 module from TypeScript and other
-ES6-compatible environments.
-
-```typescript
-import * as uri from "@swim/uri";
-```
-
-### CommonJS/Node.js
-
-**@swim/uri** can also be used as a CommonJS module in Node.js applications.
-
-```javascript
-var uri = require("@swim/uri");
-```
-
-### Browser
-
-When loaded by a web browser, the `swim-core.js` script adds all
-**@swim/time** library exports to the global `swim` namespace.
-
-The `swim-system.js` script also adds all **@swim/uri** library exports
-to the global `swim` namespace, making it a drop-in replacement for
-`swim-core.js` when additional **@swim/system** libraries are needed.
+[util]: https://github.com/swimos/swim/tree/main/swim-js/swim-runtime-js/swim-core-js/@swim/util
+[codec]: https://github.com/swimos/swim/tree/main/swim-js/swim-runtime-js/swim-core-js/@swim/codec
