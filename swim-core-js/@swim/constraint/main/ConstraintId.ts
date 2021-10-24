@@ -12,13 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {Identity} from "./Identity";
-export {Booleans} from "./Booleans";
-export {Numbers} from "./Numbers";
-export {Strings} from "./Strings";
-export {Identifiers} from "./Identifiers";
-export {Functions} from "./Functions";
-export {Constructors} from "./Constructors";
-export {Arrays} from "./Arrays";
-export {Objects} from "./Objects";
-export {Values} from "./Values";
+export interface ConstraintId {
+  /** @internal */
+  readonly id: number;
+}
+
+/** @internal */
+export const ConstraintId = (function () {
+  const ConstraintId = {} as {
+    /** @internal */
+    next(): number;
+  };
+
+  let nextId = 1;
+  ConstraintId.next = function (): number {
+    const id = ~~nextId;
+    nextId += 1;
+    return id;
+  };
+
+  return ConstraintId;
+})();
