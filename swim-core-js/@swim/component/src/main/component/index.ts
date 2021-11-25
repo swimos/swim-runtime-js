@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {Equals} from "./Equals";
-export {HashCode} from "./HashCode";
-export {Equivalent} from "./Equivalent";
-export {Compare} from "./Compare";
-export {Comparator} from "./Comparator";
+export {
+  ComponentFlags,
+  Component,
+} from "./Component";
+export {ComponentObserver} from "./ComponentObserver";
