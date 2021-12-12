@@ -43,67 +43,60 @@ npm install
 #### Build script
 
 The Swim TypeScript stack is compiled using a custom build script.
-Use the `bin/build.js` script to execute build commands:
+Before building the stack, first bootstrap the build script.
 
 ```sh
-bin/build.js help # prints build script usage instructions
-bin/build.js projects # lists available project targets
+npm run bootstrap
+```
+
+Use `npx swim-build` to execute build commands:
+
+```sh
+npx swim-build help # prints build script usage instructions
+npx swim-build pkgs # lists buildable packages
 ```
 
 #### Compiling sources
 
-Use the `compile` build command to compile, bundle, and minify TypeScript
-sources into JavaScript UMD files.
-
-To compile all targets, of all projects, run:
+The default `swim-build` command will compile, lint, api-extract, and bundle
+TypeScript sources. To compile all libraries, of all packages, run:
 
 ```sh
-bin/build.js compile
+npx swim-build
 ```
 
-To compile a subset of projects and targets, include a `--projects` (`-p`)
-option with a comma-separated list of `$project:($target)?` specifiers.
-For example, to build the `main` target of the `core` project. run:
+To compile a subset of packages, include a `--pkgs` (`-p`) option followed
+by a comma-separated list of package names. For example, to build the `core`
+package, run:
 
 ```sh
-bin/build.js compile -p core:main
+npx swim-build -p core
 ```
 
 #### Running tests
 
-Use the `test` build command to compile and run unit tests.
-For example, to compile and test just the `core` project, run:
+The `test` subcommand reruns unit tests. For example, to compile and test
+the `core` package and its dependencies, run:
 
 ```sh
-bin/build.js test -p core
+npx swim-build test -p core -r
 ```
 
 #### Continuous development builds
 
-Use the `watch` build command to automatically rebuild projects when
-dependent source files change.  For example, to continuously watch and
-recompile the `main` target of the `host` project, run:
+The `watch` subcommand automatically rebuilds packages when dependent files
+change. For example, to continuously build the `host` package, run:
 
 ```sh
-bin/build.js watch -p host:main
-```
-
-Pass the `--devel` (`-d`) option to expedite recompilation by skipping the
-minification step.  Add the `--test` (`-t`) option to automatically run unit
-tests after each successful compilation.  For example, to continuosly compile
-and test the `structure` project, bypassing minification, and skipping
-generation of the main script, run:
-
-```sh
-bin/build.js watch -p structure:test -d -t
+npx swim-build watch -p host
 ```
 
 #### Generating documentation
 
-Use the `doc` build command to generate API docs:
+The `doc` subcommand generates API documentation:
 
 ```sh
-bin/build.js doc -p runtime
+npx swim-build doc -p runtime
 ```
 
 ## Contributing
