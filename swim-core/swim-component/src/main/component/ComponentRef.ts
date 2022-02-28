@@ -144,15 +144,15 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
       }
       if (oldComponent !== newComponent) {
         if (oldComponent !== null) {
-          this.willDetachComponent(oldComponent);
           (this as Mutable<typeof this>).component = null;
+          this.willDetachComponent(oldComponent);
           this.onDetachComponent(oldComponent);
           this.deinitComponent(oldComponent);
           this.didDetachComponent(oldComponent);
         }
         if (newComponent !== null) {
-          this.willAttachComponent(newComponent, target);
           (this as Mutable<typeof this>).component = newComponent;
+          this.willAttachComponent(newComponent, target);
           this.onAttachComponent(newComponent, target);
           this.initComponent(newComponent);
           this.didAttachComponent(newComponent, target);
@@ -176,14 +176,14 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
         target = null;
       }
       if (oldComponent !== null) {
-        this.willDetachComponent(oldComponent);
         (this as Mutable<typeof this>).component = null;
+        this.willDetachComponent(oldComponent);
         this.onDetachComponent(oldComponent);
         this.deinitComponent(oldComponent);
         this.didDetachComponent(oldComponent);
       }
-      this.willAttachComponent(newComponent, target);
       (this as Mutable<typeof this>).component = newComponent;
+      this.willAttachComponent(newComponent, target);
       this.onAttachComponent(newComponent, target);
       this.initComponent(newComponent);
       this.didAttachComponent(newComponent, target);
@@ -194,8 +194,8 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
   ComponentRef.prototype.detachComponent = function <C extends Component>(this: ComponentRef<unknown, C>): C | null {
     const oldComponent = this.component;
     if (oldComponent !== null) {
-      this.willDetachComponent(oldComponent);
       (this as Mutable<typeof this>).component = null;
+      this.willDetachComponent(oldComponent);
       this.onDetachComponent(oldComponent);
       this.deinitComponent(oldComponent);
       this.didDetachComponent(oldComponent);
@@ -229,15 +229,15 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     const oldComponent = this.component;
     if (newComponent !== oldComponent) {
       if (oldComponent !== null) {
-        this.willDetachComponent(oldComponent);
         (this as Mutable<typeof this>).component = null;
+        this.willDetachComponent(oldComponent);
         this.onDetachComponent(oldComponent);
         this.deinitComponent(oldComponent);
         this.didDetachComponent(oldComponent);
         oldComponent.remove();
       }
-      this.willAttachComponent(newComponent, target);
       (this as Mutable<typeof this>).component = newComponent;
+      this.willAttachComponent(newComponent, target);
       this.onAttachComponent(newComponent, target);
       this.initComponent(newComponent);
       this.didAttachComponent(newComponent, target);
@@ -265,8 +265,8 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     if (this.binds && this.component === null) {
       const newComponent = this.detectComponent(component);
       if (newComponent !== null) {
-        this.willAttachComponent(newComponent, target);
         (this as Mutable<typeof this>).component = newComponent;
+        this.willAttachComponent(newComponent, target);
         this.onAttachComponent(newComponent, target);
         this.initComponent(newComponent);
         this.didAttachComponent(newComponent, target);
@@ -278,8 +278,8 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     if (this.binds) {
       const oldComponent = this.detectComponent(component);
       if (oldComponent !== null && this.component === oldComponent) {
-        this.willDetachComponent(oldComponent);
         (this as Mutable<typeof this>).component = null;
+        this.willDetachComponent(oldComponent);
         this.onDetachComponent(oldComponent);
         this.deinitComponent(oldComponent);
         this.didDetachComponent(oldComponent);
