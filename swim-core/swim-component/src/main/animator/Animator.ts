@@ -191,9 +191,6 @@ export interface Animator<O = unknown, T = unknown, U = T> extends Property<O, T
 
   /** @internal @protected */
   didInterrupt(value: T): void;
-
-  /** @protected @override */
-  onUnmount(): void;
 }
 
 /** @public */
@@ -576,11 +573,6 @@ export const Animator = (function (_super: typeof Property) {
 
   Animator.prototype.didInterrupt = function <T>(this: Animator<unknown, T>, value: T): void {
     // hook
-  };
-
-  Animator.prototype.onUnmount = function (this: Animator): void {
-    this.stopTweening();
-    _super.prototype.onUnmount.call(this);
   };
 
   Animator.construct = function <A extends Animator<any, any>>(animatorClass: {prototype: A}, animator: A | null, owner: FastenerOwner<A>): A {
