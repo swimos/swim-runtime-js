@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Mutable, Proto, ObserverType} from "@swim/util";
-import type {FastenerOwner, FastenerFlags} from "../fastener/Fastener";
+import {Affinity} from "../fastener/Affinity";
+import {FastenerOwner, FastenerFlags, Fastener} from "../fastener/Fastener";
 import type {AnyComponent, Component} from "./Component";
 import {ComponentRelationInit, ComponentRelationClass, ComponentRelation} from "./ComponentRelation";
 
@@ -32,6 +33,16 @@ export interface ComponentSetInit<C extends Component = Component> extends Compo
   didSort?(parent: Component | null): void;
   sortChildren?(parent: Component): void;
   compareChildren?(a: Component, b: Component): number;
+
+  willInherit?(superFastener: ComponentSet<unknown, C>): void;
+  didInherit?(superFastener: ComponentSet<unknown, C>): void;
+  willUninherit?(superFastener: ComponentSet<unknown, C>): void;
+  didUninherit?(superFastener: ComponentSet<unknown, C>): void;
+
+  willBindSuperFastener?(superFastener: ComponentSet<unknown, C>): void;
+  didBindSuperFastener?(superFastener: ComponentSet<unknown, C>): void;
+  willUnbindSuperFastener?(superFastener: ComponentSet<unknown, C>): void;
+  didUnbindSuperFastener?(superFastener: ComponentSet<unknown, C>): void;
 }
 
 /** @public */
@@ -70,6 +81,63 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   /** @override */
   get fastenerType(): Proto<ComponentSet<any, any>>;
 
+  /** @internal @override */
+  setInherited(inherited: boolean, superFastener: ComponentSet<unknown, C>): void;
+
+  /** @internal */
+  syncInherited(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  willInherit(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  onInherit(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  didInherit(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  willUninherit(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  onUninherit(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  didUninherit(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @override */
+  readonly superFastener: ComponentSet<unknown, C> | null;
+
+  /** @internal @override */
+  getSuperFastener(): ComponentSet<unknown, C> | null;
+
+  /** @protected @override */
+  willBindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  onBindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  didBindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  willUnbindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  onUnbindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @protected @override */
+  didUnbindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+
+  /** @internal */
+  readonly subFasteners: ReadonlyArray<ComponentSet<unknown, C>> | null;
+
+  /** @internal @override */
+  attachSubFastener(subFastener: ComponentSet<unknown, C>): void;
+
+  /** @internal @override */
+  detachSubFastener(subFastener: ComponentSet<unknown, C>): void;
+
   /** @internal */
   readonly components: {readonly [componentId: number]: C | undefined};
 
@@ -97,6 +165,15 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
 
   /** @override */
   detectComponent(component: Component): C | null;
+
+  /** @internal @protected */
+  decohereSubFasteners(): void;
+
+  /** @internal @protected */
+  decohereSubFastener(subFastener: ComponentSet<unknown, C>): void;
+
+  /** @override */
+  recohere(t: number): void;
 
   /** @internal @protected */
   key(component: C): string | undefined;
@@ -138,6 +215,54 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     configurable: true,
   });
 
+  ComponentSet.prototype.syncInherited = function (this: ComponentSet, superFastener: ComponentSet): void {
+    const components = this.components;
+    const superComponents = superFastener.components;
+    for (const componentId in components) {
+      if (superComponents[componentId] === void 0) {
+        this.detachComponent(components[componentId]!);
+      }
+    }
+    for (const componentId in superComponents) {
+      if (components[componentId] === void 0) {
+        this.attachComponent(superComponents[componentId]);
+      }
+    }
+  };
+
+  ComponentSet.prototype.onInherit = function (this: ComponentSet, superFastener: ComponentSet): void {
+    this.syncInherited(superFastener);
+  };
+
+  ComponentSet.prototype.onBindSuperFastener = function <C extends Component>(this: ComponentSet<unknown, C>, superFastener: ComponentSet<unknown, C>): void {
+    (this as Mutable<typeof this>).superFastener = superFastener;
+    _super.prototype.onBindSuperFastener.call(this, superFastener);
+  };
+
+  ComponentSet.prototype.onUnbindSuperFastener = function <C extends Component>(this: ComponentSet<unknown, C>, superFastener: ComponentSet<unknown, C>): void {
+    _super.prototype.onUnbindSuperFastener.call(this, superFastener);
+    (this as Mutable<typeof this>).superFastener = null;
+  };
+
+  ComponentSet.prototype.attachSubFastener = function <C extends Component>(this: ComponentSet<unknown, C>, subFastener: ComponentSet<unknown, C>): void {
+    let subFasteners = this.subFasteners as ComponentSet<unknown, C>[] | null;
+    if (subFasteners === null) {
+      subFasteners = [];
+      (this as Mutable<typeof this>).subFasteners = subFasteners;
+    }
+    subFasteners.push(subFastener);
+  };
+
+  ComponentSet.prototype.detachSubFastener = function <C extends Component>(this: ComponentSet<unknown, C>, subFastener: ComponentSet<unknown, C>): void {
+    const subFasteners = this.subFasteners as ComponentSet<unknown, C>[] | null;
+    if (subFasteners !== null) {
+      const index = subFasteners.indexOf(subFastener);
+      if (index >= 0) {
+        subFasteners.splice(index, 1);
+      }
+    }
+  };
+
   ComponentSet.prototype.hasComponent = function (this: ComponentSet, component: Component): boolean {
     return this.components[component.uid] !== void 0;
   };
@@ -166,6 +291,8 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       this.onAttachComponent(newComponent, target);
       this.initComponent(newComponent);
       this.didAttachComponent(newComponent, target);
+      this.setCoherent(true);
+      this.decohereSubFasteners();
     }
     return newComponent;
   };
@@ -187,6 +314,8 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       this.onAttachComponent(newComponent, target);
       this.initComponent(newComponent);
       this.didAttachComponent(newComponent, target);
+      this.setCoherent(true);
+      this.decohereSubFasteners();
     }
     return newComponent;
   };
@@ -200,6 +329,8 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       this.onDetachComponent(oldComponent);
       this.deinitComponent(oldComponent);
       this.didDetachComponent(oldComponent);
+      this.setCoherent(true);
+      this.decohereSubFasteners();
       return oldComponent;
     }
     return null;
@@ -231,6 +362,8 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       this.onAttachComponent(newComponent, target);
       this.initComponent(newComponent);
       this.didAttachComponent(newComponent, target);
+      this.setCoherent(true);
+      this.decohereSubFasteners();
     }
     return newComponent;
   };
@@ -262,6 +395,8 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
         this.onAttachComponent(newComponent, target);
         this.initComponent(newComponent);
         this.didAttachComponent(newComponent, target);
+        this.setCoherent(true);
+        this.decohereSubFasteners();
       }
     }
   };
@@ -277,6 +412,8 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
         this.onDetachComponent(oldComponent);
         this.deinitComponent(oldComponent);
         this.didDetachComponent(oldComponent);
+        this.setCoherent(true);
+        this.decohereSubFasteners();
       }
     }
   };
@@ -286,6 +423,31 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       return component as C;
     }
     return null;
+  };
+
+  ComponentSet.prototype.decohereSubFasteners = function (this: ComponentSet): void {
+    const subFasteners = this.subFasteners;
+    for (let i = 0, n = subFasteners !== null ? subFasteners.length : 0; i < n; i += 1) {
+      this.decohereSubFastener(subFasteners![i]!);
+    }
+  };
+
+  ComponentSet.prototype.decohereSubFastener = function (this: ComponentSet, subFastener: ComponentSet): void {
+    if ((subFastener.flags & Fastener.InheritedFlag) === 0 && Math.min(this.flags & Affinity.Mask, Affinity.Intrinsic) >= (subFastener.flags & Affinity.Mask)) {
+      subFastener.setInherited(true, this);
+    } else if ((subFastener.flags & Fastener.InheritedFlag) !== 0 && (subFastener.flags & Fastener.DecoherentFlag) === 0) {
+      subFastener.setCoherent(false);
+      subFastener.decohere();
+    }
+  };
+
+  ComponentSet.prototype.recohere = function (this: ComponentSet, t: number): void {
+    if ((this.flags & Fastener.InheritedFlag) !== 0) {
+      const superFastener = this.superFastener;
+      if (superFastener !== null) {
+        this.syncInherited(superFastener);
+      }
+    }
   };
 
   ComponentSet.prototype.key = function <C extends Component>(this: ComponentSet<unknown, C>, component: C): string | undefined {
@@ -299,7 +461,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     configurable: true,
   });
 
-  ComponentSet.prototype.initInherits = function (this: ComponentSet, sorted: boolean): void {
+  ComponentSet.prototype.initSorted = function (this: ComponentSet, sorted: boolean): void {
     if (sorted) {
       (this as Mutable<typeof this>).flags = this.flags | ComponentSet.SortedFlag;
     } else {
@@ -367,6 +529,13 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       Object.setPrototypeOf(fastener, fastenerClass.prototype);
     }
     fastener = _super.construct(fastenerClass, fastener, owner) as F;
+    Object.defineProperty(fastener, "superFastener", { // override getter
+      value: null,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
+    (fastener as Mutable<typeof fastener>).subFasteners = null;
     (fastener as Mutable<typeof fastener>).components = {};
     (fastener as Mutable<typeof fastener>).componentCount = 0;
     return fastener;

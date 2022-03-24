@@ -176,7 +176,12 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
   });
 
   ComponentRef.prototype.onInherit = function (this: ComponentRef, superFastener: ComponentRef): void {
-    this.setComponent(superFastener.component);
+    const superComponent = superFastener.component;
+    if (superComponent !== null) {
+      this.attachComponent(superComponent);
+    } else {
+      this.detachComponent();
+    }
   };
 
   ComponentRef.prototype.onBindSuperFastener = function <C extends Component>(this: ComponentRef<unknown, C>, superFastener: ComponentRef<unknown, C>): void {
