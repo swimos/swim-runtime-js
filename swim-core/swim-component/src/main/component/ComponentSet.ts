@@ -84,9 +84,6 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   /** @internal @override */
   setInherited(inherited: boolean, superFastener: ComponentSet<unknown, C>): void;
 
-  /** @internal */
-  syncInherited(superFastener: ComponentSet<unknown, C>): void;
-
   /** @protected @override */
   willInherit(superFastener: ComponentSet<unknown, C>): void;
 
@@ -147,15 +144,29 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
 
   addComponent(component?: AnyComponent<C>, target?: Component | null, key?: string): C;
 
+  addComponents(components: {readonly [componentId: number]: C | undefined}, target?: Component | null): void;
+
+  setComponents(components: {readonly [componentId: number]: C | undefined}, target?: Component | null): void;
+
   attachComponent(component?: AnyComponent<C>, target?: Component | null): C;
+
+  attachComponents(components: {readonly [componentId: number]: C | undefined}, target?: Component | null): void;
 
   detachComponent(component: C): C | null;
 
+  detachComponents(components?: {readonly [componentId: number]: C | undefined}): void;
+
   insertComponent(parent?: Component | null, component?: AnyComponent<C>, target?: Component | null, key?: string): C;
+
+  insertComponents(parent: Component | null, components: {readonly [componentId: number]: C | undefined}, target?: Component | null): void;
 
   removeComponent(component: C): C | null;
 
+  removeComponents(components?: {readonly [componentId: number]: C | undefined}): void;
+
   deleteComponent(component: C): C | null;
+
+  deleteComponents(components?: {readonly [componentId: number]: C | undefined}): void;
 
   /** @internal @override */
   bindComponent(component: Component, target: Component | null): void;
@@ -215,23 +226,8 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     configurable: true,
   });
 
-  ComponentSet.prototype.syncInherited = function (this: ComponentSet, superFastener: ComponentSet): void {
-    const components = this.components;
-    const superComponents = superFastener.components;
-    for (const componentId in components) {
-      if (superComponents[componentId] === void 0) {
-        this.detachComponent(components[componentId]!);
-      }
-    }
-    for (const componentId in superComponents) {
-      if (components[componentId] === void 0) {
-        this.attachComponent(superComponents[componentId]);
-      }
-    }
-  };
-
   ComponentSet.prototype.onInherit = function (this: ComponentSet, superFastener: ComponentSet): void {
-    this.syncInherited(superFastener);
+    this.setComponents(superFastener.components);
   };
 
   ComponentSet.prototype.onBindSuperFastener = function <C extends Component>(this: ComponentSet<unknown, C>, superFastener: ComponentSet<unknown, C>): void {
@@ -297,6 +293,26 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return newComponent;
   };
 
+  ComponentSet.prototype.addComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: number]: C | undefined}, target?: Component | null): void {
+    for (const componentId in newComponents) {
+      this.addComponent(newComponents[componentId]!, target);
+    }
+  };
+
+  ComponentSet.prototype.setComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: number]: C | undefined}, target?: Component | null): void {
+    const components = this.components;
+    for (const componentId in components) {
+      if (newComponents[componentId] === void 0) {
+        this.detachComponent(components[componentId]!);
+      }
+    }
+    for (const componentId in newComponents) {
+      if (components[componentId] === void 0) {
+        this.attachComponent(newComponents[componentId]!, target);
+      }
+    }
+  };
+
   ComponentSet.prototype.attachComponent = function <C extends Component>(this: ComponentSet<unknown, C>, newComponent?: AnyComponent<C>, target?: Component | null): C {
     if (newComponent !== void 0 && newComponent !== null) {
       newComponent = this.fromAny(newComponent);
@@ -320,6 +336,12 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return newComponent;
   };
 
+  ComponentSet.prototype.attachComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: number]: C | undefined}, target?: Component | null): void {
+    for (const componentId in newComponents) {
+      this.attachComponent(newComponents[componentId]!, target);
+    }
+  };
+
   ComponentSet.prototype.detachComponent = function <C extends Component>(this: ComponentSet<unknown, C>, oldComponent: C): C | null {
     const components = this.components as {[comtrollerId: number]: C | undefined};
     if (components[oldComponent.uid] !== void 0) {
@@ -334,6 +356,15 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       return oldComponent;
     }
     return null;
+  };
+
+  ComponentSet.prototype.detachComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: number]: C | undefined}): void {
+    if (components === void 0) {
+      components = this.components;
+    }
+    for (const componentId in components) {
+      this.detachComponent(components[componentId]!);
+    }
   };
 
   ComponentSet.prototype.insertComponent = function <C extends Component>(this: ComponentSet<unknown, C>, parent?: Component | null, newComponent?: AnyComponent<C>, target?: Component | null, key?: string): C {
@@ -368,6 +399,12 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return newComponent;
   };
 
+  ComponentSet.prototype.insertComponents = function <C extends Component>(this: ComponentSet, parent: Component | null, newComponents: {readonly [componentId: number]: C | undefined}, target?: Component | null): void {
+    for (const componentId in newComponents) {
+      this.insertComponent(parent, newComponents[componentId]!, target);
+    }
+  };
+
   ComponentSet.prototype.removeComponent = function <C extends Component>(this: ComponentSet<unknown, C>, component: C): C | null {
     if (this.hasComponent(component)) {
       component.remove();
@@ -376,12 +413,30 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return null;
   };
 
+  ComponentSet.prototype.removeComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: number]: C | undefined}): void {
+    if (components === void 0) {
+      components = this.components;
+    }
+    for (const componentId in components) {
+      this.removeComponent(components[componentId]!);
+    }
+  };
+
   ComponentSet.prototype.deleteComponent = function <C extends Component>(this: ComponentSet<unknown, C>, component: C): C | null {
     const oldComponent = this.detachComponent(component);
     if (oldComponent !== null) {
       oldComponent.remove();
     }
     return oldComponent;
+  };
+
+  ComponentSet.prototype.deleteComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: number]: C | undefined}): void {
+    if (components === void 0) {
+      components = this.components;
+    }
+    for (const componentId in components) {
+      this.deleteComponent(components[componentId]!);
+    }
   };
 
   ComponentSet.prototype.bindComponent = function <C extends Component>(this: ComponentSet<unknown, C>, component: Component, target: Component | null): void {
@@ -445,7 +500,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     if ((this.flags & Fastener.InheritedFlag) !== 0) {
       const superFastener = this.superFastener;
       if (superFastener !== null) {
-        this.syncInherited(superFastener);
+        this.setComponents(superFastener.components);
       }
     }
   };
