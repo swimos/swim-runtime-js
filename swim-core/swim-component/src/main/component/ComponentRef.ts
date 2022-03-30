@@ -303,7 +303,7 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     } else {
       newComponent = oldComponent;
     }
-    if (newComponent !== oldComponent) {
+    if (oldComponent !== newComponent) {
       if (target === void 0) {
         target = null;
       }
@@ -363,7 +363,7 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
       this.insertChild(parent, newComponent, target, key);
     }
     const oldComponent = this.component;
-    if (newComponent !== oldComponent) {
+    if (oldComponent !== newComponent) {
       if (oldComponent !== null) {
         (this as Mutable<typeof this>).component = null;
         this.willDetachComponent(oldComponent);
