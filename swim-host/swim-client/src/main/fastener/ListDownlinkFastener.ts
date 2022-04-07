@@ -12,64 +12,98 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Cursor} from "@swim/util";
+import {Mutable, Proto, Cursor} from "@swim/util";
 import type {FastenerOwner} from "@swim/component";
-import {AnyValue, Value, Form} from "@swim/structure";
-import {Uri} from "@swim/uri";
+import type {AnyValue, Value, Form} from "@swim/structure";
 import type {ListDownlinkObserver, ListDownlink} from "../downlink/ListDownlink";
 import type {WarpRef} from "../ref/WarpRef";
-import {DownlinkFastenerInit, DownlinkFastenerClass, DownlinkFastener} from "./DownlinkFastener";
+import {
+  DownlinkFastenerRefinement,
+  DownlinkFastenerTemplate,
+  DownlinkFastenerClass,
+  DownlinkFastener,
+} from "./DownlinkFastener";
 
-/** @internal */
-export type ListDownlinkFastenerType<F extends ListDownlinkFastener<any, any>> =
-  F extends ListDownlinkFastener<any, infer V, any> ? V : never;
+/** @public */
+export interface ListDownlinkFastenerRefinement extends DownlinkFastenerRefinement {
+  value?: unknown;
+  valueInit?: unknown;
+}
 
-/** @internal */
-export type ListDownlinkFastenerInitType<F extends ListDownlinkFastener<any, any>> =
-  F extends ListDownlinkFastener<any, infer V, infer VU> ? V | VU : never;
+/** @public */
+export type ListDownlinkFastenerValue<R extends ListDownlinkFastenerRefinement | ListDownlinkFastener<any, any, any>, D = Value> =
+  R extends {value: infer V} ? V :
+  R extends {extends: infer E} ? ListDownlinkFastenerValue<E, D> :
+  R extends ListDownlinkFastener<any, infer V, any> ? V :
+  D;
 
-/** @beta */
-export interface ListDownlinkFastenerInit<V = unknown, VU = V> extends DownlinkFastenerInit, ListDownlinkObserver<V, VU> {
-  extends?: {prototype: ListDownlinkFastener<any, any>} | string | boolean | null;
+/** @public */
+export type ListDownlinkFastenerValueInit<R extends ListDownlinkFastenerRefinement | ListDownlinkFastener<any, any, any>, D = ListDownlinkFastenerValue<R, AnyValue>> =
+  R extends {valueInit: infer VU} ? VU :
+  R extends {extends: infer E} ? ListDownlinkFastenerValueInit<E, D> :
+  R extends ListDownlinkFastener<any, any, infer VU> ? VU :
+  D;
+
+/** @public */
+export interface ListDownlinkFastenerTemplate<V = unknown, VU = V> extends DownlinkFastenerTemplate {
+  extends?: Proto<ListDownlinkFastener<any, any, any>> | string | boolean | null;
   valueForm?: Form<V, VU>;
-
-  initDownlink?(downlink: ListDownlink<V, VU>): ListDownlink<V, VU>;
 }
 
-/** @beta */
-export type ListDownlinkFastenerDescriptor<O = unknown, V = unknown, VU = V, I = {}> = ThisType<ListDownlinkFastener<O, V, VU> & I> & ListDownlinkFastenerInit<V, VU> & Partial<I>;
-
-/** @beta */
+/** @public */
 export interface ListDownlinkFastenerClass<F extends ListDownlinkFastener<any, any> = ListDownlinkFastener<any, any>> extends DownlinkFastenerClass<F> {
+  /** @override */
+  specialize(className: string, template: ListDownlinkFastenerTemplate): ListDownlinkFastenerClass;
+
+  /** @override */
+  refine(fastenerClass: ListDownlinkFastenerClass): void;
+
+  /** @override */
+  extend(className: string, template: ListDownlinkFastenerTemplate): ListDownlinkFastenerClass<F>;
+
+  /** @override */
+  specify<O, V = Value, VU = V extends Value ? AnyValue : V>(className: string, template: ThisType<ListDownlinkFastener<O, V, VU>> & ListDownlinkFastenerTemplate<V, VU> & Partial<Omit<ListDownlinkFastener<O, V, VU>, keyof ListDownlinkFastenerTemplate>>): ListDownlinkFastenerClass<F>;
+
+  /** @override */
+  <O, V = Value, VU = V extends Value ? AnyValue : V>(template: ThisType<ListDownlinkFastener<O, V, VU>> & ListDownlinkFastenerTemplate<V, VU> & Partial<Omit<ListDownlinkFastener<O, V, VU>, keyof ListDownlinkFastenerTemplate>>): PropertyDecorator;
 }
 
-/** @beta */
-export interface ListDownlinkFastenerFactory<F extends ListDownlinkFastener<any, any> = ListDownlinkFastener<any, any>> extends ListDownlinkFastenerClass<F> {
-  extend<I = {}>(className: string, classMembers?: Partial<I> | null): ListDownlinkFastenerFactory<F> & I;
+/** @public */
+export type ListDownlinkFastenerDef<O, R extends ListDownlinkFastenerRefinement> =
+  ListDownlinkFastener<O, ListDownlinkFastenerValue<R>,
+                          ListDownlinkFastenerValueInit<R>> &
+  {readonly name: string} & // prevent type alias simplification
+  (R extends {extends: infer E} ? E : {}) &
+  (R extends {defines: infer D} ? D : {}) &
+  (R extends {implements: infer I} ? I : {});
 
-  define<O, V extends Value = Value, VU extends AnyValue = AnyValue>(className: string, descriptor: ListDownlinkFastenerDescriptor<O, V, VU>): ListDownlinkFastenerFactory<ListDownlinkFastener<any, V, VU>>;
-  define<O, V, VU = V>(className: string, descriptor: {valueForm: Form<V, VU>} & ListDownlinkFastenerDescriptor<O, V, VU>): ListDownlinkFastenerFactory<ListDownlinkFastener<any, V, VU>>;
-  define<O, V extends Value, VU extends AnyValue = AnyValue, I = {}>(className: string, descriptor: {implements: unknown} & ListDownlinkFastenerDescriptor<O, V, VU, I>): ListDownlinkFastenerFactory<ListDownlinkFastener<any, V, VU> & I>;
-  define<O, V, VU = V, I = {}>(className: string, descriptor: {implements: unknown; valueForm: Form<V, VU>} & ListDownlinkFastenerDescriptor<O, V, VU, I>): ListDownlinkFastenerFactory<ListDownlinkFastener<any, V, VU> & I>;
-
-  <O, V extends Value = Value, VU extends AnyValue = AnyValue>(descriptor: ListDownlinkFastenerDescriptor<O, V, VU>): PropertyDecorator;
-  <O, V, VU = V>(descriptor: {valueForm: Form<V, VU>} & ListDownlinkFastenerDescriptor<O, V, VU>): PropertyDecorator;
-  <O, V extends Value, VU extends AnyValue = AnyValue, I = {}>(descriptor: {implements: unknown} & ListDownlinkFastenerDescriptor<O, V, VU, I>): PropertyDecorator;
-  <O, V, VU = V, I = {}>(descriptor: {implements: unknown; valueForm: Form<V, VU>} & ListDownlinkFastenerDescriptor<O, V, VU, I>): PropertyDecorator;
+/** @public */
+export function ListDownlinkFastenerDef<F extends ListDownlinkFastener<any, any, any>>(
+  template: F extends ListDownlinkFastenerDef<infer O, infer R>
+          ? ThisType<ListDownlinkFastenerDef<O, R>>
+          & ListDownlinkFastenerTemplate<ListDownlinkFastenerValue<R>, ListDownlinkFastenerValueInit<R>>
+          & Partial<Omit<ListDownlinkFastener<O, ListDownlinkFastenerValue<R>, ListDownlinkFastenerValueInit<R>>, keyof ListDownlinkFastenerTemplate>>
+          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ListDownlinkFastenerTemplate>> & {extends: unknown}) : {})
+          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {implements: infer I} ? I : {})
+          : never
+): PropertyDecorator {
+  return ListDownlinkFastener(template);
 }
 
-/** @beta */
-export interface ListDownlinkFastener<O = unknown, V = unknown, VU = V> extends DownlinkFastener<O> {
+/** @public */
+export interface ListDownlinkFastener<O = unknown, V = unknown, VU = V> extends DownlinkFastener<O>, ListDownlinkObserver<V, VU> {
   (index: number): V | undefined;
   (index: number, newObject: V | VU): O;
 
-  /** @internal */
-  readonly ownValueForm: Form<V, VU> | null;
+  /** @protected */
+  initValueForm(): Form<V, VU> | null;
+
+  readonly valueForm: Form<V, VU> | null;
+
+  setValueForm(valueForm: Form<V, VU> | null): void;
 
   get length(): number;
-
-  valueForm(): Form<V, VU> | null;
-  valueForm(valueForm: Form<V, VU> | null): this;
 
   isEmpty(): boolean;
 
@@ -112,28 +146,31 @@ export interface ListDownlinkFastener<O = unknown, V = unknown, VU = V> extends 
   /** @internal @override */
   createDownlink(warp: WarpRef): ListDownlink<V, VU>;
 
+  /** @override */
+  initDownlink?(downlink: ListDownlink<V, VU>): ListDownlink<V, VU>;
+
   /** @internal @override */
   bindDownlink(downlink: ListDownlink<V, VU>): ListDownlink<V, VU>;
-
-  /** @internal */
-  initDownlink?(downlink: ListDownlink<V, VU>): ListDownlink<V, VU>;
 }
 
-/** @beta */
+/** @public */
 export const ListDownlinkFastener = (function (_super: typeof DownlinkFastener) {
-  const ListDownlinkFastener: ListDownlinkFastenerFactory = _super.extend("ListDownlinkFastener");
+  const ListDownlinkFastener = _super.extend("ListDownlinkFastener", {}) as ListDownlinkFastenerClass;
 
-  ListDownlinkFastener.prototype.valueForm = function <V, VU>(this: ListDownlinkFastener<unknown, V, VU>, valueForm?: Form<V, VU> | null): Form<V, VU> | null | typeof this {
+  ListDownlinkFastener.prototype.initValueForm = function <V, VU>(this: ListDownlinkFastener<unknown, V, VU>): Form<V, VU> | null {
+    let valueForm = (Object.getPrototypeOf(this) as ListDownlinkFastener<unknown, V, VU>).valueForm as Form<V, VU> | null | undefined;
     if (valueForm === void 0) {
-      return this.ownValueForm;
-    } else {
-      if (this.ownValueForm !== valueForm) {
-        (this as Mutable<typeof this>).ownValueForm = valueForm;
-        this.relink();
-      }
-      return this;
+      valueForm = null;
     }
-  } as typeof ListDownlinkFastener.prototype.valueForm;
+    return valueForm;
+  };
+
+  ListDownlinkFastener.prototype.setValueForm = function <V, VU>(this: ListDownlinkFastener<unknown, V, VU>, valueForm: Form<V, VU> | null): void {
+    if (this.valueForm !== valueForm) {
+      (this as Mutable<typeof this>).valueForm = valueForm;
+      this.relink();
+    }
+  };
 
   Object.defineProperty(ListDownlinkFastener.prototype, "length", {
     get: function (this: ListDownlinkFastener<unknown>): number {
@@ -244,15 +281,15 @@ export const ListDownlinkFastener = (function (_super: typeof DownlinkFastener) 
 
   ListDownlinkFastener.prototype.createDownlink = function <V, VU>(this: ListDownlinkFastener<unknown, V, VU>, warp: WarpRef): ListDownlink<V, VU> {
     let downlink = warp.downlinkList() as unknown as ListDownlink<V, VU>;
-    if (this.ownValueForm !== null) {
-      downlink = downlink.valueForm(this.ownValueForm);
+    if (this.valueForm !== null) {
+      downlink = downlink.valueForm(this.valueForm);
     }
     return downlink;
   };
 
-  ListDownlinkFastener.construct = function <F extends ListDownlinkFastener<any, any>>(fastenerClass: {prototype: F}, fastener: F | null, owner: FastenerOwner<F>): F {
+  ListDownlinkFastener.construct = function <F extends ListDownlinkFastener<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
     if (fastener === null) {
-      fastener = function (index: number, value?: ListDownlinkFastenerType<F> | ListDownlinkFastenerInitType<F>): ListDownlinkFastenerType<F> | undefined | FastenerOwner<F> {
+      fastener = function (index: number, value?: ListDownlinkFastenerValue<F> | ListDownlinkFastenerValueInit<F>): ListDownlinkFastenerValue<F> | undefined | FastenerOwner<F> {
         if (arguments.length === 0) {
           return fastener!.get(index);
         } else {
@@ -261,108 +298,11 @@ export const ListDownlinkFastener = (function (_super: typeof DownlinkFastener) 
         }
       } as F;
       delete (fastener as Partial<Mutable<F>>).name; // don't clobber prototype name
-      Object.setPrototypeOf(fastener, fastenerClass.prototype);
+      Object.setPrototypeOf(fastener, this.prototype);
     }
-    fastener = _super.construct(fastenerClass, fastener, owner) as F;
-    (fastener as Mutable<typeof fastener>).ownValueForm = null;
+    fastener = _super.construct.call(this, fastener, owner) as F;
+    (fastener as Mutable<typeof fastener>).valueForm = fastener.initValueForm();
     return fastener;
-  };
-
-  ListDownlinkFastener.define = function <O, V, VU>(className: string, descriptor: ListDownlinkFastenerDescriptor<O, V, VU>): ListDownlinkFastenerFactory<ListDownlinkFastener<any, V, VU>> {
-    let superClass = descriptor.extends as ListDownlinkFastenerFactory | null | undefined;
-    const affinity = descriptor.affinity;
-    const inherits = descriptor.inherits;
-    const valueForm = descriptor.valueForm;
-    let hostUri = descriptor.hostUri;
-    let nodeUri = descriptor.nodeUri;
-    let laneUri = descriptor.laneUri;
-    let prio = descriptor.prio;
-    let rate = descriptor.rate;
-    let body = descriptor.body;
-    delete descriptor.extends;
-    delete descriptor.implements;
-    delete descriptor.affinity;
-    delete descriptor.inherits;
-    delete descriptor.valueForm;
-    delete descriptor.hostUri;
-    delete descriptor.nodeUri;
-    delete descriptor.laneUri;
-    delete descriptor.prio;
-    delete descriptor.rate;
-    delete descriptor.body;
-
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
-    }
-
-    const fastenerClass = superClass.extend(className, descriptor);
-
-    fastenerClass.construct = function (fastenerClass: {prototype: ListDownlinkFastener<any, any>}, fastener: ListDownlinkFastener<O, V, VU> | null, owner: O): ListDownlinkFastener<O, V, VU> {
-      fastener = superClass!.construct(fastenerClass, fastener, owner);
-      if (affinity !== void 0) {
-        fastener.initAffinity(affinity);
-      }
-      if (inherits !== void 0) {
-        fastener.initInherits(inherits);
-      }
-      if (hostUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownHostUri = hostUri as Uri;
-      }
-      if (nodeUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownNodeUri = nodeUri as Uri;
-      }
-      if (laneUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownLaneUri = laneUri as Uri;
-      }
-      if (prio !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownPrio = prio as number;
-      }
-      if (rate !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownRate = rate as number;
-      }
-      if (body !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownBody = body as Value;
-      }
-      if (valueForm !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownValueForm = valueForm;
-      }
-      return fastener;
-    };
-
-    if (typeof hostUri === "function") {
-      fastenerClass.prototype.initHostUri = hostUri;
-      hostUri = void 0;
-    } else if (hostUri !== void 0) {
-      hostUri = Uri.fromAny(hostUri);
-    }
-    if (typeof nodeUri === "function") {
-      fastenerClass.prototype.initNodeUri = nodeUri;
-      nodeUri = void 0;
-    } else if (nodeUri !== void 0) {
-      nodeUri = Uri.fromAny(nodeUri);
-    }
-    if (typeof laneUri === "function") {
-      fastenerClass.prototype.initLaneUri = laneUri;
-      laneUri = void 0;
-    } else if (laneUri !== void 0) {
-      laneUri = Uri.fromAny(laneUri);
-    }
-    if (typeof prio === "function") {
-      fastenerClass.prototype.initPrio = prio;
-      prio = void 0;
-    }
-    if (typeof rate === "function") {
-      fastenerClass.prototype.initRate = rate;
-      rate = void 0;
-    }
-    if (typeof body === "function") {
-      fastenerClass.prototype.initBody = body;
-      body = void 0;
-    } else if (body !== void 0) {
-      body = Value.fromAny(body);
-    }
-
-    return fastenerClass;
   };
 
   return ListDownlinkFastener;

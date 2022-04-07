@@ -14,65 +14,76 @@
 
 import {Mutable, Proto, Observable, ObserverType} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
-import {FastenerOwner, FastenerInit, FastenerClass, Fastener} from "../fastener/Fastener";
+import {
+  FastenerOwner,
+  FastenerRefinement,
+  FastenerTemplate,
+  FastenerClass,
+  Fastener,
+} from "../fastener/Fastener";
 import {Service} from "../service/Service";
 
-/** @internal */
-export type MemberProviderService<O, K extends keyof O> =
-  O[K] extends Provider<any, infer S> ? S : never;
-
-/** @internal */
-export type ProviderService<P extends Provider<any, any>> =
-  P extends Provider<any, infer S> ? S : never;
-
 /** @public */
-export interface ProviderInit<S = unknown> extends FastenerInit {
-  extends?: {prototype: Provider<any, any>} | string | boolean | null;
-  type?: unknown;
-  observes?: boolean;
-
-  initService?(service: S): void;
-  willAttachService?(service: S): void;
-  didAttachService?(service: S): void;
-
-  deinitService?(service: S): void;
-  willDetachService?(service: S): void;
-  didDetachService?(service: S): void;
-
-  willInherit?(superFastener: Provider<unknown, S>): void;
-  didInherit?(superFastener: Provider<unknown, S>): void;
-  willUninherit?(superFastener: Provider<unknown, S>): void;
-  didUninherit?(superFastener: Provider<unknown, S>): void;
-
-  willBindSuperFastener?(superFastener: Provider<unknown, S>): void;
-  didBindSuperFastener?(superFastener: Provider<unknown, S>): void;
-  willUnbindSuperFastener?(superFastener: Provider<unknown, S>): void;
-  didUnbindSuperFastener?(superFastener: Provider<unknown, S>): void;
-
-  service?: S;
-  createService?(): S;
+export interface ProviderRefinement extends FastenerRefinement {
+  service?: unknown;
+  observes?: unknown;
 }
 
 /** @public */
-export type ProviderDescriptor<O = unknown, S = unknown, I = {}> = ThisType<Provider<O, S> & I> & ProviderInit<S> & Partial<I>;
+export type ProviderService<R extends ProviderRefinement | Provider<any, any>, D = unknown> =
+  R extends {service: infer S} ? S :
+  R extends {extends: infer E} ? ProviderService<E, D> :
+  R extends Provider<any, infer S> ? S :
+  D;
+
+/** @public */
+export interface ProviderTemplate<S = unknown> extends FastenerTemplate {
+  extends?: Proto<Provider<any, any>> | string | boolean | null;
+  serviceType?: unknown;
+  service?: S;
+  observes?: boolean;
+}
 
 /** @public */
 export interface ProviderClass<P extends Provider<any, any> = Provider<any, any>> extends FastenerClass<P> {
+  /** @override */
+  specialize(className: string, template: ProviderTemplate): ProviderClass;
+
+  /** @override */
+  refine(providerClass: ProviderClass): void;
+
+  /** @override */
+  extend(className: string, template: ProviderTemplate): ProviderClass<P>;
+
+  /** @override */
+  specify<O, S = unknown>(className: string, template: ThisType<Provider<O, S>> & ProviderTemplate<S> & Partial<Omit<Provider<O, S>, keyof ProviderTemplate>>): ProviderClass<P>;
+
+  /** @override */
+  <O, S = unknown>(template: ThisType<Provider<O, S>> & ProviderTemplate<S> & Partial<Omit<Provider<O, S>, keyof ProviderTemplate>>): PropertyDecorator;
 }
 
 /** @public */
-export interface ProviderFactory<P extends Provider<any, any> = Provider<any, any>> extends ProviderClass<P> {
-  extend<I = {}>(className: string, classMembers?: Partial<I> | null): ProviderFactory<P> & I;
+export type ProviderDef<O, R extends ProviderRefinement> =
+  Provider<O, ProviderService<R>> &
+  {readonly name: string} & // prevent type alias simplification
+  (R extends {extends: infer E} ? E : {}) &
+  (R extends {defines: infer D} ? D : {}) &
+  (R extends {implements: infer I} ? I : {}) &
+  (R extends {observes: infer B} ? ObserverType<B extends boolean ? ProviderService<R> : B> : {});
 
-  define<O, S>(className: string, descriptor: ProviderDescriptor<O, S>): ProviderFactory;
-  define<O, S extends Observable>(className: string, descriptor: {observes: boolean} & ProviderDescriptor<O, S, ObserverType<S>>): ProviderFactory<Provider<any, S>>;
-  define<O, S, I = {}>(className: string, descriptor: {implements: unknown} & ProviderDescriptor<O, S, I>): ProviderFactory<Provider<any, S> & I>;
-  define<O, S extends Observable, I = {}>(className: string, descriptor: {implements: unknown; observes: boolean} & ProviderDescriptor<O, S, I & ObserverType<S>>): ProviderFactory<Provider<any, S> & I>;
-
-  <O, S>(descriptor: ProviderDescriptor<O, S>): PropertyDecorator;
-  <O, S extends Observable>(descriptor: {observes: boolean} & ProviderDescriptor<O, S, ObserverType<S>>): PropertyDecorator;
-  <O, S, I = {}>(descriptor: {implements: unknown} & ProviderDescriptor<O, S, I>): PropertyDecorator;
-  <O, S extends Observable, I = {}>(descriptor: {implements: unknown; observes: boolean} & ProviderDescriptor<O, S, I & ObserverType<S>>): PropertyDecorator;
+/** @public */
+export function ProviderDef<P extends Provider<any, any>>(
+  template: P extends ProviderDef<infer O, infer R>
+          ? ThisType<ProviderDef<O, R>>
+          & ProviderTemplate<ProviderService<R>>
+          & Partial<Omit<Provider<O, ProviderService<R>>, keyof ProviderTemplate>>
+          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ProviderTemplate>> & {extends: unknown}) : {})
+          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {implements: infer I} ? I : {})
+          & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ProviderService<R> : B> & {observes: boolean}) : {})
+          : never
+): PropertyDecorator {
+  return Provider(template);
 }
 
 /** @public */
@@ -83,55 +94,58 @@ export interface Provider<O = unknown, S = unknown> extends Fastener<O> {
   get fastenerType(): Proto<Provider<any, any>>;
 
   /** @internal @override */
-  setInherited(inherited: boolean, superFastener: Provider<unknown, S>): void;
+  getSuper(): Provider<unknown, S> | null;
+
+  /** @internal @override */
+  setDerived(derived: boolean, inlet: Provider<unknown, S>): void;
 
   /** @protected @override */
-  willInherit(superFastener: Provider<unknown, S>): void;
+  willDerive(inlet: Provider<unknown, S>): void;
 
   /** @protected @override */
-  onInherit(superFastener: Provider<unknown, S>): void;
+  onDerive(inlet: Provider<unknown, S>): void;
 
   /** @protected @override */
-  didInherit(superFastener: Provider<unknown, S>): void;
+  didDerive(inlet: Provider<unknown, S>): void;
 
   /** @protected @override */
-  willUninherit(superFastener: Provider<unknown, S>): void;
+  willUnderive(inlet: Provider<unknown, S>): void;
 
   /** @protected @override */
-  onUninherit(superFastener: Provider<unknown, S>): void;
+  onUnderive(inlet: Provider<unknown, S>): void;
 
   /** @protected @override */
-  didUninherit(superFastener: Provider<unknown, S>): void;
+  didUnderive(inlet: Provider<unknown, S>): void;
 
   /** @override */
-  get superFastener(): Provider<unknown, S> | null;
+  get inlet(): Provider<unknown, S> | null;
+
+  /** @protected @override */
+  willBindInlet(inlet: Provider<unknown, S>): void;
+
+  /** @protected @override */
+  onBindInlet(inlet: Provider<unknown, S>): void;
+
+  /** @protected @override */
+  didBindInlet(inlet: Provider<unknown, S>): void;
+
+  /** @protected @override */
+  willUnbindInlet(inlet: Provider<unknown, S>): void;
+
+  /** @protected @override */
+  onUnbindInlet(inlet: Provider<unknown, S>): void;
+
+  /** @protected @override */
+  didUnbindInlet(inlet: Provider<unknown, S>): void;
 
   /** @internal @override */
-  getSuperFastener(): Provider<unknown, S> | null;
-
-  /** @protected @override */
-  willBindSuperFastener(superFastener: Provider<unknown, S>): void;
-
-  /** @protected @override */
-  onBindSuperFastener(superFastener: Provider<unknown, S>): void;
-
-  /** @protected @override */
-  didBindSuperFastener(superFastener: Provider<unknown, S>): void;
-
-  /** @protected @override */
-  willUnbindSuperFastener(superFastener: Provider<unknown, S>): void;
-
-  /** @protected @override */
-  onUnbindSuperFastener(superFastener: Provider<unknown, S>): void;
-
-  /** @protected @override */
-  didUnbindSuperFastener(superFastener: Provider<unknown, S>): void;
+  attachOutlet(target: Provider<unknown, S>): void;
 
   /** @internal @override */
-  attachSubFastener(subFastener: Provider<unknown, S>): void;
+  detachOutlet(target: Provider<unknown, S>): void;
 
-  /** @internal @override */
-  detachSubFastener(subFastener: Provider<unknown, S>): void;
+  /** @internal */
+  readonly serviceType?: unknown; // optional prototype property
 
   readonly service: S;
 
@@ -166,43 +180,44 @@ export interface Provider<O = unknown, S = unknown> extends Fastener<O> {
   /** @protected */
   didDetachService(service: S): void;
 
-  /** @internal */
   createService(): S;
+
+  /** @internal */
+  readonly observes?: boolean; // optional prototype property
 
   /** @protected @override */
   onMount(): void;
 
   /** @protected @override */
   onUnmount(): void;
-
-  /** @internal */
-  get observes(): boolean | undefined; // optional prototype field
 }
 
 /** @public */
 export const Provider = (function (_super: typeof Fastener) {
-  const Provider: ProviderFactory = _super.extend("Provider");
+  const Provider = _super.extend("Provider", {
+    static: true,
+    affinity: Affinity.Inherited,
+    inherits: true,
+  }) as ProviderClass;
 
   Object.defineProperty(Provider.prototype, "fastenerType", {
-    get: function (this: Provider): Proto<Provider<any, any>> {
-      return Provider;
-    },
+    value: Provider,
     configurable: true,
   });
 
-  Provider.prototype.onInherit = function <S>(this: Provider<unknown, S>, superFastener: Provider<unknown, S>): void {
-    this.setService(superFastener.service);
+  Provider.prototype.onDerive = function <S>(this: Provider<unknown, S>, inlet: Provider<unknown, S>): void {
+    this.setService(inlet.service);
   };
 
-  Provider.prototype.onBindSuperFastener = function <S>(this: Provider<unknown, S>, superFastener: Provider<unknown, S>): void {
+  Provider.prototype.onBindInlet = function <S>(this: Provider<unknown, S>, inlet: Provider<unknown, S>): void {
     if ((this.flags & Fastener.InheritsFlag) !== 0 && (this.flags & Affinity.Mask) === Affinity.Inherited) {
       this.initAffinity(Affinity.Transient);
     }
-    _super.prototype.onBindSuperFastener.call(this, superFastener);
+    _super.prototype.onBindInlet.call(this, inlet);
   };
 
-  Provider.prototype.onUnbindSuperFastener = function <S>(this: Provider<unknown, S>, superFastener: Provider<unknown, S>): void {
-    _super.prototype.onUnbindSuperFastener.call(this, superFastener);
+  Provider.prototype.onUnbindInlet = function <S>(this: Provider<unknown, S>, inlet: Provider<unknown, S>): void {
+    _super.prototype.onUnbindInlet.call(this, inlet);
     if ((this.flags & Fastener.InheritsFlag) !== 0 && (this.flags & Affinity.Mask) === Affinity.Transient) {
       this.initAffinity(Affinity.Inherited);
     }
@@ -297,66 +312,41 @@ export const Provider = (function (_super: typeof Fastener) {
       service = this.createService();
       this.setService(service);
     }
-    if ((this.flags & Fastener.InheritedFlag) === 0 && service instanceof Service) {
+    if ((this.flags & Fastener.DerivedFlag) === 0 && service instanceof Service) {
       service.attachRoot(this.owner);
     }
   };
 
   Provider.prototype.onUnmount = function (this: Provider): void {
     const service = this.service;
-    if ((this.flags & Fastener.InheritedFlag) === 0 && service instanceof Service) {
+    if ((this.flags & Fastener.DerivedFlag) === 0 && service instanceof Service) {
       service.detachRoot(this.owner);
     }
     _super.prototype.onUnmount.call(this);
   };
 
-  Provider.construct = function <P extends Provider<any, any>>(providerClass: {prototype: P}, provider: P | null, owner: FastenerOwner<P>): P {
+  Provider.create = function <P extends Provider<any, any>>(this: ProviderClass<P>, owner: FastenerOwner<P>): P {
+    const provider = _super.create.call(this, owner) as P;
+    if (provider.service === void 0) {
+      const service = (Object.getPrototypeOf(provider) as ProviderTemplate).service;
+      if (service !== void 0) {
+        provider.setService(service);
+      }
+    }
+    return provider;
+  };
+
+  Provider.construct = function <P extends Provider<any, any>>(provider: P | null, owner: FastenerOwner<P>): P {
     if (provider === null) {
       provider = function (): ProviderService<P> {
         return provider!.service;
       } as P;
       delete (provider as Partial<Mutable<P>>).name; // don't clobber prototype name
-      Object.setPrototypeOf(provider, providerClass.prototype);
+      Object.setPrototypeOf(provider, this.prototype);
     }
-    provider = _super.construct(providerClass, provider, owner) as P;
-    (provider as Mutable<typeof provider>).service = void 0 as unknown as ProviderService<P>;
-    provider.initAffinity(Affinity.Inherited);
-    provider.initInherits(true);
+    provider = _super.construct.call(this, provider, owner) as P;
+    (provider as Mutable<typeof provider>).service = void 0;
     return provider;
-  };
-
-  Provider.define = function <O, S>(className: string, descriptor: ProviderDescriptor<O, S>): ProviderFactory<Provider<any, S>> {
-    let superClass = descriptor.extends as ProviderFactory | null | undefined;
-    const affinity = descriptor.affinity;
-    const inherits = descriptor.inherits;
-    const service = descriptor.service;
-    delete descriptor.extends;
-    delete descriptor.implements;
-    delete descriptor.affinity;
-    delete descriptor.inherits;
-    delete descriptor.service;
-
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
-    }
-
-    const providerClass = superClass.extend(className, descriptor);
-
-    providerClass.construct = function (providerClass: {prototype: Provider<any, any>}, provider: Provider<O, S> | null, owner: O): Provider<O, S> {
-      provider = superClass!.construct(providerClass, provider, owner);
-      if (affinity !== void 0) {
-        provider.initAffinity(affinity);
-      }
-      if (inherits !== void 0) {
-        provider.initInherits(inherits);
-      }
-      if (service !== void 0) {
-        provider.setService(service);
-      }
-      return provider;
-    };
-
-    return providerClass;
   };
 
   return Provider;

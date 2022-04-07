@@ -12,158 +12,86 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable} from "@swim/util";
-import type {FastenerOwner} from "@swim/component";
-import {Value} from "@swim/structure";
-import {Uri} from "@swim/uri";
-import type {DownlinkObserver} from "../downlink/Downlink";
-import type {EventDownlink} from "../downlink/EventDownlink";
+import type {Proto} from "@swim/util";
+import type {EventDownlinkObserver, EventDownlink} from "../downlink/EventDownlink";
 import type {WarpRef} from "../ref/WarpRef";
-import {DownlinkFastenerInit, DownlinkFastenerClass, DownlinkFastener} from "./DownlinkFastener";
+import {
+  DownlinkFastenerRefinement,
+  DownlinkFastenerTemplate,
+  DownlinkFastenerClass,
+  DownlinkFastener,
+} from "./DownlinkFastener";
 
-/** @beta */
-export interface EventDownlinkFastenerInit extends DownlinkFastenerInit, DownlinkObserver {
-  extends?: {prototype: EventDownlinkFastener<any>} | string | boolean | null;
-
-  initDownlink?(downlink: EventDownlink): EventDownlink;
+/** @public */
+export interface EventDownlinkFastenerRefinement extends DownlinkFastenerRefinement {
 }
 
-/** @beta */
-export type EventDownlinkFastenerDescriptor<O = unknown, I = {}> = ThisType<EventDownlinkFastener<O> & I> & EventDownlinkFastenerInit & Partial<I>;
+/** @public */
+export interface EventDownlinkFastenerTemplate extends DownlinkFastenerTemplate {
+  extends?: Proto<EventDownlinkFastener<any>> | string | boolean | null;
+}
 
-/** @beta */
+/** @public */
 export interface EventDownlinkFastenerClass<F extends EventDownlinkFastener<any> = EventDownlinkFastener<any>> extends DownlinkFastenerClass<F> {
+  /** @override */
+  specialize(className: string, template: EventDownlinkFastenerTemplate): EventDownlinkFastenerClass;
+
+  /** @override */
+  refine(fastenerClass: EventDownlinkFastenerClass): void;
+
+  /** @override */
+  extend(className: string, template: EventDownlinkFastenerTemplate): EventDownlinkFastenerClass<F>;
+
+  /** @override */
+  specify<O>(className: string, template: ThisType<EventDownlinkFastener<O>> & EventDownlinkFastenerTemplate & Partial<Omit<EventDownlinkFastener<O>, keyof EventDownlinkFastenerTemplate>>): EventDownlinkFastenerClass<F>;
+
+  /** @override */
+  <O>(template: ThisType<EventDownlinkFastener<O>> & EventDownlinkFastenerTemplate & Partial<Omit<EventDownlinkFastener<O>, keyof EventDownlinkFastenerTemplate>>): PropertyDecorator;
 }
 
-/** @beta */
-export interface EventDownlinkFastenerFactory<F extends EventDownlinkFastener<any> = EventDownlinkFastener<any>> extends EventDownlinkFastenerClass<F> {
-  extend<I = {}>(className: string, classMembers?: Partial<I> | null): EventDownlinkFastenerFactory<F> & I;
+/** @public */
+export type EventDownlinkFastenerDef<O, R extends EventDownlinkFastenerRefinement> =
+  EventDownlinkFastener<O> &
+  {readonly name: string} & // prevent type alias simplification
+  (R extends {extends: infer E} ? E : {}) &
+  (R extends {defines: infer D} ? D : {}) &
+  (R extends {implements: infer I} ? I : {});
 
-  define<O>(className: string, descriptor: EventDownlinkFastenerDescriptor<O>): EventDownlinkFastenerFactory<EventDownlinkFastener<any>>;
-  define<O, I = {}>(className: string, descriptor: {implements: unknown} & EventDownlinkFastenerDescriptor<O, I>): EventDownlinkFastenerFactory<EventDownlinkFastener<any> & I>;
-
-  <O>(descriptor: EventDownlinkFastenerDescriptor<O>): PropertyDecorator;
-  <O, I = {}>(descriptor: {implements: unknown} & EventDownlinkFastenerDescriptor<O, I>): PropertyDecorator;
+/** @public */
+export function EventDownlinkFastenerDef<F extends EventDownlinkFastener<any>>(
+  template: F extends EventDownlinkFastenerDef<infer O, infer R>
+          ? ThisType<EventDownlinkFastenerDef<O, R>>
+          & EventDownlinkFastenerTemplate
+          & Partial<Omit<EventDownlinkFastener<O>, keyof EventDownlinkFastenerTemplate>>
+          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof EventDownlinkFastenerTemplate>> & {extends: unknown}) : {})
+          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {implements: infer I} ? I : {})
+          : never
+): PropertyDecorator {
+  return EventDownlinkFastener(template);
 }
 
-/** @beta */
-export interface EventDownlinkFastener<O = unknown> extends DownlinkFastener<O> {
+/** @public */
+export interface EventDownlinkFastener<O = unknown> extends DownlinkFastener<O>, EventDownlinkObserver {
   /** @override */
   readonly downlink: EventDownlink | null;
 
   /** @internal @override */
   createDownlink(warp: WarpRef): EventDownlink;
 
+  /** @override */
+  initDownlink?(downlink: EventDownlink): EventDownlink;
+
   /** @internal @override */
   bindDownlink(downlink: EventDownlink): EventDownlink;
-
-  /** @internal */
-  initDownlink?(downlink: EventDownlink): EventDownlink;
 }
 
-/** @beta */
+/** @public */
 export const EventDownlinkFastener = (function (_super: typeof DownlinkFastener) {
-  const EventDownlinkFastener: EventDownlinkFastenerFactory = _super.extend("EventDownlinkFastener");
+  const EventDownlinkFastener: EventDownlinkFastenerClass = _super.extend("EventDownlinkFastener", {}) as EventDownlinkFastenerClass;
 
   EventDownlinkFastener.prototype.createDownlink = function <V, VU>(this: EventDownlinkFastener<unknown>, warp: WarpRef): EventDownlink {
     return warp.downlink();
-  };
-
-  EventDownlinkFastener.construct = function <F extends EventDownlinkFastener<any>>(fastenerClass: {prototype: F}, fastener: F | null, owner: FastenerOwner<F>): F {
-    fastener = _super.construct(fastenerClass, fastener, owner) as F;
-    return fastener;
-  };
-
-  EventDownlinkFastener.define = function <O>(className: string, descriptor: EventDownlinkFastenerDescriptor<O>): EventDownlinkFastenerFactory<EventDownlinkFastener<any>> {
-    let superClass = descriptor.extends as EventDownlinkFastenerFactory | null | undefined;
-    const affinity = descriptor.affinity;
-    const inherits = descriptor.inherits;
-    let hostUri = descriptor.hostUri;
-    let nodeUri = descriptor.nodeUri;
-    let laneUri = descriptor.laneUri;
-    let prio = descriptor.prio;
-    let rate = descriptor.rate;
-    let body = descriptor.body;
-    delete descriptor.extends;
-    delete descriptor.implements;
-    delete descriptor.affinity;
-    delete descriptor.inherits;
-    delete descriptor.hostUri;
-    delete descriptor.nodeUri;
-    delete descriptor.laneUri;
-    delete descriptor.prio;
-    delete descriptor.rate;
-    delete descriptor.body;
-
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
-    }
-
-    const fastenerClass = superClass.extend(className, descriptor);
-
-    fastenerClass.construct = function (fastenerClass: {prototype: EventDownlinkFastener<any>}, fastener: EventDownlinkFastener<O> | null, owner: O): EventDownlinkFastener<O> {
-      fastener = superClass!.construct(fastenerClass, fastener, owner);
-      if (affinity !== void 0) {
-        fastener.initAffinity(affinity);
-      }
-      if (inherits !== void 0) {
-        fastener.initInherits(inherits);
-      }
-      if (hostUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownHostUri = hostUri as Uri;
-      }
-      if (nodeUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownNodeUri = nodeUri as Uri;
-      }
-      if (laneUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownLaneUri = laneUri as Uri;
-      }
-      if (prio !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownPrio = prio as number;
-      }
-      if (rate !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownRate = rate as number;
-      }
-      if (body !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownBody = body as Value;
-      }
-      return fastener;
-    };
-
-    if (typeof hostUri === "function") {
-      fastenerClass.prototype.initHostUri = hostUri;
-      hostUri = void 0;
-    } else if (hostUri !== void 0) {
-      hostUri = Uri.fromAny(hostUri);
-    }
-    if (typeof nodeUri === "function") {
-      fastenerClass.prototype.initNodeUri = nodeUri;
-      nodeUri = void 0;
-    } else if (nodeUri !== void 0) {
-      nodeUri = Uri.fromAny(nodeUri);
-    }
-    if (typeof laneUri === "function") {
-      fastenerClass.prototype.initLaneUri = laneUri;
-      laneUri = void 0;
-    } else if (laneUri !== void 0) {
-      laneUri = Uri.fromAny(laneUri);
-    }
-    if (typeof prio === "function") {
-      fastenerClass.prototype.initPrio = prio;
-      prio = void 0;
-    }
-    if (typeof rate === "function") {
-      fastenerClass.prototype.initRate = rate;
-      rate = void 0;
-    }
-    if (typeof body === "function") {
-      fastenerClass.prototype.initBody = body;
-      body = void 0;
-    } else if (body !== void 0) {
-      body = Value.fromAny(body);
-    }
-
-    return fastenerClass;
   };
 
   return EventDownlinkFastener;

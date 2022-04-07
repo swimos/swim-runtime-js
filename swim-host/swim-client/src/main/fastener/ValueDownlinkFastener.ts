@@ -12,62 +12,96 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable} from "@swim/util";
+import type {Mutable, Proto} from "@swim/util";
 import type {FastenerOwner} from "@swim/component";
-import {AnyValue, Value, Form} from "@swim/structure";
-import {Uri} from "@swim/uri";
+import type {AnyValue, Value, Form} from "@swim/structure";
 import type {ValueDownlinkObserver, ValueDownlink} from "../downlink/ValueDownlink";
 import type {WarpRef} from "../ref/WarpRef";
-import {DownlinkFastenerInit, DownlinkFastenerClass, DownlinkFastener} from "./DownlinkFastener";
+import {
+  DownlinkFastenerRefinement,
+  DownlinkFastenerTemplate,
+  DownlinkFastenerClass,
+  DownlinkFastener,
+} from "./DownlinkFastener";
 
-/** @internal */
-export type ValueDownlinkFastenerType<F extends ValueDownlinkFastener<any, any>> =
-  F extends ValueDownlinkFastener<any, infer V, any> ? V : never;
+/** @public */
+export interface ValueDownlinkFastenerRefinement extends DownlinkFastenerRefinement {
+  value?: unknown;
+  valueInit?: unknown;
+}
 
-/** @internal */
-export type ValueDownlinkFastenerInitType<F extends ValueDownlinkFastener<any, any>> =
-  F extends ValueDownlinkFastener<any, infer V, infer VU> ? V | VU : never;
+/** @public */
+export type ValueDownlinkFastenerValue<R extends ValueDownlinkFastenerRefinement | ValueDownlinkFastener<any, any, any>, D = Value> =
+  R extends {value: infer V} ? V :
+  R extends {extends: infer E} ? ValueDownlinkFastenerValue<E, D> :
+  R extends ValueDownlinkFastener<any, infer V, any> ? V :
+  D;
 
-/** @beta */
-export interface ValueDownlinkFastenerInit<V = unknown, VU = V> extends DownlinkFastenerInit, ValueDownlinkObserver<V, VU> {
-  extends?: {prototype: ValueDownlinkFastener<any, any>} | string | boolean | null;
+/** @public */
+export type ValueDownlinkFastenerValueInit<R extends ValueDownlinkFastenerRefinement | ValueDownlinkFastener<any, any, any>, D = ValueDownlinkFastenerValue<R, AnyValue>> =
+  R extends {valueInit: infer VU} ? VU :
+  R extends {extends: infer E} ? ValueDownlinkFastenerValueInit<E, D> :
+  R extends ValueDownlinkFastener<any, any, infer VU> ? VU :
+  D;
+
+/** @public */
+export interface ValueDownlinkFastenerTemplate<V = unknown, VU = V> extends DownlinkFastenerTemplate {
+  extends?: Proto<ValueDownlinkFastener<any, any, any>> | string | boolean | null;
   valueForm?: Form<V, VU>;
-
-  initDownlink?(downlink: ValueDownlink<V, VU>): ValueDownlink<V, VU>;
 }
 
-/** @beta */
-export type ValueDownlinkFastenerDescriptor<O = unknown, V = unknown, VU = V, I = {}> = ThisType<ValueDownlinkFastener<O, V, VU> & I> & ValueDownlinkFastenerInit<V, VU> & Partial<I>;
-
-/** @beta */
+/** @public */
 export interface ValueDownlinkFastenerClass<F extends ValueDownlinkFastener<any, any> = ValueDownlinkFastener<any, any>> extends DownlinkFastenerClass<F> {
+  /** @override */
+  specialize(className: string, template: ValueDownlinkFastenerTemplate): ValueDownlinkFastenerClass;
+
+  /** @override */
+  refine(fastenerClass: ValueDownlinkFastenerClass): void;
+
+  /** @override */
+  extend(className: string, template: ValueDownlinkFastenerTemplate): ValueDownlinkFastenerClass<F>;
+
+  /** @override */
+  specify<O, V = Value, VU = V extends Value ? AnyValue : V>(className: string, template: ThisType<ValueDownlinkFastener<O, V, VU>> & ValueDownlinkFastenerTemplate<V, VU> & Partial<Omit<ValueDownlinkFastener<O, V, VU>, keyof ValueDownlinkFastenerTemplate>>): ValueDownlinkFastenerClass<F>;
+
+  /** @override */
+  <O, V = Value, VU = V extends Value ? AnyValue : V>(template: ThisType<ValueDownlinkFastener<O, V, VU>> & ValueDownlinkFastenerTemplate<V, VU> & Partial<Omit<ValueDownlinkFastener<O, V, VU>, keyof ValueDownlinkFastenerTemplate>>): PropertyDecorator;
 }
 
-/** @beta */
-export interface ValueDownlinkFastenerFactory<F extends ValueDownlinkFastener<any, any> = ValueDownlinkFastener<any, any>> extends ValueDownlinkFastenerClass<F> {
-  extend<I = {}>(className: string, classMembers?: Partial<I> | null): ValueDownlinkFastenerFactory<F> & I;
+/** @public */
+export type ValueDownlinkFastenerDef<O, R extends ValueDownlinkFastenerRefinement> =
+  ValueDownlinkFastener<O, ValueDownlinkFastenerValue<R>,
+                           ValueDownlinkFastenerValueInit<R>> &
+  {readonly name: string} & // prevent type alias simplification
+  (R extends {extends: infer E} ? E : {}) &
+  (R extends {defines: infer D} ? D : {}) &
+  (R extends {implements: infer I} ? I : {});
 
-  define<O, V extends Value = Value, VU extends AnyValue = AnyValue>(className: string, descriptor: ValueDownlinkFastenerDescriptor<O, V, VU>): ValueDownlinkFastenerFactory<ValueDownlinkFastener<any, V, VU>>;
-  define<O, V, VU = V>(className: string, descriptor: {valueForm: Form<V, VU>} & ValueDownlinkFastenerDescriptor<O, V, VU>): ValueDownlinkFastenerFactory<ValueDownlinkFastener<any, V, VU>>;
-  define<O, V extends Value = Value, VU extends AnyValue = AnyValue, I = {}>(className: string, descriptor: {implements: unknown} & ValueDownlinkFastenerDescriptor<O, V, VU, I>): ValueDownlinkFastenerFactory<ValueDownlinkFastener<any, V, VU> & I>;
-  define<O, V, VU = V, I = {}>(className: string, descriptor: {implements: unknown; valueForm: Form<V, VU>} & ValueDownlinkFastenerDescriptor<O, V, VU, I>): ValueDownlinkFastenerFactory<ValueDownlinkFastener<any, V, VU> & I>;
-
-  <O, V extends Value = Value, VU extends AnyValue = AnyValue>(descriptor: ValueDownlinkFastenerDescriptor<O, V, VU>): PropertyDecorator;
-  <O, V, VU = V>(descriptor: {valueForm: Form<V, VU>} & ValueDownlinkFastenerDescriptor<O, V, VU>): PropertyDecorator;
-  <O, V extends Value = Value, VU extends AnyValue = AnyValue, I = {}>(descriptor: {implements: unknown} & ValueDownlinkFastenerDescriptor<O, V, VU, I>): PropertyDecorator;
-  <O, V, VU = V, I = {}>(descriptor: {implements: unknown; valueForm: Form<V, VU>} & ValueDownlinkFastenerDescriptor<O, V, VU, I>): PropertyDecorator;
+/** @public */
+export function ValueDownlinkFastenerDef<F extends ValueDownlinkFastener<any, any, any>>(
+  template: F extends ValueDownlinkFastenerDef<infer O, infer R>
+          ? ThisType<ValueDownlinkFastenerDef<O, R>>
+          & ValueDownlinkFastenerTemplate<ValueDownlinkFastenerValue<R>, ValueDownlinkFastenerValueInit<R>>
+          & Partial<Omit<ValueDownlinkFastener<O, ValueDownlinkFastenerValue<R>, ValueDownlinkFastenerValueInit<R>>, keyof ValueDownlinkFastenerTemplate>>
+          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ValueDownlinkFastenerTemplate>> & {extends: unknown}) : {})
+          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {implements: infer I} ? I : {})
+          : never
+): PropertyDecorator {
+  return ValueDownlinkFastener(template);
 }
 
-/** @beta */
-export interface ValueDownlinkFastener<O = unknown, V = unknown, VU = V> extends DownlinkFastener<O> {
+/** @public */
+export interface ValueDownlinkFastener<O = unknown, V = unknown, VU = V> extends DownlinkFastener<O>, ValueDownlinkObserver<V, VU> {
   (): V | undefined;
   (value: V | VU): O;
 
-  /** @internal */
-  readonly ownValueForm: Form<V, VU> | null;
+  /** @protected */
+  initValueForm(): Form<V, VU> | null;
 
-  valueForm(): Form<V, VU> | null;
-  valueForm(valueForm: Form<V, VU> | null): this;
+  readonly valueForm: Form<V, VU> | null;
+
+  setValueForm(valueForm: Form<V, VU> | null): void;
 
   get(): V | undefined;
 
@@ -79,28 +113,31 @@ export interface ValueDownlinkFastener<O = unknown, V = unknown, VU = V> extends
   /** @internal @override */
   createDownlink(warp: WarpRef): ValueDownlink<V, VU>;
 
+  /** @override */
+  initDownlink?(downlink: ValueDownlink<V, VU>): ValueDownlink<V, VU>;
+
   /** @internal @override */
   bindDownlink(downlink: ValueDownlink<V, VU>): ValueDownlink<V, VU>;
-
-  /** @internal */
-  initDownlink?(downlink: ValueDownlink<V, VU>): ValueDownlink<V, VU>;
 }
 
-/** @beta */
+/** @public */
 export const ValueDownlinkFastener = (function (_super: typeof DownlinkFastener) {
-  const ValueDownlinkFastener: ValueDownlinkFastenerFactory = _super.extend("ValueDownlinkFastener");
+  const ValueDownlinkFastener = _super.extend("ValueDownlinkFastener", {}) as ValueDownlinkFastenerClass;
 
-  ValueDownlinkFastener.prototype.valueForm = function <V, VU>(this: ValueDownlinkFastener<unknown, V, VU>, valueForm?: Form<V, VU> | null): Form<V, VU> | null | typeof this {
+  ValueDownlinkFastener.prototype.initValueForm = function <V, VU>(this: ValueDownlinkFastener<unknown, V, VU>): Form<V, VU> | null {
+    let valueForm = (Object.getPrototypeOf(this) as ValueDownlinkFastener<unknown, V, VU>).valueForm as Form<V, VU> | null | undefined;
     if (valueForm === void 0) {
-      return this.ownValueForm;
-    } else {
-      if (this.ownValueForm !== valueForm) {
-        (this as Mutable<typeof this>).ownValueForm = valueForm;
-        this.relink();
-      }
-      return this;
+      valueForm = null;
     }
-  } as typeof ValueDownlinkFastener.prototype.valueForm;
+    return valueForm;
+  };
+
+  ValueDownlinkFastener.prototype.setValueForm = function <V, VU>(this: ValueDownlinkFastener<unknown, V, VU>, valueForm: Form<V, VU> | null): void {
+    if (this.valueForm !== valueForm) {
+      (this as Mutable<typeof this>).valueForm = valueForm;
+      this.relink();
+    }
+  };
 
   ValueDownlinkFastener.prototype.get = function <V>(this: ValueDownlinkFastener<unknown, V>): V | undefined {
     const downlink = this.downlink;
@@ -116,15 +153,15 @@ export const ValueDownlinkFastener = (function (_super: typeof DownlinkFastener)
 
   ValueDownlinkFastener.prototype.createDownlink = function <V, VU>(this: ValueDownlinkFastener<unknown, V, VU>, warp: WarpRef): ValueDownlink<V, VU> {
     let downlink = warp.downlinkValue() as unknown as ValueDownlink<V, VU>;
-    if (this.ownValueForm !== null) {
-      downlink = downlink.valueForm(this.ownValueForm);
+    if (this.valueForm !== null) {
+      downlink = downlink.valueForm(this.valueForm);
     }
     return downlink;
   };
 
-  ValueDownlinkFastener.construct = function <F extends ValueDownlinkFastener<any, any>>(fastenerClass: {prototype: F}, fastener: F | null, owner: FastenerOwner<F>): F {
+  ValueDownlinkFastener.construct = function <F extends ValueDownlinkFastener<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
     if (fastener === null) {
-      fastener = function (value?: ValueDownlinkFastenerType<F> | ValueDownlinkFastenerInitType<F>): ValueDownlinkFastenerType<F> | undefined | FastenerOwner<F> {
+      fastener = function (value?: ValueDownlinkFastenerValue<F> | ValueDownlinkFastenerValueInit<F>): ValueDownlinkFastenerValue<F> | undefined | FastenerOwner<F> {
         if (arguments.length === 0) {
           return fastener!.get();
         } else {
@@ -133,108 +170,11 @@ export const ValueDownlinkFastener = (function (_super: typeof DownlinkFastener)
         }
       } as F;
       delete (fastener as Partial<Mutable<F>>).name; // don't clobber prototype name
-      Object.setPrototypeOf(fastener, fastenerClass.prototype);
+      Object.setPrototypeOf(fastener, this.prototype);
     }
-    fastener = _super.construct(fastenerClass, fastener, owner) as F;
-    (fastener as Mutable<typeof fastener>).ownValueForm = null;
+    fastener = _super.construct.call(this, fastener, owner) as F;
+    (fastener as Mutable<typeof fastener>).valueForm = fastener.initValueForm();
     return fastener;
-  };
-
-  ValueDownlinkFastener.define = function <O, V, VU>(className: string, descriptor: ValueDownlinkFastenerDescriptor<O, V, VU>): ValueDownlinkFastenerFactory<ValueDownlinkFastener<any, V, VU>> {
-    let superClass = descriptor.extends as ValueDownlinkFastenerFactory | null | undefined;
-    const affinity = descriptor.affinity;
-    const inherits = descriptor.inherits;
-    const valueForm = descriptor.valueForm;
-    let hostUri = descriptor.hostUri;
-    let nodeUri = descriptor.nodeUri;
-    let laneUri = descriptor.laneUri;
-    let prio = descriptor.prio;
-    let rate = descriptor.rate;
-    let body = descriptor.body;
-    delete descriptor.extends;
-    delete descriptor.implements;
-    delete descriptor.affinity;
-    delete descriptor.inherits;
-    delete descriptor.valueForm;
-    delete descriptor.hostUri;
-    delete descriptor.nodeUri;
-    delete descriptor.laneUri;
-    delete descriptor.prio;
-    delete descriptor.rate;
-    delete descriptor.body;
-
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
-    }
-
-    const fastenerClass = superClass.extend(className, descriptor);
-
-    fastenerClass.construct = function (fastenerClass: {prototype: ValueDownlinkFastener<any, any>}, fastener: ValueDownlinkFastener<O, V, VU> | null, owner: O): ValueDownlinkFastener<O, V, VU> {
-      fastener = superClass!.construct(fastenerClass, fastener, owner);
-      if (affinity !== void 0) {
-        fastener.initAffinity(affinity);
-      }
-      if (inherits !== void 0) {
-        fastener.initInherits(inherits);
-      }
-      if (hostUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownHostUri = hostUri as Uri;
-      }
-      if (nodeUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownNodeUri = nodeUri as Uri;
-      }
-      if (laneUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownLaneUri = laneUri as Uri;
-      }
-      if (prio !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownPrio = prio as number;
-      }
-      if (rate !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownRate = rate as number;
-      }
-      if (body !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownBody = body as Value;
-      }
-      if (valueForm !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownValueForm = valueForm;
-      }
-      return fastener;
-    };
-
-    if (typeof hostUri === "function") {
-      fastenerClass.prototype.initHostUri = hostUri;
-      hostUri = void 0;
-    } else if (hostUri !== void 0) {
-      hostUri = Uri.fromAny(hostUri);
-    }
-    if (typeof nodeUri === "function") {
-      fastenerClass.prototype.initNodeUri = nodeUri;
-      nodeUri = void 0;
-    } else if (nodeUri !== void 0) {
-      nodeUri = Uri.fromAny(nodeUri);
-    }
-    if (typeof laneUri === "function") {
-      fastenerClass.prototype.initLaneUri = laneUri;
-      laneUri = void 0;
-    } else if (laneUri !== void 0) {
-      laneUri = Uri.fromAny(laneUri);
-    }
-    if (typeof prio === "function") {
-      fastenerClass.prototype.initPrio = prio;
-      prio = void 0;
-    }
-    if (typeof rate === "function") {
-      fastenerClass.prototype.initRate = rate;
-      rate = void 0;
-    }
-    if (typeof body === "function") {
-      fastenerClass.prototype.initBody = body;
-      body = void 0;
-    } else if (body !== void 0) {
-      body = Value.fromAny(body);
-    }
-
-    return fastenerClass;
   };
 
   return ValueDownlinkFastener;

@@ -14,49 +14,49 @@
 
 export {DownlinkFastenerContext} from "./DownlinkFastenerContext";
 export {
-  DownlinkFastenerInit,
-  DownlinkFastenerDescriptor,
+  DownlinkFastenerRefinement,
+  DownlinkFastenerTemplate,
   DownlinkFastenerClass,
-  DownlinkFastenerFactory,
+  DownlinkFastenerDef,
   DownlinkFastener,
 } from "./DownlinkFastener";
 
 export {
-  EventDownlinkFastenerInit,
-  EventDownlinkFastenerDescriptor,
+  EventDownlinkFastenerRefinement,
+  EventDownlinkFastenerTemplate,
   EventDownlinkFastenerClass,
-  EventDownlinkFastenerFactory,
+  EventDownlinkFastenerDef,
   EventDownlinkFastener,
 } from "./EventDownlinkFastener";
 
 export {
-  ListDownlinkFastenerType,
-  ListDownlinkFastenerInitType,
-  ListDownlinkFastenerInit,
-  ListDownlinkFastenerDescriptor,
+  ListDownlinkFastenerRefinement,
+  ListDownlinkFastenerValue,
+  ListDownlinkFastenerValueInit,
+  ListDownlinkFastenerTemplate,
   ListDownlinkFastenerClass,
-  ListDownlinkFastenerFactory,
+  ListDownlinkFastenerDef,
   ListDownlinkFastener,
 } from "./ListDownlinkFastener";
 
 export {
-  MapDownlinkFastenerKeyType,
-  MapDownlinkFastenerKeyInitType,
-  MapDownlinkFastenerValueType,
-  MapDownlinkFastenerValueInitType,
-  MapDownlinkFastenerInit,
-  MapDownlinkFastenerDescriptor,
+  MapDownlinkFastenerRefinement,
+  MapDownlinkFastenerKey,
+  MapDownlinkFastenerKeyInit,
+  MapDownlinkFastenerValue,
+  MapDownlinkFastenerValueInit,
+  MapDownlinkFastenerTemplate,
   MapDownlinkFastenerClass,
-  MapDownlinkFastenerFactory,
+  MapDownlinkFastenerDef,
   MapDownlinkFastener,
 } from "./MapDownlinkFastener";
 
 export {
-  ValueDownlinkFastenerType,
-  ValueDownlinkFastenerInitType,
-  ValueDownlinkFastenerInit,
-  ValueDownlinkFastenerDescriptor,
+  ValueDownlinkFastenerRefinement,
+  ValueDownlinkFastenerValue,
+  ValueDownlinkFastenerValueInit,
+  ValueDownlinkFastenerTemplate,
   ValueDownlinkFastenerClass,
-  ValueDownlinkFastenerFactory,
+  ValueDownlinkFastenerDef,
   ValueDownlinkFastener,
 } from "./ValueDownlinkFastener";

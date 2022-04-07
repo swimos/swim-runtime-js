@@ -22,23 +22,23 @@ import {DownlinkType, DownlinkObserver, DownlinkInit, DownlinkFlags, Downlink} f
 import {ValueDownlinkModel} from "./ValueDownlinkModel";
 
 /** @public */
-export type ValueDownlinkWillSet<V, VU = never> = (newValue: V, downlink: ValueDownlink<V, VU>) => V | void;
+export type ValueDownlinkWillSet<V, VU = V> = (newValue: V, downlink: ValueDownlink<V, VU>) => V | void;
 /** @public */
-export type VaueDownlinkDidSet<V, VU = never> = (newValue: V, oldValue: V, downlink: ValueDownlink<V, VU>) => void;
+export type VaueDownlinkDidSet<V, VU = V> = (newValue: V, oldValue: V, downlink: ValueDownlink<V, VU>) => void;
 
 /** @public */
-export interface ValueDownlinkObserver<V, VU = never> extends DownlinkObserver {
+export interface ValueDownlinkObserver<V, VU = V> extends DownlinkObserver {
   willSet?: ValueDownlinkWillSet<V, VU>;
   didSet?: VaueDownlinkDidSet<V, VU>;
 }
 
 /** @public */
-export interface ValueDownlinkInit<V, VU = never> extends ValueDownlinkObserver<V, VU>, DownlinkInit {
+export interface ValueDownlinkInit<V, VU = V> extends ValueDownlinkObserver<V, VU>, DownlinkInit {
   valueForm?: Form<V, VU>;
 }
 
 /** @public */
-export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, Outlet<V> {
+export class ValueDownlink<V, VU = V> extends Downlink implements Inlet<V>, Outlet<V> {
   /** @internal */
   constructor(context: DownlinkContext, owner: DownlinkOwner | null, init?: ValueDownlinkInit<V, VU>,
               hostUri?: Uri, nodeUri?: Uri, laneUri?: Uri, prio?: number, rate?: number,
@@ -89,8 +89,8 @@ export class ValueDownlink<V, VU = never> extends Downlink implements Inlet<V>, 
   }
 
   valueForm(): Form<V, VU>;
-  valueForm<V2, V2U = never>(valueForm: Form<V2, V2U>): ValueDownlink<V2, V2U>;
-  valueForm<V2, V2U = never>(valueForm?: Form<V2, V2U>): Form<V, VU> | ValueDownlink<V2, V2U> {
+  valueForm<V2, V2U = V2>(valueForm: Form<V2, V2U>): ValueDownlink<V2, V2U>;
+  valueForm<V2, V2U = V2>(valueForm?: Form<V2, V2U>): Form<V, VU> | ValueDownlink<V2, V2U> {
     if (valueForm === void 0) {
       return this.ownValueForm;
     } else {

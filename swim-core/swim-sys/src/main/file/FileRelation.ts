@@ -15,38 +15,52 @@
 import * as Path from "path";
 import * as FS from "fs";
 import {Mutable, Proto, Equals} from "@swim/util";
-import {FastenerOwner, FastenerFlags, FastenerInit, FastenerClass, Fastener} from "@swim/component";
-
-/** @internal */
-export type FileRelationValue<F extends FileRelation<any, any>> =
-  F extends FileRelation<any, infer T> ? T : never;
+import {
+  FastenerFlags,
+  FastenerOwner,
+  FastenerRefinement,
+  FastenerTemplate,
+  FastenerClass,
+  Fastener,
+} from "@swim/component";
 
 /** @public */
-export interface FileRelationInit<T = unknown> extends FastenerInit {
-  extends?: {prototype: FileRelation<any, any>} | string | boolean | null;
-  baseDir?: string;
-  resolves?: boolean;
-
-  getBaseDir?(): string | undefined;
-  willSetBaseDir?(newBaseDir: string | undefined, oldBaseDir: string | undefined): void;
-  didSetBaseDir?(newBaseDir: string | undefined, oldBaseDir: string | undefined): void;
-
-  resolveFile?(baseDir: string | undefined, fileName: string | undefined): Promise<string | undefined>;
-  exists?(path: string): boolean;
-  readFile?(path: string): Promise<T>;
-  writeFile?(path: string, value: T): Promise<void>;
-
-  willSetValue?(path: string, newValue: T, oldValue: T): void;
-  didSetValue?(path: string, newValue: T, oldValue: T): void;
-
-  equalValues?(newValue: T, oldValue: T): boolean;
+export interface FileRelationRefinement extends FastenerRefinement {
+  value?: unknown;
 }
 
 /** @public */
-export type FileRelationDescriptor<O = unknown, T = unknown, I = {}> = ThisType<FileRelation<O, T> & I> & FileRelationInit<T> & Partial<I>;
+export type FileRelationValue<R extends FileRelationRefinement | FileRelation<any, any>, D = unknown> =
+  R extends {value: infer T} ? T :
+  R extends {extends: infer E} ? FileRelationValue<E, D> :
+  R extends FileRelation<any, infer T> ? T :
+  D;
 
 /** @public */
-export interface FileRelationClass<F extends FileRelation<any, any> = FileRelation<any, any>> extends FastenerClass<F> {  /** @internal */
+export interface FileRelationTemplate<T = unknown> extends FastenerTemplate {
+  extends?: Proto<FileRelation<any, any>> | string | boolean | null;
+  baseDir?: string;
+  resolves?: boolean;
+}
+
+/** @public */
+export interface FileRelationClass<F extends FileRelation<any, any> = FileRelation<any, any>> extends FastenerClass<F> {
+  /** @override */
+  specialize(className: string, template: FileRelationTemplate): FileRelationClass;
+
+  /** @override */
+  refine(propertyClass: FileRelationClass): void;
+
+  /** @override */
+  extend(className: string, template: FileRelationTemplate): FileRelationClass<F>;
+
+  /** @override */
+  specify<O, T = unknown>(className: string, template: ThisType<FileRelation<O, T>> & FileRelationTemplate<T> & Partial<Omit<FileRelation<O, T>, keyof FileRelationTemplate>>): FileRelationClass<F>;
+
+  /** @override */
+  <O, T = unknown>(template: ThisType<FileRelation<O, T>> & FileRelationTemplate<T> & Partial<Omit<FileRelation<O, T>, keyof FileRelationTemplate>>): PropertyDecorator;
+
+  /** @internal */
   readonly ResolvesFlag: FastenerFlags;
 
   /** @internal @override */
@@ -56,14 +70,25 @@ export interface FileRelationClass<F extends FileRelation<any, any> = FileRelati
 }
 
 /** @public */
-export interface FileRelationFactory<F extends FileRelation<any, any> = FileRelation<any, any>> extends FileRelationClass<F> {
-  extend<I = {}>(className: string, classMembers?: Partial<I> | null): FileRelationFactory<F> & I;
+export type FileRelationDef<O, R extends FileRelationRefinement> =
+  FileRelation<O, FileRelationValue<R>> &
+  {readonly name: string} & // prevent type alias simplification
+  (R extends {extends: infer E} ? E : {}) &
+  (R extends {defines: infer D} ? D : {}) &
+  (R extends {implements: infer I} ? I : {});
 
-  define<O, T = unknown>(className: string, descriptor: FileRelationDescriptor<O, T>): FileRelationFactory<FileRelation<any, T>>;
-  define<O, T = unknown, I = {}>(className: string, descriptor: {implements: unknown} & FileRelationDescriptor<O, T, I>): FileRelationFactory<FileRelation<any, T> & I>;
-
-  <O, T = unknown>(descriptor: FileRelationDescriptor<O, T>): PropertyDecorator;
-  <O, T = unknown, I = {}>(descriptor: {implements: unknown} & FileRelationDescriptor<O, T, I>): PropertyDecorator;
+/** @public */
+export function FileRelationDef<F extends FileRelation<any, any>>(
+  template: F extends FileRelationDef<infer O, infer R>
+          ? ThisType<FileRelationDef<O, R>>
+          & FileRelationTemplate<FileRelationValue<R>>
+          & Partial<Omit<FileRelation<O, FileRelationValue<R>>, keyof FileRelationTemplate>>
+          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof FileRelationTemplate>> & {extends: unknown}) : {})
+          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {implements: infer I} ? I : {})
+          : never
+): PropertyDecorator {
+  return FileRelation(template);
 }
 
 /** @public */
@@ -71,12 +96,11 @@ export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
   /** @override */
   get fastenerType(): Proto<FileRelation<any, any>>;
 
+  initBaseDir(): string | undefined;
+
   readonly baseDir: string | undefined;
 
   getBaseDir(): string | undefined;
-
-  /** @internal */
-  initBaseDir(baseDir: string | undefined): void;
 
   setBaseDir(baseDir: string | undefined): void;
 
@@ -119,24 +143,23 @@ export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
 
   /** @internal */
   equalValues(newValue: T, oldValue: T): boolean;
-
-  /** @internal @override */
-  get lazy(): boolean; // prototype property
-
-  /** @internal @override */
-  get static(): string | boolean; // prototype property
 }
 
 /** @public */
 export const FileRelation = (function (_super: typeof Fastener) {
-  const FileRelation: FileRelationFactory = _super.extend("FileRelation");
+  const FileRelation = _super.extend("FileRelation", {
+    lazy: false,
+    static: true,
+  }) as FileRelationClass;
 
   Object.defineProperty(FileRelation.prototype, "fastenerType", {
-    get: function (this: FileRelation): Proto<FileRelation<any, any>> {
-      return FileRelation;
-    },
+    value: FileRelation,
     configurable: true,
   });
+
+  FileRelation.prototype.initBaseDir = function (this: FileRelation): string | undefined {
+    return (Object.getPrototypeOf(this) as FileRelation).baseDir;
+  };
 
   FileRelation.prototype.getBaseDir = function (this: FileRelation): string | undefined {
     let baseDir = this.baseDir;
@@ -144,10 +167,6 @@ export const FileRelation = (function (_super: typeof Fastener) {
       baseDir = process.cwd();
     }
     return baseDir;
-  };
-
-  FileRelation.prototype.initBaseDir = function (this: FileRelation, baseDir: string | undefined): void {
-    (this as Mutable<typeof this>).baseDir = baseDir;
   };
 
   FileRelation.prototype.setBaseDir = function (this: FileRelation, newBaseDir: string | undefined): void {
@@ -249,63 +268,39 @@ export const FileRelation = (function (_super: typeof Fastener) {
     return Equals(newValue, oldValue);
   };
 
-  Object.defineProperty(FileRelation.prototype, "lazy", {
-    get: function (this: FileRelation): boolean {
-      return false;
-    },
-    configurable: true,
-  });
-
-  Object.defineProperty(FileRelation.prototype, "static", {
-    get: function (this: FileRelation): string | boolean {
-      return true;
-    },
-    configurable: true,
-  });
-
-  FileRelation.construct = function <F extends FileRelation<any, any>>(fastenerClass: {prototype: F}, fastener: F | null, owner: FastenerOwner<F>): F {
-    fastener = _super.construct(fastenerClass, fastener, owner) as F;
-    (fastener as Mutable<typeof fastener>).baseDir = void 0;
+  FileRelation.construct = function <F extends FileRelation<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+    fastener = _super.construct.call(this, fastener, owner) as F;
+    const flagsInit = fastener.flagsInit;
+    if (flagsInit !== void 0) {
+      fastener.initResolves((flagsInit & FileRelation.ResolvesFlag) !== 0);
+    }
+    (fastener as Mutable<typeof fastener>).baseDir = fastener.initBaseDir();
     return fastener;
   };
 
-  FileRelation.define = function <O, T>(className: string, descriptor: FileRelationDescriptor<O, T>): FileRelationFactory<FileRelation<any, T>> {
-    let superClass = descriptor.extends as FileRelationFactory | null | undefined;
-    const affinity = descriptor.affinity;
-    const inherits = descriptor.inherits;
-    const baseDir = descriptor.baseDir;
-    const resolves = descriptor.resolves;
-    delete descriptor.extends;
-    delete descriptor.implements;
-    delete descriptor.affinity;
-    delete descriptor.inherits;
-    delete descriptor.baseDir;
-    delete descriptor.resolves;
+  FileRelation.refine = function (fastenerClass: FileRelationClass): void {
+    _super.refine.call(this, fastenerClass);
+    const fastenerPrototype = fastenerClass.prototype;
+    let flagsInit = fastenerPrototype.flagsInit;
 
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "resolves")) {
+      if (flagsInit === void 0) {
+        flagsInit = 0;
+      }
+      if (fastenerPrototype.resolves) {
+        flagsInit |= FileRelation.ResolvesFlag;
+      } else {
+        flagsInit &= ~FileRelation.ResolvesFlag;
+      }
+      delete (fastenerPrototype as FileRelationTemplate).resolves;
     }
 
-    const fastenerClass = superClass.extend(className, descriptor);
-
-    fastenerClass.construct = function (fastenerClass: {prototype: FileRelation<any, any>}, fastener: FileRelation<O, T> | null, owner: O): FileRelation<O, T> {
-      fastener = superClass!.construct(fastenerClass, fastener, owner);
-      if (affinity !== void 0) {
-        fastener.initAffinity(affinity);
-      }
-      if (inherits !== void 0) {
-        fastener.initInherits(inherits);
-      }
-      if (baseDir !== void 0) {
-        fastener.initBaseDir(baseDir);
-      }
-      if (resolves !== void 0) {
-        fastener.initResolves(resolves);
-      }
-      return fastener;
-    };
-
-    return fastenerClass;
+    if (flagsInit !== void 0) {
+      Object.defineProperty(fastenerPrototype, "flagsInit", {
+        value: flagsInit,
+        configurable: true,
+      });
+    }
   };
 
   (FileRelation as Mutable<typeof FileRelation>).ResolvesFlag = 1 << (_super.FlagShift + 0);

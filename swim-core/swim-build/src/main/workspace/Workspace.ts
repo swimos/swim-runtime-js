@@ -15,7 +15,7 @@
 import * as Path from "path";
 import {Class, Lazy, Dictionary, MutableDictionary} from "@swim/util";
 import {OutputSettings, OutputStyle, Unicode} from "@swim/codec";
-import {MemberFastenerClass, Service, ComponentSet} from "@swim/component";
+import {FastenerClass, Service, ComponentSetDef} from "@swim/component";
 import type {WorkspaceObserver} from "./WorkspaceObserver";
 import {Scope} from "../"; // forward import
 import type {TaskConfig} from "../task/Task";
@@ -33,8 +33,8 @@ export class Workspace<T extends Scope = Scope> extends Service<T> {
 
   override readonly observerType?: Class<WorkspaceObserver<T>>;
 
-  @ComponentSet<Workspace, PackageScope>({
-    // avoid cyclic static reference to type: PackageScope
+  @ComponentSetDef<Workspace["packages"]>({
+    // avoid cyclic static reference to componentType: PackageScope
     observes: true,
     packageLibraryDidChange(libraryScope: LibraryScope): void {
       this.owner.callObservers("workspaceLibraryDidChange", libraryScope, this.owner);
@@ -43,8 +43,8 @@ export class Workspace<T extends Scope = Scope> extends Service<T> {
       this.owner.callObservers("workspacePackageDidChange", packageScope, this.owner);
     },
   })
-  readonly packages!: ComponentSet<this, PackageScope>;
-  static readonly packages: MemberFastenerClass<Workspace, "packages">;
+  readonly packages!: ComponentSetDef<this, {component: PackageScope, observes: true}>;
+  static readonly packages: FastenerClass<Workspace["packages"]>;
 
   readonly packageNameMap: Dictionary<PackageScope>;
 

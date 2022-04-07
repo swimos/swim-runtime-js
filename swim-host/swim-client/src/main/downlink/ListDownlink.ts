@@ -22,32 +22,32 @@ import {DownlinkType, DownlinkObserver, DownlinkInit, DownlinkFlags, Downlink} f
 import {ListDownlinkModel} from "./ListDownlinkModel";
 
 /** @public */
-export type ListDownlinkWillUpdate<V, VU = never> = (index: number, newValue: V, downlink: ListDownlink<V, VU>) => V | void;
+export type ListDownlinkWillUpdate<V, VU = V> = (index: number, newValue: V, downlink: ListDownlink<V, VU>) => V | void;
 /** @public */
-export type ListDownlinkDidUpdate<V, VU = never> = (index: number, newValue: V, oldValue: V, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkDidUpdate<V, VU = V> = (index: number, newValue: V, oldValue: V, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkWillMove<V, VU = never> = (fromIndex: number, toIndex: number, value: V, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkWillMove<V, VU = V> = (fromIndex: number, toIndex: number, value: V, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkDidMove<V, VU = never> = (fromIndex: number, toIndex: number, value: V, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkDidMove<V, VU = V> = (fromIndex: number, toIndex: number, value: V, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkWillRemove<V, VU = never> = (index: number, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkWillRemove<V, VU = V> = (index: number, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkDidRemove<V, VU = never> = (index: number, oldValue: V, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkDidRemove<V, VU = V> = (index: number, oldValue: V, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkWillDrop<V, VU = never> = (lower: number, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkWillDrop<V, VU = V> = (lower: number, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkDidDrop<V, VU = never> = (lower: number, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkDidDrop<V, VU = V> = (lower: number, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkWillTake<V, VU = never> = (upper: number, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkWillTake<V, VU = V> = (upper: number, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkDidTake<V, VU = never> = (upper: number, downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkDidTake<V, VU = V> = (upper: number, downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkWillClear<V, VU = never> = (downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkWillClear<V, VU = V> = (downlink: ListDownlink<V, VU>) => void;
 /** @public */
-export type ListDownlinkDidClear<V, VU = never> = (downlink: ListDownlink<V, VU>) => void;
+export type ListDownlinkDidClear<V, VU = V> = (downlink: ListDownlink<V, VU>) => void;
 
 /** @public */
-export interface ListDownlinkObserver<V, VU = never> extends DownlinkObserver {
+export interface ListDownlinkObserver<V, VU = V> extends DownlinkObserver {
   willUpdate?: ListDownlinkWillUpdate<V, VU>;
   didUpdate?: ListDownlinkDidUpdate<V, VU>;
   willMove?: ListDownlinkWillMove<V, VU>;
@@ -63,12 +63,12 @@ export interface ListDownlinkObserver<V, VU = never> extends DownlinkObserver {
 }
 
 /** @public */
-export interface ListDownlinkInit<V, VU = never> extends ListDownlinkObserver<V, VU>, DownlinkInit {
+export interface ListDownlinkInit<V, VU = V> extends ListDownlinkObserver<V, VU>, DownlinkInit {
   valueForm?: Form<V, VU>;
 }
 
 /** @public */
-export class ListDownlink<V, VU = never> extends Downlink {
+export class ListDownlink<V, VU = V> extends Downlink {
   /** @internal */
   constructor(context: DownlinkContext, owner: DownlinkOwner | null, init?: ListDownlinkInit<V, VU>,
               hostUri?: Uri, nodeUri?: Uri, laneUri?: Uri, prio?: number, rate?: number,
@@ -126,8 +126,8 @@ export class ListDownlink<V, VU = never> extends Downlink {
   }
 
   valueForm(): Form<V, VU>;
-  valueForm<V2, V2U = never>(valueForm: Form<V2, V2U>): ListDownlink<V2, V2U>;
-  valueForm<V2, V2U = never>(valueForm?: Form<V2, V2U>): Form<V, VU> | ListDownlink<V2, V2U> {
+  valueForm<V2, V2U = V2>(valueForm: Form<V2, V2U>): ListDownlink<V2, V2U>;
+  valueForm<V2, V2U = V2>(valueForm?: Form<V2, V2U>): Form<V, VU> | ListDownlink<V2, V2U> {
     if (valueForm === void 0) {
       return this.ownValueForm;
     } else {

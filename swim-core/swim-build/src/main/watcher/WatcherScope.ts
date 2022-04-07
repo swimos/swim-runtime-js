@@ -14,8 +14,7 @@
 
 import type {Class, MutableDictionary} from "@swim/util";
 import {OutputSettings, Output, OutputStyle, Format, Unicode} from "@swim/codec";
-import {MemberFastenerClass, Provider, Timer} from "@swim/component";
-import type {Workspace} from "../workspace/Workspace";
+import {FastenerClass, ProviderDef, Timer} from "@swim/component";
 import {Scope} from "../scope/Scope";
 import type {TaskConfig} from "../task/Task";
 import type {PackageScope} from "../package/PackageScope";
@@ -252,15 +251,18 @@ export class WatcherScope extends Scope {
     console.log("");
   }
 
-  @Provider<WatcherScope, Workspace>({
+  @ProviderDef<WatcherScope["workspace"]>({
     extends: true,
     observes: true,
     workspacePackageDidChange(packageScope: PackageScope): void {
       this.owner.rebuildPackage(packageScope);
     },
   })
-  override readonly workspace!: Provider<this, Workspace>;
-  static override readonly workspace: MemberFastenerClass<Scope, "workspace">;
+  override readonly workspace!: ProviderDef<this, {
+    extends: Scope["workspace"],
+    observes: true,
+  }>;
+  static override readonly workspace: FastenerClass<Scope["workspace"]>;
 
   static async watch(watchConfig: TaskConfig, buildConfigs: TaskConfig | readonly TaskConfig[], packageNames?: string[] | string, libraryNames?: string[] | string): Promise<WatcherScope> {
     if (typeof packageNames === "string") {

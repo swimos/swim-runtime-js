@@ -12,43 +12,64 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Class, Proto, Equals, Arrays, ConsumerType, Consumable, Consumer} from "@swim/util";
-import {FastenerOwner, FastenerFlags, FastenerInit, FastenerClass, Fastener} from "@swim/component";
+import {
+  Mutable,
+  Class,
+  Proto,
+  Equals,
+  Arrays,
+  ConsumerType,
+  Consumable,
+  Consumer,
+} from "@swim/util";
+import {
+  FastenerFlags,
+  FastenerOwner,
+  FastenerRefinement,
+  FastenerTemplate,
+  FastenerClass,
+  Fastener,
+} from "@swim/component";
 import {AnyValue, Value} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
 import type {DownlinkObserver, Downlink} from "../downlink/Downlink";
 import type {WarpRef} from "../ref/WarpRef";
 import type {DownlinkFastenerContext} from "./DownlinkFastenerContext";
 
-/** @beta */
-export interface DownlinkFastenerInit extends FastenerInit, DownlinkObserver {
-  extends?: {prototype: DownlinkFastener<any>} | string | boolean | null;
-  consumed?: boolean;
-
-  hostUri?: AnyUri | (() => AnyUri | null);
-  nodeUri?: AnyUri | (() => AnyUri | null);
-  laneUri?: AnyUri | (() => AnyUri | null);
-  prio?: number | (() => number | undefined);
-  rate?: number | (() => number | undefined);
-  body?: AnyValue | (() => AnyValue | null);
-
-  willConsume?(conssumer: unknown): void;
-  didConsume?(conssumer: unknown): void;
-  willUnconsume?(conssumer: unknown): void;
-  didUnconsume?(conssumer: unknown): void;
-  willStartConsuming?(): void;
-  didStartConsuming?(): void;
-  willStopConsuming?(): void;
-  didStopConsuming?(): void;
-
-  initDownlink?(downlink: Downlink): Downlink;
+/** @public */
+export interface DownlinkFastenerRefinement extends FastenerRefinement {
 }
 
-/** @beta */
-export type DownlinkFastenerDescriptor<O = unknown, I = {}> = ThisType<DownlinkFastener<O> & I> & DownlinkFastenerInit & Partial<I>;
+/** @public */
+export interface DownlinkFastenerTemplate extends FastenerTemplate {
+  extends?: Proto<DownlinkFastener<any>> | string | boolean | null;
+  consumed?: boolean;
+  hostUri?: AnyUri | null;
+  nodeUri?: AnyUri | null;
+  laneUri?: AnyUri | null;
+  prio?: number;
+  rate?: number;
+  body?: AnyValue | null;
+  warp?: WarpRef | null;
+}
 
-/** @beta */
+/** @public */
 export interface DownlinkFastenerClass<F extends DownlinkFastener<any> = DownlinkFastener<any>> extends FastenerClass<F> {
+  /** @override */
+  specialize(className: string, template: DownlinkFastenerTemplate): DownlinkFastenerClass;
+
+  /** @override */
+  refine(fastenerClass: DownlinkFastenerClass): void;
+
+  /** @override */
+  extend(className: string, template: DownlinkFastenerTemplate): DownlinkFastenerClass<F>;
+
+  /** @override */
+  specify<O>(className: string, template: ThisType<DownlinkFastener<O>> & DownlinkFastenerTemplate & Partial<Omit<DownlinkFastener<O>, keyof DownlinkFastenerTemplate>>): DownlinkFastenerClass<F>;
+
+  /** @override */
+  <O>(template: ThisType<DownlinkFastener<O>> & DownlinkFastenerTemplate & Partial<Omit<DownlinkFastener<O>, keyof DownlinkFastenerTemplate>>): PropertyDecorator;
+
   /** @internal */
   readonly ConsumingFlag: FastenerFlags;
   /** @internal */
@@ -62,19 +83,30 @@ export interface DownlinkFastenerClass<F extends DownlinkFastener<any> = Downlin
   readonly FlagMask: FastenerFlags;
 }
 
-/** @beta */
-export interface DownlinkFastenerFactory<F extends DownlinkFastener<any> = DownlinkFastener<any>> extends DownlinkFastenerClass<F> {
-  extend<I = {}>(className: string, classMembers?: Partial<I> | null): DownlinkFastenerFactory<F> & I;
+/** @public */
+export type DownlinkFastenerDef<O, R extends DownlinkFastenerRefinement> =
+  DownlinkFastener<O> &
+  {readonly name: string} & // prevent type alias simplification
+  (R extends {extends: infer E} ? E : {}) &
+  (R extends {defines: infer D} ? D : {}) &
+  (R extends {implements: infer I} ? I : {});
 
-  define<O>(className: string, descriptor: DownlinkFastenerDescriptor<O>): DownlinkFastenerFactory<DownlinkFastener<any>>;
-  define<O, I = {}>(className: string, descriptor: {implements: unknown} & DownlinkFastenerDescriptor<O, I>): DownlinkFastenerFactory<DownlinkFastener<any> & I>;
-
-  <O>(descriptor: DownlinkFastenerDescriptor<O>): PropertyDecorator;
-  <O, I = {}>(descriptor: {implements: unknown} & DownlinkFastenerDescriptor<O, I>): PropertyDecorator;
+/** @public */
+export function DownlinkFastenerDef<F extends DownlinkFastener<any>>(
+  template: F extends DownlinkFastenerDef<infer O, infer R>
+          ? ThisType<DownlinkFastenerDef<O, R>>
+          & DownlinkFastenerTemplate
+          & Partial<Omit<DownlinkFastener<O>, keyof DownlinkFastenerTemplate>>
+          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof DownlinkFastenerTemplate>> & {extends: unknown}) : {})
+          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {implements: infer I} ? I : {})
+          : never
+): PropertyDecorator {
+  return DownlinkFastener(template);
 }
 
-/** @beta */
-export interface DownlinkFastener<O = unknown> extends Fastener<O>, Consumable {
+/** @public */
+export interface DownlinkFastener<O = unknown> extends Fastener<O>, Consumable, DownlinkObserver {
   /** @override */
   get fastenerType(): Proto<DownlinkFastener<any>>;
 
@@ -82,49 +114,59 @@ export interface DownlinkFastener<O = unknown> extends Fastener<O>, Consumable {
   readonly consumerType?: Class<Consumer>;
 
   /** @protected @override */
-  onInherit(superFastener: Fastener): void;
+  onDerive(inlet: Fastener): void;
 
   /** @internal */
-  readonly ownHostUri: Uri | null;
+  readonly consumed?: boolean; // optional prototype property
 
-  hostUri(): Uri | null;
-  hostUri(hostUri: AnyUri | null): this;
+  /** @protected */
+  initHostUri(): Uri | null;
 
-  /** @internal */
-  readonly ownNodeUri: Uri | null;
+  readonly hostUri: Uri | null;
 
-  nodeUri(): Uri | null;
-  nodeUri(nodeUri: AnyUri | null): this;
+  setHostUri(hostUri: AnyUri | null): void;
 
-  /** @internal */
-  readonly ownLaneUri: Uri | null;
+  /** @protected */
+  initNodeUri(): Uri | null;
 
-  laneUri(): Uri | null;
-  laneUri(laneUri: AnyUri | null): this;
+  readonly nodeUri: Uri | null;
 
-  /** @internal */
-  readonly ownPrio: number | undefined;
+  setNodeUri(nodeUri: AnyUri | null): void;
 
-  prio(): number | undefined;
-  prio(prio: number | undefined): this;
+  /** @protected */
+  initLaneUri(): Uri | null;
 
-  /** @internal */
-  readonly ownRate: number | undefined;
+  readonly laneUri: Uri | null;
 
-  rate(): number | undefined;
-  rate(rate: number | undefined): this;
+  setLaneUri(laneUri: AnyUri | null): void;
 
-  /** @internal */
-  readonly ownBody: Value | null;
+  /** @protected */
+  initPrio(): number | undefined;
 
-  body(): Value | null;
-  body(body: AnyValue | null): this;
+  readonly prio: number | undefined;
 
-  /** @internal */
-  readonly ownWarp: WarpRef | null;
+  setPrio(prio: number | undefined): void;
 
-  warp(): WarpRef | null;
-  warp(warp: WarpRef | null): this;
+  /** @protected */
+  initRate(): number | undefined;
+
+  readonly rate: number | undefined;
+
+  setRate(rate: number | undefined): void;
+
+  /** @protected */
+  initBody(): Value | null;
+
+  readonly body: Value | null;
+
+  setBody(body: AnyValue | null): void;
+
+  /** @protected */
+  initWarp(): WarpRef | null;
+
+  readonly warp: WarpRef | null;
+
+  setWarp(warp: WarpRef | null): void;
 
   readonly downlink: Downlink | null;
 
@@ -139,6 +181,8 @@ export interface DownlinkFastener<O = unknown> extends Fastener<O>, Consumable {
 
   /** @internal @abstract */
   createDownlink(warp: WarpRef): Downlink;
+
+  initDownlink?(downlink: Downlink): Downlink;
 
   /** @internal */
   bindDownlink(downlink: Downlink): Downlink;
@@ -204,204 +248,157 @@ export interface DownlinkFastener<O = unknown> extends Fastener<O>, Consumable {
 
   /** @protected @override */
   onUnmount(): void;
-
-  /** @internal */
-  initDownlink?(downlink: Downlink): Downlink;
-
-  /** @internal */
-  initHostUri?(): AnyUri | null;
-
-  /** @internal */
-  initNodeUri?(): AnyUri | null;
-
-  /** @internal */
-  initLaneUri?(): AnyUri | null;
-
-  /** @internal */
-  initPrio?(): number | undefined;
-
-  /** @internal */
-  initRate?(): number | undefined;
-
-  /** @internal */
-  initBody?(): AnyValue | null;
-
-  /** @internal @protected */
-  get consumed(): boolean | undefined; // optional prototype property
-
-  /** @internal @override */
-  get lazy(): boolean; // prototype property
-
-  /** @internal @override */
-  get static(): string | boolean; // prototype property
 }
 
-/** @beta */
+/** @public */
 export const DownlinkFastener = (function (_super: typeof Fastener) {
-  const DownlinkFastener: DownlinkFastenerFactory = _super.extend("DownlinkFastener");
+  const DownlinkFastener = _super.extend("DownlinkFastener", {
+    lazy: false,
+    static: true,
+  }) as DownlinkFastenerClass;
 
   Object.defineProperty(DownlinkFastener.prototype, "fastenerType", {
-    get: function (this: DownlinkFastener): Proto<DownlinkFastener<any>> {
-      return DownlinkFastener;
-    },
+    value: DownlinkFastener,
     configurable: true,
   });
 
-  DownlinkFastener.prototype.onInherit = function (this: DownlinkFastener, superFastener: DownlinkFastener): void {
+  DownlinkFastener.prototype.onDerive = function (this: DownlinkFastener, inlet: DownlinkFastener): void {
     // hook
   };
 
-  DownlinkFastener.prototype.hostUri = function (this: DownlinkFastener<unknown>, hostUri?: AnyUri | null): Uri | null | typeof this {
+  DownlinkFastener.prototype.initHostUri = function (this: DownlinkFastener): Uri | null {
+    let hostUri = (Object.getPrototypeOf(this) as DownlinkFastener).hostUri as Uri | null | undefined;
     if (hostUri === void 0) {
-      if (this.ownHostUri !== null) {
-        return this.ownHostUri;
-      } else {
-        hostUri = this.initHostUri !== void 0 ? this.initHostUri() : null;
-        if (hostUri !== null) {
-          hostUri = Uri.fromAny(hostUri);
-          (this as Mutable<typeof this>).ownHostUri = hostUri;
-        }
-        return hostUri;
-      }
-    } else {
-      if (hostUri !== null) {
-        hostUri = Uri.fromAny(hostUri);
-      }
-      if (!Equals(this.ownHostUri, hostUri)) {
-        (this as Mutable<typeof this>).ownHostUri = hostUri;
-        this.relink();
-      }
-      return this;
+      hostUri = null;
     }
-  } as typeof DownlinkFastener.prototype.hostUri;
+    return hostUri;
+  };
 
-  DownlinkFastener.prototype.nodeUri = function (this: DownlinkFastener<unknown>, nodeUri?: AnyUri | null): Uri | null | typeof this {
+  DownlinkFastener.prototype.setHostUri = function (this: DownlinkFastener, hostUri: AnyUri | null): void {
+    if (hostUri !== null) {
+      hostUri = Uri.fromAny(hostUri);
+    }
+    if (!Equals(this.hostUri, hostUri)) {
+      (this as Mutable<typeof this>).hostUri = hostUri;
+      this.relink();
+    }
+  };
+
+  DownlinkFastener.prototype.initNodeUri = function (this: DownlinkFastener): Uri | null {
+    let nodeUri = (Object.getPrototypeOf(this) as DownlinkFastener).nodeUri as Uri | null | undefined;
     if (nodeUri === void 0) {
-      if (this.ownNodeUri !== null) {
-        return this.ownNodeUri;
-      } else {
-        nodeUri = this.initNodeUri !== void 0 ? this.initNodeUri() : null;
-        if (nodeUri !== null) {
-          nodeUri = Uri.fromAny(nodeUri);
-          (this as Mutable<typeof this>).ownNodeUri = nodeUri;
-        }
-        return nodeUri;
-      }
-    } else {
-      if (nodeUri !== null) {
-        nodeUri = Uri.fromAny(nodeUri);
-      }
-      if (!Equals(this.ownNodeUri, nodeUri)) {
-        (this as Mutable<typeof this>).ownNodeUri = nodeUri;
-        this.relink();
-      }
-      return this;
+      nodeUri = null;
     }
-  } as typeof DownlinkFastener.prototype.nodeUri;
+    return nodeUri;
+  };
 
-  DownlinkFastener.prototype.laneUri = function (this: DownlinkFastener<unknown>, laneUri?: AnyUri | null): Uri | null | typeof this {
+  DownlinkFastener.prototype.setNodeUri = function (this: DownlinkFastener, nodeUri: AnyUri | null): void {
+    if (nodeUri !== null) {
+      nodeUri = Uri.fromAny(nodeUri);
+    }
+    if (!Equals(this.nodeUri, nodeUri)) {
+      (this as Mutable<typeof this>).nodeUri = nodeUri;
+      this.relink();
+    }
+  };
+
+  DownlinkFastener.prototype.initLaneUri = function (this: DownlinkFastener): Uri | null {
+    let laneUri = (Object.getPrototypeOf(this) as DownlinkFastener).laneUri as Uri | null | undefined;
     if (laneUri === void 0) {
-      if (this.ownLaneUri !== null) {
-        return this.ownLaneUri;
-      } else {
-        laneUri = this.initLaneUri !== void 0 ? this.initLaneUri() : null;
-        if (laneUri !== null) {
-          laneUri = Uri.fromAny(laneUri);
-          (this as Mutable<typeof this>).ownLaneUri = laneUri;
-        }
-        return laneUri;
-      }
-    } else {
-      if (laneUri !== null) {
-        laneUri = Uri.fromAny(laneUri);
-      }
-      if (!Equals(this.ownLaneUri, laneUri)) {
-        (this as Mutable<typeof this>).ownLaneUri = laneUri;
-        this.relink();
-      }
-      return this;
+      laneUri = null;
     }
-  } as typeof DownlinkFastener.prototype.laneUri;
+    return laneUri;
+  };
 
-  DownlinkFastener.prototype.prio = function (this: DownlinkFastener<unknown>, prio?: number | undefined): number | undefined | typeof this {
-    if (arguments.length === 0) {
-      if (this.ownPrio !== void 0) {
-        return this.ownPrio;
-      } else {
-        prio = this.initPrio !== void 0 ? this.initPrio() : void 0;
-        if (prio !== void 0) {
-          (this as Mutable<typeof this>).ownPrio = prio;
-        }
-        return prio;
-      }
-    } else {
-      if (this.ownPrio !== prio) {
-        (this as Mutable<typeof this>).ownPrio = prio;
-        this.relink();
-      }
-      return this;
+  DownlinkFastener.prototype.setLaneUri = function (this: DownlinkFastener, laneUri: AnyUri | null): void {
+    if (laneUri !== null) {
+      laneUri = Uri.fromAny(laneUri);
     }
-  } as typeof DownlinkFastener.prototype.prio;
-
-  DownlinkFastener.prototype.rate = function (this: DownlinkFastener<unknown>, rate?: number | undefined): number | undefined | typeof this {
-    if (arguments.length === 0) {
-      if (this.ownRate !== void 0) {
-        return this.ownRate;
-      } else {
-        rate = this.initRate !== void 0 ? this.initRate() : void 0;
-        if (rate !== void 0) {
-          (this as Mutable<typeof this>).ownRate = rate;
-        }
-        return rate;
-      }
-    } else {
-      if (this.ownRate !== rate) {
-        (this as Mutable<typeof this>).ownRate = rate;
-        this.relink();
-      }
-      return this;
+    if (!Equals(this.laneUri, laneUri)) {
+      (this as Mutable<typeof this>).laneUri = laneUri;
+      this.relink();
     }
-  } as typeof DownlinkFastener.prototype.rate;
+  };
 
-  DownlinkFastener.prototype.body = function (this: DownlinkFastener<unknown>, body?: AnyValue | null): Value | null | typeof this {
+  DownlinkFastener.prototype.initPrio = function (this: DownlinkFastener): number | undefined {
+    return (Object.getPrototypeOf(this) as DownlinkFastener).prio;
+  };
+
+  DownlinkFastener.prototype.setPrio = function (this: DownlinkFastener, prio: number | undefined): void {
+    if (this.prio !== prio) {
+      (this as Mutable<typeof this>).prio = prio;
+      this.relink();
+    }
+  };
+
+  DownlinkFastener.prototype.initRate = function (this: DownlinkFastener): number | undefined {
+    return (Object.getPrototypeOf(this) as DownlinkFastener).rate;
+  };
+
+  DownlinkFastener.prototype.setRate = function (this: DownlinkFastener, rate: number | undefined): void {
+    if (this.rate !== rate) {
+      (this as Mutable<typeof this>).rate = rate;
+      this.relink();
+    }
+  };
+
+  DownlinkFastener.prototype.initBody = function (this: DownlinkFastener): Value | null {
+    let body = (Object.getPrototypeOf(this) as DownlinkFastener).body as Value | null | undefined;
     if (body === void 0) {
-      if (this.ownBody !== null) {
-        return this.ownBody;
-      } else {
-        body = this.initBody !== void 0 ? this.initBody() : null;
-        if (body !== null) {
-          body = Value.fromAny(body);
-          (this as Mutable<typeof this>).ownBody = body;
-        }
-        return body;
-      }
-    } else {
-      if (body !== null) {
-        body = Value.fromAny(body);
-      }
-      if (!Equals(this.ownBody, body)) {
-        (this as Mutable<typeof this>).ownBody = body;
-        this.relink();
-      }
-      return this;
+      body = null;
     }
-  } as typeof DownlinkFastener.prototype.body;
+    return body;
+  };
 
-  DownlinkFastener.prototype.warp = function (this: DownlinkFastener<unknown>, warp?: WarpRef | null): WarpRef | null | typeof this {
-    if (warp === void 0) {
-      return this.ownWarp;
-    } else {
-      if (this.ownWarp !== warp) {
-        (this as Mutable<typeof this>).ownWarp = warp;
-        this.relink();
-      }
-      return this;
+  DownlinkFastener.prototype.setBody = function (this: DownlinkFastener, body: AnyValue | null): void {
+    if (body !== null) {
+      body = Value.fromAny(body);
     }
-  } as typeof DownlinkFastener.prototype.warp;
+    if (!Equals(this.body, body)) {
+      (this as Mutable<typeof this>).body = body;
+      this.relink();
+    }
+  };
+
+  DownlinkFastener.prototype.initWarp = function (this: DownlinkFastener): WarpRef | null {
+    let warp = (Object.getPrototypeOf(this) as DownlinkFastener).warp as WarpRef | null | undefined;
+    if (warp === void 0) {
+      warp = null;
+    }
+    return warp;
+  };
+
+  DownlinkFastener.prototype.setWarp = function (this: DownlinkFastener, warp: WarpRef | null): void {
+    if (this.warp !== warp) {
+      (this as Mutable<typeof this>).warp = warp;
+      this.relink();
+    }
+  };
 
   DownlinkFastener.prototype.link = function (this: DownlinkFastener<DownlinkFastenerContext>): void {
     if (this.downlink === null) {
-      let warp = this.ownWarp;
+      if (this.hostUri === null) {
+        (this as Mutable<typeof this>).hostUri = this.initHostUri();
+      }
+      if (this.nodeUri === null) {
+        (this as Mutable<typeof this>).nodeUri = this.initNodeUri();
+      }
+      if (this.laneUri === null) {
+        (this as Mutable<typeof this>).laneUri = this.initLaneUri();
+      }
+      if (this.prio === null) {
+        (this as Mutable<typeof this>).prio = this.initPrio();
+      }
+      if (this.rate === null) {
+        (this as Mutable<typeof this>).rate = this.initRate();
+      }
+      if (this.body === null) {
+        (this as Mutable<typeof this>).body = this.initBody();
+      }
+      if (this.warp === null) {
+        (this as Mutable<typeof this>).warp = this.initWarp();
+      }
+      let warp = this.warp;
       if (warp === null) {
         warp = this.owner.warpRef.value;
       }
@@ -413,13 +410,13 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
       if (this.initDownlink !== void 0) {
         downlink = this.initDownlink(downlink);
       }
-      downlink = downlink.observe(this as DownlinkObserver);
+      downlink = downlink.observe(this);
       (this as Mutable<typeof this>).downlink = downlink.open();
       this.setFlags(this.flags & ~DownlinkFastener.PendingFlag);
     }
   };
 
-  DownlinkFastener.prototype.unlink = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.unlink = function (this: DownlinkFastener): void {
     const downlink = this.downlink;
     if (downlink !== null) {
       downlink.close();
@@ -428,7 +425,7 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
     }
   };
 
-  DownlinkFastener.prototype.relink = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.relink = function (this: DownlinkFastener): void {
     this.setFlags(this.flags | DownlinkFastener.PendingFlag);
     if ((this.flags & DownlinkFastener.ConsumingFlag) !== 0) {
       this.setCoherent(false);
@@ -436,35 +433,35 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
     }
   };
 
-  DownlinkFastener.prototype.bindDownlink = function (this: DownlinkFastener<unknown>, downlink: Downlink): Downlink {
-    const hostUri = this.hostUri();
+  DownlinkFastener.prototype.bindDownlink = function (this: DownlinkFastener, downlink: Downlink): Downlink {
+    const hostUri = this.hostUri;
     if (hostUri !== null) {
       downlink = downlink.hostUri(hostUri);
     }
-    const nodeUri = this.nodeUri();
+    const nodeUri = this.nodeUri;
     if (nodeUri !== null) {
       downlink = downlink.nodeUri(nodeUri);
     }
-    const laneUri = this.laneUri();
+    const laneUri = this.laneUri;
     if (laneUri !== null) {
       downlink = downlink.laneUri(laneUri);
     }
-    const prio = this.prio();
+    const prio = this.prio;
     if (prio !== void 0) {
       downlink = downlink.prio(prio);
     }
-    const rate = this.rate();
+    const rate = this.rate;
     if (rate !== void 0) {
       downlink = downlink.rate(rate);
     }
-    const body = this.body();
+    const body = this.body;
     if (body !== null) {
       downlink = downlink.body(body);
     }
     return downlink;
   };
 
-  DownlinkFastener.prototype.recohere = function (this: DownlinkFastener<unknown>, t: number): void {
+  DownlinkFastener.prototype.recohere = function (this: DownlinkFastener, t: number): void {
     this.setCoherent(true);
     if (this.downlink !== null && (this.flags & DownlinkFastener.RelinkMask) === DownlinkFastener.RelinkMask) {
       this.unlink();
@@ -476,7 +473,7 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
     }
   };
 
-  DownlinkFastener.prototype.consume = function (this: DownlinkFastener<unknown>, downlinkConsumer: ConsumerType<typeof this>): void {
+  DownlinkFastener.prototype.consume = function (this: DownlinkFastener, downlinkConsumer: ConsumerType<typeof this>): void {
     const oldConsumers = this.consumers;
     const newConsumerrss = Arrays.inserted(downlinkConsumer, oldConsumers);
     if (oldConsumers !== newConsumerrss) {
@@ -490,19 +487,19 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
     }
   };
 
-  DownlinkFastener.prototype.willConsume = function (this: DownlinkFastener<unknown>, downlinkConsumer: ConsumerType<typeof this>): void {
+  DownlinkFastener.prototype.willConsume = function (this: DownlinkFastener, downlinkConsumer: ConsumerType<typeof this>): void {
     // hook
   }
 
-  DownlinkFastener.prototype.onConsume = function (this: DownlinkFastener<unknown>, downlinkConsumer: ConsumerType<typeof this>): void {
+  DownlinkFastener.prototype.onConsume = function (this: DownlinkFastener, downlinkConsumer: ConsumerType<typeof this>): void {
     // hook
   };
 
-  DownlinkFastener.prototype.didConsume = function (this: DownlinkFastener<unknown>, downlinkConsumer: ConsumerType<typeof this>): void {
+  DownlinkFastener.prototype.didConsume = function (this: DownlinkFastener, downlinkConsumer: ConsumerType<typeof this>): void {
     // hook
   };
 
-  DownlinkFastener.prototype.unconsume = function (this: DownlinkFastener<unknown>, downlinkConsumer: ConsumerType<typeof this>): void {
+  DownlinkFastener.prototype.unconsume = function (this: DownlinkFastener, downlinkConsumer: ConsumerType<typeof this>): void {
     const oldConsumers = this.consumers;
     const newConsumerrss = Arrays.removed(downlinkConsumer, oldConsumers);
     if (oldConsumers !== newConsumerrss) {
@@ -516,26 +513,26 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
     }
   };
 
-  DownlinkFastener.prototype.willUnconsume = function (this: DownlinkFastener<unknown>, downlinkConsumer: ConsumerType<typeof this>): void {
+  DownlinkFastener.prototype.willUnconsume = function (this: DownlinkFastener, downlinkConsumer: ConsumerType<typeof this>): void {
     // hook
   };
 
-  DownlinkFastener.prototype.onUnconsume = function (this: DownlinkFastener<unknown>, downlinkConsumer: ConsumerType<typeof this>): void {
+  DownlinkFastener.prototype.onUnconsume = function (this: DownlinkFastener, downlinkConsumer: ConsumerType<typeof this>): void {
     // hook
   };
 
-  DownlinkFastener.prototype.didUnconsume = function (this: DownlinkFastener<unknown>, downlinkConsumer: ConsumerType<typeof this>): void {
+  DownlinkFastener.prototype.didUnconsume = function (this: DownlinkFastener, downlinkConsumer: ConsumerType<typeof this>): void {
     // hook
   };
 
   Object.defineProperty(DownlinkFastener.prototype, "consuming", {
-    get(this: DownlinkFastener<unknown>): boolean {
+    get(this: DownlinkFastener): boolean {
       return (this.flags & DownlinkFastener.ConsumingFlag) !== 0;
     },
     configurable: true,
   })
 
-  DownlinkFastener.prototype.startConsuming = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.startConsuming = function (this: DownlinkFastener): void {
     if ((this.flags & DownlinkFastener.ConsumingFlag) === 0) {
       this.willStartConsuming();
       this.setFlags(this.flags | DownlinkFastener.ConsumingFlag);
@@ -544,20 +541,20 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
     }
   };
 
-  DownlinkFastener.prototype.willStartConsuming = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.willStartConsuming = function (this: DownlinkFastener): void {
     // hook
   };
 
-  DownlinkFastener.prototype.onStartConsuming = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.onStartConsuming = function (this: DownlinkFastener): void {
     this.setCoherent(false);
     this.decohere();
   };
 
-  DownlinkFastener.prototype.didStartConsuming = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.didStartConsuming = function (this: DownlinkFastener): void {
     // hook
   };
 
-  DownlinkFastener.prototype.stopConsuming = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.stopConsuming = function (this: DownlinkFastener): void {
     if ((this.flags & DownlinkFastener.ConsumingFlag) !== 0) {
       this.willStopConsuming();
       this.setFlags(this.flags & ~DownlinkFastener.ConsumingFlag);
@@ -566,20 +563,20 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
     }
   };
 
-  DownlinkFastener.prototype.willStopConsuming = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.willStopConsuming = function (this: DownlinkFastener): void {
     // hook
   };
 
-  DownlinkFastener.prototype.onStopConsuming = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.onStopConsuming = function (this: DownlinkFastener): void {
     this.setCoherent(false);
     this.decohere();
   };
 
-  DownlinkFastener.prototype.didStopConsuming = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.didStopConsuming = function (this: DownlinkFastener): void {
     // hook
   };
 
-  DownlinkFastener.prototype.onMount = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.onMount = function (this: DownlinkFastener): void {
     _super.prototype.onMount.call(this);
     if ((this.flags & DownlinkFastener.ConsumingFlag) !== 0) {
       this.setCoherent(false);
@@ -587,129 +584,76 @@ export const DownlinkFastener = (function (_super: typeof Fastener) {
     }
   };
 
-  DownlinkFastener.prototype.onUnmount = function (this: DownlinkFastener<unknown>): void {
+  DownlinkFastener.prototype.onUnmount = function (this: DownlinkFastener): void {
     _super.prototype.onUnmount.call(this);
     this.unlink();
   };
 
-  Object.defineProperty(DownlinkFastener.prototype, "lazy", {
-    get: function (this: DownlinkFastener): boolean {
-      return false;
-    },
-    configurable: true,
-  });
-
-  Object.defineProperty(DownlinkFastener.prototype, "static", {
-    get: function (this: DownlinkFastener): string | boolean {
-      return true;
-    },
-    configurable: true,
-  });
-
-  DownlinkFastener.construct = function <F extends DownlinkFastener<any>>(fastenerClass: {prototype: F}, fastener: F | null, owner: FastenerOwner<F>): F {
-    fastener = _super.construct(fastenerClass, fastener, owner) as F;
-    (fastener as Mutable<typeof fastener>).ownHostUri = null;
-    (fastener as Mutable<typeof fastener>).ownNodeUri = null;
-    (fastener as Mutable<typeof fastener>).ownLaneUri = null;
-    (fastener as Mutable<typeof fastener>).ownPrio = void 0;
-    (fastener as Mutable<typeof fastener>).ownRate = void 0;
-    (fastener as Mutable<typeof fastener>).ownBody = null;
-    (fastener as Mutable<typeof fastener>).ownWarp = null;
-    (fastener as Mutable<typeof fastener>).downlink = null;
+  DownlinkFastener.construct = function <F extends DownlinkFastener<any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+    fastener = _super.construct.call(this, fastener, owner) as F;
     (fastener as Mutable<typeof fastener>).consumers = Arrays.empty;
+    (fastener as Mutable<typeof fastener>).hostUri = null;
+    (fastener as Mutable<typeof fastener>).nodeUri = null;
+    (fastener as Mutable<typeof fastener>).laneUri = null;
+    (fastener as Mutable<typeof fastener>).prio = void 0;
+    (fastener as Mutable<typeof fastener>).rate = void 0;
+    (fastener as Mutable<typeof fastener>).body = null;
+    (fastener as Mutable<typeof fastener>).warp = null;
+    (fastener as Mutable<typeof fastener>).downlink = null;
     return fastener;
   };
 
-  DownlinkFastener.define = function <O>(className: string, descriptor: DownlinkFastenerDescriptor<O>): DownlinkFastenerFactory<DownlinkFastener<any>> {
-    let superClass = descriptor.extends as DownlinkFastenerFactory | null | undefined;
-    const affinity = descriptor.affinity;
-    const inherits = descriptor.inherits;
-    let hostUri = descriptor.hostUri;
-    let nodeUri = descriptor.nodeUri;
-    let laneUri = descriptor.laneUri;
-    let prio = descriptor.prio;
-    let rate = descriptor.rate;
-    let body = descriptor.body;
-    delete descriptor.extends;
-    delete descriptor.implements;
-    delete descriptor.affinity;
-    delete descriptor.inherits;
-    delete descriptor.hostUri;
-    delete descriptor.nodeUri;
-    delete descriptor.laneUri;
-    delete descriptor.prio;
-    delete descriptor.rate;
-    delete descriptor.body;
+  DownlinkFastener.refine = function (fastenerClass: DownlinkFastenerClass): void {
+    _super.refine.call(this, fastenerClass);
+    const fastenerPrototype = fastenerClass.prototype;
 
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "hostUri")) {
+      Object.defineProperty(fastenerPrototype, "hostUri", {
+        value: Uri.fromAny(fastenerPrototype.hostUri),
+        enumerable: true,
+        configurable: true,
+      });
     }
 
-    const fastenerClass = superClass.extend(className, descriptor);
-
-    fastenerClass.construct = function (fastenerClass: {prototype: DownlinkFastener<any>}, fastener: DownlinkFastener<O> | null, owner: O): DownlinkFastener<O> {
-      fastener = superClass!.construct(fastenerClass, fastener, owner);
-      if (affinity !== void 0) {
-        fastener.initAffinity(affinity);
-      }
-      if (inherits !== void 0) {
-        fastener.initInherits(inherits);
-      }
-      if (hostUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownHostUri = hostUri as Uri;
-      }
-      if (nodeUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownNodeUri = nodeUri as Uri;
-      }
-      if (laneUri !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownLaneUri = laneUri as Uri;
-      }
-      if (prio !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownPrio = prio as number;
-      }
-      if (rate !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownRate = rate as number;
-      }
-      if (body !== void 0) {
-        (fastener as Mutable<typeof fastener>).ownBody = body as Value;
-      }
-      return fastener;
-    };
-
-    if (typeof hostUri === "function") {
-      fastenerClass.prototype.initHostUri = hostUri;
-      hostUri = void 0;
-    } else if (hostUri !== void 0) {
-      hostUri = Uri.fromAny(hostUri);
-    }
-    if (typeof nodeUri === "function") {
-      fastenerClass.prototype.initNodeUri = nodeUri;
-      nodeUri = void 0;
-    } else if (nodeUri !== void 0) {
-      nodeUri = Uri.fromAny(nodeUri);
-    }
-    if (typeof laneUri === "function") {
-      fastenerClass.prototype.initLaneUri = laneUri;
-      laneUri = void 0;
-    } else if (laneUri !== void 0) {
-      laneUri = Uri.fromAny(laneUri);
-    }
-    if (typeof prio === "function") {
-      fastenerClass.prototype.initPrio = prio;
-      prio = void 0;
-    }
-    if (typeof rate === "function") {
-      fastenerClass.prototype.initRate = rate;
-      rate = void 0;
-    }
-    if (typeof body === "function") {
-      fastenerClass.prototype.initBody = body;
-      body = void 0;
-    } else if (body !== void 0) {
-      body = Value.fromAny(body);
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "nodeUri")) {
+      Object.defineProperty(fastenerPrototype, "nodeUri", {
+        value: Uri.fromAny(fastenerPrototype.nodeUri),
+        enumerable: true,
+        configurable: true,
+      });
     }
 
-    return fastenerClass;
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "laneUri")) {
+      Object.defineProperty(fastenerPrototype, "laneUri", {
+        value: Uri.fromAny(fastenerPrototype.laneUri),
+        enumerable: true,
+        configurable: true,
+      });
+    }
+
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "prio")) {
+      Object.defineProperty(fastenerPrototype, "prio", {
+        value: fastenerPrototype.prio,
+        enumerable: true,
+        configurable: true,
+      });
+    }
+
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "rate")) {
+      Object.defineProperty(fastenerPrototype, "rate", {
+        value: fastenerPrototype.rate,
+        enumerable: true,
+        configurable: true,
+      });
+    }
+
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "body")) {
+      Object.defineProperty(fastenerPrototype, "body", {
+        value: Value.fromAny(fastenerPrototype.body),
+        enumerable: true,
+        configurable: true,
+      });
+    }
   };
 
   (DownlinkFastener as Mutable<typeof DownlinkFastener>).ConsumingFlag = 1 << (_super.FlagShift + 0);

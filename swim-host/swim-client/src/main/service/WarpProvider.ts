@@ -17,7 +17,7 @@ import type {WarpClient} from "../client/WarpClient";
 import {WarpService} from "./WarpService";
 
 /** @public */
-export interface WarpProvider<O, S extends WarpService<O> | null | undefined = WarpService<O>> extends Provider<O, S> {
+export interface WarpProvider<O, S extends WarpService<any> | null | undefined = WarpService> extends Provider<O, S> {
   get client(): WarpClient
 
   createService(): S;
@@ -25,7 +25,9 @@ export interface WarpProvider<O, S extends WarpService<O> | null | undefined = W
 
 /** @public */
 export const WarpProvider = (function (_super: typeof Provider) {
-  const WarpProvider = _super.extend("WarpProvider") as ProviderClass<WarpProvider<any, any>>;
+  const WarpProvider = _super.extend("WarpProvider", {
+    serviceType: WarpService,
+  }) as ProviderClass<WarpProvider<any, any>>;
 
   Object.defineProperty(WarpProvider.prototype, "client", {
     get<O, S extends WarpService<O> | null | undefined>(this: WarpProvider<O, S>): WarpClient {

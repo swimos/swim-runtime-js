@@ -14,7 +14,7 @@
 
 import type {Class, Instance} from "@swim/util";
 import {OutputSettings, Output, OutputStyle, Unicode} from "@swim/codec";
-import {Property} from "@swim/component";
+import {PropertyDef} from "@swim/component";
 import {Scope} from "../scope/Scope";
 import type {TaskObserver} from "./TaskObserver";
 
@@ -46,11 +46,11 @@ export abstract class Task extends Scope {
 
   readonly optionsType?: Class<TaskOptions>;
 
-  @Property({type: String, inherits: true})
-  override readonly baseDir!: Property<this, string | undefined>;
+  @PropertyDef({valueType: String, inherits: true})
+  override readonly baseDir!: PropertyDef<this, {value: string | undefined}>;
 
-  @Property({type: Number, value: TaskStatus.Pending})
-  readonly status!: Property<this, TaskStatus>;
+  @PropertyDef({valueType: Number, value: TaskStatus.Pending})
+  readonly status!: PropertyDef<this, {value: TaskStatus}>;
 
   getPeerTask<C extends Class<Task>>(taskClass: C): InstanceType<C> | null {
     const parent = this.parent;

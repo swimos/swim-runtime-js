@@ -20,14 +20,11 @@ export {
 } from "./FastenerContext";
 
 export {
-  MemberFasteners,
-  MemberFastener,
-  MemberFastenerClass,
-  FastenerOwner,
   FastenerFlags,
-  FastenerInit,
-  FastenerDescriptor,
+  FastenerOwner,
+  FastenerRefinement,
+  FastenerTemplate,
   FastenerClass,
-  FastenerFactory,
+  FastenerDef,
   Fastener,
 } from "./Fastener";

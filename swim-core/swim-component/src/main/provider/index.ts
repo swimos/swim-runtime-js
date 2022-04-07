@@ -13,11 +13,10 @@
 // limitations under the License.
 
 export {
-  MemberProviderService,
+  ProviderRefinement,
   ProviderService,
-  ProviderInit,
-  ProviderDescriptor,
+  ProviderTemplate,
   ProviderClass,
-  ProviderFactory,
+  ProviderDef,
   Provider,
 } from "./Provider";

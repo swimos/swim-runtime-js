@@ -31,8 +31,8 @@ import {
   ObserverMethods,
   ObserverParameters,
 } from "@swim/util";
-import {FastenerContext} from "../fastener/FastenerContext";
-import type {Fastener} from "../fastener/Fastener";
+import {FastenerContextClass, FastenerContext} from "../fastener/FastenerContext";
+import type {FastenerClass, Fastener} from "../fastener/Fastener";
 import type {ComponentObserver} from "./ComponentObserver";
 import {ComponentRelation} from "./"; // forward import
 
@@ -1019,6 +1019,17 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     } else {
       return (this as unknown as ComponentFactory<InstanceType<S>>).fromInit(value);
     }
+  }
+
+  static getFastenerClass<S extends Class<InstanceType<S>>,
+                          K extends keyof {[K in keyof InstanceType<S> as InstanceType<S>[K] extends F ? K : never]: InstanceType<S>[K]},
+                          F extends Fastener<any> = Fastener<any>>
+                         (this: S, fastenerName: K, fastenerBound?: Proto<F> | null)
+                         : FastenerClass<InstanceType<S>[K] extends F ? InstanceType<S>[K] : never>;
+  static getFastenerClass<F extends Fastener<any>>(fastenerName: string, fastenerBound: Proto<F>): FastenerClass | null;
+  static getFastenerClass(fastenerName: string, fastenerBound?: Proto<Fastener> | null): FastenerClass | null;
+  static getFastenerClass(fastenerName: string, fastenerBound?: Proto<Fastener> | null): FastenerClass | null {
+    return FastenerContext.getFastenerClass(this as FastenerContextClass, fastenerName, fastenerBound);
   }
 
   /** @internal */

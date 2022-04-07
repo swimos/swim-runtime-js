@@ -17,7 +17,7 @@ import type {Observer} from "./Observer";
 
 /** @public */
 export type ObserverType<O> =
-  O extends {readonly observerType?: Class<infer T>} ? T : never;
+  O extends {readonly observerType?: Class<infer T>} ? T : {};
 
 /** @public */
 export interface Observable {

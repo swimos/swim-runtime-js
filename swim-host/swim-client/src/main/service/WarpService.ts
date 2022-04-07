@@ -19,7 +19,7 @@ import {client} from "../client/global";
 import type {WarpServiceObserver} from "./WarpServiceObserver";
 
 /** @public */
-export class WarpService<O> extends Service<O> {
+export class WarpService<O = unknown> extends Service<O> {
   constructor(client: WarpClient) {
     super();
     this.client = client;

@@ -16,8 +16,8 @@ import type * as ts from "typescript";
 import * as eslint from "eslint";
 import {Dictionary, Severity} from "@swim/util";
 import {Tag, Mark, Span, OutputSettings, Diagnostic, Unicode} from "@swim/codec";
-import type {MemberFastenerClass} from "@swim/component";
-import {FileRef} from "@swim/sys";
+import type {FastenerClass} from "@swim/component";
+import {FileRefDef} from "@swim/sys";
 import {TaskStatus} from "../task/Task";
 import {LibraryTask} from "./LibraryTask";
 import {CompileTask} from "./CompileTask";
@@ -46,7 +46,7 @@ export class LintTask extends LibraryTask {
   fixableErrorCount: number;
   fatalErrorCount: number;
 
-  @FileRef<LintTask, eslint.ESLint.Options | null>({
+  @FileRefDef<LintTask["eslintrc"]>({
     fileName: ".eslintrc",
     resolves: true,
     value: null,
@@ -54,8 +54,8 @@ export class LintTask extends LibraryTask {
       return this.owner.baseDir.value;
     },
   })
-  readonly eslintrc!: FileRef<this, eslint.ESLint.Options | null>;
-  static readonly eslintrc: MemberFastenerClass<LintTask, "eslintrc">;
+  readonly eslintrc!: FileRefDef<this, {value: eslint.ESLint.Options | null}>;
+  static readonly eslintrc: FastenerClass<LintTask["eslintrc"]>;
 
   override async exec(): Promise<TaskStatus> {
     let status = TaskStatus.Pending;

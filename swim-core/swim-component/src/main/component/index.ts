@@ -24,28 +24,28 @@ export {
 export {ComponentObserver} from "./ComponentObserver";
 
 export {
-  ComponentRelationType,
-  ComponentRelationInit,
-  ComponentRelationDescriptor,
+  ComponentRelationRefinement,
+  ComponentRelationComponent,
+  ComponentRelationTemplate,
   ComponentRelationClass,
-  ComponentRelationFactory,
+  ComponentRelationDef,
   ComponentRelation,
 } from "./ComponentRelation";
 
 export {
-  ComponentRefType,
-  ComponentRefInit,
-  ComponentRefDescriptor,
+  ComponentRefRefinement,
+  ComponentRefComponent,
+  ComponentRefTemplate,
   ComponentRefClass,
-  ComponentRefFactory,
+  ComponentRefDef,
   ComponentRef,
 } from "./ComponentRef";
 
 export {
-  ComponentSetType,
-  ComponentSetInit,
-  ComponentSetDescriptor,
+  ComponentSetRefinement,
+  ComponentSetComponent,
+  ComponentSetTemplate,
   ComponentSetClass,
-  ComponentSetFactory,
+  ComponentSetDef,
   ComponentSet,
 } from "./ComponentSet";

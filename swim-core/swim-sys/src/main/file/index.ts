@@ -13,28 +13,19 @@
 // limitations under the License.
 
 export {
+  FileRelationRefinement,
   FileRelationValue,
-  FileRelationInit,
-  FileRelationDescriptor,
+  FileRelationTemplate,
   FileRelationClass,
-  FileRelationFactory,
+  FileRelationDef,
   FileRelation,
 } from "./FileRelation";
 
 export {
+  FileRefRefinement,
   FileRefValue,
-  FileRefInit,
-  FileRefDescriptor,
+  FileRefTemplate,
   FileRefClass,
-  FileRefFactory,
+  FileRefDef,
   FileRef,
 } from "./FileRef";
-
-//export {
-//  FileSetType,
-//  FileSetInit,
-//  FileSetDescriptor,
-//  FileSetClass,
-//  FileSetFactory,
-//  FileSet,
-//} from "./FileSet";

@@ -17,8 +17,8 @@ import * as FS from "fs";
 import * as apiExtractor from "@microsoft/api-extractor";
 import {Severity} from "@swim/util";
 import {Mark, OutputSettings, Diagnostic, Unicode} from "@swim/codec";
-import type {MemberFastenerClass} from "@swim/component";
-import {FileRef} from "@swim/sys";
+import type {FastenerClass} from "@swim/component";
+import {FileRefDef} from "@swim/sys";
 import {TaskStatus} from "../task/Task";
 import {LibraryTask} from "./LibraryTask";
 
@@ -35,7 +35,7 @@ export class ApiTask extends LibraryTask {
 
   readonly messages: apiExtractor.ExtractorMessage[];
 
-  @FileRef<ApiTask, apiExtractor.ExtractorConfig | null>({
+  @FileRefDef<ApiTask["extractorConfig"]>({
     fileName: "api-extractor.json",
     value: null,
     getBaseDir(): string | undefined {
@@ -45,8 +45,8 @@ export class ApiTask extends LibraryTask {
       return apiExtractor.ExtractorConfig.loadFileAndPrepare(path);
     },
   })
-  readonly extractorConfig!: FileRef<this, apiExtractor.ExtractorConfig | null>;
-  static readonly extractorConfig: MemberFastenerClass<ApiTask, "extractorConfig">;
+  readonly extractorConfig!: FileRefDef<this, {value: apiExtractor.ExtractorConfig | null}>;
+  static readonly extractorConfig: FastenerClass<ApiTask["extractorConfig"]>;
 
   override async exec(): Promise<TaskStatus> {
     let status = TaskStatus.Pending;

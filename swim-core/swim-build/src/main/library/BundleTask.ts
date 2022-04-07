@@ -14,8 +14,8 @@
 
 import * as Path from "path";
 import * as rollup from "rollup";
-import type {MemberFastenerClass} from "@swim/component";
-import {FileRef} from "@swim/sys";
+import type {FastenerClass} from "@swim/component";
+import {FileRefDef} from "@swim/sys";
 import {TaskStatus} from "../task/Task";
 import {LibraryTask} from "./LibraryTask";
 
@@ -33,7 +33,7 @@ export class BundleTask extends LibraryTask {
   /** @internal */
   readonly caches: (rollup.RollupCache | undefined)[];
 
-  @FileRef<BundleTask, rollup.RollupOptions[] | null>({
+  @FileRefDef<BundleTask["rollupConfig"]>({
     fileName: "rollup.config.js",
     value: null,
     getBaseDir(): string | undefined {
@@ -56,8 +56,8 @@ export class BundleTask extends LibraryTask {
       }
     },
   })
-  readonly rollupConfig!: FileRef<this, rollup.RollupOptions[] | null>;
-  static readonly rollupConfig: MemberFastenerClass<BundleTask, "rollupConfig">;
+  readonly rollupConfig!: FileRefDef<this, {value: rollup.RollupOptions[] | null}>;
+  static readonly rollupConfig: FastenerClass<BundleTask["rollupConfig"]>;
 
   override async exec(): Promise<TaskStatus> {
     let status = TaskStatus.Pending;

@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import {Spec, Test, Exam} from "@swim/unit";
-import {Provider, Component} from "@swim/component";
+import {ProviderDef, Provider, Component} from "@swim/component";
 
 export class ProviderSpec extends Spec {
   @Test
   testProviderDefine(exam: Exam): void {
-    const testProvider = Provider.define("foo", {service: "bar"});
+    const testProvider = Provider.specify("foo", {service: "bar"});
     const provider = testProvider.create(null);
     exam.equal(provider.name, "foo");
     exam.equal(provider.service, "bar");
@@ -43,7 +43,7 @@ export class ProviderSpec extends Spec {
   testProviderInheritance(exam: Exam): void {
     let id = 0;
     class TestComponent extends Component {
-      @Provider<TestComponent, {id: number} | undefined>({
+      @ProviderDef<TestComponent["foo"]>({
         inherits: true,
         createService(): {id: number} | undefined {
           const service = {id};
@@ -51,25 +51,27 @@ export class ProviderSpec extends Spec {
           return service;
         },
       })
-      readonly foo!: Provider<this, {id: number} | undefined>;
+      readonly foo!: ProviderDef<this, {
+        service: {id: number} | undefined,
+      }>;
     }
     const parent = new TestComponent();
     const child = new TestComponent();
     parent.appendChild(child);
     parent.mount();
 
-    exam.equal(child.foo.superFastener, parent.foo);
+    exam.equal(child.foo.inlet, parent.foo);
     exam.equal(parent.foo.service, {id: 0});
-    exam.false(parent.foo.inherited);
+    exam.false(parent.foo.derived);
     exam.equal(child.foo.service, {id: 0});
-    exam.true(child.foo.inherited);
+    exam.true(child.foo.derived);
   }
 
   @Test
   testProviderOverride(exam: Exam): void {
     let id = 0;
     class TestComponent extends Component {
-      @Provider<TestComponent, {id: number} | undefined>({
+      @ProviderDef<TestComponent["foo"]>({
         lazy: false,
         inherits: true,
         createService(): {id: number} | undefined {
@@ -78,7 +80,9 @@ export class ProviderSpec extends Spec {
           return service;
         },
       })
-      readonly foo!: Provider<this, {id: number} | undefined>;
+      readonly foo!: ProviderDef<this, {
+        service: {id: number} | undefined,
+      }>;
     }
     const parent = new TestComponent();
     const child = new TestComponent();
@@ -86,16 +90,16 @@ export class ProviderSpec extends Spec {
     parent.appendChild(child);
     parent.mount();
 
-    exam.equal(child.foo.superFastener, null);
+    exam.equal(child.foo.inlet, null);
     exam.equal(parent.foo.service, {id: 0});
-    exam.false(parent.foo.inherited);
+    exam.false(parent.foo.derived);
     exam.equal(child.foo.service, {id: 1});
-    exam.false(child.foo.inherited);
+    exam.false(child.foo.derived);
 
     child.foo.setInherits(true);
     exam.equal(parent.foo.service, {id: 0});
-    exam.false(parent.foo.inherited);
+    exam.false(parent.foo.derived);
     exam.equal(child.foo.service, {id: 0});
-    exam.true(child.foo.inherited);
+    exam.true(child.foo.derived);
   }
 }

@@ -14,7 +14,7 @@
 
 import type {Class} from "@swim/util";
 import {OutputSettings, Output, OutputStyle, Format, Unicode} from "@swim/codec";
-import {MemberFastenerClass, Property, Provider, Component, ComponentSet} from "@swim/component";
+import {FastenerClass, PropertyDef, ProviderDef, Component, ComponentSetDef} from "@swim/component";
 import {Workspace} from "../workspace/Workspace";
 import type {ScopeObserver} from "./ScopeObserver";
 import {TaskStatus, TaskConfig, Task} from "../"; // forward import
@@ -31,18 +31,18 @@ export abstract class Scope extends Component<Scope> {
 
   abstract readonly name: string;
 
-  @Property({type: String})
-  readonly baseDir!: Property<this, string | undefined>;
+  @PropertyDef({valueType: String})
+  readonly baseDir!: PropertyDef<this, {value: string | undefined}>;
 
-  @ComponentSet<Scope, Task>({
-    // avoid cyclic static reference to type: Task
+  @ComponentSetDef<Scope["tasks"]>({
+    // avoid cyclic static reference to componentType: Task
     binds: true,
     detectComponent(component: Component): Task | null {
       return component instanceof Task ? component : null;
     },
   })
-  readonly tasks!: ComponentSet<this, Task>;
-  static readonly tasks: MemberFastenerClass<Scope, "tasks">;
+  readonly tasks!: ComponentSetDef<this, {component: Task}>;
+  static readonly tasks: FastenerClass<Scope["tasks"]>;
 
   getTask<C extends Class<Task>>(taskClass: C): InstanceType<C> | null {
     let child = this.firstChild;
@@ -80,14 +80,14 @@ export abstract class Scope extends Component<Scope> {
     }
   }
 
-  @Provider<Scope, Workspace>({
-    type: Workspace,
-    lazy: false,
-    inherits: false,
+  @ProviderDef<Scope["workspace"]>({
+    serviceType: Workspace,
     service: Workspace.global(),
+    inherits: false,
+    lazy: false,
   })
-  readonly workspace!: Provider<this, Workspace>;
-  static readonly workspace: MemberFastenerClass<Scope, "workspace">;
+  readonly workspace!: ProviderDef<this, {service: Workspace}>;
+  static readonly workspace: FastenerClass<Scope["workspace"]>;
 
   writeName<T>(output: Output<T>): Output<T> {
     output = OutputStyle.bold(output);

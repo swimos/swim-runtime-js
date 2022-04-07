@@ -14,42 +14,49 @@
 
 import type {Mutable, Proto, ObserverType} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
-import {FastenerOwner, FastenerFlags, Fastener} from "../fastener/Fastener";
+import {FastenerFlags, FastenerOwner, Fastener} from "../fastener/Fastener";
 import type {AnyComponent, Component} from "./Component";
-import {ComponentRelationInit, ComponentRelationClass, ComponentRelation} from "./ComponentRelation";
-
-/** @internal */
-export type ComponentSetType<F extends ComponentSet<any, any>> =
-  F extends ComponentSet<any, infer C> ? C : never;
+import {
+  ComponentRelationRefinement,
+  ComponentRelationTemplate,
+  ComponentRelationClass,
+  ComponentRelation,
+} from "./ComponentRelation";
 
 /** @public */
-export interface ComponentSetInit<C extends Component = Component> extends ComponentRelationInit<C> {
-  extends?: {prototype: ComponentSet<any, any>} | string | boolean | null;
-  key?(component: C): string | undefined;
-  compare?(a: C, b: C): number;
-
-  sorted?: boolean;
-  willSort?(parent: Component | null): void;
-  didSort?(parent: Component | null): void;
-  sortChildren?(parent: Component): void;
-  compareChildren?(a: Component, b: Component): number;
-
-  willInherit?(superFastener: ComponentSet<unknown, C>): void;
-  didInherit?(superFastener: ComponentSet<unknown, C>): void;
-  willUninherit?(superFastener: ComponentSet<unknown, C>): void;
-  didUninherit?(superFastener: ComponentSet<unknown, C>): void;
-
-  willBindSuperFastener?(superFastener: ComponentSet<unknown, C>): void;
-  didBindSuperFastener?(superFastener: ComponentSet<unknown, C>): void;
-  willUnbindSuperFastener?(superFastener: ComponentSet<unknown, C>): void;
-  didUnbindSuperFastener?(superFastener: ComponentSet<unknown, C>): void;
+export interface ComponentSetRefinement extends ComponentRelationRefinement {
 }
 
 /** @public */
-export type ComponentSetDescriptor<O = unknown, C extends Component = Component, I = {}> = ThisType<ComponentSet<O, C> & I> & ComponentSetInit<C> & Partial<I>;
+export type ComponentSetComponent<R extends ComponentSetRefinement | ComponentSet<any, any>, D = Component> =
+  R extends {component: infer C} ? C :
+  R extends {extends: infer E} ? ComponentSetComponent<E, D> :
+  R extends ComponentSet<any, infer C> ? C :
+  D;
+
+/** @public */
+export interface ComponentSetTemplate<C extends Component = Component> extends ComponentRelationTemplate<C> {
+  extends?: Proto<ComponentSet<any, any>> | string | boolean | null;
+  sorted?: boolean;
+}
 
 /** @public */
 export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentSet<any, any>> extends ComponentRelationClass<F> {
+  /** @override */
+  specialize(className: string, template: ComponentSetTemplate): ComponentSetClass;
+
+  /** @override */
+  refine(fastenerClass: ComponentSetClass): void;
+
+  /** @override */
+  extend(className: string, template: ComponentSetTemplate): ComponentSetClass<F>;
+
+  /** @override */
+  specify<O, C extends Component = Component>(className: string, template: ThisType<ComponentSet<O, C>> & ComponentSetTemplate<C> & Partial<Omit<ComponentSet<O, C>, keyof ComponentSetTemplate>>): ComponentSetClass<F>;
+
+  /** @override */
+  <O, C extends Component = Component>(template: ThisType<ComponentSet<O, C>> & ComponentSetTemplate<C> & Partial<Omit<ComponentSet<O, C>, keyof ComponentSetTemplate>>): PropertyDecorator;
+
   /** @internal */
   readonly SortedFlag: FastenerFlags;
 
@@ -60,18 +67,27 @@ export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentS
 }
 
 /** @public */
-export interface ComponentSetFactory<F extends ComponentSet<any, any> = ComponentSet<any, any>> extends ComponentSetClass<F> {
-  extend<I = {}>(className: string, classMembers?: Partial<I> | null): ComponentSetFactory<F> & I;
+export type ComponentSetDef<O, R extends ComponentSetRefinement> =
+  ComponentSet<O, ComponentSetComponent<R>> &
+  {readonly name: string} & // prevent type alias simplification
+  (R extends {extends: infer E} ? E : {}) &
+  (R extends {defines: infer D} ? D : {}) &
+  (R extends {implements: infer I} ? I : {}) &
+  (R extends {observes: infer B} ? ObserverType<B extends boolean ? ComponentSetComponent<R> : B> : {});
 
-  define<O, C extends Component = Component>(className: string, descriptor: ComponentSetDescriptor<O, C>): ComponentSetFactory<ComponentSet<any, C>>;
-  define<O, C extends Component = Component>(className: string, descriptor: {observes: boolean} & ComponentSetDescriptor<O, C, ObserverType<C>>): ComponentSetFactory<ComponentSet<any, C>>;
-  define<O, C extends Component = Component, I = {}>(className: string, descriptor: {implements: unknown} & ComponentSetDescriptor<O, C, I>): ComponentSetFactory<ComponentSet<any, C> & I>;
-  define<O, C extends Component = Component, I = {}>(className: string, descriptor: {implements: unknown; observes: boolean} & ComponentSetDescriptor<O, C, I & ObserverType<C>>): ComponentSetFactory<ComponentSet<any, C> & I>;
-
-  <O, C extends Component = Component>(descriptor: ComponentSetDescriptor<O, C>): PropertyDecorator;
-  <O, C extends Component = Component>(descriptor: {observes: boolean} & ComponentSetDescriptor<O, C, ObserverType<C>>): PropertyDecorator;
-  <O, C extends Component = Component, I = {}>(descriptor: {implements: unknown} & ComponentSetDescriptor<O, C, I>): PropertyDecorator;
-  <O, C extends Component = Component, I = {}>(descriptor: {implements: unknown; observes: boolean} & ComponentSetDescriptor<O, C, I & ObserverType<C>>): PropertyDecorator;
+/** @public */
+export function ComponentSetDef<F extends ComponentSet<any, any>>(
+  template: F extends ComponentSetDef<infer O, infer R>
+          ? ThisType<ComponentSetDef<O, R>>
+          & ComponentSetTemplate<ComponentSetComponent<R>>
+          & Partial<Omit<ComponentSet<O, ComponentSetComponent<R>>, keyof ComponentSetTemplate>>
+          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ComponentSetTemplate>> & {extends: unknown}) : {})
+          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {implements: infer I} ? I : {})
+          & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ComponentSetComponent<R> : B> & {observes: boolean}) : {})
+          : never
+): PropertyDecorator {
+  return ComponentSet(template);
 }
 
 /** @public */
@@ -82,58 +98,58 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   get fastenerType(): Proto<ComponentSet<any, any>>;
 
   /** @internal @override */
-  setInherited(inherited: boolean, superFastener: ComponentSet<unknown, C>): void;
+  getSuper(): ComponentSet<unknown, C> | null;
+
+  /** @internal @override */
+  setDerived(derived: boolean, inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  willInherit(superFastener: ComponentSet<unknown, C>): void;
+  willDerive(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  onInherit(superFastener: ComponentSet<unknown, C>): void;
+  onDerive(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  didInherit(superFastener: ComponentSet<unknown, C>): void;
+  didDerive(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  willUninherit(superFastener: ComponentSet<unknown, C>): void;
+  willUnderive(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  onUninherit(superFastener: ComponentSet<unknown, C>): void;
+  onUnderive(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  didUninherit(superFastener: ComponentSet<unknown, C>): void;
+  didUnderive(inlet: ComponentSet<unknown, C>): void;
 
   /** @override */
-  readonly superFastener: ComponentSet<unknown, C> | null;
-
-  /** @internal @override */
-  getSuperFastener(): ComponentSet<unknown, C> | null;
+  readonly inlet: ComponentSet<unknown, C> | null;
 
   /** @protected @override */
-  willBindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+  willBindInlet(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  onBindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+  onBindInlet(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  didBindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+  didBindInlet(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  willUnbindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+  willUnbindInlet(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  onUnbindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+  onUnbindInlet(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
-  didUnbindSuperFastener(superFastener: ComponentSet<unknown, C>): void;
+  didUnbindInlet(inlet: ComponentSet<unknown, C>): void;
 
   /** @internal */
-  readonly subFasteners: ReadonlyArray<ComponentSet<unknown, C>> | null;
+  readonly outlets: ReadonlyArray<ComponentSet<unknown, C>> | null;
 
   /** @internal @override */
-  attachSubFastener(subFastener: ComponentSet<unknown, C>): void;
+  attachOutlet(outlet: ComponentSet<unknown, C>): void;
 
   /** @internal @override */
-  detachSubFastener(subFastener: ComponentSet<unknown, C>): void;
+  detachOutlet(outlet: ComponentSet<unknown, C>): void;
 
   /** @internal */
   readonly components: {readonly [componentId: number]: C | undefined};
@@ -178,16 +194,16 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   detectComponent(component: Component): C | null;
 
   /** @internal @protected */
-  decohereSubFasteners(): void;
+  decohereOutlets(): void;
 
   /** @internal @protected */
-  decohereSubFastener(subFastener: ComponentSet<unknown, C>): void;
+  decohereOutlet(outlet: ComponentSet<unknown, C>): void;
 
   /** @override */
   recohere(t: number): void;
 
   /** @internal @protected */
-  key(component: C): string | undefined;
+  componentKey(component: C): string | undefined;
 
   get sorted(): boolean;
 
@@ -217,44 +233,42 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
 
 /** @public */
 export const ComponentSet = (function (_super: typeof ComponentRelation) {
-  const ComponentSet: ComponentSetFactory = _super.extend("ComponentSet");
+  const ComponentSet = _super.extend("ComponentSet", {}) as ComponentSetClass;
 
   Object.defineProperty(ComponentSet.prototype, "fastenerType", {
-    get: function (this: ComponentSet): Proto<ComponentSet<any, any>> {
-      return ComponentSet;
-    },
+    value: ComponentSet,
     configurable: true,
   });
 
-  ComponentSet.prototype.onInherit = function (this: ComponentSet, superFastener: ComponentSet): void {
-    this.setComponents(superFastener.components);
+  ComponentSet.prototype.onDerive = function (this: ComponentSet, inlet: ComponentSet): void {
+    this.setComponents(inlet.components);
   };
 
-  ComponentSet.prototype.onBindSuperFastener = function <C extends Component>(this: ComponentSet<unknown, C>, superFastener: ComponentSet<unknown, C>): void {
-    (this as Mutable<typeof this>).superFastener = superFastener;
-    _super.prototype.onBindSuperFastener.call(this, superFastener);
+  ComponentSet.prototype.onBindInlet = function <C extends Component>(this: ComponentSet<unknown, C>, inlet: ComponentSet<unknown, C>): void {
+    (this as Mutable<typeof this>).inlet = inlet;
+    _super.prototype.onBindInlet.call(this, inlet);
   };
 
-  ComponentSet.prototype.onUnbindSuperFastener = function <C extends Component>(this: ComponentSet<unknown, C>, superFastener: ComponentSet<unknown, C>): void {
-    _super.prototype.onUnbindSuperFastener.call(this, superFastener);
-    (this as Mutable<typeof this>).superFastener = null;
+  ComponentSet.prototype.onUnbindInlet = function <C extends Component>(this: ComponentSet<unknown, C>, inlet: ComponentSet<unknown, C>): void {
+    _super.prototype.onUnbindInlet.call(this, inlet);
+    (this as Mutable<typeof this>).inlet = null;
   };
 
-  ComponentSet.prototype.attachSubFastener = function <C extends Component>(this: ComponentSet<unknown, C>, subFastener: ComponentSet<unknown, C>): void {
-    let subFasteners = this.subFasteners as ComponentSet<unknown, C>[] | null;
-    if (subFasteners === null) {
-      subFasteners = [];
-      (this as Mutable<typeof this>).subFasteners = subFasteners;
+  ComponentSet.prototype.attachOutlet = function <C extends Component>(this: ComponentSet<unknown, C>, outlet: ComponentSet<unknown, C>): void {
+    let outlets = this.outlets as ComponentSet<unknown, C>[] | null;
+    if (outlets === null) {
+      outlets = [];
+      (this as Mutable<typeof this>).outlets = outlets;
     }
-    subFasteners.push(subFastener);
+    outlets.push(outlet);
   };
 
-  ComponentSet.prototype.detachSubFastener = function <C extends Component>(this: ComponentSet<unknown, C>, subFastener: ComponentSet<unknown, C>): void {
-    const subFasteners = this.subFasteners as ComponentSet<unknown, C>[] | null;
-    if (subFasteners !== null) {
-      const index = subFasteners.indexOf(subFastener);
+  ComponentSet.prototype.detachOutlet = function <C extends Component>(this: ComponentSet<unknown, C>, outlet: ComponentSet<unknown, C>): void {
+    const outlets = this.outlets as ComponentSet<unknown, C>[] | null;
+    if (outlets !== null) {
+      const index = outlets.indexOf(outlet);
       if (index >= 0) {
-        subFasteners.splice(index, 1);
+        outlets.splice(index, 1);
       }
     }
   };
@@ -275,7 +289,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     let parent: Component | null;
     if (this.binds && (parent = this.parentComponent, parent !== null)) {
       if (key === void 0) {
-        key = this.key(newComponent);
+        key = this.componentKey(newComponent);
       }
       this.insertChild(parent, newComponent, target, key);
     }
@@ -288,7 +302,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       this.initComponent(newComponent);
       this.didAttachComponent(newComponent, target);
       this.setCoherent(true);
-      this.decohereSubFasteners();
+      this.decohereOutlets();
     }
     return newComponent;
   };
@@ -331,7 +345,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       this.initComponent(newComponent);
       this.didAttachComponent(newComponent, target);
       this.setCoherent(true);
-      this.decohereSubFasteners();
+      this.decohereOutlets();
     }
     return newComponent;
   };
@@ -352,7 +366,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       this.deinitComponent(oldComponent);
       this.didDetachComponent(oldComponent);
       this.setCoherent(true);
-      this.decohereSubFasteners();
+      this.decohereOutlets();
       return oldComponent;
     }
     return null;
@@ -380,7 +394,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       target = null;
     }
     if (key === void 0) {
-      key = this.key(newComponent);
+      key = this.componentKey(newComponent);
     }
     if (parent !== null && (newComponent.parent !== parent || newComponent.key !== key)) {
       this.insertChild(parent, newComponent, target, key);
@@ -394,7 +408,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       this.initComponent(newComponent);
       this.didAttachComponent(newComponent, target);
       this.setCoherent(true);
-      this.decohereSubFasteners();
+      this.decohereOutlets();
     }
     return newComponent;
   };
@@ -451,7 +465,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
         this.initComponent(newComponent);
         this.didAttachComponent(newComponent, target);
         this.setCoherent(true);
-        this.decohereSubFasteners();
+        this.decohereOutlets();
       }
     }
   };
@@ -468,44 +482,44 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
         this.deinitComponent(oldComponent);
         this.didDetachComponent(oldComponent);
         this.setCoherent(true);
-        this.decohereSubFasteners();
+        this.decohereOutlets();
       }
     }
   };
 
   ComponentSet.prototype.detectComponent = function <C extends Component>(this: ComponentSet<unknown, C>, component: Component): C | null {
-    if (typeof this.type === "function" && component instanceof this.type) {
+    if (typeof this.componentType === "function" && component instanceof this.componentType) {
       return component as C;
     }
     return null;
   };
 
-  ComponentSet.prototype.decohereSubFasteners = function (this: ComponentSet): void {
-    const subFasteners = this.subFasteners;
-    for (let i = 0, n = subFasteners !== null ? subFasteners.length : 0; i < n; i += 1) {
-      this.decohereSubFastener(subFasteners![i]!);
+  ComponentSet.prototype.decohereOutlets = function (this: ComponentSet): void {
+    const outlets = this.outlets;
+    for (let i = 0, n = outlets !== null ? outlets.length : 0; i < n; i += 1) {
+      this.decohereOutlet(outlets![i]!);
     }
   };
 
-  ComponentSet.prototype.decohereSubFastener = function (this: ComponentSet, subFastener: ComponentSet): void {
-    if ((subFastener.flags & Fastener.InheritedFlag) === 0 && Math.min(this.flags & Affinity.Mask, Affinity.Intrinsic) >= (subFastener.flags & Affinity.Mask)) {
-      subFastener.setInherited(true, this);
-    } else if ((subFastener.flags & Fastener.InheritedFlag) !== 0 && (subFastener.flags & Fastener.DecoherentFlag) === 0) {
-      subFastener.setCoherent(false);
-      subFastener.decohere();
+  ComponentSet.prototype.decohereOutlet = function (this: ComponentSet, outlet: ComponentSet): void {
+    if ((outlet.flags & Fastener.DerivedFlag) === 0 && Math.min(this.flags & Affinity.Mask, Affinity.Intrinsic) >= (outlet.flags & Affinity.Mask)) {
+      outlet.setDerived(true, this);
+    } else if ((outlet.flags & Fastener.DerivedFlag) !== 0 && (outlet.flags & Fastener.DecoherentFlag) === 0) {
+      outlet.setCoherent(false);
+      outlet.decohere();
     }
   };
 
   ComponentSet.prototype.recohere = function (this: ComponentSet, t: number): void {
-    if ((this.flags & Fastener.InheritedFlag) !== 0) {
-      const superFastener = this.superFastener;
-      if (superFastener !== null) {
-        this.setComponents(superFastener.components);
+    if ((this.flags & Fastener.DerivedFlag) !== 0) {
+      const inlet = this.inlet;
+      if (inlet !== null) {
+        this.setComponents(inlet.components);
       }
     }
   };
 
-  ComponentSet.prototype.key = function <C extends Component>(this: ComponentSet<unknown, C>, component: C): string | undefined {
+  ComponentSet.prototype.componentKey = function <C extends Component>(this: ComponentSet<unknown, C>, component: C): string | undefined {
     return void 0;
   };
 
@@ -574,60 +588,55 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return a.uid < b.uid ? -1 : a.uid > b.uid ? 1 : 0;
   };
 
-  ComponentSet.construct = function <F extends ComponentSet<any, any>>(fastenerClass: {prototype: F}, fastener: F | null, owner: FastenerOwner<F>): F {
+  ComponentSet.construct = function <F extends ComponentSet<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
     if (fastener === null) {
-      fastener = function (newComponent: AnyComponent<ComponentSetType<F>>): FastenerOwner<F> {
+      fastener = function (newComponent: AnyComponent<ComponentSetComponent<F>>): FastenerOwner<F> {
         fastener!.addComponent(newComponent);
         return fastener!.owner;
       } as F;
       delete (fastener as Partial<Mutable<F>>).name; // don't clobber prototype name
-      Object.setPrototypeOf(fastener, fastenerClass.prototype);
+      Object.setPrototypeOf(fastener, this.prototype);
     }
-    fastener = _super.construct(fastenerClass, fastener, owner) as F;
-    Object.defineProperty(fastener, "superFastener", { // override getter
+    fastener = _super.construct.call(this, fastener, owner) as F;
+    const flagsInit = fastener.flagsInit;
+    if (flagsInit !== void 0) {
+      fastener.initSorted((flagsInit & ComponentSet.SortedFlag) !== 0);
+    }
+    Object.defineProperty(fastener, "inlet", { // override getter
       value: null,
       writable: true,
       enumerable: true,
       configurable: true,
     });
-    (fastener as Mutable<typeof fastener>).subFasteners = null;
+    (fastener as Mutable<typeof fastener>).outlets = null;
     (fastener as Mutable<typeof fastener>).components = {};
     (fastener as Mutable<typeof fastener>).componentCount = 0;
     return fastener;
   };
 
-  ComponentSet.define = function <O, C extends Component>(className: string, descriptor: ComponentSetDescriptor<O, C>): ComponentSetFactory<ComponentSet<any, C>> {
-    let superClass = descriptor.extends as ComponentSetFactory | null | undefined;
-    const affinity = descriptor.affinity;
-    const inherits = descriptor.inherits;
-    const sorted = descriptor.sorted;
-    delete descriptor.extends;
-    delete descriptor.implements;
-    delete descriptor.affinity;
-    delete descriptor.inherits;
-    delete descriptor.sorted;
+  ComponentSet.refine = function (fastenerClass: ComponentSetClass): void {
+    _super.refine.call(this, fastenerClass);
+    const fastenerPrototype = fastenerClass.prototype;
+    let flagsInit = fastenerPrototype.flagsInit;
 
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "sorted")) {
+      if (flagsInit === void 0) {
+        flagsInit = 0;
+      }
+      if (fastenerPrototype.sorted) {
+        flagsInit |= ComponentSet.SortedFlag;
+      } else {
+        flagsInit &= ~ComponentSet.SortedFlag;
+      }
+      delete (fastenerPrototype as ComponentSetTemplate).sorted;
     }
 
-    const fastenerClass = superClass.extend(className, descriptor);
-
-    fastenerClass.construct = function (fastenerClass: {prototype: ComponentSet<any, any>}, fastener: ComponentSet<O, C> | null, owner: O): ComponentSet<O, C> {
-      fastener = superClass!.construct(fastenerClass, fastener, owner);
-      if (affinity !== void 0) {
-        fastener.initAffinity(affinity);
-      }
-      if (inherits !== void 0) {
-        fastener.initInherits(inherits);
-      }
-      if (sorted !== void 0) {
-        fastener.initSorted(sorted);
-      }
-      return fastener;
-    };
-
-    return fastenerClass;
+    if (flagsInit !== void 0) {
+      Object.defineProperty(fastenerPrototype, "flagsInit", {
+        value: flagsInit,
+        configurable: true,
+      });
+    }
   };
 
   (ComponentSet as Mutable<typeof ComponentSet>).SortedFlag = 1 << (_super.FlagShift + 0);
