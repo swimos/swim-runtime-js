@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {EventDownlinkSpec} from "./EventDownlinkSpec";
+import type {Observer} from "@swim/util";
+import type {Value} from "@swim/structure";
+import type {WarpHost} from "./WarpHost";
 
-export {ValueDownlinkSpec} from "./ValueDownlinkSpec";
+/** @public */
+export interface WarpHostObserver<H extends WarpHost = WarpHost> extends Observer {
+  hostDidConnect?(host: H): void;
 
-export {ListDownlinkSpec} from "./ListDownlinkSpec";
+  hostDidAuthenticate?(body: Value, host: H): void;
 
-export {MapDownlinkSpec} from "./MapDownlinkSpec";
+  hostDidDeauthenticate?(body: Value, host: H): void;
 
-export {DownlinkSuite} from "./DownlinkSuite";
+  hostDidDisconnect?(host: H): void;
+
+  hostDidFail?(error: unknown, host: H): void;
+}

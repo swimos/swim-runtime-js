@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Observer} from "@swim/util";
 import type {Value} from "@swim/structure";
-import type {Uri} from "@swim/uri";
-import {WarpDownlinkModel} from "./WarpDownlinkModel";
-import type {EventDownlink} from "./EventDownlink";
+import type {WarpHost} from "../host/WarpHost";
+import type {WarpClient} from "./WarpClient";
 
-/** @internal */
-export class EventDownlinkModel extends WarpDownlinkModel {
-  constructor(hostUri: Uri, nodeUri: Uri, laneUri: Uri,
-              prio: number, rate: number, body: Value) {
-    super(hostUri, nodeUri, laneUri, prio, rate, body);
-  }
+/** @public */
+export interface WarpClientObserver<C extends WarpClient = WarpClient> extends Observer {
+  clientDidConnect?(host: WarpHost, client: C): void;
 
-  override views!: ReadonlyArray<EventDownlink>;
+  clientDidAuthenticate?(body: Value, host: WarpHost, client: C): void;
+
+  clientDidDeauthenticate?(body: Value, host: WarpHost, client: C): void;
+
+  clientDidDisconnect?(host: WarpHost, client: C): void;
+
+  clientDidFail?(error: unknown, host: WarpHost, client: C): void;
 }

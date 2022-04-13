@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {EventDownlinkSpec} from "./EventDownlinkSpec";
+import type {WarpDownlinkObserver} from "./WarpDownlinkObserver";
+import type {ValueDownlink} from "./ValueDownlink";
 
-export {ValueDownlinkSpec} from "./ValueDownlinkSpec";
+/** @public */
+export interface ValueDownlinkObserver<V = unknown, D extends ValueDownlink<any, V, any> = ValueDownlink<unknown, V>> extends WarpDownlinkObserver<D> {
+  willSet?(newValue: V, downlink: D): V | void;
 
-export {ListDownlinkSpec} from "./ListDownlinkSpec";
-
-export {MapDownlinkSpec} from "./MapDownlinkSpec";
-
-export {DownlinkSuite} from "./DownlinkSuite";
+  didSet?(newValue: V, oldValue: V, downlink: D): void;
+}

@@ -91,7 +91,7 @@ export type FastenerDef<O, R extends FastenerRefinement> =
   Fastener<O> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {});
 
 /** @public */
@@ -101,7 +101,7 @@ export function FastenerDef<P extends Fastener<any>>(
           & FastenerTemplate
           & Partial<Omit<Fastener<O>, keyof FastenerTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof FastenerTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           : never
 ): PropertyDecorator {

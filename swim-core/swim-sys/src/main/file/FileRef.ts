@@ -72,7 +72,7 @@ export type FileRefDef<O, R extends FileRefRefinement> =
   FileRef<O, FileRefValue<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {});
 
 /** @public */
@@ -82,7 +82,7 @@ export function FileRefDef<F extends FileRef<any, any>>(
           & FileRefTemplate<FileRefValue<R>>
           & Partial<Omit<FileRef<O, FileRefValue<R>>, keyof FileRefTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof FileRefTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           : never
 ): PropertyDecorator {

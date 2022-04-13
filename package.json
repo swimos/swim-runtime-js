@@ -56,8 +56,6 @@
     "./swim-core/swim-collections",
     "./swim-core/swim-constraint",
     "./swim-core/swim-structure",
-    "./swim-core/swim-streamlet",
-    "./swim-core/swim-dataflow",
     "./swim-core/swim-recon",
     "./swim-core/swim-macro",
     "./swim-core/swim-uri",

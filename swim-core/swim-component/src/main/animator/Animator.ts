@@ -84,7 +84,7 @@ export type AnimatorDef<O, R extends AnimatorRefinement> =
   Animator<O, AnimatorValue<R>, AnimatorValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {});
 
 /** @public */
@@ -94,7 +94,7 @@ export function AnimatorDef<A extends Animator<any, any, any>>(
           & AnimatorTemplate<AnimatorValue<R>, AnimatorValueInit<R>>
           & Partial<Omit<Animator<O, AnimatorValue<R>, AnimatorValueInit<R>>, keyof AnimatorTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof AnimatorTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           : never
 ): PropertyDecorator {

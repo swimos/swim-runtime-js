@@ -28,20 +28,15 @@ import {
   ErrorSignal,
   Envelope,
   CommandMessage,
-  AuthRequest,
 } from "@swim/warp";
-import webworker from "@swim/client/webworker";
-import type {HostContext} from "./HostContext";
-import type {HostOptions} from "./Host";
-import {RemoteHost} from "./RemoteHost";
+import {WarpHost} from "./WarpHost";
 
 /** @internal */
-export class WarpWorkerHost extends RemoteHost {
-  constructor(context: HostContext, hostUri: Uri, options: HostOptions, worker: Worker) {
-    super(context, hostUri, options);
+export class WarpWorkerHost extends WarpHost {
+  constructor(hostUri: Uri, worker: Worker) {
+    super(hostUri);
     this.worker = worker;
     this.port = null;
-    this.connected = false;
 
     this.onWorkerReceive = this.onWorkerReceive.bind(this);
     this.onPortReceive = this.onPortReceive.bind(this);
@@ -55,7 +50,19 @@ export class WarpWorkerHost extends RemoteHost {
   /** @internal */
   readonly port: MessagePort | null;
 
-  override readonly connected: boolean;
+  override push(envelope: Envelope): void {
+    if (this.connected) {
+      this.idleTimer.cancel();
+      this.port!.postMessage(envelope.toAny());
+      this.idleTimer.watch();
+    } else if (envelope instanceof CommandMessage) {
+      if (this.sendBuffer.length < this.sendBufferSize.value) {
+        this.sendBuffer.push(envelope);
+      } else {
+        throw new Error("send buffer overflow");
+      }
+    }
+  }
 
   override open(): void {
     const port = this.port;
@@ -65,28 +72,15 @@ export class WarpWorkerHost extends RemoteHost {
   }
 
   override close(): void {
-    this.clearIdle();
+    this.idleTimer.cancel();
+
     if (this.port !== null) {
       this.worker.postMessage(CloseSignal.create(this.hostUri).toAny());
-      if (!this.context.online) {
+      if (!this.online.value) {
         this.closeDown();
       }
     } else {
       super.close();
-    }
-  }
-
-  override push(envelope: Envelope): void {
-    if (this.connected) {
-      this.clearIdle();
-      this.port!.postMessage(envelope.toAny());
-      this.watchIdle();
-    } else if (envelope instanceof CommandMessage) {
-      if (this.sendBuffer.length < this.sendBufferSize) {
-        this.sendBuffer.push(envelope);
-      } else {
-        throw new Error("send buffer overflow");
-      }
     }
   }
 
@@ -153,31 +147,11 @@ export class WarpWorkerHost extends RemoteHost {
   }
 
   protected onConnectedSignal(response: ConnectedSignal): void {
-    (this as Mutable<this>).connected = true;
-    const credentials = this.credentials;
-    if (credentials.isDefined()) {
-      const request = new AuthRequest(credentials);
-      this.push(request);
-    }
-    this.onConnect();
-    let envelope;
-    while ((envelope = this.sendBuffer.shift()) && this.connected) {
-      this.push(envelope);
-    }
-    this.watchIdle();
+    this.setConnected(true);
   }
 
   protected onDisconnectedSignal(response: DisconnectedSignal): void {
-    (this as Mutable<this>).connected = false;
-    this.onDisconnect();
-    this.clearIdle();
-    if (!this.idle) {
-      if (this.context.online) {
-        this.reconnect();
-      }
-    } else {
-      this.close();
-    }
+    this.setConnected(false);
   }
 
   protected onErrorSignal(response: ErrorSignal): void {
@@ -194,40 +168,11 @@ export class WarpWorkerHost extends RemoteHost {
 
   protected closeDown(): void {
     this.onDisconnect();
-    this.clearIdle();
+    this.idleTimer.cancel();
     if (!this.idle) {
-      if (this.context.online) {
-        this.reconnect();
-      }
+      this.reconnect();
     } else {
       this.close();
     }
   }
-
-  static create(context: HostContext, hostUri: Uri, options: HostOptions): WarpWorkerHost | null {
-    try {
-      if (options.worker !== false && this.webworker !== void 0 && typeof Blob !== "undefined") {
-        let webworkerUrl = this.webworkerUrl;
-        if (webworkerUrl === void 0) {
-          const webworkerBlob = new Blob([this.webworker], {type: "text/javascript"});
-          webworkerUrl = URL.createObjectURL(webworkerBlob);
-          this.webworkerUrl = webworkerUrl;
-        }
-        const worker = new Worker(webworkerUrl, {
-          name: hostUri.toString(),
-          type: "classic",
-          credentials: "same-origin",
-        });
-        return new WarpWorkerHost(context, hostUri, options, worker);
-      }
-    } catch (error) {
-      // swallow
-    }
-    return null;
-  }
-
-  /** @internal */
-  static webworker: string | undefined = webworker;
-  /** @internal */
-  static webworkerUrl: string | undefined = void 0;
 }

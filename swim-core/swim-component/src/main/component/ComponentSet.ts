@@ -71,7 +71,7 @@ export type ComponentSetDef<O, R extends ComponentSetRefinement> =
   ComponentSet<O, ComponentSetComponent<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {}) &
   (R extends {observes: infer B} ? ObserverType<B extends boolean ? ComponentSetComponent<R> : B> : {});
 
@@ -82,7 +82,7 @@ export function ComponentSetDef<F extends ComponentSet<any, any>>(
           & ComponentSetTemplate<ComponentSetComponent<R>>
           & Partial<Omit<ComponentSet<O, ComponentSetComponent<R>>, keyof ComponentSetTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ComponentSetTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ComponentSetComponent<R> : B> & {observes: boolean}) : {})
           : never
@@ -205,10 +205,10 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   /** @internal @protected */
   componentKey(component: C): string | undefined;
 
-  get sorted(): boolean;
-
   /** @internal */
   initSorted(sorted: boolean): void;
+
+  get sorted(): boolean;
 
   sort(sorted?: boolean): this;
 
@@ -523,13 +523,6 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return void 0;
   };
 
-  Object.defineProperty(ComponentSet.prototype, "sorted", {
-    get(this: ComponentSet): boolean {
-      return (this.flags & ComponentSet.SortedFlag) !== 0;
-    },
-    configurable: true,
-  });
-
   ComponentSet.prototype.initSorted = function (this: ComponentSet, sorted: boolean): void {
     if (sorted) {
       (this as Mutable<typeof this>).flags = this.flags | ComponentSet.SortedFlag;
@@ -537,6 +530,13 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       (this as Mutable<typeof this>).flags = this.flags & ~ComponentSet.SortedFlag;
     }
   };
+
+  Object.defineProperty(ComponentSet.prototype, "sorted", {
+    get(this: ComponentSet): boolean {
+      return (this.flags & ComponentSet.SortedFlag) !== 0;
+    },
+    configurable: true,
+  });
 
   ComponentSet.prototype.sort = function (this: ComponentSet, sorted?: boolean): typeof this {
     if (sorted === void 0) {

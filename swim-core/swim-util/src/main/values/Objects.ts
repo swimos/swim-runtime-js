@@ -23,6 +23,11 @@ import {Values} from "./Values";
 export const Objects = (function () {
   const Objects = {} as {
     /**
+     * Returns `true` if the given object has no own properties.
+     */
+    isEmpty(x: object | null | undefined): boolean;
+
+    /**
      * Returns `true` if `x` and `y` are structurally equal objects; otherwise
      * returns `x === y` if either `x` or `y` is not an object.
      */
@@ -50,6 +55,17 @@ export const Objects = (function () {
      * otherwise returns `0` or `1` if `x` is `undefined` or `null`, respectively.
      */
     hash(x: object | null | undefined): number;
+  };
+
+  Objects.isEmpty = function (x: object | null | undefined) {
+    if (typeof x === "object" && x !== null) {
+      for (const k in x) {
+        if (Object.prototype.hasOwnProperty.call(x, k)) {
+          return false;
+        }
+      }
+    }
+    return true;
   };
 
   Objects.equal = function (x: object | null | undefined, y: object | null | undefined): boolean {

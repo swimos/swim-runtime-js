@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {EventDownlinkSpec} from "./EventDownlinkSpec";
+import type {WarpDownlinkObserver} from "./WarpDownlinkObserver";
+import type {EventDownlink} from "./EventDownlink";
 
-export {ValueDownlinkSpec} from "./ValueDownlinkSpec";
-
-export {ListDownlinkSpec} from "./ListDownlinkSpec";
-
-export {MapDownlinkSpec} from "./MapDownlinkSpec";
-
-export {DownlinkSuite} from "./DownlinkSuite";
+/** @public */
+export interface EventDownlinkObserver<D extends EventDownlink<any> = EventDownlink> extends WarpDownlinkObserver<D> {
+}

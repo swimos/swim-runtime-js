@@ -12,86 +12,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {DownlinkOwner} from "./DownlinkOwner";
-export {DownlinkContext} from "./DownlinkContext";
+export {WarpDownlinkContext} from "./WarpDownlinkContext";
 
-export {DownlinkModel} from "./DownlinkModel";
+export {WarpDownlinkModel} from "./WarpDownlinkModel";
 export {
-  DownlinkType,
-  DownlinkOnEvent,
-  DownlinkOnCommand,
-  DownlinkWillLink,
-  DownlinkDidLink,
-  DownlinkWillSync,
-  DownlinkDidSync,
-  DownlinkWillUnlink,
-  DownlinkDidUnlink,
-  DownlinkDidConnect,
-  DownlinkDidDisconnect,
-  DownlinkDidClose,
-  DownlinkDidFail,
-  DownlinkObserver,
-  DownlinkInit,
-  DownlinkFlags,
-  Downlink,
-} from "./Downlink";
+  WarpDownlinkRefinement,
+  WarpDownlinkTemplate,
+  WarpDownlinkClass,
+  WarpDownlinkDef,
+  WarpDownlink,
+} from "./WarpDownlink";
+export {WarpDownlinkObserver} from "./WarpDownlinkObserver";
 
 export {EventDownlinkModel} from "./EventDownlinkModel";
 export {
-  EventDownlinkObserver,
-  EventDownlinkInit,
+  EventDownlinkRefinement,
+  EventDownlinkTemplate,
+  EventDownlinkClass,
+  EventDownlinkDef,
   EventDownlink,
 } from "./EventDownlink";
-
-export {ListDownlinkModel} from "./ListDownlinkModel";
-export {
-  ListDownlinkWillUpdate,
-  ListDownlinkDidUpdate,
-  ListDownlinkWillMove,
-  ListDownlinkDidMove,
-  ListDownlinkWillRemove,
-  ListDownlinkDidRemove,
-  ListDownlinkWillDrop,
-  ListDownlinkDidDrop,
-  ListDownlinkWillTake,
-  ListDownlinkDidTake,
-  ListDownlinkWillClear,
-  ListDownlinkDidClear,
-  ListDownlinkObserver,
-  ListDownlinkInit,
-  ListDownlink,
-} from "./ListDownlink";
-
-export {MapDownlinkModel} from "./MapDownlinkModel";
-export {
-  MapDownlinkWillUpdate,
-  MapDownlinkDidUpdate,
-  MapDownlinkWillRemove,
-  MapDownlinkDidRemove,
-  MapDownlinkWillDrop,
-  MapDownlinkDidDrop,
-  MapDownlinkWillTake,
-  MapDownlinkDidTake,
-  MapDownlinkWillClear,
-  MapDownlinkDidClear,
-  MapDownlinkObserver,
-  MapDownlinkInit,
-  MapDownlink,
-} from "./MapDownlink";
+export {EventDownlinkObserver} from "./EventDownlinkObserver";
 
 export {ValueDownlinkModel} from "./ValueDownlinkModel";
 export {
-  ValueDownlinkWillSet,
-  VaueDownlinkDidSet,
-  ValueDownlinkObserver,
-  ValueDownlinkInit,
+  ValueDownlinkRefinement,
+  ValueDownlinkValue,
+  ValueDownlinkValueInit,
+  ValueDownlinkTemplate,
+  ValueDownlinkClass,
+  ValueDownlinkDef,
   ValueDownlink,
 } from "./ValueDownlink";
+export {ValueDownlinkObserver} from "./ValueDownlinkObserver";
 
-export {DownlinkRecord} from "./DownlinkRecord";
-export {ListDownlinkRecord} from "./ListDownlinkRecord";
-export {MapDownlinkRecord} from "./MapDownlinkRecord";
-export {ValueDownlinkRecord} from "./ValueDownlinkRecord";
+export {ListDownlinkModel} from "./ListDownlinkModel";
+export {
+  ListDownlinkRefinement,
+  ListDownlinkValue,
+  ListDownlinkValueInit,
+  ListDownlinkTemplate,
+  ListDownlinkClass,
+  ListDownlinkDef,
+  ListDownlink,
+} from "./ListDownlink";
+export {ListDownlinkObserver} from "./ListDownlinkObserver";
 
-export {DownlinkStreamlet} from "./DownlinkStreamlet";
-export {DownlinkReifier} from "./DownlinkReifier";
+export {MapDownlinkModel} from "./MapDownlinkModel";
+export {
+  MapDownlinkRefinement,
+  MapDownlinkKey,
+  MapDownlinkKeyInit,
+  MapDownlinkValue,
+  MapDownlinkValueInit,
+  MapDownlinkTemplate,
+  MapDownlinkClass,
+  MapDownlinkDef,
+  MapDownlink,
+} from "./MapDownlink";
+export {MapDownlinkObserver} from "./MapDownlinkObserver";

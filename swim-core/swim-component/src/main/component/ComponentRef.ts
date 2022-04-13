@@ -63,7 +63,7 @@ export type ComponentRefDef<O, R extends ComponentRefRefinement> =
   ComponentRef<O, ComponentRefComponent<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {}) &
   (R extends {observes: infer B} ? ObserverType<B extends boolean ? ComponentRefComponent<R> : B> : {});
 
@@ -74,7 +74,7 @@ export function ComponentRefDef<F extends ComponentRef<any, any>>(
           & ComponentRefTemplate<ComponentRefComponent<R>>
           & Partial<Omit<ComponentRef<O, ComponentRefComponent<R>>, keyof ComponentRefTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ComponentRefTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ComponentRefComponent<R> : B> & {observes: boolean}) : {})
           : never

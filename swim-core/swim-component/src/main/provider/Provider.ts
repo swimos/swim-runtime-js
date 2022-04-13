@@ -67,7 +67,7 @@ export type ProviderDef<O, R extends ProviderRefinement> =
   Provider<O, ProviderService<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {}) &
   (R extends {observes: infer B} ? ObserverType<B extends boolean ? ProviderService<R> : B> : {});
 
@@ -78,7 +78,7 @@ export function ProviderDef<P extends Provider<any, any>>(
           & ProviderTemplate<ProviderService<R>>
           & Partial<Omit<Provider<O, ProviderService<R>>, keyof ProviderTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ProviderTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ProviderService<R> : B> & {observes: boolean}) : {})
           : never

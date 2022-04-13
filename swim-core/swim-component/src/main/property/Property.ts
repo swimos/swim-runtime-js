@@ -82,7 +82,7 @@ export type PropertyDef<O, R extends PropertyRefinement> =
   Property<O, PropertyValue<R>, PropertyValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {});
 
 /** @public */
@@ -92,7 +92,7 @@ export function PropertyDef<P extends Property<any, any, any>>(
           & PropertyTemplate<PropertyValue<R>, PropertyValueInit<R>>
           & Partial<Omit<Property<O, PropertyValue<R>, PropertyValueInit<R>>, keyof PropertyTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof PropertyTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           : never
 ): PropertyDecorator {

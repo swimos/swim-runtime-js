@@ -54,7 +54,7 @@ export type TimerDef<O, R extends TimerRefinement> =
   Timer<O> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {});
 
 /** @public */
@@ -64,7 +64,7 @@ export function TimerDef<P extends Timer<any>>(
           & TimerTemplate
           & Partial<Omit<Timer<O>, keyof TimerTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof TimerTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           : never
 ): PropertyDecorator {

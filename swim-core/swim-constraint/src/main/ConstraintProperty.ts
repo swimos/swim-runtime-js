@@ -78,7 +78,7 @@ export type ConstraintPropertyDef<O, R extends ConstraintPropertyRefinement> =
   ConstraintProperty<O, PropertyValue<R>, PropertyValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {});
 
 /** @public */
@@ -88,7 +88,7 @@ export function ConstraintPropertyDef<A extends ConstraintProperty<any, any, any
           & ConstraintPropertyTemplate<PropertyValue<R>, PropertyValueInit<R>>
           & Partial<Omit<ConstraintProperty<O, PropertyValue<R>, PropertyValueInit<R>>, keyof ConstraintPropertyTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ConstraintPropertyTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           : never
 ): PropertyDecorator {

@@ -390,19 +390,6 @@ export class Service<R> implements FastenerContext, Observable {
     // hook
   }
 
-  protected forEachObserver<T>(callback: (this: this, observer: ObserverType<this>) => T | void): T | undefined {
-    let result: T | undefined;
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      result = callback.call(this, observer as ObserverType<this>) as T | undefined;
-      if (result !== void 0) {
-        return result;
-      }
-    }
-    return result;
-  }
-
   callObservers<O, K extends keyof ObserverMethods<O>>(this: this & {readonly observerType?: Class<O>}, key: K, ...args: ObserverParameters<O, K>): void {
     const observers = this.observers;
     for (let i = 0, n = observers.length; i < n; i += 1) {

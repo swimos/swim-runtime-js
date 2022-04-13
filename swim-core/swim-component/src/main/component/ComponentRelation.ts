@@ -60,7 +60,7 @@ export type ComponentRelationDef<O, R extends ComponentRelationRefinement> =
   ComponentRelation<O, ComponentRelationComponent<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer D} ? D : {}) &
+  (R extends {defines: infer I} ? I : {}) &
   (R extends {implements: infer I} ? I : {}) &
   (R extends {observes: infer B} ? ObserverType<B extends boolean ? ComponentRelationComponent<R> : B> : {});
 
@@ -71,7 +71,7 @@ export function ComponentRelationDef<F extends ComponentRelation<any, any>>(
           & ComponentRelationTemplate<ComponentRelationComponent<R>>
           & Partial<Omit<ComponentRelation<O, ComponentRelationComponent<R>>, keyof ComponentRelationTemplate>>
           & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ComponentRelationTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer D} ? Partial<D> : {})
+          & (R extends {defines: infer I} ? Partial<I> : {})
           & (R extends {implements: infer I} ? I : {})
           & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ComponentRelationComponent<R> : B> & {observes: boolean}) : {})
           : never
