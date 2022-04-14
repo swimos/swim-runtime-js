@@ -47,7 +47,7 @@ export interface EventDownlinkClass<D extends EventDownlink<any> = EventDownlink
 }
 
 /** @public */
-export type EventDownlinkDef<O, R extends EventDownlinkRefinement> =
+export type EventDownlinkDef<O, R extends EventDownlinkRefinement = {}> =
   EventDownlink<O> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

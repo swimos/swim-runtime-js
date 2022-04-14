@@ -13,11 +13,10 @@
 // limitations under the License.
 
 export {
-  MemberPropertyInit,
-  MemberPropertyInitMap,
   PropertyRefinement,
   PropertyValue,
   PropertyValueInit,
+  AnyPropertyValue,
   PropertyTemplate,
   PropertyClass,
   PropertyDef,

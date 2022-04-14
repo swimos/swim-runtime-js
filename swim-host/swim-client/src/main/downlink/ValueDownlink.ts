@@ -27,18 +27,21 @@ export interface ValueDownlinkRefinement extends WarpDownlinkRefinement {
 }
 
 /** @public */
-export type ValueDownlinkValue<R extends ValueDownlinkRefinement | ValueDownlink<any, any, any>, D = Value> =
+export type ValueDownlinkValue<R extends ValueDownlinkRefinement, D = Value> =
   R extends {value: infer V} ? V :
   R extends {extends: infer E} ? ValueDownlinkValue<E, D> :
-  R extends ValueDownlink<any, infer V, any> ? V :
   D;
 
 /** @public */
-export type ValueDownlinkValueInit<R extends ValueDownlinkRefinement | ValueDownlink<any, any, any>, D = ValueDownlinkValue<R, AnyValue>> =
+export type ValueDownlinkValueInit<R extends ValueDownlinkRefinement, D = ValueDownlinkValue<R, AnyValue>> =
   R extends {valueInit: infer VU} ? VU :
+  R extends {valueInit?: infer VU} ? VU :
   R extends {extends: infer E} ? ValueDownlinkValueInit<E, D> :
-  R extends ValueDownlink<any, any, infer VU> ? VU :
   D;
+
+/** @public */
+export type AnyValueDownlinkValue<R extends ValueDownlinkRefinement> =
+  ValueDownlinkValue<R> | ValueDownlinkValueInit<R>;
 
 /** @public */
 export interface ValueDownlinkTemplate<V = unknown, VU = V> extends WarpDownlinkTemplate {
@@ -67,7 +70,7 @@ export interface ValueDownlinkClass<D extends ValueDownlink<any, any, any> = Val
 }
 
 /** @public */
-export type ValueDownlinkDef<O, R extends ValueDownlinkRefinement> =
+export type ValueDownlinkDef<O, R extends ValueDownlinkRefinement = {}> =
   ValueDownlink<O, ValueDownlinkValue<R>, ValueDownlinkValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
@@ -105,6 +108,12 @@ export interface ValueDownlink<O = unknown, V = unknown, VU = V> extends WarpDow
   readonly valueForm: Form<V, VU>;
 
   setValueForm(valueForm: Form<V, VU>): this;
+
+  /** @internal */
+  readonly value?: V; // refinement
+
+  /** @internal */
+  readonly valueInit?: VU; // refinement
 
   /** @internal */
   readonly stateInit?: Value | null; // optional prototype property

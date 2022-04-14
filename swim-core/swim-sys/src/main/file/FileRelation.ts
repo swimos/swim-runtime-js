@@ -70,7 +70,7 @@ export interface FileRelationClass<F extends FileRelation<any, any> = FileRelati
 }
 
 /** @public */
-export type FileRelationDef<O, R extends FileRelationRefinement> =
+export type FileRelationDef<O, R extends FileRelationRefinement = {}> =
   FileRelation<O, FileRelationValue<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

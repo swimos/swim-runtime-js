@@ -87,7 +87,7 @@ export interface FastenerClass<F extends Fastener<any> = Fastener<any>> extends 
 }
 
 /** @public */
-export type FastenerDef<O, R extends FastenerRefinement> =
+export type FastenerDef<O, R extends FastenerRefinement = {}> =
   Fastener<O> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

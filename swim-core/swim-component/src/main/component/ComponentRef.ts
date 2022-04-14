@@ -29,7 +29,7 @@ export interface ComponentRefRefinement extends ComponentRelationRefinement {
 
 /** @public */
 export type ComponentRefComponent<R extends ComponentRefRefinement | ComponentRef<any, any>, D = Component> =
-  R extends {component: infer C} ? C :
+  R extends {component: infer C | null} ? C :
   R extends {extends: infer E} ? ComponentRefComponent<E, D> :
   R extends ComponentRef<any, infer C> ? C :
   D;
@@ -59,7 +59,7 @@ export interface ComponentRefClass<F extends ComponentRef<any, any> = ComponentR
 }
 
 /** @public */
-export type ComponentRefDef<O, R extends ComponentRefRefinement> =
+export type ComponentRefDef<O, R extends ComponentRefRefinement = {}> =
   ComponentRef<O, ComponentRefComponent<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

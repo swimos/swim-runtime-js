@@ -68,7 +68,7 @@ export interface FileRefClass<F extends FileRef<any, any> = FileRef<any, any>> e
 }
 
 /** @public */
-export type FileRefDef<O, R extends FileRefRefinement> =
+export type FileRefDef<O, R extends FileRefRefinement = {}> =
   FileRef<O, FileRefValue<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

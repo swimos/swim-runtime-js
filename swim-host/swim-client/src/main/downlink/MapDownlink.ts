@@ -30,32 +30,38 @@ export interface MapDownlinkRefinement extends WarpDownlinkRefinement {
 }
 
 /** @public */
-export type MapDownlinkKey<R extends MapDownlinkRefinement | MapDownlink<any, any, any, any, any>, D = Value> =
+export type MapDownlinkKey<R extends MapDownlinkRefinement, D = Value> =
   R extends {key: infer K} ? K :
   R extends {extends: infer E} ? MapDownlinkKey<E, D> :
-  R extends MapDownlink<any, infer K, any, any, any> ? K :
   D;
 
 /** @public */
-export type MapDownlinkValue<R extends MapDownlinkRefinement | MapDownlink<any, any, any, any, any>, D = Value> =
+export type MapDownlinkValue<R extends MapDownlinkRefinement, D = Value> =
   R extends {value: infer V} ? V :
   R extends {extends: infer E} ? MapDownlinkValue<E, D> :
-  R extends MapDownlink<any, any, infer V, any, any> ? V :
   D;
 
 /** @public */
-export type MapDownlinkKeyInit<R extends MapDownlinkRefinement | MapDownlink<any, any, any, any, any>, D = MapDownlinkValue<R, AnyValue>> =
+export type MapDownlinkKeyInit<R extends MapDownlinkRefinement, D = MapDownlinkValue<R, AnyValue>> =
   R extends {keyInit: infer KU} ? KU :
+  R extends {keyInit?: infer KU} ? KU :
   R extends {extends: infer E} ? MapDownlinkKeyInit<E, D> :
-  R extends MapDownlink<any, any, any, infer KU, any> ? KU :
   D;
 
 /** @public */
-export type MapDownlinkValueInit<R extends MapDownlinkRefinement | MapDownlink<any, any, any, any, any>, D = MapDownlinkValue<R, AnyValue>> =
+export type MapDownlinkValueInit<R extends MapDownlinkRefinement, D = MapDownlinkValue<R, AnyValue>> =
   R extends {valueInit: infer VU} ? VU :
+  R extends {valueInit?: infer VU} ? VU :
   R extends {extends: infer E} ? MapDownlinkValueInit<E, D> :
-  R extends MapDownlink<any, any, any, any, infer VU> ? VU :
   D;
+
+/** @public */
+export type AnyMapDownlinkKey<R extends MapDownlinkRefinement> =
+  MapDownlinkKey<R> | MapDownlinkKeyInit<R>;
+
+/** @public */
+export type AnyMapDownlinkValue<R extends MapDownlinkRefinement> =
+  MapDownlinkValue<R> | MapDownlinkValueInit<R>;
 
 /** @public */
 export interface MapDownlinkTemplate<K = unknown, V = unknown, KU = K, VU = V> extends WarpDownlinkTemplate {
@@ -85,7 +91,7 @@ export interface MapDownlinkClass<D extends MapDownlink<any, any, any, any, any>
 }
 
 /** @public */
-export type MapDownlinkDef<O, R extends MapDownlinkRefinement> =
+export type MapDownlinkDef<O, R extends MapDownlinkRefinement = {}> =
   MapDownlink<O, MapDownlinkKey<R>, MapDownlinkValue<R>, MapDownlinkKeyInit<R>, MapDownlinkValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
@@ -130,6 +136,18 @@ export interface MapDownlink<O = unknown, K = unknown, V = unknown, KU = K, VU =
   readonly valueForm: Form<V, VU>;
 
   setValueForm(valueForm: Form<V, VU>): this;
+
+  /** @internal */
+  readonly key?: K; // refinement
+
+  /** @internal */
+  readonly keyInit?: KU; // refinement
+
+  /** @internal */
+  readonly value?: V; // refinement
+
+  /** @internal */
+  readonly valueInit?: VU; // refinement
 
   /** @internal */
   readonly stateInit?: BTree<Value, Value> | null; // optional prototype property

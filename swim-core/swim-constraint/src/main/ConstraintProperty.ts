@@ -74,7 +74,7 @@ export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any> 
 }
 
 /** @public */
-export type ConstraintPropertyDef<O, R extends ConstraintPropertyRefinement> =
+export type ConstraintPropertyDef<O, R extends ConstraintPropertyRefinement = {}> =
   ConstraintProperty<O, PropertyValue<R>, PropertyValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

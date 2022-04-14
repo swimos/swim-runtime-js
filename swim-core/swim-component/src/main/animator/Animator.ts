@@ -17,31 +17,26 @@ import {Affinity} from "../fastener/Affinity";
 import type {FastenerFlags, FastenerOwner} from "../fastener/Fastener";
 import {PropertyRefinement, PropertyTemplate, PropertyClass, Property} from "../property/Property";
 
-/** @internal */
-export type MemberAnimatorInit<O, K extends keyof O> =
-  O[K] extends Animator<any, infer T, infer U> ? T | U : never;
-
-/** @internal */
-export type MemberAnimatorInitMap<O> =
-  {-readonly [K in keyof O as O[K] extends Property<any, any> ? K : never]?: MemberAnimatorInit<O, K>};
-
 /** @public */
 export interface AnimatorRefinement extends PropertyRefinement {
 }
 
 /** @public */
-export type AnimatorValue<R extends AnimatorRefinement | Animator<any, any, any>, D = unknown> =
+export type AnimatorValue<R extends AnimatorRefinement, D = unknown> =
   R extends {value: infer T} ? T :
   R extends {extends: infer E} ? AnimatorValue<E, D> :
-  R extends Animator<any, infer T, any> ? T :
   D;
 
 /** @public */
-export type AnimatorValueInit<R extends AnimatorRefinement | Animator<any, any, any>, D = AnimatorValue<R>> =
+export type AnimatorValueInit<R extends AnimatorRefinement, D = AnimatorValue<R>> =
   R extends {valueInit: infer U} ? U :
+  R extends {valueInit?: infer U} ? U :
   R extends {extends: infer E} ? AnimatorValueInit<E, D> :
-  R extends Animator<any, any, infer U> ? U :
   D;
+
+/** @public */
+export type AnyAnimatorValue<R extends AnimatorRefinement> =
+  AnimatorValue<R> | AnimatorValueInit<R>;
 
 /** @public */
 export interface AnimatorTemplate<T = unknown, U = T> extends PropertyTemplate<T, U> {
@@ -80,7 +75,7 @@ export interface AnimatorClass<A extends Animator<any, any> = Animator<any, any>
 }
 
 /** @public */
-export type AnimatorDef<O, R extends AnimatorRefinement> =
+export type AnimatorDef<O, R extends AnimatorRefinement = {}> =
   Animator<O, AnimatorValue<R>, AnimatorValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

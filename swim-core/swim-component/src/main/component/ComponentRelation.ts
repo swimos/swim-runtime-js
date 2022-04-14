@@ -56,7 +56,7 @@ export interface ComponentRelationClass<F extends ComponentRelation<any, any> = 
 }
 
 /** @public */
-export type ComponentRelationDef<O, R extends ComponentRelationRefinement> =
+export type ComponentRelationDef<O, R extends ComponentRelationRefinement = {}> =
   ComponentRelation<O, ComponentRelationComponent<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

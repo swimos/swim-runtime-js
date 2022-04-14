@@ -63,7 +63,7 @@ export interface ProviderClass<P extends Provider<any, any> = Provider<any, any>
 }
 
 /** @public */
-export type ProviderDef<O, R extends ProviderRefinement> =
+export type ProviderDef<O, R extends ProviderRefinement = {}> =
   Provider<O, ProviderService<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

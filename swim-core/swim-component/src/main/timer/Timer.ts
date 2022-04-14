@@ -50,7 +50,7 @@ export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerC
 }
 
 /** @public */
-export type TimerDef<O, R extends TimerRefinement> =
+export type TimerDef<O, R extends TimerRefinement = {}> =
   Timer<O> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

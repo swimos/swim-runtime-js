@@ -96,7 +96,7 @@ export interface WarpDownlinkClass<D extends WarpDownlink<any> = WarpDownlink<an
 }
 
 /** @public */
-export type WarpDownlinkDef<O, R extends WarpDownlinkRefinement> =
+export type WarpDownlinkDef<O, R extends WarpDownlinkRefinement = {}> =
   WarpDownlink<O> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

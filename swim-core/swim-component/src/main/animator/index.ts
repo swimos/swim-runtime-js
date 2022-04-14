@@ -13,11 +13,10 @@
 // limitations under the License.
 
 export {
-  MemberAnimatorInit,
-  MemberAnimatorInitMap,
   AnimatorRefinement,
   AnimatorValue,
   AnimatorValueInit,
+  AnyAnimatorValue,
   AnimatorTemplate,
   AnimatorClass,
   AnimatorDef,

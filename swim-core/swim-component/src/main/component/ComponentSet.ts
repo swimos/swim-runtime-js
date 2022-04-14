@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Proto, ObserverType} from "@swim/util";
+import {Mutable, Proto, Objects, Comparator, ObserverType} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
 import {FastenerFlags, FastenerOwner, Fastener} from "../fastener/Fastener";
 import type {AnyComponent, Component} from "./Component";
@@ -29,7 +29,7 @@ export interface ComponentSetRefinement extends ComponentRelationRefinement {
 
 /** @public */
 export type ComponentSetComponent<R extends ComponentSetRefinement | ComponentSet<any, any>, D = Component> =
-  R extends {component: infer C} ? C :
+  R extends {component: infer C | null} ? C :
   R extends {extends: infer E} ? ComponentSetComponent<E, D> :
   R extends ComponentSet<any, infer C> ? C :
   D;
@@ -37,6 +37,7 @@ export type ComponentSetComponent<R extends ComponentSetRefinement | ComponentSe
 /** @public */
 export interface ComponentSetTemplate<C extends Component = Component> extends ComponentRelationTemplate<C> {
   extends?: Proto<ComponentSet<any, any>> | string | boolean | null;
+  ordered?: boolean;
   sorted?: boolean;
 }
 
@@ -58,6 +59,8 @@ export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentS
   <O, C extends Component = Component>(template: ThisType<ComponentSet<O, C>> & ComponentSetTemplate<C> & Partial<Omit<ComponentSet<O, C>, keyof ComponentSetTemplate>>): PropertyDecorator;
 
   /** @internal */
+  readonly OrderedFlag: FastenerFlags;
+  /** @internal */
   readonly SortedFlag: FastenerFlags;
 
   /** @internal @override */
@@ -67,7 +70,7 @@ export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentS
 }
 
 /** @public */
-export type ComponentSetDef<O, R extends ComponentSetRefinement> =
+export type ComponentSetDef<O, R extends ComponentSetRefinement = {}> =
   ComponentSet<O, ComponentSetComponent<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
@@ -152,37 +155,45 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   detachOutlet(outlet: ComponentSet<unknown, C>): void;
 
   /** @internal */
-  readonly components: {readonly [componentId: number]: C | undefined};
+  readonly components: {readonly [componentId: string]: C | undefined};
 
   readonly componentCount: number;
+
+  /** @internal */
+  insertComponentMap(newComponent: C, target: Component | null): void;
+
+  /** @internal */
+  removeComponentMap(oldComponent: C): void;
 
   hasComponent(component: Component): boolean;
 
   addComponent(component?: AnyComponent<C>, target?: Component | null, key?: string): C;
 
-  addComponents(components: {readonly [componentId: number]: C | undefined}, target?: Component | null): void;
+  addComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component | null): void;
 
-  setComponents(components: {readonly [componentId: number]: C | undefined}, target?: Component | null): void;
+  setComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component | null): void;
 
   attachComponent(component?: AnyComponent<C>, target?: Component | null): C;
 
-  attachComponents(components: {readonly [componentId: number]: C | undefined}, target?: Component | null): void;
+  attachComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component | null): void;
 
   detachComponent(component: C): C | null;
 
-  detachComponents(components?: {readonly [componentId: number]: C | undefined}): void;
+  detachComponents(components?: {readonly [componentId: string]: C | undefined}): void;
 
   insertComponent(parent?: Component | null, component?: AnyComponent<C>, target?: Component | null, key?: string): C;
 
-  insertComponents(parent: Component | null, components: {readonly [componentId: number]: C | undefined}, target?: Component | null): void;
+  insertComponents(parent: Component | null, components: {readonly [componentId: string]: C | undefined}, target?: Component | null): void;
 
   removeComponent(component: C): C | null;
 
-  removeComponents(components?: {readonly [componentId: number]: C | undefined}): void;
+  removeComponents(components?: {readonly [componentId: string]: C | undefined}): void;
 
   deleteComponent(component: C): C | null;
 
-  deleteComponents(components?: {readonly [componentId: number]: C | undefined}): void;
+  deleteComponents(components?: {readonly [componentId: string]: C | undefined}): void;
+
+  reinsertComponent(component: C, target?: Component | null): void;
 
   /** @internal @override */
   bindComponent(component: Component, target: Component | null): void;
@@ -206,6 +217,13 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   componentKey(component: C): string | undefined;
 
   /** @internal */
+  initOrdered(ordered: boolean): void;
+
+  get ordered(): boolean;
+
+  order(ordered?: boolean): this;
+
+  /** @internal */
   initSorted(sorted: boolean): void;
 
   get sorted(): boolean;
@@ -221,13 +239,19 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   /** @protected */
   didSort(parent: Component | null): void;
 
-  /** @internal @protected */
-  sortChildren(parent: Component): void;
+  /** @internal */
+  sortChildren(parent: Component, comparator?: Comparator<C>): void;
+
+  /** @internal */
+  getTargetChild(parent: Component, child: C): Component | null;
 
   /** @internal */
   compareChildren(a: Component, b: Component): number;
 
-  /** @internal @protected */
+  /** @internal */
+  compareTargetChild(a: Component, b: Component): number;
+
+  /** @protected */
   compare(a: C, b: C): number;
 }
 
@@ -273,6 +297,20 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     }
   };
 
+  ComponentSet.prototype.insertComponentMap = function <C extends Component>(this: ComponentSet<unknown, C>, newComponent: C, target: Component | null): void {
+    const components = this.components as {[componentId: string]: C | undefined};
+    if (target !== null && (this.flags & ComponentSet.OrderedFlag) !== 0) {
+      (this as Mutable<typeof this>).components = Objects.inserted(components, newComponent.uid, newComponent, target);
+    } else {
+      components[newComponent.uid] = newComponent;
+    }
+  };
+
+  ComponentSet.prototype.removeComponentMap = function <C extends Component>(this: ComponentSet<unknown, C>, oldComponent: C): void {
+    const components = this.components as {[componentId: string]: C | undefined};
+    delete components[oldComponent.uid];
+  };
+
   ComponentSet.prototype.hasComponent = function (this: ComponentSet, component: Component): boolean {
     return this.components[component.uid] !== void 0;
   };
@@ -288,14 +326,16 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     }
     let parent: Component | null;
     if (this.binds && (parent = this.parentComponent, parent !== null)) {
+      if (target === null) {
+        target = this.getTargetChild(parent, newComponent);
+      }
       if (key === void 0) {
         key = this.componentKey(newComponent);
       }
       this.insertChild(parent, newComponent, target, key);
     }
-    const components = this.components as {[comtrollerId: number]: C | undefined};
-    if (components[newComponent.uid] === void 0) {
-      components[newComponent.uid] = newComponent;
+    if (this.components[newComponent.uid] === void 0) {
+      this.insertComponentMap(newComponent, target);
       (this as Mutable<typeof this>).componentCount += 1;
       this.willAttachComponent(newComponent, target);
       this.onAttachComponent(newComponent, target);
@@ -307,22 +347,36 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return newComponent;
   };
 
-  ComponentSet.prototype.addComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: number]: C | undefined}, target?: Component | null): void {
+  ComponentSet.prototype.addComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
     for (const componentId in newComponents) {
       this.addComponent(newComponents[componentId]!, target);
     }
   };
 
-  ComponentSet.prototype.setComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: number]: C | undefined}, target?: Component | null): void {
+  ComponentSet.prototype.setComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
     const components = this.components;
     for (const componentId in components) {
       if (newComponents[componentId] === void 0) {
         this.detachComponent(components[componentId]!);
       }
     }
-    for (const componentId in newComponents) {
-      if (components[componentId] === void 0) {
-        this.attachComponent(newComponents[componentId]!, target);
+    if ((this.flags & ComponentSet.OrderedFlag) !== 0) {
+      const orderedComponents = new Array<C>();
+      for (const componentId in newComponents) {
+        orderedComponents.push(newComponents[componentId]!);
+      }
+      for (let i = 0, n = orderedComponents.length; i < n; i += 1) {
+        const newComponent = orderedComponents[i]!;
+        if (components[newComponent.uid] === void 0) {
+          const targetComponent = i < n + 1 ? orderedComponents[i + 1] : target;
+          this.attachComponent(newComponent, targetComponent);
+        }
+      }
+    } else {
+      for (const componentId in newComponents) {
+        if (components[componentId] === void 0) {
+          this.attachComponent(newComponents[componentId]!, target);
+        }
       }
     }
   };
@@ -333,12 +387,11 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     } else {
       newComponent = this.createComponent();
     }
-    const components = this.components as {[comtrollerId: number]: C | undefined};
-    if (components[newComponent.uid] === void 0) {
+    if (this.components[newComponent.uid] === void 0) {
       if (target === void 0) {
         target = null;
       }
-      components[newComponent.uid] = newComponent;
+      this.insertComponentMap(newComponent, target);
       (this as Mutable<typeof this>).componentCount += 1;
       this.willAttachComponent(newComponent, target);
       this.onAttachComponent(newComponent, target);
@@ -350,17 +403,16 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return newComponent;
   };
 
-  ComponentSet.prototype.attachComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: number]: C | undefined}, target?: Component | null): void {
+  ComponentSet.prototype.attachComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
     for (const componentId in newComponents) {
       this.attachComponent(newComponents[componentId]!, target);
     }
   };
 
   ComponentSet.prototype.detachComponent = function <C extends Component>(this: ComponentSet<unknown, C>, oldComponent: C): C | null {
-    const components = this.components as {[comtrollerId: number]: C | undefined};
-    if (components[oldComponent.uid] !== void 0) {
+    if (this.components[oldComponent.uid] !== void 0) {
       (this as Mutable<typeof this>).componentCount -= 1;
-      delete components[oldComponent.uid];
+      this.removeComponentMap(oldComponent);
       this.willDetachComponent(oldComponent);
       this.onDetachComponent(oldComponent);
       this.deinitComponent(oldComponent);
@@ -372,7 +424,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return null;
   };
 
-  ComponentSet.prototype.detachComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: number]: C | undefined}): void {
+  ComponentSet.prototype.detachComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: string]: C | undefined}): void {
     if (components === void 0) {
       components = this.components;
     }
@@ -397,11 +449,13 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       key = this.componentKey(newComponent);
     }
     if (parent !== null && (newComponent.parent !== parent || newComponent.key !== key)) {
+      if (target === null) {
+        target = this.getTargetChild(parent, newComponent);
+      }
       this.insertChild(parent, newComponent, target, key);
     }
-    const components = this.components as {[comtrollerId: number]: C | undefined};
-    if (components[newComponent.uid] === void 0) {
-      components[newComponent.uid] = newComponent;
+    if (this.components[newComponent.uid] === void 0) {
+      this.insertComponentMap(newComponent, target);
       (this as Mutable<typeof this>).componentCount += 1;
       this.willAttachComponent(newComponent, target);
       this.onAttachComponent(newComponent, target);
@@ -413,7 +467,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return newComponent;
   };
 
-  ComponentSet.prototype.insertComponents = function <C extends Component>(this: ComponentSet, parent: Component | null, newComponents: {readonly [componentId: number]: C | undefined}, target?: Component | null): void {
+  ComponentSet.prototype.insertComponents = function <C extends Component>(this: ComponentSet, parent: Component | null, newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
     for (const componentId in newComponents) {
       this.insertComponent(parent, newComponents[componentId]!, target);
     }
@@ -427,7 +481,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return null;
   };
 
-  ComponentSet.prototype.removeComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: number]: C | undefined}): void {
+  ComponentSet.prototype.removeComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: string]: C | undefined}): void {
     if (components === void 0) {
       components = this.components;
     }
@@ -444,7 +498,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return oldComponent;
   };
 
-  ComponentSet.prototype.deleteComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: number]: C | undefined}): void {
+  ComponentSet.prototype.deleteComponents = function <C extends Component>(this: ComponentSet<unknown, C>, components?: {readonly [componentId: string]: C | undefined}): void {
     if (components === void 0) {
       components = this.components;
     }
@@ -453,12 +507,23 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     }
   };
 
+  ComponentSet.prototype.reinsertComponent = function <C extends Component>(this: ComponentSet<unknown, C>, component: C, target?: Component | null): void {
+    if (this.components[component.uid] !== void 0 && (target !== void 0 || (this.flags & ComponentSet.SortedFlag) !== 0)) {
+      const parent = component.parent;
+      if (parent !== null) {
+        if (target === void 0) {
+          target = this.getTargetChild(parent, component);
+        }
+        parent.reinsertChild(component, target);
+      }
+    }
+  };
+
   ComponentSet.prototype.bindComponent = function <C extends Component>(this: ComponentSet<unknown, C>, component: Component, target: Component | null): void {
     if (this.binds) {
       const newComponent = this.detectComponent(component);
-      const components = this.components as {[comtrollerId: number]: C | undefined};
-      if (newComponent !== null && components[newComponent.uid] === void 0) {
-        components[newComponent.uid] = newComponent;
+      if (newComponent !== null && this.components[newComponent.uid] === void 0) {
+        this.insertComponentMap(newComponent, target);
         (this as Mutable<typeof this>).componentCount += 1;
         this.willAttachComponent(newComponent, target);
         this.onAttachComponent(newComponent, target);
@@ -473,10 +538,9 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
   ComponentSet.prototype.unbindComponent = function <C extends Component>(this: ComponentSet<unknown, C>, component: Component): void {
     if (this.binds) {
       const oldComponent = this.detectComponent(component);
-      const components = this.components as {[comtrollerId: number]: C | undefined};
-      if (oldComponent !== null && components[oldComponent.uid] !== void 0) {
+      if (oldComponent !== null && this.components[oldComponent.uid] !== void 0) {
         (this as Mutable<typeof this>).componentCount -= 1;
-        delete components[oldComponent.uid];
+        this.removeComponentMap(oldComponent);
         this.willDetachComponent(oldComponent);
         this.onDetachComponent(oldComponent);
         this.deinitComponent(oldComponent);
@@ -523,6 +587,33 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return void 0;
   };
 
+  ComponentSet.prototype.initOrdered = function (this: ComponentSet, ordered: boolean): void {
+    if (ordered) {
+      (this as Mutable<typeof this>).flags = this.flags | ComponentSet.OrderedFlag;
+    } else {
+      (this as Mutable<typeof this>).flags = this.flags & ~ComponentSet.OrderedFlag;
+    }
+  };
+
+  Object.defineProperty(ComponentSet.prototype, "ordered", {
+    get(this: ComponentSet): boolean {
+      return (this.flags & ComponentSet.OrderedFlag) !== 0;
+    },
+    configurable: true,
+  });
+
+  ComponentSet.prototype.order = function (this: ComponentSet, ordered?: boolean): typeof this {
+    if (ordered === void 0) {
+      ordered = true;
+    }
+    if (ordered) {
+      this.setFlags(this.flags | ComponentSet.OrderedFlag);
+    } else {
+      this.setFlags(this.flags & ~ComponentSet.OrderedFlag);
+    }
+    return this;
+  };
+
   ComponentSet.prototype.initSorted = function (this: ComponentSet, sorted: boolean): void {
     if (sorted) {
       (this as Mutable<typeof this>).flags = this.flags | ComponentSet.SortedFlag;
@@ -542,15 +633,14 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     if (sorted === void 0) {
       sorted = true;
     }
-    const flags = this.flags;
-    if (sorted && (flags & ComponentSet.SortedFlag) === 0) {
+    if (sorted) {
       const parent = this.parentComponent;
       this.willSort(parent);
-      this.setFlags(flags | ComponentSet.SortedFlag);
+      this.setFlags(this.flags | ComponentSet.SortedFlag);
       this.onSort(parent);
       this.didSort(parent);
-    } else if (!sorted && (flags & ComponentSet.SortedFlag) !== 0) {
-      this.setFlags(flags & ~ComponentSet.SortedFlag);
+    } else {
+      this.setFlags(this.flags & ~ComponentSet.SortedFlag);
     }
     return this;
   };
@@ -569,8 +659,16 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     // hook
   };
 
-  ComponentSet.prototype.sortChildren = function <C extends Component>(this: ComponentSet<unknown, C>, parent: Component): void {
+  ComponentSet.prototype.sortChildren = function <C extends Component>(this: ComponentSet<unknown, C>, parent: Component, comparator?: Comparator<C>): void {
     parent.sortChildren(this.compareChildren.bind(this));
+  };
+
+  ComponentSet.prototype.getTargetChild = function <C extends Component>(this: ComponentSet<unknown, C>, parent: Component, child: C): Component | null {
+    if ((this.flags & ComponentSet.SortedFlag) !== 0) {
+      return parent.getTargetChild(child, this.compareTargetChild.bind(this));
+    } else {
+      return null;
+    }
   };
 
   ComponentSet.prototype.compareChildren = function <C extends Component>(this: ComponentSet<unknown, C>, a: Component, b: Component): number {
@@ -581,6 +679,16 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       return this.compare(x, y);
     } else {
       return x !== void 0 ? 1 : y !== void 0 ? -1 : 0;
+    }
+  };
+
+  ComponentSet.prototype.compareTargetChild = function <C extends Component>(this: ComponentSet<unknown, C>, a: C, b: Component): number {
+    const components = this.components;
+    const y = components[b.uid];
+    if (y !== void 0) {
+      return this.compare(a, y);
+    } else {
+      return y !== void 0 ? -1 : 0;
     }
   };
 
@@ -600,6 +708,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     fastener = _super.construct.call(this, fastener, owner) as F;
     const flagsInit = fastener.flagsInit;
     if (flagsInit !== void 0) {
+      fastener.initOrdered((flagsInit & ComponentSet.OrderedFlag) !== 0);
       fastener.initSorted((flagsInit & ComponentSet.SortedFlag) !== 0);
     }
     Object.defineProperty(fastener, "inlet", { // override getter
@@ -618,6 +727,18 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;
+
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "ordered")) {
+      if (flagsInit === void 0) {
+        flagsInit = 0;
+      }
+      if (fastenerPrototype.ordered) {
+        flagsInit |= ComponentSet.OrderedFlag;
+      } else {
+        flagsInit &= ~ComponentSet.OrderedFlag;
+      }
+      delete (fastenerPrototype as ComponentSetTemplate).ordered;
+    }
 
     if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "sorted")) {
       if (flagsInit === void 0) {
@@ -639,9 +760,10 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     }
   };
 
-  (ComponentSet as Mutable<typeof ComponentSet>).SortedFlag = 1 << (_super.FlagShift + 0);
+  (ComponentSet as Mutable<typeof ComponentSet>).OrderedFlag = 1 << (_super.FlagShift + 0);
+  (ComponentSet as Mutable<typeof ComponentSet>).SortedFlag = 1 << (_super.FlagShift + 1);
 
-  (ComponentSet as Mutable<typeof ComponentSet>).FlagShift = _super.FlagShift + 1;
+  (ComponentSet as Mutable<typeof ComponentSet>).FlagShift = _super.FlagShift + 2;
   (ComponentSet as Mutable<typeof ComponentSet>).FlagMask = (1 << ComponentSet.FlagShift) - 1;
 
   return ComponentSet;

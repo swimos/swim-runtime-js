@@ -74,7 +74,7 @@ export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any> 
 }
 
 /** @public */
-export type ConstraintAnimatorDef<O, R extends ConstraintAnimatorRefinement> =
+export type ConstraintAnimatorDef<O, R extends ConstraintAnimatorRefinement = {}> =
   ConstraintAnimator<O, AnimatorValue<R>, AnimatorValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &

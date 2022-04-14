@@ -23,14 +23,6 @@ import {
   Fastener,
 } from "../fastener/Fastener";
 
-/** @internal */
-export type MemberPropertyInit<O, K extends keyof O> =
-  O[K] extends Property<any, infer T, infer U> ? T | U : never;
-
-/** @internal */
-export type MemberPropertyInitMap<O> =
-  {-readonly [K in keyof O as O[K] extends Property ? K : never]?: MemberPropertyInit<O, K>};
-
 /** @public */
 export interface PropertyRefinement extends FastenerRefinement {
   value?: unknown;
@@ -38,18 +30,21 @@ export interface PropertyRefinement extends FastenerRefinement {
 }
 
 /** @public */
-export type PropertyValue<R extends PropertyRefinement | Property<any, any, any>, D = unknown> =
+export type PropertyValue<R extends PropertyRefinement, D = unknown> =
   R extends {value: infer T} ? T :
   R extends {extends: infer E} ? PropertyValue<E, D> :
-  R extends Property<any, infer T, any> ? T :
   D;
 
 /** @public */
-export type PropertyValueInit<R extends PropertyRefinement | Property<any, any, any>, D = PropertyValue<R>> =
+export type PropertyValueInit<R extends PropertyRefinement, D = PropertyValue<R>> =
   R extends {valueInit: infer U} ? U :
-  R extends {extends: infer E} ? PropertyValueInit<E, D> :
-  R extends Property<any, any, infer U> ? U :
+  R extends {valueInit?: infer U} ? U :
+  R extends {extends?: infer E} ? PropertyValueInit<E, D> :
   D;
+
+/** @public */
+export type AnyPropertyValue<R extends PropertyRefinement> =
+  PropertyValue<R> | PropertyValueInit<R>;
 
 /** @public */
 export interface PropertyTemplate<T = unknown, U = T> extends FastenerTemplate {
@@ -78,7 +73,7 @@ export interface PropertyClass<P extends Property<any, any> = Property<any, any>
 }
 
 /** @public */
-export type PropertyDef<O, R extends PropertyRefinement> =
+export type PropertyDef<O, R extends PropertyRefinement = {}> =
   Property<O, PropertyValue<R>, PropertyValueInit<R>> &
   {readonly name: string} & // prevent type alias simplification
   (R extends {extends: infer E} ? E : {}) &
@@ -173,6 +168,9 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   readonly valueType?: unknown; // optional prototype property
 
   initValue(): T;
+
+  /** @internal */
+  readonly valueInit?: U; // refinement
 
   readonly value: T;
 
