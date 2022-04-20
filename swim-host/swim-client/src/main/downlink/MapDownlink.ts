@@ -896,11 +896,16 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
   };
 
   MapDownlink.prototype.didAliasModel = function (this: MapDownlink): void {
-    this.onLinkedResponse();
-    this.model!.state.forEach(function (key: Value, value: Value): void {
-      this.mapDidUpdate(key, value, Value.absent());
-    }, this);
-    this.onSyncedResponse();
+    const model = this.model;
+    if (model !== null && model.linked) {
+      this.onLinkedResponse();
+      model.state.forEach(function (key: Value, value: Value): void {
+        this.mapDidUpdate(key, value, Value.absent());
+      }, this);
+      if (model.synced) {
+        this.onSyncedResponse();
+      }
+    }
   };
 
   MapDownlink.prototype.open = function (this: MapDownlink): MapDownlink {

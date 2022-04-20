@@ -35,6 +35,8 @@ export type AnyDateTime = DateTime | DateTimeInit | Date | string | number;
 
 /** @public */
 export interface DateTimeInit {
+  /** @internal */
+  time?: never, // force type ambiguity between DateTime and DateTimeInit
   year?: number;
   month?: number;
   day?: number;

@@ -271,9 +271,14 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
   };
 
   ValueDownlink.prototype.didAliasModel = function <V>(this: ValueDownlink<unknown, V>): void {
-    this.onLinkedResponse();
-    this.valueDidSet(this.model!.get(), Value.absent());
-    this.onSyncedResponse();
+    const model = this.model;
+    if (model !== null && model.linked) {
+      this.onLinkedResponse();
+      this.valueDidSet(model.get(), Value.absent());
+      if (model.synced) {
+        this.onSyncedResponse();
+      }
+    }
   };
 
   ValueDownlink.prototype.open = function (this: ValueDownlink): ValueDownlink {

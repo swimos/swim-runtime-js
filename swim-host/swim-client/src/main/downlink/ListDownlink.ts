@@ -743,11 +743,16 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
   };
 
   ListDownlink.prototype.didAliasModel = function (this: ListDownlink): void {
-    this.onLinkedResponse();
-    this.model!.state.forEach(function (value: Value, index: number) {
-      this.listDidUpdate(index, value, Value.absent());
-    }, this);
-    this.onSyncedResponse();
+    const model = this.model;
+    if (model !== null && model.linked) {
+      this.onLinkedResponse();
+      model.state.forEach(function (value: Value, index: number) {
+        this.listDidUpdate(index, value, Value.absent());
+      }, this);
+      if (model.synced) {
+        this.onSyncedResponse();
+      }
+    }
   };
 
   ListDownlink.prototype.open = function (this: ListDownlink): ListDownlink {
