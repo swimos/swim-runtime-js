@@ -53,11 +53,13 @@ export class WarpSocketHost extends WarpHost {
       } else {
         throw new Error("send buffer overflow");
       }
-      this.open();
+      if (!this.connected && this.online.value) {
+        this.connect();
+      }
     }
   }
 
-  override open(): void {
+  override connect(): void {
     this.reconnectTimer.cancel();
 
     let socket = this.socket;
@@ -86,18 +88,17 @@ export class WarpSocketHost extends WarpHost {
     }
   }
 
-  override close(): void {
-    this.reconnectTimer.cancel();
-    this.idleTimer.cancel();
-
-    if (this.socket !== null) {
-      this.socket.close();
-      if (!this.online.value) {
-        this.onWebSocketClose(); // force close event
-      }
-    } else {
-      super.close();
+  override disconnect(): void {
+    const socket = this.socket;
+    if (socket !== null) {
+      socket.onopen = null;
+      socket.onmessage = null;
+      socket.onclose = null;
+      socket.onerror = null;
+      (this as Mutable<this>).socket = null;
+      socket.close();
     }
+    this.setConnected(false);
   }
 
   protected onWebSocketOpen(): void {
@@ -125,7 +126,16 @@ export class WarpSocketHost extends WarpHost {
       socket.onerror = null;
       (this as Mutable<this>).socket = null;
     }
-    this.setConnected(false);
+    if (this.connected) {
+      this.setConnected(false);
+    } else {
+      this.idleTimer.cancel();
+      if (!this.idle) {
+        this.reconnect();
+      } else {
+        this.close();
+      }
+    }
   }
 
   protected onWebSocketError(): void {

@@ -161,7 +161,7 @@ export abstract class WarpHost extends Component {
   @TimerDef<WarpHost["reconnectTimer"]>({
     delay: 0,
     fire(): void {
-      this.owner.open();
+      this.owner.connect();
     },
     backoff(): void {
       if (!this.scheduled) {
@@ -194,10 +194,17 @@ export abstract class WarpHost extends Component {
   readonly online!: PropertyDef<this, {value: boolean}>;
 
   /** @internal */
-  abstract open(): void;
+  abstract connect(): void;
+
+  /** @internal */
+  abstract disconnect(): void;
 
   /** @internal */
   close(): void {
+    this.reconnectTimer.cancel();
+    this.idleTimer.cancel();
+
+    this.disconnect();
     this.remove();
   }
 
@@ -247,8 +254,8 @@ export abstract class WarpHost extends Component {
       if (this.owner.connected) {
         const request = new AuthRequest(credentials);
         this.owner.push(request);
-      } else if (credentials.isDefined()) {
-        this.owner.open();
+      } else if (this.owner.online.value && credentials.isDefined()) {
+        this.owner.connect();
       }
     },
   })
@@ -365,7 +372,9 @@ export abstract class WarpHost extends Component {
   /** @internal */
   openDownlink(downlink: WarpDownlinkModel): void {
     this.appendChild(downlink);
-    this.open();
+    if (!this.connected && this.online.value) {
+      this.connect();
+    }
   }
 
   /** @internal */

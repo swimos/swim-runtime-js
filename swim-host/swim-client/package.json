@@ -28,7 +28,7 @@
   },
   "types": "./dist/swim-client.d.ts",
   "typedocMain": "./src/main/index.ts",
-  "sideEffects": true,
+  "sideEffects": false,
   "keywords": [
     "client",
     "protocol",

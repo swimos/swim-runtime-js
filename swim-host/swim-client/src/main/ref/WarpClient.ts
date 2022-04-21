@@ -246,12 +246,20 @@ export class WarpClient extends WarpScope {
   @PropertyDef<WarpClient["online"]>({
     extends: WarpScope.getFastenerClass("online"),
     inherits: false,
+    initValue(): boolean {
+      return typeof navigator === "object" ? navigator.onLine : true;
+    },
     didSetValue(online: boolean): void {
       let child = this.owner.firstChild;
       while (child !== null) {
         const next = child.nextSibling;
         if (child instanceof WarpHost) {
-          child.open();
+          child.online.recohere(performance.now());
+          if (online) {
+            child.connect();
+          } else {
+            child.disconnect();
+          }
         }
         child = next;
       }

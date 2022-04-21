@@ -20,10 +20,10 @@ import {
   Signal,
   OpenSignal,
   OpenedSignal,
-  CloseSignal,
   ClosedSignal,
   ConnectSignal,
   ConnectedSignal,
+  DisconnectSignal,
   DisconnectedSignal,
   ErrorSignal,
   Envelope,
@@ -61,27 +61,26 @@ export class WarpWorkerHost extends WarpHost {
       } else {
         throw new Error("send buffer overflow");
       }
+      if (!this.connected && this.online.value) {
+        this.connect();
+      }
     }
   }
 
-  override open(): void {
+  override connect(): void {
+    this.reconnectTimer.cancel();
     const port = this.port;
     if (port !== null) {
       port.postMessage(ConnectSignal.create(this.hostUri).toAny());
     }
   }
 
-  override close(): void {
-    this.idleTimer.cancel();
-
-    if (this.port !== null) {
-      this.worker.postMessage(CloseSignal.create(this.hostUri).toAny());
-      if (!this.online.value) {
-        this.closeDown();
-      }
-    } else {
-      super.close();
+  override disconnect(): void {
+    const port = this.port;
+    if (port !== null) {
+      port.postMessage(DisconnectSignal.create(this.hostUri).toAny());
     }
+    this.setConnected(false);
   }
 
   protected onWorkerReceive(event: MessageEvent<AnyValue>): void {
@@ -137,13 +136,13 @@ export class WarpWorkerHost extends WarpHost {
     }
   }
 
-  protected onClosedSignal(response: ClosedSignal): void {
+  protected onClosedSignal(response?: ClosedSignal): void {
     const port = this.port;
     if (port !== null) {
       (this as Mutable<this>).port = null;
       port.removeEventListener("message", this.onPortReceive);
     }
-    this.closeDown();
+    this.setConnected(false);
   }
 
   protected onConnectedSignal(response: ConnectedSignal): void {
@@ -151,7 +150,16 @@ export class WarpWorkerHost extends WarpHost {
   }
 
   protected onDisconnectedSignal(response: DisconnectedSignal): void {
-    this.setConnected(false);
+    if (this.connected) {
+      this.setConnected(false);
+    } else {
+      this.idleTimer.cancel();
+      if (!this.idle) {
+        this.reconnect();
+      } else {
+        this.close();
+      }
+    }
   }
 
   protected onErrorSignal(response: ErrorSignal): void {
@@ -164,15 +172,5 @@ export class WarpWorkerHost extends WarpHost {
 
   protected onUnknownMessage(message: Message | Value): void {
     throw new Error("unknown warp host message: " + message);
-  }
-
-  protected closeDown(): void {
-    this.onDisconnect();
-    this.idleTimer.cancel();
-    if (!this.idle) {
-      this.reconnect();
-    } else {
-      this.close();
-    }
   }
 }

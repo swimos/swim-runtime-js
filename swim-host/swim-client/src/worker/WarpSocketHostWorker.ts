@@ -29,7 +29,7 @@ import {
 import type {WarpWorkerOptions} from "./WarpWorker";
 
 /** @internal */
-export class WebSocketHostWorker {
+export class WarpSocketHostWorker {
   constructor(hostUri: Uri, options: WarpWorkerOptions) {
     this.hostUri = hostUri;
     this.options = options;
@@ -51,7 +51,8 @@ export class WebSocketHostWorker {
   readonly channel: MessageChannel;
 
   get sendBufferSize(): number {
-    return this.options.sendBufferSize ?? WebSocketHostWorker.SendBufferSize;
+    const sendBufferSize = this.options.sendBufferSize;
+    return sendBufferSize !== void 0 ? sendBufferSize : WarpSocketHostWorker.SendBufferSize;
   }
 
   /** @internal */
@@ -92,12 +93,19 @@ export class WebSocketHostWorker {
   }
 
   protected onConnectSignal(request: ConnectSignal): void {
-    this.open();
+    this.connect();
   }
 
   protected onDisconnectSignal(request: DisconnectSignal): void {
-    if (this.socket !== null) {
-      this.socket.close();
+    const socket = this.socket;
+    if (socket !== null) {
+      socket.onopen = null;
+      socket.onmessage = null;
+      socket.onclose = null;
+      socket.onerror = null;
+      (this as Mutable<this>).socket = null;
+      socket.close();
+      this.onDisconnect();
     }
   }
 
@@ -120,7 +128,7 @@ export class WebSocketHostWorker {
     return this.socket !== null && this.socket.readyState === this.socket.OPEN;
   }
 
-  open(): void {
+  connect(): void {
     let socket = this.socket;
     if (socket === null) {
       let WebSocketConstructor: typeof WebSocket;
@@ -128,8 +136,8 @@ export class WebSocketHostWorker {
         WebSocketConstructor = this.options.WebSocket;
       } else if (typeof WebSocket !== "undefined") {
         WebSocketConstructor = WebSocket;
-      } else if (WebSocketHostWorker.WebSocket !== null) {
-        WebSocketConstructor = WebSocketHostWorker.WebSocket;
+      } else if (WarpSocketHostWorker.WebSocket !== null) {
+        WebSocketConstructor = WarpSocketHostWorker.WebSocket;
       } else {
         throw new Error("Missing WebSocket implementation");
       }
@@ -154,12 +162,6 @@ export class WebSocketHostWorker {
   }
 
   close(): void {
-    if (this.socket !== null) {
-      this.socket.close();
-    }
-  }
-
-  closeUp(): void {
     if (this.socket !== null) {
       this.socket.close();
     }
@@ -191,19 +193,15 @@ export class WebSocketHostWorker {
       } else {
         throw new Error("send buffer overflow");
       }
-      this.open();
+      this.connect();
     }
   }
 
   protected onWebSocketOpen(): void {
-    if (this.connected) {
-      this.onConnect();
-      let envelope;
-      while ((envelope = this.sendBuffer.shift()) && this.connected) {
-        this.push(envelope);
-      }
-    } else {
-      this.close();
+    this.onConnect();
+    let envelope;
+    while ((envelope = this.sendBuffer.shift()) && this.connected) {
+      this.push(envelope);
     }
   }
 
@@ -227,14 +225,14 @@ export class WebSocketHostWorker {
       socket.onclose = null;
       socket.onerror = null;
       (this as Mutable<this>).socket = null;
+      this.onDisconnect();
     }
-    this.onDisconnect();
   }
 
   protected onWebSocketError(): void {
     if (this.socket !== null) {
-      this.socket.close();
       this.onError();
+      this.socket.close();
     }
   }
 
@@ -244,7 +242,7 @@ export class WebSocketHostWorker {
   static WebSocket: typeof WebSocket | null = null;
 }
 if (typeof WebSocket !== "undefined") {
-  WebSocketHostWorker.WebSocket = WebSocket;
+  WarpSocketHostWorker.WebSocket = WebSocket;
 } else if (typeof ws !== "undefined" && ws.WebSocket !== void 0) {
-  WebSocketHostWorker.WebSocket = ws.WebSocket as unknown as typeof WebSocket | null;
+  WarpSocketHostWorker.WebSocket = ws.WebSocket as unknown as typeof WebSocket | null;
 }

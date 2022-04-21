@@ -18,7 +18,7 @@
   },
   "types": "./dist/swim-collections.d.ts",
   "typedocMain": "./src/main/index.ts",
-  "sideEffects": true,
+  "sideEffects": false,
   "keywords": [
     "collections",
     "immutable",
