@@ -16,35 +16,24 @@ import type {Mutable, Class, Proto} from "@swim/util";
 import type {FastenerOwner} from "@swim/component";
 import {AnyValue, Value, Form} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
-import {WarpDownlinkRefinement, WarpDownlinkTemplate, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
+import {WarpDownlinkDescriptor, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
 import {ValueDownlinkModel} from "./ValueDownlinkModel";
 import type {ValueDownlinkObserver} from "./ValueDownlinkObserver";
 
 /** @public */
-export interface ValueDownlinkRefinement extends WarpDownlinkRefinement {
-  value?: unknown;
-  valueInit?: unknown;
-}
+export type ValueDownlinkValue<D extends ValueDownlink<any, any, any>> =
+  D extends {value: infer V} ? V : never;
 
 /** @public */
-export type ValueDownlinkValue<R extends ValueDownlinkRefinement, D = Value> =
-  R extends {value: infer V} ? V :
-  R extends {extends: infer E} ? ValueDownlinkValue<E, D> :
-  D;
+export type ValueDownlinkValueInit<D extends ValueDownlink<any, any, any>> =
+  D extends {valueInit?: infer VU} ? VU : never;
 
 /** @public */
-export type ValueDownlinkValueInit<R extends ValueDownlinkRefinement, D = ValueDownlinkValue<R, AnyValue>> =
-  R extends {valueInit: infer VU} ? VU :
-  R extends {valueInit?: infer VU} ? VU :
-  R extends {extends: infer E} ? ValueDownlinkValueInit<E, D> :
-  D;
+export type AnyValueDownlinkValue<D extends ValueDownlink<any, any, any>> =
+  ValueDownlinkValue<D> | ValueDownlinkValueInit<D>;
 
 /** @public */
-export type AnyValueDownlinkValue<R extends ValueDownlinkRefinement> =
-  ValueDownlinkValue<R> | ValueDownlinkValueInit<R>;
-
-/** @public */
-export interface ValueDownlinkTemplate<V = unknown, VU = V> extends WarpDownlinkTemplate {
+export interface ValueDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlinkDescriptor {
   extends?: Proto<ValueDownlink<any, any, any>> | string | boolean | null;
   valueForm?: Form<V, VU>;
   /** @internal */
@@ -52,47 +41,33 @@ export interface ValueDownlinkTemplate<V = unknown, VU = V> extends WarpDownlink
 }
 
 /** @public */
+export type ValueDownlinkTemplate<D extends ValueDownlink<any, any, any>> =
+  ThisType<D> &
+  ValueDownlinkDescriptor<ValueDownlinkValue<D>, ValueDownlinkValueInit<D>> &
+  Partial<Omit<D, keyof ValueDownlinkDescriptor>>;
+
+/** @public */
 export interface ValueDownlinkClass<D extends ValueDownlink<any, any, any> = ValueDownlink<any, any, any>> extends WarpDownlinkClass<D> {
   /** @override */
-  specialize(className: string, template: ValueDownlinkTemplate): ValueDownlinkClass;
+  specialize(template: ValueDownlinkDescriptor<any>): ValueDownlinkClass<D>;
 
   /** @override */
-  refine(downlinkClass: ValueDownlinkClass): void;
+  refine(downlinkClass: ValueDownlinkClass<any>): void;
 
   /** @override */
-  extend(className: string, template: ValueDownlinkTemplate): ValueDownlinkClass<D>;
+  extend<D2 extends D>(className: string, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
+  extend<D2 extends D>(className: string, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
 
   /** @override */
-  specify<O, V = Value, VU = V extends Value ? AnyValue : V>(className: string, template: ThisType<ValueDownlink<O, V, VU>> & ValueDownlinkTemplate<V, VU> & Partial<Omit<ValueDownlink<O, V, VU>, keyof ValueDownlinkTemplate>>): ValueDownlinkClass<D>;
+  define<D2 extends D>(className: string, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
+  define<D2 extends D>(className: string, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
 
   /** @override */
-  <O, V = Value, VU = V extends Value ? AnyValue : V>(template: ThisType<ValueDownlink<O, V, VU>> & ValueDownlinkTemplate<V, VU> & Partial<Omit<ValueDownlink<O, V, VU>, keyof ValueDownlinkTemplate>>): PropertyDecorator;
+  <D2 extends D>(template: ValueDownlinkTemplate<D2>): PropertyDecorator;
 }
 
 /** @public */
-export type ValueDownlinkDef<O, R extends ValueDownlinkRefinement = {}> =
-  ValueDownlink<O, ValueDownlinkValue<R>, ValueDownlinkValueInit<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function ValueDownlinkDef<D extends ValueDownlink<any, any, any>>(
-  template: D extends ValueDownlinkDef<infer O, infer R>
-          ? ThisType<ValueDownlinkDef<O, R>>
-          & ValueDownlinkTemplate<ValueDownlinkValue<R>, ValueDownlinkValueInit<R>>
-          & Partial<Omit<ValueDownlink<O, ValueDownlinkValue<R>, ValueDownlinkValueInit<R>>, keyof ValueDownlinkTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ValueDownlinkTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return ValueDownlink(template);
-}
-
-/** @public */
-export interface ValueDownlink<O = unknown, V = unknown, VU = V> extends WarpDownlink<O> {
+export interface ValueDownlink<O = unknown, V = Value, VU = V extends Value ? AnyValue & V : V> extends WarpDownlink<O> {
   (): V;
   (value: V | VU): O;
 
@@ -110,10 +85,10 @@ export interface ValueDownlink<O = unknown, V = unknown, VU = V> extends WarpDow
   setValueForm(valueForm: Form<V, VU>): this;
 
   /** @internal */
-  readonly value?: V; // refinement
+  readonly value?: V; // for type destructuring
 
   /** @internal */
-  readonly valueInit?: VU; // refinement
+  readonly valueInit?: VU; // for type destructuring
 
   /** @internal */
   readonly stateInit?: Value | null; // optional prototype property

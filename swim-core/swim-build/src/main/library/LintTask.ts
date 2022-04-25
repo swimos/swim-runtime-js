@@ -17,7 +17,7 @@ import * as eslint from "eslint";
 import {Dictionary, Severity} from "@swim/util";
 import {Tag, Mark, Span, OutputSettings, Diagnostic, Unicode} from "@swim/codec";
 import type {FastenerClass} from "@swim/component";
-import {FileRefDef} from "@swim/sys";
+import {FileRef} from "@swim/sys";
 import {TaskStatus} from "../task/Task";
 import {LibraryTask} from "./LibraryTask";
 import {CompileTask} from "./CompileTask";
@@ -46,7 +46,7 @@ export class LintTask extends LibraryTask {
   fixableErrorCount: number;
   fatalErrorCount: number;
 
-  @FileRefDef<LintTask["eslintrc"]>({
+  @FileRef<LintTask["eslintrc"]>({
     fileName: ".eslintrc",
     resolves: true,
     value: null,
@@ -54,7 +54,7 @@ export class LintTask extends LibraryTask {
       return this.owner.baseDir.value;
     },
   })
-  readonly eslintrc!: FileRefDef<this, {value: eslint.ESLint.Options | null}>;
+  readonly eslintrc!: FileRef<this, eslint.ESLint.Options | null>;
   static readonly eslintrc: FastenerClass<LintTask["eslintrc"]>;
 
   override async exec(): Promise<TaskStatus> {

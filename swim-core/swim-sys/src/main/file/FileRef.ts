@@ -14,47 +14,43 @@
 
 import type {Mutable, Proto} from "@swim/util";
 import type {FastenerFlags, FastenerOwner, Fastener} from "@swim/component";
-import {
-  FileRelationRefinement,
-  FileRelationTemplate,
-  FileRelationClass,
-  FileRelation,
-} from "./FileRelation";
+import {FileRelationDescriptor, FileRelationClass, FileRelation} from "./FileRelation";
 
 /** @public */
-export interface FileRefRefinement extends FileRelationRefinement {
-}
+export type FileRefValue<F extends FileRef<any, any>> =
+  F extends {value: infer T} ? T : never;
 
 /** @public */
-export type FileRefValue<R extends FileRefRefinement | FileRef<any, any>, D = unknown> =
-  R extends {value: infer T} ? T :
-  R extends {extends: infer E} ? FileRefValue<E, D> :
-  R extends FileRef<any, infer T> ? T :
-  D;
-
-/** @public */
-export interface FileRefTemplate<T = unknown> extends FileRelationTemplate {
+export interface FileRefDescriptor<T = unknown> extends FileRelationDescriptor {
   extends?: Proto<FileRef<any, any>> | string | boolean | null;
   fileName?: string;
   value?: T;
 }
 
 /** @public */
+export type FileRefTemplate<F extends FileRef<any, any>> =
+  ThisType<F> &
+  FileRefDescriptor<FileRefValue<F>> &
+  Partial<Omit<F, keyof FileRefDescriptor>>;
+
+/** @public */
 export interface FileRefClass<F extends FileRef<any, any> = FileRef<any, any>> extends FileRelationClass<F> {
   /** @override */
-  specialize(className: string, template: FileRefTemplate): FileRefClass;
+  specialize(template: FileRefDescriptor<any>): FileRefClass<F>;
 
   /** @override */
-  refine(propertyClass: FileRefClass): void;
+  refine(fastenerClass: FileRefClass<any>): void;
 
   /** @override */
-  extend(className: string, template: FileRefTemplate): FileRefClass<F>;
+  extend<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
+  extend<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
 
   /** @override */
-  specify<O, T = unknown>(className: string, template: ThisType<FileRef<O, T>> & FileRefTemplate<T> & Partial<Omit<FileRef<O, T>, keyof FileRefTemplate>>): FileRefClass<F>;
+  define<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
+  define<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
 
   /** @override */
-  <O, T = unknown>(template: ThisType<FileRef<O, T>> & FileRefTemplate<T> & Partial<Omit<FileRef<O, T>, keyof FileRefTemplate>>): PropertyDecorator;
+  <F2 extends F>(template: FileRefTemplate<F2>): PropertyDecorator;
 
   /** @internal */
   readonly LoadedFlag: FastenerFlags;
@@ -65,28 +61,6 @@ export interface FileRefClass<F extends FileRef<any, any> = FileRef<any, any>> e
   readonly FlagShift: number;
   /** @internal @override */
   readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
-export type FileRefDef<O, R extends FileRefRefinement = {}> =
-  FileRef<O, FileRefValue<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function FileRefDef<F extends FileRef<any, any>>(
-  template: F extends FileRefDef<infer O, infer R>
-          ? ThisType<FileRefDef<O, R>>
-          & FileRefTemplate<FileRefValue<R>>
-          & Partial<Omit<FileRef<O, FileRefValue<R>>, keyof FileRefTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof FileRefTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return FileRef(template);
 }
 
 /** @public */

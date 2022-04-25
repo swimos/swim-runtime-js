@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {PropertyDef, Component} from "@swim/component";
+import {Property, Component} from "@swim/component";
 import {AnyValue, Value} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
 import type {WarpDownlinkModel} from "../downlink/WarpDownlinkModel";
@@ -26,49 +26,49 @@ import {WarpClient} from "./"; // forward import
 /** @public */
 export class WarpScope extends Component implements WarpRef {
   /** @override */
-  @PropertyDef({valueType: Uri, value: null, inherits: true})
-  readonly hostUri!: PropertyDef<this, {value: Uri | null, valueInit: AnyUri | null}>;
+  @Property({valueType: Uri, value: null, inherits: true})
+  readonly hostUri!: Property<this, Uri | null, AnyUri | null>;
 
   /** @override */
-  @PropertyDef({valueType: Uri, value: null, inherits: true})
-  readonly nodeUri!: PropertyDef<this, {value: Uri | null, valueInit: AnyUri | null}>;
+  @Property({valueType: Uri, value: null, inherits: true})
+  readonly nodeUri!: Property<this, Uri | null, AnyUri | null>;
 
   /** @override */
-  @PropertyDef({valueType: Uri, value: null, inherits: true})
-  readonly laneUri!: PropertyDef<this, {value: Uri | null, valueInit: AnyUri | null}>;
+  @Property({valueType: Uri, value: null, inherits: true})
+  readonly laneUri!: Property<this, Uri | null,AnyUri | null>;
 
   /** @override */
-  downlink(template?: ThisType<EventDownlink<this>> & EventDownlinkTemplate & Partial<Omit<EventDownlink<this>, keyof EventDownlinkTemplate>>): EventDownlink<this> {
+  downlink(template?: EventDownlinkTemplate<EventDownlink<this>>): EventDownlink<this> {
     let downlinkClass = EventDownlink;
     if (template !== void 0) {
-      downlinkClass = downlinkClass.specify("downlink", template);
+      downlinkClass = downlinkClass.define("downlink", template);
     }
     return downlinkClass.create(this);
   }
 
   /** @override */
-  downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ValueDownlink<this, V, VU>> & ValueDownlinkTemplate<V, VU> & Partial<Omit<ValueDownlink<this, V, VU>, keyof ValueDownlinkTemplate>>): ValueDownlink<this, V, VU> {
+  downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ValueDownlinkTemplate<ValueDownlink<this, V, VU>>): ValueDownlink<this, V, VU> {
     let downlinkClass = ValueDownlink;
     if (template !== void 0) {
-      downlinkClass = downlinkClass.specify("downlinkValue", template);
+      downlinkClass = downlinkClass.define("downlinkValue", template);
     }
     return downlinkClass.create(this);
   }
 
   /** @override */
-  downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ListDownlink<this, V, VU>> & ListDownlinkTemplate<V, VU> & Partial<Omit<ListDownlink<this, V, VU>, keyof ListDownlinkTemplate>>): ListDownlink<this, V, VU> {
+  downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ListDownlinkTemplate<ListDownlink<this, V, VU>>): ListDownlink<this, V, VU> {
     let downlinkClass = ListDownlink;
     if (template !== void 0) {
-      downlinkClass = downlinkClass.specify("downlinkList", template);
+      downlinkClass = downlinkClass.define("downlinkList", template);
     }
     return downlinkClass.create(this);
   }
 
   /** @override */
-  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: ThisType<MapDownlink<this, K, V, KU, VU>> & MapDownlinkTemplate<V, VU> & Partial<Omit<MapDownlink<this, K, V, KU, VU>, keyof MapDownlinkTemplate>>): MapDownlink<this, K, V, KU, VU> {
+  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: MapDownlinkTemplate<MapDownlink<this, K, V, KU, VU>>): MapDownlink<this, K, V, KU, VU> {
     let downlinkClass = MapDownlink;
     if (template !== void 0) {
-      downlinkClass = downlinkClass.specify("downlinkMap", template);
+      downlinkClass = downlinkClass.define("downlinkMap", template);
     }
     return downlinkClass.create(this);
   }
@@ -215,7 +215,7 @@ export class WarpScope extends Component implements WarpRef {
     warpRef.openDownlink(downlink);
   }
 
-  @PropertyDef<WarpScope["warpRef"]>({
+  @Property<WarpScope["warpRef"]>({
     valueType: WarpRef,
     inherits: true,
     initValue(): WarpRef {
@@ -225,8 +225,8 @@ export class WarpScope extends Component implements WarpRef {
       return newValue === oldValue;
     },
   })
-  readonly warpRef!: PropertyDef<this, {value: WarpRef}>;
+  readonly warpRef!: Property<this, WarpRef>;
 
-  @PropertyDef({valueType: Boolean, value: true, inherits: true})
-  readonly online!: PropertyDef<this, {value: boolean}>;
+  @Property({valueType: Boolean, value: true, inherits: true})
+  readonly online!: Property<this, boolean>;
 }

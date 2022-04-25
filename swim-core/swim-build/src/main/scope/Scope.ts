@@ -14,7 +14,7 @@
 
 import type {Class} from "@swim/util";
 import {OutputSettings, Output, OutputStyle, Format, Unicode} from "@swim/codec";
-import {FastenerClass, PropertyDef, ProviderDef, Component, ComponentSetDef} from "@swim/component";
+import {FastenerClass, Property, Provider, Component, ComponentSet} from "@swim/component";
 import {Workspace} from "../workspace/Workspace";
 import type {ScopeObserver} from "./ScopeObserver";
 import {TaskStatus, TaskConfig, Task} from "../"; // forward import
@@ -31,17 +31,17 @@ export abstract class Scope extends Component<Scope> {
 
   abstract readonly name: string;
 
-  @PropertyDef({valueType: String})
-  readonly baseDir!: PropertyDef<this, {value: string | undefined}>;
+  @Property({valueType: String})
+  readonly baseDir!: Property<this, string | undefined>;
 
-  @ComponentSetDef<Scope["tasks"]>({
+  @ComponentSet<Scope["tasks"]>({
     // avoid cyclic static reference to componentType: Task
     binds: true,
     detectComponent(component: Component): Task | null {
       return component instanceof Task ? component : null;
     },
   })
-  readonly tasks!: ComponentSetDef<this, {component: Task}>;
+  readonly tasks!: ComponentSet<this, Task>;
   static readonly tasks: FastenerClass<Scope["tasks"]>;
 
   getTask<C extends Class<Task>>(taskClass: C): InstanceType<C> | null {
@@ -80,13 +80,13 @@ export abstract class Scope extends Component<Scope> {
     }
   }
 
-  @ProviderDef<Scope["workspace"]>({
+  @Provider<Scope["workspace"]>({
     serviceType: Workspace,
     service: Workspace.global(),
     inherits: false,
     lazy: false,
   })
-  readonly workspace!: ProviderDef<this, {service: Workspace}>;
+  readonly workspace!: Provider<this, Workspace>;
   static readonly workspace: FastenerClass<Scope["workspace"]>;
 
   writeName<T>(output: Output<T>): Output<T> {

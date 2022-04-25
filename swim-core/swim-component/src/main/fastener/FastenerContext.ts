@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Proto} from "@swim/util";
-import type {FastenerTemplate, FastenerClass, Fastener} from "./Fastener";
+import type {FastenerDescriptor, FastenerClass, Fastener} from "./Fastener";
 
 /** @public */
 export interface FastenerContextClass {
@@ -55,9 +55,9 @@ export const FastenerContext = (function () {
   
     getSuperFastenerClass(contextClass: FastenerContextClass, fastenerName: string, fastenerBound?: Proto<Fastener> | null): FastenerClass;
   
-    decorate(superClass: FastenerClass, template: FastenerTemplate, target: Object, propertyKey: string | symbol): void;
+    decorate(superClass: FastenerClass, template: FastenerDescriptor, target: Object, propertyKey: string | symbol): void;
 
-    decorator(superClass: FastenerClass, template: FastenerTemplate): PropertyDecorator;
+    decorator(superClass: FastenerClass, template: FastenerDescriptor): PropertyDecorator;
 
     init(fastenerContext: FastenerContext): void;
   
@@ -105,7 +105,7 @@ export const FastenerContext = (function () {
     return fastenerClass;
   };
 
-  FastenerContext.decorate = function (superClass: FastenerClass, template: FastenerTemplate, target: Object, propertyKey: string | symbol): void {
+  FastenerContext.decorate = function (superClass: FastenerClass, template: FastenerDescriptor, target: Object, propertyKey: string | symbol): void {
     const contextClass = target.constructor as FastenerContextClass;
     const fastenerName = propertyKey.toString();
 
@@ -130,7 +130,7 @@ export const FastenerContext = (function () {
       });
     }
 
-    const fastenerClass = superClass.specify(fastenerName, template as object);
+    const fastenerClass = superClass.define(fastenerName, template);
     fastenerClass.contextClass = contextClass;
 
     if (!Object.prototype.hasOwnProperty.call(contextClass, "fastenerClassMap")) {
@@ -175,7 +175,7 @@ export const FastenerContext = (function () {
     });
   };
 
-  FastenerContext.decorator = function (superClass: FastenerClass, template: FastenerTemplate): PropertyDecorator {
+  FastenerContext.decorator = function (superClass: FastenerClass, template: FastenerDescriptor): PropertyDecorator {
     return FastenerContext.decorate.bind(FastenerContext, superClass, template);
   };
 

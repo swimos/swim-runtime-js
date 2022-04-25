@@ -12,71 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto, ObserverType} from "@swim/util";
-import {FastenerRefinement, FastenerTemplate, FastenerClass, Fastener} from "../fastener/Fastener";
+import type {Proto, Observes} from "@swim/util";
+import {FastenerDescriptor, FastenerClass, Fastener} from "../fastener/Fastener";
 import {AnyComponent, ComponentFactory, Component} from "./Component";
 
 /** @public */
-export interface ComponentRelationRefinement extends FastenerRefinement {
-  component?: Component;
-  observes?: unknown;
-}
+export type ComponentRelationComponent<F extends ComponentRelation<any, any>> =
+  F extends {componentType?: ComponentFactory<infer C>} ? C : never;
 
 /** @public */
-export type ComponentRelationComponent<R extends ComponentRelationRefinement | ComponentRelation<any, any>, D = Component> =
-  R extends {component: infer C} ? C :
-  R extends {extends: infer E} ? ComponentRelationComponent<E, D> :
-  R extends ComponentRelation<any, infer C> ? C :
-  D;
-
-/** @public */
-export interface ComponentRelationTemplate<C extends Component = Component> extends FastenerTemplate {
+export interface ComponentRelationDescriptor<C extends Component = Component> extends FastenerDescriptor {
   extends?: Proto<ComponentRelation<any, any>> | string | boolean | null;
-  componentType?: ComponentFactory<C>;
+  componentType?: ComponentFactory<any, any>;
   observes?: boolean;
   binds?: boolean;
 }
 
 /** @public */
+export type ComponentRelationTemplate<F extends ComponentRelation<any, any>> =
+  ThisType<F> &
+  ComponentRelationDescriptor<ComponentRelationComponent<F>> &
+  Partial<Omit<F, keyof ComponentRelationDescriptor>>;
+
+/** @public */
 export interface ComponentRelationClass<F extends ComponentRelation<any, any> = ComponentRelation<any, any>> extends FastenerClass<F> {
   /** @override */
-  specialize(className: string, template: ComponentRelationTemplate): ComponentRelationClass;
+  specialize(template: ComponentRelationDescriptor<any>): ComponentRelationClass<F>;
 
   /** @override */
-  refine(fastenerClass: ComponentRelationClass): void;
+  refine(fastenerClass: ComponentRelationClass<any>): void;
 
   /** @override */
-  extend(className: string, template: ComponentRelationTemplate): ComponentRelationClass<F>;
+  extend<F2 extends F>(className: string, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
+  extend<F2 extends F>(className: string, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
 
   /** @override */
-  specify<O, C extends Component = Component>(className: string, template: ThisType<ComponentRelation<O, C>> & ComponentRelationTemplate<C> & Partial<Omit<ComponentRelation<O, C>, keyof ComponentRelationTemplate>>): ComponentRelationClass<F>;
+  define<F2 extends F>(className: string, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
+  define<F2 extends F>(className: string, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
 
   /** @override */
-  <O, C extends Component = Component>(template: ThisType<ComponentRelation<O, C>> & ComponentRelationTemplate<C> & Partial<Omit<ComponentRelation<O, C>, keyof ComponentRelationTemplate>>): PropertyDecorator;
-}
-
-/** @public */
-export type ComponentRelationDef<O, R extends ComponentRelationRefinement = {}> =
-  ComponentRelation<O, ComponentRelationComponent<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {}) &
-  (R extends {observes: infer B} ? ObserverType<B extends boolean ? ComponentRelationComponent<R> : B> : {});
-
-/** @public */
-export function ComponentRelationDef<F extends ComponentRelation<any, any>>(
-  template: F extends ComponentRelationDef<infer O, infer R>
-          ? ThisType<ComponentRelationDef<O, R>>
-          & ComponentRelationTemplate<ComponentRelationComponent<R>>
-          & Partial<Omit<ComponentRelation<O, ComponentRelationComponent<R>>, keyof ComponentRelationTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ComponentRelationTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ComponentRelationComponent<R> : B> & {observes: boolean}) : {})
-          : never
-): PropertyDecorator {
-  return ComponentRelation(template);
+  <F2 extends F>(template: ComponentRelationTemplate<F2>): PropertyDecorator;
 }
 
 /** @public */
@@ -156,7 +131,7 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
 
   ComponentRelation.prototype.onAttachComponent = function <C extends Component>(this: ComponentRelation<unknown, C>, component: C, target: Component | null): void {
     if (this.observes === true) {
-      component.observe(this as ObserverType<C>);
+      component.observe(this as Observes<C>);
     }
   };
 
@@ -174,7 +149,7 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
 
   ComponentRelation.prototype.onDetachComponent = function <C extends Component>(this: ComponentRelation<unknown, C>, component: C): void {
     if (this.observes === true) {
-      component.unobserve(this as ObserverType<C>);
+      component.unobserve(this as Observes<C>);
     }
   };
 

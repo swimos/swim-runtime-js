@@ -31,7 +31,7 @@ export class PropertySpec extends Spec {
 
   @Test
   testPropertyDefine(exam: Exam): void {
-    const testProperty = Property.specify("foo", {value: "bar"});
+    const testProperty = Property.define("foo", {value: "bar"});
     const property = testProperty.create(null);
     exam.equal(property.name, "foo");
     exam.equal(property.value, "bar");

@@ -15,39 +15,22 @@
 import {Mutable, Proto, Equals, FromAny} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
 import {FastenerContext} from "../fastener/FastenerContext";
-import {
-  FastenerOwner,
-  FastenerRefinement,
-  FastenerTemplate,
-  FastenerClass,
-  Fastener,
-} from "../fastener/Fastener";
+import {FastenerOwner, FastenerDescriptor, FastenerClass, Fastener} from "../fastener/Fastener";
 
 /** @public */
-export interface PropertyRefinement extends FastenerRefinement {
-  value?: unknown;
-  valueInit?: unknown;
-}
+export type PropertyValue<P extends Property<any, any, any>> =
+  P extends {value: infer T} ? T : never;
 
 /** @public */
-export type PropertyValue<R extends PropertyRefinement, D = unknown> =
-  R extends {value: infer T} ? T :
-  R extends {extends: infer E} ? PropertyValue<E, D> :
-  D;
+export type PropertyValueInit<P extends Property<any, any, any>> =
+  P extends {valueInit?: infer U} ? U : never;
 
 /** @public */
-export type PropertyValueInit<R extends PropertyRefinement, D = PropertyValue<R>> =
-  R extends {valueInit: infer U} ? U :
-  R extends {valueInit?: infer U} ? U :
-  R extends {extends?: infer E} ? PropertyValueInit<E, D> :
-  D;
+export type AnyPropertyValue<P extends Property<any, any, any>> =
+  PropertyValue<P> | PropertyValueInit<P>;
 
 /** @public */
-export type AnyPropertyValue<R extends PropertyRefinement> =
-  PropertyValue<R> | PropertyValueInit<R>;
-
-/** @public */
-export interface PropertyTemplate<T = unknown, U = T> extends FastenerTemplate {
+export interface PropertyDescriptor<T = unknown, U = T> extends FastenerDescriptor {
   extends?: Proto<Property<any, any, any>> | string | boolean | null;
   valueType?: unknown;
   value?: T | U;
@@ -55,43 +38,29 @@ export interface PropertyTemplate<T = unknown, U = T> extends FastenerTemplate {
 }
 
 /** @public */
-export interface PropertyClass<P extends Property<any, any> = Property<any, any>> extends FastenerClass<P> {
-  /** @override */
-  specialize(className: string, template: PropertyTemplate): PropertyClass;
-
-  /** @override */
-  refine(propertyClass: PropertyClass): void;
-
-  /** @override */
-  extend(className: string, template: PropertyTemplate): PropertyClass<P>;
-
-  /** @override */
-  specify<O, T = unknown, U = T>(className: string, template: ThisType<Property<O, T, U>> & PropertyTemplate<T, U> & Partial<Omit<Property<O, T, U>, keyof PropertyTemplate>>): PropertyClass<P>;
-
-  /** @override */
-  <O, T = unknown, U = T>(template: ThisType<Property<O, T, U>> & PropertyTemplate<T, U> & Partial<Omit<Property<O, T, U>, keyof PropertyTemplate>>): PropertyDecorator;
-}
+export type PropertyTemplate<P extends Property<any, any, any>> =
+  ThisType<P> &
+  PropertyDescriptor<PropertyValue<P>, PropertyValueInit<P>> &
+  Partial<Omit<P, keyof PropertyDescriptor>>;
 
 /** @public */
-export type PropertyDef<O, R extends PropertyRefinement = {}> =
-  Property<O, PropertyValue<R>, PropertyValueInit<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
+export interface PropertyClass<P extends Property<any, any, any> = Property<any, any, any>> extends FastenerClass<P> {
+  /** @override */
+  specialize(template: PropertyDescriptor<any, any>): PropertyClass<P>;
 
-/** @public */
-export function PropertyDef<P extends Property<any, any, any>>(
-  template: P extends PropertyDef<infer O, infer R>
-          ? ThisType<PropertyDef<O, R>>
-          & PropertyTemplate<PropertyValue<R>, PropertyValueInit<R>>
-          & Partial<Omit<Property<O, PropertyValue<R>, PropertyValueInit<R>>, keyof PropertyTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof PropertyTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return Property(template);
+  /** @override */
+  refine(propertyClass: PropertyClass<any>): void;
+
+  /** @override */
+  extend<P2 extends P>(className: string, template: PropertyTemplate<P2>): PropertyClass<P2>;
+  extend<P2 extends P>(className: string, template: PropertyTemplate<P2>): PropertyClass<P2>;
+
+  /** @override */
+  define<P2 extends P>(className: string, template: PropertyTemplate<P2>): PropertyClass<P2>;
+  define<P2 extends P>(className: string, template: PropertyTemplate<P2>): PropertyClass<P2>;
+
+  /** @override */
+  <P2 extends P>(template: PropertyTemplate<P2>): PropertyDecorator;
 }
 
 /** @public */
@@ -100,7 +69,7 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   (value: T | U, affinity?: Affinity): O;
 
   /** @override */
-  get fastenerType(): Proto<Property<any, any>>;
+  get fastenerType(): Proto<Property<any, any, any>>;
 
   /** @internal @override */
   getSuper(): Property<unknown, T> | null;
@@ -167,10 +136,10 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   /** @internal */
   readonly valueType?: unknown; // optional prototype property
 
-  initValue(): T;
-
   /** @internal */
-  readonly valueInit?: U; // refinement
+  readonly valueInit?: U; // for type destructuring
+
+  initValue(): T;
 
   readonly value: T;
 
@@ -390,7 +359,7 @@ export const Property = (function (_super: typeof Fastener) {
     return FromAny.fromAny<T, U>(this.valueType, value);
   };
 
-  Property.construct = function <P extends Property<any, any>>(property: P | null, owner: FastenerOwner<P>): P {
+  Property.construct = function <P extends Property<any, any, any>>(property: P | null, owner: FastenerOwner<P>): P {
     if (property === null) {
       property = function (value?: PropertyValue<P> | PropertyValueInit<P>, affinity?: Affinity): PropertyValue<P> | FastenerOwner<P> {
         if (arguments.length === 0) {
@@ -415,7 +384,7 @@ export const Property = (function (_super: typeof Fastener) {
     return property;
   };
 
-  Property.refine = function (propertyClass: PropertyClass): void {
+  Property.refine = function (propertyClass: PropertyClass<any>): void {
     _super.refine.call(this, propertyClass);
     const propertyProtortype = propertyClass.prototype;
 

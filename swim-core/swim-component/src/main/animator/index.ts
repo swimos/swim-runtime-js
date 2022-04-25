@@ -13,12 +13,11 @@
 // limitations under the License.
 
 export {
-  AnimatorRefinement,
   AnimatorValue,
   AnimatorValueInit,
   AnyAnimatorValue,
+  AnimatorDescriptor,
   AnimatorTemplate,
   AnimatorClass,
-  AnimatorDef,
   Animator,
 } from "./Animator";

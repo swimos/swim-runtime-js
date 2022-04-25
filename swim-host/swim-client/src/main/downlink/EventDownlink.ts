@@ -15,57 +15,39 @@
 import type {Mutable, Class, Proto} from "@swim/util";
 import {Value} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
-import {WarpDownlinkRefinement, WarpDownlinkTemplate, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
+import {WarpDownlinkDescriptor, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
 import {EventDownlinkModel} from "./EventDownlinkModel";
 import type {EventDownlinkObserver} from "./EventDownlinkObserver";
 
 /** @public */
-export interface EventDownlinkRefinement extends WarpDownlinkRefinement {
-}
-
-/** @public */
-export interface EventDownlinkTemplate extends WarpDownlinkTemplate {
+export interface EventDownlinkDescriptor extends WarpDownlinkDescriptor {
   extends?: Proto<EventDownlink<any>> | string | boolean | null;
 }
 
 /** @public */
+export type EventDownlinkTemplate<D extends EventDownlink<any>> =
+  ThisType<D> &
+  EventDownlinkDescriptor &
+  Partial<Omit<D, keyof EventDownlinkDescriptor>>;
+
+/** @public */
 export interface EventDownlinkClass<D extends EventDownlink<any> = EventDownlink<any>> extends WarpDownlinkClass<D> {
   /** @override */
-  specialize(className: string, template: EventDownlinkTemplate): EventDownlinkClass;
+  specialize(template: EventDownlinkDescriptor): EventDownlinkClass<D>;
 
   /** @override */
-  refine(downlinkClass: EventDownlinkClass): void;
+  refine(downlinkClass: EventDownlinkClass<any>): void;
 
   /** @override */
-  extend(className: string, template: EventDownlinkTemplate): EventDownlinkClass<D>;
+  extend<D2 extends D>(className: string, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
+  extend<D2 extends D>(className: string, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
 
   /** @override */
-  specify<O>(className: string, template: ThisType<EventDownlink<O>> & EventDownlinkTemplate & Partial<Omit<EventDownlink<O>, keyof EventDownlinkTemplate>>): EventDownlinkClass<D>;
+  define<D2 extends D>(className: string, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
+  define<D2 extends D>(className: string, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
 
   /** @override */
-  <O>(template: ThisType<EventDownlink<O>> & EventDownlinkTemplate & Partial<Omit<EventDownlink<O>, keyof EventDownlinkTemplate>>): PropertyDecorator;
-}
-
-/** @public */
-export type EventDownlinkDef<O, R extends EventDownlinkRefinement = {}> =
-  EventDownlink<O> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function EventDownlinkDef<D extends EventDownlink<any>>(
-  template: D extends EventDownlinkDef<infer O, infer R>
-          ? ThisType<EventDownlinkDef<O, R>>
-          & EventDownlinkTemplate
-          & Partial<Omit<EventDownlink<O>, keyof EventDownlinkTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof EventDownlinkTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return EventDownlink(template);
+  <D2 extends D>(template: EventDownlinkTemplate<D2>): PropertyDecorator;
 }
 
 /** @public */

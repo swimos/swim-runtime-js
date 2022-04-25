@@ -18,7 +18,7 @@ import * as apiExtractor from "@microsoft/api-extractor";
 import {Severity} from "@swim/util";
 import {Mark, OutputSettings, Diagnostic, Unicode} from "@swim/codec";
 import type {FastenerClass} from "@swim/component";
-import {FileRefDef} from "@swim/sys";
+import {FileRef} from "@swim/sys";
 import {TaskStatus} from "../task/Task";
 import {LibraryTask} from "./LibraryTask";
 
@@ -35,7 +35,7 @@ export class ApiTask extends LibraryTask {
 
   readonly messages: apiExtractor.ExtractorMessage[];
 
-  @FileRefDef<ApiTask["extractorConfig"]>({
+  @FileRef<ApiTask["extractorConfig"]>({
     fileName: "api-extractor.json",
     value: null,
     getBaseDir(): string | undefined {
@@ -45,7 +45,7 @@ export class ApiTask extends LibraryTask {
       return apiExtractor.ExtractorConfig.loadFileAndPrepare(path);
     },
   })
-  readonly extractorConfig!: FileRefDef<this, {value: apiExtractor.ExtractorConfig | null}>;
+  readonly extractorConfig!: FileRef<this, apiExtractor.ExtractorConfig | null>;
   static readonly extractorConfig: FastenerClass<ApiTask["extractorConfig"]>;
 
   override async exec(): Promise<TaskStatus> {

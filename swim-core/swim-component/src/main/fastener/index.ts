@@ -22,9 +22,8 @@ export {
 export {
   FastenerFlags,
   FastenerOwner,
-  FastenerRefinement,
+  FastenerDescriptor,
   FastenerTemplate,
   FastenerClass,
-  FastenerDef,
   Fastener,
 } from "./Fastener";

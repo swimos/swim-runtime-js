@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import {Spec, Test, Exam} from "@swim/unit";
-import {ProviderDef, Provider, Component} from "@swim/component";
+import {Provider, Component} from "@swim/component";
 
 export class ProviderSpec extends Spec {
   @Test
   testProviderDefine(exam: Exam): void {
-    const testProvider = Provider.specify("foo", {service: "bar"});
+    const testProvider = Provider.define("foo", {service: "bar"});
     const provider = testProvider.create(null);
     exam.equal(provider.name, "foo");
     exam.equal(provider.service, "bar");
@@ -43,7 +43,7 @@ export class ProviderSpec extends Spec {
   testProviderInheritance(exam: Exam): void {
     let id = 0;
     class TestComponent extends Component {
-      @ProviderDef<TestComponent["foo"]>({
+      @Provider<TestComponent["foo"]>({
         inherits: true,
         createService(): {id: number} | undefined {
           const service = {id};
@@ -51,9 +51,7 @@ export class ProviderSpec extends Spec {
           return service;
         },
       })
-      readonly foo!: ProviderDef<this, {
-        service: {id: number} | undefined,
-      }>;
+      readonly foo!: Provider<this, {id: number} | undefined>;
     }
     const parent = new TestComponent();
     const child = new TestComponent();
@@ -71,7 +69,7 @@ export class ProviderSpec extends Spec {
   testProviderOverride(exam: Exam): void {
     let id = 0;
     class TestComponent extends Component {
-      @ProviderDef<TestComponent["foo"]>({
+      @Provider<TestComponent["foo"]>({
         lazy: false,
         inherits: true,
         createService(): {id: number} | undefined {
@@ -80,9 +78,7 @@ export class ProviderSpec extends Spec {
           return service;
         },
       })
-      readonly foo!: ProviderDef<this, {
-        service: {id: number} | undefined,
-      }>;
+      readonly foo!: Provider<this, {id: number} | undefined>;
     }
     const parent = new TestComponent();
     const child = new TestComponent();

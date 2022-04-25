@@ -18,17 +18,16 @@ import {
   Proto,
   Equals,
   Arrays,
-  ObserverType,
+  Observes,
   Observable,
-  ConsumerType,
+  Consumes,
   Consumable,
   Consumer,
 } from "@swim/util";
 import {
   FastenerFlags,
   FastenerOwner,
-  FastenerRefinement,
-  FastenerTemplate,
+  FastenerDescriptor,
   FastenerClass,
   Fastener,
 } from "@swim/component";
@@ -48,11 +47,7 @@ import type {WarpDownlinkModel} from "./WarpDownlinkModel";
 import type {WarpDownlinkObserver} from "./WarpDownlinkObserver";
 
 /** @public */
-export interface WarpDownlinkRefinement extends FastenerRefinement {
-}
-
-/** @public */
-export interface WarpDownlinkTemplate extends FastenerTemplate {
+export interface WarpDownlinkDescriptor extends FastenerDescriptor {
   extends?: Proto<WarpDownlink<any>> | string | boolean | null;
   consumed?: boolean;
   hostUri?: AnyUri | null;
@@ -66,21 +61,29 @@ export interface WarpDownlinkTemplate extends FastenerTemplate {
 }
 
 /** @public */
+export type WarpDownlinkTemplate<D extends WarpDownlink<any>> =
+  ThisType<D> &
+  WarpDownlinkDescriptor &
+  Partial<Omit<D, keyof WarpDownlinkDescriptor>>;
+
+/** @public */
 export interface WarpDownlinkClass<D extends WarpDownlink<any> = WarpDownlink<any>> extends FastenerClass<D> {
   /** @override */
-  specialize(className: string, template: WarpDownlinkTemplate): WarpDownlinkClass;
+  specialize(template: WarpDownlinkDescriptor): WarpDownlinkClass<D>;
 
   /** @override */
-  refine(downlinkClass: WarpDownlinkClass): void;
+  refine(downlinkClass: WarpDownlinkClass<any>): void;
 
   /** @override */
-  extend(className: string, template: WarpDownlinkTemplate): WarpDownlinkClass<D>;
+  extend<D2 extends D>(className: string, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
+  extend<D2 extends D>(className: string, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
 
   /** @override */
-  specify<O>(className: string, template: ThisType<WarpDownlink<O>> & WarpDownlinkTemplate & Partial<Omit<WarpDownlink<O>, keyof WarpDownlinkTemplate>>): WarpDownlinkClass<D>;
+  define<D2 extends D>(className: string, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
+  define<D2 extends D>(className: string, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
 
   /** @override */
-  <O>(template: ThisType<WarpDownlink<O>> & WarpDownlinkTemplate & Partial<Omit<WarpDownlink<O>, keyof WarpDownlinkTemplate>>): PropertyDecorator;
+  <D2 extends D>(template: WarpDownlinkTemplate<D2>): PropertyDecorator;
 
   /** @internal */
   readonly RelinksFlag: FastenerFlags;
@@ -93,28 +96,6 @@ export interface WarpDownlinkClass<D extends WarpDownlink<any> = WarpDownlink<an
   readonly FlagShift: number;
   /** @internal @override */
   readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
-export type WarpDownlinkDef<O, R extends WarpDownlinkRefinement = {}> =
-  WarpDownlink<O> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function WarpDownlinkDef<D extends WarpDownlink<any>>(
-  template: D extends WarpDownlinkDef<infer O, infer R>
-          ? ThisType<WarpDownlinkDef<O, R>>
-          & WarpDownlinkTemplate
-          & Partial<Omit<WarpDownlink<O>, keyof WarpDownlinkTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof WarpDownlinkTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return WarpDownlink(template);
 }
 
 /** @public */
@@ -291,58 +272,58 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
   hostDidFail(error: unknown): void;
 
   /** @internal */
-  readonly observers: ReadonlyArray<ObserverType<this>>;
+  readonly observers: ReadonlyArray<Observes<this>>;
 
   /** @override */
-  observe(observer: ObserverType<this>): void;
+  observe(observer: Observes<this>): void;
 
   /** @protected */
-  willObserve(observer: ObserverType<this>): void;
+  willObserve(observer: Observes<this>): void;
 
   /** @protected */
-  onObserve(observer: ObserverType<this>): void;
+  onObserve(observer: Observes<this>): void;
 
   /** @protected */
-  didObserve(observer: ObserverType<this>): void;
+  didObserve(observer: Observes<this>): void;
 
   /** @override */
-  unobserve(observer: ObserverType<this>): void;
+  unobserve(observer: Observes<this>): void;
 
   /** @protected */
-  willUnobserve(observer: ObserverType<this>): void;
+  willUnobserve(observer: Observes<this>): void;
 
   /** @protected */
-  onUnobserve(observer: ObserverType<this>): void;
+  onUnobserve(observer: Observes<this>): void;
 
   /** @protected */
-  didUnobserve(observer: ObserverType<this>): void;
+  didUnobserve(observer: Observes<this>): void;
 
   /** @internal */
-  readonly consumers: ReadonlyArray<ConsumerType<this>>;
+  readonly consumers: ReadonlyArray<Consumes<this>>;
 
   /** @override */
-  consume(consumer: ConsumerType<this>): void
+  consume(consumer: Consumes<this>): void
 
   /** @protected */
-  willConsume(consumer: ConsumerType<this>): void;
+  willConsume(consumer: Consumes<this>): void;
 
   /** @protected */
-  onConsume(consumer: ConsumerType<this>): void;
+  onConsume(consumer: Consumes<this>): void;
 
   /** @protected */
-  didConsume(consumer: ConsumerType<this>): void;
+  didConsume(consumer: Consumes<this>): void;
 
   /** @override */
-  unconsume(consumer: ConsumerType<this>): void
+  unconsume(consumer: Consumes<this>): void
 
   /** @protected */
-  willUnconsume(consumer: ConsumerType<this>): void;
+  willUnconsume(consumer: Consumes<this>): void;
 
   /** @protected */
-  onUnconsume(consumer: ConsumerType<this>): void;
+  onUnconsume(consumer: Consumes<this>): void;
 
   /** @protected */
-  didUnconsume(consumer: ConsumerType<this>): void;
+  didUnconsume(consumer: Consumes<this>): void;
 
   get consuming(): boolean;
 
@@ -830,7 +811,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     }
   };
 
-  WarpDownlink.prototype.observe = function (this: WarpDownlink, observer: ObserverType<typeof this>): void {
+  WarpDownlink.prototype.observe = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.inserted(observer, oldObservers);
     if (oldObservers !== newObservers) {
@@ -841,19 +822,19 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     }
   };
 
-  WarpDownlink.prototype.willObserve = function (this: WarpDownlink, observer: ObserverType<typeof this>): void {
+  WarpDownlink.prototype.willObserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.onObserve = function (this: WarpDownlink, observer: ObserverType<typeof this>): void {
+  WarpDownlink.prototype.onObserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.didObserve = function (this: WarpDownlink, observer: ObserverType<typeof this>): void {
+  WarpDownlink.prototype.didObserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.unobserve = function (this: WarpDownlink, observer: ObserverType<typeof this>): void {
+  WarpDownlink.prototype.unobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.removed(observer, oldObservers);
     if (oldObservers !== newObservers) {
@@ -864,19 +845,19 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     }
   };
 
-  WarpDownlink.prototype.willUnobserve = function (this: WarpDownlink, observer: ObserverType<typeof this>): void {
+  WarpDownlink.prototype.willUnobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.onUnobserve = function (this: WarpDownlink, observer: ObserverType<typeof this>): void {
+  WarpDownlink.prototype.onUnobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.didUnobserve = function (this: WarpDownlink, observer: ObserverType<typeof this>): void {
+  WarpDownlink.prototype.didUnobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.consume = function (this: WarpDownlink, downlinkConsumer: ConsumerType<typeof this>): void {
+  WarpDownlink.prototype.consume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
     const oldConsumers = this.consumers;
     const newConsumerrss = Arrays.inserted(downlinkConsumer, oldConsumers);
     if (oldConsumers !== newConsumerrss) {
@@ -890,19 +871,19 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     }
   };
 
-  WarpDownlink.prototype.willConsume = function (this: WarpDownlink, downlinkConsumer: ConsumerType<typeof this>): void {
+  WarpDownlink.prototype.willConsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.onConsume = function (this: WarpDownlink, downlinkConsumer: ConsumerType<typeof this>): void {
+  WarpDownlink.prototype.onConsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.didConsume = function (this: WarpDownlink, downlinkConsumer: ConsumerType<typeof this>): void {
+  WarpDownlink.prototype.didConsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.unconsume = function (this: WarpDownlink, downlinkConsumer: ConsumerType<typeof this>): void {
+  WarpDownlink.prototype.unconsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
     const oldConsumers = this.consumers;
     const newConsumerrss = Arrays.removed(downlinkConsumer, oldConsumers);
     if (oldConsumers !== newConsumerrss) {
@@ -916,15 +897,15 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     }
   };
 
-  WarpDownlink.prototype.willUnconsume = function (this: WarpDownlink, downlinkConsumer: ConsumerType<typeof this>): void {
+  WarpDownlink.prototype.willUnconsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.onUnconsume = function (this: WarpDownlink, downlinkConsumer: ConsumerType<typeof this>): void {
+  WarpDownlink.prototype.onUnconsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
     // hook
   };
 
-  WarpDownlink.prototype.didUnconsume = function (this: WarpDownlink, downlinkConsumer: ConsumerType<typeof this>): void {
+  WarpDownlink.prototype.didUnconsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
     // hook
   };
 
@@ -1045,7 +1026,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     return downlink;
   };
 
-  WarpDownlink.refine = function (downlinkClass: WarpDownlinkClass): void {
+  WarpDownlink.refine = function (downlinkClass: WarpDownlinkClass<any>): void {
     _super.refine.call(this, downlinkClass);
     const downlinkPrototype = downlinkClass.prototype;
     let flagsInit = downlinkPrototype.flagsInit;
@@ -1059,7 +1040,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       } else {
         flagsInit &= ~WarpDownlink.RelinksFlag;
       }
-      delete (downlinkPrototype as WarpDownlinkTemplate).relinks;
+      delete (downlinkPrototype as WarpDownlinkDescriptor).relinks;
     }
 
     if (Object.prototype.hasOwnProperty.call(downlinkPrototype, "syncs")) {
@@ -1071,7 +1052,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       } else {
         flagsInit &= ~WarpDownlink.SyncsFlag;
       }
-      delete (downlinkPrototype as WarpDownlinkTemplate).syncs;
+      delete (downlinkPrototype as WarpDownlinkDescriptor).syncs;
     }
 
     if (flagsInit !== void 0) {

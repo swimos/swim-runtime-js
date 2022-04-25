@@ -12,51 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Proto, Objects, Comparator, ObserverType} from "@swim/util";
+import {Mutable, Proto, Objects, Comparator} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
 import {FastenerFlags, FastenerOwner, Fastener} from "../fastener/Fastener";
-import type {AnyComponent, Component} from "./Component";
-import {
-  ComponentRelationRefinement,
-  ComponentRelationTemplate,
-  ComponentRelationClass,
-  ComponentRelation,
-} from "./ComponentRelation";
+import type {AnyComponent, ComponentFactory, Component} from "./Component";
+import {ComponentRelationDescriptor, ComponentRelationClass, ComponentRelation} from "./ComponentRelation";
 
 /** @public */
-export interface ComponentSetRefinement extends ComponentRelationRefinement {
-}
+export type ComponentSetComponent<F extends ComponentSet<any, any>> =
+  F extends {componentType?: ComponentFactory<infer C>} ? C : never;
 
 /** @public */
-export type ComponentSetComponent<R extends ComponentSetRefinement | ComponentSet<any, any>, D = Component> =
-  R extends {component: infer C | null} ? C :
-  R extends {extends: infer E} ? ComponentSetComponent<E, D> :
-  R extends ComponentSet<any, infer C> ? C :
-  D;
-
-/** @public */
-export interface ComponentSetTemplate<C extends Component = Component> extends ComponentRelationTemplate<C> {
+export interface ComponentSetDescriptor<C extends Component = Component> extends ComponentRelationDescriptor<C> {
   extends?: Proto<ComponentSet<any, any>> | string | boolean | null;
   ordered?: boolean;
   sorted?: boolean;
 }
 
 /** @public */
+export type ComponentSetTemplate<F extends ComponentSet<any, any>> =
+  ThisType<F> &
+  ComponentSetDescriptor<ComponentSetComponent<F>> &
+  Partial<Omit<F, keyof ComponentSetDescriptor>>;
+
+/** @public */
 export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentSet<any, any>> extends ComponentRelationClass<F> {
   /** @override */
-  specialize(className: string, template: ComponentSetTemplate): ComponentSetClass;
+  specialize(template: ComponentSetDescriptor<any>): ComponentSetClass<F>;
 
   /** @override */
-  refine(fastenerClass: ComponentSetClass): void;
+  refine(fastenerClass: ComponentSetClass<any>): void;
 
   /** @override */
-  extend(className: string, template: ComponentSetTemplate): ComponentSetClass<F>;
+  extend<F2 extends F>(className: string, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
+  extend<F2 extends F>(className: string, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
 
   /** @override */
-  specify<O, C extends Component = Component>(className: string, template: ThisType<ComponentSet<O, C>> & ComponentSetTemplate<C> & Partial<Omit<ComponentSet<O, C>, keyof ComponentSetTemplate>>): ComponentSetClass<F>;
+  define<F2 extends F>(className: string, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
+  define<F2 extends F>(className: string, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
 
   /** @override */
-  <O, C extends Component = Component>(template: ThisType<ComponentSet<O, C>> & ComponentSetTemplate<C> & Partial<Omit<ComponentSet<O, C>, keyof ComponentSetTemplate>>): PropertyDecorator;
+  <F2 extends F>(template: ComponentSetTemplate<F2>): PropertyDecorator;
 
   /** @internal */
   readonly OrderedFlag: FastenerFlags;
@@ -67,30 +63,6 @@ export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentS
   readonly FlagShift: number;
   /** @internal @override */
   readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
-export type ComponentSetDef<O, R extends ComponentSetRefinement = {}> =
-  ComponentSet<O, ComponentSetComponent<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {}) &
-  (R extends {observes: infer B} ? ObserverType<B extends boolean ? ComponentSetComponent<R> : B> : {});
-
-/** @public */
-export function ComponentSetDef<F extends ComponentSet<any, any>>(
-  template: F extends ComponentSetDef<infer O, infer R>
-          ? ThisType<ComponentSetDef<O, R>>
-          & ComponentSetTemplate<ComponentSetComponent<R>>
-          & Partial<Omit<ComponentSet<O, ComponentSetComponent<R>>, keyof ComponentSetTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ComponentSetTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ComponentSetComponent<R> : B> & {observes: boolean}) : {})
-          : never
-): PropertyDecorator {
-  return ComponentSet(template);
 }
 
 /** @public */
@@ -723,7 +695,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return fastener;
   };
 
-  ComponentSet.refine = function (fastenerClass: ComponentSetClass): void {
+  ComponentSet.refine = function (fastenerClass: ComponentSetClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;
@@ -737,7 +709,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       } else {
         flagsInit &= ~ComponentSet.OrderedFlag;
       }
-      delete (fastenerPrototype as ComponentSetTemplate).ordered;
+      delete (fastenerPrototype as ComponentSetDescriptor).ordered;
     }
 
     if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "sorted")) {
@@ -749,7 +721,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       } else {
         flagsInit &= ~ComponentSet.SortedFlag;
       }
-      delete (fastenerPrototype as ComponentSetTemplate).sorted;
+      delete (fastenerPrototype as ComponentSetDescriptor).sorted;
     }
 
     if (flagsInit !== void 0) {

@@ -15,60 +15,41 @@
 import type {Mutable, Proto} from "@swim/util";
 import {
   FastenerOwner,
-  FastenerRefinement,
-  FastenerTemplate,
+  FastenerDescriptor,
   FastenerClass,
   Fastener,
 } from "../fastener/Fastener";
 
 /** @public */
-export interface TimerRefinement extends FastenerRefinement {
-}
-
-/** @public */
-export interface TimerTemplate extends FastenerTemplate {
+export interface TimerDescriptor extends FastenerDescriptor {
   extends?: Proto<Timer<any>> | string | boolean | null;
   delay?: number;
 }
 
 /** @public */
+export type TimerTemplate<F extends Timer<any>> =
+  ThisType<F> &
+  TimerDescriptor &
+  Partial<Omit<F, keyof TimerDescriptor>>;
+
+/** @public */
 export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerClass<F> {
   /** @override */
-  specialize(className: string, template: TimerTemplate): TimerClass;
+  specialize(template: TimerDescriptor): TimerClass<F>;
 
   /** @override */
-  refine(timerClass: TimerClass): void;
+  refine(timerClass: TimerClass<any>): void;
 
   /** @override */
-  extend(className: string, template: TimerTemplate): TimerClass<F>;
+  extend<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
+  extend<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
 
   /** @override */
-  specify<O>(className: string, template: ThisType<Timer<O>> & TimerTemplate & Partial<Omit<Timer<O>, keyof TimerTemplate>>): TimerClass<F>;
+  define<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
+  define<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
 
   /** @override */
-  <O>(template: ThisType<Timer<O>> & TimerTemplate & Partial<Omit<Timer<O>, keyof TimerTemplate>>): PropertyDecorator;
-}
-
-/** @public */
-export type TimerDef<O, R extends TimerRefinement = {}> =
-  Timer<O> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function TimerDef<P extends Timer<any>>(
-  template: P extends TimerDef<infer O, infer R>
-          ? ThisType<TimerDef<O, R>>
-          & TimerTemplate
-          & Partial<Omit<Timer<O>, keyof TimerTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof TimerTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return Timer(template);
+  <F2 extends F>(template: TimerTemplate<F2>): PropertyDecorator;
 }
 
 /** @public */

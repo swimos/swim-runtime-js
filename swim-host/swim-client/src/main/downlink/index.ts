@@ -16,62 +16,57 @@ export {WarpDownlinkContext} from "./WarpDownlinkContext";
 
 export {WarpDownlinkModel} from "./WarpDownlinkModel";
 export {
-  WarpDownlinkRefinement,
+  WarpDownlinkDescriptor,
   WarpDownlinkTemplate,
   WarpDownlinkClass,
-  WarpDownlinkDef,
   WarpDownlink,
 } from "./WarpDownlink";
 export {WarpDownlinkObserver} from "./WarpDownlinkObserver";
 
 export {EventDownlinkModel} from "./EventDownlinkModel";
 export {
-  EventDownlinkRefinement,
+  EventDownlinkDescriptor,
   EventDownlinkTemplate,
   EventDownlinkClass,
-  EventDownlinkDef,
   EventDownlink,
 } from "./EventDownlink";
 export {EventDownlinkObserver} from "./EventDownlinkObserver";
 
 export {ValueDownlinkModel} from "./ValueDownlinkModel";
 export {
-  ValueDownlinkRefinement,
   ValueDownlinkValue,
   ValueDownlinkValueInit,
   AnyValueDownlinkValue,
+  ValueDownlinkDescriptor,
   ValueDownlinkTemplate,
   ValueDownlinkClass,
-  ValueDownlinkDef,
   ValueDownlink,
 } from "./ValueDownlink";
 export {ValueDownlinkObserver} from "./ValueDownlinkObserver";
 
 export {ListDownlinkModel} from "./ListDownlinkModel";
 export {
-  ListDownlinkRefinement,
   ListDownlinkValue,
   ListDownlinkValueInit,
   AnyListDownlinkValue,
+  ListDownlinkDescriptor,
   ListDownlinkTemplate,
   ListDownlinkClass,
-  ListDownlinkDef,
   ListDownlink,
 } from "./ListDownlink";
 export {ListDownlinkObserver} from "./ListDownlinkObserver";
 
 export {MapDownlinkModel} from "./MapDownlinkModel";
 export {
-  MapDownlinkRefinement,
   MapDownlinkKey,
   MapDownlinkValue,
   MapDownlinkKeyInit,
   MapDownlinkValueInit,
   AnyMapDownlinkKey,
   AnyMapDownlinkValue,
+  MapDownlinkDescriptor,
   MapDownlinkTemplate,
   MapDownlinkClass,
-  MapDownlinkDef,
   MapDownlink,
 } from "./MapDownlink";
 export {MapDownlinkObserver} from "./MapDownlinkObserver";

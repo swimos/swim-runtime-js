@@ -13,12 +13,11 @@
 // limitations under the License.
 
 export {
-  PropertyRefinement,
   PropertyValue,
   PropertyValueInit,
   AnyPropertyValue,
+  PropertyDescriptor,
   PropertyTemplate,
   PropertyClass,
-  PropertyDef,
   Property,
 } from "./Property";

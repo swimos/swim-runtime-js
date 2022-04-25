@@ -34,7 +34,7 @@ export class AnimatorSpec extends Spec {
 
   @Test
   testAnimatorDefine(exam: Exam): void {
-    const testAnimator = Animator.specify("foo", {valueType: Number, value: 0});
+    const testAnimator = Animator.define("foo", {valueType: Number, value: 0});
     const animator = testAnimator.create(null);
     exam.equal(animator.name, "foo");
     exam.equal(animator.value, 0);
@@ -138,7 +138,7 @@ export class AnimatorSpec extends Spec {
 
   @Test
   testAnimatorTweening(exam: Exam): void {
-    const testAnimator = Animator.specify("foo", {valueType: Number, value: 0});
+    const testAnimator = Animator.define("foo", {valueType: Number, value: 0});
     const animator = testAnimator.create(null);
     exam.equal(animator.name, "foo");
     exam.equal(animator.value, 0);

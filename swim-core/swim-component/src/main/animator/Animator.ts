@@ -15,51 +15,50 @@
 import {Mutable, Proto, AnyTiming, Timing, Easing, Interpolator} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
 import type {FastenerFlags, FastenerOwner} from "../fastener/Fastener";
-import {PropertyRefinement, PropertyTemplate, PropertyClass, Property} from "../property/Property";
+import {PropertyDescriptor, PropertyClass, Property} from "../property/Property";
 
 /** @public */
-export interface AnimatorRefinement extends PropertyRefinement {
-}
+export type AnimatorValue<A extends Animator<any, any, any>> =
+  A extends {value: infer T} ? T : never;
 
 /** @public */
-export type AnimatorValue<R extends AnimatorRefinement, D = unknown> =
-  R extends {value: infer T} ? T :
-  R extends {extends: infer E} ? AnimatorValue<E, D> :
-  D;
+export type AnimatorValueInit<A extends Animator<any, any, any>> =
+  A extends {valueInit?: infer U} ? U : never;
 
 /** @public */
-export type AnimatorValueInit<R extends AnimatorRefinement, D = AnimatorValue<R>> =
-  R extends {valueInit: infer U} ? U :
-  R extends {valueInit?: infer U} ? U :
-  R extends {extends: infer E} ? AnimatorValueInit<E, D> :
-  D;
+export type AnyAnimatorValue<A extends Animator<any, any, any>> =
+  AnimatorValue<A> | AnimatorValueInit<A>;
 
 /** @public */
-export type AnyAnimatorValue<R extends AnimatorRefinement> =
-  AnimatorValue<R> | AnimatorValueInit<R>;
-
-/** @public */
-export interface AnimatorTemplate<T = unknown, U = T> extends PropertyTemplate<T, U> {
+export interface AnimatorDescriptor<T = unknown, U = T> extends PropertyDescriptor<T, U> {
   extends?: Proto<Animator<any, any, any>> | string | boolean | null;
   transition?: Timing | null;
 }
 
 /** @public */
-export interface AnimatorClass<A extends Animator<any, any> = Animator<any, any>> extends PropertyClass<A> {
+export type AnimatorTemplate<A extends Animator<any, any, any>> =
+  ThisType<A> &
+  AnimatorDescriptor<AnimatorValue<A>, AnimatorValueInit<A>> &
+  Partial<Omit<A, keyof AnimatorDescriptor>>;
+
+/** @public */
+export interface AnimatorClass<A extends Animator<any, any, any> = Animator<any, any, any>> extends PropertyClass<A> {
   /** @override */
-  specialize(className: string, template: AnimatorTemplate): AnimatorClass;
+  specialize(template: AnimatorDescriptor<any, any>): AnimatorClass<A>;
 
   /** @override */
-  refine(animatorClass: AnimatorClass): void;
+  refine(animatorClass: AnimatorClass<any>): void;
 
   /** @override */
-  extend(className: string, template: AnimatorTemplate): AnimatorClass<A>;
+  extend<A2 extends A>(className: string, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
+  extend<A2 extends A>(className: string, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
 
   /** @override */
-  specify<O, T = unknown, U = T>(className: string, template: ThisType<Animator<O, T, U>> & AnimatorTemplate<T, U> & Partial<Omit<Animator<O, T, U>, keyof AnimatorTemplate>>): AnimatorClass<A>;
+  define<A2 extends A>(className: string, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
+  define<A2 extends A>(className: string, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
 
   /** @override */
-  <O, T = unknown, U = T>(template: ThisType<Animator<O, T, U>> & AnimatorTemplate<T, U> & Partial<Omit<Animator<O, T, U>, keyof AnimatorTemplate>>): PropertyDecorator;
+  <A2 extends A>(template: AnimatorTemplate<A2>): PropertyDecorator;
 
   /** @internal */
   readonly TweeningFlag: FastenerFlags;
@@ -72,28 +71,6 @@ export interface AnimatorClass<A extends Animator<any, any> = Animator<any, any>
   readonly FlagShift: number;
   /** @internal @override */
   readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
-export type AnimatorDef<O, R extends AnimatorRefinement = {}> =
-  Animator<O, AnimatorValue<R>, AnimatorValueInit<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function AnimatorDef<A extends Animator<any, any, any>>(
-  template: A extends AnimatorDef<infer O, infer R>
-          ? ThisType<AnimatorDef<O, R>>
-          & AnimatorTemplate<AnimatorValue<R>, AnimatorValueInit<R>>
-          & Partial<Omit<Animator<O, AnimatorValue<R>, AnimatorValueInit<R>>, keyof AnimatorTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof AnimatorTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return Animator(template);
 }
 
 /** @public */
@@ -581,7 +558,7 @@ export const Animator = (function (_super: typeof Property) {
     // hook
   };
 
-  Animator.construct = function <A extends Animator<any, any>>(animator: A | null, owner: FastenerOwner<A>): A {
+  Animator.construct = function <A extends Animator<any, any, any>>(animator: A | null, owner: FastenerOwner<A>): A {
     if (animator === null) {
       animator = function (state?: AnimatorValueInit<A>, timing?: Affinity | AnyTiming | boolean | null, affinity?: Affinity): AnimatorValue<A> | FastenerOwner<A> {
         if (arguments.length === 0) {

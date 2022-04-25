@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Mutable, Arrays} from "@swim/util";
-import {PropertyDef, ComponentFlags, Component} from "@swim/component";
+import {Property, ComponentFlags, Component} from "@swim/component";
 import type {Uri} from "@swim/uri";
 import {AnyValue, Value} from "@swim/structure";
 import {
@@ -76,8 +76,8 @@ export class WarpDownlinkModel extends Component {
     return false;
   }
 
-  @PropertyDef({valueType: Boolean, value: true, inherits: true})
-  readonly online!: PropertyDef<this, {value: boolean}>;
+  @Property({valueType: Boolean, value: true, inherits: true})
+  readonly online!: Property<this, boolean>;
 
   get connected(): boolean {
     return (this.flags & WarpDownlinkModel.ConnectedFlag) !== 0;
@@ -203,8 +203,8 @@ export class WarpDownlinkModel extends Component {
     // hook
   }
 
-  @PropertyDef({valueType: Value, value: Value.absent(), inherits: true})
-  readonly session!: PropertyDef<this, {value: Value, valueInit: AnyValue}>;
+  @Property({valueType: Value, value: Value.absent(), inherits: true})
+  readonly session!: Property<this, Value, AnyValue>;
 
   addDownlink(view: WarpDownlink): void {
     (this as Mutable<this>).views = Arrays.inserted(view, this.views);
@@ -261,8 +261,8 @@ export class WarpDownlinkModel extends Component {
     }
   }
 
-  @PropertyDef({valueType: Number, value: 0, inherits: true})
-  readonly unlinkDelay!: PropertyDef<this, {value: number}>;
+  @Property({valueType: Number, value: 0, inherits: true})
+  readonly unlinkDelay!: Property<this, number>;
 
   command(body: AnyValue): void {
     const host = this.getSuper(WarpHost);

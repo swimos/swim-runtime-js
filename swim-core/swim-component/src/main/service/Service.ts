@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Class, Proto, Arrays, ObserverType, Observable, ObserverMethods, ObserverParameters} from "@swim/util";
+import {Mutable, Class, Proto, Arrays, Observes, Observable, ObserverMethods, ObserverParameters} from "@swim/util";
 import {FastenerContext} from "../fastener/FastenerContext";
 import type {Fastener} from "../fastener/Fastener";
 import type {ServiceObserver} from "./ServiceObserver";
@@ -340,10 +340,10 @@ export class Service<R> implements FastenerContext, Observable {
   }
 
   /** @internal */
-  readonly observers: ReadonlyArray<ObserverType<this>>;
+  readonly observers: ReadonlyArray<Observes<this>>;
 
   /** @override */
-  observe(observer: ObserverType<this>): void {
+  observe(observer: Observes<this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.inserted(observer, oldObservers);
     if (oldObservers !== newObservers) {
@@ -354,20 +354,20 @@ export class Service<R> implements FastenerContext, Observable {
     }
   }
 
-  protected willObserve(observer: ObserverType<this>): void {
+  protected willObserve(observer: Observes<this>): void {
     // hook
   }
 
-  protected onObserve(observer: ObserverType<this>): void {
+  protected onObserve(observer: Observes<this>): void {
     // hook
   }
 
-  protected didObserve(observer: ObserverType<this>): void {
+  protected didObserve(observer: Observes<this>): void {
     // hook
   }
 
   /** @override */
-  unobserve(observer: ObserverType<this>): void {
+  unobserve(observer: Observes<this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.removed(observer, oldObservers);
     if (oldObservers !== newObservers) {
@@ -378,15 +378,15 @@ export class Service<R> implements FastenerContext, Observable {
     }
   }
 
-  protected willUnobserve(observer: ObserverType<this>): void {
+  protected willUnobserve(observer: Observes<this>): void {
     // hook
   }
 
-  protected onUnobserve(observer: ObserverType<this>): void {
+  protected onUnobserve(observer: Observes<this>): void {
     // hook
   }
 
-  protected didUnobserve(observer: ObserverType<this>): void {
+  protected didUnobserve(observer: Observes<this>): void {
     // hook
   }
 

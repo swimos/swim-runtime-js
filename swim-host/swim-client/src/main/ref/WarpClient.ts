@@ -14,7 +14,7 @@
 
 import * as ws from "ws";
 import {Class, Lazy} from "@swim/util";
-import {Affinity, PropertyDef, Component} from "@swim/component";
+import {Affinity, Property, Component} from "@swim/component";
 import {AnyValue, Value} from "@swim/structure";
 import {AnyUri, Uri} from "@swim/uri";
 import webworker from "@swim/client/webworker";
@@ -147,30 +147,30 @@ export class WarpClient extends WarpScope {
     return host;
   }
 
-  @PropertyDef({valueType: Number, value: 1024})
-  readonly sendBufferSize!: PropertyDef<this, {value: number}>;
+  @Property({valueType: Number, value: 1024})
+  readonly sendBufferSize!: Property<this, number>;
 
-  @PropertyDef({valueType: Number, value: 30 * 1000})
-  readonly maxReconnectTimeout!: PropertyDef<this, {value: number}>;
+  @Property({valueType: Number, value: 30 * 1000})
+  readonly maxReconnectTimeout!: Property<this, number>;
 
-  @PropertyDef({valueType: Number, value: 1000})
-  readonly idleTimeout!: PropertyDef<this, {value: number}>;
+  @Property({valueType: Number, value: 1000})
+  readonly idleTimeout!: Property<this, number>;
 
-  @PropertyDef({valueType: Number, value: 0})
-  readonly unlinkDelay!: PropertyDef<this, {value: number}>;
+  @Property({valueType: Number, value: 0})
+  readonly unlinkDelay!: Property<this, number>;
 
-  @PropertyDef<WarpClient["wsConstructor"]>({
+  @Property<WarpClient["wsConstructor"]>({
     value: typeof WebSocket !== "undefined" ? WebSocket : ws.WebSocket as typeof WebSocket,
     equalValues(newValue: typeof WebSocket, oldValue: typeof WebSocket): boolean {
       return newValue === oldValue;
     },
   })
-  readonly wsConstructor!: PropertyDef<this, {value: typeof WebSocket}>;
+  readonly wsConstructor!: Property<this, typeof WebSocket>;
 
-  @PropertyDef({})
-  readonly wsProtocols!: PropertyDef<this, {value: string[] | string | undefined}>;
+  @Property({})
+  readonly wsProtocols!: Property<this, string[] | string | undefined>;
 
-  @PropertyDef<WarpClient["workerUrl"]>({
+  @Property<WarpClient["workerUrl"]>({
     valueType: String,
     initValue(): string | undefined {
       if (webworker !== void 0 && typeof Blob !== "undefined") {
@@ -181,7 +181,7 @@ export class WarpClient extends WarpScope {
       }
     },
   })
-  readonly workerUrl!: PropertyDef<this, {value: string | undefined}>;
+  readonly workerUrl!: Property<this, string | undefined>;
 
   /** @internal */
   hostDidConnect(host: WarpHost): void {
@@ -232,18 +232,16 @@ export class WarpClient extends WarpScope {
     host.unobserve(this);
   }
 
-  @PropertyDef<WarpClient["warpRef"]>({
+  @Property<WarpClient["warpRef"]>({
     extends: WarpScope.getFastenerClass("warpRef"),
     inherits: false,
     initValue(): WarpRef {
       return this.owner;
     },
   })
-  override readonly warpRef!: PropertyDef<this, {
-    extends: WarpScope["warpRef"],
-  }>;
+  override readonly warpRef!: Property<this, WarpRef> & WarpScope["warpRef"];
 
-  @PropertyDef<WarpClient["online"]>({
+  @Property<WarpClient["online"]>({
     extends: WarpScope.getFastenerClass("online"),
     inherits: false,
     initValue(): boolean {
@@ -265,9 +263,7 @@ export class WarpClient extends WarpScope {
       }
     },
   })
-  override readonly online!: PropertyDef<this, {
-    extends: WarpScope["online"],
-  }>;
+  override readonly online!: Property<this, boolean> & WarpScope["online"];
 
   /** @internal */
   protected onOnline(event: Event): void {

@@ -13,10 +13,9 @@
 // limitations under the License.
 
 export {
-  ProviderRefinement,
   ProviderService,
+  ProviderDescriptor,
   ProviderTemplate,
   ProviderClass,
-  ProviderDef,
   Provider,
 } from "./Provider";

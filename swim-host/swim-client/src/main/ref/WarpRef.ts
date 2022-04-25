@@ -22,13 +22,13 @@ import type {MapDownlinkTemplate, MapDownlink} from "../downlink/MapDownlink";
 
 /** @public */
 export interface WarpRef extends WarpDownlinkContext {
-  downlink(template?: ThisType<EventDownlink<this>> & EventDownlinkTemplate & Partial<Omit<EventDownlink<this>, keyof EventDownlinkTemplate>>): EventDownlink<this>;
+  downlink(template?: EventDownlinkTemplate<EventDownlink<this>>): EventDownlink<this>;
 
-  downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ValueDownlink<this, V, VU>> & ValueDownlinkTemplate<V, VU> & Partial<Omit<ValueDownlink<this, V, VU>, keyof ValueDownlinkTemplate>>): ValueDownlink<this, V, VU>;
+  downlinkValue<V = Value, VU = V extends Value ? AnyValue & V : V>(template?: ValueDownlinkTemplate<ValueDownlink<this, V, VU>>): ValueDownlink<this, V, VU>;
 
-  downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ListDownlink<this, V, VU>> & ListDownlinkTemplate<V, VU> & Partial<Omit<ListDownlink<this, V, VU>, keyof ListDownlinkTemplate>>): ListDownlink<this, V, VU>;
+  downlinkList<V = Value, VU = V extends Value ? AnyValue & V : V>(template?: ListDownlinkTemplate<ListDownlink<this, V, VU>>): ListDownlink<this, V, VU>;
 
-  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: ThisType<MapDownlink<this, K, V, KU, VU>> & MapDownlinkTemplate<V, VU> & Partial<Omit<MapDownlink<this, K, V, KU, VU>, keyof MapDownlinkTemplate>>): MapDownlink<this, K, V, KU, VU>;
+  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue & K : K, VU = V extends Value ? AnyValue & V : V>(template?: MapDownlinkTemplate<MapDownlink<this, K, V, KU, VU>>): MapDownlink<this, K, V, KU, VU>;
 
   command(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
   command(nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;

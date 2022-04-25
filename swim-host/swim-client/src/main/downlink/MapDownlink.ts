@@ -17,54 +17,36 @@ import type {FastenerOwner} from "@swim/component";
 import type {BTree} from "@swim/collections";
 import {AnyValue, Value, Form, ValueCursor, ValueEntryCursor} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
-import {WarpDownlinkRefinement, WarpDownlinkTemplate, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
+import {WarpDownlinkDescriptor, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
 import {MapDownlinkModel} from "./MapDownlinkModel";
 import type {MapDownlinkObserver} from "./MapDownlinkObserver";
 
 /** @public */
-export interface MapDownlinkRefinement extends WarpDownlinkRefinement {
-  key?: unknown;
-  keyInit?: unknown;
-  value?: unknown;
-  valueInit?: unknown;
-}
+export type MapDownlinkKey<D extends MapDownlink<any, any, any, any, any>> =
+  D extends {key: infer K} ? K : never;
 
 /** @public */
-export type MapDownlinkKey<R extends MapDownlinkRefinement, D = Value> =
-  R extends {key: infer K} ? K :
-  R extends {extends: infer E} ? MapDownlinkKey<E, D> :
-  D;
+export type MapDownlinkValue<D extends MapDownlink<any, any, any, any, any>> =
+  D extends {value: infer V} ? V : never;
 
 /** @public */
-export type MapDownlinkValue<R extends MapDownlinkRefinement, D = Value> =
-  R extends {value: infer V} ? V :
-  R extends {extends: infer E} ? MapDownlinkValue<E, D> :
-  D;
+export type MapDownlinkKeyInit<D extends MapDownlink<any, any, any, any, any>> =
+  D extends {keyInit?: infer KU} ? KU : never;
 
 /** @public */
-export type MapDownlinkKeyInit<R extends MapDownlinkRefinement, D = MapDownlinkValue<R, AnyValue>> =
-  R extends {keyInit: infer KU} ? KU :
-  R extends {keyInit?: infer KU} ? KU :
-  R extends {extends: infer E} ? MapDownlinkKeyInit<E, D> :
-  D;
+export type MapDownlinkValueInit<D extends MapDownlink<any, any, any, any, any>> =
+  D extends {valueInit?: infer VU} ? VU : never;
 
 /** @public */
-export type MapDownlinkValueInit<R extends MapDownlinkRefinement, D = MapDownlinkValue<R, AnyValue>> =
-  R extends {valueInit: infer VU} ? VU :
-  R extends {valueInit?: infer VU} ? VU :
-  R extends {extends: infer E} ? MapDownlinkValueInit<E, D> :
-  D;
+export type AnyMapDownlinkKey<D extends MapDownlink<any, any, any, any, any>> =
+  MapDownlinkKey<D> | MapDownlinkKeyInit<D>;
 
 /** @public */
-export type AnyMapDownlinkKey<R extends MapDownlinkRefinement> =
-  MapDownlinkKey<R> | MapDownlinkKeyInit<R>;
+export type AnyMapDownlinkValue<D extends MapDownlink<any, any, any, any, any>> =
+  MapDownlinkValue<D> | MapDownlinkValueInit<D>;
 
 /** @public */
-export type AnyMapDownlinkValue<R extends MapDownlinkRefinement> =
-  MapDownlinkValue<R> | MapDownlinkValueInit<R>;
-
-/** @public */
-export interface MapDownlinkTemplate<K = unknown, V = unknown, KU = K, VU = V> extends WarpDownlinkTemplate {
+export interface MapDownlinkDescriptor<K = unknown, V = unknown, KU = K, VU = V> extends WarpDownlinkDescriptor {
   extends?: Proto<MapDownlink<any, any, any, any, any>> | string | boolean | null;
   keyForm?: Form<K, KU>;
   valueForm?: Form<V, VU>;
@@ -73,47 +55,33 @@ export interface MapDownlinkTemplate<K = unknown, V = unknown, KU = K, VU = V> e
 }
 
 /** @public */
+export type MapDownlinkTemplate<D extends MapDownlink<any, any, any, any, any>> =
+  ThisType<D> &
+  MapDownlinkDescriptor<MapDownlinkKey<D>, MapDownlinkValue<D>, MapDownlinkKeyInit<D>, MapDownlinkValueInit<D>> &
+  Partial<Omit<D, keyof MapDownlinkDescriptor>>;
+
+/** @public */
 export interface MapDownlinkClass<D extends MapDownlink<any, any, any, any, any> = MapDownlink<any, any, any, any, any>> extends WarpDownlinkClass<D> {
   /** @override */
-  specialize(className: string, template: MapDownlinkTemplate): MapDownlinkClass;
+  specialize(template: MapDownlinkDescriptor<any>): MapDownlinkClass<D>;
 
   /** @override */
-  refine(downlinkClass: MapDownlinkClass): void;
+  refine(downlinkClass: MapDownlinkClass<any>): void;
 
   /** @override */
-  extend(className: string, template: MapDownlinkTemplate): MapDownlinkClass<D>;
+  extend<D2 extends D>(className: string, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
+  extend<D2 extends D>(className: string, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
 
   /** @override */
-  specify<O, K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(className: string, template: ThisType<MapDownlink<O, K, V, KU, VU>> & MapDownlinkTemplate<V, VU> & Partial<Omit<MapDownlink<O, K, V, KU, VU>, keyof MapDownlinkTemplate>>): MapDownlinkClass<D>;
+  define<D2 extends D>(className: string, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
+  define<D2 extends D>(className: string, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
 
   /** @override */
-  <O, K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template: ThisType<MapDownlink<O, K, V, KU, VU>> & MapDownlinkTemplate<V, VU> & Partial<Omit<MapDownlink<O, K, V, KU, VU>, keyof MapDownlinkTemplate>>): PropertyDecorator;
+  <D2 extends D>(template: MapDownlinkTemplate<D2>): PropertyDecorator;
 }
 
 /** @public */
-export type MapDownlinkDef<O, R extends MapDownlinkRefinement = {}> =
-  MapDownlink<O, MapDownlinkKey<R>, MapDownlinkValue<R>, MapDownlinkKeyInit<R>, MapDownlinkValueInit<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function MapDownlinkDef<D extends MapDownlink<any, any, any, any, any>>(
-  template: D extends MapDownlinkDef<infer O, infer R>
-          ? ThisType<MapDownlinkDef<O, R>>
-          & MapDownlinkTemplate<MapDownlinkKey<R>, MapDownlinkValue<R>, MapDownlinkKeyInit<R>, MapDownlinkValueInit<R>>
-          & Partial<Omit<MapDownlink<O, MapDownlinkKey<R>, MapDownlinkValue<R>, MapDownlinkKeyInit<R>, MapDownlinkValueInit<R>>, keyof MapDownlinkTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof MapDownlinkTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return MapDownlink(template);
-}
-
-/** @public */
-export interface MapDownlink<O = unknown, K = unknown, V = unknown, KU = K, VU = V> extends WarpDownlink<O>, OrderedMap<K, V> {
+export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends Value ? AnyValue & K : K, VU = V extends Value ? AnyValue & V : V> extends WarpDownlink<O>, OrderedMap<K, V> {
   (key: K | KU): V | undefined;
   (key: K | KU, value: V | VU): O;
 
@@ -138,16 +106,16 @@ export interface MapDownlink<O = unknown, K = unknown, V = unknown, KU = K, VU =
   setValueForm(valueForm: Form<V, VU>): this;
 
   /** @internal */
-  readonly key?: K; // refinement
+  readonly key?: K; // for type destructuring
 
   /** @internal */
-  readonly keyInit?: KU; // refinement
+  readonly keyInit?: KU; // for type destructuring
 
   /** @internal */
-  readonly value?: V; // refinement
+  readonly value?: V; // for type destructuring
 
   /** @internal */
-  readonly valueInit?: VU; // refinement
+  readonly valueInit?: VU; // for type destructuring
 
   /** @internal */
   readonly stateInit?: BTree<Value, Value> | null; // optional prototype property

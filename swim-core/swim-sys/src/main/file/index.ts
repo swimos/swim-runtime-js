@@ -13,19 +13,17 @@
 // limitations under the License.
 
 export {
-  FileRelationRefinement,
   FileRelationValue,
+  FileRelationDescriptor,
   FileRelationTemplate,
   FileRelationClass,
-  FileRelationDef,
   FileRelation,
 } from "./FileRelation";
 
 export {
-  FileRefRefinement,
   FileRefValue,
+  FileRefDescriptor,
   FileRefTemplate,
   FileRefClass,
-  FileRefDef,
   FileRef,
 } from "./FileRef";

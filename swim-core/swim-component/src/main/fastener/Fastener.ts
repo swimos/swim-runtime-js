@@ -24,14 +24,7 @@ export type FastenerOwner<F> =
   F extends Fastener<infer O> ? O : never;
 
 /** @public */
-export interface FastenerRefinement {
-  extends?: unknown;
-  defines?: unknown;
-  implements?: unknown;
-}
-
-/** @public */
-export interface FastenerTemplate {
+export interface FastenerDescriptor {
   extends?: Proto<Fastener<any>> | string | boolean | null;
   name?: string;
   lazy?: boolean;
@@ -44,7 +37,13 @@ export interface FastenerTemplate {
 }
 
 /** @public */
-export interface FastenerClass<F extends Fastener<any> = Fastener<any>> extends Function {
+export type FastenerTemplate<F extends Fastener<any>> =
+  ThisType<F> &
+  FastenerDescriptor &
+  Partial<Omit<F, keyof FastenerDescriptor>>;
+
+/** @public */
+export interface FastenerClass<F extends Fastener<any> = Fastener<any>> {
   /** @internal */
   prototype: F;
 
@@ -53,23 +52,26 @@ export interface FastenerClass<F extends Fastener<any> = Fastener<any>> extends 
 
   create(owner: FastenerOwner<F>): F;
 
+  /** @protected */
   construct(fastener: F | null, owner: FastenerOwner<F>): F;
 
-  specialize(className: string, template: FastenerTemplate): FastenerClass;
+  /** @internal */
+  declare(className: string): FastenerClass<F>;
 
   /** @internal */
-  declare(className: string): FastenerClass;
+  implement(fastenerClass: FastenerClass<any>, template: FastenerDescriptor): void;
 
-  /** @internal */
-  define(fastenerClass: FastenerClass, template: FastenerTemplate): void;
+  specialize(template: FastenerDescriptor): FastenerClass<F>;
 
-  refine(fastenerClass: FastenerClass): void;
+  refine(fastenerClass: FastenerClass<any>): void;
 
-  extend(className: string, template: FastenerTemplate): FastenerClass<F>;
+  extend<F2 extends F>(className: string, template: FastenerTemplate<F2>): FastenerClass<F2>;
+  extend<F2 extends F>(className: string, template: FastenerTemplate<F2>): FastenerClass<F2>;
 
-  specify<O>(className: string, template: ThisType<Fastener<O>> & FastenerTemplate & Partial<Omit<Fastener<O>, keyof FastenerTemplate>>): FastenerClass<F>;
+  define<F2 extends F>(className: string, template: FastenerTemplate<F2>): FastenerClass<F2>;
+  define<F2 extends F>(className: string, template: FastenerTemplate<F2>): FastenerClass<F2>;
 
-  <O>(template: ThisType<Fastener<O>> & FastenerTemplate & Partial<Omit<Fastener<O>, keyof FastenerTemplate>>): PropertyDecorator;
+  <F2 extends F>(template: FastenerTemplate<F2>): PropertyDecorator;
 
   /** @internal */
   readonly MountedFlag: FastenerFlags;
@@ -84,28 +86,6 @@ export interface FastenerClass<F extends Fastener<any> = Fastener<any>> extends 
   readonly FlagShift: number;
   /** @internal */
   readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
-export type FastenerDef<O, R extends FastenerRefinement = {}> =
-  Fastener<O> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function FastenerDef<P extends Fastener<any>>(
-  template: P extends FastenerDef<infer O, infer R>
-          ? ThisType<FastenerDef<O, R>>
-          & FastenerTemplate
-          & Partial<Omit<Fastener<O>, keyof FastenerTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof FastenerTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return Fastener(template);
 }
 
 /** @public */
@@ -278,7 +258,7 @@ export interface Fastener<O = unknown> {
 
 /** @public */
 export const Fastener = (function (_super: typeof Object) {
-  const Fastener = function (template: FastenerTemplate): PropertyDecorator {
+  const Fastener = function (template: FastenerDescriptor): PropertyDecorator {
     return FastenerContext.decorator(Fastener, template);
   } as FastenerClass;
 
@@ -663,14 +643,6 @@ export const Fastener = (function (_super: typeof Object) {
     return fastener;
   };
 
-  Fastener.specialize = function (className: string, template: FastenerTemplate): FastenerClass {
-    let superClass = template.extends as FastenerClass | null | undefined;
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
-    }
-    return superClass
-  };
-
   Fastener.declare = function (className: string): FastenerClass {
     let fastenerClass: FastenerClass;
     if (Identifiers.isValid(className)) {
@@ -678,7 +650,7 @@ export const Fastener = (function (_super: typeof Object) {
         "return function " + className + "(template) { return FastenerContext.decorator(" + className + ", template); }"
       )(FastenerContext);
     } else {
-      fastenerClass = function (template: FastenerTemplate): PropertyDecorator {
+      fastenerClass = function (template: FastenerDescriptor): PropertyDecorator {
         return FastenerContext.decorator(fastenerClass, template);
       } as FastenerClass;
       Object.defineProperty(fastenerClass, "name", {
@@ -690,7 +662,7 @@ export const Fastener = (function (_super: typeof Object) {
     return fastenerClass;
   };
 
-  Fastener.define = function (fastenerClass: FastenerClass, template: FastenerTemplate): void {
+  Fastener.implement = function (fastenerClass: FastenerClass<any>, template: FastenerDescriptor): void {
     const properties: PropertyDescriptorMap = {};
     properties.name = {
       value: fastenerClass.name,
@@ -709,7 +681,15 @@ export const Fastener = (function (_super: typeof Object) {
     fastenerClass.prototype.constructor = fastenerClass;
   };
 
-  Fastener.refine = function (fastenerClass: FastenerClass): void {
+  Fastener.specialize = function (template: FastenerDescriptor): FastenerClass {
+    let superClass = template.extends as FastenerClass | null | undefined;
+    if (superClass === void 0 || superClass === null) {
+      superClass = this;
+    }
+    return superClass
+  };
+
+  Fastener.refine = function (fastenerClass: FastenerClass<any>): void {
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;
 
@@ -718,7 +698,7 @@ export const Fastener = (function (_super: typeof Object) {
         flagsInit = 0;
       }
       flagsInit = flagsInit & ~Affinity.Mask | fastenerPrototype.affinity & Affinity.Mask;
-      delete (fastenerPrototype as FastenerTemplate).affinity;
+      delete (fastenerPrototype as FastenerDescriptor).affinity;
     }
 
     if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "inherits")) {
@@ -739,7 +719,7 @@ export const Fastener = (function (_super: typeof Object) {
       } else {
         flagsInit &= ~Fastener.InheritsFlag;
       }
-      delete (fastenerPrototype as FastenerTemplate).inherits;
+      delete (fastenerPrototype as FastenerDescriptor).inherits;
     }
 
     if (flagsInit !== void 0) {
@@ -750,18 +730,18 @@ export const Fastener = (function (_super: typeof Object) {
     }
   };
 
-  Fastener.extend = function (className: string, template: FastenerTemplate): FastenerClass {
+  Fastener.extend = function <F extends Fastener<any>>(className: string, template: FastenerTemplate<F>): FastenerClass<F> {
     if (template.name !== void 0) {
       className = template.name;
     }
-    const fastenerClass = this.declare(className);
-    this.define(fastenerClass, template);
+    const fastenerClass = this.declare(className) as FastenerClass<F>;
+    this.implement(fastenerClass, template);
     this.refine(fastenerClass);
     return fastenerClass;
   };
 
-  Fastener.specify = function <O>(className: string, template: FastenerTemplate): FastenerClass {
-    const superClass = this.specialize(className, template);
+  Fastener.define = function <F extends Fastener<any>>(className: string, template: FastenerTemplate<F>): FastenerClass<F> {
+    const superClass = this.specialize(template);
     return superClass.extend(className, template);
   };
 

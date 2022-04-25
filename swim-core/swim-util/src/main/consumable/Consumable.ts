@@ -16,16 +16,16 @@ import type {Class} from "../types/Class";
 import type {Consumer} from "./Consumer";
 
 /** @public */
-export type ConsumerType<O> =
+export type Consumes<O> =
   O extends {readonly consumerType?: Class<infer T>} ? T : never;
 
 /** @public */
 export interface Consumable {
   readonly consumerType?: Class<Consumer>;
 
-  consume(consumer: ConsumerType<this>): void;
+  consume(consumer: Consumes<this>): void;
 
-  unconsume(consumer: ConsumerType<this>): void;
+  unconsume(consumer: Consumes<this>): void;
 }
 
 /** @public */

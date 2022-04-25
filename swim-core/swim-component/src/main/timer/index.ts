@@ -13,9 +13,8 @@
 // limitations under the License.
 
 export {
-  TimerRefinement,
+  TimerDescriptor,
   TimerTemplate,
   TimerClass,
-  TimerDef,
   Timer,
 } from "./Timer";

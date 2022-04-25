@@ -12,32 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Proto, Observable, ObserverType} from "@swim/util";
+import {Mutable, Proto, Observable, Observes} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
-import {
-  FastenerOwner,
-  FastenerRefinement,
-  FastenerTemplate,
-  FastenerClass,
-  Fastener,
-} from "../fastener/Fastener";
+import {FastenerOwner, FastenerDescriptor, FastenerClass, Fastener} from "../fastener/Fastener";
 import {Service} from "../service/Service";
 
 /** @public */
-export interface ProviderRefinement extends FastenerRefinement {
-  service?: unknown;
-  observes?: unknown;
-}
+export type ProviderService<P extends Provider<any, any>> =
+  P extends {service: infer S | null} ? S : never;
 
 /** @public */
-export type ProviderService<R extends ProviderRefinement | Provider<any, any>, D = unknown> =
-  R extends {service: infer S} ? S :
-  R extends {extends: infer E} ? ProviderService<E, D> :
-  R extends Provider<any, infer S> ? S :
-  D;
-
-/** @public */
-export interface ProviderTemplate<S = unknown> extends FastenerTemplate {
+export interface ProviderDescriptor<S = unknown> extends FastenerDescriptor {
   extends?: Proto<Provider<any, any>> | string | boolean | null;
   serviceType?: unknown;
   service?: S;
@@ -45,45 +30,29 @@ export interface ProviderTemplate<S = unknown> extends FastenerTemplate {
 }
 
 /** @public */
+export type ProviderTemplate<P extends Provider<any, any>> =
+  ThisType<P> &
+  ProviderDescriptor<ProviderService<P>> &
+  Partial<Omit<P, keyof ProviderDescriptor>>;
+
+/** @public */
 export interface ProviderClass<P extends Provider<any, any> = Provider<any, any>> extends FastenerClass<P> {
   /** @override */
-  specialize(className: string, template: ProviderTemplate): ProviderClass;
+  specialize(template: ProviderDescriptor<any>): ProviderClass<P>;
 
   /** @override */
-  refine(providerClass: ProviderClass): void;
+  refine(providerClass: ProviderClass<any>): void;
 
   /** @override */
-  extend(className: string, template: ProviderTemplate): ProviderClass<P>;
+  extend<P2 extends P>(className: string, template: ProviderTemplate<P2>): ProviderClass<P2>;
+  extend<P2 extends P>(className: string, template: ProviderTemplate<P2>): ProviderClass<P2>;
 
   /** @override */
-  specify<O, S = unknown>(className: string, template: ThisType<Provider<O, S>> & ProviderTemplate<S> & Partial<Omit<Provider<O, S>, keyof ProviderTemplate>>): ProviderClass<P>;
+  define<P2 extends P>(className: string, template: ProviderTemplate<P2>): ProviderClass<P2>;
+  define<P2 extends P>(className: string, template: ProviderTemplate<P2>): ProviderClass<P2>;
 
   /** @override */
-  <O, S = unknown>(template: ThisType<Provider<O, S>> & ProviderTemplate<S> & Partial<Omit<Provider<O, S>, keyof ProviderTemplate>>): PropertyDecorator;
-}
-
-/** @public */
-export type ProviderDef<O, R extends ProviderRefinement = {}> =
-  Provider<O, ProviderService<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {}) &
-  (R extends {observes: infer B} ? ObserverType<B extends boolean ? ProviderService<R> : B> : {});
-
-/** @public */
-export function ProviderDef<P extends Provider<any, any>>(
-  template: P extends ProviderDef<infer O, infer R>
-          ? ThisType<ProviderDef<O, R>>
-          & ProviderTemplate<ProviderService<R>>
-          & Partial<Omit<Provider<O, ProviderService<R>>, keyof ProviderTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ProviderTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          & (R extends {observes: infer B} ? (ObserverType<B extends boolean ? ProviderService<R> : B> & {observes: boolean}) : {})
-          : never
-): PropertyDecorator {
-  return Provider(template);
+  <P2 extends P>(template: ProviderTemplate<P2>): PropertyDecorator;
 }
 
 /** @public */
@@ -275,7 +244,7 @@ export const Provider = (function (_super: typeof Fastener) {
 
   Provider.prototype.onAttachService = function <S>(this: Provider<unknown, S>, service: S): void {
     if (this.observes === true && Observable.is(service)) {
-      service.observe(this as ObserverType<S>);
+      service.observe(this as Observes<S>);
     }
   };
 
@@ -293,7 +262,7 @@ export const Provider = (function (_super: typeof Fastener) {
 
   Provider.prototype.onDetachService = function <S>(this: Provider<unknown, S>, service: S): void {
     if (this.observes === true && Observable.is(service)) {
-      service.unobserve(this as ObserverType<S>);
+      service.unobserve(this as Observes<S>);
     }
   };
 
@@ -328,7 +297,7 @@ export const Provider = (function (_super: typeof Fastener) {
   Provider.create = function <P extends Provider<any, any>>(this: ProviderClass<P>, owner: FastenerOwner<P>): P {
     const provider = _super.create.call(this, owner) as P;
     if (provider.service === void 0) {
-      const service = (Object.getPrototypeOf(provider) as ProviderTemplate).service;
+      const service = (Object.getPrototypeOf(provider) as ProviderDescriptor).service;
       if (service !== void 0) {
         provider.setService(service);
       }

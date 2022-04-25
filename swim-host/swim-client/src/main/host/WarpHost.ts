@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Mutable, Class, Objects} from "@swim/util";
-import {PropertyDef, TimerDef, ComponentFlags, Component} from "@swim/component";
+import {Property, Timer, ComponentFlags, Component} from "@swim/component";
 import {AnyUri, Uri, UriCache} from "@swim/uri";
 import {AnyValue, Value} from "@swim/structure";
 import {
@@ -158,7 +158,7 @@ export abstract class WarpHost extends Component {
   }
 
   /** @internal */
-  @TimerDef<WarpHost["reconnectTimer"]>({
+  @Timer<WarpHost["reconnectTimer"]>({
     delay: 0,
     fire(): void {
       this.owner.connect();
@@ -180,18 +180,16 @@ export abstract class WarpHost extends Component {
       this.setDelay(0);
     },
   })
-  readonly reconnectTimer!: TimerDef<this, {
-    implements: {
-      backoff(): void,
-      reset(): void,
-    },
-  }>;
+  readonly reconnectTimer!: Timer<this> & {
+    backoff(): void,
+    reset(): void,
+  };
 
-  @PropertyDef({valueType: Number, value: 30 * 1000, inherits: true})
-  readonly maxReconnectTimeout!: PropertyDef<this, {value: number}>;
+  @Property({valueType: Number, value: 30 * 1000, inherits: true})
+  readonly maxReconnectTimeout!: Property<this, number>;
 
-  @PropertyDef({valueType: Boolean, value: true, inherits: true})
-  readonly online!: PropertyDef<this, {value: boolean}>;
+  @Property({valueType: Boolean, value: true, inherits: true})
+  readonly online!: Property<this, boolean>;
 
   /** @internal */
   abstract connect(): void;
@@ -208,15 +206,15 @@ export abstract class WarpHost extends Component {
     this.remove();
   }
 
-  @PropertyDef({valueType: Number, value: 0, inherits: true})
-  readonly unlinkDelay!: PropertyDef<this, {value: number}>;
+  @Property({valueType: Number, value: 0, inherits: true})
+  readonly unlinkDelay!: Property<this, number>;
 
   get idle(): boolean {
     return this.sendBuffer.length === 0 && this.downlinkCount === 0;
   }
 
   /** @internal */
-  @TimerDef<WarpHost["idleTimer"]>({
+  @Timer<WarpHost["idleTimer"]>({
     delay: 1000,
     fire(): void {
       if (this.owner.connected && this.owner.idle) {
@@ -229,13 +227,11 @@ export abstract class WarpHost extends Component {
       }
     },
   })
-  readonly idleTimer!: TimerDef<this, {
-    implements: {
-      watch(): void,
-    },
-  }>;
+  readonly idleTimer!: Timer<this> & {
+    watch(): void,
+  };
 
-  @PropertyDef<WarpHost["idleTimeout"]>({
+  @Property<WarpHost["idleTimeout"]>({
     valueType: Number,
     value: 1000,
     inherits: true,
@@ -244,9 +240,9 @@ export abstract class WarpHost extends Component {
       this.owner.idleTimer.setDelay(idleTimeout);
     },
   })
-  readonly idleTimeout!: PropertyDef<this, {value: number}>;
+  readonly idleTimeout!: Property<this, number>;
 
-  @PropertyDef<WarpHost["credentials"]>({
+  @Property<WarpHost["credentials"]>({
     valueType: Value,
     value: Value.absent(),
     lazy: false,
@@ -259,7 +255,7 @@ export abstract class WarpHost extends Component {
       }
     },
   })
-  readonly credentials!: PropertyDef<this, {value: Value, valueInit: AnyValue}>
+  readonly credentials!: Property<this, Value, AnyValue>
 
   get authenticated(): boolean {
     return (this.flags & WarpHost.AuthenticatedFlag) !== 0;
@@ -343,8 +339,8 @@ export abstract class WarpHost extends Component {
     this.credentials.setValue(credentials);
   }
 
-  @PropertyDef({valueType: Value, value: Value.absent()})
-  readonly session!: PropertyDef<this, {value: Value, valueInit: AnyValue}>;
+  @Property({valueType: Value, value: Value.absent()})
+  readonly session!: Property<this, Value, AnyValue>;
 
   /** @internal */
   readonly downlinks: {
@@ -490,8 +486,8 @@ export abstract class WarpHost extends Component {
     downlink.setDeauthenticated(false);
   }
 
-  @PropertyDef({valueType: Number, value: 1024, inherits: true})
-  readonly sendBufferSize!: PropertyDef<this, {value: number}>;
+  @Property({valueType: Number, value: 1024, inherits: true})
+  readonly sendBufferSize!: Property<this, number>;
 
   /** @internal */
   readonly sendBuffer: Envelope[];

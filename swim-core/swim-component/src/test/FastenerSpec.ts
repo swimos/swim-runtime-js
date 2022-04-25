@@ -24,7 +24,7 @@ export class FastenerSpec extends Spec {
 
   @Test
   testFastenerDefine(exam: Exam): void {
-    const testFastener = Fastener.specify("foo", {});
+    const testFastener = Fastener.define("foo", {});
     const fastener = testFastener.create(null);
     exam.equal(fastener.name, "foo");
   }

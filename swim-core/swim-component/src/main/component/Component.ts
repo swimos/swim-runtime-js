@@ -26,9 +26,9 @@ import {
   FromAny,
   AnyTiming,
   Creatable,
-  InitType,
+  Inits,
   Initable,
-  ObserverType,
+  Observes,
   Observable,
   ObserverMethods,
   ObserverParameters,
@@ -45,7 +45,7 @@ import {ComponentRelation} from "./"; // forward import
 export type ComponentFlags = number;
 
 /** @public */
-export type AnyComponent<C extends Component = Component> = C | ComponentFactory<C> | InitType<C>;
+export type AnyComponent<C extends Component<any> = Component> = C | ComponentFactory<C> | Inits<C>;
 
 /** @public */
 export interface ComponentInit {
@@ -57,17 +57,17 @@ export interface ComponentInit {
 }
 
 /** @public */
-export interface ComponentFactory<C extends Component = Component, U = AnyComponent<C>> extends Creatable<C>, FromAny<C, U> {
-  fromInit(init: InitType<C>): C;
+export interface ComponentFactory<C extends Component<any> = Component, U = AnyComponent<C>> extends Creatable<C>, FromAny<C, U> {
+  fromInit(init: Inits<C>): C;
 }
 
 /** @public */
-export interface ComponentClass<C extends Component = Component, U = AnyComponent<C>> extends Function, ComponentFactory<C, U> {
+export interface ComponentClass<C extends Component<any> = Component, U = AnyComponent<C>> extends Function, ComponentFactory<C, U> {
   readonly prototype: C;
 }
 
 /** @public */
-export interface ComponentConstructor<C extends Component = Component, U = AnyComponent<C>> extends ComponentClass<C, U> {
+export interface ComponentConstructor<C extends Component<any> = Component, U = AnyComponent<C>> extends ComponentClass<C, U> {
   new(): C;
 }
 
@@ -1105,10 +1105,10 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @internal */
-  readonly observers: ReadonlyArray<ObserverType<this>>;
+  readonly observers: ReadonlyArray<Observes<this>>;
 
   /** @override */
-  observe(observer: ObserverType<this>): void {
+  observe(observer: Observes<this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.inserted(observer, oldObservers);
     if (oldObservers !== newObservers) {
@@ -1119,20 +1119,20 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
-  protected willObserve(observer: ObserverType<this>): void {
+  protected willObserve(observer: Observes<this>): void {
     // hook
   }
 
-  protected onObserve(observer: ObserverType<this>): void {
+  protected onObserve(observer: Observes<this>): void {
     // hook
   }
 
-  protected didObserve(observer: ObserverType<this>): void {
+  protected didObserve(observer: Observes<this>): void {
     // hook
   }
 
   /** @override */
-  unobserve(observer: ObserverType<this>): void {
+  unobserve(observer: Observes<this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.removed(observer, oldObservers);
     if (oldObservers !== newObservers) {
@@ -1143,15 +1143,15 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
-  protected willUnobserve(observer: ObserverType<this>): void {
+  protected willUnobserve(observer: Observes<this>): void {
     // hook
   }
 
-  protected onUnobserve(observer: ObserverType<this>): void {
+  protected onUnobserve(observer: Observes<this>): void {
     // hook
   }
 
-  protected didUnobserve(observer: ObserverType<this>): void {
+  protected didUnobserve(observer: Observes<this>): void {
     // hook
   }
 
@@ -1185,7 +1185,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return new this();
   }
 
-  static fromInit<S extends Class<Instance<S, Component>>>(this: S, init: InitType<InstanceType<S>>): InstanceType<S> {
+  static fromInit<S extends Class<Instance<S, Component>>>(this: S, init: Inits<InstanceType<S>>): InstanceType<S> {
     let type: Creatable<InstanceType<S>>;
     if ((typeof init === "object" && init !== null || typeof init === "function") && Creatable.is((init as ComponentInit).type)) {
       type = (init as ComponentInit).type as Creatable<InstanceType<S>>;
@@ -1193,7 +1193,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
       type = this as unknown as Creatable<InstanceType<S>>;
     }
     const component = type.create();
-    (component as Initable<InitType<InstanceType<S>>>).init(init);
+    (component as Initable<Inits<InstanceType<S>>>).init(init);
     return component;
   }
 

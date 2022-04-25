@@ -17,10 +17,9 @@ import {
   Affinity,
   FastenerFlags,
   FastenerOwner,
-  PropertyRefinement,
   PropertyValue,
   PropertyValueInit,
-  PropertyTemplate,
+  PropertyDescriptor,
   PropertyClass,
   Property,
 } from "@swim/component";
@@ -35,32 +34,36 @@ import {ConstraintScope} from "./"; // forward import
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @public */
-export interface ConstraintPropertyRefinement extends PropertyRefinement {
-}
-
-/** @public */
-export interface ConstraintPropertyTemplate<T = unknown, U = T> extends PropertyTemplate<T, U> {
+export interface ConstraintPropertyDescriptor<T = unknown, U = T> extends PropertyDescriptor<T, U> {
   extends?: Proto<ConstraintProperty<any, any, any>> | string | boolean | null;
   strength?: AnyConstraintStrength;
   constrained?: boolean;
 }
 
 /** @public */
-export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any> = ConstraintProperty<any, any>> extends PropertyClass<P> {
+export type ConstraintPropertyTemplate<P extends ConstraintProperty<any, any, any>> =
+  ThisType<P> &
+  ConstraintPropertyDescriptor<PropertyValue<P>, PropertyValueInit<P>> &
+  Partial<Omit<P, keyof ConstraintPropertyDescriptor>>;
+
+/** @public */
+export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any, any> = ConstraintProperty<any, any, any>> extends PropertyClass<P> {
   /** @override */
-  specialize(className: string, template: ConstraintPropertyTemplate): ConstraintPropertyClass;
+  specialize(template: ConstraintPropertyDescriptor<any, any>): ConstraintPropertyClass<P>;
 
   /** @override */
-  refine(propertyClass: ConstraintPropertyClass): void;
+  refine(propertyClass: ConstraintPropertyClass<any>): void;
 
   /** @override */
-  extend(className: string, template: ConstraintPropertyTemplate): ConstraintPropertyClass<P>;
+  extend<P2 extends P>(className: string, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
+  extend<P2 extends P>(className: string, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
 
   /** @override */
-  specify<O, T = unknown, U = T>(className: string, template: ThisType<ConstraintProperty<O, T, U>> & ConstraintPropertyTemplate<T, U> & Partial<Omit<ConstraintProperty<O, T, U>, keyof ConstraintPropertyTemplate>>): ConstraintPropertyClass<P>;
+  define<P2 extends P>(className: string, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
+  define<P2 extends P>(className: string, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
 
   /** @override */
-  <O, T = unknown, U = T>(template: ThisType<ConstraintProperty<O, T, U>> & ConstraintPropertyTemplate<T, U> & Partial<Omit<ConstraintProperty<O, T, U>, keyof ConstraintPropertyTemplate>>): PropertyDecorator;
+  <P2 extends P>(template: ConstraintPropertyTemplate<P2>): PropertyDecorator;
 
   /** @internal */
   readonly ConstrainedFlag: FastenerFlags;
@@ -71,28 +74,6 @@ export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any> 
   readonly FlagShift: number;
   /** @internal @override */
   readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
-export type ConstraintPropertyDef<O, R extends ConstraintPropertyRefinement = {}> =
-  ConstraintProperty<O, PropertyValue<R>, PropertyValueInit<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function ConstraintPropertyDef<A extends ConstraintProperty<any, any, any>>(
-  template: A extends ConstraintPropertyDef<infer O, infer R>
-          ? ThisType<ConstraintPropertyDef<O, R>>
-          & ConstraintPropertyTemplate<PropertyValue<R>, PropertyValueInit<R>>
-          & Partial<Omit<ConstraintProperty<O, PropertyValue<R>, PropertyValueInit<R>>, keyof ConstraintPropertyTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ConstraintPropertyTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return ConstraintProperty(template);
 }
 
 /** @public */
@@ -438,7 +419,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
     return value !== void 0 && value !== null ? +value : 0;
   };
 
-  ConstraintProperty.construct = function <P extends ConstraintProperty<any, any>>(property: P | null, owner: FastenerOwner<P>): P {
+  ConstraintProperty.construct = function <P extends ConstraintProperty<any, any, any>>(property: P | null, owner: FastenerOwner<P>): P {
     property = _super.construct.call(this, property, owner) as P;
     (property as Mutable<typeof property>).id = ConstraintId.next();
     (property as Mutable<typeof property>).strength = property.initStrength();
@@ -450,7 +431,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
     return property;
   };
 
-  ConstraintProperty.refine = function (propertyClass: ConstraintPropertyClass): void {
+  ConstraintProperty.refine = function (propertyClass: ConstraintPropertyClass<any>): void {
     _super.refine.call(this, propertyClass);
     const propertyPrototype = propertyClass.prototype;
     let flagsInit = propertyPrototype.flagsInit;
@@ -464,7 +445,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
       } else {
         flagsInit &= ~ConstraintProperty.ConstrainedFlag;
       }
-      delete (propertyPrototype as ConstraintPropertyTemplate).constrained;
+      delete (propertyPrototype as ConstraintPropertyDescriptor).constrained;
     }
 
     if (flagsInit !== void 0) {

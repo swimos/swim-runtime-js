@@ -18,47 +18,46 @@ import {Mutable, Proto, Equals} from "@swim/util";
 import {
   FastenerFlags,
   FastenerOwner,
-  FastenerRefinement,
-  FastenerTemplate,
+  FastenerDescriptor,
   FastenerClass,
   Fastener,
 } from "@swim/component";
 
 /** @public */
-export interface FileRelationRefinement extends FastenerRefinement {
-  value?: unknown;
-}
+export type FileRelationValue<F extends FileRelation<any, any>> =
+  F extends FileRelation<any, infer T> ? T : never;
 
 /** @public */
-export type FileRelationValue<R extends FileRelationRefinement | FileRelation<any, any>, D = unknown> =
-  R extends {value: infer T} ? T :
-  R extends {extends: infer E} ? FileRelationValue<E, D> :
-  R extends FileRelation<any, infer T> ? T :
-  D;
-
-/** @public */
-export interface FileRelationTemplate<T = unknown> extends FastenerTemplate {
+export interface FileRelationDescriptor<T = unknown> extends FastenerDescriptor {
   extends?: Proto<FileRelation<any, any>> | string | boolean | null;
   baseDir?: string;
   resolves?: boolean;
 }
 
 /** @public */
+export type FileRelationTemplate<F extends FileRelation<any, any>> =
+  ThisType<F> &
+  FileRelationDescriptor<FileRelationValue<F>> &
+  Partial<Omit<F, keyof FileRelationDescriptor>>;
+
+/** @public */
 export interface FileRelationClass<F extends FileRelation<any, any> = FileRelation<any, any>> extends FastenerClass<F> {
   /** @override */
-  specialize(className: string, template: FileRelationTemplate): FileRelationClass;
+  specialize(template: FileRelationDescriptor<any>): FileRelationClass<F>;
 
   /** @override */
-  refine(propertyClass: FileRelationClass): void;
+  refine(fastenerClass: FileRelationClass<any>): void;
 
   /** @override */
-  extend(className: string, template: FileRelationTemplate): FileRelationClass<F>;
+  extend<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
+  extend<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
 
   /** @override */
-  specify<O, T = unknown>(className: string, template: ThisType<FileRelation<O, T>> & FileRelationTemplate<T> & Partial<Omit<FileRelation<O, T>, keyof FileRelationTemplate>>): FileRelationClass<F>;
+  define<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
+  define<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
 
   /** @override */
-  <O, T = unknown>(template: ThisType<FileRelation<O, T>> & FileRelationTemplate<T> & Partial<Omit<FileRelation<O, T>, keyof FileRelationTemplate>>): PropertyDecorator;
+  <F2 extends F>(template: FileRelationTemplate<F2>): PropertyDecorator;
 
   /** @internal */
   readonly ResolvesFlag: FastenerFlags;
@@ -67,28 +66,6 @@ export interface FileRelationClass<F extends FileRelation<any, any> = FileRelati
   readonly FlagShift: number;
   /** @internal @override */
   readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
-export type FileRelationDef<O, R extends FileRelationRefinement = {}> =
-  FileRelation<O, FileRelationValue<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function FileRelationDef<F extends FileRelation<any, any>>(
-  template: F extends FileRelationDef<infer O, infer R>
-          ? ThisType<FileRelationDef<O, R>>
-          & FileRelationTemplate<FileRelationValue<R>>
-          & Partial<Omit<FileRelation<O, FileRelationValue<R>>, keyof FileRelationTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof FileRelationTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return FileRelation(template);
 }
 
 /** @public */
@@ -278,7 +255,7 @@ export const FileRelation = (function (_super: typeof Fastener) {
     return fastener;
   };
 
-  FileRelation.refine = function (fastenerClass: FileRelationClass): void {
+  FileRelation.refine = function (fastenerClass: FileRelationClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;
@@ -292,7 +269,7 @@ export const FileRelation = (function (_super: typeof Fastener) {
       } else {
         flagsInit &= ~FileRelation.ResolvesFlag;
       }
-      delete (fastenerPrototype as FileRelationTemplate).resolves;
+      delete (fastenerPrototype as FileRelationDescriptor).resolves;
     }
 
     if (flagsInit !== void 0) {

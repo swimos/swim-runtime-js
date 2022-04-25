@@ -17,10 +17,9 @@ import {
   Affinity,
   FastenerFlags,
   FastenerOwner,
-  AnimatorRefinement,
   AnimatorValue,
   AnimatorValueInit,
-  AnimatorTemplate,
+  AnimatorDescriptor,
   AnimatorClass,
   Animator,
 } from "@swim/component";
@@ -35,32 +34,36 @@ import {ConstraintScope} from "./"; // forward import
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @public */
-export interface ConstraintAnimatorRefinement extends AnimatorRefinement {
-}
-
-/** @public */
-export interface ConstraintAnimatorTemplate<T = unknown, U = T> extends AnimatorTemplate<T, U> {
+export interface ConstraintAnimatorDescriptor<T = unknown, U = T> extends AnimatorDescriptor<T, U> {
   extends?: Proto<ConstraintAnimator<any, any, any>> | string | boolean | null;
   strength?: AnyConstraintStrength;
   constrained?: boolean;
 }
 
 /** @public */
-export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any> = ConstraintAnimator<any, any>> extends AnimatorClass<A> {
+export type ConstraintAnimatorTemplate<A extends ConstraintAnimator<any, any, any>> =
+  ThisType<A> &
+  ConstraintAnimatorDescriptor<AnimatorValue<A>, AnimatorValueInit<A>> &
+  Partial<Omit<A, keyof ConstraintAnimatorDescriptor>>;
+
+/** @public */
+export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any, any> = ConstraintAnimator<any, any, any>> extends AnimatorClass<A> {
   /** @override */
-  specialize(className: string, template: ConstraintAnimatorTemplate): ConstraintAnimatorClass;
+  specialize(template: ConstraintAnimatorDescriptor<any, any>): ConstraintAnimatorClass<A>;
 
   /** @override */
-  refine(animatorClass: ConstraintAnimatorClass): void;
+  refine(animatorClass: ConstraintAnimatorClass<any>): void;
 
   /** @override */
-  extend(className: string,template: ConstraintAnimatorTemplate): ConstraintAnimatorClass<A>;
+  extend<A2 extends A>(className: string, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
+  extend<A2 extends A>(className: string, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
 
   /** @override */
-  specify<O, T = unknown, U = T>(className: string, template: ThisType<ConstraintAnimator<O, T, U>> & ConstraintAnimatorTemplate<T, U> & Partial<Omit< ConstraintAnimator<O, T, U>, keyof ConstraintAnimatorTemplate>>): ConstraintAnimatorClass<A>;
+  define<A2 extends A>(className: string, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
+  define<A2 extends A>(className: string, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
 
   /** @override */
-  <O, T = unknown, U = T>(template: ThisType<ConstraintAnimator<O, T, U>> & ConstraintAnimatorTemplate<T, U> & Partial<Omit< ConstraintAnimator<O, T, U>, keyof ConstraintAnimatorTemplate>>): PropertyDecorator;
+  <A2 extends A>(template: ConstraintAnimatorDescriptor<A2>): PropertyDecorator;
 
   /** @internal */
   readonly ConstrainedFlag: FastenerFlags;
@@ -71,28 +74,6 @@ export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any> 
   readonly FlagShift: number;
   /** @internal @override */
   readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
-export type ConstraintAnimatorDef<O, R extends ConstraintAnimatorRefinement = {}> =
-  ConstraintAnimator<O, AnimatorValue<R>, AnimatorValueInit<R>> &
-  {readonly name: string} & // prevent type alias simplification
-  (R extends {extends: infer E} ? E : {}) &
-  (R extends {defines: infer I} ? I : {}) &
-  (R extends {implements: infer I} ? I : {});
-
-/** @public */
-export function ConstraintAnimatorDef<A extends ConstraintAnimator<any, any, any>>(
-  template: A extends ConstraintAnimatorDef<infer O, infer R>
-          ? ThisType<ConstraintAnimatorDef<O, R>>
-          & ConstraintAnimatorTemplate<AnimatorValue<R>, AnimatorValueInit<R>>
-          & Partial<Omit<ConstraintAnimator<O, AnimatorValue<R>, AnimatorValueInit<R>>, keyof ConstraintAnimatorTemplate>>
-          & (R extends {extends: infer E} ? (Partial<Omit<E, keyof ConstraintAnimatorTemplate>> & {extends: unknown}) : {})
-          & (R extends {defines: infer I} ? Partial<I> : {})
-          & (R extends {implements: infer I} ? I : {})
-          : never
-): PropertyDecorator {
-  return ConstraintAnimator(template);
 }
 
 /** @public */
@@ -438,7 +419,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
     return value !== void 0 && value !== null ? +value : 0;
   };
 
-  ConstraintAnimator.construct = function <A extends ConstraintAnimator<any, any>>(animator: A | null, owner: FastenerOwner<A>): A {
+  ConstraintAnimator.construct = function <A extends ConstraintAnimator<any, any, any>>(animator: A | null, owner: FastenerOwner<A>): A {
     animator = _super.construct.call(this, animator, owner) as A;
     (animator as Mutable<typeof animator>).id = ConstraintId.next();
     (animator as Mutable<typeof animator>).strength = animator.initStrength();
@@ -450,7 +431,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
     return animator;
   };
 
-  ConstraintAnimator.refine = function (animatorClass: ConstraintAnimatorClass): void {
+  ConstraintAnimator.refine = function (animatorClass: ConstraintAnimatorClass<any>): void {
     _super.refine.call(this, animatorClass);
     const animatorPrototype = animatorClass.prototype;
     let flagsInit = animatorPrototype.flagsInit;
@@ -464,7 +445,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
       } else {
         flagsInit &= ~ConstraintAnimator.ConstrainedFlag;
       }
-      delete (animatorPrototype as ConstraintAnimatorTemplate).constrained;
+      delete (animatorPrototype as ConstraintAnimatorDescriptor).constrained;
     }
 
     if (flagsInit !== void 0) {

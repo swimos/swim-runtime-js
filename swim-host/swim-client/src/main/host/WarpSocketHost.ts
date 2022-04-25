@@ -14,7 +14,7 @@
 
 import * as ws from "ws";
 import type {Mutable} from "@swim/util";
-import {PropertyDef} from "@swim/component";
+import {Property} from "@swim/component";
 import type {Uri} from "@swim/uri";
 import {Envelope, CommandMessage} from "@swim/warp";
 import {WarpHost} from "./WarpHost";
@@ -29,17 +29,17 @@ export class WarpSocketHost extends WarpHost {
   /** @internal */
   readonly socket: WebSocket | null;
 
-  @PropertyDef<WarpSocketHost["wsConstructor"]>({
+  @Property<WarpSocketHost["wsConstructor"]>({
     value: typeof WebSocket !== "undefined" ? WebSocket : ws.WebSocket as typeof WebSocket,
     inherits: true,
     equalValues(newValue: typeof WebSocket, oldValue: typeof WebSocket): boolean {
       return newValue === oldValue;
     },
   })
-  readonly wsConstructor!: PropertyDef<this, {value: typeof WebSocket}>;
+  readonly wsConstructor!: Property<this, typeof WebSocket>;
 
-  @PropertyDef({inherits: true})
-  readonly wsProtocols!: PropertyDef<this, {value: string[] | string | undefined}>;
+  @Property({inherits: true})
+  readonly wsProtocols!: Property<this, string[] | string | undefined>;
 
   override push(envelope: Envelope): void {
     if (this.connected) {
