@@ -751,6 +751,28 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
+  isAncestorOf(descendant: C | null): boolean;
+  isAncestorOf(this: C, descendant: C | null): boolean {
+    while (descendant !== null) {
+      if (descendant === this) {
+        return true;
+      }
+      descendant = descendant.parent;
+    }
+    return false;
+  }
+
+  commonAncestor(relative: C | null): C | null;
+  commonAncestor(this: C, relative: C | null): C | null {
+    while (relative !== null) {
+      if (relative.isAncestorOf(this)) {
+        return relative;
+      }
+      relative = relative.parent;
+    }
+    return null;
+  }
+
   get mounted(): boolean {
     return (this.flags & Component.MountedFlag) !== 0;
   }

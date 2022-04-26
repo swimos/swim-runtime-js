@@ -302,7 +302,10 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     return new DateTime(time, zone);
   }
 
-  static fromAny(value: AnyDateTime, zone?: AnyTimeZone): DateTime {
+  static fromAny(value: AnyDateTime, zone?: AnyTimeZone): DateTime;
+  static fromAny(value: AnyDateTime | null, zone?: AnyTimeZone): DateTime | null;
+  static fromAny(value: AnyDateTime | null | undefined, zone?: AnyTimeZone): DateTime | null | undefined;
+  static fromAny(value: AnyDateTime | null | undefined, zone?: AnyTimeZone): DateTime | null | undefined {
     if (value === void 0 || value === null || value instanceof DateTime) {
       return value;
     } else if (value instanceof Date) {

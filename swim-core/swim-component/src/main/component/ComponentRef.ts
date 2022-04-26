@@ -240,10 +240,10 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
   };
 
   ComponentRef.prototype.setComponent = function <C extends Component>(this: ComponentRef<unknown, C>, newComponent: C  | null, target?: Component | null, key?: string): C | null {
+    let oldComponent = this.component;
     if (newComponent !== null) {
       newComponent = this.fromAny(newComponent);
     }
-    let oldComponent = this.component;
     if (oldComponent !== newComponent) {
       if (target === void 0) {
         target = null;
@@ -332,45 +332,48 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
   };
 
   ComponentRef.prototype.insertComponent = function <C extends Component>(this: ComponentRef<unknown, C>, parent?: Component | null, newComponent?: AnyComponent<C>, target?: Component | null, key?: string): C {
+    let oldComponent = this.component;
     if (newComponent !== void 0 && newComponent !== null) {
       newComponent = this.fromAny(newComponent);
+    } else if (oldComponent === null) {
+      newComponent = this.createComponent();
     } else {
-      const oldComponent = this.component;
-      if (oldComponent === null) {
-        newComponent = this.createComponent();
-      } else {
-        newComponent = oldComponent;
+      newComponent = oldComponent;
+    }
+    if (parent === void 0) {
+      parent = null;
+    }
+    if (this.binds || oldComponent !== newComponent || newComponent.parent === null || parent !== null || key !== void 0) {
+      if (parent === null) {
+        parent = this.parentComponent;
       }
-    }
-    if (parent === void 0 || parent === null) {
-      parent = this.parentComponent;
-    }
-    if (target === void 0) {
-      target = null;
-    }
-    if (key === void 0) {
-      key = this.componentKey;
-    }
-    if (parent !== null && (newComponent.parent !== parent || newComponent.key !== key)) {
-      this.insertChild(parent, newComponent, target, key);
-    }
-    const oldComponent = this.component;
-    if (oldComponent !== newComponent) {
-      if (oldComponent !== null) {
-        (this as Mutable<typeof this>).component = null;
-        this.willDetachComponent(oldComponent);
-        this.onDetachComponent(oldComponent);
-        this.deinitComponent(oldComponent);
-        this.didDetachComponent(oldComponent);
-        oldComponent.remove();
+      if (target === void 0) {
+        target = null;
       }
-      (this as Mutable<typeof this>).component = newComponent;
-      this.willAttachComponent(newComponent, target);
-      this.onAttachComponent(newComponent, target);
-      this.initComponent(newComponent);
-      this.didAttachComponent(newComponent, target);
-      this.setCoherent(true);
-      this.decohereOutlets();
+      if (key === void 0) {
+        key = this.componentKey;
+      }
+      if (parent !== null && (newComponent.parent !== parent || newComponent.key !== key)) {
+        this.insertChild(parent, newComponent, target, key);
+      }
+      oldComponent = this.component;
+      if (oldComponent !== newComponent) {
+        if (oldComponent !== null) {
+          (this as Mutable<typeof this>).component = null;
+          this.willDetachComponent(oldComponent);
+          this.onDetachComponent(oldComponent);
+          this.deinitComponent(oldComponent);
+          this.didDetachComponent(oldComponent);
+          oldComponent.remove();
+        }
+        (this as Mutable<typeof this>).component = newComponent;
+        this.willAttachComponent(newComponent, target);
+        this.onAttachComponent(newComponent, target);
+        this.initComponent(newComponent);
+        this.didAttachComponent(newComponent, target);
+        this.setCoherent(true);
+        this.decohereOutlets();
+      }
     }
     return newComponent;
   };
