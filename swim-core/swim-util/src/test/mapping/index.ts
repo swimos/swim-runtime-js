@@ -12,11 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "./runtime";
-export * from "./mapping";
-export * from "./interpolate";
-export * from "./transition";
-export * from "./scale";
-export {UtilSuite} from "./UtilSuite";
-
-export {UtilSuite as default} from "./UtilSuite";
+export {PiecewiseSpec} from "./PiecewiseSpec";
+export {MappingSuite} from "./MappingSuite";

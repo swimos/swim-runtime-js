@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "./runtime";
-export * from "./mapping";
-export * from "./interpolate";
-export * from "./transition";
-export * from "./scale";
-export {UtilSuite} from "./UtilSuite";
+import {Spec, Unit} from "@swim/unit";
+import {PiecewiseSpec} from "./PiecewiseSpec";
 
-export {UtilSuite as default} from "./UtilSuite";
+@Unit
+export class MappingSuite extends Spec {
+  @Unit
+  piecewiseSpec(): Spec {
+    return new PiecewiseSpec();
+  }
+}

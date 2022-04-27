@@ -21,6 +21,7 @@ export interface StepInterpolator<Y> extends Interpolator<Y> {
   /** @internal */
   readonly phase: number;
 
+  /** @override */
   equals(that: unknown): boolean;
 }
 
@@ -48,7 +49,7 @@ export const StepInterpolator = (function (_super: typeof Interpolator) {
   StepInterpolator.prototype = Object.create(_super.prototype);
   StepInterpolator.prototype.constructor = StepInterpolator;
 
-  StepInterpolator.prototype.equals = function (that: unknown): boolean {
+  StepInterpolator.prototype.equals = function <Y>(this: StepInterpolator<Y>, that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof StepInterpolator) {
