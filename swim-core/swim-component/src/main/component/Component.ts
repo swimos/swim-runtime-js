@@ -714,12 +714,20 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   getTargetChild(child: C, comparator: Comparator<C>): C | null {
     let target = this.lastChild;
     while (target !== null) {
-      if (comparator(child, target) >= 0) {
-        return target.nextSibling;
+      if (target !== child && comparator(child, target) >= 0) {
+        target = target.nextSibling;
+        if (target === child) {
+          target = target.nextSibling;
+        }
+        return target;
       }
       target = target.previousSibling;
     }
-    return this.firstChild;
+    target = this.firstChild;
+    if (target === child) {
+      target = target.nextSibling;
+    }
+    return target;
   }
 
   getSuper<F extends Class<C>>(superBound: F): InstanceType<F> | null;
