@@ -186,6 +186,8 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 
   sync(syncs?: boolean): this;
 
+  get opened(): boolean;
+
   get online(): boolean;
 
   get connected(): boolean;
@@ -576,6 +578,13 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     }
     return this;
   };
+
+  Object.defineProperty(WarpDownlink.prototype, "opened", {
+    get(this: WarpDownlink): boolean {
+      return this.model !== null;
+    },
+    configurable: true,
+  });
 
   Object.defineProperty(WarpDownlink.prototype, "online", {
     get(this: WarpDownlink): boolean {
