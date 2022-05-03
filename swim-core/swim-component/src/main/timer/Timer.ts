@@ -38,7 +38,7 @@ export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerC
   specialize(template: TimerDescriptor): TimerClass<F>;
 
   /** @override */
-  refine(timerClass: TimerClass<any>): void;
+  refine(fastenerClass: TimerClass<any>): void;
 
   /** @override */
   extend<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
@@ -54,11 +54,13 @@ export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerC
 
 /** @public */
 export interface Timer<O = unknown> extends Fastener<O> {
+  (): void;
+
   /** @override */
   get fastenerType(): Proto<Timer<any>>;
 
-  /** @protected @override */
-  onDerive(inlet: Fastener): void;
+  /** @protected */
+  fire(): void;
 
   initDelay(): number;
 
@@ -71,9 +73,6 @@ export interface Timer<O = unknown> extends Fastener<O> {
   get elapsed(): number | undefined;
 
   get remaining(): number | undefined;
-
-  /** @internal @protected */
-  fire(): void;
 
   get scheduled(): boolean;
 
@@ -140,8 +139,8 @@ export const Timer = (function (_super: typeof Fastener) {
     configurable: true,
   });
 
-  Timer.prototype.onDerive = function (this: Timer, inlet: Timer): void {
-    this.setDelay(inlet.delay);
+  Timer.prototype.fire = function (this: Timer): void {
+    // hook
   };
 
   Timer.prototype.initDelay = function (this: Timer): number {
@@ -180,10 +179,6 @@ export const Timer = (function (_super: typeof Fastener) {
     configurable: true,
   });
 
-  Timer.prototype.fire = function (this: Timer): void {
-    // hook
-  };
-
   Object.defineProperty(Timer.prototype, "scheduled", {
     get: function (this: Timer): boolean {
       return this.timeout !== void 0;
@@ -201,7 +196,7 @@ export const Timer = (function (_super: typeof Fastener) {
       }
       this.willSchedule(delay);
       (this as Mutable<typeof this>).deadline = performance.now() + delay;
-      timeout = this.setTimeout(this.expire.bind(this), delay);
+      timeout = this.setTimeout(this, delay);
       (this as Mutable<typeof this>).timeout = timeout;
       this.onSchedule(delay);
       this.didSchedule(delay);
@@ -220,7 +215,7 @@ export const Timer = (function (_super: typeof Fastener) {
       }
       this.willSchedule(delay);
       (this as Mutable<typeof this>).deadline = performance.now() + delay;
-      timeout = this.setTimeout(this.expire.bind(this), delay);
+      timeout = this.setTimeout(this, delay);
       (this as Mutable<typeof this>).timeout = timeout;
       this.onSchedule(delay);
       this.didSchedule(delay);
@@ -243,7 +238,7 @@ export const Timer = (function (_super: typeof Fastener) {
     }
     this.willSchedule(delay);
     (this as Mutable<typeof this>).deadline = performance.now() + delay;
-    timeout = this.setTimeout(this.expire.bind(this), delay);
+    timeout = this.setTimeout(this, delay);
     (this as Mutable<typeof this>).timeout = timeout;
     this.onSchedule(delay);
     this.didSchedule(delay);
@@ -320,11 +315,17 @@ export const Timer = (function (_super: typeof Fastener) {
   };
 
   Timer.construct = function <F extends Timer<any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+    if (fastener === null) {
+      fastener = function (): void {
+        fastener!.expire();
+      } as F;
+      delete (fastener as Partial<Mutable<F>>).name; // don't clobber prototype name
+      Object.setPrototypeOf(fastener, this.prototype);
+    }
     fastener = _super.construct.call(this, fastener, owner) as F;
     (fastener as Mutable<typeof fastener>).delay = fastener.initDelay();
     (fastener as Mutable<typeof fastener>).deadline = 0;
     (fastener as Mutable<typeof fastener>).timeout = void 0;
-    (fastener as Mutable<typeof fastener>).expire = fastener.expire.bind(fastener);
     return fastener;
   };
 

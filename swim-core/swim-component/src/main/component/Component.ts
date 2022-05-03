@@ -38,6 +38,7 @@ import {FastenerContextClass, FastenerContext} from "../fastener/FastenerContext
 import type {FastenerClass, Fastener} from "../fastener/Fastener";
 import {Property} from "../property/Property";
 import {Animator} from "../animator/Animator";
+import {EventHandler} from "../event/EventHandler";
 import type {ComponentObserver} from "./ComponentObserver";
 import {ComponentRelation} from "./"; // forward import
 
@@ -651,6 +652,8 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     const parent = this.parent;
     if (parent !== null) {
       parent.removeChild(this);
+    } else if (this.mounted) {
+      this.unmount();
     }
   }
 
@@ -1053,7 +1056,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected bindChildFastener(fastener: Fastener, child: C, target: C | null): void {
-    if (fastener instanceof ComponentRelation) {
+    if (fastener instanceof ComponentRelation || fastener instanceof EventHandler) {
       fastener.bindComponent(child, target);
     }
   }
@@ -1069,7 +1072,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected unbindChildFastener(fastener: Fastener, child: C): void {
-    if (fastener instanceof ComponentRelation) {
+    if (fastener instanceof ComponentRelation || fastener instanceof EventHandler) {
       fastener.unbindComponent(child);
     }
   }

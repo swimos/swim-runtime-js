@@ -59,7 +59,7 @@ export class WatcherScope extends Scope {
 
       const t0 = Date.now();
       this.onRebuildBegin(packageNames);
-      const workspace = this.workspace.service;
+      const workspace = this.workspace.getService();
       rebuildPromise = workspace.runPackageLibraryTasks(this.buildConfigs, packageNames, this.libraryNames);
       rebuildPromise = rebuildPromise.then(this.onRebuildSuccess.bind(this, packageNames, t0), this.onRebuildFailure.bind(this));
       this.rebuildPromise = rebuildPromise;
@@ -177,7 +177,7 @@ export class WatcherScope extends Scope {
       changedPackageNames = this.packageNames;
     }
 
-    const workspace = this.workspace.service;
+    const workspace = this.workspace.getService();
     const dependentPackages = workspace.getDependents(changedPackageNames);
     const selectedPackages = workspace.getDependencies(this.packageNames);
 
@@ -216,7 +216,7 @@ export class WatcherScope extends Scope {
   build(): Promise<void> {
     let rebuildPromise = this.rebuildPromise;
     if (rebuildPromise === null) {
-      const workspace = this.workspace.service;
+      const workspace = this.workspace.getService();
       rebuildPromise = workspace.runPackageLibraryDependencyTasks(this.buildConfigs, this.packageNames, this.libraryNames);
       rebuildPromise = rebuildPromise.then(this.onBuildSuccess.bind(this), this.onBuildFailure.bind(this));
       this.rebuildPromise = rebuildPromise;
@@ -235,7 +235,7 @@ export class WatcherScope extends Scope {
   }
 
   watch(watchConfig: TaskConfig): Promise<void> {
-    const workspace = this.workspace.service;
+    const workspace = this.workspace.getService();
     return workspace.runPackageLibraryDependencyTasks(watchConfig, this.packageNames, this.libraryNames);
   }
 
@@ -254,8 +254,9 @@ export class WatcherScope extends Scope {
 
   @Provider<WatcherScope["workspace"]>({
     extends: true,
+    lazy: false,
     observes: true,
-    workspacePackageDidChange(packageScope: PackageScope): void {
+    servicePackageDidChange(packageScope: PackageScope): void {
       this.owner.rebuildPackage(packageScope);
     },
   })

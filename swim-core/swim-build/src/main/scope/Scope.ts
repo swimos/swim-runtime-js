@@ -82,9 +82,7 @@ export abstract class Scope extends Component<Scope> {
 
   @Provider<Scope["workspace"]>({
     serviceType: Workspace,
-    service: Workspace.global(),
     inherits: false,
-    lazy: false,
   })
   readonly workspace!: Provider<this, Workspace>;
   static readonly workspace: FastenerClass<Scope["workspace"]>;

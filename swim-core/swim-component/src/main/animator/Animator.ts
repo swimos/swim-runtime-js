@@ -85,6 +85,8 @@ export interface Animator<O = unknown, T = unknown, U = T> extends Property<O, T
   /** @override */
   setValue(newValue: T | U, affinity?: Affinity): void;
 
+  getOutletState(outlet: Animator<unknown, T>): T;
+
   get inletState(): T | undefined;
 
   getInletState(): NonNullable<T>;
@@ -179,10 +181,10 @@ export const Animator = (function (_super: typeof Property) {
     let newValue: T;
     let newState: T;
     if (inlet instanceof Animator) {
-      newValue = this.transformInletValue(inlet.value);
-      newState = this.transformInletValue(inlet.state);
+      newValue = this.transformInletValue(inlet.getOutletValue(this));
+      newState = this.transformInletValue(inlet.getOutletState(this));
     } else {
-      newValue = this.transformInletValue(inlet.value);
+      newValue = this.transformInletValue(inlet.getOutletValue(this));
       newState = newValue;
     }
     const oldState = this.state;
@@ -229,10 +231,14 @@ export const Animator = (function (_super: typeof Property) {
     }
   };
 
+  Animator.prototype.getOutletState = function <T>(this: Animator<unknown, T>, outlet: Animator<unknown, T>): T {
+    return this.state;
+  };
+
   Object.defineProperty(Animator.prototype, "inletState", {
     get: function <T>(this: Animator<unknown, T>): T | undefined {
       const inlet = this.inlet;
-      return inlet instanceof Animator ? inlet.state : void 0;
+      return inlet instanceof Animator ? inlet.getOutletState(this) : void 0;
     },
     configurable: true,
   });
@@ -456,10 +462,10 @@ export const Animator = (function (_super: typeof Property) {
       let newValue: T;
       let newState: T;
       if (inlet instanceof Animator) {
-        newValue = this.transformInletValue(inlet.value);
-        newState = this.transformInletValue(inlet.state);
+        newValue = this.transformInletValue(inlet.getOutletValue(this));
+        newState = this.transformInletValue(inlet.getOutletState(this));
       } else {
-        newValue = this.transformInletValue(inlet.value);
+        newValue = this.transformInletValue(inlet.getOutletValue(this));
         newState = newValue;
       }
       const oldState = this.state;

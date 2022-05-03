@@ -125,6 +125,8 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   /** @internal @override */
   detachOutlet(outlet: Property<unknown, T>): void;
 
+  getOutletValue(outlet: Property<unknown, T>): T;
+
   get inletValue(): T | undefined;
 
   getInletValue(): NonNullable<T>;
@@ -192,7 +194,7 @@ export const Property = (function (_super: typeof Fastener) {
   });
 
   Property.prototype.onDerive = function <T>(this: Property<unknown, T>, inlet: Property<unknown, T>): void {
-    const inletValue = this.transformInletValue(inlet.value);
+    const inletValue = this.transformInletValue(inlet.getOutletValue(this));
     this.setValue(inletValue, Affinity.Reflexive);
   };
 
@@ -225,10 +227,14 @@ export const Property = (function (_super: typeof Fastener) {
     }
   };
 
+  Property.prototype.getOutletValue = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): T {
+    return this.value;
+  };
+
   Object.defineProperty(Property.prototype, "inletValue", {
     get: function <T>(this: Property<unknown, T>): T | undefined {
       const inlet = this.inlet;
-      return inlet !== null ? inlet.value : void 0;
+      return inlet !== null ? inlet.getOutletValue(this) : void 0;
     },
     configurable: true,
   });
@@ -341,7 +347,7 @@ export const Property = (function (_super: typeof Fastener) {
     if ((this.flags & Fastener.DerivedFlag) !== 0) {
       const inlet = this.inlet;
       if (inlet !== null) {
-        const inletValue = this.transformInletValue(inlet.value);
+        const inletValue = this.transformInletValue(inlet.getOutletValue(this));
         this.setValue(inletValue, Affinity.Reflexive);
       }
     }

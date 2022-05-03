@@ -16,7 +16,8 @@ import * as Path from "path";
 import type * as FS from "fs";
 import type {Class, Observes} from "@swim/util";
 import {Output, OutputStyle} from "@swim/codec";
-import {FastenerClass, ComponentRef} from "@swim/component";
+import {FastenerClass, Provider, ComponentRef, Service} from "@swim/component";
+import type {Workspace} from "../workspace/Workspace";
 import {Scope} from "../scope/Scope";
 import {TaskStatus, TaskConfig} from "../task/Task";
 import {PackageScope} from "../package/PackageScope";
@@ -124,6 +125,20 @@ export class LibraryScope extends Scope {
     return output;
   }
 
+  @Provider<LibraryScope["workspace"]>({
+    extends: true,
+    mountService(service: Workspace, target: Service | null, key: string | undefined): void {
+      Provider.prototype.mountService.call(this, service, target, key);
+      service.libraries.addComponent(this.owner);
+    },
+    unmountService(service: Workspace): void {
+      Provider.prototype.unmountService.call(this, service);
+      service.libraries.removeComponent(this.owner);
+    },
+  })
+  override readonly workspace!: Provider<this, Workspace> & Scope["workspace"];
+  static override readonly workspace: FastenerClass<LibraryScope["workspace"]>;
+
   static override async load(baseDir: string): Promise<LibraryScope | null> {
     const name = Path.basename(baseDir);
     const libraryScope = new LibraryScope(name);
@@ -136,6 +151,7 @@ export class LibraryScope extends Scope {
       libraryScope.bundle.insertComponent();
       libraryScope.build.insertComponent();
       libraryScope.watch.insertComponent();
+      libraryScope.workspace; // instantiate
       return libraryScope;
     }
     return null;

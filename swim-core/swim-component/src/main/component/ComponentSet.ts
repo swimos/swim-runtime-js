@@ -411,30 +411,35 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     } else {
       newComponent = this.createComponent();
     }
-    if (parent === void 0 || parent === null) {
-      parent = this.parentComponent;
+    if (parent === void 0) {
+      parent = null;
     }
-    if (target === void 0) {
-      target = null;
-    }
-    if (key === void 0) {
-      key = this.componentKey(newComponent);
-    }
-    if (parent !== null && (newComponent.parent !== parent || newComponent.key !== key)) {
-      if (target === null) {
-        target = this.getTargetChild(parent, newComponent);
+    if (this.binds || this.components[newComponent.uid] === void 0 || newComponent.parent === null || parent !== null || key !== void 0) {
+      if (parent === null) {
+        parent = this.parentComponent;
       }
-      this.insertChild(parent, newComponent, target, key);
-    }
-    if (this.components[newComponent.uid] === void 0) {
-      this.insertComponentMap(newComponent, target);
-      (this as Mutable<typeof this>).componentCount += 1;
-      this.willAttachComponent(newComponent, target);
-      this.onAttachComponent(newComponent, target);
-      this.initComponent(newComponent);
-      this.didAttachComponent(newComponent, target);
-      this.setCoherent(true);
-      this.decohereOutlets();
+      if (target === void 0) {
+        target = null;
+      }
+      if (key === void 0) {
+        key = this.componentKey(newComponent);
+      }
+      if (parent !== null && (newComponent.parent !== parent || newComponent.key !== key)) {
+        if (target === null) {
+          target = this.getTargetChild(parent, newComponent);
+        }
+        this.insertChild(parent, newComponent, target, key);
+      }
+      if (this.components[newComponent.uid] === void 0) {
+        this.insertComponentMap(newComponent, target);
+        (this as Mutable<typeof this>).componentCount += 1;
+        this.willAttachComponent(newComponent, target);
+        this.onAttachComponent(newComponent, target);
+        this.initComponent(newComponent);
+        this.didAttachComponent(newComponent, target);
+        this.setCoherent(true);
+        this.decohereOutlets();
+      }
     }
     return newComponent;
   };

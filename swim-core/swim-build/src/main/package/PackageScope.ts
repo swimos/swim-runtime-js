@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Mutable, Class, Dictionary, MutableDictionary, Observes} from "@swim/util";
-import {FastenerClass, Provider, Component, ComponentRef, ComponentSet} from "@swim/component";
+import {FastenerClass, Provider, Component, ComponentRef, ComponentSet, Service} from "@swim/component";
 import {FileRef} from "@swim/sys";
 import type {Workspace} from "../workspace/Workspace";
 import {Scope} from "../scope/Scope";
@@ -113,23 +113,6 @@ export class PackageScope extends Scope {
   })
   readonly dependents!: ComponentSet<this, PackageScope>;
   static readonly dependents: FastenerClass<PackageScope["dependents"]>;
-
-  @Provider<PackageScope["workspace"]>({
-    extends: true,
-    observes: true,
-    didAttachService(service: Workspace): void {
-      const packages = service.packageNameMap;
-      for (const packageName in packages) {
-        const packageScope = packages[packageName]!;
-        this.owner.detectDependency(packageScope);
-      }
-    },
-    workspaceDidAttachPackage(packageScope: PackageScope): void {
-      this.owner.detectDependency(packageScope);
-    },
-  })
-  override readonly workspace!: Provider<this, Workspace> & Scope["workspace"] & Observes<Workspace>;
-  static override readonly workspace: FastenerClass<PackageScope["workspace"]>;
 
   @ComponentRef<PackageScope["deps"]>({
     componentType: DepsTask,
@@ -517,6 +500,29 @@ export class PackageScope extends Scope {
     }
   }
 
+  @Provider<PackageScope["workspace"]>({
+    extends: true,
+    observes: true,
+    serviceDidAttachPackage(packageScope: PackageScope): void {
+      this.owner.detectDependency(packageScope);
+    },
+    mountService(service: Workspace, target: Service | null, key: string | undefined): void {
+      Provider.prototype.mountService.call(this, service, target, key);
+      service.packages.addComponent(this.owner);
+      const packages = service.packageNameMap;
+      for (const packageName in packages) {
+        const packageScope = packages[packageName]!;
+        this.owner.detectDependency(packageScope);
+      }
+    },
+    unmountService(service: Workspace): void {
+      Provider.prototype.unmountService.call(this, service);
+      service.packages.removeComponent(this.owner);
+    },
+  })
+  override readonly workspace!: Provider<this, Workspace> & Scope["workspace"] & Observes<Workspace>;
+  static override readonly workspace: FastenerClass<PackageScope["workspace"]>;
+
   static override async load(baseDir: string): Promise<PackageScope | null> {
     const packageScope = new PackageScope("");
     packageScope.baseDir.setValue(baseDir);
@@ -530,6 +536,7 @@ export class PackageScope extends Scope {
       packageScope.version.insertComponent();
       packageScope.publish.insertComponent();
       packageScope.clean.insertComponent();
+      packageScope.workspace; // instantiate
       await packageScope.initChildren();
       return packageScope;
     }

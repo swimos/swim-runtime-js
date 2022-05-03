@@ -13,9 +13,17 @@
 // limitations under the License.
 
 export {
-  ServiceFactory,
-  ServiceClass,
-  ServiceConstructor,
-  Service,
-} from "./Service";
-export {ServiceObserver} from "./ServiceObserver";
+  EventHandlerTarget,
+  EventHandlerDescriptor,
+  EventHandlerTemplate,
+  EventHandlerClass,
+  EventHandler,
+} from "./EventHandler";
+
+export {
+  EventTimerTarget,
+  EventTimerDescriptor,
+  EventTimerTemplate,
+  EventTimerClass,
+  EventTimer,
+} from "./EventTimer";

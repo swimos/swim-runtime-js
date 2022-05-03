@@ -109,7 +109,7 @@ export class CompileTask extends LibraryTask {
   }
 
   protected getParsedCommandLine(fileName: string): ts.ParsedCommandLine | undefined {
-    const workspace = this.workspace.service;
+    const workspace = this.workspace.getService();
     const libraryDir = Path.dirname(fileName);
     const libraryScope = workspace.getLibrary(libraryDir);
     if (libraryScope !== null) {
@@ -133,7 +133,7 @@ export class CompileTask extends LibraryTask {
   protected injectProjectReferences(packageScope: PackageScope, projectReferences: readonly ts.ProjectReference[] | undefined): readonly ts.ProjectReference[] | undefined {
     const dependencyReferences = projectReferences !== void 0 ? projectReferences.slice(0) : [];
 
-    const workspace = this.workspace.service;
+    const workspace = this.workspace.getService();
     const dependencies = packageScope.getDependencies();
     for (let i = 0; i < dependencyReferences.length; i += 1) {
       const dependencyReference = dependencyReferences[i]!;
