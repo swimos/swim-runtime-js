@@ -308,6 +308,8 @@ export const Property = (function (_super: typeof Fastener) {
         this.didSetValue(newValue, oldValue);
         this.setCoherent(true);
         this.decohereOutlets();
+      } else {
+        this.setCoherent(true);
       }
     }
   };
