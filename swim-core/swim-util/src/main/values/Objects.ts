@@ -33,6 +33,10 @@ export const Objects = (function () {
      */
     inserted<O, K extends keyof O>(object: O, key: K, value: O[K], target: unknown): O;
 
+    getFirstKey<O>(object: O): keyof O | undefined;
+
+    getFirstValue<O>(object: O): O[keyof O] | undefined;
+
     getNextKey<O>(object: O, key: keyof O): keyof O | undefined;
 
     getNextValue<O>(object: O, key: keyof O): O[keyof O] | undefined;
@@ -95,6 +99,24 @@ export const Objects = (function () {
       newObject[newKey as keyof O] = newValue as O[keyof O];
     }
     return newObject;
+  };
+
+  Objects.getFirstKey = function <O>(object: O): keyof O | undefined {
+    for (const k in object) {
+      if (Object.prototype.hasOwnProperty.call(object, k)) {
+        return k;
+      }
+    }
+    return void 0;
+  };
+
+  Objects.getFirstValue = function <O>(object: O): O[keyof O] | undefined {
+    for (const k in object) {
+      if (Object.prototype.hasOwnProperty.call(object, k)) {
+        return object[k]!;
+      }
+    }
+    return void 0;
   };
 
   Objects.getNextKey = function <O>(object: O, key: keyof O): keyof O | undefined {
