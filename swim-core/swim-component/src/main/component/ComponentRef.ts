@@ -107,7 +107,7 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
   /** @protected @override */
   didUnbindInlet(inlet: ComponentRef<unknown, C>): void;
 
-  /** @internal */
+  /** @internal @override */
   readonly outlets: ReadonlyArray<ComponentRef<unknown, C>> | null;
 
   /** @internal @override */
@@ -173,35 +173,6 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
       this.attachComponent(inletComponent);
     } else {
       this.detachComponent();
-    }
-  };
-
-  ComponentRef.prototype.onBindInlet = function <C extends Component>(this: ComponentRef<unknown, C>, inlet: ComponentRef<unknown, C>): void {
-    (this as Mutable<typeof this>).inlet = inlet;
-    _super.prototype.onBindInlet.call(this, inlet);
-  };
-
-  ComponentRef.prototype.onUnbindInlet = function <C extends Component>(this: ComponentRef<unknown, C>, inlet: ComponentRef<unknown, C>): void {
-    _super.prototype.onUnbindInlet.call(this, inlet);
-    (this as Mutable<typeof this>).inlet = null;
-  };
-
-  ComponentRef.prototype.attachOutlet = function <C extends Component>(this: ComponentRef<unknown, C>, outlet: ComponentRef<unknown, C>): void {
-    let outlets = this.outlets as ComponentRef<unknown, C>[] | null;
-    if (outlets === null) {
-      outlets = [];
-      (this as Mutable<typeof this>).outlets = outlets;
-    }
-    outlets.push(outlet);
-  };
-
-  ComponentRef.prototype.detachOutlet = function <C extends Component>(this: ComponentRef<unknown, C>, outlet: ComponentRef<unknown, C>): void {
-    const outlets = this.outlets as ComponentRef<unknown, C>[] | null;
-    if (outlets !== null) {
-      const index = outlets.indexOf(outlet);
-      if (index >= 0) {
-        outlets.splice(index, 1);
-      }
     }
   };
 
@@ -471,13 +442,6 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
       Object.setPrototypeOf(fastener, this.prototype);
     }
     fastener = _super.construct.call(this, fastener, owner) as F;
-    Object.defineProperty(fastener, "inlet", { // override getter
-      value: null,
-      writable: true,
-      enumerable: true,
-      configurable: true,
-    });
-    (fastener as Mutable<typeof fastener>).outlets = null;
     (fastener as Mutable<typeof fastener>).component = null;
     return fastener;
   };

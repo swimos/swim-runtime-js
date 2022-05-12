@@ -20,9 +20,8 @@ import {
   Arrays,
   Observes,
   Observable,
-  Consumes,
-  Consumable,
   Consumer,
+  Consumable,
 } from "@swim/util";
 import {
   FastenerFlags,
@@ -106,14 +105,11 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
   /** @override */
   readonly observerType?: Class<WarpDownlinkObserver>;
 
-  /** @override */
-  readonly consumerType?: Class<Consumer>;
+  /** @protected */
+  readonly consumed?: boolean; // optional prototype property
 
   /** @internal */
   readonly model: WarpDownlinkModel | null;
-
-  /** @protected */
-  readonly consumed?: boolean; // optional prototype property
 
   /** @protected @override */
   onDerive(inlet: WarpDownlink): void;
@@ -301,31 +297,31 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
   didUnobserve(observer: Observes<this>): void;
 
   /** @internal */
-  readonly consumers: ReadonlyArray<Consumes<this>>;
+  readonly consumers: ReadonlyArray<Consumer>;
 
   /** @override */
-  consume(consumer: Consumes<this>): void
+  consume(consumer: Consumer): void
 
   /** @protected */
-  willConsume(consumer: Consumes<this>): void;
+  willConsume(consumer: Consumer): void;
 
   /** @protected */
-  onConsume(consumer: Consumes<this>): void;
+  onConsume(consumer: Consumer): void;
 
   /** @protected */
-  didConsume(consumer: Consumes<this>): void;
+  didConsume(consumer: Consumer): void;
 
   /** @override */
-  unconsume(consumer: Consumes<this>): void
+  unconsume(consumer: Consumer): void
 
   /** @protected */
-  willUnconsume(consumer: Consumes<this>): void;
+  willUnconsume(consumer: Consumer): void;
 
   /** @protected */
-  onUnconsume(consumer: Consumes<this>): void;
+  onUnconsume(consumer: Consumer): void;
 
   /** @protected */
-  didUnconsume(consumer: Consumes<this>): void;
+  didUnconsume(consumer: Consumer): void;
 
   get consuming(): boolean;
 
@@ -866,55 +862,55 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     // hook
   };
 
-  WarpDownlink.prototype.consume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
+  WarpDownlink.prototype.consume = function (this: WarpDownlink, consumer: Consumer): void {
     const oldConsumers = this.consumers;
-    const newConsumerrss = Arrays.inserted(downlinkConsumer, oldConsumers);
+    const newConsumerrss = Arrays.inserted(consumer, oldConsumers);
     if (oldConsumers !== newConsumerrss) {
-      this.willConsume(downlinkConsumer);
+      this.willConsume(consumer);
       (this as Mutable<typeof this>).consumers = newConsumerrss;
-      this.onConsume(downlinkConsumer);
-      this.didConsume(downlinkConsumer);
+      this.onConsume(consumer);
+      this.didConsume(consumer);
       if (oldConsumers.length === 0) {
         this.startConsuming();
       }
     }
   };
 
-  WarpDownlink.prototype.willConsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
+  WarpDownlink.prototype.willConsume = function (this: WarpDownlink, consumer: Consumer): void {
     // hook
   };
 
-  WarpDownlink.prototype.onConsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
+  WarpDownlink.prototype.onConsume = function (this: WarpDownlink, consumer: Consumer): void {
     // hook
   };
 
-  WarpDownlink.prototype.didConsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
+  WarpDownlink.prototype.didConsume = function (this: WarpDownlink, consumer: Consumer): void {
     // hook
   };
 
-  WarpDownlink.prototype.unconsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
+  WarpDownlink.prototype.unconsume = function (this: WarpDownlink, consumer: Consumer): void {
     const oldConsumers = this.consumers;
-    const newConsumerrss = Arrays.removed(downlinkConsumer, oldConsumers);
+    const newConsumerrss = Arrays.removed(consumer, oldConsumers);
     if (oldConsumers !== newConsumerrss) {
-      this.willUnconsume(downlinkConsumer);
+      this.willUnconsume(consumer);
       (this as Mutable<typeof this>).consumers = newConsumerrss;
-      this.onUnconsume(downlinkConsumer);
-      this.didUnconsume(downlinkConsumer);
+      this.onUnconsume(consumer);
+      this.didUnconsume(consumer);
       if (newConsumerrss.length === 0) {
         this.stopConsuming();
       }
     }
   };
 
-  WarpDownlink.prototype.willUnconsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
+  WarpDownlink.prototype.willUnconsume = function (this: WarpDownlink, consumer: Consumer): void {
     // hook
   };
 
-  WarpDownlink.prototype.onUnconsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
+  WarpDownlink.prototype.onUnconsume = function (this: WarpDownlink, consumer: Consumer): void {
     // hook
   };
 
-  WarpDownlink.prototype.didUnconsume = function (this: WarpDownlink, downlinkConsumer: Consumes<typeof this>): void {
+  WarpDownlink.prototype.didUnconsume = function (this: WarpDownlink, consumer: Consumer): void {
     // hook
   };
 

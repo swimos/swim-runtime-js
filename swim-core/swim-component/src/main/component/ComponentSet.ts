@@ -117,7 +117,7 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   /** @protected @override */
   didUnbindInlet(inlet: ComponentSet<unknown, C>): void;
 
-  /** @internal */
+  /** @internal @override */
   readonly outlets: ReadonlyArray<ComponentSet<unknown, C>> | null;
 
   /** @internal @override */
@@ -238,35 +238,6 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
 
   ComponentSet.prototype.onDerive = function (this: ComponentSet, inlet: ComponentSet): void {
     this.setComponents(inlet.components);
-  };
-
-  ComponentSet.prototype.onBindInlet = function <C extends Component>(this: ComponentSet<unknown, C>, inlet: ComponentSet<unknown, C>): void {
-    (this as Mutable<typeof this>).inlet = inlet;
-    _super.prototype.onBindInlet.call(this, inlet);
-  };
-
-  ComponentSet.prototype.onUnbindInlet = function <C extends Component>(this: ComponentSet<unknown, C>, inlet: ComponentSet<unknown, C>): void {
-    _super.prototype.onUnbindInlet.call(this, inlet);
-    (this as Mutable<typeof this>).inlet = null;
-  };
-
-  ComponentSet.prototype.attachOutlet = function <C extends Component>(this: ComponentSet<unknown, C>, outlet: ComponentSet<unknown, C>): void {
-    let outlets = this.outlets as ComponentSet<unknown, C>[] | null;
-    if (outlets === null) {
-      outlets = [];
-      (this as Mutable<typeof this>).outlets = outlets;
-    }
-    outlets.push(outlet);
-  };
-
-  ComponentSet.prototype.detachOutlet = function <C extends Component>(this: ComponentSet<unknown, C>, outlet: ComponentSet<unknown, C>): void {
-    const outlets = this.outlets as ComponentSet<unknown, C>[] | null;
-    if (outlets !== null) {
-      const index = outlets.indexOf(outlet);
-      if (index >= 0) {
-        outlets.splice(index, 1);
-      }
-    }
   };
 
   ComponentSet.prototype.insertComponentMap = function <C extends Component>(this: ComponentSet<unknown, C>, newComponent: C, target: Component | null): void {
@@ -688,13 +659,6 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
       fastener.initOrdered((flagsInit & ComponentSet.OrderedFlag) !== 0);
       fastener.initSorted((flagsInit & ComponentSet.SortedFlag) !== 0);
     }
-    Object.defineProperty(fastener, "inlet", { // override getter
-      value: null,
-      writable: true,
-      enumerable: true,
-      configurable: true,
-    });
-    (fastener as Mutable<typeof fastener>).outlets = null;
     (fastener as Mutable<typeof fastener>).components = {};
     (fastener as Mutable<typeof fastener>).componentCount = 0;
     return fastener;
