@@ -186,8 +186,9 @@ export const FastenerContext = (function () {
         const fastenerClassInitMap = contextClass.fastenerClassInitMap!;
         for (const fastenerName in fastenerClassInitMap) {
           const fastenerClass = fastenerClassInitMap[fastenerName]!;
-          if (!fastenerContext.hasFastener(fastenerName)) {
-            const fastener = fastenerClass.create(fastenerContext);
+          let fastener = fastenerContext.getFastener(fastenerName);
+          if (fastener === null) {
+            fastener = fastenerClass.create(fastenerContext);
             fastenerContext.setFastener(fastenerName, fastener);
           }
         }
