@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@types/prismjs": "1",
-    "prismjs": "1.27"
+    "prismjs": "1.28"
   },
   "bin": {
     "swim-macro": "./dist/swim-macro-cli.cjs"
