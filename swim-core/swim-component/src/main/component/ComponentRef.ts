@@ -133,7 +133,7 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
 
   detachComponent(): C | null;
 
-  insertComponent(parent?: Component, component?: AnyComponent<C>, target?: Component | null, key?: string): C;
+  insertComponent(parent?: Component | null, component?: AnyComponent<C>, target?: Component | null, key?: string): C;
 
   removeComponent(): C | null;
 
