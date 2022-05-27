@@ -1,6 +1,6 @@
 {
   "name": "@swim/client",
-  "version": "4.0.0-dev.20220527.2",
+  "version": "4.0.0-dev.20220527.3",
   "description": "Streaming API client for linking to lanes of stateful Web Agents using the WARP protocol, enabling massively real-time applications that continuously synchronize all shared states with ping latency",
   "homepage": "https://github.com/swimos/swim/tree/main/swim-js/swim-runtime/swim-host/swim-client",
   "author": "Chris Sachs <chris@swimos.org>",
@@ -39,15 +39,15 @@
     "websocket"
   ],
   "dependencies": {
-    "@swim/util": "4.0.0-dev.20220527.2",
-    "@swim/codec": "4.0.0-dev.20220527.2",
-    "@swim/args": "4.0.0-dev.20220527.2",
-    "@swim/component": "4.0.0-dev.20220527.2",
-    "@swim/collections": "4.0.0-dev.20220527.2",
-    "@swim/structure": "4.0.0-dev.20220527.2",
-    "@swim/recon": "4.0.0-dev.20220527.2",
-    "@swim/uri": "4.0.0-dev.20220527.2",
-    "@swim/warp": "4.0.0-dev.20220527.2",
+    "@swim/util": "4.0.0-dev.20220527.3",
+    "@swim/codec": "4.0.0-dev.20220527.3",
+    "@swim/args": "4.0.0-dev.20220527.3",
+    "@swim/component": "4.0.0-dev.20220527.3",
+    "@swim/collections": "4.0.0-dev.20220527.3",
+    "@swim/structure": "4.0.0-dev.20220527.3",
+    "@swim/recon": "4.0.0-dev.20220527.3",
+    "@swim/uri": "4.0.0-dev.20220527.3",
+    "@swim/warp": "4.0.0-dev.20220527.3",
     "ws": "8"
   },
   "devDependencies": {
