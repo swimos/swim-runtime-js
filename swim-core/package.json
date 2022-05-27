@@ -44,7 +44,7 @@
     "chokidar": "3",
     "eslint": "8",
     "prismjs": "1.28",
-    "rollup": "2.73",
+    "rollup": "2.75",
     "rollup-plugin-sourcemaps": "0.6",
     "rollup-plugin-terser": "7",
     "terser": "5",
