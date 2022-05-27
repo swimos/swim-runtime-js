@@ -1,6 +1,6 @@
 {
   "name": "@swim/component",
-  "version": "4.0.0-dev.20220527.1",
+  "version": "4.0.0-dev.20220527.2",
   "description": "Lifecycle managed object model and observable fastener model",
   "homepage": "https://github.com/swimos/swim/tree/main/swim-js/swim-runtime/swim-core/swim-component",
   "author": "Chris Sachs <chris@swimos.org>",
@@ -20,7 +20,7 @@
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
-    "@swim/util": "4.0.0-dev.20220527.1"
+    "@swim/util": "4.0.0-dev.20220527.2"
   },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",
