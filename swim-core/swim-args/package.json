@@ -1,6 +1,6 @@
 {
   "name": "@swim/args",
-  "version": "4.0.0-dev.20220527",
+  "version": "4.0.0-dev.20220527.1",
   "description": "Composable command line argument parser",
   "homepage": "https://github.com/swimos/swim/tree/main/swim-js/swim-runtime/swim-core/swim-args",
   "author": "Chris Sachs <chris@swimos.org>",
@@ -20,8 +20,8 @@
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
-    "@swim/util": "4.0.0-dev.20220527",
-    "@swim/codec": "4.0.0-dev.20220527"
+    "@swim/util": "4.0.0-dev.20220527.1",
+    "@swim/codec": "4.0.0-dev.20220527.1"
   },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",

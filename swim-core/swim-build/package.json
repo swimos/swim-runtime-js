@@ -1,6 +1,6 @@
 {
   "name": "@swim/build",
-  "version": "4.0.0-dev.20220527",
+  "version": "4.0.0-dev.20220527.1",
   "description": "Swim build tool",
   "homepage": "https://github.com/swimos/swim/tree/main/swim-js/swim-runtime/swim-core/swim-build",
   "author": "Chris Sachs <chris@swimos.org>",
@@ -21,11 +21,11 @@
   "sideEffects": false,
   "dependencies": {
     "chokidar": "3",
-    "@swim/util": "4.0.0-dev.20220527",
-    "@swim/codec": "4.0.0-dev.20220527",
-    "@swim/component": "4.0.0-dev.20220527",
-    "@swim/sys": "4.0.0-dev.20220527",
-    "@swim/args": "4.0.0-dev.20220527"
+    "@swim/util": "4.0.0-dev.20220527.1",
+    "@swim/codec": "4.0.0-dev.20220527.1",
+    "@swim/component": "4.0.0-dev.20220527.1",
+    "@swim/sys": "4.0.0-dev.20220527.1",
+    "@swim/args": "4.0.0-dev.20220527.1"
   },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",
