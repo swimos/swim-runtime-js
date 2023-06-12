@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {ItemOrderSpec} from "./ItemOrderSpec";
 import {RecordMapSpec} from "./RecordMapSpec";
 import {RecordMapViewSpec} from "./RecordMapViewSpec";
@@ -22,45 +23,44 @@ import {InterpolatorSpec} from "./InterpolatorSpec";
 import {FuncSuite} from "./func/FuncSuite";
 import {FormSuite} from "./form/FormSuite";
 
-@Unit
-export class StructureSuite extends Spec {
+export class StructureSuite extends Suite {
   @Unit
-  itemOrderSpec(): Spec {
+  itemOrderSpec(): Suite {
     return new ItemOrderSpec();
   }
 
   @Unit
-  recordMapSpec(): Spec {
+  recordMapSpec(): Suite {
     return new RecordMapSpec();
   }
 
   @Unit
-  recordMapViewSpec(): Spec {
+  recordMapViewSpec(): Suite {
     return new RecordMapViewSpec();
   }
 
   @Unit
-  selectorSpec(): Spec {
+  selectorSpec(): Suite {
     return new SelectorSpec();
   }
 
   @Unit
-  operatorSpec(): Spec {
+  operatorSpec(): Suite {
     return new OperatorSpec();
   }
 
   @Unit
-  funcSuite(): Spec {
+  funcSuite(): Suite {
     return new FuncSuite();
   }
 
   @Unit
-  formSuite(): Spec {
+  formSuite(): Suite {
     return new FormSuite();
   }
 
   @Unit
-  interpolatorSpec(): Spec {
+  interpolatorSpec(): Suite {
     return new InterpolatorSpec();
   }
 }

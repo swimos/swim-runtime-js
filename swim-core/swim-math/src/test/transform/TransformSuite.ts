@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {TransformParserSpec} from "./TransformParserSpec";
 
-@Unit
-export class TransformSuite extends Spec {
+export class TransformSuite extends Suite {
   @Unit
-  transformParserSpec(): Spec {
+  transformParserSpec(): Suite {
     return new TransformParserSpec();
   }
 }

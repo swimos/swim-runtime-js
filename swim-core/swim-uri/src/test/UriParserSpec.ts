@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Uri} from "@swim/uri";
 
-export class UriParserSpec extends Spec {
+export class UriParserSpec extends Suite {
   @Test
   parseEmptyURIs(exam: Exam): void {
     exam.equal(Uri.parse(""), Uri.empty());

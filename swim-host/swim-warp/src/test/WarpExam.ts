@@ -13,22 +13,27 @@
 // limitations under the License.
 
 import {Unicode} from "@swim/codec";
-import {TestException, TestOptions, Spec, Proof, Report, Exam} from "@swim/unit";
+import {TestException} from "@swim/unit";
+import {Proof} from "@swim/unit";
+import {Exam} from "@swim/unit";
+import type {TestOptions} from "@swim/unit";
+import type {Suite} from "@swim/unit";
+import type {Report} from "@swim/unit";
 import {Envelope} from "@swim/warp";
 
 export class WarpExam extends Exam {
-  constructor(report: Report, spec: Spec, name: string, options: TestOptions) {
+  constructor(report: Report, spec: Suite, name: string, options: TestOptions) {
     super(report, spec, name, options);
   }
 
   parses(recon: string, envelope: Envelope): void {
     const actual = Envelope.parseRecon(recon);
     if (envelope.equals(actual)) {
-      this.proove(Proof.valid("parses"));
+      this.prove(Proof.valid("parses"));
     } else {
       const message = Unicode.stringOutput();
       message.write("when parsing ").debug(recon);
-      this.proove(Proof.refuted(actual, "equals", envelope, message.bind()));
+      this.prove(Proof.refuted(actual, "equals", envelope, message.bind()));
       throw new TestException(message.bind());
     }
   }
@@ -36,11 +41,11 @@ export class WarpExam extends Exam {
   writes(envelope: Envelope, recon: string): void {
     const actual = envelope.toRecon();
     if (actual === recon) {
-      this.proove(Proof.valid("writes"));
+      this.prove(Proof.valid("writes"));
     } else {
       const message = Unicode.stringOutput();
       message.write("when writing ").debug(envelope);
-      this.proove(Proof.refuted(actual, "equals", recon, message.bind()));
+      this.prove(Proof.refuted(actual, "equals", recon, message.bind()));
     }
   }
 }

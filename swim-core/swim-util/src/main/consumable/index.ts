@@ -12,7 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  Consumer,
-  Consumable,
-} from "./Consumable";
+export type {Consumer} from "./Consumable";
+export {Consumable} from "./Consumable";

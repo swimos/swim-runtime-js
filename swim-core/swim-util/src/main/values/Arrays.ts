@@ -25,8 +25,8 @@ export const Arrays = (function () {
 
     /**
      * Returns a copy of an array with the given element inserted, if the element
-     * is not already present in the arrary; otherwise returns the input array if
-     * it already containts the specified element.
+     * is not already present in the array; otherwise returns the input array if
+     * it already contains the specified element.
      */
     inserted<T>(newElement: T, oldArray: ReadonlyArray<T> | null | undefined): ReadonlyArray<T>;
 

@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Uri} from "@swim/uri";
 
-export class UriResolverSpec extends Spec {
+export class UriResolverSpec extends Suite {
   @Test
   resolveNormalURIs(exam: Exam): void {
     const base = Uri.parse("http://a/b/c/d;p?q");

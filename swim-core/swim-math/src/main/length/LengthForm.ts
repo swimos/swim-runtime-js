@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item, Text, Form} from "@swim/structure";
-import {LengthUnits, AnyLength, Length} from "./Length";
+import type {Item} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Form} from "@swim/structure";
+import type {LengthUnits} from "./Length";
+import type {AnyLength} from "./Length";
+import {Length} from "./Length";
 
 /** @internal */
 export class LengthForm extends Form<Length, AnyLength> {

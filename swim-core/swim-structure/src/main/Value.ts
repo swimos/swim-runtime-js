@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem, Item} from "./Item";
-import type {Interpolator, Builder} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import type {Builder} from "@swim/util";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
 import type {Field} from "./Field";
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
 import {ValueBuilder} from "./"; // forward import
 import {Record} from "./"; // forward import
 import {Data} from "./"; // forward import
-import {AnyText, Text} from "./"; // forward import
-import {AnyNum, Num} from "./"; // forward import
+import type {AnyText} from "./Text";
+import {Text} from "./"; // forward import
+import type {AnyNum} from "./Num";
+import {Num} from "./"; // forward import
 import {Bool} from "./"; // forward import
 import {Extant} from "./"; // forward import
 import {Absent} from "./"; // forward import

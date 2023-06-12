@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {HostRefSpec} from "./HostRefSpec";
 import {NodeRefSpec} from "./NodeRefSpec";
 import {LaneRefSpec} from "./LaneRefSpec";
 import {WarpClientSpec} from "./WarpClientSpec";
 
-@Unit
-export class RefSuite extends Spec {
+export class RefSuite extends Suite {
   @Unit
-  hostRefSpec(): Spec {
+  hostRefSpec(): Suite {
     return new HostRefSpec();
   }
 
   @Unit
-  nodeRefSpec(): Spec {
+  nodeRefSpec(): Suite {
     return new NodeRefSpec();
   }
 
   @Unit
-  laneRefSpec(): Spec {
+  laneRefSpec(): Suite {
     return new LaneRefSpec();
   }
 
   @Unit
-  warpClientSpec(): Spec {
+  warpClientSpec(): Suite {
     return new WarpClientSpec();
   }
 }

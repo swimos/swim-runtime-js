@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Murmur3, Numbers, Constructors, Interpolator} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import type {Value} from "../Value";
 import {Operator} from "./Operator";
 import {InvokeOperatorInterpolator} from "../"; // forward import
 import {Func} from "../"; // forward import
-import {AnyInterpreter, Interpreter} from "../"; // forward import
+import type {AnyInterpreter} from "../interpreter/Interpreter"; // forward import
+import {Interpreter} from "../"; // forward import
 
 /** @public */
 export class InvokeOperator extends Operator {

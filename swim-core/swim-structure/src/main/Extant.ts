@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Numbers, Constructors, Interpolator} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "./Item";
 import {Value} from "./Value";

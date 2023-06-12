@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {ScopeObserver} from "../scope/ScopeObserver";
-import type {TaskStatus, Task} from "./Task";
+import type {TaskStatus} from "./Task";
+import type {Task} from "./Task";
 
 /** @public */
 export interface TaskObserver<T extends Task = Task> extends ScopeObserver<T> {

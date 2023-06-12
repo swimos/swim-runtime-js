@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Domain, Interpolate, Interpolator} from "@swim/util";
-import {AnyDateTime, DateTime} from "../DateTime";
+import type {Mutable} from "@swim/util";
+import {Domain} from "@swim/util";
+import type {Interpolate} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import type {AnyDateTime} from "../DateTime";
+import {DateTime} from "../DateTime";
 import {TimeDomainInterpolator} from "./"; // forward import
 import {TimeRange} from "./"; // forward import
 
@@ -65,7 +69,7 @@ export const TimeDomain = (function (_super: typeof Domain) {
 
     /** @internal */
     prototype: TimeDomain;
-  }
+  };
 
   TimeDomain.prototype = Object.create(_super.prototype);
   TimeDomain.prototype.constructor = TimeDomain;

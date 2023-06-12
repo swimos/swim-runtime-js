@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {HashGenCacheMap} from "@swim/util";
-import {AnyUri, Uri} from "./Uri";
+import type {AnyUri} from "./Uri";
+import {Uri} from "./Uri";
 
 /** @public */
 export class UriCache {

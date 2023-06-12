@@ -13,7 +13,13 @@
 // limitations under the License.
 
 import type {Output} from "@swim/codec";
-import {Item, Attr, Slot, Value, Record, Text, Num} from "@swim/structure";
+import type {Item} from "@swim/structure";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Num} from "@swim/structure";
 import {Converter} from "./Converter";
 
 /** @public */

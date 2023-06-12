@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Builder} from "@swim/util";
-import {Input, Parser} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import {Recon} from "../Recon";
 import type {ReconParser} from "./ReconParser";
 

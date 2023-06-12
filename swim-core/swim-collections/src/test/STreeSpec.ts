@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {STree} from "@swim/collections";
 
-export class STreeSpec extends Spec {
+export class STreeSpec extends Suite {
   @Test
   testSetAndGet(exam: Exam): void {
     const tree = new STree<number>();

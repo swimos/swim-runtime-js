@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Murmur3, Constructors, Interpolator} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {Item, Value, Record} from "@swim/structure";
+import type {Item} from "@swim/structure";
+import type {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
 import {R2Point} from "../r2/R2Point";
 import {Transform} from "./Transform";
 import {AffineTransform} from "./AffineTransform";

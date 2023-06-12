@@ -12,19 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit, Test, Exam} from "@swim/unit";
-import {Value, Attr, Slot, Record, Text} from "@swim/structure";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Value} from "@swim/structure";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Text} from "@swim/structure";
 import {RecordMapViewMutableSpec} from "./RecordMapViewMutableSpec";
 import {RecordMapViewImmutableSpec} from "./RecordMapViewImmutableSpec";
 
-export class RecordMapViewSpec extends Spec {
+export class RecordMapViewSpec extends Suite {
   @Unit
-  mutableSpec(): Spec {
+  mutableSpec(): Suite {
     return new RecordMapViewMutableSpec();
   }
 
   @Unit
-  immutableSpec(): Spec {
+  immutableSpec(): Suite {
     return new RecordMapViewImmutableSpec();
   }
 

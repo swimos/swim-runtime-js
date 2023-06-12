@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {OutputSettings, OutputStyle, Unicode} from "@swim/codec";
-import type {Spec} from "./Spec";
+import {OutputSettings} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import type {Proof} from "./Proof";
-import {Report} from "./Report";
 import type {Exam} from "./Exam";
+import type {Suite} from "./Suite";
+import type {Report} from "./Report";
 
 /**
  * Unit test `Report` that prints its results to the console.
  * @public
  */
-export class ConsoleReport extends Report {
+export class ConsoleReport implements Report {
   /** @internal */
   outputSettings: OutputSettings;
   /** @internal */
@@ -33,7 +35,6 @@ export class ConsoleReport extends Report {
   failCount: number;
 
   constructor(outputSettings?: OutputSettings) {
-    super();
     if (outputSettings === void 0) {
       outputSettings = OutputSettings.styled();
     }
@@ -43,7 +44,8 @@ export class ConsoleReport extends Report {
     this.failCount = 0;
   }
 
-  override willRunSpec(spec: Spec): void {
+  /** @override */
+  willRunSuite(suite: Suite): void {
     let output = Unicode.stringOutput(this.outputSettings);
     if (this.testDepth > 0) {
       OutputStyle.cyanBold(output);
@@ -54,14 +56,15 @@ export class ConsoleReport extends Report {
       OutputStyle.reset(output);
     }
     OutputStyle.bold(output);
-    output = output.write(spec.name);
+    output = output.write(suite.name);
     OutputStyle.reset(output);
     console.log(output.toString());
 
     this.testDepth += 1;
   }
 
-  override willRunTest(spec: Spec, exam: Exam): void {
+  /** @override */
+  willRunTest(suite: Suite, exam: Exam): void {
     let output = Unicode.stringOutput(this.outputSettings);
     OutputStyle.cyanBold(output);
     for (let i = 0; i < this.testDepth - 1; i += 1) {
@@ -73,7 +76,8 @@ export class ConsoleReport extends Report {
     console.log(output.toString());
   }
 
-  override onProof(spec: Spec, exam: Exam, proof: Proof): void {
+  /** @override */
+  onProof(suite: Suite, exam: Exam, proof: Proof): void {
     if (proof.isValid()) {
       this.passCount += 1;
     } else {
@@ -89,7 +93,8 @@ export class ConsoleReport extends Report {
     console.log(output.toString());
   }
 
-  override onComment(spec: Spec, exam: Exam, message: string): void {
+  /** @override */
+  onComment(suite: Suite, exam: Exam, message: string): void {
     let output = Unicode.stringOutput(this.outputSettings);
     OutputStyle.cyanBold(output);
     for (let i = 0; i < this.testDepth; i += 1) {
@@ -102,7 +107,8 @@ export class ConsoleReport extends Report {
     console.log(output.toString());
   }
 
-  override didRunSpec(spec: Spec): void {
+  /** @override */
+  didRunSpec(suite: Suite): void {
     this.testDepth -= 1;
     if (this.testDepth === 0) {
       let output = Unicode.stringOutput(this.outputSettings);

@@ -13,13 +13,16 @@
 // limitations under the License.
 
 import type {Interpolator} from "@swim/util";
-import {AnyItem, Item} from "./Item";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
 import {FieldInterpolator} from "./"; // forward import
 import {Attr} from "./"; // forward import
-import {Slot} from "./" // forward import
-import {AnyValue, Value} from "./"; // forward import
+import {Slot} from "./"; // forward import
+import type {AnyValue} from "./Value";
+import {Value} from "./"; // forward import
 import {Record} from "./"; // forward import
-import {AnyText, Text} from "./"; // forward import
+import type {AnyText} from "./Text";
+import {Text} from "./"; // forward import
 import type {AnyNum} from "./Num";
 
 /** @public */

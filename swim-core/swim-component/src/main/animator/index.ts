@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  AnimatorValue,
-  AnimatorValueInit,
-  AnyAnimatorValue,
-  AnimatorDescriptor,
-  AnimatorTemplate,
-  AnimatorClass,
-  Animator,
-} from "./Animator";
+export type {AnimatorValue} from "./Animator";
+export type {AnimatorValueInit} from "./Animator";
+export type {AnyAnimatorValue} from "./Animator";
+export type {AnimatorDecorator} from "./Animator";
+export type {AnimatorDescriptor} from "./Animator";
+export type {AnimatorTemplate} from "./Animator";
+export type {AnimatorClass} from "./Animator";
+export {Animator} from "./Animator";

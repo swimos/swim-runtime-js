@@ -13,4 +13,4 @@
 // limitations under the License.
 
 export {Workspace} from "./Workspace";
-export {WorkspaceObserver} from "./WorkspaceObserver";
+export type {WorkspaceObserver} from "./WorkspaceObserver";

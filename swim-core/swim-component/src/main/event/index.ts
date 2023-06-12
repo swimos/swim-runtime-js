@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  EventHandlerTarget,
-  EventHandlerDescriptor,
-  EventHandlerTemplate,
-  EventHandlerClass,
-  EventHandler,
-} from "./EventHandler";
+export type {EventHandlerTarget} from "./EventHandler";
+export type {EventHandlerDecorator} from "./EventHandler";
+export type {EventHandlerDescriptor} from "./EventHandler";
+export type {EventHandlerTemplate} from "./EventHandler";
+export type {EventHandlerClass} from "./EventHandler";
+export {EventHandler} from "./EventHandler";
 
-export {
-  EventTimerTarget,
-  EventTimerDescriptor,
-  EventTimerTemplate,
-  EventTimerClass,
-  EventTimer,
-} from "./EventTimer";
+export type {EventTimerTarget} from "./EventTimer";
+export type {EventTimerDecorator} from "./EventTimer";
+export type {EventTimerDescriptor} from "./EventTimer";
+export type {EventTimerTemplate} from "./EventTimer";
+export type {EventTimerClass} from "./EventTimer";
+export {EventTimer} from "./EventTimer";

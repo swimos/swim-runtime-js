@@ -13,9 +13,8 @@
 // limitations under the License.
 
 export {AssertException} from "./AssertException";
-export {
-  AssertFunction,
-  Assert,
-} from "./Assert";
+
+export type {AssertFunction} from "./Assert";
+export {Assert} from "./Assert";
 
 export {Severity} from "./Severity";

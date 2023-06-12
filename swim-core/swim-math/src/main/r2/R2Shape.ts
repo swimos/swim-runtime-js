@@ -13,10 +13,15 @@
 // limitations under the License.
 
 import type {R2Function} from "./R2Function";
-import {R2PointInit, R2PointTuple, R2Point} from "../"; // forward import
-import {R2SegmentInit, R2Segment} from "../"; // forward import
-import {R2BoxInit, R2Box} from "../"; // forward import
-import {R2CircleInit, R2Circle} from "../"; // forward import
+import type {R2PointInit} from "./R2Point";
+import type {R2PointTuple} from "./R2Point";
+import {R2Point} from "../"; // forward import
+import type {R2SegmentInit} from "./R2Segment";
+import {R2Segment} from "../"; // forward import
+import type {R2BoxInit} from "./R2Box";
+import {R2Box} from "../"; // forward import
+import type {R2CircleInit} from "./R2Circle";
+import {R2Circle} from "../"; // forward import
 
 /** @public */
 export type AnyR2Shape = R2Shape | R2PointInit | R2PointTuple | R2SegmentInit | R2BoxInit | R2CircleInit;

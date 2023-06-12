@@ -14,7 +14,8 @@
 
 import {Lazy} from "@swim/util";
 import {Mark} from "../source/Mark";
-import {AnyInputSettings, InputSettings} from "./InputSettings";
+import type {AnyInputSettings} from "./InputSettings";
+import {InputSettings} from "./InputSettings";
 import {Input} from "./Input";
 import {InputBufferEmpty} from "../"; // forward import
 import {InputBufferDone} from "../"; // forward import

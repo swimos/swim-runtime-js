@@ -12,30 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto, Mutable} from "@swim/util";
-import {
-  Affinity,
-  FastenerFlags,
-  FastenerOwner,
-  PropertyValue,
-  PropertyValueInit,
-  PropertyDescriptor,
-  PropertyClass,
-  Property,
-} from "@swim/component";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Affinity} from "@swim/component";
+import type {FastenerFlags} from "@swim/component";
+import type {FastenerOwner} from "@swim/component";
+import type {PropertyValue} from "@swim/component";
+import type {PropertyValueInit} from "@swim/component";
+import type {PropertyDescriptor} from "@swim/component";
+import type {PropertyClass} from "@swim/component";
+import {Property} from "@swim/component";
 import {ConstraintId} from "./ConstraintId";
 import {ConstraintMap} from "./ConstraintMap";
-import {AnyConstraintExpression, ConstraintExpression} from "./ConstraintExpression";
+import type {AnyConstraintExpression} from "./ConstraintExpression";
+import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
 import type {ConstraintVariable} from "./ConstraintVariable";
-import {AnyConstraintStrength, ConstraintStrength} from "./"; // forward import
+import type {AnyConstraintStrength} from "./"; // forward import
+import {ConstraintStrength} from "./"; // forward import
 import type {Constraint} from "./Constraint";
 import {ConstraintScope} from "./"; // forward import
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @public */
+export type ConstraintPropertyDecorator<P extends Property<any, any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
+};
+
+/** @public */
 export interface ConstraintPropertyDescriptor<T = unknown, U = T> extends PropertyDescriptor<T, U> {
-  extends?: Proto<ConstraintProperty<any, any, any>> | string | boolean | null;
+  extends?: Proto<ConstraintProperty<any, any, any>> | boolean | null;
   strength?: AnyConstraintStrength;
   constrained?: boolean;
 }
@@ -55,15 +61,15 @@ export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any, 
   refine(propertyClass: ConstraintPropertyClass<any>): void;
 
   /** @override */
-  extend<P2 extends P>(className: string, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
-  extend<P2 extends P>(className: string, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
+  extend<P2 extends P>(className: string | symbol, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
+  extend<P2 extends P>(className: string | symbol, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
 
   /** @override */
-  define<P2 extends P>(className: string, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
-  define<P2 extends P>(className: string, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
+  define<P2 extends P>(className: string | symbol, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
+  define<P2 extends P>(className: string | symbol, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
 
   /** @override */
-  <P2 extends P>(template: ConstraintPropertyTemplate<P2>): PropertyDecorator;
+  <P2 extends P>(template: ConstraintPropertyTemplate<P2>): ConstraintPropertyDecorator<P2>;
 
   /** @internal */
   readonly ConstrainedFlag: FastenerFlags;

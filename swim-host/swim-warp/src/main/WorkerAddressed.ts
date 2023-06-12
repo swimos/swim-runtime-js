@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Instance, Murmur3, Constructors} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import type {Instance} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {Item, Attr, AnyValue, Value, Record} from "@swim/structure";
-import {AnyUri, Uri} from "@swim/uri";
+import type {Item} from "@swim/structure";
+import {Attr} from "@swim/structure";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
+import type {AnyUri} from "@swim/uri";
+import {Uri} from "@swim/uri";
 import {Signal} from "./Signal";
 
 /** @public */

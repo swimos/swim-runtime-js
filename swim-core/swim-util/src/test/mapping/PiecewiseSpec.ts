@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Mapping, Piecewise, LinearDomain, LinearRange} from "@swim/util";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Mapping} from "@swim/util";
+import {Piecewise} from "@swim/util";
+import {LinearDomain} from "@swim/util";
+import {LinearRange} from "@swim/util";
 
-export class PiecewiseSpec extends Spec {
+export class PiecewiseSpec extends Suite {
   @Test
   testPiecewiseIntervals(exam: Exam): void {
     const interval0 = Mapping(LinearDomain(0, 3), LinearRange(0, 2));

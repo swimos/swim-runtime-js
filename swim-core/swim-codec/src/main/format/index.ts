@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {Display} from "./Display";
+export type {Display} from "./Display";
 
-export {Debug} from "./Debug";
+export type {Debug} from "./Debug";
 
 export {OutputStyle} from "./OutputStyle";
 

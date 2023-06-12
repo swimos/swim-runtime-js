@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, HashCode, Compare, Mutable, Strings} from "@swim/util";
-import {Output, Format, Debug, Display} from "@swim/codec";
+import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Strings} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Compare} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import type {Display} from "@swim/codec";
+import {Format} from "@swim/codec";
 import {Uri} from "./Uri";
-import {AnyUriUser, UriUserInit, UriUser} from "./"; // forward import
-import {AnyUriHost, UriHost} from "./"; // forward import
-import {AnyUriPort, UriPort} from "./"; // forward import
+import type {AnyUriUser} from "./UriUser";
+import type {UriUserInit} from "./UriUser";
+import {UriUser} from "./"; // forward import
+import type {AnyUriHost} from "./UriHost";
+import {UriHost} from "./"; // forward import
+import type {AnyUriPort} from "./UriPort";
+import {UriPort} from "./"; // forward import
 
 /** @public */
 export type AnyUriAuthority = UriAuthority | UriAuthorityInit | string;

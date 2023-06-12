@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Booleans, Numbers, Constructors} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Booleans} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Output} from "../output/Output";
 import {UtfErrorMode} from "./UtfErrorMode";
 

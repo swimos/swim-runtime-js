@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Constructors, Interpolator, IdentityInterpolator} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import {IdentityInterpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {Value, Record} from "@swim/structure";
+import type {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
 import {R2Point} from "../r2/R2Point";
 import {Transform} from "./Transform";
 import {AffineTransform} from "../"; // forward import

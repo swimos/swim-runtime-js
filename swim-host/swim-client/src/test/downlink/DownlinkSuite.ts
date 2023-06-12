@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {EventDownlinkSpec} from "./EventDownlinkSpec";
 import {ValueDownlinkSpec} from "./ValueDownlinkSpec";
 import {ListDownlinkSpec} from "./ListDownlinkSpec";
 import {MapDownlinkSpec} from "./MapDownlinkSpec";
 
-@Unit
-export class DownlinkSuite extends Spec {
+export class DownlinkSuite extends Suite {
   @Unit
-  eventDownlinkSpec(): Spec {
+  eventDownlinkSpec(): Suite {
     return new EventDownlinkSpec();
   }
 
   @Unit
-  valueDownlinkSpec(): Spec {
+  valueDownlinkSpec(): Suite {
     return new ValueDownlinkSpec();
   }
 
   @Unit
-  listDownlinkSpec(): Spec {
+  listDownlinkSpec(): Suite {
     return new ListDownlinkSpec();
   }
 
   @Unit
-  mapDownlinkSpec(): Spec {
+  mapDownlinkSpec(): Suite {
     return new MapDownlinkSpec();
   }
 }

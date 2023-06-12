@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import {Numbers} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 import type {R2Function} from "./R2Function";
 import type {AnyR2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";

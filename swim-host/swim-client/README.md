@@ -171,7 +171,7 @@ swim.keepOnline(false); // disable network reconnection
 The `WarpClient.hostRef` method returns a new `HostRef` bound to the given
 host URI. The `WarpClient.nodeRef` method returns a new `NodeRef` bound
 to the given host and node URIs. The `WarpClient.laneRef` method returns
-a new `LaneRef` bound to the given host, node, and lane URIs. 
+a new `LaneRef` bound to the given host, node, and lane URIs.
 
 ### HostRef
 

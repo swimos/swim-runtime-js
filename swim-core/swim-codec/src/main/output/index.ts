@@ -14,11 +14,9 @@
 
 export {OutputException} from "./OutputException";
 
-export {
-  AnyOutputSettings,
-  OutputSettingsInit,
-  OutputSettings,
-} from "./OutputSettings";
+export type {AnyOutputSettings} from "./OutputSettings";
+export type {OutputSettingsInit} from "./OutputSettings";
+export {OutputSettings} from "./OutputSettings";
 
 export {Output} from "./Output";
 export {OutputFull} from "./OutputFull";

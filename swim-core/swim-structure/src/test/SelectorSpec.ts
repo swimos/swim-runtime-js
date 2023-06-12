@@ -12,10 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Attr, Slot, Value, Record, Text, Num, Selector} from "@swim/structure";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Selector} from "@swim/structure";
 
-export class SelectorSpec extends Spec {
+export class SelectorSpec extends Suite {
   @Test
   selectIdentity(exam: Exam): void {
     exam.equal(Selector.identity().evaluate(Value.absent()), Value.absent());

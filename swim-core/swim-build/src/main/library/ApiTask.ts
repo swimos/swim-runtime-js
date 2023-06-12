@@ -14,10 +14,14 @@
 
 import * as Path from "path";
 import * as FS from "fs";
-import * as apiExtractor from "@microsoft/api-extractor";
+import {Extractor} from "@microsoft/api-extractor";
+import {ExtractorConfig} from "@microsoft/api-extractor";
+import type {ExtractorMessage} from "@microsoft/api-extractor";
 import {Severity} from "@swim/util";
-import {Mark, OutputSettings, Diagnostic, Unicode} from "@swim/codec";
-import type {FastenerClass} from "@swim/component";
+import {Mark} from "@swim/codec";
+import {Diagnostic} from "@swim/codec";
+import {OutputSettings} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import {FileRef} from "@swim/sys";
 import {TaskStatus} from "../task/Task";
 import {LibraryTask} from "./LibraryTask";
@@ -33,20 +37,19 @@ export class ApiTask extends LibraryTask {
     return "api";
   }
 
-  readonly messages: apiExtractor.ExtractorMessage[];
+  readonly messages: ExtractorMessage[];
 
-  @FileRef<ApiTask["extractorConfig"]>({
+  @FileRef({
     fileName: "api-extractor.json",
     value: null,
     getBaseDir(): string | undefined {
       return this.owner.baseDir.value;
     },
-    async readFile(path: string): Promise<apiExtractor.ExtractorConfig | null> {
-      return apiExtractor.ExtractorConfig.loadFileAndPrepare(path);
+    async readFile(path: string): Promise<ExtractorConfig | null> {
+      return ExtractorConfig.loadFileAndPrepare(path);
     },
   })
-  readonly extractorConfig!: FileRef<this, apiExtractor.ExtractorConfig | null>;
-  static readonly extractorConfig: FastenerClass<ApiTask["extractorConfig"]>;
+  readonly extractorConfig!: FileRef<this, ExtractorConfig | null>;
 
   override async exec(): Promise<TaskStatus> {
     let status = TaskStatus.Pending;
@@ -65,12 +68,12 @@ export class ApiTask extends LibraryTask {
     return status;
   }
 
-  protected async extractApi(extractorConfig: apiExtractor.ExtractorConfig): Promise<TaskStatus> {
+  protected async extractApi(extractorConfig: ExtractorConfig): Promise<TaskStatus> {
     this.messages.length = 0;
     if (extractorConfig.apiReportEnabled) {
       ApiTask.mkdir(Path.dirname(extractorConfig.reportFilePath));
     }
-    const result = apiExtractor.Extractor.invoke(extractorConfig, {
+    const result = Extractor.invoke(extractorConfig, {
       localBuild: true,
       showDiagnostics: false,
       messageCallback: this.onExtractorMessage.bind(this),
@@ -82,13 +85,13 @@ export class ApiTask extends LibraryTask {
     }
   }
 
-  protected onExtractorMessage(message: apiExtractor.ExtractorMessage): void {
+  protected onExtractorMessage(message: ExtractorMessage): void {
     message.handled = true;
     this.messages.push(message);
     this.logMessage(message);
   }
 
-  protected diagnose(message: apiExtractor.ExtractorMessage): Diagnostic | null {
+  protected diagnose(message: ExtractorMessage): Diagnostic | null {
     const sourceFilePath = message.sourceFilePath;
     const sourceFileLine = message.sourceFileLine;
     const sourceFileColumn = message.sourceFileColumn;
@@ -97,22 +100,22 @@ export class ApiTask extends LibraryTask {
 
       let severity: Severity;
       switch (message.logLevel) {
-        case apiExtractor.ExtractorLogLevel.Error: severity = Severity.error(); break;
-        case apiExtractor.ExtractorLogLevel.Warning: severity = Severity.warning(); break;
-        case apiExtractor.ExtractorLogLevel.Info: severity = Severity.info(); break;
-        case apiExtractor.ExtractorLogLevel.Verbose: severity = Severity.debug(); break;
-        case apiExtractor.ExtractorLogLevel.None:
+        case "error": severity = Severity.error(); break;
+        case "warning": severity = Severity.warning(); break;
+        case "info": severity = Severity.info(); break;
+        case "verbose": severity = Severity.debug(); break;
+        case "none":
         default: return null;
       }
 
-      const source = FS.readFileSync(sourceFilePath, "utf8")
+      const source = FS.readFileSync(sourceFilePath, "utf8");
       const input = Unicode.stringInput(source).withId(sourceFilePath);
       return new Diagnostic(input, tag, severity, message.messageId, void 0, null);
     }
     return null;
   }
 
-  protected logMessage(message: apiExtractor.ExtractorMessage): void {
+  protected logMessage(message: ExtractorMessage): void {
     const diagnostic = this.diagnose(message);
     if (diagnostic !== null) {
       console.log(diagnostic.toString(OutputSettings.styled()));

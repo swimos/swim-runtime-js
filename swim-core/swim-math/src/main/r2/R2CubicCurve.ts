@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import {Numbers} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 import type {R2Function} from "./R2Function";
 import type {AnyR2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";
@@ -176,15 +178,15 @@ export class R2CubicCurve extends R2BezierCurve implements Debug {
   override writeRest<T>(output: Output<T>): Output<T> {
     output = output.write(67/*'C'*/);
     output = Format.displayNumber(output, this.x1);
-    output = output.write(44/*','*/)
+    output = output.write(44/*','*/);
     output = Format.displayNumber(output, this.y1);
-    output = output.write(44/*','*/)
+    output = output.write(44/*','*/);
     output = Format.displayNumber(output, this.x2);
-    output = output.write(44/*','*/)
+    output = output.write(44/*','*/);
     output = Format.displayNumber(output, this.y2);
-    output = output.write(44/*','*/)
+    output = output.write(44/*','*/);
     output = Format.displayNumber(output, this.x3);
-    output = output.write(44/*','*/)
+    output = output.write(44/*','*/);
     output = Format.displayNumber(output, this.y3);
     return output;
   }

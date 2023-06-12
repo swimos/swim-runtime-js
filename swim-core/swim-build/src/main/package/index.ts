@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  PackageTaskOptions,
-  PackageTask,
-} from "./PackageTask";
+export type {PackageTaskOptions} from "./PackageTask";
+export {PackageTask} from "./PackageTask";
 
 export {DepsTask} from "./DepsTask";
 
@@ -25,20 +23,15 @@ export {TestTask} from "./TestTask";
 
 export {DocTask} from "./DocTask";
 
-export {
-  VersionTaskOptions,
-  VersionTask,
-} from "./VersionTask";
+export type {VersionTaskOptions} from "./VersionTask";
+export {VersionTask} from "./VersionTask";
 
-export {
-  PublishTaskOptions,
-  PublishTask,
-} from "./PublishTask";
+export type {PublishTaskOptions} from "./PublishTask";
+export {PublishTask} from "./PublishTask";
 
 export {CleanTask} from "./CleanTask";
 
-export {
-  PackageConfig,
-  PackageScope,
-} from "./PackageScope";
-export {PackageScopeObserver} from "./PackageScopeObserver";
+export type {PackageConfig} from "./PackageScope";
+export {PackageScope} from "./PackageScope";
+
+export type {PackageScopeObserver} from "./PackageScopeObserver";

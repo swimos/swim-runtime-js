@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {DateTime, TimeInterval} from "@swim/time";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {DateTime} from "@swim/time";
+import {TimeInterval} from "@swim/time";
 
-export class TimeIntervalSpec extends Spec {
+export class TimeIntervalSpec extends Suite {
   @Test
   testRoundYearFloor(exam: Exam): void {
     exam.equal(TimeInterval.year.floor(DateTime.fromInit({year: 2018})).toString(), "2018-01-01T00:00:00.000Z");

@@ -12,8 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Mutable, Random, Murmur3, Numbers, Constructors, Interpolator} from "@swim/util";
-import {Input, OutputSettings, Output, Writer, Unicode, Base16, Base64} from "@swim/codec";
+import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Random} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import type {Input} from "@swim/codec";
+import {OutputSettings} from "@swim/codec";
+import {Output} from "@swim/codec";
+import {Writer} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Base16} from "@swim/codec";
+import {Base64} from "@swim/codec";
 import {Item} from "./Item";
 import {Value} from "./Value";
 import {DataOutput} from "./"; // forward import

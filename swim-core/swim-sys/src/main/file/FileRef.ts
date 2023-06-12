@@ -12,17 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Proto} from "@swim/util";
-import type {FastenerFlags, FastenerOwner, Fastener} from "@swim/component";
-import {FileRelationDescriptor, FileRelationClass, FileRelation} from "./FileRelation";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import type {FastenerFlags} from "@swim/component";
+import type {FastenerOwner} from "@swim/component";
+import type {Fastener} from "@swim/component";
+import type {FileRelationDescriptor} from "./FileRelation";
+import type {FileRelationClass} from "./FileRelation";
+import {FileRelation} from "./FileRelation";
 
 /** @public */
 export type FileRefValue<F extends FileRef<any, any>> =
   F extends {value: infer T} ? T : never;
 
 /** @public */
+export type FileRefDecorator<F extends FileRef<any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+};
+
+/** @public */
 export interface FileRefDescriptor<T = unknown> extends FileRelationDescriptor {
-  extends?: Proto<FileRef<any, any>> | string | boolean | null;
+  extends?: Proto<FileRef<any, any>> | boolean | null;
   fileName?: string;
   value?: T;
 }
@@ -50,7 +60,7 @@ export interface FileRefClass<F extends FileRef<any, any> = FileRef<any, any>> e
   define<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
 
   /** @override */
-  <F2 extends F>(template: FileRefTemplate<F2>): PropertyDecorator;
+  <F2 extends F>(template: FileRefTemplate<F2>): FileRefDecorator<F2>;
 
   /** @internal */
   readonly LoadedFlag: FastenerFlags;

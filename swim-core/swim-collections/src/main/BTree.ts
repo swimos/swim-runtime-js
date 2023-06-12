@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Cursor, ReducedMap} from "@swim/util";
+import type {Cursor} from "@swim/util";
+import type {ReducedMap} from "@swim/util";
 import {BTreeContext} from "./BTreeContext";
 import {BTreePage} from "./"; // forward import
 

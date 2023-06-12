@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Provider, Component, Service} from "@swim/component";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Provider} from "@swim/component";
+import {Component} from "@swim/component";
+import {Service} from "@swim/component";
 
-export class ProviderSpec extends Spec {
+export class ProviderSpec extends Suite {
   @Test
   testProviderDefine(exam: Exam): void {
     const service = new Service();
@@ -61,7 +65,7 @@ export class ProviderSpec extends Spec {
       readonly id: number;
     }
     class TestComponent extends Component {
-      @Provider<TestComponent["foo"]>({
+      @Provider({
         inherits: true,
         lazy: false,
         createService(): TestService {
@@ -94,7 +98,7 @@ export class ProviderSpec extends Spec {
       readonly id: number;
     }
     class TestComponent extends Component {
-      @Provider<TestComponent["foo"]>({
+      @Provider({
         lazy: false,
         inherits: true,
         createService(): TestService {

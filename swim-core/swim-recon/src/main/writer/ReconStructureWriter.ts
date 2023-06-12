@@ -13,41 +13,41 @@
 // limitations under the License.
 
 import type {Cursor} from "@swim/util";
-import {Output, WriterException, Writer} from "@swim/codec";
-import {
-  Item,
-  Field,
-  Attr,
-  Slot,
-  Value,
-  Record,
-  Data,
-  Text,
-  Num,
-  Bool,
-  Expression,
-  Operator,
-  Selector,
-  Func,
-  Extant,
-  Absent,
-  ChildrenSelector,
-  DescendantsSelector,
-  FilterSelector,
-  GetAttrSelector,
-  GetItemSelector,
-  GetSelector,
-  IdentitySelector,
-  KeysSelector,
-  LiteralSelector,
-  ValuesSelector,
-  BinaryOperator,
-  ConditionalOperator,
-  InvokeOperator,
-  UnaryOperator,
-  BridgeFunc,
-  LambdaFunc,
-} from "@swim/structure";
+import type {Output} from "@swim/codec";
+import {WriterException} from "@swim/codec";
+import {Writer} from "@swim/codec";
+import type {Item} from "@swim/structure";
+import {Field} from "@swim/structure";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Data} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Bool} from "@swim/structure";
+import {Expression} from "@swim/structure";
+import {Operator} from "@swim/structure";
+import {Selector} from "@swim/structure";
+import {Func} from "@swim/structure";
+import {Extant} from "@swim/structure";
+import {Absent} from "@swim/structure";
+import {ChildrenSelector} from "@swim/structure";
+import {DescendantsSelector} from "@swim/structure";
+import {FilterSelector} from "@swim/structure";
+import {GetAttrSelector} from "@swim/structure";
+import {GetItemSelector} from "@swim/structure";
+import {GetSelector} from "@swim/structure";
+import {IdentitySelector} from "@swim/structure";
+import {KeysSelector} from "@swim/structure";
+import {LiteralSelector} from "@swim/structure";
+import {ValuesSelector} from "@swim/structure";
+import {BinaryOperator} from "@swim/structure";
+import {ConditionalOperator} from "@swim/structure";
+import {InvokeOperator} from "@swim/structure";
+import {UnaryOperator} from "@swim/structure";
+import {BridgeFunc} from "@swim/structure";
+import {LambdaFunc} from "@swim/structure";
 import {ReconWriter} from "./ReconWriter";
 
 /** @public */

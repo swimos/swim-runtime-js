@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Transform, AffineTransform} from "@swim/math";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Transform} from "@swim/math";
+import {AffineTransform} from "@swim/math";
 
-export class TransformParserSpec extends Spec {
+export class TransformParserSpec extends Suite {
   @Test
   parseIdentityTransform(exam: Exam): void {
     exam.equal(Transform.parse("none"), Transform.identity());

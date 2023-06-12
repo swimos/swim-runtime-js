@@ -14,12 +14,10 @@
 
 export {LengthException} from "./LengthException";
 
-export {
-  LengthUnits,
-  LengthBasis,
-  AnyLength,
-  Length,
-} from "./Length";
+export type {LengthUnits} from "./Length";
+export type {LengthBasis} from "./Length";
+export type {AnyLength} from "./Length";
+export {Length} from "./Length";
 export {PxLength} from "./PxLength";
 export {EmLength} from "./EmLength";
 export {RemLength} from "./RemLength";

@@ -13,8 +13,10 @@
 // limitations under the License.
 
 import * as Path from "path";
-import {Cmd, Opt} from "@swim/args";
-import type {Spec, ConsoleReport} from "@swim/unit";
+import {Opt} from "@swim/args";
+import {Cmd} from "@swim/args";
+import type {Suite} from "@swim/unit";
+import type {ConsoleReport} from "@swim/unit";
 
 export const cli = Cmd.create("swim-unit")
   .withHelpCmd()
@@ -24,12 +26,11 @@ export const cli = Cmd.create("swim-unit")
     const modulePath = Path.resolve(process.cwd(), args.module!);
     const module = await import(modulePath);
     if (module !== void 0 && module.default !== void 0) {
-      const suite: Spec = module.default;
+      const suite: Suite = module.default;
       const report = await suite.run() as ConsoleReport;
-      if (report.failCount === 0) {
-        process.exit(0);
-      } else {
+      if (report.failCount !== 0) {
         process.exit(1);
       }
+      process.exit(0);
     }
   });

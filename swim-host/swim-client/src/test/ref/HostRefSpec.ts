@@ -12,15 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TestOptions, Test, Spec, Report} from "@swim/unit";
-import {Value, Text} from "@swim/structure";
+import type {TestOptions} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import type {Report} from "@swim/unit";
+import type {Value} from "@swim/structure";
+import {Text} from "@swim/structure";
 import {Uri} from "@swim/uri";
-import {Envelope, EventMessage, CommandMessage, LinkRequest, LinkedResponse} from "@swim/warp";
+import type {Envelope} from "@swim/warp";
+import {EventMessage} from "@swim/warp";
+import {CommandMessage} from "@swim/warp";
+import {LinkRequest} from "@swim/warp";
+import {LinkedResponse} from "@swim/warp";
 import type {WarpClient} from "@swim/client";
 import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
-export class HostRefSpec extends Spec {
+export class HostRefSpec extends Suite {
   override createExam(report: Report, name: string, options: TestOptions): ClientExam {
     return new ClientExam(report, this, name, options);
   }

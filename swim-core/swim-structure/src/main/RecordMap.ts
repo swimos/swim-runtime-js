@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Mutable} from "@swim/util";
-import {AnyItem, Item} from "./Item";
+import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
 import {Field} from "./Field";
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
-import {AnyValue, Value} from "./Value";
+import type {AnyValue} from "./Value";
+import {Value} from "./Value";
 import {Record} from "./Record";
 import {RecordMapView} from "./"; // forward import
-import {AnyText, Text} from "./"; // forward import
-import {AnyNum, Num} from "./"; // forward import
-import {AnyInterpreter, Interpreter} from "./"; // forward import
+import type {AnyText} from "./Text";
+import {Text} from "./"; // forward import
+import type {AnyNum} from "./Num";
+import {Num} from "./"; // forward import
+import type {AnyInterpreter} from "./interpreter/Interpreter"; // forward import
+import {Interpreter} from "./"; // forward import
 
 /** @internal */
 export class RecordMap extends Record {
@@ -36,13 +42,13 @@ export class RecordMap extends Record {
       writable: true,
       enumerable: true,
       configurable: true,
-    })
+    });
     Object.defineProperty(this, "fieldCount", {
       value: fieldCount,
       writable: true,
       enumerable: true,
       configurable: true,
-    })
+    });
     this.flags = flags;
   }
 

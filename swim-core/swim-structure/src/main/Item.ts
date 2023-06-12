@@ -12,11 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, HashCode, Equivalent, Compare, Cursor, Interpolate, Interpolator} from "@swim/util";
-import {Debug, Display, Format, Output} from "@swim/codec";
+import {Lazy} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Equivalent} from "@swim/util";
+import type {Compare} from "@swim/util";
+import {Cursor} from "@swim/util";
+import type {Interpolate} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import type {Display} from "@swim/codec";
+import {Format} from "@swim/codec";
 import {ItemInterpolator} from "./"; // forward import
 import type {Field} from "./Field";
-import {AnyValue, Value} from "./"; // forward import
+import type {AnyValue} from "./Value";
+import {Value} from "./"; // forward import
 import {Record} from "./"; // forward import
 import type {AnyText} from "./Text";
 import type {AnyNum} from "./Num";

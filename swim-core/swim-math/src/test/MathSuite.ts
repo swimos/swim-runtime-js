@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {LengthSuite} from "./length/LengthSuite";
 import {AngleSuite} from "./angle/AngleSuite";
 import {R2Suite} from "./r2/R2Suite";
 import {TransformSuite} from "./transform/TransformSuite";
 
-@Unit
-export class MathSuite extends Spec {
+export class MathSuite extends Suite {
   @Unit
-  lengthSuite(): Spec {
+  lengthSuite(): Suite {
     return new LengthSuite();
   }
 
   @Unit
-  angleSuite(): Spec {
+  angleSuite(): Suite {
     return new AngleSuite();
   }
 
   @Unit
-  r2Suite(): Spec {
+  r2Suite(): Suite {
     return new R2Suite();
   }
 
   @Unit
-  transformSuite(): Spec {
+  transformSuite(): Suite {
     return new TransformSuite();
   }
 }

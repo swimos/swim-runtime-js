@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Compare, Lazy, Strings, HashGenCacheMap} from "@swim/util";
-import type {Output, Debug, Display} from "@swim/codec";
+import {Lazy} from "@swim/util";
+import {Strings} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Compare} from "@swim/util";
+import {HashGenCacheMap} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import type {Display} from "@swim/codec";
 import {Uri} from "./Uri";
-import {UriHostName} from "./" // forward import
-import {UriHostIPv4} from "./" // forward import
-import {UriHostIPv6} from "./" // forward import
-import {UriHostUndefined} from "./" // forward import
+import {UriHostName} from "./"; // forward import
+import {UriHostIPv4} from "./"; // forward import
+import {UriHostIPv6} from "./"; // forward import
+import {UriHostUndefined} from "./"; // forward import
 
 /** @public */
 export type AnyUriHost = UriHost | string;

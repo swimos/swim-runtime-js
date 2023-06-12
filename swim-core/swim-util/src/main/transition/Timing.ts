@@ -16,7 +16,8 @@ import type {Mutable} from "../types/Mutable";
 import {Values} from "../values/Values";
 import {Domain} from "../mapping/Domain";
 import {Interpolator} from "../interpolate/Interpolator";
-import {AnyEasing, Easing} from "../"; // forward import
+import type {AnyEasing} from "./Easing";
+import {Easing} from "../"; // forward import
 import {Tweening} from "../"; // forward import
 
 /** @public */

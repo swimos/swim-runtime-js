@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item, Slot, Value, Record} from "@swim/structure";
+import {Item} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import type {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
 import type {ProcessorContext} from "../processor/ProcessorContext";
 import {Directive} from "./Directive";
 

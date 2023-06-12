@@ -14,15 +14,11 @@
 
 export {Mapping} from "./Mapping";
 
-export {
-  AnyDomain,
-  Domain,
-} from "./Domain";
+export type {AnyDomain} from "./Domain";
+export {Domain} from "./Domain";
 
-export {
-  AnyRange,
-  Range,
-} from "./Range";
+export type {AnyRange} from "./Range";
+export {Range} from "./Range";
 
 export {Constant} from "./Constant";
 

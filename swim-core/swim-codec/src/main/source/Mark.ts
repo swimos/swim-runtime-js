@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Murmur3, Numbers, Strings, Constructors} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Strings} from "@swim/util";
+import {Constructors} from "@swim/util";
 import {Tag} from "./Tag";
 import {Span} from "../"; // forward import
 import type {Output} from "../output/Output";

@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Length} from "@swim/math";
 
-export class LengthParserSpec extends Spec {
+export class LengthParserSpec extends Suite {
   @Test
   parsePxLengths(exam: Exam): void {
     exam.equal(Length.parse("0px"), Length.px(0));

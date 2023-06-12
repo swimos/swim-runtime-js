@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Numbers, Constructors, Cursor, Interpolator} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import {Cursor} from "@swim/util";
+import type {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {AnyItem, Item} from "./Item";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
-import {AnyValue, Value} from "./Value";
+import type {AnyValue} from "./Value";
+import {Value} from "./Value";
 import {Record} from "./Record";
 import type {AnyText} from "./Text";
 

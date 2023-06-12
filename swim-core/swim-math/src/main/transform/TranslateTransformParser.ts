@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Input, Output, Parser, Diagnostic, Unicode} from "@swim/codec";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import type {Length} from "../length/Length";
 import {PxLength} from "../length/PxLength";
 import {LengthParser} from "../length/LengthParser";

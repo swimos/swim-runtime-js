@@ -12,37 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  ComponentFlags,
-  AnyComponent,
-  ComponentInit,
-  ComponentFactory,
-  ComponentClass,
-  ComponentConstructor,
-  Component,
-} from "./Component";
-export {ComponentObserver} from "./ComponentObserver";
+export type {ComponentFlags} from "./Component";
+export type {AnyComponent} from "./Component";
+export type {ComponentInit} from "./Component";
+export type {ComponentFactory} from "./Component";
+export type {ComponentClass} from "./Component";
+export type {ComponentConstructor} from "./Component";
+export {Component} from "./Component";
+export type {ComponentObserver} from "./ComponentObserver";
 
-export {
-  ComponentRelationComponent,
-  ComponentRelationDescriptor,
-  ComponentRelationTemplate,
-  ComponentRelationClass,
-  ComponentRelation,
-} from "./ComponentRelation";
+export type {ComponentRelationComponent} from "./ComponentRelation";
+export type {ComponentRelationDecorator} from "./ComponentRelation";
+export type {ComponentRelationDescriptor} from "./ComponentRelation";
+export type {ComponentRelationTemplate} from "./ComponentRelation";
+export type {ComponentRelationClass} from "./ComponentRelation";
+export {ComponentRelation} from "./ComponentRelation";
 
-export {
-  ComponentRefComponent,
-  ComponentRefDescriptor,
-  ComponentRefTemplate,
-  ComponentRefClass,
-  ComponentRef,
-} from "./ComponentRef";
+export type {ComponentRefComponent} from "./ComponentRef";
+export type {ComponentRefDecorator} from "./ComponentRef";
+export type {ComponentRefDescriptor} from "./ComponentRef";
+export type {ComponentRefTemplate} from "./ComponentRef";
+export type {ComponentRefClass} from "./ComponentRef";
+export {ComponentRef} from "./ComponentRef";
 
-export {
-  ComponentSetComponent,
-  ComponentSetDescriptor,
-  ComponentSetTemplate,
-  ComponentSetClass,
-  ComponentSet,
-} from "./ComponentSet";
+export type {ComponentSetComponent} from "./ComponentSet";
+export type {ComponentSetDecorator} from "./ComponentSet";
+export type {ComponentSetDescriptor} from "./ComponentSet";
+export type {ComponentSetTemplate} from "./ComponentSet";
+export type {ComponentSetClass} from "./ComponentSet";
+export {ComponentSet} from "./ComponentSet";

@@ -14,38 +14,33 @@
 
 export {TestException} from "./TestException";
 
-export {
-  TestFunc,
-  TestOptions,
-  Test,
-} from "./Test";
+export {Proof} from "./Proof";
+export {ProofValid} from "./Proof";
+export {ProofInvalid} from "./Proof";
+export {ProofRefuted} from "./Proof";
+export {ProofError} from "./Proof";
+export {ProofPending} from "./Proof";
 
-export {SpecUnit} from "./SpecUnit";
-export {
-  UnitFunc,
-  UnitOptions,
-  Unit,
-} from "./Unit";
+export type {ExamStatus} from "./Exam";
+export {Exam} from "./Exam";
 
-export {SpecTest} from "./SpecTest";
-export {
-  SpecClass,
-  Spec,
-} from "./Spec";
+export type {TestMethod} from "./Test";
+export type {TestOptions} from "./Test";
+export {Test} from "./Test";
 
-export {
-  Proof,
-  ProofValid,
-  ProofInvalid,
-  ProofRefuted,
-  ProofError,
-  ProofPending,
-} from "./Proof";
+export type {UnitMethod} from "./Unit";
+export type {UnitOptions} from "./Unit";
+export {Unit} from "./Unit";
 
-export {Report} from "./Report";
+export {TestRunnerCache} from "./TestRunner";
+export type {TestRunnerContext} from "./TestRunner";
+export {TestRunner} from "./TestRunner";
+
+export {UnitRunnerCache} from "./UnitRunner";
+export type {UnitRunnerContext} from "./UnitRunner";
+export {UnitRunner} from "./UnitRunner";
+
+export {Suite} from "./Suite";
+
+export type {Report} from "./Report";
 export {ConsoleReport} from "./ConsoleReport";
-
-export {
-  ExamStatus,
-  Exam,
-} from "./Exam";

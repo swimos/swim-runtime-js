@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Class, Instance} from "@swim/util";
-import {OutputSettings, Output, OutputStyle, Unicode} from "@swim/codec";
+import type {Class} from "@swim/util";
+import type {Instance} from "@swim/util";
+import {OutputSettings} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import {Property} from "@swim/component";
 import {Scope} from "../scope/Scope";
 import type {TaskObserver} from "./TaskObserver";

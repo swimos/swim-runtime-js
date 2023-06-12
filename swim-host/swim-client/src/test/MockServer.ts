@@ -15,7 +15,8 @@
 import * as http from "http";
 import * as ws from "ws";
 import type {Mutable} from "@swim/util";
-import {AnyUri, Uri} from "@swim/uri";
+import type {AnyUri} from "@swim/uri";
+import {Uri} from "@swim/uri";
 import {Envelope} from "@swim/warp";
 import {WarpClient} from "@swim/client";
 

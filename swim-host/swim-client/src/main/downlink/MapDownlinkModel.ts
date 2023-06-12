@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Cursor} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {BTree} from "@swim/collections";
-import {Attr, Value, Record} from "@swim/structure";
+import {Attr} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
 import type {Uri} from "@swim/uri";
 import type {EventMessage} from "@swim/warp";
 import {WarpDownlinkModel} from "./WarpDownlinkModel";

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Class} from "@swim/util";
-import {TaskOptions, Task} from "../task/Task";
+import type {TaskOptions} from "../task/Task";
+import {Task} from "../task/Task";
 import {PackageScope} from "../package/PackageScope";
 import {LibraryScope} from "./"; // forward import
 
@@ -26,10 +27,10 @@ export abstract class LibraryTask extends Task {
   override readonly optionsType?: Class<LibraryTaskOptions>;
 
   get packageScope(): PackageScope | null {
-    return this.getSuper(PackageScope);
+    return this.getParent(PackageScope);
   }
 
   get libraryScope(): LibraryScope | null {
-    return this.getSuper(LibraryScope);
+    return this.getParent(LibraryScope);
   }
 }

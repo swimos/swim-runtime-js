@@ -13,13 +13,16 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import {AnyItem, Item} from "./Item";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
 import {Field} from "./Field";
 import {Attr} from "./Attr";
-import {AnyValue, Value} from "./Value";
+import type {AnyValue} from "./Value";
+import {Value} from "./Value";
 import {Record} from "./Record";
 import {RecordMap} from "./RecordMap";
-import {AnyNum, Num} from "./"; // forward import
+import type {AnyNum} from "./Num";
+import {Num} from "./"; // forward import
 
 /** @internal */
 export class RecordMapView extends Record {

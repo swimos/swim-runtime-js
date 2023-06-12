@@ -12,14 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Murmur3, Numbers, Constructors, Interpolator} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {AnyItem, Item} from "./Item";
-import {AnyField, Field} from "./Field";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
+import type {AnyField} from "./Field";
+import {Field} from "./Field";
 import {SlotInterpolator} from "./"; // forward import
-import {AnyValue, Value} from "./"; // forward import
+import type {AnyValue} from "./Value";
+import {Value} from "./"; // forward import
 import {Text} from "./"; // forward import
-import {Extant} from "./" // forward import
+import {Extant} from "./"; // forward import
 import {Expression} from "./"; // forward import
 import {BitwiseOrOperator} from "./"; // forward import
 import {BitwiseXorOperator} from "./"; // forward import
@@ -29,7 +36,8 @@ import {MinusOperator} from "./"; // forward import
 import {TimesOperator} from "./"; // forward import
 import {DivideOperator} from "./"; // forward import
 import {ModuloOperator} from "./"; // forward import
-import {AnyInterpreter, Interpreter} from "./"; // forward import
+import type {AnyInterpreter} from "./interpreter/Interpreter";
+import {Interpreter} from "./"; // forward import
 
 /** @public */
 export class Slot extends Field {

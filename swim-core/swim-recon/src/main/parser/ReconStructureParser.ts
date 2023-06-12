@@ -14,39 +14,37 @@
 
 import type {Builder} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {
-  Item,
-  Attr,
-  Slot,
-  Value,
-  Record,
-  Data,
-  Text,
-  Num,
-  Bool,
-  Selector,
-  AndOperator,
-  BitwiseAndOperator,
-  BitwiseNotOperator,
-  BitwiseOrOperator,
-  BitwiseXorOperator,
-  DivideOperator,
-  EqOperator,
-  GeOperator,
-  GtOperator,
-  InvokeOperator,
-  LeOperator,
-  LtOperator,
-  MinusOperator,
-  ModuloOperator,
-  NeOperator,
-  NegativeOperator,
-  NotOperator,
-  OrOperator,
-  PlusOperator,
-  PositiveOperator,
-  TimesOperator,
-} from "@swim/structure";
+import type {Item} from "@swim/structure";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Data} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Bool} from "@swim/structure";
+import {Selector} from "@swim/structure";
+import {AndOperator} from "@swim/structure";
+import {BitwiseAndOperator} from "@swim/structure";
+import {BitwiseNotOperator} from "@swim/structure";
+import {BitwiseOrOperator} from "@swim/structure";
+import {BitwiseXorOperator} from "@swim/structure";
+import {DivideOperator} from "@swim/structure";
+import {EqOperator} from "@swim/structure";
+import {GeOperator} from "@swim/structure";
+import {GtOperator} from "@swim/structure";
+import {InvokeOperator} from "@swim/structure";
+import {LeOperator} from "@swim/structure";
+import {LtOperator} from "@swim/structure";
+import {MinusOperator} from "@swim/structure";
+import {ModuloOperator} from "@swim/structure";
+import {NeOperator} from "@swim/structure";
+import {NegativeOperator} from "@swim/structure";
+import {NotOperator} from "@swim/structure";
+import {OrOperator} from "@swim/structure";
+import {PlusOperator} from "@swim/structure";
+import {PositiveOperator} from "@swim/structure";
+import {TimesOperator} from "@swim/structure";
 import {ReconParser} from "./ReconParser";
 
 /** @public */

@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Class, Dictionary, MutableDictionary} from "@swim/util";
-import {OutputSettings, OutputStyle, Unicode} from "@swim/codec";
+import type {Class} from "@swim/util";
+import type {Dictionary} from "@swim/util";
+import type {MutableDictionary} from "@swim/util";
+import {OutputSettings} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import {TaskStatus} from "../task/Task";
-import {PackageTaskOptions, PackageTask} from "./PackageTask";
-import type {PackageConfig, PackageScope} from "./PackageScope";
+import type {PackageTaskOptions} from "./PackageTask";
+import {PackageTask} from "./PackageTask";
+import type {PackageConfig} from "./PackageScope";
+import type {PackageScope} from "./PackageScope";
 
 /** @public */
 export interface VersionTaskOptions extends PackageTaskOptions {

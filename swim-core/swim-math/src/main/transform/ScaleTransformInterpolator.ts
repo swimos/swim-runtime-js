@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Interpolator} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import {ScaleTransform} from "./ScaleTransform";
 
 /** @internal */

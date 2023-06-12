@@ -12,10 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Attr, Slot, Value, Record, Data, Text, Num, Bool} from "@swim/structure";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Data} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Bool} from "@swim/structure";
 
-export class ItemOrderSpec extends Spec {
+export class ItemOrderSpec extends Suite {
   @Test
   orderAttrsByKeyThenValue(exam: Exam): void {
     exam.compareLessThan(Attr.of("a"), Attr.of("b"));

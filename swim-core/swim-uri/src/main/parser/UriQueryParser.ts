@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Input, Output, Parser, Diagnostic, Base16, Utf8} from "@swim/codec";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import {Base16} from "@swim/codec";
+import {Utf8} from "@swim/codec";
 import {Uri} from "../Uri";
 import type {UriQuery} from "../UriQuery";
 import type {UriQueryBuilder} from "../UriQueryBuilder";

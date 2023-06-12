@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyDateTime, DateTime} from "../DateTime";
-import {UnitTimeInterval, TimeInterval} from "./TimeInterval";
+import type {AnyDateTime} from "../DateTime";
+import {DateTime} from "../DateTime";
+import {TimeInterval} from "./TimeInterval";
+import {UnitTimeInterval} from "./TimeInterval";
 import {FilterTimeInterval} from "./FilterTimeInterval";
 
 /** @internal */

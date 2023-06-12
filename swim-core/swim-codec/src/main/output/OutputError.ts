@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {OutputException} from "./OutputException";
-import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
+import type {AnyOutputSettings} from "./OutputSettings";
+import {OutputSettings} from "./OutputSettings";
 import {Output} from "./Output";
 
 /** @internal */

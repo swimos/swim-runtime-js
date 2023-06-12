@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Affinity, Property, Component} from "@swim/component";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Affinity} from "@swim/component";
+import {Property} from "@swim/component";
+import {Component} from "@swim/component";
 
-export class PropertySpec extends Spec {
+export class PropertySpec extends Suite {
   @Test
   testProperty(exam: Exam): void {
     const property = Property.create(null);

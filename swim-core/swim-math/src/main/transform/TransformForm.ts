@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item, Record, Form} from "@swim/structure";
-import {AnyTransform, Transform} from "./Transform";
+import type {Item} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Form} from "@swim/structure";
+import type {AnyTransform} from "./Transform";
+import {Transform} from "./Transform";
 
 /** @internal */
 export class TransformForm extends Form<Transform, AnyTransform> {

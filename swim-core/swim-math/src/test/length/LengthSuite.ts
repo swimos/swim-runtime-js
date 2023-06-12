@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {LengthParserSpec} from "./LengthParserSpec";
 
-@Unit
-export class LengthSuite extends Spec {
+export class LengthSuite extends Suite {
   @Unit
-  lengthParserSpec(): Spec {
+  lengthParserSpec(): Suite {
     return new LengthParserSpec();
   }
 }

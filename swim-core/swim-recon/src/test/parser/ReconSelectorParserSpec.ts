@@ -12,11 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TestOptions, Test, Spec, Report} from "@swim/unit";
-import {Attr, Slot, Record, Num, Selector} from "@swim/structure";
+import type {TestOptions} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import type {Report} from "@swim/unit";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Selector} from "@swim/structure";
 import {ReconExam} from "../ReconExam";
 
-export class ReconSelectorParserSpec extends Spec {
+export class ReconSelectorParserSpec extends Suite {
   override createExam(report: Report, name: string, options: TestOptions): ReconExam {
     return new ReconExam(report, this, name, options);
   }

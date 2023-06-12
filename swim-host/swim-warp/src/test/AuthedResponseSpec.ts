@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TestOptions, Test, Spec, Report} from "@swim/unit";
-import {Attr, Record} from "@swim/structure";
+import type {TestOptions} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import type {Report} from "@swim/unit";
+import {Attr} from "@swim/structure";
+import {Record} from "@swim/structure";
 import {AuthedResponse} from "@swim/warp";
 import {WarpExam} from "./WarpExam";
 
-export class AuthedResponseSpec extends Spec {
+export class AuthedResponseSpec extends Suite {
   override createExam(report: Report, name: string, options: TestOptions): WarpExam {
     return new WarpExam(report, this, name, options);
   }

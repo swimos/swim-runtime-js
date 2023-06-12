@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {UriParserSpec} from "./UriParserSpec";
 import {UriWriterSpec} from "./UriWriterSpec";
 import {UriPathSpec} from "./UriPathSpec";
 import {UriResolverSpec} from "./UriResolverSpec";
 
-@Unit
-export class UriSuite extends Spec {
+export class UriSuite extends Suite {
   @Unit
-  uriParserSpec(): Spec {
+  uriParserSpec(): Suite {
     return new UriParserSpec();
   }
 
   @Unit
-  uriWriterSpec(): Spec {
+  uriWriterSpec(): Suite {
     return new UriWriterSpec();
   }
 
   @Unit
-  uriPathSpec(): Spec {
+  uriPathSpec(): Suite {
     return new UriPathSpec();
   }
 
   @Unit
-  uriResolverSpec(): Spec {
+  uriResolverSpec(): Suite {
     return new UriResolverSpec();
   }
 }

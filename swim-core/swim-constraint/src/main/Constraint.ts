@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Output, Debug, Format} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 import {ConstraintId} from "./ConstraintId";
 import type {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintRelation} from "./ConstraintRelation";

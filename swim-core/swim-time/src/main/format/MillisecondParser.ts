@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Input, Parser} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {DateTimeInit} from "../DateTime";
 import {DateTimeFormat} from "./DateTimeFormat";
 

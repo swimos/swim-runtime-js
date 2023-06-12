@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Output, WriterException, Writer} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {WriterException} from "@swim/codec";
+import {Writer} from "@swim/codec";
 import type {ReconWriter} from "./ReconWriter";
 
 /** @internal */

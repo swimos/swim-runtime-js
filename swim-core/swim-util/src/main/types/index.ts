@@ -12,19 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {Mutable} from "./Mutable";
+export type {Mutable} from "./Mutable";
 
-export {Class} from "./Class";
+export type {Class} from "./Class";
 
-export {Instance} from "./Instance";
+export type {Instance} from "./Instance";
 
-export {
-  ProtoType,
-  Proto,
-} from "./Proto";
+export type {ProtoType} from "./Proto";
+export type {Proto} from "./Proto";
 
-export {
-  Methods,
-  MethodParameters,
-  MethodReturnType,
-} from "./Method";
+export type {Methods} from "./Method";
+export type {MethodParameters} from "./Method";
+export type {MethodReturnType} from "./Method";

@@ -1,6 +1,9 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "warnOnUnsupportedTypeScriptVersion": false
+  },
   "plugins": [
     "@typescript-eslint"
   ],
@@ -35,6 +38,13 @@
         "extendDefaults": false
       }
     ],
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        prefer: "type-imports",
+        disallowTypeAnnotations: false
+      }
+    ],
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-inferrable-types": [
@@ -66,6 +76,10 @@
       {
         "skipComments": true
       }
+    ],
+    "semi": [
+      "error",
+      "always"
     ]
   }
 }

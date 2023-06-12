@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {DiagnosticSpec} from "./DiagnosticSpec";
 
-@Unit
-export class CodecSuite extends Spec {
+export class CodecSuite extends Suite {
   @Unit
-  diagnosticSpec(): Spec {
+  diagnosticSpec(): Suite {
     return new DiagnosticSpec();
   }
 }

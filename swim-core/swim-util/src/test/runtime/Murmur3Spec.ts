@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Murmur3} from "@swim/util";
 
 function bytes(...xs: number[]): Uint8Array {
@@ -23,7 +25,7 @@ function bytes(...xs: number[]): Uint8Array {
   return bs;
 }
 
-export class Murmur3Spec extends Spec {
+export class Murmur3Spec extends Suite {
   @Test
   hashBytes(exam: Exam): void {
     exam.equal(Murmur3.mash(Murmur3.mixUint8Array(0,          bytes())),                       0);

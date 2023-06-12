@@ -12,14 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Property, Component} from "@swim/component";
-import {AnyValue, Value} from "@swim/structure";
-import {AnyUri, Uri} from "@swim/uri";
+import {Property} from "@swim/component";
+import {Component} from "@swim/component";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import type {AnyUri} from "@swim/uri";
+import {Uri} from "@swim/uri";
 import type {WarpDownlinkModel} from "../downlink/WarpDownlinkModel";
-import {EventDownlinkTemplate, EventDownlink} from "../downlink/EventDownlink";
-import {ValueDownlinkTemplate, ValueDownlink} from "../downlink/ValueDownlink";
-import {ListDownlinkTemplate, ListDownlink} from "../downlink/ListDownlink";
-import {MapDownlinkTemplate, MapDownlink} from "../downlink/MapDownlink";
+import type {EventDownlinkTemplate} from "../downlink/EventDownlink";
+import {EventDownlink} from "../downlink/EventDownlink";
+import type {ValueDownlinkTemplate} from "../downlink/ValueDownlink";
+import {ValueDownlink} from "../downlink/ValueDownlink";
+import type {ListDownlinkTemplate} from "../downlink/ListDownlink";
+import {ListDownlink} from "../downlink/ListDownlink";
+import type {MapDownlinkTemplate} from "../downlink/MapDownlink";
+import {MapDownlink} from "../downlink/MapDownlink";
 import {WarpRef} from "./WarpRef";
 import {WarpClient} from "./"; // forward import
 
@@ -215,10 +222,15 @@ export class WarpScope extends Component implements WarpRef {
     warpRef.openDownlink(downlink);
   }
 
-  @Property<WarpScope["warpRef"]>({
+  @Property({
     valueType: WarpRef,
     inherits: true,
     initValue(): WarpRef {
+      if (this.owner instanceof WarpClient) {
+        // Avoid infinite recursion;
+        // value will be set when WarpClient initializes.
+        return void 0 as unknown as WarpRef;
+      }
       return WarpClient.global();
     },
     equalValues(newValue: WarpRef, oldValue: WarpRef): boolean {

@@ -6,10 +6,8 @@
     "composite": true,
     "declaration": true,
     "declarationMap": false,
-    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "importsNotUsedAsValues": "error",
     "incremental": true,
     "module": "es2020",
     "moduleResolution": "node",
@@ -31,6 +29,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "es2015",
-    "tsBuildInfoFile": "../../lib/test/.tsbuildinfo"
+    "tsBuildInfoFile": "../../lib/test/.tsbuildinfo",
+    "verbatimModuleSyntax": true
   }
 }

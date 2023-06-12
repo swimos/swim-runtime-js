@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {ConstraintSolver} from "@swim/constraint";
 
-export class ConstraintSolverSpec extends Spec {
+export class ConstraintSolverSpec extends Suite {
   @Test
   solveRight(exam: Exam): void {
     const solver = new ConstraintSolver();

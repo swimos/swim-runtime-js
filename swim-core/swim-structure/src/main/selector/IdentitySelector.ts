@@ -12,18 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Numbers, Constructors} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {AnyItem, Item} from "../Item";
-import {AnyValue, Value} from "../Value";
-import {AnyText, Text} from "../Text";
-import {AnyNum, Num} from "../Num";
+import type {AnyItem} from "../Item";
+import {Item} from "../Item";
+import type {AnyValue} from "../Value";
+import {Value} from "../Value";
+import type {AnyText} from "../Text";
+import {Text} from "../Text";
+import type {AnyNum} from "../Num";
+import {Num} from "../Num";
 import {Selector} from "./Selector";
 import {GetSelector} from "../"; // forward import
 import {GetAttrSelector} from "../"; // forward import
 import {GetItemSelector} from "../"; // forward import
 import {FilterSelector} from "../"; // forward import
-import {AnyInterpreter, Interpreter} from "../"; // forward import
+import type {AnyInterpreter} from "../interpreter/Interpreter";
+import {Interpreter} from "../"; // forward import
 
 /** @public */
 export class IdentitySelector extends Selector {

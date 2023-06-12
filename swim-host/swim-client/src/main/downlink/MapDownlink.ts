@@ -12,12 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Class, Proto, Cursor, OrderedMap} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Class} from "@swim/util";
+import type {Proto} from "@swim/util";
+import type {Cursor} from "@swim/util";
+import type {OrderedMap} from "@swim/util";
 import type {FastenerOwner} from "@swim/component";
 import type {BTree} from "@swim/collections";
-import {AnyValue, Value, Form, ValueCursor, ValueEntryCursor} from "@swim/structure";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Form} from "@swim/structure";
+import {ValueCursor} from "@swim/structure";
+import {ValueEntryCursor} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
-import {WarpDownlinkDescriptor, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
+import type {WarpDownlinkDescriptor} from "./WarpDownlink";
+import type {WarpDownlinkClass} from "./WarpDownlink";
+import {WarpDownlink} from "./WarpDownlink";
 import {MapDownlinkModel} from "./MapDownlinkModel";
 import type {MapDownlinkObserver} from "./MapDownlinkObserver";
 
@@ -46,8 +56,13 @@ export type AnyMapDownlinkValue<D extends MapDownlink<any, any, any, any, any>> 
   MapDownlinkValue<D> | MapDownlinkValueInit<D>;
 
 /** @public */
+export type MapDownlinkDecorator<P extends MapDownlink<any, any, any, any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
+};
+
+/** @public */
 export interface MapDownlinkDescriptor<K = unknown, V = unknown, KU = K, VU = V> extends WarpDownlinkDescriptor {
-  extends?: Proto<MapDownlink<any, any, any, any, any>> | string | boolean | null;
+  extends?: Proto<MapDownlink<any, any, any, any, any>> | boolean | null;
   keyForm?: Form<K, KU>;
   valueForm?: Form<V, VU>;
   /** @internal */
@@ -69,15 +84,15 @@ export interface MapDownlinkClass<D extends MapDownlink<any, any, any, any, any>
   refine(downlinkClass: MapDownlinkClass<any>): void;
 
   /** @override */
-  extend<D2 extends D>(className: string, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
-  extend<D2 extends D>(className: string, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
 
   /** @override */
-  define<D2 extends D>(className: string, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
-  define<D2 extends D>(className: string, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
 
   /** @override */
-  <D2 extends D>(template: MapDownlinkTemplate<D2>): PropertyDecorator;
+  <D2 extends D>(template: MapDownlinkTemplate<D2>): MapDownlinkDecorator<D2>;
 }
 
 /** @public */

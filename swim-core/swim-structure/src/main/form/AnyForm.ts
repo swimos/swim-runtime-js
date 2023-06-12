@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem, Item} from "../Item";
+import type {AnyItem} from "../Item";
+import {Item} from "../Item";
 import {Form} from "./Form";
 
 /** @internal */

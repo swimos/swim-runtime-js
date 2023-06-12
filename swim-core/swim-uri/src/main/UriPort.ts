@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Lazy, Compare, Strings, HashGenCacheMap} from "@swim/util";
-import {Output, Format, Debug, Display} from "@swim/codec";
+import {Lazy} from "@swim/util";
+import {Strings} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Compare} from "@swim/util";
+import {HashGenCacheMap} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import type {Display} from "@swim/codec";
+import {Format} from "@swim/codec";
 import {Uri} from "./Uri";
 
 /** @public */

@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {OutputSettings, Output, OutputStyle, Format, Display} from "@swim/codec";
+import {OutputSettings} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {Display} from "@swim/codec";
 
 /**
  * Evidence for or against the validity of a test assertion.
@@ -254,8 +258,8 @@ export class ProofError extends Proof {
 }
 
 /**
- * Tentative `Proof` for the validity of an assertion that hasn't yet been
- * implemented.
+ * Tentative `Proof` for the validity of an assertion that hasn't yet
+ * been implemented.
  * @internal
  */
 export class ProofPending extends Proof {

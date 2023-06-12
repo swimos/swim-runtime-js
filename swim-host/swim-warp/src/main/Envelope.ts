@@ -14,7 +14,8 @@
 
 import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
-import type {AnyUri, Uri} from "@swim/uri";
+import type {AnyUri} from "@swim/uri";
+import type {Uri} from "@swim/uri";
 import {Message} from "./Message";
 import {EventMessage} from "./"; // forward import
 import {CommandMessage} from "./"; // forward import

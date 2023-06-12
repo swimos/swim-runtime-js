@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Arrays} from "@swim/util";
-import {Property, ComponentFlags, Component} from "@swim/component";
+import type {Mutable} from "@swim/util";
+import {Arrays} from "@swim/util";
+import {Property} from "@swim/component";
+import type {ComponentFlags} from "@swim/component";
+import {Component} from "@swim/component";
 import type {Uri} from "@swim/uri";
-import {AnyValue, Value} from "@swim/structure";
-import {
-  EventMessage,
-  LinkRequest,
-  LinkedResponse,
-  SyncRequest,
-  SyncedResponse,
-  UnlinkRequest,
-  UnlinkedResponse,
-} from "@swim/warp";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import type {EventMessage} from "@swim/warp";
+import {LinkRequest} from "@swim/warp";
+import type {LinkedResponse} from "@swim/warp";
+import {SyncRequest} from "@swim/warp";
+import type {SyncedResponse} from "@swim/warp";
+import type {UnlinkRequest} from "@swim/warp";
+import type {UnlinkedResponse} from "@swim/warp";
 import type {WarpDownlink} from "./WarpDownlink";
 import {WarpHost} from "../"; // forward import
 
@@ -228,7 +230,7 @@ export class WarpDownlinkModel extends Component {
   }
 
   sync(): void {
-    const host = this.getSuper(WarpHost);
+    const host = this.getParent(WarpHost);
     if (host !== null) {
       const nodeUri = host.unresolve(this.nodeUri);
       const request = new SyncRequest(nodeUri, this.laneUri, this.prio, this.rate, this.body);
@@ -238,7 +240,7 @@ export class WarpDownlinkModel extends Component {
   }
 
   link(): void {
-    const host = this.getSuper(WarpHost);
+    const host = this.getParent(WarpHost);
     if (host !== null) {
       const nodeUri = host.unresolve(this.nodeUri);
       const request = new LinkRequest(nodeUri, this.laneUri, this.prio, this.rate, this.body);
@@ -249,7 +251,7 @@ export class WarpDownlinkModel extends Component {
 
   unlink(): void {
     this.setFlags(this.flags & ~WarpDownlinkModel.DownlinkMask | WarpDownlinkModel.UnlinkingFlag);
-    const host = this.getSuper(WarpHost);
+    const host = this.getParent(WarpHost);
     if (host !== null) {
       host.unlinkDownlink(this);
     }
@@ -265,7 +267,7 @@ export class WarpDownlinkModel extends Component {
   readonly unlinkDelay!: Property<this, number>;
 
   command(body: AnyValue): void {
-    const host = this.getSuper(WarpHost);
+    const host = this.getParent(WarpHost);
     if (host !== null) {
       body = Value.fromAny(body);
       this.onCommandMessage(body);
@@ -382,14 +384,14 @@ export class WarpDownlinkModel extends Component {
   static readonly UnlinkingFlag: ComponentFlags = 1 << (Component.FlagShift + 7);
 
   /** @internal */
-  static readonly DownlinkMask: ComponentFlags = WarpDownlinkModel.LinkingFlag
-                                               | WarpDownlinkModel.LinkedFlag
-                                               | WarpDownlinkModel.SyncingFlag
-                                               | WarpDownlinkModel.SyncedFlag
-                                               | WarpDownlinkModel.UnlinkingFlag;
+  static readonly DownlinkMask: ComponentFlags = this.LinkingFlag
+                                               | this.LinkedFlag
+                                               | this.SyncingFlag
+                                               | this.SyncedFlag
+                                               | this.UnlinkingFlag;
 
   /** @internal */
   static override readonly FlagShift: number = Component.FlagShift + 8;
   /** @internal */
-  static override readonly FlagMask: ComponentFlags = (1 << WarpDownlinkModel.FlagShift) - 1;
+  static override readonly FlagMask: ComponentFlags = (1 << this.FlagShift) - 1;
 }

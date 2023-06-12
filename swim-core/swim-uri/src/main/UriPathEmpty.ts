@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Output} from "@swim/codec";
-import {AnyUriPath, UriPath} from "./UriPath";
+import type {AnyUriPath} from "./UriPath";
+import {UriPath} from "./UriPath";
 
 /** @internal */
 export class UriPathEmpty extends UriPath {

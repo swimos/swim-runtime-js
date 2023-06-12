@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Numbers, Strings} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Strings} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {AnyItem, Item} from "./Item";
-import {AnyValue, Value} from "./Value";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
+import type {AnyValue} from "./Value";
+import {Value} from "./Value";
 
 /** @public */
 export type AnyBool = Bool | boolean;

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {ProcessorSpec} from "./ProcessorSpec";
 
-@Unit
-export class ProcessorSuite extends Spec {
+export class ProcessorSuite extends Suite {
   @Unit
-  processorSpec(): Spec {
+  processorSpec(): Suite {
     return new ProcessorSpec();
   }
 }

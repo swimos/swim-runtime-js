@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {DateTime} from "@swim/time";
 
-export class DateTimeParserSpec extends Spec {
+export class DateTimeParserSpec extends Suite {
   @Test
   parseDateTimes(exam: Exam): void {
     exam.equal(DateTime.parse("1970-01-01T00:00:00.000Z"), new DateTime(0));

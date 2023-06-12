@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Proto} from "@swim/util";
-import {
-  FastenerOwner,
-  FastenerDescriptor,
-  FastenerClass,
-  Fastener,
-} from "../fastener/Fastener";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import type {FastenerOwner} from "../fastener/Fastener";
+import type {FastenerDescriptor} from "../fastener/Fastener";
+import type {FastenerClass} from "../fastener/Fastener";
+import {Fastener} from "../fastener/Fastener";
+
+/** @public */
+export type TimerDecorator<F extends Timer<any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+};
 
 /** @public */
 export interface TimerDescriptor extends FastenerDescriptor {
-  extends?: Proto<Timer<any>> | string | boolean | null;
+  extends?: Proto<Timer<any>> | boolean | null;
   delay?: number;
 }
 
@@ -41,15 +45,15 @@ export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerC
   refine(fastenerClass: TimerClass<any>): void;
 
   /** @override */
-  extend<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
-  extend<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: TimerTemplate<F2>): TimerClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: TimerTemplate<F2>): TimerClass<F2>;
 
   /** @override */
-  define<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
-  define<F2 extends F>(className: string, template: TimerTemplate<F2>): TimerClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: TimerTemplate<F2>): TimerClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: TimerTemplate<F2>): TimerClass<F2>;
 
   /** @override */
-  <F2 extends F>(template: TimerTemplate<F2>): PropertyDecorator;
+  <F2 extends F>(template: TimerTemplate<F2>): TimerDecorator<F2>;
 }
 
 /** @public */
@@ -129,10 +133,7 @@ export interface Timer<O = unknown> extends Fastener<O> {
 
 /** @public */
 export const Timer = (function (_super: typeof Fastener) {
-  const Timer = _super.extend("Timer", {
-    lazy: false,
-    static: true,
-  }) as TimerClass;
+  const Timer = _super.extend("Timer", {}) as TimerClass;
 
   Object.defineProperty(Timer.prototype, "fastenerType", {
     value: Timer,

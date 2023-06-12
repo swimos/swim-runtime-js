@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Strings} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Strings} from "@swim/util";
 import {Mark} from "../source/Mark";
 import {InputException} from "../input/InputException";
-import {AnyInputSettings, InputSettings} from "../input/InputSettings";
+import type {AnyInputSettings} from "../input/InputSettings";
+import {InputSettings} from "../input/InputSettings";
 import {Input} from "../input/Input";
 import {InputError} from "../input/InputError";
 

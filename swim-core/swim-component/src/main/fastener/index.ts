@@ -14,16 +14,15 @@
 
 export {Affinity} from "./Affinity";
 
-export {
-  FastenerContextClass,
-  FastenerContext,
-} from "./FastenerContext";
+export {FastenerClassCache} from "./FastenerContext";
+export {FastenerNameCache} from "./FastenerContext";
+export type {FastenerContextClass} from "./FastenerContext";
+export {FastenerContext} from "./FastenerContext";
 
-export {
-  FastenerFlags,
-  FastenerOwner,
-  FastenerDescriptor,
-  FastenerTemplate,
-  FastenerClass,
-  Fastener,
-} from "./Fastener";
+export type {FastenerFlags} from "./Fastener";
+export type {FastenerOwner} from "./Fastener";
+export type {FastenerDecorator} from "./Fastener";
+export type {FastenerDescriptor} from "./Fastener";
+export type {FastenerTemplate} from "./Fastener";
+export type {FastenerClass} from "./Fastener";
+export {Fastener} from "./Fastener";

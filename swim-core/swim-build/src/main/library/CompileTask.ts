@@ -14,9 +14,15 @@
 
 import * as Path from "path";
 import * as ts from "typescript";
-import {MutableDictionary, Severity} from "@swim/util";
-import {Input, OutputSettings, Tag, Mark, Span, Diagnostic, Unicode} from "@swim/codec";
-import type {FastenerClass} from "@swim/component";
+import type {MutableDictionary} from "@swim/util";
+import {Severity} from "@swim/util";
+import {Input} from "@swim/codec";
+import {OutputSettings} from "@swim/codec";
+import type {Tag} from "@swim/codec";
+import {Mark} from "@swim/codec";
+import {Span} from "@swim/codec";
+import {Diagnostic} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import {FileRef} from "@swim/sys";
 import {TaskStatus} from "../task/Task";
 import type {PackageScope} from "../package/PackageScope";
@@ -44,7 +50,7 @@ export class CompileTask extends LibraryTask {
 
   invalidated: boolean;
 
-  @FileRef<CompileTask["tsconfig"]>({
+  @FileRef({
     fileName: "tsconfig.json",
     value: null,
     getBaseDir(): string | undefined {
@@ -56,7 +62,6 @@ export class CompileTask extends LibraryTask {
     },
   })
   readonly tsconfig!: FileRef<this, ts.ParsedCommandLine | null>;
-  static readonly tsconfig: FastenerClass<CompileTask["tsconfig"]>;
 
   override async exec(): Promise<TaskStatus> {
     this.logBegin("compiling");

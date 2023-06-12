@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {PairBuilder} from "@swim/util";
-import {AnyUriQuery, UriQuery} from "./UriQuery";
+import type {AnyUriQuery} from "./UriQuery";
+import {UriQuery} from "./UriQuery";
 
 /** @public */
 export class UriQueryBuilder implements PairBuilder<string | undefined, string, UriQuery> {

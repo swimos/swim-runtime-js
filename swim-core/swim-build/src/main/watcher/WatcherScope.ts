@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Class, MutableDictionary, Observes} from "@swim/util";
-import {OutputSettings, Output, OutputStyle, Format, Unicode} from "@swim/codec";
-import {FastenerClass, Provider, Timer} from "@swim/component";
+import type {Class} from "@swim/util";
+import type {MutableDictionary} from "@swim/util";
+import type {Observes} from "@swim/util";
+import {OutputSettings} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Format} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Provider} from "@swim/component";
+import {Timer} from "@swim/component";
 import type {Workspace} from "../workspace/Workspace";
 import {Scope} from "../scope/Scope";
 import type {TaskConfig} from "../task/Task";
@@ -156,7 +163,7 @@ export class WatcherScope extends Scope {
     }
   }
 
-  @Timer<WatcherScope["buildTimer"]>({
+  @Timer({
     delay: 500,
     fire(): void {
       this.owner.rebuild();
@@ -252,7 +259,7 @@ export class WatcherScope extends Scope {
     console.log("");
   }
 
-  @Provider<WatcherScope["workspace"]>({
+  @Provider({
     extends: true,
     lazy: false,
     observes: true,
@@ -261,7 +268,6 @@ export class WatcherScope extends Scope {
     },
   })
   override readonly workspace!: Provider<this, Workspace> & Scope["workspace"] & Observes<Workspace>;
-  static override readonly workspace: FastenerClass<Scope["workspace"]>;
 
   static async watch(watchConfig: TaskConfig, buildConfigs: TaskConfig | readonly TaskConfig[], packageNames?: string[] | string, libraryNames?: string[] | string): Promise<WatcherScope> {
     if (typeof packageNames === "string") {

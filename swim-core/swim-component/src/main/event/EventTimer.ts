@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Proto} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import type {FastenerOwner} from "../fastener/Fastener";
-import {EventHandlerDescriptor, EventHandlerClass, EventHandler} from "./EventHandler";
+import type {EventHandlerDescriptor} from "./EventHandler";
+import type {EventHandlerClass} from "./EventHandler";
+import {EventHandler} from "./EventHandler";
+
+/** @public */
+export type EventTimerDecorator<F extends EventTimer<any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+};
 
 /** @public */
 export type EventTimerTarget<F extends EventTimer<any, any>> =
@@ -22,7 +30,7 @@ export type EventTimerTarget<F extends EventTimer<any, any>> =
 
 /** @public */
 export interface EventTimerDescriptor<T extends EventTarget = EventTarget> extends EventHandlerDescriptor<T> {
-  extends?: Proto<EventTimer<any, any>> | string | boolean | null;
+  extends?: Proto<EventTimer<any, any>> | boolean | null;
   delay?: number;
 }
 
@@ -41,15 +49,15 @@ export interface EventTimerClass<F extends EventTimer<any, any> = EventTimer<any
   refine(fastenerClass: EventTimerClass<any>): void;
 
   /** @override */
-  extend<F2 extends F>(className: string, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
-  extend<F2 extends F>(className: string, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
 
   /** @override */
-  define<F2 extends F>(className: string, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
-  define<F2 extends F>(className: string, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
 
   /** @override */
-  <F2 extends F>(template: EventTimerTemplate<F2>): PropertyDecorator;
+  <F2 extends F>(template: EventTimerTemplate<F2>): EventTimerDecorator<F2>;
 }
 
 /** @public */

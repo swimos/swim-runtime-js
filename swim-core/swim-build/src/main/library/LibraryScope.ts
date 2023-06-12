@@ -14,12 +14,17 @@
 
 import * as Path from "path";
 import type * as FS from "fs";
-import type {Class, Observes} from "@swim/util";
-import {Output, OutputStyle} from "@swim/codec";
-import {FastenerClass, Provider, ComponentRef, Service} from "@swim/component";
+import type {Class} from "@swim/util";
+import type {Observes} from "@swim/util";
+import type {Output} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Provider} from "@swim/component";
+import {ComponentRef} from "@swim/component";
+import type {Service} from "@swim/component";
 import type {Workspace} from "../workspace/Workspace";
 import {Scope} from "../scope/Scope";
-import {TaskStatus, TaskConfig} from "../task/Task";
+import {TaskStatus} from "../task/Task";
+import type {TaskConfig} from "../task/Task";
 import {PackageScope} from "../package/PackageScope";
 import {LibraryTask} from "./LibraryTask";
 import {CompileTask} from "./CompileTask";
@@ -42,43 +47,38 @@ export class LibraryScope extends Scope {
   override readonly name: string;
 
   get packageScope(): PackageScope | null {
-    return this.getSuper(PackageScope);
+    return this.getParent(PackageScope);
   }
 
-  @ComponentRef<LibraryScope["compile"]>({
+  @ComponentRef({
     componentType: CompileTask,
     initComponent(compileTask: CompileTask): void {
       compileTask.baseDir.setValue(this.owner.baseDir.value);
     },
   })
   readonly compile!: ComponentRef<this, CompileTask>;
-  static readonly compile: FastenerClass<LibraryScope["compile"]>;
 
-  @ComponentRef<LibraryScope["lint"]>({
+  @ComponentRef({
     componentType: LintTask,
   })
   readonly lint!: ComponentRef<this, LintTask>;
-  static readonly lint: FastenerClass<LibraryScope["lint"]>;
 
-  @ComponentRef<LibraryScope["api"]>({
+  @ComponentRef({
     componentType: ApiTask,
   })
   readonly api!: ComponentRef<this, ApiTask>;
-  static readonly api: FastenerClass<LibraryScope["api"]>;
 
-  @ComponentRef<LibraryScope["bundle"]>({
+  @ComponentRef({
     componentType: BundleTask,
   })
   readonly bundle!: ComponentRef<this, BundleTask>;
-  static readonly bundle: FastenerClass<LibraryScope["bundle"]>;
 
-  @ComponentRef<LibraryScope["build"]>({
+  @ComponentRef({
     componentType: BuildTask,
   })
   readonly build!: ComponentRef<this, BuildTask>;
-  static readonly build: FastenerClass<LibraryScope["build"]>;
 
-  @ComponentRef<LibraryScope["watch"]>({
+  @ComponentRef({
     componentType: WatchTask,
     observes: true,
     taskDidAdd(path: string, stats: FS.Stats | null): void {
@@ -98,7 +98,6 @@ export class LibraryScope extends Scope {
     },
   })
   readonly watch!: ComponentRef<this, WatchTask> & Observes<WatchTask>;
-  static readonly watch: FastenerClass<LibraryScope["watch"]>;
 
   override async runTask(taskConfig: TaskConfig): Promise<TaskStatus> {
     const task = this.getTask(taskConfig.class);
@@ -125,19 +124,18 @@ export class LibraryScope extends Scope {
     return output;
   }
 
-  @Provider<LibraryScope["workspace"]>({
+  @Provider({
     extends: true,
     mountService(service: Workspace, target: Service | null, key: string | undefined): void {
-      Provider.prototype.mountService.call(this, service, target, key);
+      super.mountService(service, target, key);
       service.libraries.addComponent(this.owner);
     },
     unmountService(service: Workspace): void {
-      Provider.prototype.unmountService.call(this, service);
+      super.unmountService(service);
       service.libraries.removeComponent(this.owner);
     },
   })
   override readonly workspace!: Provider<this, Workspace> & Scope["workspace"];
-  static override readonly workspace: FastenerClass<LibraryScope["workspace"]>;
 
   static override async load(baseDir: string): Promise<LibraryScope | null> {
     const name = Path.basename(baseDir);

@@ -13,7 +13,11 @@
 // limitations under the License.
 
 import type * as Prism from "prismjs";
-import {Item, Attr, Value, Record, Text} from "@swim/structure";
+import {Item} from "@swim/structure";
+import {Attr} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Text} from "@swim/structure";
 import type {ProcessorContext} from "../processor/ProcessorContext";
 import {Directive} from "./Directive";
 

@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Mapping, Easing, Tweening} from "@swim/util";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Mapping} from "@swim/util";
+import {Easing} from "@swim/util";
+import {Tweening} from "@swim/util";
 
-export class TweeningSpec extends Spec {
+export class TweeningSpec extends Suite {
   @Test
   testLinearTweening(exam: Exam): void {
     const tweening = Easing.linear.withDomain(6, 8).overRange(2, 4);

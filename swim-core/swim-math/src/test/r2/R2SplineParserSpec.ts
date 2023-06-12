@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {R2Curve, R2Spline} from "@swim/math";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {R2Curve} from "@swim/math";
+import {R2Spline} from "@swim/math";
 
-export class R2SplineParserSpec extends Spec {
+export class R2SplineParserSpec extends Suite {
   @Test
   parseAbsoluteDegenerateSplines(exam: Exam): void {
     exam.equal(R2Spline.parse("M1,-2"), R2Spline.empty());

@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Severity} from "@swim/util";
-import {Mark, Span, OutputSettings, Diagnostic, Unicode} from "@swim/codec";
+import {Mark} from "@swim/codec";
+import {Span} from "@swim/codec";
+import {OutputSettings} from "@swim/codec";
+import {Diagnostic} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 
-export class DiagnosticSpec extends Spec {
+export class DiagnosticSpec extends Suite {
   printDiagnostic(diagnostic: Diagnostic): void {
     console.log(diagnostic.toString(OutputSettings.styled()));
   }

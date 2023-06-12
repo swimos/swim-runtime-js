@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Proto, Equals, FromAny} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Equals} from "@swim/util";
+import {FromAny} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
-import {FastenerContext} from "../fastener/FastenerContext";
-import {FastenerOwner, FastenerDescriptor, FastenerClass, Fastener} from "../fastener/Fastener";
+import type {FastenerContext} from "../fastener/FastenerContext";
+import type {FastenerOwner} from "../fastener/Fastener";
+import type {FastenerDescriptor} from "../fastener/Fastener";
+import type {FastenerClass} from "../fastener/Fastener";
+import {Fastener} from "../fastener/Fastener";
 
 /** @public */
 export type PropertyValue<P extends Property<any, any, any>> =
@@ -30,8 +36,13 @@ export type AnyPropertyValue<P extends Property<any, any, any>> =
   PropertyValue<P> | PropertyValueInit<P>;
 
 /** @public */
+export type PropertyDecorator<P extends Property<any, any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
+};
+
+/** @public */
 export interface PropertyDescriptor<T = unknown, U = T> extends FastenerDescriptor {
-  extends?: Proto<Property<any, any, any>> | string | boolean | null;
+  extends?: Proto<Property<any, any, any>> | boolean | null;
   valueType?: unknown;
   value?: T | U;
   updateFlags?: number;
@@ -52,15 +63,18 @@ export interface PropertyClass<P extends Property<any, any, any> = Property<any,
   refine(propertyClass: PropertyClass<any>): void;
 
   /** @override */
-  extend<P2 extends P>(className: string, template: PropertyTemplate<P2>): PropertyClass<P2>;
-  extend<P2 extends P>(className: string, template: PropertyTemplate<P2>): PropertyClass<P2>;
+  extend<P2 extends P>(className: string | symbol, template: PropertyTemplate<P2>): PropertyClass<P2>;
+  extend<P2 extends P>(className: string | symbol, template: PropertyTemplate<P2>): PropertyClass<P2>;
 
   /** @override */
-  define<P2 extends P>(className: string, template: PropertyTemplate<P2>): PropertyClass<P2>;
-  define<P2 extends P>(className: string, template: PropertyTemplate<P2>): PropertyClass<P2>;
+  define<P2 extends P>(className: string | symbol, template: PropertyTemplate<P2>): PropertyClass<P2>;
+  define<P2 extends P>(className: string | symbol, template: PropertyTemplate<P2>): PropertyClass<P2>;
 
   /** @override */
-  <P2 extends P>(template: PropertyTemplate<P2>): PropertyDecorator;
+  dummy<P2 extends P>(): P2;
+
+  /** @override */
+  <P2 extends P>(template: PropertyTemplate<P2>): PropertyDecorator<P2>;
 }
 
 /** @public */
@@ -72,7 +86,7 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   get fastenerType(): Proto<Property<any, any, any>>;
 
   /** @internal @override */
-  getSuper(): Property<unknown, T> | null;
+  getParent(): Property<unknown, T> | null;
 
   /** @internal @override */
   setDerived(derived: boolean, inlet: Property<unknown, T>): void;
@@ -243,8 +257,9 @@ export const Property = (function (_super: typeof Fastener) {
     const inletValue = this.inletValue;
     if (inletValue === void 0 || inletValue === null) {
       let message = inletValue + " ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "inlet value";
       throw new TypeError(message);
@@ -272,8 +287,9 @@ export const Property = (function (_super: typeof Fastener) {
     const value = this.value;
     if (value === void 0 || value === null) {
       let message = value + " ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "value";
       throw new TypeError(message);
@@ -320,9 +336,12 @@ export const Property = (function (_super: typeof Fastener) {
 
   Property.prototype.onSetValue = function <T>(this: Property<unknown, T>, newValue: T, oldValue: T): void {
     const updateFlags = this.updateFlags;
-    if (updateFlags !== void 0 && FastenerContext.has(this.owner, "requireUpdate")) {
-      this.owner.requireUpdate(updateFlags);
+    const owner = this.owner;
+    if (updateFlags === void 0 || owner == null || typeof owner !== "object" && typeof owner !== "function"
+        || !("requireUpdate" in owner)) {
+      return;
     }
+    (owner as FastenerContext).requireUpdate!(updateFlags);
   };
 
   Property.prototype.didSetValue = function <T>(this: Property<unknown, T>, newValue: T, oldValue: T): void {

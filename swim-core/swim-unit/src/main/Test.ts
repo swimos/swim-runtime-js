@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {SpecTest} from "./SpecTest";
-import type {SpecClass} from "./Spec";
 import type {Exam} from "./Exam";
+import {TestRunner} from "./"; // forward import
 
 /**
- * Test evaluation function, invoked with an [[Exam]] instance to proove a unit
- * test case. Returns `void` if the test executes synchronously. Returns a
- * `Promise` if the test case executes asynchronously.
+ * A test evaluation function that tries to prove a unit test case.
+ * Test functions verify test conditions using the provided [[Exam]] object.
+ * Synchronous tests return `void`, and asynchronous tests return a `Promise`.
  *
  * ### Examples
  *
  * ```
- * class MySpec extends Spec {
+ * class MySuite {
  *   @Test
  *   myTest(exam: Exam): void {
  *     exam.ok(true);
@@ -42,15 +41,16 @@ import type {Exam} from "./Exam";
  * }
  * ```
  *
- * @throws [TestException] if the an `exam` assertion fails.
+ * @throws [TestException] if a test assertion fails.
  * @public
  */
-export type TestFunc = (exam: Exam) => Promise<unknown> | unknown | void;
+export type TestMethod<T = unknown, E extends Exam = Exam> =
+  (this: T, exam: E) => Promise<unknown> | unknown | void;
 
 /**
- * [[TestFunc test function]] registration options. `TestOptions` are passed
- * to the [[Test]] method decorator factory to modify the registration of
- * test functions with the enclosing [[Spec]].
+ * [[TestMethod test function]] options. `TestOptions` can be passed to the
+ * [[Test]] decorator factory to modify the behavior of registered tests.
+ *
  * @public
  */
 export interface TestOptions {
@@ -61,13 +61,19 @@ export interface TestOptions {
 }
 
 /**
- * Returns a method decorator that registers [[TestFunc test functions]] with
- * the enclosing [[Spec]], using the given `options`.
+ * Method decorator that registers [[TestMethod test functions]].
  *
  * ### Examples
  *
  * ```
- * class MySpec extends Spec {
+ * class MySuite {
+ *   @Test
+ *   myTest(exam: Exam): void {
+ *     exam.ok(true);
+ *   }
+ * }
+ *
+ * class MySuite {
  *   @Test({pending: true})
  *   myTest(exam: Exam): void {
  *     throw new Error("unreachable");
@@ -77,32 +83,13 @@ export interface TestOptions {
  *
  * @public
  */
-export function Test(options: TestOptions): MethodDecorator;
-
-/**
- * Method decorator that registers a [[TestFunc test function]] with the
- * enclosing [[Spec]].
- *
- * ### Examples
- *
- * ```
- * class MySpec extends Spec {
- *   @Test
- *   myTest(exam: Exam): void {
- *     exam.ok(true);
- *   }
- * }
- * ```
- *
- * @public
- */
-export function Test(target: Object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void;
-
-export function Test(target: TestOptions | Object, propertyKey?: string | symbol,
-                     descriptor?: PropertyDescriptor): MethodDecorator | void {
+export const Test: {
+  <T, E extends Exam = Exam>(target: TestMethod<T, E>, context: ClassMethodDecoratorContext<T, TestMethod<T, E>>): void;
+  (options: TestOptions): <T, E extends Exam = Exam>(target: TestMethod<T, E>, context: ClassMethodDecoratorContext<T, TestMethod<T, E>>) => void;
+} = function <T>(target: TestMethod<T> | TestOptions,
+                 context?: ClassMethodDecoratorContext<T, TestMethod<T>>): any {
   if (arguments.length === 1) {
-    return SpecTest.decorate.bind(SpecTest, target as TestOptions);
-  } else {
-    SpecTest.decorate({}, target as SpecClass, propertyKey!, descriptor!);
+    return TestRunner.decorate.bind(Test, target as TestOptions);
   }
-}
+  TestRunner.decorate({}, target as TestMethod<T>, context!);
+};

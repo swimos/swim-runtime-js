@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Equals, Equivalent, Mutable, Arrays} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
+import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Arrays} from "@swim/util";
+import type {Equals} from "@swim/util";
+import type {Equivalent} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import {AnyR2Shape, R2Shape} from "./R2Shape";
+import type {AnyR2Shape} from "./R2Shape";
+import {R2Shape} from "./R2Shape";
 import {R2Box} from "./R2Box";
 
 /** @public */

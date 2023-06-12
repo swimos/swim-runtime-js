@@ -12,37 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {GeoPointSpec} from "./GeoPointSpec";
 import {GeoTileSpec} from "./GeoTileSpec";
 import {GeoSplineBuilderSpec} from "./GeoSplineBuilderSpec";
 import {GeoPathBuilderSpec} from "./GeoPathBuilderSpec";
 import {GeoJsonSpec} from "./GeoJsonSpec";
 
-@Unit
-export class GeoSuite extends Spec {
+export class GeoSuite extends Suite {
   @Unit
-  geoPointSpec(): Spec {
+  geoPointSpec(): Suite {
     return new GeoPointSpec();
   }
 
   @Unit
-  geoTileSpec(): Spec {
+  geoTileSpec(): Suite {
     return new GeoTileSpec();
   }
 
   @Unit
-  geoSplineBuilderSpec(): Spec {
+  geoSplineBuilderSpec(): Suite {
     return new GeoSplineBuilderSpec();
   }
 
   @Unit
-  geoPathBuilderSpec(): Spec {
+  geoPathBuilderSpec(): Suite {
     return new GeoPathBuilderSpec();
   }
 
   @Unit
-  geoJsonSpec(): Spec {
+  geoJsonSpec(): Suite {
     return new GeoJsonSpec();
   }
 }

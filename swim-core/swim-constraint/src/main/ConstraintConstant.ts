@@ -13,9 +13,12 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import {Output, Debug, Format} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 import {ConstraintMap} from "./ConstraintMap";
-import {AnyConstraintExpression, ConstraintExpression} from "./ConstraintExpression";
+import type {AnyConstraintExpression} from "./ConstraintExpression";
+import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
 import type {ConstraintVariable} from "./ConstraintVariable";
 

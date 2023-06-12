@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  AnyTransform,
-  Transform,
-} from "./Transform";
+export type {AnyTransform} from "./Transform";
+export {Transform} from "./Transform";
 export {TransformForm} from "./TransformForm";
 export {TransformParser} from "./TransformParser";
 

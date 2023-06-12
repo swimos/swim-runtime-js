@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Mapping, Domain, Range, LinearRange} from "@swim/util";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Mapping} from "@swim/util";
+import {Domain} from "@swim/util";
+import {Range} from "@swim/util";
+import {LinearRange} from "@swim/util";
 
-export class LinearRangeSpec extends Spec {
+export class LinearRangeSpec extends Suite {
   @Test
   testUnitRange(exam: Exam): void {
     const range = Range.unit;

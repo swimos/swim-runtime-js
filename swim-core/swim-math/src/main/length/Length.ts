@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, HashCode, Equivalent, Compare, Interpolate, Interpolator} from "@swim/util";
-import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
-import {Attr, Value, Text, Form} from "@swim/structure";
+import {Lazy} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Equivalent} from "@swim/util";
+import type {Compare} from "@swim/util";
+import type {Interpolate} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Attr} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Text} from "@swim/structure";
+import type {Form} from "@swim/structure";
 import {LengthException} from "./LengthException";
 import {PxLength} from "../"; // forward import
 import {EmLength} from "../"; // forward import

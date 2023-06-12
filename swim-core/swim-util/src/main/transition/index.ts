@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  AnyTiming,
-  TimingInit,
-  Timing,
-} from "./Timing";
+export type {AnyTiming} from "./Timing";
+export type {TimingInit} from "./Timing";
+export {Timing} from "./Timing";
 
-export {
-  AnyEasing,
-  EasingType,
-  Easing,
-} from "./Easing";
+export type {AnyEasing} from "./Easing";
+export type {EasingType} from "./Easing";
+export {Easing} from "./Easing";
 
 export {Tweening} from "./Tweening";

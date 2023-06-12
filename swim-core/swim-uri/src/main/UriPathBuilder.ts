@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Builder} from "@swim/util";
-import {AnyUriPath, UriPath} from "./UriPath";
+import type {AnyUriPath} from "./UriPath";
+import {UriPath} from "./UriPath";
 
 /** @public */
 export class UriPathBuilder implements Builder<string, UriPath> {

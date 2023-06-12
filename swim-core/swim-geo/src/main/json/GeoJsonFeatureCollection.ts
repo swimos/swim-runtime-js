@@ -15,7 +15,8 @@
 import type {GeoShape} from "../GeoShape";
 import type {GeoJsonObject} from "./GeoJson";
 import type {GeoJsonGeometry} from "./GeoJsonGeometry";
-import {GeoJsonProperties, GeoJsonFeature} from "./GeoJsonFeature";
+import type {GeoJsonProperties} from "./GeoJsonFeature";
+import {GeoJsonFeature} from "./GeoJsonFeature";
 
 /** @public */
 export interface GeoJsonFeatureCollection<G extends GeoJsonGeometry = GeoJsonGeometry, P = GeoJsonProperties> extends GeoJsonObject {

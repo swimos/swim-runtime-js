@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TestOptions, Test, Spec, Report} from "@swim/unit";
+import type {TestOptions} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import type {Report} from "@swim/unit";
 import {Text} from "@swim/structure";
 import {Uri} from "@swim/uri";
-import {Envelope, CommandMessage, LinkRequest, LinkedResponse} from "@swim/warp";
+import type {Envelope} from "@swim/warp";
+import {CommandMessage} from "@swim/warp";
+import {LinkRequest} from "@swim/warp";
+import {LinkedResponse} from "@swim/warp";
 import {WarpClient} from "@swim/client";
 import type {MockServer} from "../MockServer";
 import {ClientExam} from "../ClientExam";
 
-export class EventDownlinkSpec extends Spec {
+export class EventDownlinkSpec extends Suite {
   override createExam(report: Report, name: string, options: TestOptions): ClientExam {
     return new ClientExam(report, this, name, options);
   }

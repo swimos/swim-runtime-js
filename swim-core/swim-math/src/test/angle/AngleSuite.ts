@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {AngleParserSpec} from "./AngleParserSpec";
 
-@Unit
-export class AngleSuite extends Spec {
+export class AngleSuite extends Suite {
   @Unit
-  angleParserSpec(): Spec {
+  angleParserSpec(): Suite {
     return new AngleParserSpec();
   }
 }

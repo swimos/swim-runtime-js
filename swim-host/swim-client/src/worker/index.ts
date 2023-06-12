@@ -14,7 +14,5 @@
 
 export {WarpSocketHostWorker} from "./WarpSocketHostWorker";
 
-export {
-  WarpWorkerOptions,
-  WarpWorker,
-} from "./WarpWorker";
+export type {WarpWorkerOptions} from "./WarpWorker";
+export {WarpWorker} from "./WarpWorker";

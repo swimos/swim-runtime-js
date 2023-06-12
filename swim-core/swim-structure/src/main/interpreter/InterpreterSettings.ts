@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Murmur3, HashCode, Numbers, Constructors} from "@swim/util";
-import {Output, Format, Debug} from "@swim/codec";
+import {Lazy} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 
 /**
  * Either an [[InterpreterSettings]] instance, or an [[InterpreterSettingsInit]]

@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Slot, Value, Record, Num, Text, Selector} from "@swim/structure";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Slot} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Selector} from "@swim/structure";
 
-export class LambdaFuncSpec extends Spec {
+export class LambdaFuncSpec extends Suite {
   @Test
   evaluateIdentityLambda(exam: Exam): void {
     const scope = Record.of(Slot.of("f", Text.from("x").lambda(

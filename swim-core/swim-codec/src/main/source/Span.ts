@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Constructors} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Constructors} from "@swim/util";
 import {Tag} from "./Tag";
 import {Mark} from "./Mark";
 import type {Output} from "../output/Output";

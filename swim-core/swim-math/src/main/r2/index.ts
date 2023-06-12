@@ -12,41 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {R2Function} from "./R2Function";
-export {R2Operator} from "./R2Operator";
+export type {R2Function} from "./R2Function";
+export type {R2Operator} from "./R2Operator";
 
-export {
-  AnyR2Vector,
-  R2VectorInit,
-  R2Vector,
-} from "./R2Vector";
+export type {AnyR2Vector} from "./R2Vector";
+export type {R2VectorInit} from "./R2Vector";
+export {R2Vector} from "./R2Vector";
 export {R2VectorInterpolator} from "./R2VectorInterpolator";
 
-export {
-  AnyR2Shape,
-  R2Shape,
-} from "./R2Shape";
+export type {AnyR2Shape} from "./R2Shape";
+export {R2Shape} from "./R2Shape";
 
-export {
-  AnyR2Point,
-  R2PointInit,
-  R2PointTuple,
-  R2Point,
-} from "./R2Point";
+export type {AnyR2Point} from "./R2Point";
+export type {R2PointInit} from "./R2Point";
+export type {R2PointTuple} from "./R2Point";
+export {R2Point} from "./R2Point";
 export {R2PointInterpolator} from "./R2PointInterpolator";
 
-export {R2CurveContext} from "./R2CurveContext";
+export type {R2CurveContext} from "./R2CurveContext";
 
 export {R2Curve} from "./R2Curve";
 export {R2CurveParser} from "./R2CurveParser";
 
 export {R2BezierCurve} from "./R2BezierCurve";
 
-export {
-  AnyR2Segment,
-  R2SegmentInit,
-  R2Segment,
-} from "./R2Segment";
+export type {AnyR2Segment} from "./R2Segment";
+export type {R2SegmentInit} from "./R2Segment";
+export {R2Segment} from "./R2Segment";
 export {R2SegmentInterpolator} from "./R2SegmentInterpolator";
 export {R2SegmentParser} from "./R2SegmentParser";
 
@@ -59,31 +51,25 @@ export {R2CubicCurveParser} from "./R2CubicCurveParser";
 export {R2EllipticCurve} from "./R2EllipticCurve";
 export {R2EllipticCurveParser} from "./R2EllipticCurveParser";
 
-export {R2SplineContext} from "./R2SplineContext";
+export type {R2SplineContext} from "./R2SplineContext";
 export {R2Spline} from "./R2Spline";
 export {R2SplineBuilder} from "./R2SplineBuilder";
 export {R2SplineParser} from "./R2SplineParser";
 
-export {R2PathContext} from "./R2PathContext";
-export {
-  AnyR2Path,
-  R2Path,
-} from "./R2Path";
+export type {R2PathContext} from "./R2PathContext";
+export type {AnyR2Path} from "./R2Path";
+export {R2Path} from "./R2Path";
 export {R2PathBuilder} from "./R2PathBuilder";
 export {R2PathParser} from "./R2PathParser";
 
-export {
-  AnyR2Box,
-  R2BoxInit,
-  R2Box,
-} from "./R2Box";
+export type {AnyR2Box} from "./R2Box";
+export type {R2BoxInit} from "./R2Box";
+export {R2Box} from "./R2Box";
 export {R2BoxInterpolator} from "./R2BoxInterpolator";
 
-export {
-  AnyR2Circle,
-  R2CircleInit,
-  R2Circle,
-} from "./R2Circle";
+export type {AnyR2Circle} from "./R2Circle";
+export type {R2CircleInit} from "./R2Circle";
+export {R2Circle} from "./R2Circle";
 export {R2CircleInterpolator} from "./R2CircleInterpolator";
 
 export {R2Group} from "./R2Group";

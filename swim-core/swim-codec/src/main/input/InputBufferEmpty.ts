@@ -14,7 +14,8 @@
 
 import type {Mark} from "../source/Mark";
 import {InputException} from "./InputException";
-import {AnyInputSettings, InputSettings} from "./InputSettings";
+import type {AnyInputSettings} from "./InputSettings";
+import {InputSettings} from "./InputSettings";
 import {InputBuffer} from "./InputBuffer";
 import {InputBufferDone} from "../"; // forward import
 import {InputBufferError} from "../"; // forward import

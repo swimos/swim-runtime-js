@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Cursor} from "@swim/util";
+import {Lazy} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import {KeysCursor} from "./KeysCursor";
 import {ValuesCursor} from "./ValuesCursor";
 import type {BTreeContext} from "./BTreeContext";

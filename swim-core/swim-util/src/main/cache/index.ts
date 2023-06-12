@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  HashGenCacheMap,
-  HashGenCacheMapBucket,
-} from "./HashGenCacheMap";
+export {HashGenCacheMap} from "./HashGenCacheMap";
+export {HashGenCacheMapBucket} from "./HashGenCacheMap";
 
-export {
-  HashGenCacheSet,
-  HashGenCacheSetBucket,
-} from "./HashGenCacheSet";
+export {HashGenCacheSet} from "./HashGenCacheSet";
+export {HashGenCacheSetBucket} from "./HashGenCacheSet";

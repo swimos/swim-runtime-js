@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Arg, Opt, Cmd} from "@swim/args";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Arg} from "@swim/args";
+import {Opt} from "@swim/args";
+import {Cmd} from "@swim/args";
 
-export class CmdSpec extends Spec {
+export class CmdSpec extends Suite {
   @Test
   parseCmd(exam: Exam): void {
     const cmd = Cmd.create("test").withCmd("exec");

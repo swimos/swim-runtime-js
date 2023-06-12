@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HashCode, Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
-import type {Value, Form} from "@swim/structure";
+import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {Value} from "@swim/structure";
+import type {Form} from "@swim/structure";
 import {TimeZoneForm} from "./"; // forward import
 
 /** @public */

@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {
   Mapping,
   Domain,
   Range,
-  Interpolator, 
+  Interpolator,
   NumberInterpolator,
   ArrayInterpolator,
   InterpolatorInterpolator,
   StepInterpolator,
 } from "@swim/util";
 
-export class InterpolatorSpec extends Spec {
+export class InterpolatorSpec extends Suite {
   @Test
   testNumberInterpolator(exam: Exam): void {
     const interpolator = NumberInterpolator(-2, 2);

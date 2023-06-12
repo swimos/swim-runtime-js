@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item, Text, Form} from "@swim/structure";
-import {AngleUnits, AnyAngle, Angle} from "./Angle";
+import type {Item} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Form} from "@swim/structure";
+import type {AngleUnits} from "./Angle";
+import type {AnyAngle} from "./Angle";
+import {Angle} from "./Angle";
 
 /** @internal */
 export class AngleForm extends Form<Angle, AnyAngle> {

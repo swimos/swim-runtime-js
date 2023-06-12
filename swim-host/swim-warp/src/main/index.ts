@@ -16,10 +16,8 @@ export {Message} from "./Message";
 
 export {Signal} from "./Signal";
 
-export {
-  WorkerAddressedConstructor,
-  WorkerAddressed,
-} from "./WorkerAddressed";
+export type {WorkerAddressedConstructor} from "./WorkerAddressed";
+export {WorkerAddressed} from "./WorkerAddressed";
 
 export {OpenSignal} from "./OpenSignal";
 export {OpenedSignal} from "./OpenedSignal";
@@ -37,20 +35,14 @@ export {ErrorSignal} from "./ErrorSignal";
 
 export {Envelope} from "./Envelope";
 
-export {
-  HostAddressedConstructor,
-  HostAddressed,
-} from "./HostAddressed";
+export type {HostAddressedConstructor} from "./HostAddressed";
+export {HostAddressed} from "./HostAddressed";
 
-export {
-  LaneAddressedConstructor,
-  LaneAddressed,
-} from "./LaneAddressed";
+export type {LaneAddressedConstructor} from "./LaneAddressed";
+export {LaneAddressed} from "./LaneAddressed";
 
-export {
-  LinkAddressedConstructor,
-  LinkAddressed,
-} from "./LinkAddressed";
+export type {LinkAddressedConstructor} from "./LinkAddressed";
+export {LinkAddressed} from "./LinkAddressed";
 
 export {EventMessage} from "./EventMessage";
 export {CommandMessage} from "./CommandMessage";

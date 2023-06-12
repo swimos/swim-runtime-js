@@ -16,7 +16,8 @@ import * as ws from "ws";
 import type {Mutable} from "@swim/util";
 import {Property} from "@swim/component";
 import type {Uri} from "@swim/uri";
-import {Envelope, CommandMessage} from "@swim/warp";
+import {Envelope} from "@swim/warp";
+import {CommandMessage} from "@swim/warp";
 import {WarpHost} from "./WarpHost";
 
 /** @internal */
@@ -29,7 +30,7 @@ export class WarpSocketHost extends WarpHost {
   /** @internal */
   readonly socket: WebSocket | null;
 
-  @Property<WarpSocketHost["wsConstructor"]>({
+  @Property({
     value: typeof WebSocket !== "undefined" ? WebSocket : ws.WebSocket as typeof WebSocket,
     inherits: true,
     equalValues(newValue: typeof WebSocket, oldValue: typeof WebSocket): boolean {

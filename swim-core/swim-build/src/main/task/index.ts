@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  TaskStatus,
-  TaskOptions,
-  TaskOptionsType,
-  TaskConfig,
-  Task,
-} from "./Task";
-export {TaskObserver} from "./TaskObserver";
+export {TaskStatus} from "./Task";
+export type {TaskOptions} from "./Task";
+export type {TaskOptionsType} from "./Task";
+export type {TaskConfig} from "./Task";
+export {Task} from "./Task";
+export type {TaskObserver} from "./TaskObserver";

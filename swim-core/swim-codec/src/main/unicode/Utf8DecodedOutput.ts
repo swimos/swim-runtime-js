@@ -14,7 +14,8 @@
 
 import type {Mutable} from "@swim/util";
 import {OutputException} from "../output/OutputException";
-import type {AnyOutputSettings, OutputSettings} from "../output/OutputSettings";
+import type {AnyOutputSettings} from "../output/OutputSettings";
+import type {OutputSettings} from "../output/OutputSettings";
 import {Output} from "../output/Output";
 import {Unicode} from "./Unicode";
 import {UtfErrorMode} from "./UtfErrorMode";

@@ -14,11 +14,15 @@
 
 import {Lazy} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {AnyItem, Item} from "../Item";
-import {AnyValue, Value} from "../Value";
+import type {AnyItem} from "../Item";
+import {Item} from "../Item";
+import type {AnyValue} from "../Value";
+import {Value} from "../Value";
 import {Record} from "../Record";
-import {AnyText, Text} from "../Text";
-import {AnyNum, Num} from "../Num";
+import type {AnyText} from "../Text";
+import {Text} from "../Text";
+import type {AnyNum} from "../Num";
+import {Num} from "../Num";
 import {Expression} from "../Expression";
 import type {Operator} from "../operator/Operator";
 import {InvokeOperator} from "../operator/InvokeOperator";
@@ -32,7 +36,8 @@ import {ChildrenSelector} from "../"; // forward import
 import {DescendantsSelector} from "../"; // forward import
 import {FilterSelector} from "../"; // forward import
 import {LiteralSelector} from "../"; // forward import
-import {AnyInterpreter, Interpreter} from "../"; // forward import
+import type {AnyInterpreter} from "../interpreter/Interpreter";
+import {Interpreter} from "../"; // forward import
 
 /** @public */
 export abstract class Selector extends Expression {

@@ -12,7 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Murmur3, HashCode, Booleans, Numbers, Strings, Constructors} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import {Booleans} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Strings} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Output} from "../output/Output";
 import type {Debug} from "../format/Debug";
 import {Format} from "../format/Format";
@@ -218,8 +224,8 @@ export class OutputSettings implements Debug, HashCode {
 
   /**
    * Returns `OutputSettings` configured with the given `lineSeparator`, pretty
-   * rinting enabled if `isPretty` is `true`, styling enabled if `isStyled` is
-   * `true`, and with the given numeric `precision`.
+   * printing enabled if `isPretty` is `true`, styling enabled if `isStyled`
+   * is `true`, and with the given numeric `precision`.
    */
   static create(lineSeparator?: string, pretty?: boolean,
                 styled?: boolean, precision?: number): OutputSettings {

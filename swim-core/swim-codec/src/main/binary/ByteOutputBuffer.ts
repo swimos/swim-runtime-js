@@ -14,7 +14,8 @@
 
 import type {Mutable} from "@swim/util";
 import {OutputException} from "../output/OutputException";
-import {AnyOutputSettings, OutputSettings} from "../output/OutputSettings";
+import type {AnyOutputSettings} from "../output/OutputSettings";
+import {OutputSettings} from "../output/OutputSettings";
 import {OutputBuffer} from "../output/OutputBuffer";
 import {OutputBufferError} from "../output/OutputBufferError";
 

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {R2CurveParserSpec} from "./R2CurveParserSpec";
 import {R2SplineBuilderSpec} from "./R2SplineBuilderSpec";
 import {R2SplineParserSpec} from "./R2SplineParserSpec";
@@ -20,35 +21,34 @@ import {R2PathBuilderSpec} from "./R2PathBuilderSpec";
 import {R2PathParserSpec} from "./R2PathParserSpec";
 import {R2PathWriterSpec} from "./R2PathWriterSpec";
 
-@Unit
-export class R2Suite extends Spec {
+export class R2Suite extends Suite {
   @Unit
-  r2CurveParserSpec(): Spec {
+  r2CurveParserSpec(): Suite {
     return new R2CurveParserSpec();
   }
 
   @Unit
-  r2SplineBuilderSpec(): Spec {
+  r2SplineBuilderSpec(): Suite {
     return new R2SplineBuilderSpec();
   }
 
   @Unit
-  r2SplineParserSpec(): Spec {
+  r2SplineParserSpec(): Suite {
     return new R2SplineParserSpec();
   }
 
   @Unit
-  r2PathBuilderSpec(): Spec {
+  r2PathBuilderSpec(): Suite {
     return new R2PathBuilderSpec();
   }
 
   @Unit
-  r2PathParserSpec(): Spec {
+  r2PathParserSpec(): Suite {
     return new R2PathParserSpec();
   }
 
   @Unit
-  r2PathWriterSpec(): Spec {
+  r2PathWriterSpec(): Suite {
     return new R2PathWriterSpec();
   }
 }

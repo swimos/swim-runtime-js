@@ -1,6 +1,6 @@
 import nodeResolve from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
-import {terser} from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import * as pkg from "../../package.json";
 
 const script = "swim-component";

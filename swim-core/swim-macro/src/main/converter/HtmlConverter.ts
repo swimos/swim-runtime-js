@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Output, OutputException} from "@swim/codec";
-import {Item, Attr, Slot, Value, Record} from "@swim/structure";
+import {OutputException} from "@swim/codec";
+import {Output} from "@swim/codec";
+import type {Item} from "@swim/structure";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Record} from "@swim/structure";
 import {Converter} from "./Converter";
 
 /** @public */

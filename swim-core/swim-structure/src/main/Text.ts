@@ -12,10 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Mutable, Numbers, Strings, Interpolator, HashGenCacheSet} from "@swim/util";
-import {OutputSettings, Output, Format} from "@swim/codec";
-import {AnyItem, Item} from "./Item";
-import {AnyValue, Value} from "./Value";
+import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Strings} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import {HashGenCacheSet} from "@swim/util";
+import {OutputSettings} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
+import type {AnyValue} from "./Value";
+import {Value} from "./Value";
 import {Num} from "./"; // forward import
 import {TextOutput} from "./"; // forward import
 

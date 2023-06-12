@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {PiecewiseSpec} from "./PiecewiseSpec";
 
-@Unit
-export class MappingSuite extends Spec {
+export class MappingSuite extends Suite {
   @Unit
-  piecewiseSpec(): Spec {
+  piecewiseSpec(): Suite {
     return new PiecewiseSpec();
   }
 }

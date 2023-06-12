@@ -12,19 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Constructors, Interpolator, Cursor, Builder} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import type {Cursor} from "@swim/util";
+import type {Builder} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {AnyItem, Item} from "./Item";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
 import {Field} from "./Field";
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
-import {AnyValue, Value} from "./Value";
+import type {AnyValue} from "./Value";
+import {Value} from "./Value";
 import {RecordInterpolator} from "./"; // forward import
 import {RecordCursor} from "./"; // forward import
 import {RecordMap} from "./"; // forward import
-import {AnyText, Text} from "./"; // forward import
+import type {AnyText} from "./Text";
+import {Text} from "./"; // forward import
 import type {AnyNum} from "./Num";
-import {AnyInterpreter, Interpreter} from "./"; // forward import
+import type {AnyInterpreter} from "./interpreter/Interpreter";
+import {Interpreter} from "./"; // forward import
 
 /** @public */
 export type AnyRecord = Record

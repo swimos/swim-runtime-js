@@ -13,22 +13,21 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import {AnyValue, Value} from "@swim/structure";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
 import type {Uri} from "@swim/uri";
-import {
-  Message,
-  Signal,
-  OpenSignal,
-  OpenedSignal,
-  ClosedSignal,
-  ConnectSignal,
-  ConnectedSignal,
-  DisconnectSignal,
-  DisconnectedSignal,
-  ErrorSignal,
-  Envelope,
-  CommandMessage,
-} from "@swim/warp";
+import {Message} from "@swim/warp";
+import {Signal} from "@swim/warp";
+import {OpenSignal} from "@swim/warp";
+import {OpenedSignal} from "@swim/warp";
+import {ClosedSignal} from "@swim/warp";
+import {ConnectSignal} from "@swim/warp";
+import {ConnectedSignal} from "@swim/warp";
+import {DisconnectSignal} from "@swim/warp";
+import {DisconnectedSignal} from "@swim/warp";
+import {ErrorSignal} from "@swim/warp";
+import {Envelope} from "@swim/warp";
+import {CommandMessage} from "@swim/warp";
 import {WarpHost} from "./WarpHost";
 
 /** @internal */

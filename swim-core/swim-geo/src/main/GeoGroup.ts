@@ -12,11 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Equivalent, Equals, Mutable, Arrays} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
-import {R2Shape, R2Group} from "@swim/math";
+import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Arrays} from "@swim/util";
+import type {Equals} from "@swim/util";
+import type {Equivalent} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {R2Shape} from "@swim/math";
+import {R2Group} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import {AnyGeoShape, GeoShape} from "./GeoShape";
+import type {AnyGeoShape} from "./GeoShape";
+import {GeoShape} from "./GeoShape";
 import {GeoBox} from "./GeoBox";
 
 /** @public */

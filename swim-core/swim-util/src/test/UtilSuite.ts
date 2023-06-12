@@ -12,37 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {RuntimeSuite} from "./runtime/RuntimeSuite";
 import {MappingSuite} from "./mapping/MappingSuite";
 import {InterpolateSuite} from "./interpolate/InterpolateSuite";
 import {TransitionSuite} from "./transition/TransitionSuite";
 import {ScaleSuite} from "./scale/ScaleSuite";
 
-@Unit
-export class UtilSuite extends Spec {
+export class UtilSuite extends Suite {
   @Unit
-  runtimeSuite(): Spec {
+  runtimeSuite(): Suite {
     return new RuntimeSuite();
   }
 
   @Unit
-  mappingSuite(): Spec {
+  mappingSuite(): Suite {
     return new MappingSuite();
   }
 
   @Unit
-  interpolateSuite(): Spec {
+  interpolateSuite(): Suite {
     return new InterpolateSuite();
   }
 
   @Unit
-  transitionSuite(): Spec {
+  transitionSuite(): Suite {
     return new TransitionSuite();
   }
 
   @Unit
-  scaleSuite(): Spec {
+  scaleSuite(): Suite {
     return new ScaleSuite();
   }
 }

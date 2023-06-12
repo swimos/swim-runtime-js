@@ -12,30 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto, Mutable} from "@swim/util";
-import {
-  Affinity,
-  FastenerFlags,
-  FastenerOwner,
-  AnimatorValue,
-  AnimatorValueInit,
-  AnimatorDescriptor,
-  AnimatorClass,
-  Animator,
-} from "@swim/component";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Affinity} from "@swim/component";
+import type {FastenerFlags} from "@swim/component";
+import type {FastenerOwner} from "@swim/component";
+import type {AnimatorValue} from "@swim/component";
+import type {AnimatorValueInit} from "@swim/component";
+import type {AnimatorDescriptor} from "@swim/component";
+import type {AnimatorClass} from "@swim/component";
+import {Animator} from "@swim/component";
 import {ConstraintId} from "./ConstraintId";
 import {ConstraintMap} from "./ConstraintMap";
-import {AnyConstraintExpression, ConstraintExpression} from "./ConstraintExpression";
+import type {AnyConstraintExpression} from "./ConstraintExpression";
+import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
 import type {ConstraintVariable} from "./ConstraintVariable";
-import {AnyConstraintStrength, ConstraintStrength} from "./"; // forward import
+import type {AnyConstraintStrength} from "./ConstraintStrength";
+import {ConstraintStrength} from "./"; // forward import
 import type {Constraint} from "./Constraint";
 import {ConstraintScope} from "./"; // forward import
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @public */
+export type ConstraintAnimatorDecorator<A extends Animator<any, any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, A>): (this: T, value: A | undefined) => A;
+};
+
+/** @public */
 export interface ConstraintAnimatorDescriptor<T = unknown, U = T> extends AnimatorDescriptor<T, U> {
-  extends?: Proto<ConstraintAnimator<any, any, any>> | string | boolean | null;
+  extends?: Proto<ConstraintAnimator<any, any, any>> | boolean | null;
   strength?: AnyConstraintStrength;
   constrained?: boolean;
 }
@@ -55,15 +61,15 @@ export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any, 
   refine(animatorClass: ConstraintAnimatorClass<any>): void;
 
   /** @override */
-  extend<A2 extends A>(className: string, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
-  extend<A2 extends A>(className: string, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
+  extend<A2 extends A>(className: string | symbol, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
+  extend<A2 extends A>(className: string | symbol, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
 
   /** @override */
-  define<A2 extends A>(className: string, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
-  define<A2 extends A>(className: string, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
+  define<A2 extends A>(className: string | symbol, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
+  define<A2 extends A>(className: string | symbol, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
 
   /** @override */
-  <A2 extends A>(template: ConstraintAnimatorDescriptor<A2>): PropertyDecorator;
+  <A2 extends A>(template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorDecorator<A2>;
 
   /** @internal */
   readonly ConstrainedFlag: FastenerFlags;

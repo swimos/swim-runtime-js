@@ -14,11 +14,9 @@
 
 export {InputException} from "./InputException";
 
-export {
-  AnyInputSettings,
-  InputSettingsInit,
-  InputSettings,
-} from "./InputSettings";
+export type {AnyInputSettings} from "./InputSettings";
+export type {InputSettingsInit} from "./InputSettings";
+export {InputSettings} from "./InputSettings";
 
 export {Input} from "./Input";
 export {InputEmpty} from "./InputEmpty";

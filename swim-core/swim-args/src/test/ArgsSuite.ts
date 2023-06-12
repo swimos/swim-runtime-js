@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {CmdSpec} from "./CmdSpec";
 
-@Unit
-export class ArgsSuite extends Spec {
+export class ArgsSuite extends Suite {
   @Unit
-  cmdSpec(): Spec {
+  cmdSpec(): Suite {
     return new CmdSpec();
   }
 }

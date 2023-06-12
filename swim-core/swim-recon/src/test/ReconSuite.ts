@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {ReconParserSuite} from "./parser/ReconParserSuite";
 import {ReconWriterSuite} from "./writer/ReconWriterSuite";
 
-@Unit
-export class ReconSuite extends Spec {
+export class ReconSuite extends Suite {
   @Unit
-  reconParserSuite(): Spec {
+  reconParserSuite(): Suite {
     return new ReconParserSuite();
   }
 
   @Unit
-  reconWriterSuite(): Spec {
+  reconWriterSuite(): Suite {
     return new ReconWriterSuite();
   }
 }

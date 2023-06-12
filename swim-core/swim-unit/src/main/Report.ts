@@ -12,106 +12,83 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Spec} from "./Spec";
 import type {Proof} from "./Proof";
 import type {Exam} from "./Exam";
+import type {Suite} from "./Suite";
 
 /**
  * Unit test result aggregator.
  * @public
  */
-export class Report {
+export interface Report {
   /**
-   * Lifecycle callback invoked before running the `spec`.
+   * Lifecycle callback invoked before running the `suite`.
    */
-  willRunSpec(spec: Spec): void {
-    // hook
-  }
+  willRunSuite?(suite: Suite): void;
 
   /**
-   * Lifecycle callback invoked before running any [[TestFunc test functions]]
-   * registered with the `spec`.
+   * Lifecycle callback invoked before running any [[TestMethod test method]]
+   * registered with the `suite`.
    */
-  willRunTests(spec: Spec): void {
-    // hook
-  }
+  willRunTests?(suite: Suite): void;
 
   /**
-   * Lifecycle callback invoked before evaluating the `exam`'s [[TestFunc test
-   * function]].
+   * Lifecycle callback invoked before evaluating the `exam`'s
+   * [[TestMethod test methods]].
    */
-  willRunTest(spec: Spec, exam: Exam): void {
-    // hook
-  }
+  willRunTest?(suite: Suite, exam: Exam): void;
 
   /**
-   * Lifecycle callback invoked every time a test function attempts to proove
+   * Lifecycle callback invoked every time a test function attempts to prove
    * an assertion.
    */
-  onProof(spec: Spec, exam: Exam, proof: Proof): void {
-    // hook
-  }
+  onProof?(suite: Suite, exam: Exam, proof: Proof): void;
 
   /**
    * Lifecycle callback invoked every time a test function makes a comment.
    */
-  onComment(spec: Spec, exam: Exam, message: string): void {
-    // hook
-  }
+  onComment?(suite: Suite, exam: Exam, message: string): void;
 
   /**
-   * Lifecycle callback invoked after evaluating the `exam`'s [[TestFunc test
-   * function]], passing in the returned value of the test function–or a thrown
-   * exception–in `result`.
+   * Lifecycle callback invoked after evaluating the `exam`'s
+   * [[TestMethod test methods]], passing in the returned value
+   * of the test function a thrown exception–in `result`.
    */
-  didRunTest(spec: Spec, exam: Exam, result: unknown): void {
-    // hook
-  }
+  didRunTest?(suite: Suite, exam: Exam, result: unknown): void;
 
   /**
-   * Lifecycle callback invoked after all [[TestFunc test functions]]
-   * registered with the `spec` have been evaluated.
+   * Lifecycle callback invoked after all [[TestMethod test method]]
+   * registered with the `suite` have been evaluated.
    */
-  didRunTests(spec: Spec): void {
-    // hook
-  }
+  didRunTests?(suite: Suite): void;
 
   /**
-   * Lifecycle callback invoked before executing any child specs returned by
-   * [[TestUnit unit factory functions]] registered with the `spec`.
+   * Lifecycle callback invoked before executing any child units returned
+   * by [[TestUnit unit factory functions]] registered with the `suite`.
    */
-  willRunUnits(spec: Spec): void {
-    // hook
-  }
+  willRunUnits?(suite: Suite): void;
 
   /**
-   * Lifecycle callback invoked before executing a child `unit` spec.
+   * Lifecycle callback invoked before executing a child `unit` suite.
    */
-  willRunUnit(spec: Spec, unit: Spec): void {
-    // hook
-  }
+  willRunUnit?(suite: Suite, unit: Suite): void;
 
   /**
-   * Lifecycle callback invoked after executing a child `unit` spec.
+   * Lifecycle callback invoked after executing a child `unit` suite.
    */
-  didRunUnit(spec: Spec, unit: Spec): void {
-    // hook
-  }
+  didRunUnit?(suite: Suite, unit: Suite): void;
 
   /**
-   * Lifecycle callback invoked after all child specs returned by [[TestUnit
-   * unit factory functions]] registered with the `spec` have been executed.
+   * Lifecycle callback invoked after all child units returned by
+   * [[TestUnit unit factory functions]] registered with the `suite`
+   * have been executed.
    */
-  didRunUnits(spec: Spec): void {
-    // hook
-  }
+  didRunUnits?(suite: Suite): void;
 
   /**
-   * Lifecycle callback invoked after all [[TestFunc test functions]] and child
-   * specs returned by [[UnitFunc unit factory functions]] registered with the
-   * `spec` have been evaluated.
+   * Lifecycle callback invoked after all [[TestMethod test methods]]
+   * and child units returned by [[UnitMethod unit factory]] methods
+   * registered with the `suite` have been evaluated.
    */
-  didRunSpec(spec: Spec): void {
-    // hook
-  }
+  didRunSpec?(suite: Suite): void;
 }

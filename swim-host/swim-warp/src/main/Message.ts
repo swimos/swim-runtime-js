@@ -13,8 +13,11 @@
 // limitations under the License.
 
 import type {HashCode} from "@swim/util";
-import {Output, Debug, Format} from "@swim/codec";
-import type {AnyValue, Value} from "@swim/structure";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {AnyValue} from "@swim/structure";
+import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
 import {OpenSignal} from "./"; // forward import
 import {OpenedSignal} from "./"; // forward import

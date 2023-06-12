@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Input, Parser, Unicode} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import {Transform} from "./Transform";
 import {TransformParser} from "./TransformParser";
 

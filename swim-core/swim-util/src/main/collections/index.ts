@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  Dictionary,
-  MutableDictionary,
-} from "./Dictionary";
+export type {Dictionary} from "./Dictionary";
+export type {MutableDictionary} from "./Dictionary";
 
-export {Iterator} from "./Iterator";
+export type {Iterator} from "./Iterator";
 export {Cursor} from "./Cursor";
 export {CursorEmpty} from "./CursorEmpty";
 export {CursorUnary} from "./CursorUnary";
 export {CursorArray} from "./CursorArray";
 
-export {Builder} from "./Builder";
-export {PairBuilder} from "./PairBuilder";
+export type {Builder} from "./Builder";
+export type {PairBuilder} from "./PairBuilder";
 
-export {Map} from "./Map";
-export {OrderedMap} from "./OrderedMap";
-export {ReducedMap} from "./ReducedMap";
+export type {Map} from "./Map";
+export type {OrderedMap} from "./OrderedMap";
+export type {ReducedMap} from "./ReducedMap";

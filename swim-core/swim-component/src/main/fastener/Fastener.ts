@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Proto, Identifiers} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Identifiers} from "@swim/util";
 import {Affinity} from "./Affinity";
-import {FastenerContextClass, FastenerContext} from "./FastenerContext";
+import {FastenerContext} from "./FastenerContext";
 
 /** @public */
 export type FastenerFlags = number;
@@ -25,16 +27,20 @@ export type FastenerOwner<F> =
 
 /** @public */
 export interface FastenerDescriptor {
-  extends?: Proto<Fastener<any>> | string | boolean | null;
-  name?: string;
+  extends?: Proto<Fastener<any>> | boolean | null;
+  name?: string | symbol;
   lazy?: boolean;
-  static?: string | boolean;
   /** @internal */
   flagsInit?: number;
   affinity?: Affinity;
-  inherits?: string | boolean;
+  inherits?: string | symbol | boolean;
   binds?: boolean;
 }
+
+/** @public */
+export type FastenerDecorator<F extends Fastener<any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+};
 
 /** @public */
 export type FastenerTemplate<F extends Fastener<any>> =
@@ -47,16 +53,13 @@ export interface FastenerClass<F extends Fastener<any> = Fastener<any>> {
   /** @internal */
   prototype: F;
 
-  /** @internal */
-  contextClass?: FastenerContextClass;
-
   create(owner: FastenerOwner<F>): F;
 
   /** @protected */
   construct(fastener: F | null, owner: FastenerOwner<F>): F;
 
   /** @internal */
-  declare(className: string): FastenerClass<F>;
+  declare(className: string | symbol): FastenerClass<F>;
 
   /** @internal */
   implement(fastenerClass: FastenerClass<any>, template: FastenerDescriptor): void;
@@ -65,13 +68,16 @@ export interface FastenerClass<F extends Fastener<any> = Fastener<any>> {
 
   refine(fastenerClass: FastenerClass<any>): void;
 
-  extend<F2 extends F>(className: string, template: FastenerTemplate<F2>): FastenerClass<F2>;
-  extend<F2 extends F>(className: string, template: FastenerTemplate<F2>): FastenerClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: FastenerTemplate<F2>): FastenerClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: FastenerTemplate<F2>): FastenerClass<F2>;
 
-  define<F2 extends F>(className: string, template: FastenerTemplate<F2>): FastenerClass<F2>;
-  define<F2 extends F>(className: string, template: FastenerTemplate<F2>): FastenerClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: FastenerTemplate<F2>): FastenerClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: FastenerTemplate<F2>): FastenerClass<F2>;
 
-  <F2 extends F>(template: FastenerTemplate<F2>): PropertyDecorator;
+  dummy<F2 extends F>(): F2;
+
+  /** @override */
+  <F2 extends F>(template: FastenerTemplate<F2>): FastenerDecorator<F2>;
 
   /** @internal */
   readonly MountedFlag: FastenerFlags;
@@ -95,13 +101,10 @@ export interface Fastener<O = unknown> {
   /** @override */
   readonly fastenerType: Proto<Fastener<any>>; // prototype property
 
-  readonly name: string;
+  readonly name: string | symbol;
 
   /** @internal */
   readonly lazy?: boolean; // optional prototype property
-
-  /** @internal */
-  readonly static?: string | boolean; // optional prototype property
 
   /** @internal */
   readonly binds?: boolean; // optional prototype property
@@ -139,26 +142,26 @@ export interface Fastener<O = unknown> {
   /** @protected */
   didSetAffinity(newAffinity: Affinity, oldAffinity: Affinity): void;
 
-  get superName(): string | undefined;
+  get parentName(): string | symbol | undefined;
 
   /** @internal */
-  getSuper(): Fastener | null;
+  getParent(): Fastener | null;
 
   get inherits(): boolean;
 
   /** @internal */
-  initInherits(inherits: string | boolean): void;
+  initInherits(inherits: string | symbol | boolean): void;
 
-  setInherits(inherits: string | boolean): void;
-
-  /** @protected */
-  willSetInherits(inherits: boolean, superName: string | undefined): void;
+  setInherits(inherits: string | symbol | boolean): void;
 
   /** @protected */
-  onSetInherits(inherits: boolean, superName: string | undefined): void;
+  willSetInherits(inherits: boolean, parentName: string | symbol | undefined): void;
 
   /** @protected */
-  didSetInherits(inherits: boolean, superName: string | undefined): void;
+  onSetInherits(inherits: boolean, parentName: string | symbol | undefined): void;
+
+  /** @protected */
+  didSetInherits(inherits: boolean, parentName: string | symbol | undefined): void;
 
   get derived(): boolean;
 
@@ -258,7 +261,7 @@ export interface Fastener<O = unknown> {
 
 /** @public */
 export const Fastener = (function (_super: typeof Object) {
-  const Fastener = function (template: FastenerDescriptor): PropertyDecorator {
+  const Fastener = function <F extends Fastener<any>>(template: FastenerTemplate<F>): FastenerDecorator<F> {
     return FastenerContext.decorator(Fastener, template);
   } as FastenerClass;
 
@@ -349,25 +352,19 @@ export const Fastener = (function (_super: typeof Object) {
     // hook
   };
 
-  Object.defineProperty(Fastener.prototype, "superName", {
-    get: function (this: Fastener): string | undefined {
+  Object.defineProperty(Fastener.prototype, "parentName", {
+    get: function (this: Fastener): string | symbol | undefined {
       return (this.flags & Fastener.InheritsFlag) !== 0 ? this.name : void 0;
     },
     configurable: true,
   });
 
-  Fastener.prototype.getSuper = function (this: Fastener): Fastener | null {
-    const superName = this.superName;
-    if (superName !== void 0) {
-      const fastenerContext = this.owner;
-      if (FastenerContext.is(fastenerContext)) {
-        const superFastener = fastenerContext.getSuperFastener(superName, this.fastenerType);
-        if (superFastener !== null) {
-          return superFastener;
-        }
-      }
+  Fastener.prototype.getParent = function (this: Fastener): Fastener | null {
+    const parentName = this.parentName;
+    if (parentName === void 0 || !(this.owner instanceof (FastenerContext as any))) {
+      return null;
     }
-    return null;
+    return (this.owner as FastenerContext).getParentFastener(parentName, this.fastenerType);
   };
 
   Object.defineProperty(Fastener.prototype, "inherits", {
@@ -377,16 +374,16 @@ export const Fastener = (function (_super: typeof Object) {
     configurable: true,
   });
 
-  Fastener.prototype.initInherits = function (this: Fastener, inherits: string | boolean): void {
-    let superName: string | undefined;
-    if (typeof inherits === "string") {
-      superName = inherits;
+  Fastener.prototype.initInherits = function (this: Fastener, inherits: string | symbol | boolean): void {
+    let parentName: string | symbol | undefined;
+    if (typeof inherits === "string" || typeof inherits === "symbol") {
+      parentName = inherits;
       inherits = true;
     }
     if (inherits) {
-      if (superName !== void 0) {
+      if (parentName !== void 0) {
         Object.defineProperty(this, "name", {
-          value: superName,
+          value: parentName,
           enumerable: true,
           configurable: true,
         });
@@ -397,21 +394,21 @@ export const Fastener = (function (_super: typeof Object) {
     }
   };
 
-  Fastener.prototype.setInherits = function (this: Fastener, inherits: string | boolean): void {
-    let superName: string | undefined;
-    if (typeof inherits === "string") {
+  Fastener.prototype.setInherits = function (this: Fastener, inherits: string | symbol | boolean): void {
+    let parentName: string | symbol | undefined;
+    if (typeof inherits === "string" || typeof inherits === "symbol") {
       if (inherits !== this.name) {
-        superName = inherits;
+        parentName = inherits;
       }
       inherits = true;
     }
-    if (inherits !== ((this.flags & Fastener.InheritsFlag) !== 0) || superName !== void 0) {
+    if (inherits !== ((this.flags & Fastener.InheritsFlag) !== 0) || parentName !== void 0) {
       this.unbindInlet();
-      this.willSetInherits(inherits, superName);
+      this.willSetInherits(inherits, parentName);
       if (inherits) {
-        if (superName !== void 0) {
+        if (parentName !== void 0) {
           Object.defineProperty(this, "name", {
-            value: superName,
+            value: parentName,
             enumerable: true,
             configurable: true,
           });
@@ -420,21 +417,21 @@ export const Fastener = (function (_super: typeof Object) {
       } else {
         this.setFlags(this.flags & ~Fastener.InheritsFlag);
       }
-      this.onSetInherits(inherits, superName);
-      this.didSetInherits(inherits, superName);
+      this.onSetInherits(inherits, parentName);
+      this.didSetInherits(inherits, parentName);
       this.bindInlet();
     }
   };
 
-  Fastener.prototype.willSetInherits = function (this: Fastener, inherits: boolean, superName: string | undefined): void {
+  Fastener.prototype.willSetInherits = function (this: Fastener, inherits: boolean, parentName: string | symbol | undefined): void {
     // hook
   };
 
-  Fastener.prototype.onSetInherits = function (this: Fastener, inherits: boolean, superName: string | undefined): void {
+  Fastener.prototype.onSetInherits = function (this: Fastener, inherits: boolean, parentName: string | symbol | undefined): void {
     // hook
   };
 
-  Fastener.prototype.didSetInherits = function (this: Fastener, inherits: boolean, superName: string | undefined): void {
+  Fastener.prototype.didSetInherits = function (this: Fastener, inherits: boolean, parentName: string | symbol | undefined): void {
     // hook
   };
 
@@ -485,13 +482,13 @@ export const Fastener = (function (_super: typeof Object) {
 
   Object.defineProperty(Fastener.prototype, "inlet", {
     get: function (this: Fastener): Fastener | null {
-      return this.getSuper();
+      return this.getParent();
     },
     configurable: true,
   });
 
   Fastener.prototype.bindInlet = function (this: Fastener): void {
-    const inlet = this.getSuper();
+    const inlet = this.getParent();
     if (inlet !== null) {
       this.willBindInlet(inlet);
       inlet.attachOutlet(this);
@@ -560,10 +557,12 @@ export const Fastener = (function (_super: typeof Object) {
   };
 
   Fastener.prototype.decohere = function (this: Fastener): void {
-    const fastenerContext = this.owner;
-    if (FastenerContext.has(fastenerContext, "decohereFastener")) {
-      fastenerContext.decohereFastener(this);
+    const owner = this.owner;
+    if (owner == null || typeof owner !== "object" && typeof owner !== "function"
+        || !("decohereFastener" in owner)) {
+      return;
     }
+    (owner as FastenerContext).decohereFastener!(this);
   };
 
   Fastener.prototype.recohere = function (this: Fastener, t: number): void {
@@ -620,7 +619,7 @@ export const Fastener = (function (_super: typeof Object) {
   };
 
   Fastener.prototype.toString = function (this: Fastener): string {
-    return this.name;
+    return this.name.toString();
   };
 
   Fastener.create = function <F extends Fastener<any>>(this: FastenerClass<F>, owner: FastenerOwner<F>): F {
@@ -643,14 +642,14 @@ export const Fastener = (function (_super: typeof Object) {
     return fastener;
   };
 
-  Fastener.declare = function (className: string): FastenerClass {
+  Fastener.declare = function (className: string | symbol): FastenerClass {
     let fastenerClass: FastenerClass;
-    if (Identifiers.isValid(className)) {
+    if (typeof className === "string" && Identifiers.isValid(className)) {
       fastenerClass = new Function("FastenerContext",
         "return function " + className + "(template) { return FastenerContext.decorator(" + className + ", template); }"
       )(FastenerContext);
     } else {
-      fastenerClass = function (template: FastenerDescriptor): PropertyDecorator {
+      fastenerClass = function <F extends Fastener<any>>(template: FastenerTemplate<F>): FastenerDecorator<F> {
         return FastenerContext.decorator(fastenerClass, template);
       } as FastenerClass;
       Object.defineProperty(fastenerClass, "name", {
@@ -663,30 +662,28 @@ export const Fastener = (function (_super: typeof Object) {
   };
 
   Fastener.implement = function (fastenerClass: FastenerClass<any>, template: FastenerDescriptor): void {
-    const properties: PropertyDescriptorMap = {};
-    properties.name = {
+    Object.defineProperty(template, "name", {
       value: fastenerClass.name,
       enumerable: true,
       configurable: true,
-    };
-    const propertyNames = Object.getOwnPropertyNames(template);
-    for (let i = 0; i < propertyNames.length; i += 1) {
-      const propertyName = propertyNames[i]!;
-      if (propertyName !== "extends") {
-        properties[propertyName] = Object.getOwnPropertyDescriptor(template, propertyName)!;
-      }
+    });
+    if ("extends" in template) {
+      delete template.extends;
     }
-    Object.setPrototypeOf(fastenerClass, this);
-    fastenerClass.prototype = Object.create(this.prototype, properties);
+    // Directly insert the template object into the prototype chain
+    // to ensure that super works correctly.
+    Object.setPrototypeOf(template, this.prototype);
+    fastenerClass.prototype = template;
     fastenerClass.prototype.constructor = fastenerClass;
+    Object.setPrototypeOf(fastenerClass, this);
   };
 
   Fastener.specialize = function (template: FastenerDescriptor): FastenerClass {
-    let superClass = template.extends as FastenerClass | null | undefined;
-    if (superClass === void 0 || superClass === null) {
-      superClass = this;
+    let baseClass = template.extends as FastenerClass | null | undefined;
+    if (baseClass === void 0 || baseClass === null) {
+      baseClass = this;
     }
-    return superClass
+    return baseClass;
   };
 
   Fastener.refine = function (fastenerClass: FastenerClass<any>): void {
@@ -705,8 +702,8 @@ export const Fastener = (function (_super: typeof Object) {
       if (flagsInit === void 0) {
         flagsInit = 0;
       }
-      let inherits = fastenerPrototype.inherits as string | boolean;
-      if (typeof inherits === "string") {
+      let inherits = fastenerPrototype.inherits as string | symbol | boolean;
+      if (typeof inherits === "string" || typeof inherits === "symbol") {
         Object.defineProperty(fastenerPrototype, "name", {
           value: inherits,
           enumerable: true,
@@ -730,7 +727,7 @@ export const Fastener = (function (_super: typeof Object) {
     }
   };
 
-  Fastener.extend = function <F extends Fastener<any>>(className: string, template: FastenerTemplate<F>): FastenerClass<F> {
+  Fastener.extend = function <F extends Fastener<any>>(className: string | symbol, template: FastenerTemplate<F>): FastenerClass<F> {
     if (template.name !== void 0) {
       className = template.name;
     }
@@ -740,9 +737,13 @@ export const Fastener = (function (_super: typeof Object) {
     return fastenerClass;
   };
 
-  Fastener.define = function <F extends Fastener<any>>(className: string, template: FastenerTemplate<F>): FastenerClass<F> {
-    const superClass = this.specialize(template);
-    return superClass.extend(className, template);
+  Fastener.define = function <F extends Fastener<any>>(className: string | symbol, template: FastenerTemplate<F>): FastenerClass<F> {
+    const baseClass = this.specialize(template);
+    return baseClass.extend(className, template);
+  };
+
+  Fastener.dummy = function <F extends Fastener<any>>(): F {
+    throw new Error("dummy fastener");
   };
 
   (Fastener as Mutable<typeof Fastener>).MountedFlag = 1 << (Affinity.Shift + 0);

@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  FileRelationValue,
-  FileRelationDescriptor,
-  FileRelationTemplate,
-  FileRelationClass,
-  FileRelation,
-} from "./FileRelation";
+export type {FileRelationValue} from "./FileRelation";
+export type {FileRelationDecorator} from "./FileRelation";
+export type {FileRelationDescriptor} from "./FileRelation";
+export type {FileRelationTemplate} from "./FileRelation";
+export type {FileRelationClass} from "./FileRelation";
+export {FileRelation} from "./FileRelation";
 
-export {
-  FileRefValue,
-  FileRefDescriptor,
-  FileRefTemplate,
-  FileRefClass,
-  FileRef,
-} from "./FileRef";
+export type {FileRefValue} from "./FileRef";
+export type {FileRefDecorator} from "./FileRef";
+export type {FileRefDescriptor} from "./FileRef";
+export type {FileRefTemplate} from "./FileRef";
+export type {FileRefClass} from "./FileRef";
+export {FileRef} from "./FileRef";

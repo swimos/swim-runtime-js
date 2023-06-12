@@ -13,7 +13,10 @@
 // limitations under the License.
 
 import {Strings} from "@swim/util";
-import {Output, WriterException, Writer, Utf8} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {WriterException} from "@swim/codec";
+import {Writer} from "@swim/codec";
+import {Utf8} from "@swim/codec";
 import {Recon} from "../Recon";
 
 /** @internal */

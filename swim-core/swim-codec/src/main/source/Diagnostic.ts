@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Values, Severity} from "@swim/util";
+import {Values} from "@swim/util";
+import {Severity} from "@swim/util";
 import type {Tag} from "./Tag";
 import type {Mark} from "./Mark";
 import type {Input} from "../input/Input";

@@ -13,10 +13,14 @@
 // limitations under the License.
 
 import {Easing} from "@swim/util";
-import {Spec, Test, Exam} from "@swim/unit";
-import {Affinity, Animator, Component} from "@swim/component";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Affinity} from "@swim/component";
+import {Animator} from "@swim/component";
+import {Component} from "@swim/component";
 
-export class AnimatorSpec extends Spec {
+export class AnimatorSpec extends Suite {
   @Test
   testAnimator(exam: Exam): void {
     const animator = Animator.create(null);

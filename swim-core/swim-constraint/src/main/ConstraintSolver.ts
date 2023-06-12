@@ -12,14 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Mutable} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Equivalent} from "@swim/util";
 import {ConstraintMap} from "./ConstraintMap";
-import {ConstraintSymbol, ConstraintSlack, ConstraintError, ConstraintDummy} from "./ConstraintSymbol";
-import {AnyConstraintExpression, ConstraintExpression} from "./ConstraintExpression";
+import {ConstraintSymbol} from "./ConstraintSymbol";
+import {ConstraintSlack} from "./ConstraintSymbol";
+import {ConstraintError} from "./ConstraintSymbol";
+import {ConstraintDummy} from "./ConstraintSymbol";
+import type {AnyConstraintExpression} from "./ConstraintExpression";
+import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintVariable} from "./ConstraintVariable";
 import {ConstraintProperty} from "./ConstraintProperty";
 import type {ConstraintRelation} from "./ConstraintRelation";
-import {AnyConstraintStrength, ConstraintStrength} from "./ConstraintStrength";
+import type {AnyConstraintStrength} from "./ConstraintStrength";
+import {ConstraintStrength} from "./ConstraintStrength";
 import {Constraint} from "./Constraint";
 import type {ConstraintScope} from "./ConstraintScope";
 import {ConstraintRow} from "./ConstraintRow";

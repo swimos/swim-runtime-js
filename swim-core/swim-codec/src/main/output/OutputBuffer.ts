@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
+import type {AnyOutputSettings} from "./OutputSettings";
+import {OutputSettings} from "./OutputSettings";
 import {Output} from "./Output";
 import {OutputBufferFull} from "../"; // forward import
 import {OutputBufferDone} from "../"; // forward import

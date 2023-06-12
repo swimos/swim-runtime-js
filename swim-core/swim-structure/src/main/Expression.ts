@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyItem, Item} from "./Item";
-import {AnyValue, Value} from "./Value";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
+import type {AnyValue} from "./Value";
+import {Value} from "./Value";
 import {Num} from "./Num";
 import type {Operator} from "./operator/Operator";
 import {ConditionalOperator} from "./"; // forward import

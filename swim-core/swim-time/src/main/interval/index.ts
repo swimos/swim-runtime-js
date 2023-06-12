@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  TimeInterval,
-  UnitTimeInterval,
-} from "./TimeInterval";
+export {TimeInterval} from "./TimeInterval";
+export {UnitTimeInterval} from "./TimeInterval";
 
 export {FilterTimeInterval} from "./FilterTimeInterval";
 export {YearInterval} from "./YearInterval";

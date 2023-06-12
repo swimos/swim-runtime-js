@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Input, Output, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
-import {LengthUnits, Length} from "./Length";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Base10} from "@swim/codec";
+import type {LengthUnits} from "./Length";
+import {Length} from "./Length";
 
 /** @internal */
 export class LengthParser extends Parser<Length> {

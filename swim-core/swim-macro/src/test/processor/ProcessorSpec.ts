@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {
-  Processor,
-  DefineDirective,
-  IncludeDirective,
-  TemplateDirective,
-  ConvertDirective,
-  ExportDirective,
-  IfDirective,
-  EachDirective,
-  HighlightDirective,
-  ReconConverter,
-  HtmlConverter,
-  CssConverter,
-} from "@swim/macro";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Processor} from "@swim/macro";
+import {DefineDirective} from "@swim/macro";
+import {IncludeDirective} from "@swim/macro";
+import {TemplateDirective} from "@swim/macro";
+import {ConvertDirective} from "@swim/macro";
+import {ExportDirective} from "@swim/macro";
+import {IfDirective} from "@swim/macro";
+import {EachDirective} from "@swim/macro";
+import {HighlightDirective} from "@swim/macro";
+import {ReconConverter} from "@swim/macro";
+import {HtmlConverter} from "@swim/macro";
+import {CssConverter} from "@swim/macro";
 
-export class ProcessorSpec extends Spec {
+export class ProcessorSpec extends Suite {
   @Test
   hasBuiltinDirectives(exam: Exam): void {
     const processor = new Processor();

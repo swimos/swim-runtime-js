@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {StringFormSpec} from "./StringFormSpec";
 import {NumberFormSpec} from "./NumberFormSpec";
 import {BooleanFormSpec} from "./BooleanFormSpec";
@@ -20,35 +21,34 @@ import {AnyFormSpec} from "./AnyFormSpec";
 import {ItemFormSpec} from "./ItemFormSpec";
 import {ValueFormSpec} from "./ValueFormSpec";
 
-@Unit
-export class FormSuite extends Spec {
+export class FormSuite extends Suite {
   @Unit
-  stringFormSpec(): Spec {
+  stringFormSpec(): Suite {
     return new StringFormSpec();
   }
 
   @Unit
-  numberFormSpec(): Spec {
+  numberFormSpec(): Suite {
     return new NumberFormSpec();
   }
 
   @Unit
-  booleanFormSpec(): Spec {
+  booleanFormSpec(): Suite {
     return new BooleanFormSpec();
   }
 
   @Unit
-  anyFormSpec(): Spec {
+  anyFormSpec(): Suite {
     return new AnyFormSpec();
   }
 
   @Unit
-  itemFormSpec(): Spec {
+  itemFormSpec(): Suite {
     return new ItemFormSpec();
   }
 
   @Unit
-  valueFormSpec(): Spec {
+  valueFormSpec(): Suite {
     return new ValueFormSpec();
   }
 }

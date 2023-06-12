@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Mapping, LinearDomain, LinearRange, Scale, ContinuousScale, LinearScale} from "@swim/util";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Mapping} from "@swim/util";
+import {LinearDomain} from "@swim/util";
+import {LinearRange} from "@swim/util";
+import {Scale} from "@swim/util";
+import {ContinuousScale} from "@swim/util";
+import {LinearScale} from "@swim/util";
 
-export class LinearScaleSpec extends Spec {
+export class LinearScaleSpec extends Suite {
   @Test
   testLinearScale(exam: Exam): void {
     const scale = LinearScale(LinearDomain(1, 2), LinearRange(10, 20));

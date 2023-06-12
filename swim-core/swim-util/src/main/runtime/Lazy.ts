@@ -16,38 +16,27 @@
  * Decorator that memoizes the computed value of a getter or nullary method.
  * @public
  */
-export const Lazy: MethodDecorator = function <T>(target: Object, propertyKey: string | symbol,
-                                                  descriptor: TypedPropertyDescriptor<T>): void {
-  const writable = descriptor.writable;
-  const enumerable = descriptor.enumerable;
-  const configurable = descriptor.configurable;
-  if (descriptor.get !== void 0) {
-    const get = descriptor.get;
-    descriptor.get = function (this: unknown): T {
-      const value = get.call(this);
-      Object.defineProperty(target, propertyKey, {
+export const Lazy: {
+  <T, R>(target: (this: T) => R, context: ClassGetterDecoratorContext<T, R>): (this: T) => R;
+  <T, R, F extends (this: T) => R>(target: F, context: ClassMethodDecoratorContext<T, F>): F;
+} = function <T, R>(target: (this: T) => R, context: ClassGetterDecoratorContext<T, R> | ClassMethodDecoratorContext<T, (this: T) => R>): (this: T) => R {
+  return function (this: T): R {
+    const value = target.call(this);
+    if (context.kind === "getter") {
+      Object.defineProperty(this, context.name, {
         value,
-        writable,
-        enumerable,
-        configurable,
+        enumerable: true,
+        configurable: true,
       });
-      return value;
-    };
-  } else if (descriptor.value !== void 0) {
-    const method = descriptor.value as unknown as () => T;
-    descriptor.value = function (this: unknown): T {
-      const value = method.call(this);
-      Object.defineProperty(target, propertyKey, {
-        value: function (): T {
+    } else if (context.kind === "method") {
+      Object.defineProperty(this, context.name, {
+        value: function () {
           return value;
         },
-        writable,
-        enumerable,
-        configurable,
+        enumerable: true,
+        configurable: true,
       });
-      return value;
-    } as unknown as T;
-  } else {
-    throw new Error("invalid lazy property descriptor");
-  }
-}
+    }
+    return value;
+  };
+};

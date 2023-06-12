@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {LinearDomainSpec} from "./LinearDomainSpec";
 import {LinearRangeSpec} from "./LinearRangeSpec";
 import {LinearScaleSpec} from "./LinearScaleSpec";
 
-@Unit
-export class ScaleSuite extends Spec {
+export class ScaleSuite extends Suite {
   @Unit
-  linearDomainSpec(): Spec {
+  linearDomainSpec(): Suite {
     return new LinearDomainSpec();
   }
 
   @Unit
-  linearRangeSpec(): Spec {
+  linearRangeSpec(): Suite {
     return new LinearRangeSpec();
   }
 
   @Unit
-  linearScaleSpec(): Spec {
+  linearScaleSpec(): Suite {
     return new LinearScaleSpec();
   }
 }

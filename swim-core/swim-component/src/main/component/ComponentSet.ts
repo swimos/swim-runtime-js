@@ -12,19 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Proto, Objects, Comparator} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Objects} from "@swim/util";
+import type {Comparator} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
-import {FastenerFlags, FastenerOwner, Fastener} from "../fastener/Fastener";
-import type {AnyComponent, ComponentFactory, Component} from "./Component";
-import {ComponentRelationDescriptor, ComponentRelationClass, ComponentRelation} from "./ComponentRelation";
+import type {FastenerFlags} from "../fastener/Fastener";
+import type {FastenerOwner} from "../fastener/Fastener";
+import {Fastener} from "../fastener/Fastener";
+import type {AnyComponent} from "./Component";
+import type {ComponentFactory} from "./Component";
+import type {Component} from "./Component";
+import type {ComponentRelationDescriptor} from "./ComponentRelation";
+import type {ComponentRelationClass} from "./ComponentRelation";
+import {ComponentRelation} from "./ComponentRelation";
 
 /** @public */
 export type ComponentSetComponent<F extends ComponentSet<any, any>> =
   F extends {componentType?: ComponentFactory<infer C>} ? C : never;
 
 /** @public */
+export type ComponentSetDecorator<F extends ComponentSet<any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+};
+
+/** @public */
 export interface ComponentSetDescriptor<C extends Component = Component> extends ComponentRelationDescriptor<C> {
-  extends?: Proto<ComponentSet<any, any>> | string | boolean | null;
+  extends?: Proto<ComponentSet<any, any>> | boolean | null;
   ordered?: boolean;
   sorted?: boolean;
 }
@@ -44,15 +58,15 @@ export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentS
   refine(fastenerClass: ComponentSetClass<any>): void;
 
   /** @override */
-  extend<F2 extends F>(className: string, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
-  extend<F2 extends F>(className: string, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
 
   /** @override */
-  define<F2 extends F>(className: string, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
-  define<F2 extends F>(className: string, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
 
   /** @override */
-  <F2 extends F>(template: ComponentSetTemplate<F2>): PropertyDecorator;
+  <F2 extends F>(template: ComponentSetTemplate<F2>): ComponentSetDecorator<F2>;
 
   /** @internal */
   readonly OrderedFlag: FastenerFlags;
@@ -73,7 +87,7 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   get fastenerType(): Proto<ComponentSet<any, any>>;
 
   /** @internal @override */
-  getSuper(): ComponentSet<unknown, C> | null;
+  getParent(): ComponentSet<unknown, C> | null;
 
   /** @internal @override */
   setDerived(derived: boolean, inlet: ComponentSet<unknown, C>): void;

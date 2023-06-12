@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {DefineDirectiveSpec} from "./DefineDirectiveSpec";
 import {IncludeDirectiveSpec} from "./IncludeDirectiveSpec";
 import {TemplateDirectiveSpec} from "./TemplateDirectiveSpec";
@@ -22,45 +23,44 @@ import {IfDirectiveSpec} from "./IfDirectiveSpec";
 import {EachDirectiveSpec} from "./EachDirectiveSpec";
 import {HighlightDirectiveSpec} from "./HighlightDirectiveSpec";
 
-@Unit
-export class DirectiveSuite extends Spec {
+export class DirectiveSuite extends Suite {
   @Unit
-  defineDirectiveSpec(): Spec {
+  defineDirectiveSpec(): Suite {
     return new DefineDirectiveSpec();
   }
 
   @Unit
-  includeDirectiveSpec(): Spec {
+  includeDirectiveSpec(): Suite {
     return new IncludeDirectiveSpec();
   }
 
   @Unit
-  templateDirectiveSpec(): Spec {
+  templateDirectiveSpec(): Suite {
     return new TemplateDirectiveSpec();
   }
 
   @Unit
-  convertDirectiveSpec(): Spec {
+  convertDirectiveSpec(): Suite {
     return new ConvertDirectiveSpec();
   }
 
   @Unit
-  exportDirectiveSpec(): Spec {
+  exportDirectiveSpec(): Suite {
     return new ExportDirectiveSpec();
   }
 
   @Unit
-  ifDirectiveSpec(): Spec {
+  ifDirectiveSpec(): Suite {
     return new IfDirectiveSpec();
   }
 
   @Unit
-  eachDirectiveSpec(): Spec {
+  eachDirectiveSpec(): Suite {
     return new EachDirectiveSpec();
   }
 
   @Unit
-  highlightDirectiveSpec(): Spec {
+  highlightDirectiveSpec(): Suite {
     return new HighlightDirectiveSpec();
   }
 }

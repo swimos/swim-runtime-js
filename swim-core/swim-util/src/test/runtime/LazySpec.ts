@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Lazy} from "@swim/util";
 
-export class LazySpec extends Spec {
+export class LazySpec extends Suite {
   @Lazy
   static get foo(): object {
     return {};

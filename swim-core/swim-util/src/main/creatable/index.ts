@@ -12,7 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  Creates,
-  Creatable,
-} from "./Creatable";
+export type {Creates} from "./Creatable";
+export {Creatable} from "./Creatable";

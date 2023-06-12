@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import {AnyOutputSettings, OutputSettings} from "../output/OutputSettings";
+import type {AnyOutputSettings} from "../output/OutputSettings";
+import {OutputSettings} from "../output/OutputSettings";
 import {Output} from "../output/Output";
 
 /** @internal */

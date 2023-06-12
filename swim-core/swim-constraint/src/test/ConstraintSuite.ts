@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {ConstraintSolverSpec} from "./ConstraintSolverSpec";
 
-@Unit
-export class ConstraintSuite extends Spec {
+export class ConstraintSuite extends Suite {
   @Unit
-  constraintSolverSpec(): Spec {
+  constraintSolverSpec(): Suite {
     return new ConstraintSolverSpec();
   }
 }

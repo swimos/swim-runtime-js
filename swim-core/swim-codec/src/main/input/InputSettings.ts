@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Murmur3, HashCode, Booleans, Constructors} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import {Booleans} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Output} from "../output/Output";
 import type {Debug} from "../format/Debug";
 import {Format} from "../format/Format";

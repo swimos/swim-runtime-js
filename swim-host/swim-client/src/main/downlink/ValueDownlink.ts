@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Class, Proto} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Class} from "@swim/util";
+import type {Proto} from "@swim/util";
 import type {FastenerOwner} from "@swim/component";
-import {AnyValue, Value, Form} from "@swim/structure";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Form} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
-import {WarpDownlinkDescriptor, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
+import type {WarpDownlinkDescriptor} from "./WarpDownlink";
+import type {WarpDownlinkClass} from "./WarpDownlink";
+import {WarpDownlink} from "./WarpDownlink";
 import {ValueDownlinkModel} from "./ValueDownlinkModel";
 import type {ValueDownlinkObserver} from "./ValueDownlinkObserver";
 
@@ -33,8 +39,13 @@ export type AnyValueDownlinkValue<D extends ValueDownlink<any, any, any>> =
   ValueDownlinkValue<D> | ValueDownlinkValueInit<D>;
 
 /** @public */
+export type ValueDownlinkDecorator<P extends ValueDownlink<any, any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
+};
+
+/** @public */
 export interface ValueDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlinkDescriptor {
-  extends?: Proto<ValueDownlink<any, any, any>> | string | boolean | null;
+  extends?: Proto<ValueDownlink<any, any, any>> | boolean | null;
   valueForm?: Form<V, VU>;
   /** @internal */
   stateInit?: Value | null;
@@ -55,15 +66,15 @@ export interface ValueDownlinkClass<D extends ValueDownlink<any, any, any> = Val
   refine(downlinkClass: ValueDownlinkClass<any>): void;
 
   /** @override */
-  extend<D2 extends D>(className: string, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
-  extend<D2 extends D>(className: string, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
 
   /** @override */
-  define<D2 extends D>(className: string, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
-  define<D2 extends D>(className: string, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
 
   /** @override */
-  <D2 extends D>(template: ValueDownlinkTemplate<D2>): PropertyDecorator;
+  <D2 extends D>(template: ValueDownlinkTemplate<D2>): ValueDownlinkDecorator<D2>;
 }
 
 /** @public */
@@ -166,7 +177,7 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
     const model = this.model;
     if (model !== null) {
       const value = model.get();
-      return value.coerce(this.valueForm)
+      return value.coerce(this.valueForm);
     } else {
       throw new Error("unopened downlink");
     }

@@ -13,21 +13,21 @@
 // limitations under the License.
 
 import type {Dictionary} from "@swim/util";
-import {Cmd, Opt, Arg} from "@swim/args";
-import {
-  Workspace,
-  TaskConfig,
-  DepsTask,
-  LibsTask,
-  CleanTask,
-  TestTask,
-  DocTask,
-  VersionTask,
-  PublishTask,
-  BuildTask,
-  WatchTask,
-  WatcherScope,
-} from "@swim/build";
+import {Arg} from "@swim/args";
+import {Opt} from "@swim/args";
+import {Cmd} from "@swim/args";
+import {Workspace} from "@swim/build";
+import type {TaskConfig} from "@swim/build";
+import {DepsTask} from "@swim/build";
+import {LibsTask} from "@swim/build";
+import {CleanTask} from "@swim/build";
+import {TestTask} from "@swim/build";
+import {DocTask} from "@swim/build";
+import {VersionTask} from "@swim/build";
+import {PublishTask} from "@swim/build";
+import {BuildTask} from "@swim/build";
+import {WatchTask} from "@swim/build";
+import {WatcherScope} from "@swim/build";
 
 const pkgsCmd: Cmd = Cmd.create("pkgs")
   .withHelpCmd()

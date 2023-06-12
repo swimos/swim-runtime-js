@@ -12,16 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Class, Proto} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Class} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Value} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
-import {WarpDownlinkDescriptor, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
+import type {WarpDownlinkDescriptor} from "./WarpDownlink";
+import type {WarpDownlinkClass} from "./WarpDownlink";
+import {WarpDownlink} from "./WarpDownlink";
 import {EventDownlinkModel} from "./EventDownlinkModel";
 import type {EventDownlinkObserver} from "./EventDownlinkObserver";
 
 /** @public */
+export type EventDownlinkDecorator<P extends EventDownlink<any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
+};
+
+/** @public */
 export interface EventDownlinkDescriptor extends WarpDownlinkDescriptor {
-  extends?: Proto<EventDownlink<any>> | string | boolean | null;
+  extends?: Proto<EventDownlink<any>> | boolean | null;
 }
 
 /** @public */
@@ -39,15 +48,15 @@ export interface EventDownlinkClass<D extends EventDownlink<any> = EventDownlink
   refine(downlinkClass: EventDownlinkClass<any>): void;
 
   /** @override */
-  extend<D2 extends D>(className: string, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
-  extend<D2 extends D>(className: string, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
 
   /** @override */
-  define<D2 extends D>(className: string, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
-  define<D2 extends D>(className: string, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
 
   /** @override */
-  <D2 extends D>(template: EventDownlinkTemplate<D2>): PropertyDecorator;
+  <D2 extends D>(template: EventDownlinkTemplate<D2>): EventDownlinkDecorator<D2>;
 }
 
 /** @public */

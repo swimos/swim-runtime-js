@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Class, Proto, Cursor} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Class} from "@swim/util";
+import type {Proto} from "@swim/util";
+import type {Cursor} from "@swim/util";
 import type {FastenerOwner} from "@swim/component";
 import type {STree} from "@swim/collections";
-import {AnyValue, Value, Form, ValueCursor, ValueEntryCursor} from "@swim/structure";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Form} from "@swim/structure";
+import {ValueCursor} from "@swim/structure";
+import {ValueEntryCursor} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
-import {WarpDownlinkDescriptor, WarpDownlinkClass, WarpDownlink} from "./WarpDownlink";
+import type {WarpDownlinkDescriptor} from "./WarpDownlink";
+import type {WarpDownlinkClass} from "./WarpDownlink";
+import {WarpDownlink} from "./WarpDownlink";
 import {ListDownlinkModel} from "./ListDownlinkModel";
 import type {ListDownlinkObserver} from "./ListDownlinkObserver";
 
@@ -34,8 +43,13 @@ export type AnyListDownlinkValue<D extends ListDownlink<any, any, any>> =
   ListDownlinkValue<D> | ListDownlinkValueInit<D>;
 
 /** @public */
+export type ListDownlinkDecorator<P extends ListDownlink<any, any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
+};
+
+/** @public */
 export interface ListDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlinkDescriptor {
-  extends?: Proto<ListDownlink<any, any, any>> | string | boolean | null;
+  extends?: Proto<ListDownlink<any, any, any>> | boolean | null;
   valueForm?: Form<V, VU>;
   /** @internal */
   stateInit?: STree<Value, Value> | null;
@@ -56,15 +70,15 @@ export interface ListDownlinkClass<D extends ListDownlink<any, any, any> = ListD
   refine(downlinkClass: ListDownlinkClass<any>): void;
 
   /** @override */
-  extend<D2 extends D>(className: string, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
-  extend<D2 extends D>(className: string, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
 
   /** @override */
-  define<D2 extends D>(className: string, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
-  define<D2 extends D>(className: string, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
 
   /** @override */
-  <D2 extends D>(template: ListDownlinkTemplate<D2>): PropertyDecorator;
+  <D2 extends D>(template: ListDownlinkTemplate<D2>): ListDownlinkDecorator<D2>;
 }
 
 /** @public */

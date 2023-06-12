@@ -15,58 +15,53 @@
 export {WarpDownlinkContext} from "./WarpDownlinkContext";
 
 export {WarpDownlinkModel} from "./WarpDownlinkModel";
-export {
-  WarpDownlinkDescriptor,
-  WarpDownlinkTemplate,
-  WarpDownlinkClass,
-  WarpDownlink,
-} from "./WarpDownlink";
-export {WarpDownlinkObserver} from "./WarpDownlinkObserver";
+export type {WarpDownlinkDecorator} from "./WarpDownlink";
+export type {WarpDownlinkDescriptor} from "./WarpDownlink";
+export type {WarpDownlinkTemplate} from "./WarpDownlink";
+export type {WarpDownlinkClass} from "./WarpDownlink";
+export {WarpDownlink} from "./WarpDownlink";
+export type {WarpDownlinkObserver} from "./WarpDownlinkObserver";
 
 export {EventDownlinkModel} from "./EventDownlinkModel";
-export {
-  EventDownlinkDescriptor,
-  EventDownlinkTemplate,
-  EventDownlinkClass,
-  EventDownlink,
-} from "./EventDownlink";
-export {EventDownlinkObserver} from "./EventDownlinkObserver";
+export type {EventDownlinkDecorator} from "./EventDownlink";
+export type {EventDownlinkDescriptor} from "./EventDownlink";
+export type {EventDownlinkTemplate} from "./EventDownlink";
+export type {EventDownlinkClass} from "./EventDownlink";
+export {EventDownlink} from "./EventDownlink";
+export type {EventDownlinkObserver} from "./EventDownlinkObserver";
 
 export {ValueDownlinkModel} from "./ValueDownlinkModel";
-export {
-  ValueDownlinkValue,
-  ValueDownlinkValueInit,
-  AnyValueDownlinkValue,
-  ValueDownlinkDescriptor,
-  ValueDownlinkTemplate,
-  ValueDownlinkClass,
-  ValueDownlink,
-} from "./ValueDownlink";
-export {ValueDownlinkObserver} from "./ValueDownlinkObserver";
+export type {ValueDownlinkValue} from "./ValueDownlink";
+export type {ValueDownlinkValueInit} from "./ValueDownlink";
+export type {AnyValueDownlinkValue} from "./ValueDownlink";
+export type {ValueDownlinkDecorator} from "./ValueDownlink";
+export type {ValueDownlinkDescriptor} from "./ValueDownlink";
+export type {ValueDownlinkTemplate} from "./ValueDownlink";
+export type {ValueDownlinkClass} from "./ValueDownlink";
+export {ValueDownlink} from "./ValueDownlink";
+export type {ValueDownlinkObserver} from "./ValueDownlinkObserver";
 
 export {ListDownlinkModel} from "./ListDownlinkModel";
-export {
-  ListDownlinkValue,
-  ListDownlinkValueInit,
-  AnyListDownlinkValue,
-  ListDownlinkDescriptor,
-  ListDownlinkTemplate,
-  ListDownlinkClass,
-  ListDownlink,
-} from "./ListDownlink";
-export {ListDownlinkObserver} from "./ListDownlinkObserver";
+export type {ListDownlinkValue} from "./ListDownlink";
+export type {ListDownlinkValueInit} from "./ListDownlink";
+export type {AnyListDownlinkValue} from "./ListDownlink";
+export type {ListDownlinkDecorator} from "./ListDownlink";
+export type {ListDownlinkDescriptor} from "./ListDownlink";
+export type {ListDownlinkTemplate} from "./ListDownlink";
+export type {ListDownlinkClass} from "./ListDownlink";
+export {ListDownlink} from "./ListDownlink";
+export type {ListDownlinkObserver} from "./ListDownlinkObserver";
 
 export {MapDownlinkModel} from "./MapDownlinkModel";
-export {
-  MapDownlinkKey,
-  MapDownlinkValue,
-  MapDownlinkKeyInit,
-  MapDownlinkValueInit,
-  AnyMapDownlinkKey,
-  AnyMapDownlinkValue,
-  MapDownlinkDescriptor,
-  MapDownlinkTemplate,
-  MapDownlinkClass,
-  MapDownlink,
-} from "./MapDownlink";
-export {MapDownlinkObserver} from "./MapDownlinkObserver";
+export type {MapDownlinkKey} from "./MapDownlink";
+export type {MapDownlinkValue} from "./MapDownlink";
+export type {MapDownlinkKeyInit} from "./MapDownlink";
+export type {MapDownlinkValueInit} from "./MapDownlink";
+export type {AnyMapDownlinkKey} from "./MapDownlink";
+export type {AnyMapDownlinkValue} from "./MapDownlink";
+export type {MapDownlinkDecorator} from "./MapDownlink";
+export type {MapDownlinkDescriptor} from "./MapDownlink";
+export type {MapDownlinkTemplate} from "./MapDownlink";
+export type {MapDownlinkClass} from "./MapDownlink";
+export {MapDownlink} from "./MapDownlink";
+export type {MapDownlinkObserver} from "./MapDownlinkObserver";

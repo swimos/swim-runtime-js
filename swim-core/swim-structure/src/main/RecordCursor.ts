@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Cursor} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Cursor} from "@swim/util";
 import type {Item} from "./Item";
 import type {Record} from "./Record";
 

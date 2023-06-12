@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyOutputSettings, OutputSettings} from "../output/OutputSettings";
+import type {AnyOutputSettings} from "../output/OutputSettings";
+import {OutputSettings} from "../output/OutputSettings";
 import type {Output} from "../output/Output";
 import type {OutputBuffer} from "../output/OutputBuffer";
 import {ByteOutputBuffer} from "./ByteOutputBuffer";

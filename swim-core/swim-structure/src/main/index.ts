@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  AnyItem,
-  Item,
-} from "./Item";
+export type {AnyItem} from "./Item";
+export {Item} from "./Item";
 export {ItemInterpolator} from "./ItemInterpolator";
 
-export {
-  AnyField,
-  Field,
-} from "./Field";
+export type {AnyField} from "./Field";
+export {Field} from "./Field";
 export {FieldInterpolator} from "./FieldInterpolator";
 
 export {Attr} from "./Attr";
@@ -30,54 +26,38 @@ export {AttrInterpolator} from "./AttrInterpolator";
 export {Slot} from "./Slot";
 export {SlotInterpolator} from "./SlotInterpolator";
 
-export {
-  AnyValue,
-  Value,
-} from "./Value";
+export type {AnyValue} from "./Value";
+export {Value} from "./Value";
 export {ValueBuilder} from "./ValueBuilder";
 
-export {
-  AnyRecord,
-  Record,
-} from "./Record";
+export type {AnyRecord} from "./Record";
+export {Record} from "./Record";
 export {RecordInterpolator} from "./RecordInterpolator";
 export {RecordCursor} from "./RecordCursor";
 
 export {RecordMap} from "./RecordMap";
 export {RecordMapView} from "./RecordMapView";
 
-export {
-  AnyData,
-  Data,
-} from "./Data";
+export type {AnyData} from "./Data";
+export {Data} from "./Data";
 export {DataOutput} from "./DataOutput";
 
-export {
-  AnyText,
-  Text,
-} from "./Text";
+export type {AnyText} from "./Text";
+export {Text} from "./Text";
 export {TextOutput} from "./TextOutput";
 
-export {
-  AnyNum,
-  Num,
-} from "./Num";
+export type {AnyNum} from "./Num";
+export {Num} from "./Num";
 export {NumInterpolator} from "./NumInterpolator";
 
-export {
-  AnyBool,
-  Bool,
-} from "./Bool";
+export type {AnyBool} from "./Bool";
+export {Bool} from "./Bool";
 
-export {
-  AnyExtant,
-  Extant,
-} from "./Extant";
+export type {AnyExtant} from "./Extant";
+export {Extant} from "./Extant";
 
-export {
-  AnyAbsent,
-  Absent,
-} from "./Absent";
+export type {AnyAbsent} from "./Absent";
+export {Absent} from "./Absent";
 
 export {Expression} from "./Expression";
 

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {EventMessageSpec} from "./EventMessageSpec";
 import {CommandMessageSpec} from "./CommandMessageSpec";
 import {LinkRequestSpec} from "./LinkRequestSpec";
@@ -26,65 +27,64 @@ import {AuthedResponseSpec} from "./AuthedResponseSpec";
 import {DeauthRequestSpec} from "./DeauthRequestSpec";
 import {DeauthedResponseSpec} from "./DeauthedResponseSpec";
 
-@Unit
-export class WarpSuite extends Spec {
+export class WarpSuite extends Suite {
   @Unit
-  eventMessageSpec(): Spec {
+  eventMessageSpec(): Suite {
     return new EventMessageSpec();
   }
 
   @Unit
-  commandMessageSpec(): Spec {
+  commandMessageSpec(): Suite {
     return new CommandMessageSpec();
   }
 
   @Unit
-  linkRequestSpec(): Spec {
+  linkRequestSpec(): Suite {
     return new LinkRequestSpec();
   }
 
   @Unit
-  linkedResponseSpec(): Spec {
+  linkedResponseSpec(): Suite {
     return new LinkedResponseSpec();
   }
 
   @Unit
-  syncRequestSpec(): Spec {
+  syncRequestSpec(): Suite {
     return new SyncRequestSpec();
   }
 
   @Unit
-  syncedResponseSpec(): Spec {
+  syncedResponseSpec(): Suite {
     return new SyncedResponseSpec();
   }
 
   @Unit
-  unlinkRequestSpec(): Spec {
+  unlinkRequestSpec(): Suite {
     return new UnlinkRequestSpec();
   }
 
   @Unit
-  unlinkedResponseSpec(): Spec {
+  unlinkedResponseSpec(): Suite {
     return new UnlinkedResponseSpec();
   }
 
   @Unit
-  authRequestSpec(): Spec {
+  authRequestSpec(): Suite {
     return new AuthRequestSpec();
   }
 
   @Unit
-  authedResponseSpec(): Spec {
+  authedResponseSpec(): Suite {
     return new AuthedResponseSpec();
   }
 
   @Unit
-  deauthRequestSpec(): Spec {
+  deauthRequestSpec(): Suite {
     return new DeauthRequestSpec();
   }
 
   @Unit
-  deauthedResponseSpec(): Spec {
+  deauthedResponseSpec(): Suite {
     return new DeauthedResponseSpec();
   }
 }

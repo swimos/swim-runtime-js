@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {GeoPoint} from "@swim/geo";
 
-export class GeoPointSpec extends Spec {
+export class GeoPointSpec extends Suite {
   @Test
   interpolateEastAcrossAntiMeridian(exam: Exam): void {
     const a = new GeoPoint(178, -10);

@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Murmur3, Numbers, Constructors} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {LengthUnits, LengthBasis, Length} from "./Length";
+import type {LengthUnits} from "./Length";
+import type {LengthBasis} from "./Length";
+import {Length} from "./Length";
 
 /** @public */
 export class PctLength extends Length {

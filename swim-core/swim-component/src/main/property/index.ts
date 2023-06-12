@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  PropertyValue,
-  PropertyValueInit,
-  AnyPropertyValue,
-  PropertyDescriptor,
-  PropertyTemplate,
-  PropertyClass,
-  Property,
-} from "./Property";
+export type {PropertyValue} from "./Property";
+export type {PropertyValueInit} from "./Property";
+export type {AnyPropertyValue} from "./Property";
+export type {PropertyDecorator} from "./Property";
+export type {PropertyDescriptor} from "./Property";
+export type {PropertyTemplate} from "./Property";
+export type {PropertyClass} from "./Property";
+export {Property} from "./Property";

@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {GeoTile} from "@swim/geo";
 
-export class GeoTileSpec extends Spec {
+export class GeoTileSpec extends Suite {
   @Test
   tileBounds(exam: Exam): void {
     const tile = new GeoTile(3, 10, 4);

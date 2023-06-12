@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {OutputSettings, OutputStyle, Unicode} from "@swim/codec";
+import {OutputSettings} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import {TaskStatus} from "../task/Task";
 import {PackageTask} from "./PackageTask";
 

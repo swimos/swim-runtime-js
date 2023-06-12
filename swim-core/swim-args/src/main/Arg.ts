@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Murmur3, HashCode, Booleans, Strings, Constructors} from "@swim/util";
-import {Output, Debug, Format} from "@swim/codec";
+import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import {Booleans} from "@swim/util";
+import {Strings} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 
 /** @public */
 export type AnyArg = Arg | ArgInit | string;

@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AnyR2Point, R2Point} from "@swim/math";
-import type {AnyGeoPoint, GeoPoint} from "./GeoPoint";
+import type {AnyR2Point} from "@swim/math";
+import type {R2Point} from "@swim/math";
+import type {AnyGeoPoint} from "./GeoPoint";
+import type {GeoPoint} from "./GeoPoint";
 
 /** @public */
 export interface GeoProjection {

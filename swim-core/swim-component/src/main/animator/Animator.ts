@@ -12,10 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Proto, AnyTiming, Timing, Easing, Interpolator} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import type {AnyTiming} from "@swim/util";
+import {Timing} from "@swim/util";
+import {Easing} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
-import type {FastenerFlags, FastenerOwner} from "../fastener/Fastener";
-import {PropertyDescriptor, PropertyClass, Property} from "../property/Property";
+import type {FastenerFlags} from "../fastener/Fastener";
+import type {FastenerOwner} from "../fastener/Fastener";
+import type {PropertyDescriptor} from "../property/Property";
+import type {PropertyClass} from "../property/Property";
+import {Property} from "../property/Property";
 
 /** @public */
 export type AnimatorValue<A extends Animator<any, any, any>> =
@@ -30,8 +38,13 @@ export type AnyAnimatorValue<A extends Animator<any, any, any>> =
   AnimatorValue<A> | AnimatorValueInit<A>;
 
 /** @public */
+export type AnimatorDecorator<A extends Animator<any, any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, A>): (this: T, value: A | undefined) => A;
+};
+
+/** @public */
 export interface AnimatorDescriptor<T = unknown, U = T> extends PropertyDescriptor<T, U> {
-  extends?: Proto<Animator<any, any, any>> | string | boolean | null;
+  extends?: Proto<Animator<any, any, any>> | boolean | null;
   transition?: Timing | null;
 }
 
@@ -50,15 +63,15 @@ export interface AnimatorClass<A extends Animator<any, any, any> = Animator<any,
   refine(animatorClass: AnimatorClass<any>): void;
 
   /** @override */
-  extend<A2 extends A>(className: string, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
-  extend<A2 extends A>(className: string, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
+  extend<A2 extends A>(className: string | symbol, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
+  extend<A2 extends A>(className: string | symbol, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
 
   /** @override */
-  define<A2 extends A>(className: string, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
-  define<A2 extends A>(className: string, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
+  define<A2 extends A>(className: string | symbol, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
+  define<A2 extends A>(className: string | symbol, template: AnimatorTemplate<A2>): AnimatorClass<A2>;
 
   /** @override */
-  <A2 extends A>(template: AnimatorTemplate<A2>): PropertyDecorator;
+  <A2 extends A>(template: AnimatorTemplate<A2>): AnimatorDecorator<A2>;
 
   /** @internal */
   readonly TweeningFlag: FastenerFlags;
@@ -247,8 +260,9 @@ export const Animator = (function (_super: typeof Property) {
     const inletState = this.inletState;
     if (inletState === void 0 || inletState === null) {
       let message = inletState + " ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "inlet state";
       throw new TypeError(message);
@@ -268,8 +282,9 @@ export const Animator = (function (_super: typeof Property) {
     const state = this.state;
     if (state === void 0 || state === null) {
       let message = state + " ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "state";
       throw new TypeError(message);

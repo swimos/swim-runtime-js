@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import {Unicode} from "@swim/codec";
-import {Item, Value, Text} from "@swim/structure";
+import {Item} from "@swim/structure";
+import type {Value} from "@swim/structure";
+import {Text} from "@swim/structure";
 import type {ProcessorContext} from "../processor/ProcessorContext";
 import type {Converter} from "../converter/Converter";
 import {Directive} from "./Directive";

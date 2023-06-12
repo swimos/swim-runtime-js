@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Output, WriterException, Writer, Base64} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {WriterException} from "@swim/codec";
+import {Writer} from "@swim/codec";
+import {Base64} from "@swim/codec";
 
 /** @internal */
 export class DataWriter extends Writer {

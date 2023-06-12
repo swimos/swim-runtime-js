@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {HtmlConverterSpec} from "./HtmlConverterSpec";
 import {CssConverterSpec} from "./CssConverterSpec";
 
-@Unit
-export class ConverterSuite extends Spec {
+export class ConverterSuite extends Suite {
   @Unit
-  htmlConverterSpec(): Spec {
+  htmlConverterSpec(): Suite {
     return new HtmlConverterSpec();
   }
 
   @Unit
-  cssConverterSpec(): Spec {
+  cssConverterSpec(): Suite {
     return new CssConverterSpec();
   }
 }

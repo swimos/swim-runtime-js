@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {ProcessorSuite} from "./processor/ProcessorSuite";
 import {DirectiveSuite} from "./directive/DirectiveSuite";
 import {ConverterSuite} from "./converter/ConverterSuite";
 
-@Unit
-export class MacroSuite extends Spec {
+export class MacroSuite extends Suite {
   @Unit
-  processorSuite(): Spec {
+  processorSuite(): Suite {
     return new ProcessorSuite();
   }
 
   @Unit
-  directiveSuite(): Spec {
+  directiveSuite(): Suite {
     return new DirectiveSuite();
   }
 
   @Unit
-  converterSuites(): Spec {
+  converterSuites(): Suite {
     return new ConverterSuite();
   }
 }

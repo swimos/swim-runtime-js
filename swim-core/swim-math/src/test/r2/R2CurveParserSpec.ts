@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {R2Curve} from "@swim/math";
 
-export class R2CurveParserSpec extends Spec {
+export class R2CurveParserSpec extends Suite {
   @Test
   parseAbsoluteMoveCurves(exam: Exam): void {
     exam.equal(R2Curve.parse("M1,-2,-3,5"), R2Curve.linear(1, -2, -3, 5));

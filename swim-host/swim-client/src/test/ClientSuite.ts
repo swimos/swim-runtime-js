@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {DownlinkSuite} from "./downlink/DownlinkSuite";
 import {RefSuite} from "./ref/RefSuite";
 
-@Unit
-export class ClientSuite extends Spec {
+export class ClientSuite extends Suite {
   @Unit
-  downlinkSuite(): Spec {
+  downlinkSuite(): Suite {
     return new DownlinkSuite();
   }
 
   @Unit
-  refSuite(): Spec {
+  refSuite(): Suite {
     return new RefSuite();
   }
 }

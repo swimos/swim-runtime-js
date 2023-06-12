@@ -12,14 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Equals, Mutable, Arrays} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
-import {R2Spline, R2Path} from "@swim/math";
+import type {Mutable} from "@swim/util";
+import {Arrays} from "@swim/util";
+import type {Equals} from "@swim/util";
+import type {Equivalent} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {R2Spline} from "@swim/math";
+import {R2Path} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import {AnyGeoShape, GeoShape} from "./GeoShape";
+import type {AnyGeoShape} from "./GeoShape";
+import {GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import type {GeoCurve} from "./GeoCurve";
-import {AnyGeoSpline, GeoSplinePoints, GeoSpline} from "./GeoSpline";
+import type {AnyGeoSpline} from "./GeoSpline";
+import type {GeoSplinePoints} from "./GeoSpline";
+import {GeoSpline} from "./GeoSpline";
 import {GeoPathBuilder} from "./"; // forward import
 import {GeoBox} from "./"; // forward import
 

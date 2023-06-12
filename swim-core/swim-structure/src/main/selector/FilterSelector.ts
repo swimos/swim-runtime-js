@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3, Numbers, Constructors} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import {AnyItem, Item} from "../Item";
+import type {AnyItem} from "../Item";
+import {Item} from "../Item";
 import {Selector} from "./Selector";
-import {AnyInterpreter, Interpreter} from "../"; // forward import
+import type {AnyInterpreter} from "../interpreter/Interpreter";
+import {Interpreter} from "../"; // forward import
 
 /** @public */
 export class FilterSelector extends Selector {

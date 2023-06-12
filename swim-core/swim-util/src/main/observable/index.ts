@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  Observes,
-  Observable,
-} from "./Observable";
-export {
-  ObserverMethods,
-  ObserverMethod,
-  ObserverParameters,
-  ObserverReturnType,
-  Observer,
-} from "./Observer";
+export type {Observes} from "./Observable";
+export {Observable} from "./Observable";
+
+export type {ObserverMethods} from "./Observer";
+export type {ObserverMethod} from "./Observer";
+export type {ObserverParameters} from "./Observer";
+export type {ObserverReturnType} from "./Observer";
+export type {Observer} from "./Observer";

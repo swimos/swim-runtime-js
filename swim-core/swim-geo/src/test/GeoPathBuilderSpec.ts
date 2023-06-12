@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {GeoSegment, GeoSpline, GeoPath} from "@swim/geo";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {GeoSegment} from "@swim/geo";
+import {GeoSpline} from "@swim/geo";
+import {GeoPath} from "@swim/geo";
 
-export class GeoPathBuilderSpec extends Spec {
+export class GeoPathBuilderSpec extends Suite {
   @Test
   buildLinearPaths(exam: Exam): void {
     const builder = GeoPath.builder();

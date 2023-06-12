@@ -12,30 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  Murmur3,
-  Mutable,
-  Class,
-  Instance,
-  Proto,
-  Arrays,
-  HashCode,
-  Comparator,
-  Dictionary,
-  MutableDictionary,
-  FromAny,
-  AnyTiming,
-  Creatable,
-  Inits,
-  Initable,
-  Observes,
-  Observable,
-  ObserverMethods,
-  ObserverParameters,
-} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Class} from "@swim/util";
+import type {Instance} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Arrays} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Comparator} from "@swim/util";
+import type {Dictionary} from "@swim/util";
+import type {MutableDictionary} from "@swim/util";
+import type {FromAny} from "@swim/util";
+import type {AnyTiming} from "@swim/util";
+import {Creatable} from "@swim/util";
+import type {Inits} from "@swim/util";
+import type {Initable} from "@swim/util";
+import type {Observes} from "@swim/util";
+import type {Observable} from "@swim/util";
+import type {ObserverMethods} from "@swim/util";
+import type {ObserverParameters} from "@swim/util";
 import type {Affinity} from "../fastener/Affinity";
-import {FastenerContextClass, FastenerContext} from "../fastener/FastenerContext";
-import type {FastenerClass, Fastener} from "../fastener/Fastener";
+import {FastenerContext} from "../fastener/FastenerContext";
+import {Fastener} from "../fastener/Fastener";
 import {Property} from "../property/Property";
 import {Animator} from "../animator/Animator";
 import {EventHandler} from "../event/EventHandler";
@@ -84,11 +82,8 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     this.firstChild = null;
     this.lastChild = null;
     this.childMap = null;
-    this.fasteners = null;
     this.decoherent = null;
     this.observers = Arrays.empty;
-
-    FastenerContext.init(this);
   }
 
   get componentType(): Class<Component> {
@@ -733,16 +728,16 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return target;
   }
 
-  getSuper<F extends Class<C>>(superBound: F): InstanceType<F> | null;
-  getSuper(superBound: Class<C>): C | null;
-  getSuper(superBound: Class<C>): C | null {
+  getParent<F extends Class<C>>(parentBound: F): InstanceType<F> | null;
+  getParent(parentBound: Class<C>): C | null;
+  getParent(parentBound: Class<C>): C | null {
     const parent = this.parent;
     if (parent === null) {
       return null;
-    } else if (parent instanceof superBound) {
+    } else if (parent instanceof parentBound) {
       return parent;
     } else {
-      return (parent as C).getSuper(superBound);
+      return (parent as C).getParent(parentBound);
     }
   }
 
@@ -890,156 +885,42 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     // hook
   }
 
-  /** @internal */
-  readonly fasteners: {[fastenerName: string]: Fastener | undefined} | null;
-
   /** @override */
-  hasFastener(fastenerName: string, fastenerBound?: Proto<Fastener> | null): boolean {
-    const fasteners = this.fasteners;
-    if (fasteners !== null) {
-      const fastener = fasteners[fastenerName];
-      if (fastener !== void 0 && (fastenerBound === void 0 || fastenerBound === null || fastener instanceof fastenerBound)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
+  getParentFastener<F extends Fastener<any>>(fastenerName: string | symbol, fastenerBound: Proto<F>): F | null;
   /** @override */
-  getFastener<F extends Fastener<any>>(fastenerName: string, fastenerBound: Proto<F>): F | null;
-  /** @override */
-  getFastener(fastenerName: string, fastenerBound?: Proto<Fastener> | null): Fastener | null;
-  getFastener(fastenerName: string, fastenerBound?: Proto<Fastener> | null): Fastener | null {
-    const fasteners = this.fasteners;
-    if (fasteners !== null) {
-      const fastener = fasteners[fastenerName];
-      if (fastener !== void 0 && (fastenerBound === void 0 || fastenerBound === null || fastener instanceof fastenerBound)) {
-        return fastener;
-      }
-    }
-    return null;
-  }
-
-  /** @override */
-  setFastener(fastenerName: string, newFastener: Fastener | null): void {
-    const fasteners = this.fasteners;
-    let oldFastener: Fastener | null | undefined = fasteners !== null ? fasteners[fastenerName] : void 0;
-    if (oldFastener === void 0) {
-      oldFastener = null;
-    }
-    if (oldFastener !== newFastener) {
-      if (oldFastener !== null) {
-        this.detachFastener(fastenerName, oldFastener);
-      }
-      if (newFastener !== null) {
-        this.attachFastener(fastenerName, newFastener);
-      }
-    }
-  }
-
-  /** @internal */
-  protected attachFastener(fastenerName: string, fastener: Fastener): void {
-    let fasteners = this.fasteners;
-    if (fasteners === null) {
-      fasteners = {};
-      (this as Mutable<this>).fasteners = fasteners;
-    }
-    // assert(fasteners[fastenerName] === void 0);
-    this.willAttachFastener(fastenerName, fastener);
-    fasteners[fastenerName] = fastener;
-    if (fastener.lazy === false) {
-      Object.defineProperty(this, fastenerName, {
-        value: fastener,
-        enumerable: true,
-        configurable: true,
-      });
-    }
-    if (this.mounted) {
-      fastener.mount();
-    }
-    this.onAttachFastener(fastenerName, fastener);
-    this.didAttachFastener(fastenerName, fastener);
-  }
-
-  protected willAttachFastener(fastenerName: string, fastener: Fastener): void {
-    // hook
-  }
-
-  protected onAttachFastener(fastenerName: string, fastener: Fastener): void {
-    this.bindFastener(fastener);
-  }
-
-  protected didAttachFastener(fastenerName: string, fastener: Fastener): void {
-    // hook
-  }
-
-  /** @internal */
-  protected detachFastener(fastenerName: string, fastener: Fastener): void {
-    const fasteners = this.fasteners!;
-    // assert(fasteners !== null);
-    // assert(fasteners[fastenerName] === fastener);
-    this.willDetachFastener(fastenerName, fastener);
-    this.onDetachFastener(fastenerName, fastener);
-    if (this.mounted) {
-      fastener.unmount();
-    }
-    delete fasteners[fastenerName];
-    this.didDetachFastener(fastenerName, fastener);
-  }
-
-  protected willDetachFastener(fastenerName: string, fastener: Fastener): void {
-    // hook
-  }
-
-  protected onDetachFastener(fastenerName: string, fastener: Fastener): void {
-    // hook
-  }
-
-  protected didDetachFastener(fastenerName: string, fastener: Fastener): void {
-    // hook
-  }
-
-  /** @override */
-  getLazyFastener<F extends Fastener<any>>(fastenerName: string, fastenerBound: Proto<F>): F | null;
-  /** @override */
-  getLazyFastener(fastenerName: string, fastenerBound?: Proto<Fastener> | null): Fastener | null;
-  getLazyFastener(fastenerName: string, fastenerBound?: Proto<Fastener> | null): Fastener | null {
-    return FastenerContext.getLazyFastener(this, fastenerName, fastenerBound);
-  }
-
-  /** @override */
-  getSuperFastener<F extends Fastener<any>>(fastenerName: string, fastenerBound: Proto<F>): F | null;
-  /** @override */
-  getSuperFastener(fastenerName: string, fastenerBound?: Proto<Fastener> | null): Fastener | null;
-  getSuperFastener(fastenerName: string, fastenerBound?: Proto<Fastener> | null): Fastener | null {
+  getParentFastener(fastenerName: string | symbol, fastenerBound?: Proto<Fastener> | null): Fastener | null;
+  getParentFastener(fastenerName: string | symbol, fastenerBound?: Proto<Fastener> | null): Fastener | null {
     const parent = this.parent;
     if (parent === null) {
       return null;
-    } else {
-      const parentFastener = parent.getLazyFastener(fastenerName, fastenerBound);
-      if (parentFastener !== null) {
-        return parentFastener;
-      } else {
-        return parent.getSuperFastener(fastenerName, fastenerBound);
-      }
     }
+    const parentFastener = (parent as any)[fastenerName] as Fastener<any> | undefined;
+    if (parentFastener !== void 0 && (fastenerBound === void 0 || fastenerBound === null
+        || parentFastener instanceof fastenerBound)) {
+      return parentFastener;
+    }
+    return parent.getParentFastener(fastenerName, fastenerBound);
   }
 
   /** @internal */
   protected mountFasteners(): void {
-    const fasteners = this.fasteners;
-    for (const fastenerName in fasteners) {
-      const fastener = fasteners[fastenerName]!;
-      fastener.mount();
+    const fastenerNames = FastenerContext.getFastenerNames(this);
+    for (let i = 0; i < fastenerNames.length; i += 1) {
+      const fastener = this[fastenerNames[i]!];
+      if (fastener instanceof Fastener) {
+        fastener.mount();
+      }
     }
   }
 
   /** @internal */
   protected unmountFasteners(): void {
-    const fasteners = this.fasteners;
-    for (const fastenerName in fasteners) {
-      const fastener = fasteners[fastenerName]!;
-      fastener.unmount();
+    const fastenerNames = FastenerContext.getFastenerNames(this);
+    for (let i = 0; i < fastenerNames.length; i += 1) {
+      const fastener = this[fastenerNames[i]!];
+      if (fastener instanceof Fastener) {
+        fastener.unmount();
+      }
     }
   }
 
@@ -1057,10 +938,12 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected bindChildFasteners(child: C, target: C | null): void {
-    const fasteners = this.fasteners;
-    for (const fastenerName in fasteners) {
-      const fastener = fasteners[fastenerName]!;
-      this.bindChildFastener(fastener, child, target);
+    const fastenerNames = FastenerContext.getFastenerNames(this);
+    for (let i = 0; i < fastenerNames.length; i += 1) {
+      const fastener = this[fastenerNames[i]!];
+      if (fastener instanceof Fastener) {
+        this.bindChildFastener(fastener, child, target);
+      }
     }
   }
 
@@ -1073,10 +956,12 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected unbindChildFasteners(child: C): void {
-    const fasteners = this.fasteners;
-    for (const fastenerName in fasteners) {
-      const fastener = fasteners[fastenerName]!;
-      this.unbindChildFastener(fastener, child);
+    const fastenerNames = FastenerContext.getFastenerNames(this);
+    for (let i = 0; i < fastenerNames.length; i += 1) {
+      const fastener = this[fastenerNames[i]!];
+      if (fastener instanceof Fastener) {
+        this.unbindChildFastener(fastener, child);
+      }
     }
   }
 
@@ -1094,13 +979,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
       affinity = timing;
       timing = void 0;
     }
-    const property = this.getLazyFastener(key as string, Property);
-    if (property !== null) {
-      if (property instanceof Animator) {
-        property.setState(value, timing, affinity);
-      } else {
-        property.setValue(value, affinity);
-      }
+    const property = this[key as keyof this] as Property<this> | undefined;
+    if (property instanceof Animator) {
+      property.setState(value, timing, affinity);
+    } else if (property instanceof Property) {
+      property.setValue(value, affinity);
     }
   }
 
@@ -1198,8 +1081,8 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     // hook
   }
 
-  callObservers<O, K extends keyof ObserverMethods<O>>(this: this & {readonly observerType?: Class<O>}, key: K, ...args: ObserverParameters<O, K>): void {
-    const observers = this.observers;
+  callObservers<O, K extends keyof ObserverMethods<O>>(this: {readonly observerType?: Class<O>}, key: K, ...args: ObserverParameters<O, K>): void {
+    const observers = (this as Component).observers;
     for (let i = 0, n = observers.length; i < n; i += 1) {
       const observer = observers[i]! as ObserverMethods<O>;
       const method = observer[key];
@@ -1252,19 +1135,8 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     } else if (Creatable.is(value)) {
       return (value as Creatable<InstanceType<S>>).create();
     } else {
-      return (this as unknown as ComponentFactory<InstanceType<S>>).fromInit(value);
+      return (this as unknown as ComponentFactory<InstanceType<S>>).fromInit(value as Inits<InstanceType<S>>);
     }
-  }
-
-  static getFastenerClass<S extends Class<InstanceType<S>>,
-                          K extends keyof {[K in keyof InstanceType<S> as InstanceType<S>[K] extends F ? K : never]: InstanceType<S>[K]},
-                          F extends Fastener<any> = Fastener<any>>
-                         (this: S, fastenerName: K, fastenerBound?: Proto<F> | null)
-                         : FastenerClass<InstanceType<S>[K] extends F ? InstanceType<S>[K] : never>;
-  static getFastenerClass<F extends Fastener<any>>(fastenerName: string, fastenerBound: Proto<F>): FastenerClass | null;
-  static getFastenerClass(fastenerName: string, fastenerBound?: Proto<Fastener> | null): FastenerClass | null;
-  static getFastenerClass(fastenerName: string, fastenerBound?: Proto<Fastener> | null): FastenerClass | null {
-    return FastenerContext.getFastenerClass(this as FastenerContextClass, fastenerName, fastenerBound);
   }
 
   /** @internal */
@@ -1287,7 +1159,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   /** @internal */
   static readonly FlagShift: number = 3;
   /** @internal */
-  static readonly FlagMask: ComponentFlags = (1 << Component.FlagShift) - 1;
+  static readonly FlagMask: ComponentFlags = (1 << this.FlagShift) - 1;
 
   static readonly MountFlags: ComponentFlags = 0;
   static readonly InsertChildFlags: ComponentFlags = 0;

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Input} from "../input/Input";
-import {AnyOutputSettings, OutputSettings} from "../output/OutputSettings";
+import type {AnyOutputSettings} from "../output/OutputSettings";
+import {OutputSettings} from "../output/OutputSettings";
 import type {Output} from "../output/Output";
 import type {Writer} from "../writer/Writer";
 import {StringInput} from "./StringInput";

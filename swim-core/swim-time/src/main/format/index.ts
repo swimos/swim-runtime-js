@@ -14,11 +14,9 @@
 
 export {DateTimeLocale} from "./DateTimeLocale";
 export {DateTimeSpecifiers} from "./DateTimeSpecifiers";
-export {
-  DateNumberFactory,
-  DateStringFactory,
-  DateTimeFormat,
-} from "./DateTimeFormat";
+export type {DateNumberFactory} from "./DateTimeFormat";
+export type {DateStringFactory} from "./DateTimeFormat";
+export {DateTimeFormat} from "./DateTimeFormat";
 
 export {YearFormat} from "./YearFormat";
 export {MonthOfYearFormat} from "./MonthOfYearFormat";

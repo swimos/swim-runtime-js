@@ -20,23 +20,24 @@
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
-    "@swim/util": "4.0.0-dev.20220527.3",
     "@swim/codec": "4.0.0-dev.20220527.3",
-    "@swim/component": "4.0.0-dev.20220527.3",
     "@swim/collections": "4.0.0-dev.20220527.3",
+    "@swim/component": "4.0.0-dev.20220527.3",
     "@swim/constraint": "4.0.0-dev.20220527.3",
-    "@swim/structure": "4.0.0-dev.20220527.3",
-    "@swim/recon": "4.0.0-dev.20220527.3",
-    "@swim/uri": "4.0.0-dev.20220527.3",
-    "@swim/math": "4.0.0-dev.20220527.3",
     "@swim/geo": "4.0.0-dev.20220527.3",
-    "@swim/time": "4.0.0-dev.20220527.3"
+    "@swim/math": "4.0.0-dev.20220527.3",
+    "@swim/recon": "4.0.0-dev.20220527.3",
+    "@swim/structure": "4.0.0-dev.20220527.3",
+    "@swim/time": "4.0.0-dev.20220527.3",
+    "@swim/uri": "4.0.0-dev.20220527.3",
+    "@swim/util": "4.0.0-dev.20220527.3"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "7.33",
+    "@microsoft/api-extractor": "7.35",
     "@rollup/plugin-node-resolve": "15",
+    "@rollup/plugin-terser": "0.4",
     "@types/eslint": "8",
-    "@types/node": "18",
+    "@types/node": "20",
     "@types/prismjs": "1",
     "@types/w3c-css-typed-object-model-level-1": "20180410",
     "@typescript-eslint/eslint-plugin": "5",
@@ -46,11 +47,10 @@
     "prismjs": "1.29",
     "rollup": "2.79",
     "rollup-plugin-sourcemaps": "0.6",
-    "rollup-plugin-terser": "7",
-    "terser": ">= 5.15",
+    "terser": ">= 5.17",
     "tslib": "2",
-    "typedoc": "0.23",
-    "typescript": "4.6"
+    "typedoc": "0.24",
+    "typescript": "5.1"
   },
   "workspaces": [
     "./swim-util",

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {OutputException} from "./OutputException";
-import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
+import type {AnyOutputSettings} from "./OutputSettings";
+import {OutputSettings} from "./OutputSettings";
 import {OutputBuffer} from "./OutputBuffer";
 import {OutputBufferDone} from "../"; // forward import
 import {OutputBufferError} from "../"; // forward import

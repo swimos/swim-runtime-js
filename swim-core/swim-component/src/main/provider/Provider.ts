@@ -12,18 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Proto, Observes} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import type {Observes} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
-import {FastenerFlags, FastenerOwner, FastenerDescriptor, FastenerClass, Fastener} from "../fastener/Fastener";
-import {ServiceFactory, Service} from "../"; // forward import
+import type {FastenerFlags} from "../fastener/Fastener";
+import type {FastenerOwner} from "../fastener/Fastener";
+import type {FastenerDescriptor} from "../fastener/Fastener";
+import type {FastenerClass} from "../fastener/Fastener";
+import {Fastener} from "../fastener/Fastener";
+import type {ServiceFactory} from "../service/Service";
+import {Service} from "../"; // forward import
 
 /** @public */
 export type ProviderService<P extends Provider<any, any>> =
   P extends {service: infer S | null} ? S : never;
 
 /** @public */
+export type ProviderDecorator<P extends Provider<any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
+};
+
+/** @public */
 export interface ProviderDescriptor<S extends Service = Service> extends FastenerDescriptor {
-  extends?: Proto<Provider<any, any>> | string | boolean | null;
+  extends?: Proto<Provider<any, any>> | boolean | null;
   serviceType?: ServiceFactory<any>;
   serviceKey?: string | boolean;
   creates?: boolean;
@@ -45,15 +57,15 @@ export interface ProviderClass<P extends Provider<any, any> = Provider<any, any>
   refine(providerClass: ProviderClass<any>): void;
 
   /** @override */
-  extend<P2 extends P>(className: string, template: ProviderTemplate<P2>): ProviderClass<P2>;
-  extend<P2 extends P>(className: string, template: ProviderTemplate<P2>): ProviderClass<P2>;
+  extend<P2 extends P>(className: string | symbol, template: ProviderTemplate<P2>): ProviderClass<P2>;
+  extend<P2 extends P>(className: string | symbol, template: ProviderTemplate<P2>): ProviderClass<P2>;
 
   /** @override */
-  define<P2 extends P>(className: string, template: ProviderTemplate<P2>): ProviderClass<P2>;
-  define<P2 extends P>(className: string, template: ProviderTemplate<P2>): ProviderClass<P2>;
+  define<P2 extends P>(className: string | symbol, template: ProviderTemplate<P2>): ProviderClass<P2>;
+  define<P2 extends P>(className: string | symbol, template: ProviderTemplate<P2>): ProviderClass<P2>;
 
   /** @override */
-  <P2 extends P>(template: ProviderTemplate<P2>): PropertyDecorator;
+  <P2 extends P>(template: ProviderTemplate<P2>): ProviderDecorator<P2>;
 
   /** @internal */
   readonly ManagedFlag: FastenerFlags;
@@ -82,7 +94,7 @@ export interface Provider<O = unknown, S extends Service = Service> extends Fast
   readonly observes?: boolean; // optional prototype property
 
   /** @internal @override */
-  getSuper(): Provider<unknown, S> | null;
+  getParent(): Provider<unknown, S> | null;
 
   /** @internal @override */
   setDerived(derived: boolean, inlet: Provider<unknown, S>): void;
@@ -199,7 +211,6 @@ export interface Provider<O = unknown, S extends Service = Service> extends Fast
 /** @public */
 export const Provider = (function (_super: typeof Fastener) {
   const Provider = _super.extend("Provider", {
-    static: true,
     affinity: Affinity.Inherited,
     inherits: true,
     creates: true,
@@ -240,8 +251,9 @@ export const Provider = (function (_super: typeof Fastener) {
     const inletService = this.inletService;
     if (inletService === void 0 || inletService === null) {
       let message = inletService + " ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "inlet service";
       throw new TypeError(message);
@@ -253,8 +265,9 @@ export const Provider = (function (_super: typeof Fastener) {
     const service = this.service;
     if (service === void 0 || service === null) {
       let message = service + " ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "service";
       throw new TypeError(message);
@@ -330,8 +343,8 @@ export const Provider = (function (_super: typeof Fastener) {
 
   Object.defineProperty(Provider.prototype, "parentService", {
     get<S extends Service>(this: Provider<unknown, S>): S | null {
-      const superProvider = this.getSuper();
-      return superProvider !== null ? superProvider.service : null;
+      const parentProvider = this.getParent();
+      return parentProvider !== null ? parentProvider.service : null;
     },
     configurable: true,
   });
@@ -348,8 +361,9 @@ export const Provider = (function (_super: typeof Fastener) {
     }
     if (service === void 0 || service === null) {
       let message = "Unable to create ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "service";
       throw new Error(message);

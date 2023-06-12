@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import {Unicode} from "@swim/codec";
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Recon} from "@swim/recon";
 import {CssConverter} from "@swim/macro";
 
-export class CssConverterSpec extends Spec {
+export class CssConverterSpec extends Suite {
   @Test
   convertEmptyRules(exam: Exam): void {
     const converter = new CssConverter();

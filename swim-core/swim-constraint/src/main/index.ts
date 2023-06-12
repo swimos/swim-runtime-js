@@ -16,58 +16,48 @@ export {ConstraintId} from "./ConstraintId";
 
 export {ConstraintMap} from "./ConstraintMap";
 
-export {
-  ConstraintSymbol,
-  ConstraintSlack,
-  ConstraintDummy,
-  ConstraintError,
-  ConstraintInvalid,
-} from "./ConstraintSymbol";
+export {ConstraintSymbol} from "./ConstraintSymbol";
+export {ConstraintSlack} from "./ConstraintSymbol";
+export {ConstraintDummy} from "./ConstraintSymbol";
+export {ConstraintError} from "./ConstraintSymbol";
+export {ConstraintInvalid} from "./ConstraintSymbol";
 
-export {
-  AnyConstraintExpression,
-  ConstraintExpression,
-} from "./ConstraintExpression";
+export type {AnyConstraintExpression} from "./ConstraintExpression";
+export {ConstraintExpression} from "./ConstraintExpression";
 
 export {ConstraintSum} from "./ConstraintSum";
 export {ConstraintTerm} from "./ConstraintTerm";
 export {ConstraintProduct} from "./ConstraintProduct";
 export {ConstraintConstant} from "./ConstraintConstant";
 
-export {ConstraintVariable} from "./ConstraintVariable";
+export type {ConstraintVariable} from "./ConstraintVariable";
 
-export {
-  ConstraintPropertyDescriptor,
-  ConstraintPropertyTemplate,
-  ConstraintPropertyClass,
-  ConstraintProperty,
-} from "./ConstraintProperty";
+export type {ConstraintPropertyDecorator} from "./ConstraintProperty";
+export type {ConstraintPropertyDescriptor} from "./ConstraintProperty";
+export type {ConstraintPropertyTemplate} from "./ConstraintProperty";
+export type {ConstraintPropertyClass} from "./ConstraintProperty";
+export {ConstraintProperty} from "./ConstraintProperty";
 
-export {
-  ConstraintAnimatorDescriptor,
-  ConstraintAnimatorTemplate,
-  ConstraintAnimatorClass,
-  ConstraintAnimator,
-} from "./ConstraintAnimator";
+export type {ConstraintAnimatorDecorator} from "./ConstraintAnimator";
+export type {ConstraintAnimatorDescriptor} from "./ConstraintAnimator";
+export type {ConstraintAnimatorTemplate} from "./ConstraintAnimator";
+export type {ConstraintAnimatorClass} from "./ConstraintAnimator";
+export {ConstraintAnimator} from "./ConstraintAnimator";
 
-export {ConstraintRelation} from "./ConstraintRelation";
-export {
-  AnyConstraintStrength,
-  ConstraintStrengthInit,
-  ConstraintStrength,
-} from "./ConstraintStrength";
+export type {ConstraintRelation} from "./ConstraintRelation";
+export type {AnyConstraintStrength} from "./ConstraintStrength";
+export type {ConstraintStrengthInit} from "./ConstraintStrength";
+export {ConstraintStrength} from "./ConstraintStrength";
 export {Constraint} from "./Constraint";
 
 export {ConstraintGroup} from "./ConstraintGroup";
 
 export {ConstraintScope} from "./ConstraintScope";
 
-export {ConstraintContext} from "./ConstraintContext";
+export type {ConstraintContext} from "./ConstraintContext";
 
 export {ConstraintRow} from "./ConstraintRow";
 
-export {
-  ConstraintTag,
-  ConstraintVariableBinding,
-  ConstraintSolver,
-} from "./ConstraintSolver";
+export type {ConstraintTag} from "./ConstraintSolver";
+export type {ConstraintVariableBinding} from "./ConstraintSolver";
+export {ConstraintSolver} from "./ConstraintSolver";

@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item, Text, Form} from "@swim/structure";
-import {AnyUri, Uri} from "./Uri";
+import type {Item} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Form} from "@swim/structure";
+import type {AnyUri} from "./Uri";
+import {Uri} from "./Uri";
 
 /** @internal */
 export class UriForm extends Form<Uri, AnyUri> {

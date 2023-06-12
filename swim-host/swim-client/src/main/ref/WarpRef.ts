@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AnyValue, Value} from "@swim/structure";
+import type {AnyValue} from "@swim/structure";
+import type {Value} from "@swim/structure";
 import type {AnyUri} from "@swim/uri";
 import type {WarpDownlinkContext} from "../downlink/WarpDownlinkContext";
-import type {EventDownlinkTemplate, EventDownlink} from "../downlink/EventDownlink";
-import type {ValueDownlinkTemplate, ValueDownlink} from "../downlink/ValueDownlink";
-import type {ListDownlinkTemplate, ListDownlink} from "../downlink/ListDownlink";
-import type {MapDownlinkTemplate, MapDownlink} from "../downlink/MapDownlink";
+import type {EventDownlinkTemplate} from "../downlink/EventDownlink";
+import type {EventDownlink} from "../downlink/EventDownlink";
+import type {ValueDownlinkTemplate} from "../downlink/ValueDownlink";
+import type {ValueDownlink} from "../downlink/ValueDownlink";
+import type {ListDownlinkTemplate} from "../downlink/ListDownlink";
+import type {ListDownlink} from "../downlink/ListDownlink";
+import type {MapDownlinkTemplate} from "../downlink/MapDownlink";
+import type {MapDownlink} from "../downlink/MapDownlink";
 
 /** @public */
 export interface WarpRef extends WarpDownlinkContext {

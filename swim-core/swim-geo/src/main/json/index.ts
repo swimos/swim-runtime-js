@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {GeoJsonPosition} from "./GeoJsonPosition";
+export type {GeoJsonPosition} from "./GeoJsonPosition";
 
-export {GeoJsonBbox} from "./GeoJsonBbox";
+export type {GeoJsonBbox} from "./GeoJsonBbox";
 
-export {
-  GeoJsonType,
-  GeoJsonObject,
-  GeoJson,
-} from "./GeoJson";
+export type {GeoJsonType} from "./GeoJson";
+export type {GeoJsonObject} from "./GeoJson";
+export {GeoJson} from "./GeoJson";
 
-export {
-  GeoJsonGeometryType,
-  GeoJsonGeometryObject,
-  GeoJsonGeometry,
-} from "./GeoJsonGeometry";
+export type {GeoJsonGeometryType} from "./GeoJsonGeometry";
+export type {GeoJsonGeometryObject} from "./GeoJsonGeometry";
+export {GeoJsonGeometry} from "./GeoJsonGeometry";
 
 export {GeoJsonPoint} from "./GeoJsonPoint";
 
@@ -42,9 +38,7 @@ export {GeoJsonMultiPolygon} from "./GeoJsonMultiPolygon";
 
 export {GeoJsonGeometryCollection} from "./GeoJsonGeometryCollection";
 
-export {
-  GeoJsonProperties,
-  GeoJsonFeature,
-} from "./GeoJsonFeature";
+export type {GeoJsonProperties} from "./GeoJsonFeature";
+export {GeoJsonFeature} from "./GeoJsonFeature";
 
 export {GeoJsonFeatureCollection} from "./GeoJsonFeatureCollection";

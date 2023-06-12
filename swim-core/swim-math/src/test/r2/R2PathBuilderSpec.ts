@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {R2Curve, R2Spline, R2Path} from "@swim/math";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {R2Curve} from "@swim/math";
+import {R2Spline} from "@swim/math";
+import {R2Path} from "@swim/math";
 
-export class R2PathBuilderSpec extends Spec {
+export class R2PathBuilderSpec extends Suite {
   @Test
   buildLinearPaths(exam: Exam): void {
     const builder = R2Path.builder();

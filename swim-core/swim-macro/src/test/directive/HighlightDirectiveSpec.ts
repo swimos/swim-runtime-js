@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Recon} from "@swim/recon";
 import {Processor} from "@swim/macro";
 
-export class HighlightDirectiveSpec extends Spec {
+export class HighlightDirectiveSpec extends Suite {
   @Test
   processHighlightDirectives(exam: Exam): void {
     const processor = new Processor();

@@ -12,21 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  Lazy,
-  Equivalent,
-  HashCode,
-  Murmur3,
-  Numbers,
-  Constructors,
-  Interpolate,
-  Interpolator,
-} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
+import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {Equivalent} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Interpolate} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 import {R2Box} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import {AnyGeoShape, GeoShape} from "./GeoShape";
-import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
+import type {AnyGeoShape} from "./GeoShape";
+import {GeoShape} from "./GeoShape";
+import type {AnyGeoPoint} from "./GeoPoint";
+import {GeoPoint} from "./GeoPoint";
 import {GeoSegment} from "./GeoSegment";
 import {GeoTile} from "./GeoTile";
 import {GeoBoxInterpolator} from "./"; // forward import

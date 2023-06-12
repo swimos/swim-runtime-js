@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  AngleUnits,
-  AnyAngle,
-  Angle,
-} from "./Angle";
+export type {AngleUnits} from "./Angle";
+export type {AnyAngle} from "./Angle";
+export {Angle} from "./Angle";
 export {DegAngle} from "./DegAngle";
 export {RadAngle} from "./RadAngle";
 export {GradAngle} from "./GradAngle";

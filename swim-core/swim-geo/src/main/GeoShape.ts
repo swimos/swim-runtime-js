@@ -15,10 +15,16 @@
 import type {Equals} from "@swim/util";
 import type {R2Shape} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import {GeoPointInit, GeoPointTuple, GeoPoint} from "./"; // forward import
-import {GeoSegmentInit, GeoSegment} from "./"; // forward import
-import {GeoBoxInit, GeoBox} from "./"; // forward import
-import {GeoTileInit, GeoTileTuple, GeoTile} from "./"; // forward import
+import type {GeoPointInit} from "./GeoPoint";
+import type {GeoPointTuple} from "./GeoPoint";
+import {GeoPoint} from "./"; // forward import
+import type {GeoSegmentInit} from "./GeoSegment";
+import {GeoSegment} from "./"; // forward import
+import type {GeoBoxInit} from "./GeoBox";
+import {GeoBox} from "./"; // forward import
+import type {GeoTileInit} from "./GeoTile";
+import type {GeoTileTuple} from "./GeoTile";
+import {GeoTile} from "./"; // forward import
 
 /** @public */
 export type AnyGeoShape = GeoShape | GeoPointInit | GeoPointTuple | GeoSegmentInit | GeoTileInit | GeoTileTuple | GeoBoxInit;

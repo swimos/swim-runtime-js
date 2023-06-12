@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Affinity, Fastener, Component} from "@swim/component";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Affinity} from "@swim/component";
+import {Fastener} from "@swim/component";
+import {Component} from "@swim/component";
 
-export class FastenerSpec extends Spec {
+export class FastenerSpec extends Suite {
   @Test
   testFastener(exam: Exam): void {
     const fastener = Fastener.create(null);

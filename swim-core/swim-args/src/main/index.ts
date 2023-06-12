@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  AnyArg,
-  ArgInit,
-  Arg,
-} from "./Arg";
+export type {AnyArg} from "./Arg";
+export type {ArgInit} from "./Arg";
+export {Arg} from "./Arg";
 
-export {
-  AnyOpt,
-  OptInit,
-  Opt,
-} from "./Opt";
+export type {AnyOpt} from "./Opt";
+export type {OptInit} from "./Opt";
+export {Opt} from "./Opt";
 
-export {
-  ExecCmd,
-  AnyCmd,
-  CmdInit,
-  Cmd,
-} from "./Cmd";
+export type {ExecCmd} from "./Cmd";
+export type {AnyCmd} from "./Cmd";
+export type {CmdInit} from "./Cmd";
+export {Cmd} from "./Cmd";

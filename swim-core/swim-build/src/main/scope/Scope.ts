@@ -13,11 +13,20 @@
 // limitations under the License.
 
 import type {Class} from "@swim/util";
-import {OutputSettings, Output, OutputStyle, Format, Unicode} from "@swim/codec";
-import {FastenerClass, Property, Provider, Component, ComponentSet} from "@swim/component";
+import {OutputSettings} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Format} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Property} from "@swim/component";
+import {Provider} from "@swim/component";
+import {Component} from "@swim/component";
+import {ComponentSet} from "@swim/component";
 import {Workspace} from "../workspace/Workspace";
 import type {ScopeObserver} from "./ScopeObserver";
-import {TaskStatus, TaskConfig, Task} from "../"; // forward import
+import {TaskStatus} from "../"; // forward import
+import type {TaskConfig} from "../task/Task";
+import {Task} from "../"; // forward import
 import {PackageScope} from "../"; // forward import
 import {LibraryScope} from "../"; // forward import
 
@@ -34,7 +43,7 @@ export abstract class Scope extends Component<Scope> {
   @Property({valueType: String})
   readonly baseDir!: Property<this, string | undefined>;
 
-  @ComponentSet<Scope["tasks"]>({
+  @ComponentSet({
     // avoid cyclic static reference to componentType: Task
     binds: true,
     detectComponent(component: Component): Task | null {
@@ -42,7 +51,6 @@ export abstract class Scope extends Component<Scope> {
     },
   })
   readonly tasks!: ComponentSet<this, Task>;
-  static readonly tasks: FastenerClass<Scope["tasks"]>;
 
   getTask<C extends Class<Task>>(taskClass: C): InstanceType<C> | null {
     let child = this.firstChild;
@@ -80,12 +88,11 @@ export abstract class Scope extends Component<Scope> {
     }
   }
 
-  @Provider<Scope["workspace"]>({
+  @Provider({
     serviceType: Workspace,
     inherits: false,
   })
   readonly workspace!: Provider<this, Workspace>;
-  static readonly workspace: FastenerClass<Scope["workspace"]>;
 
   writeName<T>(output: Output<T>): Output<T> {
     output = OutputStyle.bold(output);

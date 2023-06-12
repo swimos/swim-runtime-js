@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import {Unicode} from "@swim/codec";
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Recon} from "@swim/recon";
 import {HtmlConverter} from "@swim/macro";
 
-export class HtmlConverterSpec extends Spec {
+export class HtmlConverterSpec extends Suite {
   @Test
   convertDoctype(exam: Exam): void {
     const converter = new HtmlConverter();

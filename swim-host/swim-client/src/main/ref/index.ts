@@ -17,4 +17,4 @@ export {WarpRef} from "./WarpRef";
 export {WarpScope} from "./WarpScope";
 
 export {WarpClient} from "./WarpClient";
-export {WarpClientObserver} from "./WarpClientObserver";
+export type {WarpClientObserver} from "./WarpClientObserver";

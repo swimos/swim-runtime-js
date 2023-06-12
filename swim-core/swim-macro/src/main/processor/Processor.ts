@@ -15,8 +15,14 @@
 import * as FS from "fs";
 import * as Path from "path";
 import * as Prism from "prismjs";
-import {Diagnostic, Input, Parser, Unicode} from "@swim/codec";
-import {Item, Value, Text, Interpreter} from "@swim/structure";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import type {Item} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Interpreter} from "@swim/structure";
 import {Recon} from "@swim/recon";
 import {ProcessorContext} from "./ProcessorContext";
 import type {Directive} from "../directive/Directive";

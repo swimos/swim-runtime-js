@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {SpecClass, Spec} from "./Spec";
-import {SpecUnit} from "./SpecUnit";
+import {UnitRunner} from "./"; // forward import
 
 /**
- * Unit test factory function that returns a child [[Spec]], or a list of child
- * specs to run. Returns `undefined` if no child specs should be run.
+ * A unit test factory function that returns one or more unit tests to run.
+ * Returns `undefined` if no unit tests should be run.
  *
  * ### Examples
  *
  * ```
- * class MySpec extends Spec {
+ * class MySuite {
  *   @Unit
- *   myUnit(): Spec {
+ *   myUnit(): MyUnit {
  *     return new MyUnit();
  *   }
  *
  *   @Unit
- *   myUnits(): Spec[] {
+ *   myUnits(): MyUnit[] {
  *     return [new MyUnit({mode: "A"}), new MyUnit({mode: "B"})];
  *   }
  * }
@@ -37,12 +36,13 @@ import {SpecUnit} from "./SpecUnit";
  *
  * @public
  */
-export type UnitFunc = () => Spec[] | Spec | undefined;
+export type UnitMethod<T = unknown> = (this: T) => Object[] | Object | undefined;
 
 /**
- * [[UnitFunc Unit test factory function]] registration options. `UnitOptions`
- * are passed to the [[Unit]] method decorator factory to modify the
- * registration of unit test factory functions with the enclosing [[Spec]].
+ * [[UnitMethod Unit test factory]] registration options. `UnitOptions` can
+ * be passed to the [[Unit]] decorator factory to modify the behavior
+ * of registered units.
+ *
  * @public
  */
 export interface UnitOptions {
@@ -53,81 +53,44 @@ export interface UnitOptions {
 }
 
 /**
- * Returns a method decorator that registers [[UnitFunc unit test factory
- * functions]] with the enclosing [[Spec]], using the given `options`.
+ * Method decorator that registers [[UnitMethod unit test factory]] methods.
  *
  * ### Examples
  *
  * ```
- * class MySpec extends Spec {
+ * class MySuite {
  *   @Unit
- *   myUnitA(): Spec {
+ *   myUnitA(): MyUnit {
  *     return new MyUnit({mode: "A"});
  *   }
- *   @Unit
- *   myUnitB(): Spec {
+ *   @Unit({pending: true})
+ *   myUnitB(): MyUnit {
  *     return new MyUnit({mode: "B"});
  *   }
  * }
  *
- * class MyUnit extends Spec {
- *   readonly options: {[key: string]: unknown};
- *   constructor(options: {[key: string]: unknown}) {
+ * class MyUnit {
+ *   readonly config: {mode: string};
+ *   constructor(config: {mode: string}) {
  *     super();
- *     this.options = options;
+ *     this.config = config;
  *   }
  *   @Test
  *   myTest(exam: Exam): void {
- *     exam.ok(this.options.mode);
+ *     exam.ok(this.config.mode);
  *   }
  * }
  * ```
  *
  * @public
  */
-export function Unit(options: UnitOptions): MethodDecorator;
-
-/**
- * Method decorator that registers a [[UnitFunc unit test factory function]]
- * with the enclosing [[Spec]].
- *
- * ### Examples
- *
- * ```
- * class MySpec extends Spec {
- *   @Unit
- *   myUnit(): Spec {
- *     return new MyUnit();
- *   }
- * }
- *
- * class MyUnit extends Spec {
- *   @Test
- *   myTest(exam: Exam): void {
- *     exam.assert(true);
- *   }
- * }
- * ```
- *
- * @public
- */
-export function Unit(target: Object, propertyKey: string, descriptor: PropertyDescriptor): void;
-
-/**
- * Class decorator that initializes a `Spec` subclass.
- * @public
- */
-export function Unit(constructor: Function): void;
-
-export function Unit(target: UnitOptions | Object | Function, propertyKey?: string,
-                     descriptor?: PropertyDescriptor): MethodDecorator | void {
+export const Unit: {
+  <T>(target: UnitMethod<T>, context: ClassMethodDecoratorContext<T, UnitMethod<T>>): void;
+  (options: UnitOptions): <T>(target: UnitMethod<T>, context: ClassMethodDecoratorContext<T, UnitMethod<T>>) => void;
+} = function <T>(target: UnitMethod<T> | UnitOptions,
+                 context?: ClassMethodDecoratorContext<T, UnitMethod<T>>): any {
   if (arguments.length === 1) {
-    if (typeof target === "function") {
-      Spec.init(target.prototype as SpecClass);
-    } else {
-      return SpecUnit.decorate.bind(SpecUnit, target as UnitOptions);
-    }
-  } else {
-    SpecUnit.decorate({}, target as SpecClass, propertyKey!, descriptor!);
+    return UnitRunner.decorate.bind(UnitRunner, target as UnitOptions);
   }
-}
+  UnitRunner.decorate({}, target as UnitMethod<T>, context!);
+};

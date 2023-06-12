@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Mapping, Domain, Range, LinearDomain} from "@swim/util";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Mapping} from "@swim/util";
+import {Domain} from "@swim/util";
+import {Range} from "@swim/util";
+import {LinearDomain} from "@swim/util";
 
-export class LinearDomainSpec extends Spec {
+export class LinearDomainSpec extends Suite {
   @Test
   testUnitDomain(exam: Exam): void {
     const domain = Domain.unit;

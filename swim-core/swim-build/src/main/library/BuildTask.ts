@@ -14,7 +14,8 @@
 
 import type {Class} from "@swim/util";
 import {TaskStatus} from "../task/Task";
-import {LibraryTaskOptions, LibraryTask} from "./LibraryTask";
+import type {LibraryTaskOptions} from "./LibraryTask";
+import {LibraryTask} from "./LibraryTask";
 import {CompileTask} from "./CompileTask";
 import {LintTask} from "./LintTask";
 import {ApiTask} from "./ApiTask";

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import {AnyDateTime, DateTime} from "../DateTime";
+import type {AnyDateTime} from "../DateTime";
+import {DateTime} from "../DateTime";
 import {FilterTimeInterval} from "../"; // forward import
 import {YearInterval} from "../"; // forward import
 import {MonthInterval} from "../"; // forward import
@@ -143,9 +144,9 @@ export abstract class TimeInterval {
   /** @internal */
   static readonly MillisPerSecond: number = 1000;
   /** @internal */
-  static readonly MillisPerMinute: number = 60 * TimeInterval.MillisPerSecond;
+  static readonly MillisPerMinute: number = 60 * this.MillisPerSecond;
   /** @internal */
-  static readonly MillisPerHour: number = 60 * TimeInterval.MillisPerMinute;
+  static readonly MillisPerHour: number = 60 * this.MillisPerMinute;
 }
 
 /** @public */

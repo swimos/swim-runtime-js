@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Arrays} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
-import {R2Curve, R2Segment, R2Spline} from "@swim/math";
+import type {Mutable} from "@swim/util";
+import {Arrays} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {R2Curve} from "@swim/math";
+import {R2Segment} from "@swim/math";
+import {R2Spline} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import {AnyGeoShape, GeoShape} from "./GeoShape";
-import {AnyGeoPoint, GeoPoint} from "./GeoPoint";
+import type {AnyGeoShape} from "./GeoShape";
+import {GeoShape} from "./GeoShape";
+import type {AnyGeoPoint} from "./GeoPoint";
+import {GeoPoint} from "./GeoPoint";
 import {GeoCurve} from "./GeoCurve";
 import {GeoSegment} from "./GeoSegment";
 import {GeoSplineBuilder} from "./"; // forward import

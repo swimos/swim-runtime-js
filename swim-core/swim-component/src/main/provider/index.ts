@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  ProviderService,
-  ProviderDescriptor,
-  ProviderTemplate,
-  ProviderClass,
-  Provider,
-} from "./Provider";
+export type {ProviderService} from "./Provider";
+export type {ProviderDecorator} from "./Provider";
+export type {ProviderDescriptor} from "./Provider";
+export type {ProviderTemplate} from "./Provider";
+export type {ProviderClass} from "./Provider";
+export {Provider} from "./Provider";

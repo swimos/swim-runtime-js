@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Input, Parser, Base10} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import {Base10} from "@swim/codec";
 import type {UriPort} from "../UriPort";
 import type {UriParser} from "./UriParser";
 

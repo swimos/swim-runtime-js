@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Record} from "@swim/structure";
 
-export class RecordMapViewImmutableSpec extends Spec {
+export class RecordMapViewImmutableSpec extends Suite {
   @Test
   testImmutableViewSet(exam: Exam): void {
     const xs = Record.of().attr("k", "v").slot("a", "b").slot("c", "d");

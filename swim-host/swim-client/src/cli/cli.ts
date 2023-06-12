@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Arg, Opt, Cmd} from "@swim/args";
+import {Arg} from "@swim/args";
+import {Opt} from "@swim/args";
+import {Cmd} from "@swim/args";
 import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
-import {AnyUri, Uri} from "@swim/uri";
-import {WarpDownlink, WarpClient} from "@swim/client";
+import type {AnyUri} from "@swim/uri";
+import {Uri} from "@swim/uri";
+import type {WarpDownlink} from "@swim/client";
+import {WarpClient} from "@swim/client";
 
 function link(hostUri: AnyUri | undefined, nodeUri: AnyUri | undefined,
               laneUri: AnyUri | undefined, format?: string): WarpDownlink {

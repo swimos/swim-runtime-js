@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Item} from "../Item";
-import {AnyValue, Value} from "../Value";
+import type {AnyValue} from "../Value";
+import {Value} from "../Value";
 import {Form} from "./Form";
 
 /** @internal */

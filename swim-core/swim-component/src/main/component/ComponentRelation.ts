@@ -12,17 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Proto, Observes} from "@swim/util";
-import {FastenerOwner, FastenerDescriptor, FastenerClass, Fastener} from "../fastener/Fastener";
-import {AnyComponent, ComponentFactory, Component} from "./Component";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import type {Observes} from "@swim/util";
+import type {FastenerOwner} from "../fastener/Fastener";
+import type {FastenerDescriptor} from "../fastener/Fastener";
+import type {FastenerClass} from "../fastener/Fastener";
+import {Fastener} from "../fastener/Fastener";
+import type {AnyComponent} from "./Component";
+import type {ComponentFactory} from "./Component";
+import {Component} from "./Component";
 
 /** @public */
 export type ComponentRelationComponent<F extends ComponentRelation<any, any>> =
   F extends {componentType?: ComponentFactory<infer C>} ? C : never;
 
 /** @public */
+export type ComponentRelationDecorator<F extends ComponentRelation<any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+};
+
+/** @public */
 export interface ComponentRelationDescriptor<C extends Component = Component> extends FastenerDescriptor {
-  extends?: Proto<ComponentRelation<any, any>> | string | boolean | null;
+  extends?: Proto<ComponentRelation<any, any>> | boolean | null;
   componentType?: ComponentFactory<any, any>;
   observes?: boolean;
   binds?: boolean;
@@ -43,15 +55,15 @@ export interface ComponentRelationClass<F extends ComponentRelation<any, any> = 
   refine(fastenerClass: ComponentRelationClass<any>): void;
 
   /** @override */
-  extend<F2 extends F>(className: string, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
-  extend<F2 extends F>(className: string, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
 
   /** @override */
-  define<F2 extends F>(className: string, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
-  define<F2 extends F>(className: string, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
 
   /** @override */
-  <F2 extends F>(template: ComponentRelationTemplate<F2>): PropertyDecorator;
+  <F2 extends F>(template: ComponentRelationTemplate<F2>): ComponentRelationDecorator<F2>;
 }
 
 /** @public */
@@ -63,7 +75,7 @@ export interface ComponentRelation<O = unknown, C extends Component = Component>
   readonly observes?: boolean; // optional prototype property
 
   /** @internal @override */
-  getSuper(): ComponentRelation<unknown, C> | null;
+  getParent(): ComponentRelation<unknown, C> | null;
 
   /** @internal @override */
   setDerived(derived: boolean, inlet: ComponentRelation<unknown, C>): void;
@@ -165,10 +177,7 @@ export interface ComponentRelation<O = unknown, C extends Component = Component>
 
 /** @public */
 export const ComponentRelation = (function (_super: typeof Fastener) {
-  const ComponentRelation = _super.extend("ComponentRelation", {
-    lazy: false,
-    static: true,
-  }) as ComponentRelationClass;
+  const ComponentRelation = _super.extend("ComponentRelation", {}) as ComponentRelationClass;
 
   Object.defineProperty(ComponentRelation.prototype, "fastenerType", {
     value: ComponentRelation,
@@ -272,8 +281,9 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
     }
     if (component === void 0 || component === null) {
       let message = "Unable to create ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "component";
       throw new Error(message);

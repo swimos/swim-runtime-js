@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import {Numbers} from "@swim/util";
-import {Debug, Format, Output} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
 import type {R2Function} from "./R2Function";
 import type {AnyR2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";
@@ -150,7 +152,7 @@ export class R2EllipticCurve extends R2Curve implements Debug {
       if (b1 > 0) {
         b1 = -2 * Math.PI + b1;
       } else if (b1 < 0) {
-        b1 = 2 * Math.PI - b1
+        b1 = 2 * Math.PI - b1;
       }
     }
     const db = b1 - b0;
@@ -194,7 +196,7 @@ export class R2EllipticCurve extends R2Curve implements Debug {
       if (b1 > 0) {
         b1 = -2 * Math.PI + b1;
       } else if (b1 < 0) {
-        b1 = 2 * Math.PI - b1
+        b1 = 2 * Math.PI - b1;
       }
     }
     const ccw = b1 < b0;

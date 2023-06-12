@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Output} from "@swim/codec";
-import {AnyUriQuery, UriQuery} from "./UriQuery";
+import type {AnyUriQuery} from "./UriQuery";
+import {UriQuery} from "./UriQuery";
 import {UriQueryBuilder} from "./"; // forward import
 
 /** @internal */

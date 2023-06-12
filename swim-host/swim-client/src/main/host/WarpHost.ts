@@ -12,25 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Class, Objects} from "@swim/util";
-import {Property, Timer, ComponentFlags, Component} from "@swim/component";
-import {AnyUri, Uri, UriCache} from "@swim/uri";
-import {AnyValue, Value} from "@swim/structure";
-import {
-  Envelope,
-  EventMessage,
-  CommandMessage,
-  LinkRequest,
-  LinkedResponse,
-  SyncRequest,
-  SyncedResponse,
-  UnlinkRequest,
-  UnlinkedResponse,
-  AuthRequest,
-  AuthedResponse,
-  DeauthRequest,
-  DeauthedResponse,
-} from "@swim/warp";
+import type {Mutable} from "@swim/util";
+import type {Class} from "@swim/util";
+import {Objects} from "@swim/util";
+import {Property} from "@swim/component";
+import {Timer} from "@swim/component";
+import type {ComponentFlags} from "@swim/component";
+import {Component} from "@swim/component";
+import type {AnyUri} from "@swim/uri";
+import {Uri} from "@swim/uri";
+import {UriCache} from "@swim/uri";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import type {Envelope} from "@swim/warp";
+import {EventMessage} from "@swim/warp";
+import {CommandMessage} from "@swim/warp";
+import {LinkRequest} from "@swim/warp";
+import {LinkedResponse} from "@swim/warp";
+import {SyncRequest} from "@swim/warp";
+import {SyncedResponse} from "@swim/warp";
+import {UnlinkRequest} from "@swim/warp";
+import {UnlinkedResponse} from "@swim/warp";
+import {AuthRequest} from "@swim/warp";
+import {AuthedResponse} from "@swim/warp";
+import {DeauthRequest} from "@swim/warp";
+import {DeauthedResponse} from "@swim/warp";
 import {WarpDownlinkModel} from "../downlink/WarpDownlinkModel";
 import type {WarpHostObserver} from "./WarpHostObserver";
 
@@ -158,7 +164,7 @@ export abstract class WarpHost extends Component {
   }
 
   /** @internal */
-  @Timer<WarpHost["reconnectTimer"]>({
+  @Timer({
     delay: 0,
     fire(): void {
       this.owner.connect();
@@ -214,7 +220,7 @@ export abstract class WarpHost extends Component {
   }
 
   /** @internal */
-  @Timer<WarpHost["idleTimer"]>({
+  @Timer({
     delay: 1000,
     fire(): void {
       if (this.owner.connected && this.owner.idle) {
@@ -231,7 +237,7 @@ export abstract class WarpHost extends Component {
     watch(): void,
   };
 
-  @Property<WarpHost["idleTimeout"]>({
+  @Property({
     valueType: Number,
     value: 1000,
     inherits: true,
@@ -242,7 +248,7 @@ export abstract class WarpHost extends Component {
   })
   readonly idleTimeout!: Property<this, number>;
 
-  @Property<WarpHost["credentials"]>({
+  @Property({
     valueType: Value,
     value: Value.absent(),
     lazy: false,
@@ -255,7 +261,7 @@ export abstract class WarpHost extends Component {
       }
     },
   })
-  readonly credentials!: Property<this, Value, AnyValue>
+  readonly credentials!: Property<this, Value, AnyValue>;
 
   get authenticated(): boolean {
     return (this.flags & WarpHost.AuthenticatedFlag) !== 0;
@@ -636,5 +642,5 @@ export abstract class WarpHost extends Component {
   /** @internal */
   static override readonly FlagShift: number = Component.FlagShift + 3;
   /** @internal */
-  static override readonly FlagMask: ComponentFlags = (1 << WarpHost.FlagShift) - 1;
+  static override readonly FlagMask: ComponentFlags = (1 << this.FlagShift) - 1;
 }

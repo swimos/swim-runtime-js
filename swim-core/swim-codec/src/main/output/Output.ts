@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, Builder} from "@swim/util";
+import {Lazy} from "@swim/util";
+import type {Builder} from "@swim/util";
 import {OutputException} from "./OutputException";
-import {AnyOutputSettings, OutputSettings} from "./OutputSettings";
+import type {AnyOutputSettings} from "./OutputSettings";
+import {OutputSettings} from "./OutputSettings";
 import {OutputFull} from "../"; // forward import
 import {OutputDone} from "../"; // forward import
 import {OutputError} from "../"; // forward import

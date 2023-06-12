@@ -12,42 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  Mutable,
-  Class,
-  Proto,
-  Equals,
-  Arrays,
-  Observes,
-  Observable,
-  Consumer,
-  Consumable,
-} from "@swim/util";
-import {
-  FastenerFlags,
-  FastenerOwner,
-  FastenerDescriptor,
-  FastenerClass,
-  Fastener,
-} from "@swim/component";
-import {AnyValue, Value} from "@swim/structure";
-import {AnyUri, Uri} from "@swim/uri";
-import type {
-  EventMessage,
-  LinkRequest,
-  LinkedResponse,
-  SyncRequest,
-  SyncedResponse,
-  UnlinkRequest,
-  UnlinkedResponse,
-} from "@swim/warp";
+import type {Mutable} from "@swim/util";
+import type {Class} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Arrays} from "@swim/util";
+import {Equals} from "@swim/util";
+import type {Observes} from "@swim/util";
+import type {Observable} from "@swim/util";
+import type {Consumer} from "@swim/util";
+import type {Consumable} from "@swim/util";
+import type {FastenerFlags} from "@swim/component";
+import type {FastenerOwner} from "@swim/component";
+import type {FastenerDescriptor} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
+import {Fastener} from "@swim/component";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import type {AnyUri} from "@swim/uri";
+import {Uri} from "@swim/uri";
+import type {EventMessage} from "@swim/warp";
+import type {LinkRequest} from "@swim/warp";
+import type {LinkedResponse} from "@swim/warp";
+import type {SyncRequest} from "@swim/warp";
+import type {SyncedResponse} from "@swim/warp";
+import type {UnlinkRequest} from "@swim/warp";
+import type {UnlinkedResponse} from "@swim/warp";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkModel} from "./WarpDownlinkModel";
 import type {WarpDownlinkObserver} from "./WarpDownlinkObserver";
 
 /** @public */
+export type WarpDownlinkDecorator<P extends WarpDownlink<any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
+};
+
+/** @public */
 export interface WarpDownlinkDescriptor extends FastenerDescriptor {
-  extends?: Proto<WarpDownlink<any>> | string | boolean | null;
+  extends?: Proto<WarpDownlink<any>> | boolean | null;
   consumed?: boolean;
   hostUri?: AnyUri | null;
   nodeUri?: AnyUri | null;
@@ -74,15 +75,15 @@ export interface WarpDownlinkClass<D extends WarpDownlink<any> = WarpDownlink<an
   refine(downlinkClass: WarpDownlinkClass<any>): void;
 
   /** @override */
-  extend<D2 extends D>(className: string, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
-  extend<D2 extends D>(className: string, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
+  extend<D2 extends D>(className: string | symbol, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
 
   /** @override */
-  define<D2 extends D>(className: string, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
-  define<D2 extends D>(className: string, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
+  define<D2 extends D>(className: string | symbol, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
 
   /** @override */
-  <D2 extends D>(template: WarpDownlinkTemplate<D2>): PropertyDecorator;
+  <D2 extends D>(template: WarpDownlinkTemplate<D2>): WarpDownlinkDecorator<D2>;
 
   /** @internal */
   readonly RelinksFlag: FastenerFlags;
@@ -371,7 +372,6 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 export const WarpDownlink = (function (_super: typeof Fastener) {
   const WarpDownlink = _super.extend("WarpDownlink", {
     lazy: false,
-    static: true,
   }) as WarpDownlinkClass;
 
   Object.defineProperty(WarpDownlink.prototype, "fastenerType", {
@@ -919,7 +919,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       return (this.flags & WarpDownlink.ConsumingFlag) !== 0;
     },
     configurable: true,
-  })
+  });
 
   WarpDownlink.prototype.startConsuming = function (this: WarpDownlink): void {
     if ((this.flags & WarpDownlink.ConsumingFlag) === 0) {

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import {Output, Format} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Format} from "@swim/codec";
 import {UriPath} from "./UriPath";
 
 /** @internal */

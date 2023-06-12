@@ -13,9 +13,11 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import {AnyConstraintExpression, ConstraintExpression} from "./ConstraintExpression";
+import type {AnyConstraintExpression} from "./ConstraintExpression";
+import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintRelation} from "./ConstraintRelation";
-import {AnyConstraintStrength, ConstraintStrength} from "./ConstraintStrength";
+import type {AnyConstraintStrength} from "./ConstraintStrength";
+import {ConstraintStrength} from "./ConstraintStrength";
 import {Constraint} from "./Constraint";
 import type {ConstraintScope} from "./ConstraintScope";
 

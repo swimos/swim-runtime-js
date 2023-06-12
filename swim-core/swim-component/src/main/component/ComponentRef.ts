@@ -12,19 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable, Proto} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Affinity} from "../fastener/Affinity";
-import {FastenerOwner, Fastener} from "../fastener/Fastener";
-import type {AnyComponent, ComponentFactory, Component} from "./Component";
-import {ComponentRelationDescriptor, ComponentRelationClass, ComponentRelation} from "./ComponentRelation";
+import {type FastenerOwner} from "../fastener/Fastener";
+import {Fastener} from "../fastener/Fastener";
+import type {AnyComponent} from "./Component";
+import type {ComponentFactory} from "./Component";
+import type {Component} from "./Component";
+import type {ComponentRelationDescriptor} from "./ComponentRelation";
+import type {ComponentRelationClass} from "./ComponentRelation";
+import {ComponentRelation} from "./ComponentRelation";
 
 /** @public */
 export type ComponentRefComponent<F extends ComponentRef<any, any>> =
   F extends {componentType?: ComponentFactory<infer C>} ? C : never;
 
 /** @public */
+export type ComponentRefDecorator<F extends ComponentRef<any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+};
+
+/** @public */
 export interface ComponentRefDescriptor<C extends Component = Component> extends ComponentRelationDescriptor<C> {
-  extends?: Proto<ComponentRef<any, any>> | string | boolean | null;
+  extends?: Proto<ComponentRef<any, any>> | boolean | null;
   componentKey?: string | boolean;
 }
 
@@ -43,15 +54,15 @@ export interface ComponentRefClass<F extends ComponentRef<any, any> = ComponentR
   refine(fastenerClass: ComponentRefClass<any>): void;
 
   /** @override */
-  extend<F2 extends F>(className: string, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
-  extend<F2 extends F>(className: string, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
+  extend<F2 extends F>(className: string | symbol, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
 
   /** @override */
-  define<F2 extends F>(className: string, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
-  define<F2 extends F>(className: string, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
 
   /** @override */
-  <F2 extends F>(template: ComponentRefTemplate<F2>): PropertyDecorator;
+  <F2 extends F>(template: ComponentRefTemplate<F2>): ComponentRefDecorator<F2>;
 }
 
 /** @public */
@@ -63,7 +74,7 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
   get fastenerType(): Proto<ComponentRef<any, any>>;
 
   /** @internal @override */
-  getSuper(): ComponentRef<unknown, C> | null;
+  getParent(): ComponentRef<unknown, C> | null;
 
   /** @internal @override */
   setDerived(derived: boolean, inlet: ComponentRef<unknown, C>): void;
@@ -188,8 +199,9 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     const inletComponent = this.inletComponent;
     if (inletComponent === void 0 || inletComponent === null) {
       let message = inletComponent + " ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "inlet component";
       throw new TypeError(message);
@@ -201,8 +213,9 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     const component = this.component;
     if (component === null) {
       let message = component + " ";
-      if (this.name.length !== 0) {
-        message += this.name + " ";
+      const name = this.name.toString();
+      if (name.length !== 0) {
+        message += name + " ";
       }
       message += "component";
       throw new TypeError(message);
@@ -335,7 +348,9 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
           this.onDetachComponent(oldComponent);
           this.deinitComponent(oldComponent);
           this.didDetachComponent(oldComponent);
-          oldComponent.remove();
+          if (this.binds && parent !== null && oldComponent.parent === parent) {
+            oldComponent.remove();
+          }
         }
         (this as Mutable<typeof this>).component = newComponent;
         this.willAttachComponent(newComponent, target);

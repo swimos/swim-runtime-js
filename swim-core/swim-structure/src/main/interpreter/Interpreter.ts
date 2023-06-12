@@ -15,7 +15,8 @@
 import type {Mutable} from "@swim/util";
 import {InterpreterException} from "./InterpreterException";
 import {InterpreterSettings} from "./InterpreterSettings";
-import {AnyItem, Item} from "../Item";
+import type {AnyItem} from "../Item";
+import {Item} from "../Item";
 import type {Operator} from "../operator/Operator";
 import type {Selector} from "../selector/Selector";
 

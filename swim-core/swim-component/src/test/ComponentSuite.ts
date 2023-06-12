@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {FastenerSpec} from "./FastenerSpec";
 import {PropertySpec} from "./PropertySpec";
 import {AnimatorSpec} from "./AnimatorSpec";
 import {ProviderSpec} from "./ProviderSpec";
 
-@Unit
-export class ComponentSuite extends Spec {
+export class ComponentSuite extends Suite {
   @Unit
-  fastenerSpec(): Spec {
+  fastenerSpec(): Suite {
     return new FastenerSpec();
   }
 
   @Unit
-  propertySpec(): Spec {
+  propertySpec(): Suite {
     return new PropertySpec();
   }
 
   @Unit
-  animatorSpec(): Spec {
+  animatorSpec(): Suite {
     return new AnimatorSpec();
   }
 
   @Unit
-  providerSpec(): Spec {
+  providerSpec(): Suite {
     return new ProviderSpec();
   }
 }

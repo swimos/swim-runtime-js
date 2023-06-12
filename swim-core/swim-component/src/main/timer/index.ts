@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  TimerDescriptor,
-  TimerTemplate,
-  TimerClass,
-  Timer,
-} from "./Timer";
+export type {TimerDecorator} from "./Timer";
+export type {TimerDescriptor} from "./Timer";
+export type {TimerTemplate} from "./Timer";
+export type {TimerClass} from "./Timer";
+export {Timer} from "./Timer";

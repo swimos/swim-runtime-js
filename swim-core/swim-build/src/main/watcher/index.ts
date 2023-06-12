@@ -13,4 +13,4 @@
 // limitations under the License.
 
 export {WatcherScope} from "./WatcherScope";
-export {WatcherScopeObserver} from "./WatcherScopeObserver";
+export type {WatcherScopeObserver} from "./WatcherScopeObserver";

@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Class, Creatable} from "@swim/util";
+import type {Class} from "@swim/util";
+import type {Creatable} from "@swim/util";
 import {Component} from "../component/Component";
 import type {ServiceObserver} from "./ServiceObserver";
 
@@ -215,9 +216,9 @@ export class Service extends Component<Service> {
         configurable: true,
       });
       if (this.prototype instanceof Service) {
-        const superClass = Object.getPrototypeOf(this) as typeof Service;
-        const superService = superClass.global();
-        superService.appendChild(service as Service);
+        const serviceClass = Object.getPrototypeOf(this) as typeof Service;
+        const rootService = serviceClass.global();
+        rootService.appendChild(service as Service);
       } else { // mount root service
         (service as Service).mount();
       }

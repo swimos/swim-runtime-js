@@ -15,7 +15,8 @@
 import * as ChildProcess from "child_process";
 import type {Class} from "@swim/util";
 import {TaskStatus} from "../task/Task";
-import {PackageTaskOptions, PackageTask} from "./PackageTask";
+import type {PackageTaskOptions} from "./PackageTask";
+import {PackageTask} from "./PackageTask";
 
 /** @public */
 export interface PublishTaskOptions extends PackageTaskOptions {

@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyDateTime, DateTime} from "./DateTime";
-import {Item, Value, Text, Form} from "@swim/structure";
+import type {AnyDateTime} from "./DateTime";
+import {DateTime} from "./DateTime";
+import type {Item} from "@swim/structure";
+import type {Value} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Form} from "@swim/structure";
 
 /** @internal */
 export class DateTimeForm extends Form<DateTime, AnyDateTime> {

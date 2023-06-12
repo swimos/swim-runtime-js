@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
-import {Attr, Slot, Record, Num, Text, Form} from "@swim/structure";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
+import {Attr} from "@swim/structure";
+import {Slot} from "@swim/structure";
+import {Record} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Form} from "@swim/structure";
 
-export class NumberFormSpec extends Spec {
+export class NumberFormSpec extends Suite {
   @Test
   moldDoublesToNums(exam: Exam): void {
     exam.equal(Form.forNumber().mold(2.5), Num.from(2.5));

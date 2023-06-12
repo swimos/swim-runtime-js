@@ -12,15 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Arrays, Values} from "@swim/util";
-import {Input, ParserException, Parser, Unicode, Utf8, Binary} from "@swim/codec";
-import {TestException, TestOptions, Spec, Proof, Report, Exam} from "@swim/unit";
-import type {Item, Value} from "@swim/structure";
+import {Arrays} from "@swim/util";
+import {Values} from "@swim/util";
+import {Input} from "@swim/codec";
+import {ParserException} from "@swim/codec";
+import type {Parser} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Utf8} from "@swim/codec";
+import {Binary} from "@swim/codec";
+import {TestException} from "@swim/unit";
+import {Proof} from "@swim/unit";
+import {Exam} from "@swim/unit";
+import type {TestOptions} from "@swim/unit";
+import type {Suite} from "@swim/unit";
+import type {Report} from "@swim/unit";
+import type {Item} from "@swim/structure";
+import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
 
 export class ReconExam extends Exam {
-  constructor(report: Report, spec: Spec, name: string, options: TestOptions) {
-    super(report, spec, name, options);
+  constructor(report: Report, suite: Suite, name: string, options: TestOptions) {
+    super(report, suite, name, options);
   }
 
   parsed<O>(actual: O, expected: O, a: string, b: string, part: number): void {
@@ -28,7 +40,7 @@ export class ReconExam extends Exam {
       const message = Unicode.stringOutput();
       message.write("when parsing part ").debug(part)
           .write(" of ").debug(a).write(", ").debug(b);
-      this.proove(Proof.refuted(actual, "parsed", expected, message.bind()));
+      this.prove(Proof.refuted(actual, "parsed", expected, message.bind()));
       throw new TestException(message.bind());
     }
   }
@@ -37,7 +49,7 @@ export class ReconExam extends Exam {
     const message = Unicode.stringOutput();
     message.write("failed to parse part ").debug(part)
         .write(" of ").debug(a).write(", ").debug(b).write(": ").write(cause.toString());
-    this.proove(Proof.error(cause, message.bind()));
+    this.prove(Proof.error(cause, message.bind()));
     throw new TestException(message.bind());
   }
 
@@ -76,11 +88,11 @@ export class ReconExam extends Exam {
         } else {
           const message = Unicode.stringOutput();
           message.write("failed to completely parse ").debug(a).write(", ").debug(b);
-          this.proove(Proof.invalid("parses", message.bind()));
+          this.prove(Proof.invalid("parses", message.bind()));
           throw new TestException(message.bind());
         }
       }
-      this.proove(Proof.valid("parses"));
+      this.prove(Proof.valid("parses"));
     }
   }
 
@@ -110,18 +122,18 @@ export class ReconExam extends Exam {
       writer = writer.pull(Utf8.decodedOutput(buffer).asPart(false));
       if (writer.isDone()) {
         if (!Arrays.equal(actual, expected)) {
-          this.proove(Proof.refuted(actual, "writes", expected));
+          this.prove(Proof.refuted(actual, "writes", expected));
           throw new TestException();
         }
       } else if (writer.isError()) {
-        this.proove(Proof.error(writer.trap()));
+        this.prove(Proof.error(writer.trap()));
         throw new TestException();
       } else {
-        this.proove(Proof.invalid("writes"));
+        this.prove(Proof.invalid("writes"));
         throw new TestException();
       }
     }
-    this.proove(Proof.valid("writes"));
+    this.prove(Proof.valid("writes"));
   }
 
   writesBlock(item: Item, expected: Uint8Array | string): void {
@@ -144,16 +156,16 @@ export class ReconExam extends Exam {
       writer = writer.pull(Utf8.decodedOutput(buffer).asPart(false));
       if (writer.isDone()) {
         if (!Arrays.equal(actual, expected)) {
-          this.proove(Proof.refuted(actual, "writes", expected));
+          this.prove(Proof.refuted(actual, "writes", expected));
           throw new TestException();
         }
       } else if (writer.isError()) {
-        this.proove(Proof.error(writer.trap()));
+        this.prove(Proof.error(writer.trap()));
       } else {
-        this.proove(Proof.invalid("writes"));
+        this.prove(Proof.invalid("writes"));
         throw new TestException();
       }
     }
-    this.proove(Proof.valid("writes"));
+    this.prove(Proof.valid("writes"));
   }
 }

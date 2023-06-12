@@ -13,10 +13,15 @@
 // limitations under the License.
 
 import * as ws from "ws";
-import {Class, Lazy} from "@swim/util";
-import {Affinity, Property, Component} from "@swim/component";
-import {AnyValue, Value} from "@swim/structure";
-import {AnyUri, Uri} from "@swim/uri";
+import {Lazy} from "@swim/util";
+import type {Class} from "@swim/util";
+import {Affinity} from "@swim/component";
+import {Property} from "@swim/component";
+import type {Component} from "@swim/component";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import type {AnyUri} from "@swim/uri";
+import {Uri} from "@swim/uri";
 import webworker from "@swim/client/webworker";
 import type {WarpDownlinkModel} from "../downlink/WarpDownlinkModel";
 import {WarpHost} from "../host/WarpHost";
@@ -159,7 +164,7 @@ export class WarpClient extends WarpScope {
   @Property({valueType: Number, value: 0})
   readonly unlinkDelay!: Property<this, number>;
 
-  @Property<WarpClient["wsConstructor"]>({
+  @Property({
     value: typeof WebSocket !== "undefined" ? WebSocket : ws.WebSocket as typeof WebSocket,
     equalValues(newValue: typeof WebSocket, oldValue: typeof WebSocket): boolean {
       return newValue === oldValue;
@@ -170,15 +175,14 @@ export class WarpClient extends WarpScope {
   @Property({})
   readonly wsProtocols!: Property<this, string[] | string | undefined>;
 
-  @Property<WarpClient["workerUrl"]>({
+  @Property({
     valueType: String,
     initValue(): string | undefined {
-      if (webworker !== void 0 && typeof Blob !== "undefined") {
-        const webworkerBlob = new Blob([webworker], {type: "text/javascript"});
-        return URL.createObjectURL(webworkerBlob);
-      } else {
+      if (webworker === void 0 || typeof Blob === "undefined") {
         return void 0;
       }
+      const webworkerBlob = new Blob([webworker], {type: "text/javascript"});
+      return URL.createObjectURL(webworkerBlob);
     },
   })
   readonly workerUrl!: Property<this, string | undefined>;
@@ -232,17 +236,17 @@ export class WarpClient extends WarpScope {
     host.unobserve(this);
   }
 
-  @Property<WarpClient["warpRef"]>({
-    extends: WarpScope.getFastenerClass("warpRef"),
+  @Property({
+    extends: true,
     inherits: false,
     initValue(): WarpRef {
       return this.owner;
     },
   })
-  override readonly warpRef!: Property<this, WarpRef> & WarpScope["warpRef"];
+  override readonly warpRef!: Property<this, WarpRef>;
 
-  @Property<WarpClient["online"]>({
-    extends: WarpScope.getFastenerClass("online"),
+  @Property({
+    extends: true,
     inherits: false,
     initValue(): boolean {
       return typeof navigator === "object" ? navigator.onLine : true;

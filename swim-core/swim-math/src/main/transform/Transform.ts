@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, HashCode, Equivalent, Interpolate, Interpolator} from "@swim/util";
-import {Output, Parser, Debug, Diagnostic, Unicode} from "@swim/codec";
-import type {Value, Form} from "@swim/structure";
-import {AnyLength, Length} from "../length/Length";
+import {Lazy} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Equivalent} from "@swim/util";
+import type {Interpolate} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import type {Value} from "@swim/structure";
+import type {Form} from "@swim/structure";
+import type {AnyLength} from "../length/Length";
+import {Length} from "../length/Length";
 import {PxLength} from "../length/PxLength";
-import {AnyAngle, Angle} from "../angle/Angle";
+import type {AnyAngle} from "../angle/Angle";
+import {Angle} from "../angle/Angle";
 import {DegAngle} from "../angle/DegAngle";
 import type {R2Operator} from "../r2/R2Operator";
 import type {R2Point} from "../r2/R2Point";

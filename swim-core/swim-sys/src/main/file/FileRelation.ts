@@ -14,22 +14,27 @@
 
 import * as Path from "path";
 import * as FS from "fs";
-import {Mutable, Proto, Equals} from "@swim/util";
-import {
-  FastenerFlags,
-  FastenerOwner,
-  FastenerDescriptor,
-  FastenerClass,
-  Fastener,
-} from "@swim/component";
+import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Equals} from "@swim/util";
+import type {FastenerFlags} from "@swim/component";
+import type {FastenerOwner} from "@swim/component";
+import type {FastenerDescriptor} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
+import {Fastener} from "@swim/component";
 
 /** @public */
 export type FileRelationValue<F extends FileRelation<any, any>> =
   F extends FileRelation<any, infer T> ? T : never;
 
 /** @public */
+export type FileRelationDecorator<F extends FileRelation<any, any>> = {
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+};
+
+/** @public */
 export interface FileRelationDescriptor<T = unknown> extends FastenerDescriptor {
-  extends?: Proto<FileRelation<any, any>> | string | boolean | null;
+  extends?: Proto<FileRelation<any, any>> | boolean | null;
   baseDir?: string;
   resolves?: boolean;
 }
@@ -57,7 +62,7 @@ export interface FileRelationClass<F extends FileRelation<any, any> = FileRelati
   define<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
 
   /** @override */
-  <F2 extends F>(template: FileRelationTemplate<F2>): PropertyDecorator;
+  <F2 extends F>(template: FileRelationTemplate<F2>): FileRelationDecorator<F2>;
 
   /** @internal */
   readonly ResolvesFlag: FastenerFlags;
@@ -124,10 +129,7 @@ export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
 
 /** @public */
 export const FileRelation = (function (_super: typeof Fastener) {
-  const FileRelation = _super.extend("FileRelation", {
-    lazy: false,
-    static: true,
-  }) as FileRelationClass;
+  const FileRelation = _super.extend("FileRelation", {}) as FileRelationClass;
 
   Object.defineProperty(FileRelation.prototype, "fastenerType", {
     value: FileRelation,

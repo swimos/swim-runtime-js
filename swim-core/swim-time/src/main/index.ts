@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  AnyTimeZone,
-  TimeZone,
-} from "./TimeZone";
+export type {AnyTimeZone} from "./TimeZone";
+export {TimeZone} from "./TimeZone";
 export {TimeZoneForm} from "./TimeZoneForm";
 
-export {
-  AnyDateTime,
-  DateTimeInit,
-  DateTime,
-} from "./DateTime";
+export type {AnyDateTime} from "./DateTime";
+export type {DateTimeInit} from "./DateTime";
+export {DateTime} from "./DateTime";
 export {DateTimeInterpolator} from "./DateTimeInterpolator";
 export {DateTimeForm} from "./DateTimeForm";
 export {DateTimeParser} from "./DateTimeParser";

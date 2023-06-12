@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {
-  LibraryTaskOptions,
-  LibraryTask,
-} from "./LibraryTask";
+export type {LibraryTaskOptions} from "./LibraryTask";
+export {LibraryTask} from "./LibraryTask";
 
 export {CompileTask} from "./CompileTask";
 
-export {LintTask} from "./LintTask"
+export {LintTask} from "./LintTask";
 
 export {ApiTask} from "./ApiTask";
 
 export {BundleTask} from "./BundleTask";
 
-export {
-  BuildTaskOptions,
-  BuildTask,
-} from "./BuildTask";
+export type {BuildTaskOptions} from "./BuildTask";
+export {BuildTask} from "./BuildTask";
 
 export {WatchTask} from "./WatchTask";
-export {WatchTaskObserver} from "./WatchTaskObserver";
+export type {WatchTaskObserver} from "./WatchTaskObserver";
 
 export {LibraryScope} from "./LibraryScope";
-export {LibraryScopeObserver} from "./LibraryScopeObserver";
+export type {LibraryScopeObserver} from "./LibraryScopeObserver";

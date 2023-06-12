@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Input, Parser, Diagnostic, Unicode} from "@swim/codec";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import type {R2Spline} from "./R2Spline";
 import {R2SplineParser} from "./R2SplineParser";
 import {R2Path} from "./R2Path";

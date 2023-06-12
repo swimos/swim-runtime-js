@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Item, Text, Num, Form} from "@swim/structure";
-import {AnyTimeZone, TimeZone} from "./TimeZone";
+import type {Item} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Form} from "@swim/structure";
+import type {AnyTimeZone} from "./TimeZone";
+import {TimeZone} from "./TimeZone";
 
 /** @internal */
 export class TimeZoneForm extends Form<TimeZone, AnyTimeZone> {

@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Output, Parser, Writer, Unicode, Utf8} from "@swim/codec";
-import {Item, Value, Data} from "@swim/structure";
+import {Output} from "@swim/codec";
+import type {Parser} from "@swim/codec";
+import type {Writer} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Utf8} from "@swim/codec";
+import {Item} from "@swim/structure";
+import {Value} from "@swim/structure";
+import {Data} from "@swim/structure";
 import type {ReconParser} from "./parser/ReconParser";
 import {ReconStructureParser} from "./"; // forward import
 import type {ReconWriter} from "./writer/ReconWriter";

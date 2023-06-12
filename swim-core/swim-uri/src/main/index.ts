@@ -14,65 +14,47 @@
 
 export {UriException} from "./UriException";
 
-export {
-  AnyUri,
-  UriInit,
-  Uri,
-} from "./Uri";
+export type {AnyUri} from "./Uri";
+export type {UriInit} from "./Uri";
+export {Uri} from "./Uri";
 
-export {
-  AnyUriScheme,
-  UriScheme,
-} from "./UriScheme";
+export type {AnyUriScheme} from "./UriScheme";
+export {UriScheme} from "./UriScheme";
 
-export {
-  AnyUriAuthority,
-  UriAuthorityInit,
-  UriAuthority,
-} from "./UriAuthority";
+export type {AnyUriAuthority} from "./UriAuthority";
+export type {UriAuthorityInit} from "./UriAuthority";
+export {UriAuthority} from "./UriAuthority";
 
-export {
-  AnyUriUser,
-  UriUserInit,
-  UriUser,
-} from "./UriUser";
+export type {AnyUriUser} from "./UriUser";
+export type {UriUserInit} from "./UriUser";
+export {UriUser} from "./UriUser";
 
-export {
-  AnyUriHost,
-  UriHost,
-} from "./UriHost";
+export type {AnyUriHost} from "./UriHost";
+export {UriHost} from "./UriHost";
 export {UriHostName} from "./UriHostName";
 export {UriHostIPv4} from "./UriHostIPv4";
 export {UriHostIPv6} from "./UriHostIPv6";
 export {UriHostUndefined} from "./UriHostUndefined";
 
-export {
-  AnyUriPort,
-  UriPort,
-} from "./UriPort";
+export type {AnyUriPort} from "./UriPort";
+export {UriPort} from "./UriPort";
 
-export {
-  AnyUriPath,
-  UriPath,
-} from "./UriPath";
+export type {AnyUriPath} from "./UriPath";
+export {UriPath} from "./UriPath";
 export {UriPathSegment} from "./UriPathSegment";
 export {UriPathSlash} from "./UriPathSlash";
 export {UriPathEmpty} from "./UriPathEmpty";
 export {UriPathBuilder} from "./UriPathBuilder";
 export {UriPathForm} from "./UriPathForm";
 
-export {
-  AnyUriQuery,
-  UriQuery,
-} from "./UriQuery";
+export type {AnyUriQuery} from "./UriQuery";
+export {UriQuery} from "./UriQuery";
 export {UriQueryParam} from "./UriQueryParam";
 export {UriQueryUndefined} from "./UriQueryUndefined";
 export {UriQueryBuilder} from "./UriQueryBuilder";
 
-export {
-  AnyUriFragment,
-  UriFragment,
-} from "./UriFragment";
+export type {AnyUriFragment} from "./UriFragment";
+export {UriFragment} from "./UriFragment";
 
 export {UriForm} from "./UriForm";
 

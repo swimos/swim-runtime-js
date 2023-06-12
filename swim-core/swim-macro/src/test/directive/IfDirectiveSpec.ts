@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Test, Exam} from "@swim/unit";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
 import {Processor} from "@swim/macro";
 
-export class IfDirectiveSpec extends Spec {
+export class IfDirectiveSpec extends Suite {
   @Test
   processTruthyIfDirectives(exam: Exam): void {
     const processor = new Processor();

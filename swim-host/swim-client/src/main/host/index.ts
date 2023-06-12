@@ -13,7 +13,7 @@
 // limitations under the License.
 
 export {WarpHost} from "./WarpHost";
-export {WarpHostObserver} from "./WarpHostObserver";
+export type {WarpHostObserver} from "./WarpHostObserver";
 
 export {WarpSocketHost} from "./WarpSocketHost";
 

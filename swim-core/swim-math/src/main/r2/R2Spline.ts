@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Arrays} from "@swim/util";
-import {
-  Debug,
-  Format,
-  AnyOutputSettings,
-  Output,
-  Parser,
-  Diagnostic,
-  Unicode,
-} from "@swim/codec";
+import type {Mutable} from "@swim/util";
+import {Arrays} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {AnyOutputSettings} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import type {R2Function} from "./R2Function";
 import type {AnyR2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";

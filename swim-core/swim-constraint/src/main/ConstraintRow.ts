@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Mutable} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Equivalent} from "@swim/util";
 import type {ConstraintMap} from "./ConstraintMap";
-import {ConstraintSymbol, ConstraintDummy} from "./ConstraintSymbol";
+import type {ConstraintSymbol} from "./ConstraintSymbol";
+import {ConstraintDummy} from "./ConstraintSymbol";
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @internal */

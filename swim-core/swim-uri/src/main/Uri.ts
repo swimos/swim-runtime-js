@@ -12,20 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy, HashCode, Compare, Mutable, Strings} from "@swim/util";
-import {Output, Format, Debug, Display, Base16} from "@swim/codec";
+import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Strings} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Compare} from "@swim/util";
+import {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import type {Display} from "@swim/codec";
+import {Format} from "@swim/codec";
+import {Base16} from "@swim/codec";
 import type {Form} from "@swim/structure";
 import {UriException} from "./UriException";
-import {AnyUriScheme, UriScheme} from "./"; // forward import
-import {AnyUriAuthority, UriAuthorityInit, UriAuthority} from "./"; // forward import
-import type {AnyUriUser, UriUser} from "./UriUser";
-import type {AnyUriHost, UriHost} from "./UriHost";
-import type {AnyUriPort, UriPort} from "./UriPort";
-import {AnyUriPath, UriPath} from "./"; // forward import
+import type {AnyUriScheme} from "./UriScheme";
+import {UriScheme} from "./"; // forward import
+import type {AnyUriAuthority} from "./UriAuthority";
+import type {UriAuthorityInit} from "./UriAuthority";
+import {UriAuthority} from "./"; // forward import
+import type {AnyUriUser} from "./UriUser";
+import type {UriUser} from "./UriUser";
+import type {AnyUriHost} from "./UriHost";
+import type {UriHost} from "./UriHost";
+import type {AnyUriPort} from "./UriPort";
+import type {UriPort} from "./UriPort";
+import type {AnyUriPath} from "./UriPath";
+import {UriPath} from "./"; // forward import
 import {UriPathBuilder} from "./"; // forward import
-import {AnyUriQuery, UriQuery} from "./"; // forward import
+import type {AnyUriQuery} from "./UriQuery";
+import {UriQuery} from "./"; // forward import
 import {UriQueryBuilder} from "./"; // forward import
-import {AnyUriFragment, UriFragment} from "./"; // forward import
+import type {AnyUriFragment} from "./UriFragment";
+import {UriFragment} from "./"; // forward import
 import {UriForm} from "./"; // forward import
 import {UriParser} from "./"; // forward import
 

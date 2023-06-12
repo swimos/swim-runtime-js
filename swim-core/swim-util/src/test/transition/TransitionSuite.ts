@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Spec, Unit} from "@swim/unit";
+import {Unit} from "@swim/unit";
+import {Suite} from "@swim/unit";
 import {TimingSpec} from "./TimingSpec";
 import {EasingSpec} from "./EasingSpec";
 import {TweeningSpec} from "./TweeningSpec";
 
-@Unit
-export class TransitionSuite extends Spec {
+export class TransitionSuite extends Suite {
   @Unit
-  timingSpec(): Spec {
+  timingSpec(): Suite {
     return new TimingSpec();
   }
 
   @Unit
-  easingSpec(): Spec {
+  easingSpec(): Suite {
     return new EasingSpec();
   }
 
   @Unit
-  tweeningSpec(): Spec {
+  tweeningSpec(): Suite {
     return new TweeningSpec();
   }
 }

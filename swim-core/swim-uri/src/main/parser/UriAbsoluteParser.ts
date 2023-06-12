@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Input, Parser, Diagnostic} from "@swim/codec";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import {Uri} from "../Uri";
 import type {UriScheme} from "../UriScheme";
 import type {UriAuthority} from "../UriAuthority";

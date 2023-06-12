@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {AnyValue, Value} from "@swim/structure";
-import {AnyUri, Uri} from "@swim/uri";
-import {
-  Message,
-  Signal,
-  OpenSignal,
-  OpenedSignal,
-  CloseSignal,
-  ClosedSignal,
-  Envelope,
-} from "@swim/warp";
+import type {AnyValue} from "@swim/structure";
+import {Value} from "@swim/structure";
+import type {AnyUri} from "@swim/uri";
+import {Uri} from "@swim/uri";
+import {Message} from "@swim/warp";
+import {Signal} from "@swim/warp";
+import {OpenSignal} from "@swim/warp";
+import {OpenedSignal} from "@swim/warp";
+import {CloseSignal} from "@swim/warp";
+import {ClosedSignal} from "@swim/warp";
+import {Envelope} from "@swim/warp";
 import {WarpSocketHostWorker} from "./WarpSocketHostWorker";
 
 /** @internal */

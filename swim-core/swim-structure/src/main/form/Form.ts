@@ -13,8 +13,10 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import {AnyItem, Item} from "../Item";
-import {AnyValue, Value} from "../Value";
+import type {AnyItem} from "../Item";
+import {Item} from "../Item";
+import type {AnyValue} from "../Value";
+import {Value} from "../Value";
 import {TagForm} from "../"; // forward import
 import {UnitForm} from "../"; // forward import
 import {StringForm} from "../"; // forward import

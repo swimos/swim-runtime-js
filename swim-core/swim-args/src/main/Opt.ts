@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Equals, Arrays} from "@swim/util";
-import {Output, Debug, Format} from "@swim/codec";
-import {AnyArg, Arg} from "./Arg";
+import type {Mutable} from "@swim/util";
+import type {Equals} from "@swim/util";
+import {Arrays} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {AnyArg} from "./Arg";
+import {Arg} from "./Arg";
 
 /** @public */
 export type AnyOpt = Opt | OptInit | string;

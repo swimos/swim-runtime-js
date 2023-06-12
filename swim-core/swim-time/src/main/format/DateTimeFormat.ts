@@ -13,8 +13,15 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import {Input, Output, Parser, Diagnostic, Unicode, Base10} from "@swim/codec";
-import {AnyDateTime, DateTimeInit, DateTime} from "../DateTime";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
+import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Base10} from "@swim/codec";
+import type {AnyDateTime} from "../DateTime";
+import type {DateTimeInit} from "../DateTime";
+import {DateTime} from "../DateTime";
 import {DateTimeParser} from "../DateTimeParser";
 import {DateTimeLocale} from "./DateTimeLocale";
 import {DateTimeSpecifiers} from "./DateTimeSpecifiers";

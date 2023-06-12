@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Equivalent, Lazy, Numbers, Interpolator, HashGenCacheSet} from "@swim/util";
-import {Output, Format} from "@swim/codec";
-import {AnyItem, Item} from "./Item";
-import {AnyValue, Value} from "./Value";
+import {Lazy} from "@swim/util";
+import {Equivalent} from "@swim/util";
+import {Numbers} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import {HashGenCacheSet} from "@swim/util";
+import type {Output} from "@swim/codec";
+import {Format} from "@swim/codec";
+import type {AnyItem} from "./Item";
+import {Item} from "./Item";
+import type {AnyValue} from "./Value";
+import {Value} from "./Value";
 import {NumInterpolator} from "./"; // forward import
 
 /** @public */

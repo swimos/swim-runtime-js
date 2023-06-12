@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Equivalent, Equals} from "@swim/util";
+import type {Equals} from "@swim/util";
+import type {Equivalent} from "@swim/util";
 import type {R2Curve} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {GeoShape} from "./GeoShape";

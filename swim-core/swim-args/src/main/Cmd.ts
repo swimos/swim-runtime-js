@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Mutable, Equals, Arrays} from "@swim/util";
-import {Output, Debug, Format, Unicode} from "@swim/codec";
-import {AnyOpt, Opt} from "./Opt";
-import {AnyArg, Arg} from "./Arg";
+import type {Mutable} from "@swim/util";
+import {Equals} from "@swim/util";
+import {Arrays} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Debug} from "@swim/codec";
+import {Format} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import type {AnyOpt} from "./Opt";
+import {Opt} from "./Opt";
+import type {AnyArg} from "./Arg";
+import {Arg} from "./Arg";
 
 /** @public */
 export type ExecCmd = (this: Cmd, opts: {[name: string]: string | undefined}, args: string[]) => void;

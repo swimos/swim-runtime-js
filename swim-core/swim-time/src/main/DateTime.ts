@@ -12,20 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  Lazy,
-  HashCode,
-  Equivalent,
-  Compare,
-  Murmur3,
-  Numbers,
-  Constructors,
-  Interpolate,
-  Interpolator,
-} from "@swim/util";
-import type {Display, Output} from "@swim/codec";
-import {Item, Value, Form} from "@swim/structure";
-import {AnyTimeZone, TimeZone} from "./TimeZone";
+import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import type {HashCode} from "@swim/util";
+import type {Equivalent} from "@swim/util";
+import type {Compare} from "@swim/util";
+import type {Interpolate} from "@swim/util";
+import type {Interpolator} from "@swim/util";
+import type {Output} from "@swim/codec";
+import type {Display} from "@swim/codec";
+import type {Item} from "@swim/structure";
+import {Value} from "@swim/structure";
+import type {Form} from "@swim/structure";
+import type {AnyTimeZone} from "./TimeZone";
+import {TimeZone} from "./TimeZone";
 import {DateTimeInterpolator} from "./"; // forward import
 import {DateTimeForm} from "./"; // forward import
 import {DateTimeFormat} from "./"; // forward import

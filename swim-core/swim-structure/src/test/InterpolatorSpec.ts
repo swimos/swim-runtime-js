@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Attr, Record} from "@swim/structure";
-import {Spec, Test, Exam} from "@swim/unit";
+import {Attr} from "@swim/structure";
+import {Record} from "@swim/structure";
+import type {Exam} from "@swim/unit";
+import {Test} from "@swim/unit";
+import {Suite} from "@swim/unit";
 
-export class InterpolatorSpec extends Spec {
+export class InterpolatorSpec extends Suite {
   @Test
   interpolateRecords(exam: Exam): void {
     const v0 = Record.of(Attr.of("test", -1), 0, "%");

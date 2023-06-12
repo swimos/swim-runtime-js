@@ -13,14 +13,20 @@
 // limitations under the License.
 
 import * as Path from "path";
-import type {Class, Dictionary, MutableDictionary, Observes} from "@swim/util";
-import {OutputSettings, OutputStyle, Unicode} from "@swim/codec";
-import {FastenerClass, Service, ComponentSet} from "@swim/component";
+import type {Class} from "@swim/util";
+import type {Dictionary} from "@swim/util";
+import type {MutableDictionary} from "@swim/util";
+import type {Observes} from "@swim/util";
+import {OutputSettings} from "@swim/codec";
+import {OutputStyle} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Service} from "@swim/component";
+import {ComponentSet} from "@swim/component";
 import type {WorkspaceObserver} from "./WorkspaceObserver";
 import {Scope} from "../"; // forward import
 import type {TaskConfig} from "../task/Task";
-import type {PackageScope} from "../package/PackageScope";
-import type {LibraryScope} from "../library/LibraryScope";
+import {PackageScope} from "../"; // forward import
+import {LibraryScope} from "../"; // forward import
 
 /** @public */
 export class Workspace extends Service {
@@ -33,8 +39,10 @@ export class Workspace extends Service {
 
   override readonly observerType?: Class<WorkspaceObserver>;
 
-  @ComponentSet<Workspace["packages"]>({
-    // avoid cyclic static reference to componentType: PackageScope
+  @ComponentSet({
+    get componentType(): typeof PackageScope {
+      return PackageScope;
+    },
     observes: true,
     initComponent(packageScope: PackageScope): void {
       const packageNameMap = this.owner.packageNameMap as MutableDictionary<PackageScope>;
@@ -74,14 +82,15 @@ export class Workspace extends Service {
     },
   })
   readonly packages!: ComponentSet<this, PackageScope> & Observes<PackageScope>;
-  static readonly packages: FastenerClass<Workspace["packages"]>;
 
   readonly packageNameMap: Dictionary<PackageScope>;
 
   readonly unscopedPackageNameMap: Dictionary<PackageScope>;
 
-  @ComponentSet<Workspace["libraries"]>({
-    // avoid cyclic static reference to componentType: LibraryScope
+  @ComponentSet({
+    get componentType(): typeof LibraryScope {
+      return LibraryScope;
+    },
     initComponent(libraryScope: LibraryScope): void {
       const libraries = this.owner.libraryPathMap as MutableDictionary<LibraryScope>;
       const libraryDir = libraryScope.baseDir.value;
@@ -110,7 +119,6 @@ export class Workspace extends Service {
     },
   })
   readonly libraries!: ComponentSet<this, LibraryScope>;
-  static readonly libraries: FastenerClass<Workspace["libraries"]>;
 
   readonly libraryPathMap: Dictionary<LibraryScope>;
 

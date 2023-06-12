@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TestOptions, Spec, Report, Exam} from "@swim/unit";
+import {Exam} from "@swim/unit";
+import type {TestOptions} from "@swim/unit";
+import type {Suite} from "@swim/unit";
+import type {Report} from "@swim/unit";
 import type {AnyUri} from "@swim/uri";
 import type {WarpClient} from "@swim/client";
 import {MockServer} from "./MockServer";
 
 export class ClientExam extends Exam {
-  constructor(report: Report, spec: Spec, name: string, options: TestOptions) {
+  constructor(report: Report, spec: Suite, name: string, options: TestOptions) {
     super(report, spec, name, options);
   }
 
