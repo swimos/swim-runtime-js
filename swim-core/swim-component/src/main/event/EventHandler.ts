@@ -173,6 +173,7 @@ export const EventHandler = (function (_super: typeof Fastener) {
 
   Object.defineProperty(EventHandler.prototype, "fastenerType", {
     value: EventHandler,
+    enumerable: true,
     configurable: true,
   });
 
@@ -283,6 +284,7 @@ export const EventHandler = (function (_super: typeof Fastener) {
     get(this: EventHandler): boolean {
       return (this.flags & EventHandler.DisabledFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -421,6 +423,7 @@ export const EventHandler = (function (_super: typeof Fastener) {
     if (flagsInit !== void 0) {
       Object.defineProperty(fastenerPrototype, "flagsInit", {
         value: flagsInit,
+        enumerable: true,
         configurable: true,
       });
     }

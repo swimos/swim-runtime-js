@@ -87,9 +87,6 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   get fastenerType(): Proto<ComponentSet<any, any>>;
 
   /** @internal @override */
-  getParent(): ComponentSet<unknown, C> | null;
-
-  /** @internal @override */
   setDerived(derived: boolean, inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
@@ -109,6 +106,9 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
 
   /** @protected @override */
   didUnderive(inlet: ComponentSet<unknown, C>): void;
+
+  /** @override */
+  getInlet(): ComponentSet<unknown, C> | null;
 
   /** @override */
   readonly inlet: ComponentSet<unknown, C> | null;
@@ -247,6 +247,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
 
   Object.defineProperty(ComponentSet.prototype, "fastenerType", {
     value: ComponentSet,
+    enumerable: true,
     configurable: true,
   });
 
@@ -561,6 +562,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     get(this: ComponentSet): boolean {
       return (this.flags & ComponentSet.OrderedFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -588,6 +590,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     get(this: ComponentSet): boolean {
       return (this.flags & ComponentSet.SortedFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -710,6 +713,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     if (flagsInit !== void 0) {
       Object.defineProperty(fastenerPrototype, "flagsInit", {
         value: flagsInit,
+        enumerable: true,
         configurable: true,
       });
     }

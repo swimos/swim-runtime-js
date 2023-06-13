@@ -74,9 +74,6 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
   get fastenerType(): Proto<ComponentRef<any, any>>;
 
   /** @internal @override */
-  getParent(): ComponentRef<unknown, C> | null;
-
-  /** @internal @override */
   setDerived(derived: boolean, inlet: ComponentRef<unknown, C>): void;
 
   /** @protected @override */
@@ -96,6 +93,9 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
 
   /** @protected @override */
   didUnderive(inlet: ComponentRef<unknown, C>): void;
+
+  /** @override */
+  getInlet(): ComponentRef<unknown, C> | null;
 
   /** @override */
   readonly inlet: ComponentRef<unknown, C> | null;
@@ -175,6 +175,7 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
 
   Object.defineProperty(ComponentRef.prototype, "fastenerType", {
     value: ComponentRef,
+    enumerable: true,
     configurable: true,
   });
 
@@ -192,6 +193,7 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
       const inlet = this.inlet;
       return inlet !== null ? inlet.component : null;
     },
+    enumerable: true,
     configurable: true,
   });
 

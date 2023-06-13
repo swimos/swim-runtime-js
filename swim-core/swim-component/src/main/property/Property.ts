@@ -86,9 +86,6 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   get fastenerType(): Proto<Property<any, any, any>>;
 
   /** @internal @override */
-  getParent(): Property<unknown, T> | null;
-
-  /** @internal @override */
   setDerived(derived: boolean, inlet: Property<unknown, T>): void;
 
   /** @protected @override */
@@ -108,6 +105,9 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
 
   /** @protected @override */
   didUnderive(inlet: Property<unknown, T>): void;
+
+  /** @override */
+  getInlet(): Property<unknown, T> | null;
 
   /** @override */
   readonly inlet: Property<unknown, T> | null;
@@ -204,6 +204,7 @@ export const Property = (function (_super: typeof Fastener) {
 
   Object.defineProperty(Property.prototype, "fastenerType", {
     value: Property,
+    enumerable: true,
     configurable: true,
   });
 
@@ -250,6 +251,7 @@ export const Property = (function (_super: typeof Fastener) {
       const inlet = this.inlet;
       return inlet !== null ? inlet.getOutletValue(this) : void 0;
     },
+    enumerable: true,
     configurable: true,
   });
 

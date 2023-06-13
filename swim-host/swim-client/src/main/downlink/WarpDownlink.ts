@@ -376,6 +376,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
   Object.defineProperty(WarpDownlink.prototype, "fastenerType", {
     value: WarpDownlink,
+    enumerable: true,
     configurable: true,
   });
 
@@ -531,6 +532,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     get(this: WarpDownlink): boolean {
       return (this.flags & WarpDownlink.RelinksFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -559,6 +561,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     get(this: WarpDownlink): boolean {
       return (this.flags & WarpDownlink.SyncsFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -579,6 +582,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     get(this: WarpDownlink): boolean {
       return this.model !== null;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -587,6 +591,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       const model = this.model;
       return model !== null && model.online.value;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -595,6 +600,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       const model = this.model;
       return model !== null && model.connected;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -603,6 +609,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       const model = this.model;
       return model !== null && model.authenticated;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -611,6 +618,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       const model = this.model;
       return model !== null && model.deauthenticated;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -619,6 +627,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       const model = this.model;
       return model !== null && model.linked;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -627,6 +636,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       const model = this.model;
       return model !== null && model.synced;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -635,6 +645,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       const model = this.model;
       return model !== null ? model.session.value : Value.absent();
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -918,6 +929,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     get(this: WarpDownlink): boolean {
       return (this.flags & WarpDownlink.ConsumingFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -1063,6 +1075,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     if (flagsInit !== void 0) {
       Object.defineProperty(downlinkPrototype, "flagsInit", {
         value: flagsInit,
+        enumerable: true,
         configurable: true,
       });
     }

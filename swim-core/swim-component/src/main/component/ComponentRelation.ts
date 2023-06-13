@@ -75,9 +75,6 @@ export interface ComponentRelation<O = unknown, C extends Component = Component>
   readonly observes?: boolean; // optional prototype property
 
   /** @internal @override */
-  getParent(): ComponentRelation<unknown, C> | null;
-
-  /** @internal @override */
   setDerived(derived: boolean, inlet: ComponentRelation<unknown, C>): void;
 
   /** @protected @override */
@@ -97,6 +94,9 @@ export interface ComponentRelation<O = unknown, C extends Component = Component>
 
   /** @protected @override */
   didUnderive(inlet: ComponentRelation<unknown, C>): void;
+
+  /** @override */
+  getInlet(): ComponentRelation<unknown, C> | null;
 
   /** @override */
   readonly inlet: ComponentRelation<unknown, C> | null;
@@ -181,6 +181,7 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
 
   Object.defineProperty(ComponentRelation.prototype, "fastenerType", {
     value: ComponentRelation,
+    enumerable: true,
     configurable: true,
   });
 
@@ -254,6 +255,7 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
       const owner = this.owner;
       return owner instanceof Component ? owner : null;
     },
+    enumerable: true,
     configurable: true,
   });
 

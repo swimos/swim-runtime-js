@@ -133,6 +133,7 @@ export const FileRelation = (function (_super: typeof Fastener) {
 
   Object.defineProperty(FileRelation.prototype, "fastenerType", {
     value: FileRelation,
+    enumerable: true,
     configurable: true,
   });
 
@@ -174,6 +175,7 @@ export const FileRelation = (function (_super: typeof Fastener) {
     get: function (this: FileRelation): boolean {
       return (this.flags & FileRelation.ResolvesFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -277,6 +279,7 @@ export const FileRelation = (function (_super: typeof Fastener) {
     if (flagsInit !== void 0) {
       Object.defineProperty(fastenerPrototype, "flagsInit", {
         value: flagsInit,
+        enumerable: true,
         configurable: true,
       });
     }

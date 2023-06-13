@@ -1005,7 +1005,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @override */
   decohereFastener(fastener: Fastener): void {
-    let decoherent = this.decoherent as Fastener[];
+    let decoherent = this.decoherent as Fastener[] | null;
     if (decoherent === null) {
       decoherent = [];
       (this as Mutable<this>).decoherent = decoherent;
@@ -1146,7 +1146,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
       const id = ~~nextId;
       nextId += 1;
       return "component" + id;
-    }
+    };
   })();
 
   /** @internal */

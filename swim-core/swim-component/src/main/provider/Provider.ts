@@ -94,9 +94,6 @@ export interface Provider<O = unknown, S extends Service = Service> extends Fast
   readonly observes?: boolean; // optional prototype property
 
   /** @internal @override */
-  getParent(): Provider<unknown, S> | null;
-
-  /** @internal @override */
   setDerived(derived: boolean, inlet: Provider<unknown, S>): void;
 
   /** @protected @override */
@@ -116,6 +113,9 @@ export interface Provider<O = unknown, S extends Service = Service> extends Fast
 
   /** @protected @override */
   didUnderive(inlet: Provider<unknown, S>): void;
+
+  /** @internal @override */
+  getInlet(): Provider<unknown, S> | null;
 
   /** @override */
   get inlet(): Provider<unknown, S> | null;
@@ -218,6 +218,7 @@ export const Provider = (function (_super: typeof Fastener) {
 
   Object.defineProperty(Provider.prototype, "fastenerType", {
     value: Provider,
+    enumerable: true,
     configurable: true,
   });
 
@@ -244,6 +245,7 @@ export const Provider = (function (_super: typeof Fastener) {
       const inlet = this.inlet;
       return inlet !== null ? inlet.service : null;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -343,9 +345,10 @@ export const Provider = (function (_super: typeof Fastener) {
 
   Object.defineProperty(Provider.prototype, "parentService", {
     get<S extends Service>(this: Provider<unknown, S>): S | null {
-      const parentProvider = this.getParent();
+      const parentProvider = this.getInlet();
       return parentProvider !== null ? parentProvider.service : null;
     },
+    enumerable: true,
     configurable: true,
   });
 

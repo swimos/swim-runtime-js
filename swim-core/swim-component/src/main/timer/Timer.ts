@@ -137,6 +137,7 @@ export const Timer = (function (_super: typeof Fastener) {
 
   Object.defineProperty(Timer.prototype, "fastenerType", {
     value: Timer,
+    enumerable: true,
     configurable: true,
   });
 
@@ -165,6 +166,7 @@ export const Timer = (function (_super: typeof Fastener) {
         return void 0;
       }
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -177,6 +179,7 @@ export const Timer = (function (_super: typeof Fastener) {
         return void 0;
       }
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -184,6 +187,7 @@ export const Timer = (function (_super: typeof Fastener) {
     get: function (this: Timer): boolean {
       return this.timeout !== void 0;
     },
+    enumerable: true,
     configurable: true,
   });
 

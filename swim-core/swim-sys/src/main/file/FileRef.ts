@@ -134,6 +134,7 @@ export const FileRef = (function (_super: typeof FileRelation) {
 
   Object.defineProperty(FileRef.prototype, "fastenerType", {
     value: FileRef,
+    enumerable: true,
     configurable: true,
   });
 
@@ -182,6 +183,7 @@ export const FileRef = (function (_super: typeof FileRelation) {
     get: function (this: FileRef): boolean {
       return (this.flags & FileRef.LoadedFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 
@@ -227,6 +229,7 @@ export const FileRef = (function (_super: typeof FileRelation) {
     get: function (this: FileRef): boolean {
       return (this.flags & FileRef.ModifiedFlag) !== 0;
     },
+    enumerable: true,
     configurable: true,
   });
 

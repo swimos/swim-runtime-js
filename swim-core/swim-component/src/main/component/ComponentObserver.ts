@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Observer} from "@swim/util";
-import type {Component} from "./Component"
+import type {Component} from "./Component";
 
 /** @public */
 export interface ComponentObserver<C extends Component = Component> extends Observer<C> {

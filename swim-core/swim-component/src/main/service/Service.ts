@@ -233,6 +233,6 @@ export class Service extends Component<Service> {
       const id = ~~nextId;
       nextId += 1;
       return "service" + id;
-    }
+    };
   })();
 }
