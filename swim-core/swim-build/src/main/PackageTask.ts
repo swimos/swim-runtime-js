@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {MockServer} from "./MockServer";
-export {ClientExam} from "./ClientExam";
+import type {Class} from "@swim/util";
+import type {TaskOptions} from "./Task";
+import {Task} from "./Task";
+import {PackageScope} from "./"; // forward import
 
-export {EventDownlinkSpec} from "./EventDownlinkSpec";
-export {ValueDownlinkSpec} from "./ValueDownlinkSpec";
-export {ListDownlinkSpec} from "./ListDownlinkSpec";
-export {MapDownlinkSpec} from "./MapDownlinkSpec";
+/** @public */
+export interface PackageTaskOptions extends TaskOptions {
+}
 
-export {HostRefSpec} from "./HostRefSpec";
-export {NodeRefSpec} from "./NodeRefSpec";
-export {LaneRefSpec} from "./LaneRefSpec";
-export {WarpClientSpec} from "./WarpClientSpec";
+/** @public */
+export abstract class PackageTask extends Task {
+  override readonly optionsType?: Class<PackageTaskOptions>;
 
-export {ClientSuite} from "./ClientSuite";
-export {ClientSuite as default} from "./ClientSuite";
+  get packageScope(): PackageScope | null {
+    return this.getParent(PackageScope);
+  }
+}

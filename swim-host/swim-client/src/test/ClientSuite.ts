@@ -14,17 +14,53 @@
 
 import {Unit} from "@swim/unit";
 import {Suite} from "@swim/unit";
-import {DownlinkSuite} from "./downlink/DownlinkSuite";
-import {RefSuite} from "./ref/RefSuite";
+import {EventDownlinkSpec} from "./EventDownlinkSpec";
+import {ValueDownlinkSpec} from "./ValueDownlinkSpec";
+import {ListDownlinkSpec} from "./ListDownlinkSpec";
+import {MapDownlinkSpec} from "./MapDownlinkSpec";
+import {HostRefSpec} from "./HostRefSpec";
+import {NodeRefSpec} from "./NodeRefSpec";
+import {LaneRefSpec} from "./LaneRefSpec";
+import {WarpClientSpec} from "./WarpClientSpec";
 
 export class ClientSuite extends Suite {
   @Unit
-  downlinkSuite(): Suite {
-    return new DownlinkSuite();
+  eventDownlinkSpec(): Suite {
+    return new EventDownlinkSpec();
   }
 
   @Unit
-  refSuite(): Suite {
-    return new RefSuite();
+  valueDownlinkSpec(): Suite {
+    return new ValueDownlinkSpec();
+  }
+
+  @Unit
+  listDownlinkSpec(): Suite {
+    return new ListDownlinkSpec();
+  }
+
+  @Unit
+  mapDownlinkSpec(): Suite {
+    return new MapDownlinkSpec();
+  }
+
+  @Unit
+  hostRefSpec(): Suite {
+    return new HostRefSpec();
+  }
+
+  @Unit
+  nodeRefSpec(): Suite {
+    return new NodeRefSpec();
+  }
+
+  @Unit
+  laneRefSpec(): Suite {
+    return new LaneRefSpec();
+  }
+
+  @Unit
+  warpClientSpec(): Suite {
+    return new WarpClientSpec();
   }
 }

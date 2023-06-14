@@ -12,14 +12,67 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "./workspace";
+export type {WorkspaceObserver} from "./Workspace";
+export {Workspace} from "./Workspace";
 
-export * from "./scope";
+export type {ScopeObserver} from "./Scope";
+export {Scope} from "./Scope";
 
-export * from "./task";
+export {TaskStatus} from "./Task";
+export type {TaskOptions} from "./Task";
+export type {TaskOptionsType} from "./Task";
+export type {TaskConfig} from "./Task";
+export type {TaskObserver} from "./Task";
+export {Task} from "./Task";
 
-export * from "./package";
+// Package scope
 
-export * from "./library";
+export type {PackageTaskOptions} from "./PackageTask";
+export {PackageTask} from "./PackageTask";
 
-export * from "./watcher";
+export {DepsTask} from "./DepsTask";
+
+export {LibsTask} from "./LibsTask";
+
+export {TestTask} from "./TestTask";
+
+export {DocTask} from "./DocTask";
+
+export type {VersionTaskOptions} from "./VersionTask";
+export {VersionTask} from "./VersionTask";
+
+export type {PublishTaskOptions} from "./PublishTask";
+export {PublishTask} from "./PublishTask";
+
+export {CleanTask} from "./CleanTask";
+
+export type {PackageConfig} from "./PackageScope";
+export type {PackageScopeObserver} from "./PackageScope";
+export {PackageScope} from "./PackageScope";
+
+// Library scope
+
+export type {LibraryTaskOptions} from "./LibraryTask";
+export {LibraryTask} from "./LibraryTask";
+
+export {CompileTask} from "./CompileTask";
+
+export {LintTask} from "./LintTask";
+
+export {ApiTask} from "./ApiTask";
+
+export {BundleTask} from "./BundleTask";
+
+export type {BuildTaskOptions} from "./BuildTask";
+export {BuildTask} from "./BuildTask";
+
+export type {WatchTaskObserver} from "./WatchTask";
+export {WatchTask} from "./WatchTask";
+
+export type {LibraryScopeObserver} from "./LibraryScope";
+export {LibraryScope} from "./LibraryScope";
+
+// Watcher scope
+
+export type {WatcherScopeObserver} from "./WatcherScope";
+export {WatcherScope} from "./WatcherScope";

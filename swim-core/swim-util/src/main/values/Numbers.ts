@@ -94,7 +94,7 @@ export const Numbers = (function () {
   };
 
   Numbers.fromAny = function (value: number | string | boolean | null | undefined): number | null | undefined {
-    if (value == void 0 || value === null) {
+    if (value === void 0 || value === null) {
       return value;
     } else {
       return Number(value);
