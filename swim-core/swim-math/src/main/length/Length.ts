@@ -62,29 +62,29 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
 
   plus(that: AnyLength, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
     that = Length.fromAny(that);
-    return Length.create(this.toValue(units, basis) + that.toValue(units, basis), units);
+    return Length.of(this.toValue(units, basis) + that.toValue(units, basis), units);
   }
 
   negative(units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
-    return Length.create(-this.toValue(units, basis), units);
+    return Length.of(-this.toValue(units, basis), units);
   }
 
   minus(that: AnyLength, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
     that = Length.fromAny(that);
-    return Length.create(this.toValue(units, basis) - that.toValue(units, basis), units);
+    return Length.of(this.toValue(units, basis) - that.toValue(units, basis), units);
   }
 
   times(scalar: number, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
-    return Length.create(this.toValue(units, basis) * scalar, units);
+    return Length.of(this.toValue(units, basis) * scalar, units);
   }
 
   divide(scalar: number, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
-    return Length.create(this.toValue(units, basis) / scalar, units);
+    return Length.of(this.toValue(units, basis) / scalar, units);
   }
 
   combine(that: AnyLength, scalar: number = 1, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
     that = Length.fromAny(that);
-    return Length.create(this.toValue(units, basis) + that.toValue(units, basis) * scalar, units);
+    return Length.of(this.toValue(units, basis) + that.toValue(units, basis) * scalar, units);
   }
 
   abstract pxValue(basis?: LengthBasis | number): number;
@@ -102,19 +102,19 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
   }
 
   px(basis?: LengthBasis | number): PxLength {
-    return Length.px(this.pxValue(basis));
+    return PxLength.of(this.pxValue(basis));
   }
 
   em(basis?: LengthBasis | number): EmLength {
-    return Length.em(this.emValue(basis));
+    return EmLength.of(this.emValue(basis));
   }
 
   rem(basis?: LengthBasis | number): RemLength {
-    return Length.rem(this.remValue(basis));
+    return RemLength.of(this.remValue(basis));
   }
 
   pct(basis?: LengthBasis | number): PctLength {
-    return Length.pct(this.pctValue(basis));
+    return PctLength.of(this.pctValue(basis));
   }
 
   toValue(): Value;
@@ -122,14 +122,13 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
   toValue(units?: LengthUnits, basis?: LengthBasis | number): Value | number {
     if (units === void 0) {
       return Text.from(this.toString());
-    } else {
-      switch (units) {
-        case "px": return this.pxValue(basis);
-        case "em": return this.emValue(basis);
-        case "rem": return this.remValue(basis);
-        case "%": return this.pctValue(basis);
-        default: throw new LengthException("unknown length units: " + units);
-      }
+    }
+    switch (units) {
+      case "px": return this.pxValue(basis);
+      case "em": return this.emValue(basis);
+      case "rem": return this.remValue(basis);
+      case "%": return this.pctValue(basis);
+      default: throw new LengthException("unknown length units: " + units);
     }
   }
 
@@ -180,40 +179,40 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
   }
 
   static px(value: number): PxLength {
-    return new PxLength(value);
+    return PxLength.of(value);
   }
 
   static em(value: number): EmLength {
-    return new EmLength(value);
+    return EmLength.of(value);
   }
 
   static rem(value: number): RemLength {
-    return new RemLength(value);
+    return RemLength.of(value);
   }
 
   static pct(value: number): PctLength {
-    return new PctLength(value);
+    return PctLength.of(value);
   }
 
   static unitless(value: number): UnitlessLength {
-    return new UnitlessLength(value);
+    return UnitlessLength.of(value);
   }
 
-  static create(value: number, units?: LengthUnits): Length {
+  static of(value: number, units?: LengthUnits): Length {
     switch (units) {
       case void 0:
-      case "px": return Length.px(value);
-      case "em": return Length.em(value);
-      case "rem": return Length.rem(value);
-      case "%": return Length.pct(value);
-      case "": return Length.unitless(value);
+      case "px": return PxLength.of(value);
+      case "em": return EmLength.of(value);
+      case "rem": return RemLength.of(value);
+      case "%": return PctLength.of(value);
+      case "": return UnitlessLength.of(value);
       default: throw new LengthException("unknown length units: " + units);
     }
   }
 
   static fromCssValue(value: CSSStyleValue): Length {
     if (value instanceof CSSUnitValue) {
-      return Length.create(value.value, value.unit as LengthUnits);
+      return Length.of(value.value, value.unit as LengthUnits);
     } else {
       throw new TypeError("" + value);
     }
@@ -223,7 +222,7 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     if (value === void 0 || value === null || value instanceof Length) {
       return value;
     } else if (typeof value === "number") {
-      return Length.create(value, defaultUnits);
+      return Length.of(value, defaultUnits);
     } else if (typeof value === "string") {
       return Length.parse(value, defaultUnits);
     }
@@ -236,10 +235,10 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
       const units = value.getItem(1);
       if (num !== void 0 && isFinite(num) && units instanceof Attr && units.value === Value.extant()) {
         switch (units.key.value) {
-          case "px": return Length.px(num);
-          case "em": return Length.em(num);
-          case "rem": return Length.rem(num);
-          case "pct": return Length.pct(num);
+          case "px": return PxLength.of(num);
+          case "em": return EmLength.of(num);
+          case "rem": return RemLength.of(num);
+          case "pct": return PctLength.of(num);
           default:
         }
       }

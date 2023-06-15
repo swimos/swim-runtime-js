@@ -23,7 +23,7 @@ export const RotateTransformInterpolator = (function (_super: typeof Interpolato
     const interpolator = function (u: number): RotateTransform {
       const f0 = interpolator[0];
       const f1 = interpolator[1];
-      const a = Angle.create(f0.angle.value + u * (f1.angle.value - f0.angle.value), f1.angle.units);
+      const a = Angle.of(f0.angle.value + u * (f1.angle.value - f0.angle.value), f1.angle.units);
       return new RotateTransform(a);
     } as Interpolator<RotateTransform>;
     Object.setPrototypeOf(interpolator, RotateTransformInterpolator.prototype);

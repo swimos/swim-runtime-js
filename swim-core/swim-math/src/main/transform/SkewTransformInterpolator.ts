@@ -23,8 +23,8 @@ export const SkewTransformInterpolator = (function (_super: typeof Interpolator)
     const interpolator = function (u: number): SkewTransform {
       const f0 = interpolator[0];
       const f1 = interpolator[1];
-      const x = Angle.create(f0.x.value + u * (f1.x.value - f0.x.value), f1.x.units);
-      const y = Angle.create(f0.y.value + u * (f1.y.value - f0.y.value), f1.y.units);
+      const x = Angle.of(f0.x.value + u * (f1.x.value - f0.x.value), f1.x.units);
+      const y = Angle.of(f0.y.value + u * (f1.y.value - f0.y.value), f1.y.units);
       return new SkewTransform(x, y);
     } as Interpolator<SkewTransform>;
     Object.setPrototypeOf(interpolator, SkewTransformInterpolator.prototype);

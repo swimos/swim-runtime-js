@@ -22,7 +22,7 @@ export const AngleInterpolator = (function (_super: typeof Interpolator) {
     const interpolator = function (u: number): Angle {
       const a0 = interpolator[0];
       const a1 = interpolator[1];
-      return Angle.create(a0.value + u * (a1.value - a0.value), a1.units);
+      return Angle.of(a0.value + u * (a1.value - a0.value), a1.units);
     } as Interpolator<Angle>;
     Object.setPrototypeOf(interpolator, AngleInterpolator.prototype);
     (interpolator as Mutable<typeof interpolator>)[0] = a0.to(a1.units);

@@ -13,12 +13,10 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {LengthException} from "./LengthException";
-import type {LengthUnits} from "./Length";
 import type {LengthBasis} from "./Length";
 import {Length} from "./Length";
 
@@ -31,7 +29,7 @@ export class UnitlessLength extends Length {
 
   override readonly value: number;
 
-  override get units(): LengthUnits {
+  override get units(): "" {
     return "";
   }
 
@@ -80,8 +78,17 @@ export class UnitlessLength extends Length {
     return this.value + "";
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Zero: UnitlessLength = new UnitlessLength(0);
+
   static override zero(): UnitlessLength {
-    return new UnitlessLength(0);
+    return this.Zero;
+  }
+
+  static override of(value: number): UnitlessLength {
+    if (value === 0) {
+      return this.Zero;
+    }
+    return new UnitlessLength(value);
   }
 }

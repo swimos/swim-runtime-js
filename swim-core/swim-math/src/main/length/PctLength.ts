@@ -13,11 +13,9 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {LengthUnits} from "./Length";
 import type {LengthBasis} from "./Length";
 import {Length} from "./Length";
 
@@ -30,7 +28,7 @@ export class PctLength extends Length {
 
   override readonly value: number;
 
-  override get units(): LengthUnits {
+  override get units(): "%" {
     return "%";
   }
 
@@ -91,8 +89,17 @@ export class PctLength extends Length {
     return this.value + "%";
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Zero: PctLength = new PctLength(0);
+
   static override zero(): PctLength {
-    return new PctLength(0);
+    return this.Zero;
+  }
+
+  static override of(value: number): PctLength {
+    if (value === 0) {
+      return this.Zero;
+    }
+    return new PctLength(value);
   }
 }

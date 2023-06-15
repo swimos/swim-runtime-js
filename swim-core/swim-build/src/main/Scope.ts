@@ -48,7 +48,9 @@ export abstract class Scope extends Component<Scope> {
   readonly baseDir!: Property<this, string | undefined>;
 
   @ComponentSet({
-    // avoid cyclic static reference to componentType: Task
+    get componentType(): typeof Task {
+      return Task;
+    },
     binds: true,
     detectComponent(component: Component): Task | null {
       return component instanceof Task ? component : null;

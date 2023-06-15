@@ -23,8 +23,8 @@ export const TranslateTransformInterpolator = (function (_super: typeof Interpol
     const interpolator = function (u: number): TranslateTransform {
       const f0 = interpolator[0];
       const f1 = interpolator[1];
-      const x = Length.create(f0.x.value + u * (f1.x.value - f0.x.value), f1.x.units);
-      const y = Length.create(f0.y.value + u * (f1.y.value - f0.y.value), f1.y.units);
+      const x = Length.of(f0.x.value + u * (f1.x.value - f0.x.value), f1.x.units);
+      const y = Length.of(f0.y.value + u * (f1.y.value - f0.y.value), f1.y.units);
       return new TranslateTransform(x, y);
     } as Interpolator<TranslateTransform>;
     Object.setPrototypeOf(interpolator, TranslateTransformInterpolator.prototype);

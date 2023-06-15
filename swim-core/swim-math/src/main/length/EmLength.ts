@@ -13,11 +13,9 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {LengthUnits} from "./Length";
 import type {LengthBasis} from "./Length";
 import {Length} from "./Length";
 
@@ -30,7 +28,7 @@ export class EmLength extends Length {
 
   override readonly value: number;
 
-  override get units(): LengthUnits {
+  override get units(): "em" {
     return "em";
   }
 
@@ -49,9 +47,8 @@ export class EmLength extends Length {
   override toCssValue(): CSSUnitValue | null {
     if (typeof CSSUnitValue !== "undefined") {
       return new CSSUnitValue(this.value, "em");
-    } else {
-      return null;
     }
+    return null;
   }
 
   override compareTo(that: unknown): number {
@@ -91,8 +88,17 @@ export class EmLength extends Length {
     return this.value + "em";
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Zero: EmLength = new EmLength(0);
+
   static override zero(): EmLength {
-    return new EmLength(0);
+    return this.Zero;
+  }
+
+  static override of(value: number): EmLength {
+    if (value === 0) {
+      return this.Zero;
+    }
+    return new EmLength(value);
   }
 }

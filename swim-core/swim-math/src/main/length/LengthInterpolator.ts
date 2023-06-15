@@ -22,7 +22,7 @@ export const LengthInterpolator = (function (_super: typeof Interpolator) {
     const interpolator = function (u: number): Length {
       const l0 = interpolator[0];
       const l1 = interpolator[1];
-      return Length.create(l0.value + u * (l1.value - l0.value), l1.units);
+      return Length.of(l0.value + u * (l1.value - l0.value), l1.units);
     } as Interpolator<Length>;
     Object.setPrototypeOf(interpolator, LengthInterpolator.prototype);
     (interpolator as Mutable<typeof interpolator>)[0] = l0.to(l1.units);

@@ -15,7 +15,7 @@
 import type {Exam} from "@swim/unit";
 import {Test} from "@swim/unit";
 import {Suite} from "@swim/unit";
-import {Record,} from "@swim/structure";
+import {Record} from "@swim/structure";
 import {Text} from "@swim/structure";
 
 export class RecordMapViewMutableSpec extends Suite {

@@ -13,11 +13,9 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AngleUnits} from "./Angle";
 import {Angle} from "./Angle";
 
 /** @public */
@@ -29,7 +27,7 @@ export class DegAngle extends Angle {
 
   override readonly value: number;
 
-  override get units(): AngleUnits {
+  override get units(): "deg" {
     return "deg";
   }
 
@@ -56,9 +54,8 @@ export class DegAngle extends Angle {
   override toCssValue(): CSSUnitValue | null {
     if (typeof CSSUnitValue !== "undefined") {
       return new CSSUnitValue(this.value, "deg");
-    } else {
-      return null;
     }
+    return null;
   }
 
   override compareTo(that: unknown): number {
@@ -98,8 +95,17 @@ export class DegAngle extends Angle {
     return this.value + "deg";
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Zero: DegAngle = new DegAngle(0);
+
   static override zero(): DegAngle {
-    return new DegAngle(0);
+    return this.Zero;
+  }
+
+  static override of(value: number): DegAngle {
+    if (value === 0) {
+      return this.Zero;
+    }
+    return new DegAngle(value);
   }
 }

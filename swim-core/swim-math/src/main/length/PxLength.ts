@@ -13,11 +13,9 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {LengthUnits} from "./Length";
 import type {LengthBasis} from "./Length";
 import {Length} from "./Length";
 
@@ -30,7 +28,7 @@ export class PxLength extends Length {
 
   override readonly value: number;
 
-  override get units(): LengthUnits {
+  override get units(): "px" {
     return "px";
   }
 
@@ -45,9 +43,8 @@ export class PxLength extends Length {
   override toCssValue(): CSSUnitValue | null {
     if (typeof CSSUnitValue !== "undefined") {
       return new CSSUnitValue(this.value, "px");
-    } else {
-      return null;
     }
+    return null;
   }
 
   override valueOf(): number {
@@ -91,8 +88,17 @@ export class PxLength extends Length {
     return this.value + "px";
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Zero: PxLength = new PxLength(0);
+
   static override zero(): PxLength {
-    return new PxLength(0);
+    return this.Zero;
+  }
+
+  static override of(value: number): PxLength {
+    if (value === 0) {
+      return this.Zero;
+    }
+    return new PxLength(value);
   }
 }

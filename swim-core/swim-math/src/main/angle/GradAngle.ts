@@ -13,11 +13,9 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AngleUnits} from "./Angle";
 import {Angle} from "./Angle";
 
 /** @public */
@@ -29,7 +27,7 @@ export class GradAngle extends Angle {
 
   override readonly value: number;
 
-  override get units(): AngleUnits {
+  override get units(): "grad" {
     return "grad";
   }
 
@@ -56,9 +54,8 @@ export class GradAngle extends Angle {
   override toCssValue(): CSSUnitValue | null {
     if (typeof CSSUnitValue !== "undefined") {
       return new CSSUnitValue(this.value, "grad");
-    } else {
-      return null;
     }
+    return null;
   }
 
   override compareTo(that: unknown): number {
@@ -98,8 +95,17 @@ export class GradAngle extends Angle {
     return this.value + "grad";
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Zero: GradAngle = new GradAngle(0);
+
   static override zero(): GradAngle {
-    return new GradAngle(0);
+    return this.Zero;
+  }
+
+  static override of(value: number): GradAngle {
+    if (value === 0) {
+      return this.Zero;
+    }
+    return new GradAngle(value);
   }
 }

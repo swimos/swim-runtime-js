@@ -13,11 +13,9 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {LengthUnits} from "./Length";
 import type {LengthBasis} from "./Length";
 import {Length} from "./Length";
 
@@ -30,7 +28,7 @@ export class RemLength extends Length {
 
   override readonly value: number;
 
-  override get units(): LengthUnits {
+  override get units(): "rem" {
     return "rem";
   }
 
@@ -49,9 +47,8 @@ export class RemLength extends Length {
   override toCssValue(): CSSUnitValue | null {
     if (typeof CSSUnitValue !== "undefined") {
       return new CSSUnitValue(this.value, "rem");
-    } else {
-      return null;
     }
+    return null;
   }
 
   override compareTo(that: unknown): number {
@@ -91,8 +88,17 @@ export class RemLength extends Length {
     return this.value + "rem";
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Zero: RemLength = new RemLength(0);
+
   static override zero(): RemLength {
-    return new RemLength(0);
+    return this.Zero;
+  }
+
+  static override of(value: number): RemLength {
+    if (value === 0) {
+      return this.Zero;
+    }
+    return new RemLength(value);
   }
 }
