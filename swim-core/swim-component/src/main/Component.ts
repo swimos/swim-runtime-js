@@ -1019,18 +1019,19 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   recohereFasteners(t?: number): void {
     const decoherent = this.decoherent;
-    if (decoherent !== null) {
-      const decoherentCount = decoherent.length;
-      if (decoherentCount !== 0) {
-        if (t === void 0) {
-          t = performance.now();
-        }
-        (this as Mutable<this>).decoherent = null;
-        for (let i = 0; i < decoherentCount; i += 1) {
-          const fastener = decoherent[i]!;
-          fastener.recohere(t);
-        }
-      }
+    if (decoherent === null) {
+      return;
+    }
+    const decoherentCount = decoherent.length;
+    if (decoherentCount === 0) {
+      return;
+    } else if (t === void 0) {
+      t = performance.now();
+    }
+    (this as Mutable<this>).decoherent = null;
+    for (let i = 0; i < decoherentCount; i += 1) {
+      const fastener = decoherent[i]!;
+      fastener.recohere(t);
     }
   }
 
