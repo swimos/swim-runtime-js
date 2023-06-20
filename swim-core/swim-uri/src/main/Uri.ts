@@ -543,11 +543,26 @@ export class Uri implements HashCode, Compare, Debug, Display {
   }
 
   static fromInit(init: UriInit): Uri {
-    const scheme = UriScheme.fromAny(init.scheme);
-    const authority = UriAuthority.fromAny(init.authority !== void 0 ? init.authority : init);
-    const path = UriPath.fromAny(init.path);
-    const query = UriQuery.fromAny(init.query);
-    const fragment = UriFragment.fromAny(init.fragment);
+    let scheme = UriScheme.fromAny(init.scheme);
+    if (scheme === void 0 || scheme === null) {
+      scheme = UriScheme.undefined();
+    }
+    let authority = UriAuthority.fromAny(init.authority !== void 0 ? init.authority : init);
+    if (authority === void 0 || authority === null) {
+      authority = UriAuthority.undefined();
+    }
+    let path = UriPath.fromAny(init.path);
+    if (path === void 0 || path === null) {
+      path = UriPath.empty();
+    }
+    let query = UriQuery.fromAny(init.query);
+    if (query === void 0 || query === null) {
+      query = UriQuery.undefined();
+    }
+    let fragment = UriFragment.fromAny(init.fragment);
+    if (fragment === void 0 || fragment === null) {
+      fragment = UriFragment.undefined();
+    }
     if (scheme.isDefined() || authority.isDefined() || path.isDefined() ||
         query.isDefined() || fragment.isDefined()) {
       return new Uri(scheme, authority, path, query, fragment);

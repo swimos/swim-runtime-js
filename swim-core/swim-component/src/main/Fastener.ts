@@ -33,6 +33,7 @@ export interface FastenerDescriptor {
   /** @internal */
   flagsInit?: number;
   affinity?: Affinity;
+  parentType?: Proto<any> | null | undefined;
   inherits?: string | symbol | boolean;
   binds?: boolean;
 }
@@ -141,6 +142,8 @@ export interface Fastener<O = unknown> {
 
   /** @protected */
   didSetAffinity(newAffinity: Affinity, oldAffinity: Affinity): void;
+
+  get parentType(): Proto<unknown> | null | undefined;
 
   get inheritName(): string | symbol | undefined;
 
@@ -352,6 +355,14 @@ export const Fastener = (function (_super: typeof Object) {
     // hook
   };
 
+  Object.defineProperty(Fastener.prototype, "parentType", {
+    get: function (this: Fastener): Proto<unknown> | null | undefined {
+      return void 0;
+    },
+    enumerable: true,
+    configurable: true,
+  });
+
   Object.defineProperty(Fastener.prototype, "inheritName", {
     get: function (this: Fastener): string | symbol | undefined {
       return (this.flags & Fastener.InheritsFlag) !== 0 ? this.name : void 0;
@@ -478,7 +489,7 @@ export const Fastener = (function (_super: typeof Object) {
   Fastener.prototype.getInlet = function (this: Fastener): Fastener | null {
     const inheritName = this.inheritName;
     if (inheritName !== void 0 && this.owner instanceof (FastenerContext as any)) {
-      return (this.owner as FastenerContext).getParentFastener(inheritName, this.fastenerType);
+      return (this.owner as FastenerContext).getParentFastener(inheritName, this.fastenerType, this.parentType);
     }
     return null;
   };

@@ -109,10 +109,10 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     }
   }
 
-  static fromAny(value: AnyUriPort | null | undefined): UriPort {
-    if (value === void 0 || value === null) {
-      return UriPort.undefined();
-    } else if (value instanceof UriPort) {
+  static fromAny(value: AnyUriPort): UriPort
+  static fromAny(value: AnyUriPort | null | undefined): UriPort | null | undefined
+  static fromAny(value: AnyUriPort | null | undefined): UriPort | null | undefined {
+    if (value === void 0 || value === null || value instanceof UriPort) {
       return value;
     } else if (typeof value === "number") {
       return UriPort.create(value);

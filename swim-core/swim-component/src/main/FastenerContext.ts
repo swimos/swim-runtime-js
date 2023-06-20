@@ -35,8 +35,7 @@ export interface FastenerContextClass<F extends Fastener<any> = Fastener<any>> {
 
 /** @public */
 export interface FastenerContext {
-  getParentFastener<F extends Fastener<any>>(fastenerName: string | symbol, fastenerBound: Proto<F>): F | null;
-  getParentFastener(fastenerName: string | symbol, fastenerBound?: Proto<Fastener> | null): Fastener | null;
+  getParentFastener<F extends Fastener<unknown>>(fastenerName: string | symbol, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null;
 
   decohereFastener?(fastener: Fastener): void;
 

@@ -118,10 +118,10 @@ export abstract class UriHost implements HashCode, Compare, Debug, Display {
     }
   }
 
-  static fromAny(value: AnyUriHost | null | undefined): UriHost {
-    if (value === void 0 || value === null) {
-      return UriHost.undefined();
-    } else if (value instanceof UriHost) {
+  static fromAny(value: AnyUriHost): UriHost;
+  static fromAny(value: AnyUriHost | null | undefined): UriHost | null | undefined;
+  static fromAny(value: AnyUriHost | null | undefined): UriHost | null | undefined {
+    if (value === void 0 || value === null || value instanceof UriHost) {
       return value;
     } else if (typeof value === "string") {
       return UriHost.parse(value);

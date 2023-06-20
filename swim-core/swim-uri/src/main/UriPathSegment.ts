@@ -45,6 +45,10 @@ export class UriPathSegment extends UriPath {
     return true;
   }
 
+  override isSegment(): boolean {
+    return true;
+  }
+
   override isEmpty(): boolean {
     return false;
   }

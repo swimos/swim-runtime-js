@@ -97,10 +97,10 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     }
   }
 
-  static fromAny(value: AnyUriScheme | null | undefined): UriScheme {
-    if (value === void 0 || value === null) {
-      return UriScheme.undefined();
-    } else if (value instanceof UriScheme) {
+  static fromAny(value: AnyUriScheme): UriScheme;
+  static fromAny(value: AnyUriScheme | null | undefined): UriScheme | null | undefined;
+  static fromAny(value: AnyUriScheme | null | undefined): UriScheme | null | undefined {
+    if (value === void 0 || value === null || value instanceof UriScheme) {
       return value;
     } else if (typeof value === "string") {
       return UriScheme.parse(value);

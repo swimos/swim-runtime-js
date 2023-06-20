@@ -220,10 +220,10 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     return new UriQueryParam(key, value as string, tail);
   }
 
-  static fromAny(value: AnyUriQuery | null | undefined): UriQuery {
-    if (value === void 0 || value === null) {
-      return UriQuery.undefined();
-    } else if (value instanceof UriQuery) {
+  static fromAny(value: AnyUriQuery): UriQuery;
+  static fromAny(value: AnyUriQuery | null | undefined): UriQuery | null | undefined;
+  static fromAny(value: AnyUriQuery | null | undefined): UriQuery | null | undefined {
+    if (value === void 0 || value === null || value instanceof UriQuery) {
       return value;
     } else if (typeof value === "object") {
       const builder = new UriQueryBuilder();

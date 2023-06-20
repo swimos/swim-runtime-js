@@ -117,10 +117,10 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     }
   }
 
-  static fromAny(value: AnyUriFragment | null | undefined): UriFragment {
-    if (value === void 0 || value === null) {
-      return UriFragment.undefined();
-    } else if (value instanceof UriFragment) {
+  static fromAny(value: AnyUriFragment): UriFragment;
+  static fromAny(value: AnyUriFragment | null | undefined): UriFragment | null | undefined;
+  static fromAny(value: AnyUriFragment | null | undefined): UriFragment | null | undefined {
+    if (value === void 0 || value === null || value instanceof UriFragment) {
       return value;
     } else if (typeof value === "string") {
       return UriFragment.parse(value);

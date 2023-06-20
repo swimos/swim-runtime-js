@@ -732,33 +732,31 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return target;
   }
 
-  getParent<F extends Class<C>>(parentBound: F): InstanceType<F> | null;
-  getParent(parentBound: Class<C>): C | null;
-  getParent(parentBound: Class<C>): C | null {
-    const parent = this.parent;
-    if (parent === null) {
-      return null;
-    } else if (parent instanceof parentBound) {
-      return parent;
-    } else {
-      return (parent as C).getParent(parentBound);
+  getParent<F extends Class<C>>(parentType: F): InstanceType<F> | null;
+  getParent(parentType: Class<C>): C | null;
+  getParent(parentType: Class<C>): C | null {
+    let parent = this.parent;
+    while (parent !== null) {
+      if (parent instanceof parentType) {
+        return parent;
+      }
+      parent = parent.parent;
     }
+    return null;
   }
 
-  getBase<F extends Class<C>>(baseBound: F): InstanceType<F> | null;
-  getBase(baseBound: Class<C>): C | null;
-  getBase(baseBound: Class<C>): C | null {
-    const parent = this.parent;
-    if (parent === null) {
-      return null;
-    } else {
-      const base = parent.getBase(baseBound);
-      if (base !== null) {
-        return base;
-      } else {
-        return parent instanceof baseBound ? parent : null;
+  getBase<F extends Class<C>>(baseType: F): InstanceType<F> | null;
+  getBase(baseType: Class<C>): C | null;
+  getBase(baseType: Class<C>): C | null {
+    let base: C | null = null;
+    let parent = this.parent;
+    while (parent !== null) {
+      if (parent instanceof baseType) {
+        base = parent;
       }
+      parent = parent.parent;
     }
+    return base;
   }
 
   isAncestorOf(descendant: C | null): boolean;
@@ -889,21 +887,28 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     // hook
   }
 
-  /** @override */
-  getParentFastener<F extends Fastener<any>>(fastenerName: string | symbol, fastenerBound: Proto<F>): F | null;
-  /** @override */
-  getParentFastener(fastenerName: string | symbol, fastenerBound?: Proto<Fastener> | null): Fastener | null;
-  getParentFastener(fastenerName: string | symbol, fastenerBound?: Proto<Fastener> | null): Fastener | null {
-    const parent = this.parent;
-    if (parent === null) {
+  getFastener<F extends Fastener<unknown>>(fastenerName: string | symbol, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
+    if (contextType !== void 0 && contextType !== null && !(this instanceof contextType)) {
       return null;
     }
-    const parentFastener = (parent as any)[fastenerName] as Fastener<any> | undefined;
-    if (parentFastener !== void 0 && (fastenerBound === void 0 || fastenerBound === null
-        || parentFastener instanceof fastenerBound)) {
-      return parentFastener;
+    const fastener = (this as any)[fastenerName] as F | null | undefined;
+    if (fastener === void 0 || (fastenerType !== void 0 && fastenerType !== null && !(fastener instanceof fastenerType))) {
+      return null;
     }
-    return parent.getParentFastener(fastenerName, fastenerBound);
+    return fastener;
+  }
+
+  /** @override */
+  getParentFastener<F extends Fastener<unknown>>(fastenerName: string | symbol, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
+    let parent = this.parent;
+    while (parent !== null) {
+      const fastener = parent.getFastener(fastenerName, fastenerType, contextType);
+      if (fastener !== null) {
+        return fastener;
+      }
+      parent = parent.parent;
+    }
+    return null;
   }
 
   /** @internal */

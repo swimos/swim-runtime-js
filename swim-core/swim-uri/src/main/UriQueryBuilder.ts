@@ -146,4 +146,9 @@ export class UriQueryBuilder implements PairBuilder<string | undefined, string, 
     }
     return xi!;
   }
+
+  /** @override */
+  toString(): string {
+    return this.bind().toString();
+  }
 }

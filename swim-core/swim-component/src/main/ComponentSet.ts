@@ -285,12 +285,18 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     let parent: Component | null;
     if (this.binds && (parent = this.parentComponent, parent !== null)) {
       if (target === null) {
-        target = this.getTargetChild(parent, newComponent);
+        if (newComponent.parent === parent) {
+          target = newComponent.nextSibling;
+        } else {
+          target = this.getTargetChild(parent, newComponent);
+        }
       }
       if (key === void 0) {
         key = this.componentKey(newComponent);
       }
-      this.insertChild(parent, newComponent, target, key);
+      if (newComponent.parent !== parent || newComponent.nextSibling !== target || newComponent.key !== key) {
+        this.insertChild(parent, newComponent, target, key);
+      }
     }
     if (this.components[newComponent.uid] === void 0) {
       this.insertComponentMap(newComponent, target);

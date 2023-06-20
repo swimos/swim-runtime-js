@@ -276,16 +276,25 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
   }
 
   static fromInit(init: UriAuthorityInit): UriAuthority {
-    const user = UriUser.fromAny(init.user !== void 0 ? init.user : init);
-    const host = UriHost.fromAny(init.host);
-    const port = UriPort.fromAny(init.port);
+    let user = UriUser.fromAny(init.user !== void 0 ? init.user : init);
+    if (user === void 0 || user === null) {
+      user = UriUser.undefined();
+    }
+    let host = UriHost.fromAny(init.host);
+    if (host === void 0 || host === null) {
+      host = UriHost.undefined();
+    }
+    let port = UriPort.fromAny(init.port);
+    if (port === void 0 || port === null) {
+      port = UriPort.undefined();
+    }
     return UriAuthority.create(user, host, port);
   }
 
-  static fromAny(value: AnyUriAuthority | null | undefined): UriAuthority {
-    if (value === void 0 || value === null) {
-      return UriAuthority.undefined();
-    } else if (value instanceof UriAuthority) {
+  static fromAny(value: AnyUriAuthority): UriAuthority;
+  static fromAny(value: AnyUriAuthority | null | undefined): UriAuthority | null | undefined;
+  static fromAny(value: AnyUriAuthority | null | undefined): UriAuthority | null | undefined {
+    if (value === void 0 || value === null || value instanceof UriAuthority) {
       return value;
     } else if (typeof value === "object") {
       return UriAuthority.fromInit(value);

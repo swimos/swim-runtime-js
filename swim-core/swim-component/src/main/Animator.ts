@@ -312,54 +312,57 @@ export const Animator = (function (_super: typeof Property) {
     if (affinity === void 0) {
       affinity = Affinity.Extrinsic;
     }
+    if (!this.minAffinity(affinity)) {
+      return;
+    }
 
-    if (this.minAffinity(affinity)) {
-      newState = this.fromAny(newState);
-      newState = this.transformState(newState);
-      const oldState = this.state;
-      if (!this.equalValues(newState, oldState)) {
-        if (timing === void 0 || timing === null || timing === false) {
-          timing = false;
-        } else if (timing === true) {
-          timing = this.timing !== null ? this.timing : false;
-        } else {
-          timing = Timing.fromAny(timing);
-        }
+    newState = this.fromAny(newState);
+    newState = this.transformState(newState);
+    const oldState = this.state;
+    if (this.equalValues(newState, oldState) && timing === void 0) {
+      return;
+    }
 
-        const animated = timing !== false && this.definedValue(oldState);
+    if (timing === void 0 || timing === null || timing === false) {
+      timing = false;
+    } else if (timing === true) {
+      timing = this.timing !== null ? this.timing : false;
+    } else {
+      timing = Timing.fromAny(timing);
+    }
 
-        this.willSetState(newState, oldState);
+    const animated = timing !== false && this.definedValue(oldState);
 
-        (this as Mutable<typeof this>).state = newState;
+    this.willSetState(newState, oldState);
 
-        if (animated) {
-          (this as Mutable<typeof this>).timing = timing as Timing;
-          (this as Mutable<typeof this>).interpolator = Interpolator(this.value, newState);
-          if ((this.flags & Animator.TweeningFlag) !== 0) {
-            this.setFlags(this.flags | (Animator.DivergedFlag | Animator.InterruptFlag));
-          } else {
-            this.setFlags(this.flags | Animator.DivergedFlag);
-          }
-        } else {
-          (this as Mutable<typeof this>).timing = null;
-          (this as Mutable<typeof this>).interpolator = null;
-        }
+    (this as Mutable<typeof this>).state = newState;
 
-        this.onSetState(newState, oldState);
-
-        if (!animated) {
-          this.setValue(newState, Affinity.Reflexive);
-        }
-
-        this.didSetState(newState, oldState);
-
-        if (animated) {
-          this.startTweening();
-        } else if ((this.flags & Animator.TweeningFlag) !== 0) {
-          this.didInterrupt(this.value);
-          this.stopTweening();
-        }
+    if (animated) {
+      (this as Mutable<typeof this>).timing = timing as Timing;
+      (this as Mutable<typeof this>).interpolator = Interpolator(this.value, newState);
+      if ((this.flags & Animator.TweeningFlag) !== 0) {
+        this.setFlags(this.flags | (Animator.DivergedFlag | Animator.InterruptFlag));
+      } else {
+        this.setFlags(this.flags | Animator.DivergedFlag);
       }
+    } else {
+      (this as Mutable<typeof this>).timing = null;
+      (this as Mutable<typeof this>).interpolator = null;
+    }
+
+    this.onSetState(newState, oldState);
+
+    if (!animated) {
+      this.setValue(newState, Affinity.Reflexive);
+    }
+
+    this.didSetState(newState, oldState);
+
+    if (animated) {
+      this.startTweening();
+    } else if ((this.flags & Animator.TweeningFlag) !== 0) {
+      this.didInterrupt(this.value);
+      this.stopTweening();
     }
   };
 

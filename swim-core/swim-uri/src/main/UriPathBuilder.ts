@@ -186,4 +186,9 @@ export class UriPathBuilder implements Builder<string, UriPath> {
     }
     return xi!;
   }
+
+  /** @override */
+  toString(): string {
+    return this.bind().toString();
+  }
 }

@@ -135,10 +135,10 @@ export class UriUser implements HashCode, Debug, Display {
     return UriUser.create(init.username, init.password);
   }
 
-  static fromAny(value: AnyUriUser | null | undefined): UriUser {
-    if (value === void 0 || value === null) {
-      return UriUser.undefined();
-    } else if (value instanceof UriUser) {
+  static fromAny(value: AnyUriUser): UriUser;
+  static fromAny(value: AnyUriUser | null | undefined): UriUser | null | undefined;
+  static fromAny(value: AnyUriUser | null | undefined): UriUser | null | undefined {
+    if (value === void 0 || value === null || value instanceof UriUser) {
       return value;
     } else if (typeof value === "object") {
       return UriUser.fromInit(value);
