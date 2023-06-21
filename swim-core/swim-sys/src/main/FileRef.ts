@@ -153,12 +153,13 @@ export const FileRef = (function (_super: typeof FileRelation) {
 
   FileRef.prototype.setFileName = function (this: FileRef, newFileName: string | undefined): void {
     const oldFileName = this.fileName;
-    if (newFileName !== oldFileName) {
-      this.willSetFileName(newFileName, oldFileName);
-      (this as Mutable<typeof this>).fileName = newFileName;
-      this.onSetFileName(newFileName, oldFileName);
-      this.didSetFileName(newFileName, oldFileName);
+    if (newFileName === oldFileName) {
+      return;
     }
+    this.willSetFileName(newFileName, oldFileName);
+    (this as Mutable<typeof this>).fileName = newFileName;
+    this.onSetFileName(newFileName, oldFileName);
+    this.didSetFileName(newFileName, oldFileName);
   };
 
   FileRef.prototype.willSetFileName = function (this: FileRef, newFileName: string | undefined, oldFileName: string | undefined): void {
@@ -284,13 +285,14 @@ export const FileRef = (function (_super: typeof FileRelation) {
   FileRef.prototype.setValue = function <T>(this: FileRef<unknown, T>, path: string, newValue: T): void {
     (this as Mutable<typeof this>).path = path;
     const oldValue = this.value;
-    if (!this.equalValues(newValue, oldValue)) {
-      this.willSetValue(path, newValue, oldValue);
-      (this as Mutable<typeof this>).value = newValue;
-      this.setFlags(this.flags | FileRef.ModifiedFlag);
-      this.onSetValue(path, newValue, oldValue);
-      this.didSetValue(path, newValue, oldValue);
+    if (this.equalValues(newValue, oldValue)) {
+      return;
     }
+    this.willSetValue(path, newValue, oldValue);
+    (this as Mutable<typeof this>).value = newValue;
+    this.setFlags(this.flags | FileRef.ModifiedFlag);
+    this.onSetValue(path, newValue, oldValue);
+    this.didSetValue(path, newValue, oldValue);
   };
 
   FileRef.construct = function <F extends FileRef<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {

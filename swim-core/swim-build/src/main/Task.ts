@@ -53,9 +53,9 @@ export interface TaskObserver<T extends Task = Task> extends ScopeObserver<T> {
 
 /** @public */
 export abstract class Task extends Scope {
-  override readonly observerType?: Class<TaskObserver>;
+  declare readonly observerType?: Class<TaskObserver>;
 
-  readonly optionsType?: Class<TaskOptions>;
+  declare readonly optionsType?: Class<TaskOptions>;
 
   @Property({valueType: String, inherits: true})
   override readonly baseDir!: Property<this, string | undefined>;

@@ -31,7 +31,7 @@ export class PublishTask extends PackageTask {
     return "publish";
   }
 
-  override readonly optionsType?: Class<PublishTaskOptions>;
+  declare readonly optionsType?: Class<PublishTaskOptions>;
 
   override async exec(options?: PublishTaskOptions): Promise<TaskStatus> {
     return new Promise<TaskStatus>((resolve, reject): void => {

@@ -108,7 +108,10 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   didUnderive(inlet: ComponentSet<unknown, C>): void;
 
   /** @override */
-  getInlet(): ComponentSet<unknown, C> | null;
+  deriveInlet(): ComponentSet<unknown, C> | null;
+
+  /** @override */
+  bindInlet(inlet: ComponentSet<unknown, C>): void;
 
   /** @override */
   readonly inlet: ComponentSet<unknown, C> | null;

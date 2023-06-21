@@ -44,7 +44,7 @@ export class WatcherScope extends Scope {
     this.changedPackageCount = 0;
   }
 
-  override readonly observerType?: Class<WatcherScopeObserver>;
+  declare readonly observerType?: Class<WatcherScopeObserver>;
 
   override get name(): string {
     return "watcher";

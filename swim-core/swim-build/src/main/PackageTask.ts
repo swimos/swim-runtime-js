@@ -23,9 +23,9 @@ export interface PackageTaskOptions extends TaskOptions {
 
 /** @public */
 export abstract class PackageTask extends Task {
-  override readonly optionsType?: Class<PackageTaskOptions>;
+  declare readonly optionsType?: Class<PackageTaskOptions>;
 
   get packageScope(): PackageScope | null {
-    return this.getParent(PackageScope);
+    return this.getAncestor(PackageScope);
   }
 }

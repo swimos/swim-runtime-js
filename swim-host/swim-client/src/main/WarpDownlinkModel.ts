@@ -230,7 +230,7 @@ export class WarpDownlinkModel extends Component {
   }
 
   sync(): void {
-    const host = this.getParent(WarpHost);
+    const host = this.getAncestor(WarpHost);
     if (host !== null) {
       const nodeUri = host.unresolve(this.nodeUri);
       const request = new SyncRequest(nodeUri, this.laneUri, this.prio, this.rate, this.body);
@@ -240,7 +240,7 @@ export class WarpDownlinkModel extends Component {
   }
 
   link(): void {
-    const host = this.getParent(WarpHost);
+    const host = this.getAncestor(WarpHost);
     if (host !== null) {
       const nodeUri = host.unresolve(this.nodeUri);
       const request = new LinkRequest(nodeUri, this.laneUri, this.prio, this.rate, this.body);
@@ -251,7 +251,7 @@ export class WarpDownlinkModel extends Component {
 
   unlink(): void {
     this.setFlags(this.flags & ~WarpDownlinkModel.DownlinkMask | WarpDownlinkModel.UnlinkingFlag);
-    const host = this.getParent(WarpHost);
+    const host = this.getAncestor(WarpHost);
     if (host !== null) {
       host.unlinkDownlink(this);
     }
@@ -267,7 +267,7 @@ export class WarpDownlinkModel extends Component {
   readonly unlinkDelay!: Property<this, number>;
 
   command(body: AnyValue): void {
-    const host = this.getParent(WarpHost);
+    const host = this.getAncestor(WarpHost);
     if (host !== null) {
       body = Value.fromAny(body);
       this.onCommandMessage(body);

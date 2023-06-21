@@ -107,7 +107,10 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   didUnderive(inlet: Property<unknown, T>): void;
 
   /** @override */
-  getInlet(): Property<unknown, T> | null;
+  deriveInlet(): Property<unknown, T> | null;
+
+  /** @override */
+  bindInlet(inlet: Property<unknown, T, any>): void;
 
   /** @override */
   readonly inlet: Property<unknown, T> | null;

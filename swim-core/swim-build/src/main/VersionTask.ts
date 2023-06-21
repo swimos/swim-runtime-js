@@ -36,7 +36,7 @@ export class VersionTask extends PackageTask {
     return "version";
   }
 
-  override readonly optionsType?: Class<VersionTaskOptions>;
+  declare readonly optionsType?: Class<VersionTaskOptions>;
 
   override async exec(options?: VersionTaskOptions): Promise<TaskStatus> {
     const packageVersions = options !== void 0 ? options.packageVersions : void 0;

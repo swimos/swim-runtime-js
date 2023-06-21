@@ -95,7 +95,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @override */
-  readonly observerType?: Class<ComponentObserver>;
+  declare readonly observerType?: Class<ComponentObserver>;
 
   /** @internal */
   readonly uid: string;
@@ -241,18 +241,17 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   readonly nextSibling: C | null;
 
-  getNextSibling<F extends Class<C>>(siblingBound: F): InstanceType<F> | null;
-  getNextSibling(siblingBound: Class<C>): C | null;
-  getNextSibling(siblingBound: Class<C>): C | null {
+  getNextSibling<F extends Class<C>>(siblingType: F): InstanceType<F> | null;
+  getNextSibling(siblingType: Class<C>): C | null;
+  getNextSibling(siblingType: Class<C>): C | null {
     let nextSibling = this.nextSibling;
     do {
       if (nextSibling === null) {
         return null;
-      } else if (nextSibling instanceof siblingBound) {
+      } else if (nextSibling instanceof siblingType) {
         return nextSibling;
-      } else {
-        nextSibling = nextSibling.nextSibling;
       }
+      nextSibling = nextSibling.nextSibling;
     } while (true);
   }
 
@@ -263,18 +262,17 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   readonly previousSibling: C | null;
 
-  getPreviousSibling<F extends Class<C>>(siblingBound: F): InstanceType<F> | null;
-  getPreviousSibling(siblingBound: Class<C>): C | null;
-  getPreviousSibling(siblingBound: Class<C>): C | null {
+  getPreviousSibling<F extends Class<C>>(siblingType: F): InstanceType<F> | null;
+  getPreviousSibling(siblingType: Class<C>): C | null;
+  getPreviousSibling(siblingType: Class<C>): C | null {
     let previousSibling = this.previousSibling;
     do {
       if (previousSibling === null) {
         return null;
-      } else if (previousSibling instanceof siblingBound) {
+      } else if (previousSibling instanceof siblingType) {
         return previousSibling;
-      } else {
-        previousSibling = previousSibling.previousSibling;
       }
+      previousSibling = previousSibling.previousSibling;
     } while (true);
   }
 
@@ -285,18 +283,17 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   readonly firstChild: C | null;
 
-  getFirstChild<F extends Class<C>>(childBound: F): InstanceType<F> | null;
-  getFirstChild(childBound: Class<C>): C | null;
-  getFirstChild(childBound: Class<C>): C | null {
+  getFirstChild<F extends Class<C>>(childType: F): InstanceType<F> | null;
+  getFirstChild(childType: Class<C>): C | null;
+  getFirstChild(childType: Class<C>): C | null {
     let child = this.firstChild;
     do {
       if (child === null) {
         return null;
-      } else if (child instanceof childBound) {
+      } else if (child instanceof childType) {
         return child;
-      } else {
-        child = child.nextSibling;
       }
+      child = child.nextSibling;
     } while (true);
   }
 
@@ -307,18 +304,17 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   readonly lastChild: C | null;
 
-  getLastChild<F extends Class<C>>(childBound: F): InstanceType<F> | null;
-  getLastChild(childBound: Class<C>): C | null;
-  getLastChild(childBound: Class<C>): C | null {
+  getLastChild<F extends Class<C>>(childType: F): InstanceType<F> | null;
+  getLastChild(childType: Class<C>): C | null;
+  getLastChild(childType: Class<C>): C | null {
     let child = this.lastChild;
     do {
       if (child === null) {
         return null;
-      } else if (child instanceof childBound) {
+      } else if (child instanceof childType) {
         return child;
-      } else {
-        child = child.previousSibling;
       }
+      child = child.previousSibling;
     } while (true);
   }
 
@@ -349,38 +345,41 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   /** @internal */
   protected insertChildMap(child: C): void {
     const key = child.key;
-    if (key !== void 0) {
-      let childMap = this.childMap as MutableDictionary<C>;
-      if (childMap === null) {
-        childMap = {};
-        (this as Mutable<this>).childMap = childMap;
-      }
-      childMap[key] = child;
+    if (key === void 0) {
+      return;
     }
+    let childMap = this.childMap as MutableDictionary<C>;
+    if (childMap === null) {
+      childMap = {};
+      (this as Mutable<this>).childMap = childMap;
+    }
+    childMap[key] = child;
   }
 
   /** @internal */
   protected removeChildMap(child: C): void {
     const key = child.key;
-    if (key !== void 0) {
-      const childMap = this.childMap as MutableDictionary<C>;
-      if (childMap !== null) {
-        delete childMap[key];
-      }
+    if (key === void 0) {
+      return;
+    }
+    const childMap = this.childMap as MutableDictionary<C>;
+    if (childMap !== null) {
+      delete childMap[key];
     }
   }
 
-  getChild<F extends Class<C>>(key: string, childBound: F): InstanceType<F> | null;
-  getChild(key: string, childBound?: Class<C>): C | null;
-  getChild(key: string, childBound?: Class<C>): C | null {
+  getChild<F extends Class<C>>(key: string, childType: F): InstanceType<F> | null;
+  getChild(key: string, childType?: Class<C>): C | null;
+  getChild(key: string, childType?: Class<C>): C | null {
     const childMap = this.childMap;
-    if (childMap !== null) {
-      const child = childMap[key];
-      if (child !== void 0 && (childBound === void 0 || child instanceof childBound)) {
-        return child;
-      }
+    if (childMap === null) {
+      return null;
     }
-    return null;
+    const child = childMap[key];
+    if (child === void 0 || (childType !== void 0 && !(child instanceof childType))) {
+      return null;
+    }
+    return child;
   }
 
   setChild(key: string, newChild: C | null): C | null;
@@ -691,26 +690,28 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   sortChildren(comparator: Comparator<C>): void {
     let child = this.firstChild;
-    if (child !== null) {
-      const children: C[] = [];
-      do {
-        children.push(child);
-        child = child.nextSibling;
-      } while (child !== null);
-      children.sort(comparator);
-
-      child = children[0]!;
-      this.setFirstChild(child);
-      child.setPreviousSibling(null);
-      for (let i = 1; i < children.length; i += 1) {
-        const next = children[i]!;
-        child.setNextSibling(next);
-        next.setPreviousSibling(child);
-        child = next;
-      }
-      child.setNextSibling(null);
-      this.setLastChild(child);
+    if (child === null) {
+      return;
     }
+
+    const children: C[] = [];
+    do {
+      children.push(child);
+      child = child.nextSibling;
+    } while (child !== null);
+    children.sort(comparator);
+
+    child = children[0]!;
+    this.setFirstChild(child);
+    child.setPreviousSibling(null);
+    for (let i = 1; i < children.length; i += 1) {
+      const next = children[i]!;
+      child.setNextSibling(next);
+      next.setPreviousSibling(child);
+      child = next;
+    }
+    child.setNextSibling(null);
+    this.setLastChild(child);
   }
 
   getTargetChild(child: C, comparator: Comparator<C>): C | null {
@@ -732,29 +733,29 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return target;
   }
 
-  getParent<F extends Class<C>>(parentType: F): InstanceType<F> | null;
-  getParent(parentType: Class<C>): C | null;
-  getParent(parentType: Class<C>): C | null {
-    let parent = this.parent;
-    while (parent !== null) {
-      if (parent instanceof parentType) {
-        return parent;
+  getAncestor<F extends Class<C>>(ancestorType: F): InstanceType<F> | null;
+  getAncestor(ancestorType: Class<C>): C | null;
+  getAncestor(ancestorType: Class<C>): C | null {
+    let ancestor = this.parent;
+    while (ancestor !== null) {
+      if (ancestor instanceof ancestorType) {
+        return ancestor;
       }
-      parent = parent.parent;
+      ancestor = ancestor.parent;
     }
     return null;
   }
 
-  getBase<F extends Class<C>>(baseType: F): InstanceType<F> | null;
-  getBase(baseType: Class<C>): C | null;
-  getBase(baseType: Class<C>): C | null {
+  getRoot<F extends Class<C>>(rootType: F): InstanceType<F> | null;
+  getRoot(rootType: Class<C>): C | null;
+  getRoot(rootType: Class<C>): C | null {
     let base: C | null = null;
-    let parent = this.parent;
-    while (parent !== null) {
-      if (parent instanceof baseType) {
-        base = parent;
+    let ancestor = this.parent;
+    while (ancestor !== null) {
+      if (ancestor instanceof rootType) {
+        base = ancestor;
       }
-      parent = parent.parent;
+      ancestor = ancestor.parent;
     }
     return base;
   }
@@ -790,25 +791,25 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   mount(): void {
-    if (!this.mounted && this.parent === null) {
-      this.setFlags(this.flags | Component.InsertingFlag);
-      this.cascadeMount();
-      this.cascadeInsert();
-      this.setFlags(this.flags & ~Component.InsertingFlag);
+    if (this.mounted || this.parent !== null) {
+      return;
     }
+    this.setFlags(this.flags | Component.InsertingFlag);
+    this.cascadeMount();
+    this.cascadeInsert();
+    this.setFlags(this.flags & ~Component.InsertingFlag);
   }
 
   /** @internal */
   cascadeMount(): void {
-    if ((this.flags & Component.MountedFlag) === 0) {
-      this.willMount();
-      this.setFlags(this.flags | Component.MountedFlag);
-      this.onMount();
-      this.mountChildren();
-      this.didMount();
-    } else {
+    if ((this.flags & Component.MountedFlag) !== 0) {
       throw new Error("already mounted");
     }
+    this.willMount();
+    this.setFlags(this.flags | Component.MountedFlag);
+    this.onMount();
+    this.mountChildren();
+    this.didMount();
   }
 
   protected willMount(): void {
@@ -839,22 +840,22 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   unmount(): void {
-    if (this.mounted && this.parent === null) {
-      this.cascadeUnmount();
+    if (!this.mounted || this.parent !== null) {
+      return;
     }
+    this.cascadeUnmount();
   }
 
   /** @internal */
   cascadeUnmount(): void {
-    if ((this.flags & Component.MountedFlag) !== 0) {
-      this.willUnmount();
-      this.setFlags(this.flags & ~Component.MountedFlag);
-      this.unmountChildren();
-      this.onUnmount();
-      this.didUnmount();
-    } else {
+    if ((this.flags & Component.MountedFlag) === 0) {
       throw new Error("already unmounted");
     }
+    this.willUnmount();
+    this.setFlags(this.flags & ~Component.MountedFlag);
+    this.unmountChildren();
+    this.onUnmount();
+    this.didUnmount();
   }
 
   protected willUnmount(): void {
@@ -935,13 +936,14 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   protected bindFastener(fastener: Fastener): void;
   protected bindFastener(this: C, fastener: Fastener): void {
-    if (fastener.binds) {
-      let child = this.firstChild;
-      while (child !== null) {
-        const next = child.nextSibling;
-        this.bindChildFastener(fastener, child, next);
-        child = next !== null && next.parent === this ? next : null;
-      }
+    if (!fastener.binds) {
+      return;
+    }
+    let child = this.firstChild;
+    while (child !== null) {
+      const next = child.nextSibling;
+      this.bindChildFastener(fastener, child, next);
+      child = next !== null && next.parent === this ? next : null;
     }
   }
 
@@ -1047,12 +1049,13 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   observe(observer: Observes<this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.inserted(observer, oldObservers);
-    if (oldObservers !== newObservers) {
-      this.willObserve(observer);
-      (this as Mutable<this>).observers = newObservers;
-      this.onObserve(observer);
-      this.didObserve(observer);
+    if (oldObservers === newObservers) {
+      return;
     }
+    this.willObserve(observer);
+    (this as Mutable<this>).observers = newObservers;
+    this.onObserve(observer);
+    this.didObserve(observer);
   }
 
   protected willObserve(observer: Observes<this>): void {
@@ -1071,12 +1074,13 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   unobserve(observer: Observes<this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.removed(observer, oldObservers);
-    if (oldObservers !== newObservers) {
-      this.willUnobserve(observer);
-      (this as Mutable<this>).observers = newObservers;
-      this.onUnobserve(observer);
-      this.didUnobserve(observer);
+    if (oldObservers === newObservers) {
+      return;
     }
+    this.willUnobserve(observer);
+    (this as Mutable<this>).observers = newObservers;
+    this.onUnobserve(observer);
+    this.didUnobserve(observer);
   }
 
   protected willUnobserve(observer: Observes<this>): void {

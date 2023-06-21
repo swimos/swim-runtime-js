@@ -115,7 +115,10 @@ export interface Provider<O = unknown, S extends Service = Service> extends Fast
   didUnderive(inlet: Provider<unknown, S>): void;
 
   /** @internal @override */
-  getInlet(): Provider<unknown, S> | null;
+  deriveInlet(): Provider<unknown, S> | null;
+
+  /** @override */
+  bindInlet(inlet: Provider<unknown, S>): void;
 
   /** @override */
   get inlet(): Provider<unknown, S> | null;
@@ -345,7 +348,7 @@ export const Provider = (function (_super: typeof Fastener) {
 
   Object.defineProperty(Provider.prototype, "parentService", {
     get<S extends Service>(this: Provider<unknown, S>): S | null {
-      const parentProvider = this.getInlet();
+      const parentProvider = this.deriveInlet();
       return parentProvider !== null ? parentProvider.service : null;
     },
     enumerable: true,

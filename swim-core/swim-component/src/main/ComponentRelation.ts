@@ -96,7 +96,10 @@ export interface ComponentRelation<O = unknown, C extends Component = Component>
   didUnderive(inlet: ComponentRelation<unknown, C>): void;
 
   /** @override */
-  getInlet(): ComponentRelation<unknown, C> | null;
+  deriveInlet(): ComponentRelation<unknown, C> | null;
+
+  /** @override */
+  bindInlet(inlet: ComponentRelation<unknown, C>): void;
 
   /** @override */
   readonly inlet: ComponentRelation<unknown, C> | null;

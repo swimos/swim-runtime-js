@@ -47,12 +47,12 @@ export class LibraryScope extends Scope {
     this.name = name;
   }
 
-  override readonly observerType?: Class<LibraryScopeObserver>;
+  declare readonly observerType?: Class<LibraryScopeObserver>;
 
   override readonly name: string;
 
   get packageScope(): PackageScope | null {
-    return this.getParent(PackageScope);
+    return this.getAncestor(PackageScope);
   }
 
   @ComponentRef({

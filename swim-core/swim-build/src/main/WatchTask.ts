@@ -34,7 +34,7 @@ export interface WatchTaskObserver<T extends WatchTask = WatchTask> extends Task
 
 /** @public */
 export class WatchTask extends LibraryTask {
-  override readonly observerType?: Class<WatchTaskObserver>;
+  declare readonly observerType?: Class<WatchTaskObserver>;
 
   override get name(): string {
     return "watch";

@@ -32,7 +32,7 @@ export class BuildTask extends LibraryTask {
     return "build";
   }
 
-  override readonly optionsType?: Class<BuildTaskOptions>;
+  declare readonly optionsType?: Class<BuildTaskOptions>;
 
   override async exec(options?: BuildTaskOptions): Promise<TaskStatus> {
     const packageScope = this.packageScope;

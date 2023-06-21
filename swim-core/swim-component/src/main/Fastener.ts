@@ -186,11 +186,14 @@ export interface Fastener<O = unknown> {
   /** @protected */
   didUnderive(inlet: Fastener): void;
 
-  getInlet(): Fastener | null;
+  deriveInlet(): Fastener | null;
 
   get inlet(): Fastener | null;
 
-  bindInlet(inlet?: Fastener): void;
+  /** @internal */
+  inheritInlet(): void;
+
+  bindInlet(inlet: Fastener): void;
 
   /** @protected */
   willBindInlet(inlet: Fastener): void;
@@ -200,6 +203,9 @@ export interface Fastener<O = unknown> {
 
   /** @protected */
   didBindInlet(inlet: Fastener): void;
+
+  /** @internal */
+  uninheritInlet(): void;
 
   unbindInlet(): void;
 
@@ -325,12 +331,13 @@ export const Fastener = (function (_super: typeof Object) {
       throw new Error("invalid affinity: " + newAffinity);
     }
     const oldAffinity = this.flags & Affinity.Mask;
-    if (newAffinity !== oldAffinity) {
-      this.willSetAffinity(newAffinity, oldAffinity);
-      this.setFlags(this.flags & ~Affinity.Mask | newAffinity);
-      this.onSetAffinity(newAffinity, oldAffinity);
-      this.didSetAffinity(newAffinity, oldAffinity);
+    if (newAffinity === oldAffinity) {
+      return;
     }
+    this.willSetAffinity(newAffinity, oldAffinity);
+    this.setFlags(this.flags & ~Affinity.Mask | newAffinity);
+    this.onSetAffinity(newAffinity, oldAffinity);
+    this.didSetAffinity(newAffinity, oldAffinity);
   };
 
   Fastener.prototype.willSetAffinity = function (this: Fastener, newAffinity: Affinity, oldAffinity: Affinity): void {
@@ -407,24 +414,26 @@ export const Fastener = (function (_super: typeof Object) {
       }
       inherits = true;
     }
-    if (inherits !== ((this.flags & Fastener.InheritsFlag) !== 0) || inheritName !== void 0) {
+    if (inherits && ((this.flags & Fastener.InheritsFlag) === 0 || (inheritName !== void 0 && inheritName !== this.name))) {
       this.unbindInlet();
-      this.willSetInherits(inherits, inheritName);
-      if (inherits) {
-        if (inheritName !== void 0) {
-          Object.defineProperty(this, "name", {
-            value: inheritName,
-            enumerable: true,
-            configurable: true,
-          });
-        }
-        this.setFlags(this.flags | Fastener.InheritsFlag);
-      } else {
-        this.setFlags(this.flags & ~Fastener.InheritsFlag);
+      this.willSetInherits(true, inheritName);
+      if (inheritName !== void 0) {
+        Object.defineProperty(this, "name", {
+          value: inheritName,
+          enumerable: true,
+          configurable: true,
+        });
       }
-      this.onSetInherits(inherits, inheritName);
-      this.didSetInherits(inherits, inheritName);
-      this.bindInlet();
+      this.setFlags(this.flags | Fastener.InheritsFlag);
+      this.onSetInherits(true, inheritName);
+      this.didSetInherits(true, inheritName);
+      this.inheritInlet();
+    } else if (!inherits && (this.flags & Fastener.InheritsFlag) !== 0) {
+      this.unbindInlet();
+      this.willSetInherits(false, inheritName);
+      this.setFlags(this.flags & ~Fastener.InheritsFlag);
+      this.onSetInherits(false, inheritName);
+      this.didSetInherits(false, inheritName);
     }
   };
 
@@ -486,32 +495,42 @@ export const Fastener = (function (_super: typeof Object) {
     // hook
   };
 
-  Fastener.prototype.getInlet = function (this: Fastener): Fastener | null {
+  Fastener.prototype.deriveInlet = function (this: Fastener): Fastener | null {
     const inheritName = this.inheritName;
-    if (inheritName !== void 0 && this.owner instanceof (FastenerContext as any)) {
-      return (this.owner as FastenerContext).getParentFastener(inheritName, this.fastenerType, this.parentType);
+    if (inheritName === void 0 || !FastenerContext[Symbol.hasInstance](this.owner)) {
+      return null;
     }
-    return null;
+    return this.owner.getParentFastener(inheritName, this.fastenerType, this.parentType);
   };
 
   Object.defineProperty(Fastener.prototype, "inlet", {
     get: function (this: Fastener): Fastener | null {
-      return this.getInlet();
+      return this.deriveInlet();
     },
     enumerable: true,
     configurable: true,
   });
 
-  Fastener.prototype.bindInlet = function (this: Fastener, inlet?: Fastener | null): void {
-    if (inlet === void 0) {
-      inlet = this.getInlet();
+  Fastener.prototype.inheritInlet = function (this: Fastener): void {
+    if ((this.flags & Fastener.InheritsFlag) === 0) {
+      return;
     }
-    if (inlet !== void 0 && inlet !== null) {
-      this.willBindInlet(inlet);
-      inlet.attachOutlet(this);
-      this.onBindInlet(inlet);
-      this.didBindInlet(inlet);
+    const inlet = this.deriveInlet();
+    if (inlet === null) {
+      return;
     }
+    this.willBindInlet(inlet);
+    inlet.attachOutlet(this);
+    this.onBindInlet(inlet);
+    this.didBindInlet(inlet);
+  };
+
+  Fastener.prototype.bindInlet = function (this: Fastener, inlet: Fastener): void {
+    this.setInherits(false);
+    this.willBindInlet(inlet);
+    inlet.attachOutlet(this);
+    this.onBindInlet(inlet);
+    this.didBindInlet(inlet);
   };
 
   Fastener.prototype.willBindInlet = function (this: Fastener, inlet: Fastener): void {
@@ -528,14 +547,29 @@ export const Fastener = (function (_super: typeof Object) {
     // hook
   };
 
+  Fastener.prototype.uninheritInlet = function (this: Fastener): void {
+    if ((this.flags & Fastener.InheritsFlag) === 0) {
+      return;
+    }
+    const inlet = this.inlet;
+    if (inlet === null) {
+      return;
+    }
+    this.willUnbindInlet(inlet);
+    inlet.detachOutlet(this);
+    this.onUnbindInlet(inlet);
+    this.didUnbindInlet(inlet);
+  };
+
   Fastener.prototype.unbindInlet = function (this: Fastener): void {
     const inlet = this.inlet;
-    if (inlet !== null) {
-      this.willUnbindInlet(inlet);
-      inlet.detachOutlet(this);
-      this.onUnbindInlet(inlet);
-      this.didUnbindInlet(inlet);
+    if (inlet === null) {
+      return;
     }
+    this.willUnbindInlet(inlet);
+    inlet.detachOutlet(this);
+    this.onUnbindInlet(inlet);
+    this.didUnbindInlet(inlet);
   };
 
   Fastener.prototype.willUnbindInlet = function (this: Fastener, inlet: Fastener): void {
@@ -596,12 +630,13 @@ export const Fastener = (function (_super: typeof Object) {
   });
 
   Fastener.prototype.mount = function (this: Fastener): void {
-    if ((this.flags & Fastener.MountedFlag) === 0) {
-      this.willMount();
-      this.setFlags(this.flags | Fastener.MountedFlag);
-      this.onMount();
-      this.didMount();
+    if ((this.flags & Fastener.MountedFlag) !== 0) {
+      return;
     }
+    this.willMount();
+    this.setFlags(this.flags | Fastener.MountedFlag);
+    this.onMount();
+    this.didMount();
   };
 
   Fastener.prototype.willMount = function (this: Fastener): void {
@@ -609,7 +644,7 @@ export const Fastener = (function (_super: typeof Object) {
   };
 
   Fastener.prototype.onMount = function (this: Fastener): void {
-    this.bindInlet();
+    this.inheritInlet();
   };
 
   Fastener.prototype.didMount = function (this: Fastener): void {
@@ -617,12 +652,13 @@ export const Fastener = (function (_super: typeof Object) {
   };
 
   Fastener.prototype.unmount = function (this: Fastener): void {
-    if ((this.flags & Fastener.MountedFlag) !== 0) {
-      this.willUnmount();
-      this.setFlags(this.flags & ~Fastener.MountedFlag);
-      this.onUnmount();
-      this.didUnmount();
+    if ((this.flags & Fastener.MountedFlag) === 0) {
+      return;
     }
+    this.willUnmount();
+    this.setFlags(this.flags & ~Fastener.MountedFlag);
+    this.onUnmount();
+    this.didUnmount();
   };
 
   Fastener.prototype.willUnmount = function (this: Fastener): void {
@@ -630,7 +666,7 @@ export const Fastener = (function (_super: typeof Object) {
   };
 
   Fastener.prototype.onUnmount = function (this: Fastener): void {
-    this.unbindInlet();
+    this.uninheritInlet();
   };
 
   Fastener.prototype.didUnmount = function (this: Fastener): void {

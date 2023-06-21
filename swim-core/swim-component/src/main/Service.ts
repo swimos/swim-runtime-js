@@ -69,7 +69,7 @@ export class Service extends Component<Service> {
     return Service;
   }
 
-  override readonly observerType?: Class<ServiceObserver>;
+  declare readonly observerType?: Class<ServiceObserver>;
 
   protected override willAttachParent(parent: Service): void {
     const observers = this.observers;

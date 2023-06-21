@@ -24,13 +24,13 @@ export interface LibraryTaskOptions extends TaskOptions {
 
 /** @public */
 export abstract class LibraryTask extends Task {
-  override readonly optionsType?: Class<LibraryTaskOptions>;
+  declare readonly optionsType?: Class<LibraryTaskOptions>;
 
   get packageScope(): PackageScope | null {
-    return this.getParent(PackageScope);
+    return this.getAncestor(PackageScope);
   }
 
   get libraryScope(): LibraryScope | null {
-    return this.getParent(LibraryScope);
+    return this.getAncestor(LibraryScope);
   }
 }

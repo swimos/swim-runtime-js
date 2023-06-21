@@ -67,7 +67,7 @@ export class PackageScope extends Scope {
     this.unscopedName = PackageScope.unscopedName(name);
   }
 
-  override readonly observerType?: Class<PackageScopeObserver>;
+  declare readonly observerType?: Class<PackageScopeObserver>;
 
   override readonly name: string;
 

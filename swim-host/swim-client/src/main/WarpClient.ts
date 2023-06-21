@@ -55,7 +55,7 @@ export class WarpClient extends WarpScope {
     this.onOffline = this.onOffline.bind(this);
   }
 
-  override readonly observerType?: Class<WarpClientObserver>;
+  declare readonly observerType?: Class<WarpClientObserver>;
 
   override command(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
   override command(nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;

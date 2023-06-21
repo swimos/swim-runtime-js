@@ -64,7 +64,7 @@ export abstract class WarpHost extends Component {
     this.sendBuffer = [];
   }
 
-  override readonly observerType?: Class<WarpHostObserver>;
+  declare readonly observerType?: Class<WarpHostObserver>;
 
   readonly hostUri: Uri;
 

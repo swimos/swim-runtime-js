@@ -95,7 +95,10 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
   didUnderive(inlet: ComponentRef<unknown, C>): void;
 
   /** @override */
-  getInlet(): ComponentRef<unknown, C> | null;
+  deriveInlet(): ComponentRef<unknown, C> | null;
+
+  /** @override */
+  bindInlet(inlet: ComponentRef<unknown, C>): void;
 
   /** @override */
   readonly inlet: ComponentRef<unknown, C> | null;
@@ -226,49 +229,52 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
   };
 
   ComponentRef.prototype.setComponent = function <C extends Component>(this: ComponentRef<unknown, C>, newComponent: C  | null, target?: Component | null, key?: string): C | null {
-    let oldComponent = this.component;
     if (newComponent !== null) {
       newComponent = this.fromAny(newComponent);
     }
-    if (oldComponent !== newComponent) {
-      if (target === void 0) {
-        target = null;
+    let oldComponent = this.component;
+    if (oldComponent === newComponent) {
+      this.setCoherent(true);
+      return oldComponent;
+    }
+    if (target === void 0) {
+      target = null;
+    }
+    let parent: Component | null;
+    if (this.binds && (parent = this.parentComponent, parent !== null)) {
+      if (oldComponent !== null && oldComponent.parent === parent) {
+        if (target === null) {
+          target = oldComponent.nextSibling;
+        }
+        oldComponent.remove();
       }
-      let parent: Component | null;
-      if (this.binds && (parent = this.parentComponent, parent !== null)) {
-        if (oldComponent !== null && oldComponent.parent === parent) {
-          if (target === null) {
-            target = oldComponent.nextSibling;
-          }
-          oldComponent.remove();
+      if (newComponent !== null) {
+        if (key === void 0) {
+          key = this.componentKey;
         }
-        if (newComponent !== null) {
-          if (key === void 0) {
-            key = this.componentKey;
-          }
-          this.insertChild(parent, newComponent, target, key);
-        }
-        oldComponent = this.component;
+        this.insertChild(parent, newComponent, target, key);
       }
-      if (oldComponent !== newComponent) {
-        if (oldComponent !== null) {
-          (this as Mutable<typeof this>).component = null;
-          this.willDetachComponent(oldComponent);
-          this.onDetachComponent(oldComponent);
-          this.deinitComponent(oldComponent);
-          this.didDetachComponent(oldComponent);
-        }
-        if (newComponent !== null) {
-          (this as Mutable<typeof this>).component = newComponent;
-          this.willAttachComponent(newComponent, target);
-          this.onAttachComponent(newComponent, target);
-          this.initComponent(newComponent);
-          this.didAttachComponent(newComponent, target);
-        }
-        this.setCoherent(true);
-        this.decohereOutlets();
+      oldComponent = this.component;
+      if (oldComponent === newComponent) {
+        return oldComponent;
       }
     }
+    if (oldComponent !== null) {
+      (this as Mutable<typeof this>).component = null;
+      this.willDetachComponent(oldComponent);
+      this.onDetachComponent(oldComponent);
+      this.deinitComponent(oldComponent);
+      this.didDetachComponent(oldComponent);
+    }
+    if (newComponent !== null) {
+      (this as Mutable<typeof this>).component = newComponent;
+      this.willAttachComponent(newComponent, target);
+      this.onAttachComponent(newComponent, target);
+      this.initComponent(newComponent);
+      this.didAttachComponent(newComponent, target);
+    }
+    this.setCoherent(true);
+    this.decohereOutlets();
     return oldComponent;
   };
 
@@ -383,33 +389,37 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
   };
 
   ComponentRef.prototype.bindComponent = function <C extends Component>(this: ComponentRef<unknown, C>, component: Component, target: Component | null): void {
-    if (this.binds && this.component === null) {
-      const newComponent = this.detectComponent(component);
-      if (newComponent !== null) {
-        (this as Mutable<typeof this>).component = newComponent;
-        this.willAttachComponent(newComponent, target);
-        this.onAttachComponent(newComponent, target);
-        this.initComponent(newComponent);
-        this.didAttachComponent(newComponent, target);
-        this.setCoherent(true);
-        this.decohereOutlets();
-      }
+    if (!this.binds || this.component !== null) {
+      return;
     }
+    const newComponent = this.detectComponent(component);
+    if (newComponent === null) {
+      return;
+    }
+    (this as Mutable<typeof this>).component = newComponent;
+    this.willAttachComponent(newComponent, target);
+    this.onAttachComponent(newComponent, target);
+    this.initComponent(newComponent);
+    this.didAttachComponent(newComponent, target);
+    this.setCoherent(true);
+    this.decohereOutlets();
   };
 
   ComponentRef.prototype.unbindComponent = function <C extends Component>(this: ComponentRef<unknown, C>, component: Component): void {
-    if (this.binds) {
-      const oldComponent = this.detectComponent(component);
-      if (oldComponent !== null && this.component === oldComponent) {
-        (this as Mutable<typeof this>).component = null;
-        this.willDetachComponent(oldComponent);
-        this.onDetachComponent(oldComponent);
-        this.deinitComponent(oldComponent);
-        this.didDetachComponent(oldComponent);
-        this.setCoherent(true);
-        this.decohereOutlets();
-      }
+    if (!this.binds) {
+      return;
     }
+    const oldComponent = this.detectComponent(component);
+    if (oldComponent === null || this.component !== oldComponent) {
+      return;
+    }
+    (this as Mutable<typeof this>).component = null;
+    this.willDetachComponent(oldComponent);
+    this.onDetachComponent(oldComponent);
+    this.deinitComponent(oldComponent);
+    this.didDetachComponent(oldComponent);
+    this.setCoherent(true);
+    this.decohereOutlets();
   };
 
   ComponentRef.prototype.detectComponent = function <C extends Component>(this: ComponentRef<unknown, C>, component: Component): C | null {
@@ -437,12 +447,14 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
   };
 
   ComponentRef.prototype.recohere = function (this: ComponentRef, t: number): void {
-    if ((this.flags & Fastener.DerivedFlag) !== 0) {
-      const inlet = this.inlet;
-      if (inlet !== null) {
-        this.setComponent(inlet.component);
-      }
+    if ((this.flags & Fastener.DerivedFlag) === 0) {
+      return;
     }
+    const inlet = this.inlet;
+    if (inlet === null) {
+      return;
+    }
+    this.setComponent(inlet.component);
   };
 
   ComponentRef.construct = function <F extends ComponentRef<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {

@@ -60,7 +60,7 @@ export class Workspace extends Service {
     this.libraryPathMap = {};
   }
 
-  override readonly observerType?: Class<WorkspaceObserver>;
+  declare readonly observerType?: Class<WorkspaceObserver>;
 
   @ComponentSet({
     get componentType(): typeof PackageScope {

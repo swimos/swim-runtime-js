@@ -40,7 +40,7 @@ export abstract class Scope extends Component<Scope> {
     return Scope;
   }
 
-  override readonly observerType?: Class<ScopeObserver>;
+  declare readonly observerType?: Class<ScopeObserver>;
 
   abstract readonly name: string;
 
