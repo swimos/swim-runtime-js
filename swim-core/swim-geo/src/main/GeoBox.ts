@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Interpolate} from "@swim/util";
-import type {Interpolator} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
@@ -31,7 +31,6 @@ import type {AnyGeoPoint} from "./GeoPoint";
 import {GeoPoint} from "./GeoPoint";
 import {GeoSegment} from "./GeoSegment";
 import {GeoTile} from "./GeoTile";
-import {GeoBoxInterpolator} from "./"; // forward import
 
 /** @public */
 export type AnyGeoBox = GeoBox | GeoBoxInit;
@@ -118,9 +117,8 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
       return this.containsTile(GeoTile.fromAny(that));
     } else if (GeoBox.isAny(that)) {
       return this.containsBox(GeoBox.fromAny(that));
-    } else {
-      throw new TypeError("" + that);
     }
+    throw new TypeError("" + that);
   }
 
   /** @internal */
@@ -158,9 +156,8 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
       return this.intersectsTile(GeoTile.fromAny(that));
     } else if (GeoBox.isAny(that)) {
       return this.intersectsBox(GeoBox.fromAny(that));
-    } else {
-      throw new TypeError("" + that);
     }
+    throw new TypeError("" + that);
   }
 
   /** @internal */
@@ -304,14 +301,18 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     return Format.debug(this);
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Undefined: GeoBox = new this(Infinity, Infinity, -Infinity, -Infinity);
+
   static undefined(): GeoBox {
-    return new GeoBox(Infinity, Infinity, -Infinity, -Infinity);
+    return this.Undefined;
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Global: GeoBox = new this(-180, -90, 180, 90);
+
   static globe(): GeoBox {
-    return new GeoBox(-180, -90, 180, 90);
+    return this.Global;
   }
 
   static of(lngMin: number, latMin: number, lngMax?: number, latMax?: number): GeoBox {
@@ -355,3 +356,32 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
         || GeoBox.isInit(value);
   }
 }
+
+/** @internal */
+export const GeoBoxInterpolator = (function (_super: typeof Interpolator) {
+  const GeoBoxInterpolator = function (s0: GeoBox, s1: GeoBox): Interpolator<GeoBox> {
+    const interpolator = function (u: number): GeoBox {
+      const s0 = interpolator[0];
+      const s1 = interpolator[1];
+      const lngMin = s0.lngMin + u * (s1.lngMin - s0.lngMin);
+      const latMin = s0.latMin + u * (s1.latMin - s0.latMin);
+      const lngMax = s0.lngMax + u * (s1.lngMax - s0.lngMax);
+      const latMax = s0.latMax + u * (s1.latMax - s0.latMax);
+      return new GeoBox(lngMin, latMin, lngMax, latMax);
+    } as Interpolator<GeoBox>;
+    Object.setPrototypeOf(interpolator, GeoBoxInterpolator.prototype);
+    (interpolator as Mutable<typeof interpolator>)[0] = s0;
+    (interpolator as Mutable<typeof interpolator>)[1] = s1;
+    return interpolator;
+  } as {
+    (s0: GeoBox, s1: GeoBox): Interpolator<GeoBox>;
+
+    /** @internal */
+    prototype: Interpolator<GeoBox>;
+  };
+
+  GeoBoxInterpolator.prototype = Object.create(_super.prototype);
+  GeoBoxInterpolator.prototype.constructor = GeoBoxInterpolator;
+
+  return GeoBoxInterpolator;
+})(Interpolator);

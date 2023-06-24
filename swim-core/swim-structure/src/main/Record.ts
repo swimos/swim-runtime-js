@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
-import type {Interpolator} from "@swim/util";
-import type {Cursor} from "@swim/util";
+import {Interpolator} from "@swim/util";
+import {Cursor} from "@swim/util";
 import type {Builder} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {AnyItem} from "./Item";
@@ -26,8 +27,6 @@ import {Attr} from "./Attr";
 import {Slot} from "./Slot";
 import type {AnyValue} from "./Value";
 import {Value} from "./Value";
-import {RecordInterpolator} from "./"; // forward import
-import {RecordCursor} from "./"; // forward import
 import {RecordMap} from "./"; // forward import
 import type {AnyText} from "./Text";
 import {Text} from "./"; // forward import
@@ -151,9 +150,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
       return value;
     } else if (modified) {
       return record;
-    } else {
-      return this;
     }
+    return this;
   }
 
   /**
@@ -168,15 +166,14 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   override flattened(): Value {
     if (this.isEmpty()) {
       return Value.extant();
+    }
+    const items = this.iterator();
+    const head = items.head();
+    items.step();
+    if (items.isEmpty() && head instanceof Value) {
+      return head;
     } else {
-      const items = this.iterator();
-      const head = items.head();
-      items.step();
-      if (items.isEmpty() && head instanceof Value) {
-        return head;
-      } else {
-        return this.branch();
-      }
+      return this.branch();
     }
   }
 
@@ -201,11 +198,10 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    */
   override header(tag: string): Value {
     const head = this.head();
-    if (head instanceof Attr && head.key.value === tag) {
-      return head.value;
-    } else {
+    if (!(head instanceof Attr) || head.key.value !== tag) {
       return Value.absent();
     }
+    return head.value;
   }
 
   /**
@@ -216,15 +212,14 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    */
   override headers(tag: string): Record | undefined {
     const head = this.head();
-    if (head instanceof Attr && head.key.value === tag) {
-      const header = head.value;
-      if (header instanceof Record) {
-        return header;
-      } else {
-        return Record.of(header);
-      }
+    if (!(head instanceof Attr) || head.key.value !== tag) {
+      return void 0;
     }
-    return void 0;
+    const header = head.value;
+    if (header instanceof Record) {
+      return header;
+    }
+    return Record.of(header);
   }
 
   /**
@@ -260,11 +255,10 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    */
   override body(): Value {
     const tail = this.tail();
-    if (!tail.isEmpty()) {
-      return tail.flattened();
-    } else {
+    if (tail.isEmpty()) {
       return Value.absent();
     }
+    return tail.flattened();
   }
 
   /**
@@ -625,9 +619,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   override toAny(): AnyValue {
     if (!this.isEmpty() && this.isArray()) {
       return this.toArray();
-    } else {
-      return this.toObject();
     }
+    return this.toObject();
   }
 
   toArray(): AnyItem[] {
@@ -743,9 +736,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   override interpolateTo(that: unknown): Interpolator<Item> | null {
     if (that instanceof Record) {
       return RecordInterpolator(this, that);
-    } else {
-      return super.interpolateTo(that);
     }
+    return super.interpolateTo(that);
   }
 
   override get typeOrder(): number {
@@ -866,9 +858,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
       return Record.fromArray(value);
     } else if (typeof value === "object" && value !== null) {
       return Record.fromObject(value as {[key: string]: AnyValue});
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
   static fromArray(array: {[index: number]: AnyItem, length?: number}): Record {
@@ -916,3 +907,208 @@ Object.defineProperty(Record.prototype, "fieldCount", {
   },
   configurable: true,
 });
+
+/** @internal */
+export interface RecordInterpolator extends Interpolator<Record> {
+  /** @internal */
+  readonly interpolators: ReadonlyArray<Interpolator<Item>>;
+
+  readonly 0: Record;
+
+  readonly 1: Record;
+
+  equals(that: unknown): boolean;
+}
+
+/** @internal */
+export const RecordInterpolator = (function (_super: typeof Interpolator) {
+  const RecordInterpolator = function (y0: Record, y1: Record): RecordInterpolator {
+    const interpolator = function (u: number): Record {
+      const interpolators = interpolator.interpolators;
+      const interpolatorCount = interpolators.length;
+      const record = Record.create(interpolatorCount);
+      for (let i = 0; i < interpolatorCount; i += 1) {
+        record.push(interpolators[i]!(u));
+      }
+      return record;
+    } as RecordInterpolator;
+    Object.setPrototypeOf(interpolator, RecordInterpolator.prototype);
+    const interpolatorCount = Math.min(y0.length, y1.length);
+    const interpolators = new Array<Interpolator<Item>>(interpolatorCount);
+    for (let i = 0; i < interpolatorCount; i += 1) {
+      interpolators[i] = y0.getItem(i)!.interpolateTo(y1.getItem(i)!);
+    }
+    (interpolator as Mutable<typeof interpolator>).interpolators = interpolators;
+    return interpolator;
+  } as {
+    (y0: Record, y1: Record): RecordInterpolator;
+
+    /** @internal */
+    prototype: RecordInterpolator;
+  };
+
+  RecordInterpolator.prototype = Object.create(_super.prototype);
+  RecordInterpolator.prototype.constructor = RecordInterpolator;
+
+  Object.defineProperty(RecordInterpolator.prototype, 0, {
+    get(this: RecordInterpolator): Record {
+      const interpolators = this.interpolators;
+      const interpolatorCount = interpolators.length;
+      const record = Record.create(interpolatorCount);
+      for (let i = 0; i < interpolatorCount; i += 1) {
+        record.push(interpolators[i]![0]);
+      }
+      return record;
+    },
+    configurable: true,
+  });
+
+  Object.defineProperty(RecordInterpolator.prototype, 1, {
+    get(this: RecordInterpolator): Record {
+      const interpolators = this.interpolators;
+      const interpolatorCount = interpolators.length;
+      const record = Record.create(interpolatorCount);
+      for (let i = 0; i < interpolatorCount; i += 1) {
+        record.push(interpolators[i]![1]);
+      }
+      return record;
+    },
+    configurable: true,
+  });
+
+  RecordInterpolator.prototype.equals = function (that: unknown): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof RecordInterpolator) {
+      const n = this.interpolators.length;
+      if (n === that.interpolators.length) {
+        for (let i = 0; i < n; i += 1) {
+          if (!this.interpolators[i]!.equals(that.interpolators[i]!)) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+    return false;
+  };
+
+  return RecordInterpolator;
+})(Interpolator);
+
+/** @internal */
+export class RecordCursor extends Cursor<Item> {
+  constructor(record: Record, lower?: number, upper?: number, index?: number) {
+    super();
+    if (lower === void 0) {
+      lower = 0;
+    }
+    if (upper === void 0) {
+      upper = record.length;
+    }
+    if (index === void 0) {
+      index = lower;
+    }
+    this.record = record;
+    this.lower = lower;
+    this.upper = upper;
+    this.index = index;
+    this.direction = 0;
+  }
+
+  /** @internal */
+  readonly record: Record;
+
+  /** @internal */
+  readonly lower: number;
+
+  /** @internal */
+  readonly upper: number;
+
+  /** @internal */
+  readonly index: number;
+
+  /** @internal */
+  readonly direction: number;
+
+  override isEmpty(): boolean {
+    return this.index >= this.upper;
+  }
+
+  override head(): Item {
+    (this as Mutable<this>).direction = 0;
+    if (this.index >= this.upper) {
+      throw new Error("empty");
+    }
+    return this.record.getItem(this.index);
+  }
+
+  override step(): void {
+    (this as Mutable<this>).direction = 0;
+    const index = this.index;
+    if (index >= this.upper) {
+      throw new Error("empty");
+    }
+    (this as Mutable<this>).index = index + 1;
+  }
+
+  override skip(count: number): void {
+    (this as Mutable<this>).index = Math.min(Math.max(this.lower, this.index + count, this.upper));
+  }
+
+  override hasNext(): boolean {
+    return this.index < this.upper;
+  }
+
+  override nextIndex(): number {
+    return this.index - this.lower;
+  }
+
+  override next(): {value?: Item, done: boolean} {
+    (this as Mutable<this>).direction = 1;
+    const index = this.index;
+    if (index >= this.upper) {
+      (this as Mutable<this>).index = this.upper;
+      return {done: true};
+    }
+    (this as Mutable<this>).index = index + 1;
+    return {value: this.record.getItem(index), done: this.index === this.upper};
+  }
+
+  override hasPrevious(): boolean {
+    return this.index > this.lower;
+  }
+
+  override previousIndex(): number {
+    return this.index - this.lower - 1;
+  }
+
+  override previous(): {value?: Item, done: boolean} {
+    (this as Mutable<this>).direction = -1;
+    const index = this.index - 1;
+    if (index < this.lower) {
+      (this as Mutable<this>).index = 0;
+      return {done: true};
+    }
+    (this as Mutable<this>).index = index;
+    return {value: this.record.getItem(index), done: index === this.lower};
+  }
+
+  override set(newItem: Item): void {
+    if (this.direction > 0) {
+      this.record.setItem(this.index - 1, newItem);
+    } else {
+      this.record.setItem(this.index, newItem);
+    }
+  }
+
+  override delete(): void {
+    let index = this.index;
+    if (this.direction > 0) {
+      index -= 1;
+      (this as Mutable<this>).index = index;
+    }
+    this.record.splice(index, 1);
+    (this as Mutable<this>).direction = 0;
+  }
+}

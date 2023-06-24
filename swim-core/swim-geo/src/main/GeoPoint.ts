@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Equivalent} from "@swim/util";
 import type {Interpolate} from "@swim/util";
-import type {Interpolator} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
@@ -27,7 +27,6 @@ import type {R2Point} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import type {AnyGeoShape} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
-import {GeoPointInterpolator} from "./"; // forward import
 
 /** @public */
 export type AnyGeoPoint = GeoPoint | GeoPointInit | GeoPointTuple;
@@ -81,16 +80,15 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
   override contains(that: AnyGeoShape | number, lat?: number): boolean {
     if (typeof that === "number") {
       return this.lng === that && this.lat === lat!;
-    } else {
-      that = GeoShape.fromAny(that);
-      if (that instanceof GeoPoint) {
-        return this.lng === that.lng && this.lat === that.lat;
-      } else if (that instanceof GeoShape) {
-        return this.lng <= that.lngMin && that.lngMax <= this.lng
-            && this.lat <= that.latMin && that.latMax <= this.lat;
-      }
-      return false;
     }
+    that = GeoShape.fromAny(that);
+    if (that instanceof GeoPoint) {
+      return this.lng === that.lng && this.lat === that.lat;
+    } else if (that instanceof GeoShape) {
+      return this.lng <= that.lngMin && that.lngMax <= this.lng
+          && this.lat <= that.latMin && that.latMax <= this.lat;
+    }
+    return false;
   }
 
   override intersects(that: AnyGeoShape): boolean {
@@ -109,9 +107,8 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     const newLat = GeoPoint.normalizeLat(oldLat);
     if (oldLng === newLng && oldLat === newLat) {
       return this;
-    } else {
-      return new GeoPoint(newLng, newLat);
     }
+    return new GeoPoint(newLng, newLat);
   }
 
   toAny(): GeoPointInit {
@@ -126,9 +123,8 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
   interpolateTo(that: unknown): Interpolator<GeoPoint> | null {
     if (that instanceof GeoPoint) {
       return GeoPointInterpolator(this, that);
-    } else {
-      return null;
     }
+    return null;
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
@@ -165,14 +161,18 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return Format.debug(this);
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Origin: GeoPoint = new this(0, 0);
+
   static origin(): GeoPoint {
-    return new GeoPoint(0, 0);
+    return this.Origin;
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Undefined: GeoPoint = new this(NaN, NaN);
+
   static undefined(): GeoPoint {
-    return new GeoPoint(NaN, NaN);
+    return this.Undefined;
   }
 
   static of(lng: number, lat: number): GeoPoint {
@@ -245,3 +245,59 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
         || GeoPoint.isTuple(value);
   }
 }
+
+/** @internal */
+export const GeoPointInterpolator = (function (_super: typeof Interpolator) {
+  const GeoPointInterpolator = function (p0: GeoPoint, p1: GeoPoint): Interpolator<GeoPoint> {
+    const interpolator = function (u: number): GeoPoint {
+      const p0 = interpolator[0];
+      const lng0 = p0.lng;
+      const lat0 = p0.lat;
+      const p1 = interpolator[1];
+      const lng1 = p1.lng;
+      const lat1 = p1.lat;
+      let lng: number;
+      if (lng0 > 0 && lng1 < 0 && lng0 - lng1 > 180) {
+        // east across anti-meridian
+        const w = 180 - lng0;
+        const e = 180 + lng1;
+        const uw = w / (w + e);
+        if (u < uw) {
+          lng = lng0 + (u / uw) * w;
+        } else {
+          const ue = 1 - uw;
+          lng = -180 + ((u - uw) / ue) * e;
+        }
+      } else if (lng0 < 0 && lng1 > 0 && lng1 - lng0 > 180) {
+        // west across anti-meridian
+        const e = 180 + lng0;
+        const w = 180 - lng1;
+        const ue = e / (e + w);
+        if (u < ue) {
+          lng = lng0 - (u / ue) * e;
+        } else {
+          const uw = 1 - ue;
+          lng = 180 - ((u - ue) / uw) * w;
+        }
+      } else {
+        lng = lng0 + u * (lng1 - lng0);
+      }
+      const lat = lat0 + u * (lat1 - lat0);
+      return new GeoPoint(lng, lat);
+    } as Interpolator<GeoPoint>;
+    Object.setPrototypeOf(interpolator, GeoPointInterpolator.prototype);
+    (interpolator as Mutable<typeof interpolator>)[0] = p0.normalized();
+    (interpolator as Mutable<typeof interpolator>)[1] = p1.normalized();
+    return interpolator;
+  } as {
+    (p0: GeoPoint, p1: GeoPoint): Interpolator<GeoPoint>;
+
+    /** @internal */
+    prototype: Interpolator<GeoPoint>;
+  };
+
+  GeoPointInterpolator.prototype = Object.create(_super.prototype);
+  GeoPointInterpolator.prototype.constructor = GeoPointInterpolator;
+
+  return GeoPointInterpolator;
+})(Interpolator);

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Equals} from "@swim/util";
@@ -70,15 +69,14 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
   override project(f: GeoProjection): R2Group {
     const oldShapes = this.shapes;
     const n = oldShapes.length;
-    if (n > 0) {
-      const newShapes = new Array<R2Shape>(n);
-      for (let i = 0; i < n; i += 1) {
-        newShapes[i] = oldShapes[i]!.project(f);
-      }
-      return new R2Group(newShapes);
-    } else {
+    if (n === 0) {
       return R2Group.empty();
     }
+    const newShapes = new Array<R2Shape>(n);
+    for (let i = 0; i < n; i += 1) {
+      newShapes[i] = oldShapes[i]!.project(f);
+    }
+    return new R2Group(newShapes);
   }
 
   /** @internal */
@@ -144,9 +142,11 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     return Format.debug(this);
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Empty: GeoGroup = new this(Arrays.empty);
+
   static empty<S extends GeoShape>(): GeoGroup<S> {
-    return new GeoGroup(Arrays.empty);
+    return this.Empty as GeoGroup<S>;
   }
 
   static of<S extends GeoShape>(...shapes: S[]): GeoGroup<S> {

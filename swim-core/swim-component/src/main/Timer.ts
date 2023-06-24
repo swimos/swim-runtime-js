@@ -14,15 +14,9 @@
 
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
-import type {FastenerOwner} from "./Fastener";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
-
-/** @public */
-export type TimerDecorator<F extends Timer<any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
-};
 
 /** @public */
 export interface TimerDescriptor extends FastenerDescriptor {
@@ -31,34 +25,11 @@ export interface TimerDescriptor extends FastenerDescriptor {
 }
 
 /** @public */
-export type TimerTemplate<F extends Timer<any>> =
-  ThisType<F> &
-  TimerDescriptor &
-  Partial<Omit<F, keyof TimerDescriptor>>;
-
-/** @public */
-export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerClass<F> {
-  /** @override */
-  specialize(template: TimerDescriptor): TimerClass<F>;
-
-  /** @override */
-  refine(fastenerClass: TimerClass<any>): void;
-
-  /** @override */
-  extend<F2 extends F>(className: string | symbol, template: TimerTemplate<F2>): TimerClass<F2>;
-  extend<F2 extends F>(className: string | symbol, template: TimerTemplate<F2>): TimerClass<F2>;
-
-  /** @override */
-  define<F2 extends F>(className: string | symbol, template: TimerTemplate<F2>): TimerClass<F2>;
-  define<F2 extends F>(className: string | symbol, template: TimerTemplate<F2>): TimerClass<F2>;
-
-  /** @override */
-  <F2 extends F>(template: TimerTemplate<F2>): TimerDecorator<F2>;
-}
-
-/** @public */
 export interface Timer<O = unknown> extends Fastener<O> {
   (): void;
+
+  /** @override */
+  get descriptorType(): Proto<TimerDescriptor>;
 
   /** @override */
   get fastenerType(): Proto<Timer<any>>;
@@ -133,7 +104,7 @@ export interface Timer<O = unknown> extends Fastener<O> {
 
 /** @public */
 export const Timer = (function (_super: typeof Fastener) {
-  const Timer = _super.extend("Timer", {}) as TimerClass;
+  const Timer = _super.extend("Timer", {}) as FastenerClass<Timer<any>>;
 
   Object.defineProperty(Timer.prototype, "fastenerType", {
     value: Timer,
@@ -319,7 +290,7 @@ export const Timer = (function (_super: typeof Fastener) {
     this.cancel();
   };
 
-  Timer.construct = function <F extends Timer<any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+  Timer.construct = function <F extends Timer<any>>(fastener: F | null, owner: F extends Timer<infer O> ? O : never): F {
     if (fastener === null) {
       fastener = function (): void {
         fastener!.expire();

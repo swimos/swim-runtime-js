@@ -26,11 +26,16 @@ import type {AnyGeoShape} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import type {GeoCurve} from "./GeoCurve";
+import type {GeoSplineContext} from "./GeoSpline";
 import type {AnyGeoSpline} from "./GeoSpline";
 import type {GeoSplinePoints} from "./GeoSpline";
+import {GeoSplineBuilder} from "./GeoSpline";
 import {GeoSpline} from "./GeoSpline";
-import {GeoPathBuilder} from "./"; // forward import
 import {GeoBox} from "./"; // forward import
+
+/** @public */
+export interface GeoPathContext extends GeoSplineContext {
+}
 
 /** @public */
 export type AnyGeoPath = GeoPath | GeoPathSplines | AnyGeoSpline;
@@ -71,40 +76,37 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   interpolateLng(u: number): number {
     const splines = this.splines;
     const n = splines.length;
-    if (n > 0) {
-      const l = 1 / n;
-      const k = Math.min(Math.max(0, Math.floor(u / l)), n);
-      const v = u * n - k * l;
-      return splines[k]!.interpolateLng(v);
-    } else {
+    if (n === 0) {
       return NaN;
     }
+    const l = 1 / n;
+    const k = Math.min(Math.max(0, Math.floor(u / l)), n);
+    const v = u * n - k * l;
+    return splines[k]!.interpolateLng(v);
   }
 
   interpolateLat(u: number): number {
     const splines = this.splines;
     const n = splines.length;
-    if (n > 0) {
-      const l = 1 / n;
-      const k = Math.min(Math.max(0, Math.floor(u / l)), n);
-      const v = u * n - k * l;
-      return splines[k]!.interpolateLat(v);
-    } else {
+    if (n === 0) {
       return NaN;
     }
+    const l = 1 / n;
+    const k = Math.min(Math.max(0, Math.floor(u / l)), n);
+    const v = u * n - k * l;
+    return splines[k]!.interpolateLat(v);
   }
 
   interpolate(u: number): GeoPoint {
     const splines = this.splines;
     const n = splines.length;
-    if (n > 0) {
-      const l = 1 / n;
-      const k = Math.min(Math.max(0, Math.floor(u / l)), n);
-      const v = u * n - k * l;
-      return splines[k]!.interpolate(v);
-    } else {
-      return new GeoPoint(NaN, NaN);
+    if (n === 0) {
+      return GeoPoint.undefined();
     }
+    const l = 1 / n;
+    const k = Math.min(Math.max(0, Math.floor(u / l)), n);
+    const v = u * n - k * l;
+    return splines[k]!.interpolate(v);
   }
 
   override contains(that: AnyGeoShape): boolean;
@@ -120,60 +122,57 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   split(u: number): [GeoPath, GeoPath] {
     const splines = this.splines;
     const n = splines.length;
-    if (n > 0) {
-      const l = 1 / n;
-      const k = Math.min(Math.max(0, Math.floor(u / l)), n);
-      const v = u * n - k * l;
-      const [s0, s1] = splines[k]!.split(v);
-      const splines0 = new Array<GeoSpline>(k + 1);
-      const splines1 = new Array<GeoSpline>(n - k);
-      for (let i = 0; i < k; i += 1) {
-        splines0[i] = splines[i]!;
-      }
-      splines0[k] = s0;
-      splines1[0] = s1;
-      for (let i = k + 1; i < n; i += 1) {
-        splines1[i - k] = splines[i]!;
-      }
-      return [new GeoPath(splines0), new GeoPath(splines1)];
-    } else {
+    if (n === 0) {
       return [GeoPath.empty(), GeoPath.empty()];
     }
+    const l = 1 / n;
+    const k = Math.min(Math.max(0, Math.floor(u / l)), n);
+    const v = u * n - k * l;
+    const [s0, s1] = splines[k]!.split(v);
+    const splines0 = new Array<GeoSpline>(k + 1);
+    const splines1 = new Array<GeoSpline>(n - k);
+    for (let i = 0; i < k; i += 1) {
+      splines0[i] = splines[i]!;
+    }
+    splines0[k] = s0;
+    splines1[0] = s1;
+    for (let i = k + 1; i < n; i += 1) {
+      splines1[i - k] = splines[i]!;
+    }
+    return [new GeoPath(splines0), new GeoPath(splines1)];
   }
 
   subdivide(u: number): GeoPath {
     const oldSplines = this.splines;
     const n = oldSplines.length;
-    if (n > 0) {
-      const l = 1 / n;
-      const k = Math.min(Math.max(0, Math.floor(u / l)), n);
-      const v = u * n - k * l;
-      const newSplines = new Array<GeoSpline>(n);
-      for (let i = 0; i < k; i += 1) {
-        newSplines[i] = oldSplines[i]!;
-      }
-      newSplines[k] = oldSplines[k]!.subdivide(v);
-      for (let i = k + 1; i < n; i += 1) {
-        newSplines[i] = oldSplines[i]!;
-      }
-      return new GeoPath(newSplines);
-    } else {
+    if (n === 0) {
       return GeoPath.empty();
     }
+    const l = 1 / n;
+    const k = Math.min(Math.max(0, Math.floor(u / l)), n);
+    const v = u * n - k * l;
+    const newSplines = new Array<GeoSpline>(n);
+    for (let i = 0; i < k; i += 1) {
+      newSplines[i] = oldSplines[i]!;
+    }
+    newSplines[k] = oldSplines[k]!.subdivide(v);
+    for (let i = k + 1; i < n; i += 1) {
+      newSplines[i] = oldSplines[i]!;
+    }
+    return new GeoPath(newSplines);
   }
 
   override project(f: GeoProjection): R2Path {
     const oldSplines = this.splines;
     const n = oldSplines.length;
-    if (n > 0) {
-      const newSplines = new Array<R2Spline>(n);
-      for (let i = 0; i < n; i += 1) {
-        newSplines[i] = oldSplines[i]!.project(f);
-      }
-      return new R2Path(newSplines);
-    } else {
+    if (n === 0) {
       return R2Path.empty();
     }
+    const newSplines = new Array<R2Spline>(n);
+    for (let i = 0; i < n; i += 1) {
+      newSplines[i] = oldSplines[i]!.project(f);
+    }
+    return new R2Path(newSplines);
   }
 
   /** @internal */
@@ -209,11 +208,10 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
       latSum += lat;
       n += 1;
     }, this);
-    if (n !== 0) {
-      return new GeoPoint(lngSum / n, latSum / n);
-    } else {
+    if (n === 0) {
       return GeoPoint.undefined();
     }
+    return new GeoPoint(lngSum / n, latSum / n);
   }
 
   forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
@@ -340,5 +338,59 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   static isAnyPath(value: unknown): value is AnyGeoPath {
     return value instanceof GeoPath
         || GeoPath.isSplines(value);
+  }
+}
+
+/** @public */
+export class GeoPathBuilder implements GeoPathContext {
+  /** @internal */
+  splines: GeoSpline[];
+  /** @internal */
+  builder: GeoSplineBuilder | null;
+
+  constructor() {
+    this.splines = [];
+    this.builder = null;
+  }
+
+  moveTo(lng: number, lat: number): void {
+    let builder = this.builder;
+    if (builder !== null) {
+      const spline = builder.bind();
+      if (spline.isDefined()) {
+        this.splines.push(spline);
+      }
+    }
+    builder = new GeoSplineBuilder();
+    this.builder = builder;
+    builder.moveTo(lng, lat);
+  }
+
+  closePath(): void {
+    const builder = this.builder;
+    if (builder === null) {
+      throw new Error();
+    }
+    builder.closePath();
+  }
+
+  lineTo(lng: number, lat: number): void {
+    const builder = this.builder;
+    if (builder === null) {
+      throw new Error();
+    }
+    builder.lineTo(lng, lat);
+  }
+
+  bind(): GeoPath {
+    const splines = this.splines.slice(0);
+    const builder = this.builder;
+    if (builder !== null) {
+      const spline = builder.bind();
+      if (spline.isDefined()) {
+        splines.push(spline);
+      }
+    }
+    return new GeoPath(splines);
   }
 }

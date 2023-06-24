@@ -144,9 +144,8 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
       return this.containsTile(GeoTile.fromAny(that));
     } else if (GeoBox.isAny(that)) {
       return this.containsBox(GeoBox.fromAny(that));
-    } else {
-      throw new TypeError("" + that);
     }
+    throw new TypeError("" + that);
   }
 
   /** @internal */
@@ -184,9 +183,8 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
       return this.intersectsTile(GeoTile.fromAny(that));
     } else if (GeoBox.isAny(that)) {
       return this.intersectsBox(GeoBox.fromAny(that));
-    } else {
-      throw new TypeError("" + that);
     }
+    throw new TypeError("" + that);
   }
 
   /** @internal */

@@ -17,7 +17,7 @@ import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {Cursor} from "@swim/util";
 import type {OrderedMap} from "@swim/util";
-import type {FastenerOwner} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
 import type {BTree} from "@swim/collections";
 import type {AnyValue} from "@swim/structure";
 import {Value} from "@swim/structure";
@@ -26,39 +26,9 @@ import {ValueCursor} from "@swim/structure";
 import {ValueEntryCursor} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
-import type {WarpDownlinkClass} from "./WarpDownlink";
 import type {WarpDownlinkObserver} from "./WarpDownlink";
 import {WarpDownlink} from "./WarpDownlink";
 import {MapDownlinkModel} from "./MapDownlinkModel";
-
-/** @public */
-export type MapDownlinkKey<D extends MapDownlink<any, any, any, any, any>> =
-  D extends {key: infer K} ? K : never;
-
-/** @public */
-export type MapDownlinkValue<D extends MapDownlink<any, any, any, any, any>> =
-  D extends {value: infer V} ? V : never;
-
-/** @public */
-export type MapDownlinkKeyInit<D extends MapDownlink<any, any, any, any, any>> =
-  D extends {keyInit?: infer KU} ? KU : never;
-
-/** @public */
-export type MapDownlinkValueInit<D extends MapDownlink<any, any, any, any, any>> =
-  D extends {valueInit?: infer VU} ? VU : never;
-
-/** @public */
-export type AnyMapDownlinkKey<D extends MapDownlink<any, any, any, any, any>> =
-  MapDownlinkKey<D> | MapDownlinkKeyInit<D>;
-
-/** @public */
-export type AnyMapDownlinkValue<D extends MapDownlink<any, any, any, any, any>> =
-  MapDownlinkValue<D> | MapDownlinkValueInit<D>;
-
-/** @public */
-export type MapDownlinkDecorator<P extends MapDownlink<any, any, any, any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
-};
 
 /** @public */
 export interface MapDownlinkDescriptor<K = unknown, V = unknown, KU = K, VU = V> extends WarpDownlinkDescriptor {
@@ -70,58 +40,35 @@ export interface MapDownlinkDescriptor<K = unknown, V = unknown, KU = K, VU = V>
 }
 
 /** @public */
-export type MapDownlinkTemplate<D extends MapDownlink<any, any, any, any, any>> =
-  ThisType<D> &
-  MapDownlinkDescriptor<MapDownlinkKey<D>, MapDownlinkValue<D>, MapDownlinkKeyInit<D>, MapDownlinkValueInit<D>> &
-  Partial<Omit<D, keyof MapDownlinkDescriptor>>;
+export interface MapDownlinkObserver<K = unknown, V = unknown, F extends MapDownlink<any, K, V, any, any> = MapDownlink<unknown, K, V, any, any>> extends WarpDownlinkObserver<F> {
+  willUpdate?(key: K, newValue: V, downlink: F): V | void;
 
-/** @public */
-export interface MapDownlinkClass<D extends MapDownlink<any, any, any, any, any> = MapDownlink<any, any, any, any, any>> extends WarpDownlinkClass<D> {
-  /** @override */
-  specialize(template: MapDownlinkDescriptor<any>): MapDownlinkClass<D>;
+  didUpdate?(key: K, newValue: V, oldValue: V, downlink: F): void;
 
-  /** @override */
-  refine(downlinkClass: MapDownlinkClass<any>): void;
+  willRemove?(key: K, downlink: F): void;
 
-  /** @override */
-  extend<D2 extends D>(className: string | symbol, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
-  extend<D2 extends D>(className: string | symbol, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
+  didRemove?(key: K, oldValue: V, downlink: F): void;
 
-  /** @override */
-  define<D2 extends D>(className: string | symbol, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
-  define<D2 extends D>(className: string | symbol, template: MapDownlinkTemplate<D2>): MapDownlinkClass<D2>;
+  willDrop?(lower: number, downlink: F): void;
 
-  /** @override */
-  <D2 extends D>(template: MapDownlinkTemplate<D2>): MapDownlinkDecorator<D2>;
-}
+  didDrop?(lower: number, downlink: F): void;
 
-/** @public */
-export interface MapDownlinkObserver<K = unknown, V = unknown, D extends MapDownlink<any, K, V, any, any> = MapDownlink<unknown, K, V, any, any>> extends WarpDownlinkObserver<D> {
-  willUpdate?(key: K, newValue: V, downlink: D): V | void;
+  willTake?(upper: number, downlink: F): void;
 
-  didUpdate?(key: K, newValue: V, oldValue: V, downlink: D): void;
+  didTake?(upper: number, downlink: F): void;
 
-  willRemove?(key: K, downlink: D): void;
+  willClear?(downlink: F): void;
 
-  didRemove?(key: K, oldValue: V, downlink: D): void;
-
-  willDrop?(lower: number, downlink: D): void;
-
-  didDrop?(lower: number, downlink: D): void;
-
-  willTake?(upper: number, downlink: D): void;
-
-  didTake?(upper: number, downlink: D): void;
-
-  willClear?(downlink: D): void;
-
-  didClear?(downlink: D): void;
+  didClear?(downlink: F): void;
 }
 
 /** @public */
 export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends Value ? AnyValue & K : K, VU = V extends Value ? AnyValue & V : V> extends WarpDownlink<O>, OrderedMap<K, V> {
   (key: K | KU): V | undefined;
   (key: K | KU, value: V | VU): O;
+
+  /** @override */
+  get descriptorType(): Proto<MapDownlinkDescriptor<K, V, KU, VU>>;
 
   /** @override */
   readonly observerType?: Class<MapDownlinkObserver<K, V>>;
@@ -292,7 +239,7 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
   const MapDownlink = _super.extend("MapDownlink", {
     relinks: true,
     syncs: true,
-  }) as MapDownlinkClass;
+  }) as FastenerClass<MapDownlink<any, any, any, any, any>>;
 
   MapDownlink.prototype.initKeyForm = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>): Form<K, KU> {
     let keyForm = (Object.getPrototypeOf(this) as MapDownlink<unknown, K,V, KU, VU>).keyForm as Form<K, KU> | undefined;
@@ -965,20 +912,20 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     return this;
   };
 
-  MapDownlink.construct = function <D extends MapDownlink<any, any, any, any, any>>(downlink: D | null, owner: FastenerOwner<D>): D {
+  MapDownlink.construct = function <F extends MapDownlink<any, any, any, any, any>>(downlink: F | null, owner: F extends MapDownlink<infer O, any, any, any, any> ? O : never): F {
     if (downlink === null) {
-      downlink = function (key: MapDownlinkKey<D> | MapDownlinkKeyInit<D>, value?: MapDownlinkValue<D> | MapDownlinkValueInit<D>): MapDownlinkValue<D> | undefined | FastenerOwner<D> {
+      downlink = function (key: F extends MapDownlink<any, infer K, any, infer KU, any> ? K | KU : never, value?: F extends MapDownlink<any, any, infer V, any, infer VU> ? V | VU : never): F extends MapDownlink<infer O, any, infer V, any, any> ? V | O | undefined : never {
         if (arguments.length === 1) {
           return downlink!.get(key);
         } else {
           downlink!.set(key, value!);
           return downlink!.owner;
         }
-      } as D;
-      delete (downlink as Partial<Mutable<D>>).name; // don't clobber prototype name
+      } as F;
+      delete (downlink as Partial<Mutable<F>>).name; // don't clobber prototype name
       Object.setPrototypeOf(downlink, this.prototype);
     }
-    downlink = _super.construct.call(this, downlink, owner) as D;
+    downlink = _super.construct.call(this, downlink, owner) as F;
     (downlink as Mutable<typeof downlink>).keyForm = downlink.initKeyForm();
     (downlink as Mutable<typeof downlink>).valueForm = downlink.initValueForm();
     return downlink;

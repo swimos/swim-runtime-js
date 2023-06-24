@@ -14,19 +14,9 @@
 
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
-import type {FastenerOwner} from "./Fastener";
+import type {FastenerClass} from "./Fastener";
 import type {EventHandlerDescriptor} from "./EventHandler";
-import type {EventHandlerClass} from "./EventHandler";
 import {EventHandler} from "./EventHandler";
-
-/** @public */
-export type EventTimerDecorator<F extends EventTimer<any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
-};
-
-/** @public */
-export type EventTimerTarget<F extends EventTimer<any, any>> =
-  F extends {target: infer T | null} ? T : never;
 
 /** @public */
 export interface EventTimerDescriptor<T extends EventTarget = EventTarget> extends EventHandlerDescriptor<T> {
@@ -35,36 +25,13 @@ export interface EventTimerDescriptor<T extends EventTarget = EventTarget> exten
 }
 
 /** @public */
-export type EventTimerTemplate<F extends EventTimer<any, any>> =
-  ThisType<F> &
-  EventTimerDescriptor &
-  Partial<Omit<F, keyof EventTimerDescriptor>>;
-
-/** @public */
-export interface EventTimerClass<F extends EventTimer<any, any> = EventTimer<any, any>> extends EventHandlerClass<F> {
-  /** @override */
-  specialize(template: EventTimerDescriptor): EventTimerClass<F>;
-
-  /** @override */
-  refine(fastenerClass: EventTimerClass<any>): void;
-
-  /** @override */
-  extend<F2 extends F>(className: string | symbol, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
-  extend<F2 extends F>(className: string | symbol, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
-
-  /** @override */
-  define<F2 extends F>(className: string | symbol, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
-  define<F2 extends F>(className: string | symbol, template: EventTimerTemplate<F2>): EventTimerClass<F2>;
-
-  /** @override */
-  <F2 extends F>(template: EventTimerTemplate<F2>): EventTimerDecorator<F2>;
-}
-
-/** @public */
 export interface EventTimer<O = unknown, T extends EventTarget = EventTarget> extends EventHandler<O, T> {
   /** @override */
   (event: Event): void;
   (): void;
+
+  /** @override */
+  get descriptorType(): Proto<EventTimerDescriptor<T>>;
 
   /** @protected */
   event: Event | null;
@@ -139,7 +106,7 @@ export interface EventTimer<O = unknown, T extends EventTarget = EventTarget> ex
 
 /** @public */
 export const EventTimer = (function (_super: typeof EventHandler) {
-  const EventTimer = _super.extend("EventTimer", {}) as EventTimerClass;
+  const EventTimer = _super.extend("EventTimer", {}) as FastenerClass<EventTimer<any, any>>;
 
   EventTimer.prototype.defer = function (this: EventTimer, event: Event): void {
     this.throttle(event);
@@ -325,7 +292,7 @@ export const EventTimer = (function (_super: typeof EventHandler) {
     this.cancel();
   };
 
-  EventTimer.construct = function <F extends EventTimer<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+  EventTimer.construct = function <F extends EventTimer<any, any>>(fastener: F | null, owner: F extends EventTimer<infer O, any> ? O : never): F {
     if (fastener === null) {
       fastener = function (event?: Event): void {
         if (event !== void 0) { // event listener

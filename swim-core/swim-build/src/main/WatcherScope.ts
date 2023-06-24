@@ -265,7 +265,6 @@ export class WatcherScope extends Scope {
 
   @Provider({
     extends: true,
-    lazy: false,
     observes: true,
     servicePackageDidChange(packageScope: PackageScope): void {
       this.owner.rebuildPackage(packageScope);

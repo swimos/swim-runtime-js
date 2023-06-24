@@ -16,13 +16,12 @@ import type {Mutable} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
-import type {Interpolator} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {AnyItem} from "./Item";
 import {Item} from "./Item";
 import type {AnyField} from "./Field";
 import {Field} from "./Field";
-import {AttrInterpolator} from "./"; // forward import
 import {Slot} from "./"; // forward import
 import type {AnyValue} from "./Value";
 import {Value} from "./"; // forward import
@@ -321,11 +320,10 @@ export class Attr extends Field {
   }
 
   override branch(): Attr {
-    if ((this.flags & Field.ImmutableFlag) !== 0) {
-      return new Attr(this.key, this.value, this.flags & ~Field.ImmutableFlag);
-    } else {
+    if ((this.flags & Field.ImmutableFlag) === 0) {
       return this;
     }
+    return new Attr(this.key, this.value, this.flags & ~Field.ImmutableFlag);
   }
 
   override clone(): Attr {
@@ -344,9 +342,8 @@ export class Attr extends Field {
   override interpolateTo(that: unknown): Interpolator<Item> | null {
     if (that instanceof Attr) {
       return AttrInterpolator(this, that);
-    } else {
-      return super.interpolateTo(that);
     }
+    return super.interpolateTo(that);
   }
 
   override get typeOrder(): number {
@@ -418,3 +415,66 @@ export class Attr extends Field {
     return new Attr(key, value);
   }
 }
+
+/** @internal */
+export interface AttrInterpolator extends Interpolator<Attr> {
+  /** @internal */
+  readonly keyInterpolator: Interpolator<Text>;
+  /** @internal */
+  readonly valueInterpolator: Interpolator<Value>;
+
+  readonly 0: Attr;
+
+  readonly 1: Attr;
+
+  equals(that: unknown): boolean;
+}
+
+/** @internal */
+export const AttrInterpolator = (function (_super: typeof Interpolator) {
+  const AttrInterpolator = function (y0: Attr, y1: Attr): AttrInterpolator {
+    const interpolator = function (u: number): Attr {
+      const key = interpolator.keyInterpolator(u);
+      const value = interpolator.valueInterpolator(u);
+      return Attr.of(key, value);
+    } as AttrInterpolator;
+    Object.setPrototypeOf(interpolator, AttrInterpolator.prototype);
+    (interpolator as Mutable<typeof interpolator>).keyInterpolator = y0.key.interpolateTo(y1.key);
+    (interpolator as Mutable<typeof interpolator>).valueInterpolator = y0.value.interpolateTo(y1.value);
+    return interpolator;
+  } as {
+    (y0: Attr, y1: Attr): AttrInterpolator;
+
+    /** @internal */
+    prototype: AttrInterpolator;
+  };
+
+  AttrInterpolator.prototype = Object.create(_super.prototype);
+  AttrInterpolator.prototype.constructor = AttrInterpolator;
+
+  Object.defineProperty(AttrInterpolator.prototype, 0, {
+    get(this: AttrInterpolator): Attr {
+      return Attr.of(this.keyInterpolator[0], this.valueInterpolator[0]);
+    },
+    configurable: true,
+  });
+
+  Object.defineProperty(AttrInterpolator.prototype, 1, {
+    get(this: AttrInterpolator): Attr {
+      return Attr.of(this.keyInterpolator[1], this.valueInterpolator[1]);
+    },
+    configurable: true,
+  });
+
+  AttrInterpolator.prototype.equals = function (that: unknown): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof AttrInterpolator) {
+      return this.keyInterpolator.equals(that.keyInterpolator)
+          && this.valueInterpolator.equals(that.valueInterpolator);
+    }
+    return false;
+  };
+
+  return AttrInterpolator;
+})(Interpolator);

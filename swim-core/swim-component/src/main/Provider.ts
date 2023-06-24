@@ -17,21 +17,11 @@ import type {Proto} from "@swim/util";
 import type {Observes} from "@swim/util";
 import {Affinity} from "./Affinity";
 import type {FastenerFlags} from "./Fastener";
-import type {FastenerOwner} from "./Fastener";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 import type {ServiceFactory} from "./Service";
 import {Service} from "./"; // forward import
-
-/** @public */
-export type ProviderService<P extends Provider<any, any>> =
-  P extends {service: infer S | null} ? S : never;
-
-/** @public */
-export type ProviderDecorator<P extends Provider<any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
-};
 
 /** @public */
 export interface ProviderDescriptor<S extends Service = Service> extends FastenerDescriptor {
@@ -43,43 +33,12 @@ export interface ProviderDescriptor<S extends Service = Service> extends Fastene
 }
 
 /** @public */
-export type ProviderTemplate<P extends Provider<any, any>> =
-  ThisType<P> &
-  ProviderDescriptor<ProviderService<P>> &
-  Partial<Omit<P, keyof ProviderDescriptor>>;
-
-/** @public */
-export interface ProviderClass<P extends Provider<any, any> = Provider<any, any>> extends FastenerClass<P> {
-  /** @override */
-  specialize(template: ProviderDescriptor<any>): ProviderClass<P>;
-
-  /** @override */
-  refine(providerClass: ProviderClass<any>): void;
-
-  /** @override */
-  extend<P2 extends P>(className: string | symbol, template: ProviderTemplate<P2>): ProviderClass<P2>;
-  extend<P2 extends P>(className: string | symbol, template: ProviderTemplate<P2>): ProviderClass<P2>;
-
-  /** @override */
-  define<P2 extends P>(className: string | symbol, template: ProviderTemplate<P2>): ProviderClass<P2>;
-  define<P2 extends P>(className: string | symbol, template: ProviderTemplate<P2>): ProviderClass<P2>;
-
-  /** @override */
-  <P2 extends P>(template: ProviderTemplate<P2>): ProviderDecorator<P2>;
-
-  /** @internal */
-  readonly ManagedFlag: FastenerFlags;
-
-  /** @internal @override */
-  readonly FlagShift: number;
-  /** @internal @override */
-  readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
 export interface Provider<O = unknown, S extends Service = Service> extends Fastener<O> {
   (): S | null;
   (service: S | null, target?: Service | null, key?: string): O;
+
+  /** @override */
+  get descriptorType(): Proto<ProviderDescriptor<S>>;
 
   /** @override */
   get fastenerType(): Proto<Provider<any, any>>;
@@ -115,13 +74,13 @@ export interface Provider<O = unknown, S extends Service = Service> extends Fast
   didUnderive(inlet: Provider<unknown, S>): void;
 
   /** @internal @override */
-  deriveInlet(): Provider<unknown, S> | null;
-
-  /** @override */
-  bindInlet(inlet: Provider<unknown, S>): void;
+  get parent(): Provider<unknown, S> | null;
 
   /** @override */
   get inlet(): Provider<unknown, S> | null;
+
+  /** @override */
+  bindInlet(inlet: Provider<unknown, S>): void;
 
   /** @protected @override */
   willBindInlet(inlet: Provider<unknown, S>): void;
@@ -217,7 +176,15 @@ export const Provider = (function (_super: typeof Fastener) {
     affinity: Affinity.Inherited,
     inherits: true,
     creates: true,
-  }) as ProviderClass;
+  }) as FastenerClass<Provider<any, any>> & {
+    /** @internal */
+    readonly ManagedFlag: FastenerFlags;
+
+    /** @internal @override */
+    readonly FlagShift: number;
+    /** @internal @override */
+    readonly FlagMask: FastenerFlags;
+  };
 
   Object.defineProperty(Provider.prototype, "fastenerType", {
     value: Provider,
@@ -348,7 +315,7 @@ export const Provider = (function (_super: typeof Fastener) {
 
   Object.defineProperty(Provider.prototype, "parentService", {
     get<S extends Service>(this: Provider<unknown, S>): S | null {
-      const parentProvider = this.deriveInlet();
+      const parentProvider = this.parent;
       return parentProvider !== null ? parentProvider.service : null;
     },
     enumerable: true,
@@ -438,7 +405,7 @@ export const Provider = (function (_super: typeof Fastener) {
     _super.prototype.onUnmount.call(this);
   };
 
-  Provider.create = function <P extends Provider<any, any>>(this: ProviderClass<P>, owner: FastenerOwner<P>): P {
+  Provider.create = function <P extends Provider<any, any>>(owner: P extends Provider<infer O, any> ? O : never): P {
     const provider = _super.create.call(this, owner) as P;
     if (provider.service === null && provider.creates) {
       const service = provider.createService();
@@ -447,9 +414,9 @@ export const Provider = (function (_super: typeof Fastener) {
     return provider;
   };
 
-  Provider.construct = function <P extends Provider<any, any>>(provider: P | null, owner: FastenerOwner<P>): P {
+  Provider.construct = function <P extends Provider<any, any>>(provider: P | null, owner: P extends Provider<infer O, any> ? O : never): P {
     if (provider === null) {
-      provider = function (service?: ProviderService<P> | null, target?: Service | null, key?: string): ProviderService<P> | null | FastenerOwner<P> {
+      provider = function (service?: P extends Provider<any, infer S> ? S | null : never, target?: Service | null, key?: string): P extends Provider<infer O, infer S> ? S | O | null : never {
         if (service === void 0) {
           return provider!.service;
         } else {
@@ -465,7 +432,7 @@ export const Provider = (function (_super: typeof Fastener) {
     return provider;
   };
 
-  Provider.refine = function (providerClass: ProviderClass<any>): void {
+  Provider.refine = function (providerClass: FastenerClass<any>): void {
     _super.refine.call(this, providerClass);
     const providerPrototype = providerClass.prototype;
 

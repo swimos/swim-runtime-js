@@ -13,11 +13,12 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Interpolate} from "@swim/util";
-import type {Interpolator} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
@@ -27,7 +28,6 @@ import type {AnyGeoShape} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import {GeoCurve} from "./GeoCurve";
-import {GeoSegmentInterpolator} from "./"; // forward import
 
 /** @public */
 export type AnyGeoSegment = GeoSegment | GeoSegmentInit;
@@ -99,15 +99,14 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   override contains(that: AnyGeoShape | number, lat?: number): boolean {
     if (typeof that === "number") {
       return R2Segment.contains(this.lng0, this.lat0, this.lng1, this.lat1, that, lat!);
-    } else {
-      that = GeoShape.fromAny(that);
-      if (that instanceof GeoPoint) {
-        return this.containsPoint(that);
-      } else if (that instanceof GeoSegment) {
-        return this.containsSegment(that);
-      }
-      return false;
     }
+    that = GeoShape.fromAny(that);
+    if (that instanceof GeoPoint) {
+      return this.containsPoint(that);
+    } else if (that instanceof GeoSegment) {
+      return this.containsSegment(that);
+    }
+    return false;
   }
 
   /** @internal */
@@ -202,9 +201,8 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   interpolateTo(that: unknown): Interpolator<GeoSegment> | null {
     if (that instanceof GeoSegment) {
       return GeoSegmentInterpolator(this, that);
-    } else {
-      return null;
     }
+    return null;
   }
 
   override equivalentTo(that: unknown, epsilon?: number): boolean {
@@ -281,3 +279,32 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
         || GeoSegment.isInit(value);
   }
 }
+
+/** @internal */
+export const GeoSegmentInterpolator = (function (_super: typeof Interpolator) {
+  const GeoSegmentInterpolator = function (s0: GeoSegment, s1: GeoSegment): Interpolator<GeoSegment> {
+    const interpolator = function (u: number): GeoSegment {
+      const s0 = interpolator[0];
+      const s1 = interpolator[1];
+      const lng0 = s0.lng0 + u * (s1.lng0 - s0.lng0);
+      const lat0 = s0.lat0 + u * (s1.lat0 - s0.lat0);
+      const lng1 = s0.lng1 + u * (s1.lng1 - s0.lng1);
+      const lat1 = s0.lat1 + u * (s1.lat1 - s0.lat1);
+      return new GeoSegment(lng0, lat0, lng1, lat1);
+    } as Interpolator<GeoSegment>;
+    Object.setPrototypeOf(interpolator, GeoSegmentInterpolator.prototype);
+    (interpolator as Mutable<typeof interpolator>)[0] = s0;
+    (interpolator as Mutable<typeof interpolator>)[1] = s1;
+    return interpolator;
+  } as {
+    (s0: GeoSegment, s1: GeoSegment): Interpolator<GeoSegment>;
+
+    /** @internal */
+    prototype: Interpolator<GeoSegment>;
+  };
+
+  GeoSegmentInterpolator.prototype = Object.create(_super.prototype);
+  GeoSegmentInterpolator.prototype.constructor = GeoSegmentInterpolator;
+
+  return GeoSegmentInterpolator;
+})(Interpolator);

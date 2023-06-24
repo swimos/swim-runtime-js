@@ -16,24 +16,24 @@ import type {AnyValue} from "@swim/structure";
 import type {Value} from "@swim/structure";
 import type {AnyUri} from "@swim/uri";
 import type {WarpDownlinkContext} from "./WarpDownlinkContext";
-import type {EventDownlinkTemplate} from "./EventDownlink";
+import type {EventDownlinkDescriptor} from "./EventDownlink";
 import type {EventDownlink} from "./EventDownlink";
-import type {ValueDownlinkTemplate} from "./ValueDownlink";
+import type {ValueDownlinkDescriptor} from "./ValueDownlink";
 import type {ValueDownlink} from "./ValueDownlink";
-import type {ListDownlinkTemplate} from "./ListDownlink";
+import type {ListDownlinkDescriptor} from "./ListDownlink";
 import type {ListDownlink} from "./ListDownlink";
-import type {MapDownlinkTemplate} from "./MapDownlink";
+import type {MapDownlinkDescriptor} from "./MapDownlink";
 import type {MapDownlink} from "./MapDownlink";
 
 /** @public */
 export interface WarpRef extends WarpDownlinkContext {
-  downlink(template?: EventDownlinkTemplate<EventDownlink<this>>): EventDownlink<this>;
+  downlink(template?: ThisType<EventDownlink<this>> & EventDownlinkDescriptor & Partial<Omit<EventDownlink<this>, keyof EventDownlinkDescriptor>>): EventDownlink<this>;
 
-  downlinkValue<V = Value, VU = V extends Value ? AnyValue & V : V>(template?: ValueDownlinkTemplate<ValueDownlink<this, V, VU>>): ValueDownlink<this, V, VU>;
+  downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ValueDownlink<this, V, VU>> & ValueDownlinkDescriptor<V, VU> & Partial<Omit<ValueDownlink<this, V, VU>, keyof ValueDownlinkDescriptor<V, VU>>>): ValueDownlink<this, V, VU>;
 
-  downlinkList<V = Value, VU = V extends Value ? AnyValue & V : V>(template?: ListDownlinkTemplate<ListDownlink<this, V, VU>>): ListDownlink<this, V, VU>;
+  downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ListDownlink<this, V, VU>> & ListDownlinkDescriptor<V, VU> & Partial<Omit<ListDownlink<this, V, VU>, keyof ListDownlinkDescriptor<V, VU>>>): ListDownlink<this, V, VU>;
 
-  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue & K : K, VU = V extends Value ? AnyValue & V : V>(template?: MapDownlinkTemplate<MapDownlink<this, K, V, KU, VU>>): MapDownlink<this, K, V, KU, VU>;
+  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: ThisType<MapDownlink<this, K, V, KU, VU>> & MapDownlinkDescriptor<K, V, KU, VU> & Partial<Omit<MapDownlink<this, K, V, KU, VU>, keyof MapDownlinkDescriptor<K, V, KU, VU>>>): MapDownlink<this, K, V, KU, VU>;
 
   command(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
   command(nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;

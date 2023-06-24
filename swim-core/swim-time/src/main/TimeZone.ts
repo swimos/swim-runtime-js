@@ -20,9 +20,11 @@ import type {HashCode} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
+import type {Item} from "@swim/structure";
 import type {Value} from "@swim/structure";
-import type {Form} from "@swim/structure";
-import {TimeZoneForm} from "./"; // forward import
+import {Text} from "@swim/structure";
+import {Num} from "@swim/structure";
+import {Form} from "@swim/structure";
 
 /** @public */
 export type AnyTimeZone = TimeZone | string | number;
@@ -78,34 +80,40 @@ export class TimeZone implements HashCode, Debug {
     return Format.debug(this);
   }
 
-  @Lazy
-  static get utc(): TimeZone {
-    return new TimeZone("UTC", 0);
+  /** @internal */
+  static readonly UTC: TimeZone = new this("UTC", 0);
+
+  static utc(): TimeZone {
+    return this.UTC;
   }
 
-  @Lazy
-  static get local(): TimeZone {
-    return TimeZone.forOffset(-new Date().getTimezoneOffset());
+  /** @internal */
+  static Local: TimeZone | null = null;
+
+  static local(): TimeZone {
+    if (this.Local === null) {
+      this.Local = this.forOffset(-new Date().getTimezoneOffset());
+    }
+    return this.Local;
   }
 
   static create(name: string | undefined, offset: number): TimeZone {
     if (name === "UTC" && offset === 0) {
-      return TimeZone.utc;
-    } else {
-      return new TimeZone(name, offset);
+      return TimeZone.utc();
     }
+    return new TimeZone(name, offset);
   }
 
   static forName(name: string): TimeZone | null {
     switch (name) {
-      case "UTC": return TimeZone.utc;
+      case "UTC": return TimeZone.utc();
       default: return null;
     }
   }
 
   static forOffset(offset: number): TimeZone {
     switch (offset) {
-      case 0: return TimeZone.utc;
+      case 0: return TimeZone.utc();
       default: return new TimeZone(void 0, offset);
     }
   }
@@ -148,6 +156,43 @@ export class TimeZone implements HashCode, Debug {
 
   @Lazy
   static form(): Form<TimeZone, AnyTimeZone> {
-    return new TimeZoneForm(TimeZone.utc);
+    return new TimeZoneForm(TimeZone.utc());
+  }
+}
+
+/** @internal */
+export class TimeZoneForm extends Form<TimeZone, AnyTimeZone> {
+  constructor(unit: TimeZone | undefined) {
+    super();
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
+  }
+
+  override readonly unit!: TimeZone | undefined;
+
+  override withUnit(unit: TimeZone | undefined): Form<TimeZone, AnyTimeZone> {
+    if (unit !== this.unit) {
+      return new TimeZoneForm(unit);
+    } else {
+      return this;
+    }
+  }
+
+  override mold(zone: AnyTimeZone): Item {
+    zone = TimeZone.fromAny(zone);
+    const name = zone.name;
+    if (name !== void 0) {
+      return Text.from(name);
+    } else {
+      return Num.from(zone.offset);
+    }
+  }
+
+  override cast(item: Item): TimeZone | undefined {
+    const value = item.toValue();
+    const zone = TimeZone.fromValue(value);
+    return zone !== null ? zone : void 0;
   }
 }

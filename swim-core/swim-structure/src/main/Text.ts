@@ -18,15 +18,15 @@ import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {Interpolator} from "@swim/util";
 import {HashGenCacheSet} from "@swim/util";
+import type {AnyOutputSettings} from "@swim/codec";
 import {OutputSettings} from "@swim/codec";
-import type {Output} from "@swim/codec";
+import {Output} from "@swim/codec";
 import {Format} from "@swim/codec";
 import type {AnyItem} from "./Item";
 import {Item} from "./Item";
 import type {AnyValue} from "./Value";
 import {Value} from "./Value";
 import {Num} from "./"; // forward import
-import {TextOutput} from "./"; // forward import
 
 /** @public */
 export type AnyText = Text | string;
@@ -170,22 +170,23 @@ export class Text extends Value {
     return this.value;
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Empty: Text = new this("");
+
   static override empty(): Text {
-    return new Text("");
+    return this.Empty;
   }
 
   static from(value: string): Text {
     const n = value.length;
     if (n === 0) {
       return Text.empty();
-    } else {
-      let text = new Text(value);
-      if (n <= 64) {
-        text = Text.cache.put(text);
-      }
-      return text;
     }
+    let text = new Text(value);
+    if (n <= 64) {
+      text = Text.cache.put(text);
+    }
+    return text;
   }
 
   static override fromAny(value: AnyText): Text {
@@ -193,9 +194,8 @@ export class Text extends Value {
       return value;
     } else if (typeof value === "string") {
       return Text.from(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
   static output(settings?: OutputSettings): Output<Text> {
@@ -210,5 +210,77 @@ export class Text extends Value {
   static get cache(): HashGenCacheSet<Text> {
     const cacheSize = 128;
     return new HashGenCacheSet<Text>(cacheSize);
+  }
+}
+
+/** @internal */
+export class TextOutput extends Output<Text> {
+  constructor(string: string, settings: OutputSettings) {
+    super();
+    this.string = string;
+    this.settings = settings;
+  }
+
+  /** @internal */
+  readonly string: string;
+
+  override isCont(): boolean {
+    return true;
+  }
+
+  override isFull(): boolean {
+    return false;
+  }
+
+  override isDone(): boolean {
+    return false;
+  }
+
+  override isError(): boolean {
+    return false;
+  }
+
+  override isPart(): boolean {
+    return false;
+  }
+
+  override asPart(part: boolean): Output<Text> {
+    return this;
+  }
+
+  override write(token: number | string): Output<Text> {
+    if (typeof token === "number") {
+      if ((token >= 0x0000 && token <= 0xd7ff)
+          || (token >= 0xe000 && token <= 0xffff)) { // U+0000..U+D7FF | U+E000..U+FFFF
+        token = String.fromCharCode(token);
+      } else if (token >= 0x10000 && token <= 0x10ffff) { // U+10000..U+10FFFF
+        const u = token - 0x10000;
+        token = String.fromCharCode(0xd800 | (u >>> 10), 0xdc00 | (u & 0x3ff));
+      } else { // invalid code point
+        token = "\ufffd";
+      }
+    }
+    (this as Mutable<this>).string += token;
+    return this;
+  }
+
+  override readonly settings!: OutputSettings;
+
+  override withSettings(settings: AnyOutputSettings): Output<Text> {
+    settings = OutputSettings.fromAny(settings);
+    (this as Mutable<this>).settings = settings;
+    return this;
+  }
+
+  override bind(): Text {
+    return Text.from(this.string);
+  }
+
+  override clone(): Output<Text> {
+    return new TextOutput(this.string, this.settings);
+  }
+
+  override toString(): string {
+    return this.string;
   }
 }

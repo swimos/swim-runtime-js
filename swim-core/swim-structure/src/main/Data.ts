@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Random} from "@swim/util";
 import {Murmur3} from "@swim/util";
@@ -20,6 +19,7 @@ import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Interpolator} from "@swim/util";
 import type {Input} from "@swim/codec";
+import type {AnyOutputSettings} from "@swim/codec";
 import {OutputSettings} from "@swim/codec";
 import {Output} from "@swim/codec";
 import {Writer} from "@swim/codec";
@@ -28,7 +28,6 @@ import {Base16} from "@swim/codec";
 import {Base64} from "@swim/codec";
 import {Item} from "./Item";
 import {Value} from "./Value";
-import {DataOutput} from "./"; // forward import
 
 /** @public */
 export type AnyData = Data | Uint8Array;
@@ -141,15 +140,14 @@ export class Data extends Value {
 
   addData(data: Data): Data {
     let array = data.array;
-    if (array !== null) {
-      const size = data.size;
-      if (array.length > size) {
-        array = array.slice(0, size);
-      }
-      return this.addUint8Array(array);
-    } else {
+    if (array === null) {
       return this;
     }
+    const size = data.size;
+    if (array.length > size) {
+      array = array.slice(0, size);
+    }
+    return this.addUint8Array(array);
   }
 
   addUint8Array(array: Uint8Array): Data {
@@ -225,20 +223,16 @@ export class Data extends Value {
       (this as Mutable<this>).array = newArray;
       (this as Mutable<this>).flags &= ~Data.AliasedFlag;
       return newArray;
-    } else {
-      return oldArray!;
     }
+    return oldArray!;
   }
 
   asUint8Array(): Uint8Array | undefined {
-    let array: Uint8Array | undefined;
-    if (this.array !== null && this.size > 0) {
-      array = this.array;
-      if (array.length !== this.size) {
-        array = new Uint8Array(array.buffer, array.byteOffset, this.size);
-      }
-    } else {
-      array = void 0;
+    const array = this.array;
+    if (array === null || this.size === 0) {
+      return void 0;
+    } else if (array.length !== this.size) {
+      return new Uint8Array(array.buffer, array.byteOffset, this.size);
     }
     return array;
   }
@@ -272,14 +266,12 @@ export class Data extends Value {
   writeBase16(output: Output, base16: Base16 = Base16.uppercase): Writer<unknown, unknown> {
     let array = this.array;
     const size = this.size;
-    if (array !== null && size !== 0) {
-      if (array.length !== size) {
-        array = array.slice(0, size);
-      }
-      return base16.writeUint8Array(output, array);
-    } else {
+    if (array === null || size === 0) {
       return Writer.end();
+    } else if (array.length !== size) {
+      array = array.slice(0, size);
     }
+    return base16.writeUint8Array(output, array);
   }
 
   toBase16(base16: Base16 = Base16.uppercase): string {
@@ -291,14 +283,12 @@ export class Data extends Value {
   writeBase64(output: Output, base64: Base64 = Base64.standard()): Writer<unknown, unknown> {
     let array = this.array;
     const size = this.size;
-    if (array !== null && size !== 0) {
-      if (array.length !== size) {
-        array = array.slice(0, size);
-      }
-      return base64.writeUint8Array(output, array);
-    } else {
+    if (array === null || size === 0) {
       return Writer.end();
+    } else if (array.length !== size) {
+      array = array.slice(0, size);
     }
+    return base64.writeUint8Array(output, array);
   }
 
   toBase64(base64: Base64 = Base64.standard()): string {
@@ -400,17 +390,18 @@ export class Data extends Value {
   /** @internal */
   static readonly ImmutableFlag: number = 1 << 1;
 
-  @Lazy
+  /** @internal */
+  static readonly Empty: Data = new this(null, 0, Data.AliasedFlag | Data.ImmutableFlag);
+
   static override empty(): Data {
-    return new Data(null, 0, Data.AliasedFlag | Data.ImmutableFlag);
+    return this.Empty;
   }
 
   static create(initialCapacity?: number): Data {
     if (initialCapacity === void 0) {
       return new Data(null, 0, Data.AliasedFlag);
-    } else {
-      return new Data(new Uint8Array(initialCapacity), 0, 0);
     }
+    return new Data(new Uint8Array(initialCapacity), 0, 0);
   }
 
   static wrap(value: Uint8Array): Data {
@@ -436,9 +427,8 @@ export class Data extends Value {
       return value;
     } else if (value instanceof Uint8Array) {
       return Data.wrap(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
   static random(size: number): Data {
@@ -462,5 +452,69 @@ export class Data extends Value {
     n = Math.max(32, n) - 1;
     n |= n >> 1; n |= n >> 2; n |= n >> 4; n |= n >> 8; n |= n >> 16;
     return n + 1;
+  }
+}
+
+/** @internal */
+export class DataOutput extends Output<Data> {
+  constructor(data: Data, settings: OutputSettings) {
+    super();
+    this.data = data;
+    this.settings = settings;
+  }
+
+  /** @internal */
+  readonly data: Data;
+
+  override isCont(): boolean {
+    return true;
+  }
+
+  override isFull(): boolean {
+    return false;
+  }
+
+  override isDone(): boolean {
+    return false;
+  }
+
+  override isError(): boolean {
+    return false;
+  }
+
+  override isPart(): boolean {
+    return false;
+  }
+
+  override asPart(part: boolean): Output<Data> {
+    return this;
+  }
+
+  override write(b: number | string): Output<Data> {
+    if (typeof b !== "number") {
+      throw new TypeError("" + b);
+    }
+    this.data.addByte(b);
+    return this;
+  }
+
+  override writeln(string?: string): Output<Data> {
+    throw new TypeError("" + string);
+  }
+
+  override readonly settings: OutputSettings;
+
+  override withSettings(settings: AnyOutputSettings): Output<Data> {
+    settings = OutputSettings.fromAny(settings);
+    (this as Mutable<this>).settings = settings;
+    return this;
+  }
+
+  override bind(): Data {
+    return this.data;
+  }
+
+  override clone(): Output<Data> {
+    return new DataOutput(this.data.branch(), this.settings);
   }
 }

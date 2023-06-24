@@ -152,7 +152,7 @@ export abstract class Expression extends Value {
   }
 
   override inverse(): Operator {
-    return new DivideOperator(Num.one, this);
+    return new DivideOperator(Num.one(), this);
   }
 
   override toAny(): AnyValue {

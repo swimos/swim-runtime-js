@@ -15,33 +15,15 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
-import type {FastenerOwner} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
 import type {AnyValue} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Form} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
-import type {WarpDownlinkClass} from "./WarpDownlink";
 import type {WarpDownlinkObserver} from "./WarpDownlink";
 import {WarpDownlink} from "./WarpDownlink";
 import {ValueDownlinkModel} from "./ValueDownlinkModel";
-
-/** @public */
-export type ValueDownlinkValue<D extends ValueDownlink<any, any, any>> =
-  D extends {value: infer V} ? V : never;
-
-/** @public */
-export type ValueDownlinkValueInit<D extends ValueDownlink<any, any, any>> =
-  D extends {valueInit?: infer VU} ? VU : never;
-
-/** @public */
-export type AnyValueDownlinkValue<D extends ValueDownlink<any, any, any>> =
-  ValueDownlinkValue<D> | ValueDownlinkValueInit<D>;
-
-/** @public */
-export type ValueDownlinkDecorator<P extends ValueDownlink<any, any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
-};
 
 /** @public */
 export interface ValueDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlinkDescriptor {
@@ -52,42 +34,19 @@ export interface ValueDownlinkDescriptor<V = unknown, VU = V> extends WarpDownli
 }
 
 /** @public */
-export type ValueDownlinkTemplate<D extends ValueDownlink<any, any, any>> =
-  ThisType<D> &
-  ValueDownlinkDescriptor<ValueDownlinkValue<D>, ValueDownlinkValueInit<D>> &
-  Partial<Omit<D, keyof ValueDownlinkDescriptor>>;
+export interface ValueDownlinkObserver<V = unknown, F extends ValueDownlink<any, V, any> = ValueDownlink<unknown, V>> extends WarpDownlinkObserver<F> {
+  willSet?(newValue: V, downlink: F): V | void;
 
-/** @public */
-export interface ValueDownlinkClass<D extends ValueDownlink<any, any, any> = ValueDownlink<any, any, any>> extends WarpDownlinkClass<D> {
-  /** @override */
-  specialize(template: ValueDownlinkDescriptor<any>): ValueDownlinkClass<D>;
-
-  /** @override */
-  refine(downlinkClass: ValueDownlinkClass<any>): void;
-
-  /** @override */
-  extend<D2 extends D>(className: string | symbol, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
-  extend<D2 extends D>(className: string | symbol, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
-
-  /** @override */
-  define<D2 extends D>(className: string | symbol, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
-  define<D2 extends D>(className: string | symbol, template: ValueDownlinkTemplate<D2>): ValueDownlinkClass<D2>;
-
-  /** @override */
-  <D2 extends D>(template: ValueDownlinkTemplate<D2>): ValueDownlinkDecorator<D2>;
-}
-
-/** @public */
-export interface ValueDownlinkObserver<V = unknown, D extends ValueDownlink<any, V, any> = ValueDownlink<unknown, V>> extends WarpDownlinkObserver<D> {
-  willSet?(newValue: V, downlink: D): V | void;
-
-  didSet?(newValue: V, oldValue: V, downlink: D): void;
+  didSet?(newValue: V, oldValue: V, downlink: F): void;
 }
 
 /** @public */
 export interface ValueDownlink<O = unknown, V = Value, VU = V extends Value ? AnyValue & V : V> extends WarpDownlink<O> {
   (): V;
   (value: V | VU): O;
+
+  /** @override */
+  get descriptorType(): Proto<ValueDownlinkDescriptor<V, VU>>;
 
   /** @override */
   readonly observerType?: Class<ValueDownlinkObserver<V>>;
@@ -145,7 +104,7 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
   const ValueDownlink = _super.extend("ValueDownlink", {
     relinks: true,
     syncs: true,
-  }) as ValueDownlinkClass;
+  }) as FastenerClass<ValueDownlink<any, any, any>>;
 
   ValueDownlink.prototype.initValueForm = function <V, VU>(this: ValueDownlink<unknown, V, VU>): Form<V, VU> {
     let valueForm = (Object.getPrototypeOf(this) as ValueDownlink<unknown, V, VU>).valueForm as Form<V, VU> | undefined;
@@ -325,20 +284,20 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
     return this;
   };
 
-  ValueDownlink.construct = function <D extends ValueDownlink<any, any, any>>(downlink: D | null, owner: FastenerOwner<D>): D {
+  ValueDownlink.construct = function <F extends ValueDownlink<any, any, any>>(downlink: F | null, owner: F extends ValueDownlink<infer O, any, any> ? O : never): F {
     if (downlink === null) {
-      downlink = function (value?: ValueDownlinkValue<D> | ValueDownlinkValueInit<D>): ValueDownlinkValue<D> | FastenerOwner<D> {
+      downlink = function (value?: F extends ValueDownlink<any, infer T, infer U> ? T | U : never): F extends ValueDownlink<infer O, infer V, any> ? V | O : never {
         if (arguments.length === 0) {
           return downlink!.get();
         } else {
           downlink!.set(value!);
           return downlink!.owner;
         }
-      } as D;
-      delete (downlink as Partial<Mutable<D>>).name; // don't clobber prototype name
+      } as F;
+      delete (downlink as Partial<Mutable<F>>).name; // don't clobber prototype name
       Object.setPrototypeOf(downlink, this.prototype);
     }
-    downlink = _super.construct.call(this, downlink, owner) as D;
+    downlink = _super.construct.call(this, downlink, owner) as F;
     (downlink as Mutable<typeof downlink>).valueForm = downlink.initValueForm();
     return downlink;
   };

@@ -254,7 +254,6 @@ export abstract class WarpHost extends Component {
     valueType: Number,
     value: 1000,
     inherits: true,
-    lazy: false,
     didSetValue(idleTimeout: number): void {
       this.owner.idleTimer.setDelay(idleTimeout);
     },
@@ -264,7 +263,6 @@ export abstract class WarpHost extends Component {
   @Property({
     valueType: Value,
     value: Value.absent(),
-    lazy: false,
     didSetValue(credentials: Value): void {
       if (this.owner.connected) {
         const request = new AuthRequest(credentials);

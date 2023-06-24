@@ -15,23 +15,12 @@
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Affinity} from "./Affinity";
-import {type FastenerOwner} from "./Fastener";
+import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 import type {AnyComponent} from "./Component";
-import type {ComponentFactory} from "./Component";
 import type {Component} from "./Component";
 import type {ComponentRelationDescriptor} from "./ComponentRelation";
-import type {ComponentRelationClass} from "./ComponentRelation";
 import {ComponentRelation} from "./ComponentRelation";
-
-/** @public */
-export type ComponentRefComponent<F extends ComponentRef<any, any>> =
-  F extends {componentType?: ComponentFactory<infer C>} ? C : never;
-
-/** @public */
-export type ComponentRefDecorator<F extends ComponentRef<any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
-};
 
 /** @public */
 export interface ComponentRefDescriptor<C extends Component = Component> extends ComponentRelationDescriptor<C> {
@@ -40,35 +29,12 @@ export interface ComponentRefDescriptor<C extends Component = Component> extends
 }
 
 /** @public */
-export type ComponentRefTemplate<F extends ComponentRef<any, any>> =
-  ThisType<F> &
-  ComponentRefDescriptor<ComponentRefComponent<F>> &
-  Partial<Omit<F, keyof ComponentRefDescriptor>>;
-
-/** @public */
-export interface ComponentRefClass<F extends ComponentRef<any, any> = ComponentRef<any, any>> extends ComponentRelationClass<F> {
-  /** @override */
-  specialize(template: ComponentRefDescriptor<any>): ComponentRefClass<F>;
-
-  /** @override */
-  refine(fastenerClass: ComponentRefClass<any>): void;
-
-  /** @override */
-  extend<F2 extends F>(className: string | symbol, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
-  extend<F2 extends F>(className: string | symbol, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
-
-  /** @override */
-  define<F2 extends F>(className: string | symbol, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
-  define<F2 extends F>(className: string | symbol, template: ComponentRefTemplate<F2>): ComponentRefClass<F2>;
-
-  /** @override */
-  <F2 extends F>(template: ComponentRefTemplate<F2>): ComponentRefDecorator<F2>;
-}
-
-/** @public */
 export interface ComponentRef<O = unknown, C extends Component = Component> extends ComponentRelation<O, C> {
   (): C | null;
   (component: AnyComponent<C> | null, target?: Component | null, key?: string): O;
+
+  /** @override */
+  get descriptorType(): Proto<ComponentRefDescriptor<C>>;
 
   /** @override */
   get fastenerType(): Proto<ComponentRef<any, any>>;
@@ -95,13 +61,13 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
   didUnderive(inlet: ComponentRef<unknown, C>): void;
 
   /** @override */
-  deriveInlet(): ComponentRef<unknown, C> | null;
-
-  /** @override */
-  bindInlet(inlet: ComponentRef<unknown, C>): void;
+  get parent(): ComponentRef<unknown, C> | null;
 
   /** @override */
   readonly inlet: ComponentRef<unknown, C> | null;
+
+  /** @override */
+  bindInlet(inlet: ComponentRef<unknown, C>): void;
 
   /** @protected @override */
   willBindInlet(inlet: ComponentRef<unknown, C>): void;
@@ -174,7 +140,7 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
 
 /** @public */
 export const ComponentRef = (function (_super: typeof ComponentRelation) {
-  const ComponentRef = _super.extend("ComponentRef", {}) as ComponentRefClass;
+  const ComponentRef = _super.extend("ComponentRef", {}) as FastenerClass<ComponentRef<any, any>>;
 
   Object.defineProperty(ComponentRef.prototype, "fastenerType", {
     value: ComponentRef,
@@ -457,9 +423,9 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     this.setComponent(inlet.component);
   };
 
-  ComponentRef.construct = function <F extends ComponentRef<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+  ComponentRef.construct = function <F extends ComponentRef<any, any>>(fastener: F | null, owner: F extends ComponentRef<infer O, any> ? O : never): F {
     if (fastener === null) {
-      fastener = function (component?: AnyComponent<ComponentRefComponent<F>> | null, target?: Component | null, key?: string): ComponentRefComponent<F> | null | FastenerOwner<F> {
+      fastener = function (component?: F extends ComponentRef<any, infer C> ? AnyComponent<C> | null : never, target?: Component | null, key?: string): F extends ComponentRelation<infer O, infer C> ? C | O | null : never {
         if (component === void 0) {
           return fastener!.component;
         } else {
@@ -475,7 +441,7 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     return fastener;
   };
 
-  ComponentRef.refine = function (fastenerClass: ComponentRefClass<any>): void {
+  ComponentRef.refine = function (fastenerClass: FastenerClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
 

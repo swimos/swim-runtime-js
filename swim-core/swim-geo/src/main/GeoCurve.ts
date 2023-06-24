@@ -20,6 +20,13 @@ import {GeoShape} from "./GeoShape";
 import type {GeoPoint} from "./GeoPoint";
 
 /** @public */
+export interface GeoCurveContext {
+  moveTo(lng: number, lat: number): void;
+
+  lineTo(lng: number, lat: number): void;
+}
+
+/** @public */
 export abstract class GeoCurve extends GeoShape implements Equals, Equivalent {
   abstract interpolateLng(u: number): number;
 

@@ -94,13 +94,14 @@ export class RecordMapView extends Record {
   }
 
   override get tag(): string | undefined {
-    if (this.length > 0) {
-      const item = this.record.array![this.lower];
-      if (item instanceof Attr) {
-        return item.key.value;
-      }
+    if (this.length === 0) {
+      return void 0;
     }
-    return void 0;
+    const item = this.record.array![this.lower];
+    if (!(item instanceof Attr)) {
+      return void 0;
+    }
+    return item.key.value;
   }
 
   override get target(): Value {
@@ -130,41 +131,36 @@ export class RecordMapView extends Record {
       return value;
     } else if (modified) {
       return record;
-    } else {
-      return this;
     }
+    return this;
   }
 
   override head(): Item {
-    if (this.length > 0) {
-      return this.record.array![this.lower]!;
-    } else {
+    if (this.length === 0) {
       return Item.absent();
     }
+    return this.record.array![this.lower]!;
   }
 
   override tail(): Record {
-    if (this.length > 0) {
-      return new RecordMapView(this.record, this.lower + 1, this.upper);
-    } else {
+    if (this.length === 0) {
       return Record.empty();
     }
+    return new RecordMapView(this.record, this.lower + 1, this.upper);
   }
 
   override body(): Value {
     const n = this.length;
-    if (n > 2) {
-      return new RecordMapView(this.record, this.lower + 1, this.upper).branch();
+    if (n === 0 || n === 1) {
+      return Value.absent();
     } else if (n === 2) {
       const item = this.record.array![this.lower + 1];
       if (item instanceof Value) {
         return item;
-      } else {
-        return Record.of(item);
       }
-    } else {
-      return Value.absent();
+      return Record.of(item);
     }
+    return new RecordMapView(this.record, this.lower + 1, this.upper).branch();
   }
 
   override indexOf(item: AnyItem, index: number = 0): number {
@@ -211,11 +207,10 @@ export class RecordMapView extends Record {
     if (index < 0) {
       index = n + index;
     }
-    if (index >= 0 && index < n) {
-      return this.record.array![this.lower + index]!;
-    } else {
+    if (index < 0 || index >= n) {
       return Item.absent();
     }
+    return this.record.array![this.lower + index]!;
   }
 
   override setItem(index: number, newItem: AnyItem): this {

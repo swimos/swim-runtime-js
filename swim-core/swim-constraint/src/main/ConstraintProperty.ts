@@ -16,11 +16,8 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Affinity} from "@swim/component";
 import type {FastenerFlags} from "@swim/component";
-import type {FastenerOwner} from "@swim/component";
-import type {PropertyValue} from "@swim/component";
-import type {PropertyValueInit} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
 import type {PropertyDescriptor} from "@swim/component";
-import type {PropertyClass} from "@swim/component";
 import {Property} from "@swim/component";
 import {ConstraintId} from "./ConstraintId";
 import {ConstraintMap} from "./ConstraintMap";
@@ -35,51 +32,10 @@ import {ConstraintScope} from "./"; // forward import
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @public */
-export type ConstraintPropertyDecorator<P extends Property<any, any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
-};
-
-/** @public */
 export interface ConstraintPropertyDescriptor<T = unknown, U = T> extends PropertyDescriptor<T, U> {
   extends?: Proto<ConstraintProperty<any, any, any>> | boolean | null;
   strength?: AnyConstraintStrength;
   constrained?: boolean;
-}
-
-/** @public */
-export type ConstraintPropertyTemplate<P extends ConstraintProperty<any, any, any>> =
-  ThisType<P> &
-  ConstraintPropertyDescriptor<PropertyValue<P>, PropertyValueInit<P>> &
-  Partial<Omit<P, keyof ConstraintPropertyDescriptor>>;
-
-/** @public */
-export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any, any> = ConstraintProperty<any, any, any>> extends PropertyClass<P> {
-  /** @override */
-  specialize(template: ConstraintPropertyDescriptor<any, any>): ConstraintPropertyClass<P>;
-
-  /** @override */
-  refine(propertyClass: ConstraintPropertyClass<any>): void;
-
-  /** @override */
-  extend<P2 extends P>(className: string | symbol, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
-  extend<P2 extends P>(className: string | symbol, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
-
-  /** @override */
-  define<P2 extends P>(className: string | symbol, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
-  define<P2 extends P>(className: string | symbol, template: ConstraintPropertyTemplate<P2>): ConstraintPropertyClass<P2>;
-
-  /** @override */
-  <P2 extends P>(template: ConstraintPropertyTemplate<P2>): ConstraintPropertyDecorator<P2>;
-
-  /** @internal */
-  readonly ConstrainedFlag: FastenerFlags;
-  /** @internal */
-  readonly ConstrainingFlag: FastenerFlags;
-
-  /** @internal @override */
-  readonly FlagShift: number;
-  /** @internal @override */
-  readonly FlagMask: FastenerFlags;
 }
 
 /** @public */
@@ -198,7 +154,17 @@ export interface ConstraintProperty<O = unknown, T = unknown, U = T> extends Pro
 
 /** @public */
 export const ConstraintProperty = (function (_super: typeof Property) {
-  const ConstraintProperty = _super.extend("ConstraintProperty", {}) as ConstraintPropertyClass;
+  const ConstraintProperty = _super.extend("ConstraintProperty", {}) as FastenerClass<ConstraintProperty<any, any, any>> & {
+    /** @internal */
+    readonly ConstrainedFlag: FastenerFlags;
+    /** @internal */
+    readonly ConstrainingFlag: FastenerFlags;
+
+    /** @internal @override */
+    readonly FlagShift: number;
+    /** @internal @override */
+    readonly FlagMask: FastenerFlags;
+  };
 
   ConstraintProperty.prototype.isExternal = function (this: ConstraintProperty): boolean {
     return true;
@@ -344,12 +310,13 @@ export const ConstraintProperty = (function (_super: typeof Property) {
   });
 
   ConstraintProperty.prototype.startConstraining = function (this: ConstraintProperty): void {
-    if ((this.flags & ConstraintProperty.ConstrainingFlag) === 0) {
-      this.willStartConstraining();
-      this.setFlags(this.flags | ConstraintProperty.ConstrainingFlag);
-      this.onStartConstraining();
-      this.didStartConstraining();
+    if ((this.flags & ConstraintProperty.ConstrainingFlag) !== 0) {
+      return;
     }
+    this.willStartConstraining();
+    this.setFlags(this.flags | ConstraintProperty.ConstrainingFlag);
+    this.onStartConstraining();
+    this.didStartConstraining();
   };
 
   ConstraintProperty.prototype.willStartConstraining = function (this: ConstraintProperty): void {
@@ -368,12 +335,13 @@ export const ConstraintProperty = (function (_super: typeof Property) {
   };
 
   ConstraintProperty.prototype.stopConstraining = function (this: ConstraintProperty): void {
-    if ((this.flags & ConstraintProperty.ConstrainingFlag) !== 0) {
-      this.willStopConstraining();
-      this.setFlags(this.flags & ~ConstraintProperty.ConstrainingFlag);
-      this.onStopConstraining();
-      this.didStopConstraining();
+    if ((this.flags & ConstraintProperty.ConstrainingFlag) === 0) {
+      return;
     }
+    this.willStopConstraining();
+    this.setFlags(this.flags & ~ConstraintProperty.ConstrainingFlag);
+    this.onStopConstraining();
+    this.didStopConstraining();
   };
 
   ConstraintProperty.prototype.willStopConstraining = function (this: ConstraintProperty): void {
@@ -425,7 +393,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
     return value !== void 0 && value !== null ? +value : 0;
   };
 
-  ConstraintProperty.construct = function <P extends ConstraintProperty<any, any, any>>(property: P | null, owner: FastenerOwner<P>): P {
+  ConstraintProperty.construct = function <P extends ConstraintProperty<any, any, any>>(property: P | null, owner: P extends ConstraintProperty<infer O, any, any> ? O : never): P {
     property = _super.construct.call(this, property, owner) as P;
     (property as Mutable<typeof property>).id = ConstraintId.next();
     (property as Mutable<typeof property>).strength = property.initStrength();
@@ -437,7 +405,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
     return property;
   };
 
-  ConstraintProperty.refine = function (propertyClass: ConstraintPropertyClass<any>): void {
+  ConstraintProperty.refine = function (propertyClass: FastenerClass<ConstraintProperty<any, any, any>>): void {
     _super.refine.call(this, propertyClass);
     const propertyPrototype = propertyClass.prototype;
     let flagsInit = propertyPrototype.flagsInit;

@@ -16,7 +16,7 @@ import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {Cursor} from "@swim/util";
-import type {FastenerOwner} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
 import type {STree} from "@swim/collections";
 import type {AnyValue} from "@swim/structure";
 import {Value} from "@swim/structure";
@@ -25,27 +25,9 @@ import {ValueCursor} from "@swim/structure";
 import {ValueEntryCursor} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
-import type {WarpDownlinkClass} from "./WarpDownlink";
 import type {WarpDownlinkObserver} from "./WarpDownlink";
 import {WarpDownlink} from "./WarpDownlink";
 import {ListDownlinkModel} from "./ListDownlinkModel";
-
-/** @public */
-export type ListDownlinkValue<D extends ListDownlink<any, any, any>> =
-  D extends {value: infer V} ? V : never;
-
-/** @public */
-export type ListDownlinkValueInit<D extends ListDownlink<any, any, any>> =
-  D extends {valueInit?: infer VU} ? VU : never;
-
-/** @public */
-export type AnyListDownlinkValue<D extends ListDownlink<any, any, any>> =
-  ListDownlinkValue<D> | ListDownlinkValueInit<D>;
-
-/** @public */
-export type ListDownlinkDecorator<P extends ListDownlink<any, any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
-};
 
 /** @public */
 export interface ListDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlinkDescriptor {
@@ -56,62 +38,39 @@ export interface ListDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlin
 }
 
 /** @public */
-export type ListDownlinkTemplate<D extends ListDownlink<any, any, any>> =
-  ThisType<D> &
-  ListDownlinkDescriptor<ListDownlinkValue<D>, ListDownlinkValueInit<D>> &
-  Partial<Omit<D, keyof ListDownlinkDescriptor>>;
+export interface ListDownlinkObserver<V = unknown, F extends ListDownlink<any, V, any> = ListDownlink<unknown, V>> extends WarpDownlinkObserver<F> {
+  willUpdate?(index: number, newValue: V, downlink: F): V | void;
 
-/** @public */
-export interface ListDownlinkClass<D extends ListDownlink<any, any, any> = ListDownlink<any, any, any>> extends WarpDownlinkClass<D> {
-  /** @override */
-  specialize(template: ListDownlinkDescriptor<any>): ListDownlinkClass<D>;
+  didUpdate?(index: number, newValue: V, oldValue: V, downlink: F): void;
 
-  /** @override */
-  refine(downlinkClass: ListDownlinkClass<any>): void;
+  willMove?(fromIndex: number, toIndex: number, value: V, downlink: F): void;
 
-  /** @override */
-  extend<D2 extends D>(className: string | symbol, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
-  extend<D2 extends D>(className: string | symbol, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
+  didMove?(fromIndex: number, toIndex: number, value: V, downlink: F): void;
 
-  /** @override */
-  define<D2 extends D>(className: string | symbol, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
-  define<D2 extends D>(className: string | symbol, template: ListDownlinkTemplate<D2>): ListDownlinkClass<D2>;
+  willRemove?(index: number, downlink: F): void;
 
-  /** @override */
-  <D2 extends D>(template: ListDownlinkTemplate<D2>): ListDownlinkDecorator<D2>;
-}
+  didRemove?(index: number, oldValue: V, downlink: F): void;
 
-/** @public */
-export interface ListDownlinkObserver<V = unknown, D extends ListDownlink<any, V, any> = ListDownlink<unknown, V>> extends WarpDownlinkObserver<D> {
-  willUpdate?(index: number, newValue: V, downlink: D): V | void;
+  willDrop?(lower: number, downlink: F): void;
 
-  didUpdate?(index: number, newValue: V, oldValue: V, downlink: D): void;
+  didDrop?(lower: number, downlink: F): void;
 
-  willMove?(fromIndex: number, toIndex: number, value: V, downlink: D): void;
+  willTake?(upper: number, downlink: F): void;
 
-  didMove?(fromIndex: number, toIndex: number, value: V, downlink: D): void;
+  didTake?(upper: number, downlink: F): void;
 
-  willRemove?(index: number, downlink: D): void;
+  willClear?(downlink: F): void;
 
-  didRemove?(index: number, oldValue: V, downlink: D): void;
-
-  willDrop?(lower: number, downlink: D): void;
-
-  didDrop?(lower: number, downlink: D): void;
-
-  willTake?(upper: number, downlink: D): void;
-
-  didTake?(upper: number, downlink: D): void;
-
-  willClear?(downlink: D): void;
-
-  didClear?(downlink: D): void;
+  didClear?(downlink: F): void;
 }
 
 /** @public */
 export interface ListDownlink<O = unknown, V = Value, VU = V extends Value ? AnyValue & V : V> extends WarpDownlink<O> {
   (index: number): V | undefined;
   (index: number, newObject: V | VU): O;
+
+  /** @override */
+  get descriptorType(): Proto<ListDownlinkDescriptor<V, VU>>;
 
   /** @override */
   readonly observerType?: Class<ListDownlinkObserver<V>>;
@@ -265,7 +224,7 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
   const ListDownlink = _super.extend("ListDownlink", {
     relinks: true,
     syncs: true,
-  }) as ListDownlinkClass;
+  }) as FastenerClass<ListDownlink<any, any, any>>;
 
   ListDownlink.prototype.initValueForm = function <V, VU>(this: ListDownlink<unknown, V, VU>): Form<V, VU> {
     let valueForm = (Object.getPrototypeOf(this) as ListDownlink<unknown, V, VU>).valueForm as Form<V, VU> | undefined;
@@ -822,20 +781,20 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     return this;
   };
 
-  ListDownlink.construct = function <D extends ListDownlink<any, any, any>>(downlink: D | null, owner: FastenerOwner<D>): D {
+  ListDownlink.construct = function <F extends ListDownlink<any, any, any>>(downlink: F | null, owner: F extends ListDownlink<infer O, any, any> ? O : never): F {
     if (downlink === null) {
-      downlink = function (index: number, value?: ListDownlinkValue<D> | ListDownlinkValueInit<D>): ListDownlinkValue<D> | undefined | FastenerOwner<D> {
+      downlink = function (index: number, value?: F extends ListDownlink<any, infer V, infer U> ? V | U : never): F extends ListDownlink<infer O, infer V, any> ? V | O | undefined : never {
         if (arguments.length === 0) {
           return downlink!.get(index);
         } else {
           downlink!.set(index, value!);
           return downlink!.owner;
         }
-      } as D;
-      delete (downlink as Partial<Mutable<D>>).name; // don't clobber prototype name
+      } as F;
+      delete (downlink as Partial<Mutable<F>>).name; // don't clobber prototype name
       Object.setPrototypeOf(downlink, this.prototype);
     }
-    downlink = _super.construct.call(this, downlink, owner) as D;
+    downlink = _super.construct.call(this, downlink, owner) as F;
     (downlink as Mutable<typeof downlink>).valueForm = downlink.initValueForm();
     return downlink;
   };

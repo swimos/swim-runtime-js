@@ -14,22 +14,24 @@
 
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {Compare} from "@swim/util";
 import type {Interpolate} from "@swim/util";
-import type {Interpolator} from "@swim/util";
+import {Interpolator} from "@swim/util";
+import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import type {Item} from "@swim/structure";
 import {Value} from "@swim/structure";
-import type {Form} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Form} from "@swim/structure";
 import type {AnyTimeZone} from "./TimeZone";
 import {TimeZone} from "./TimeZone";
-import {DateTimeInterpolator} from "./"; // forward import
-import {DateTimeForm} from "./"; // forward import
 import {DateTimeFormat} from "./"; // forward import
 
 /** @public */
@@ -51,7 +53,7 @@ export interface DateTimeInit {
 
 /** @public */
 export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Compare, Display {
-  constructor(time: number, zone: TimeZone = TimeZone.utc) {
+  constructor(time: number, zone: TimeZone = TimeZone.utc()) {
     this.time = time;
     this.zone = zone;
   }
@@ -225,9 +227,8 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
   interpolateTo(that: unknown): Interpolator<DateTime> | null {
     if (that instanceof DateTime) {
       return DateTimeInterpolator(this, that);
-    } else {
-      return null;
     }
+    return null;
   }
 
   compareTo(that: unknown): number {
@@ -262,17 +263,17 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
         Numbers.hash(this.time)), this.zone.hashCode()));
   }
 
-  display<T>(output: Output<T>, format: DateTimeFormat = DateTimeFormat.iso8601): Output<T> {
+  display<T>(output: Output<T>, format: DateTimeFormat = DateTimeFormat.iso8601()): Output<T> {
     output = format.writeDate(output, this);
     return output;
   }
 
-  toString(format: DateTimeFormat = DateTimeFormat.iso8601): string {
+  toString(format: DateTimeFormat = DateTimeFormat.iso8601()): string {
     return format.format(this);
   }
 
   static current(zone?: AnyTimeZone): DateTime {
-    zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.local;
+    zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.local();
     return new DateTime(Date.now(), zone);
   }
 
@@ -299,7 +300,7 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
       zone = TimeZone.fromAny(zone);
       time += 60000 * zone.offset;
     } else {
-      zone = TimeZone.utc;
+      zone = TimeZone.utc();
     }
     return new DateTime(time, zone);
   }
@@ -311,10 +312,10 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
     if (value === void 0 || value === null || value instanceof DateTime) {
       return value;
     } else if (value instanceof Date) {
-      zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc;
+      zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc();
       return new DateTime(value.getTime(), zone);
     } else if (typeof value === "number") {
-      zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc;
+      zone = zone !== void 0 ? TimeZone.fromAny(zone) : TimeZone.utc();
       return new DateTime(value, zone);
     } else if (typeof value === "string") {
       return DateTime.parse(value, zone);
@@ -381,7 +382,7 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
   }
 
   static parse(date: string, zone?: AnyTimeZone): DateTime {
-    return DateTimeFormat.iso8601.parse(date);
+    return DateTimeFormat.iso8601().parse(date);
   }
 
   static time(date: AnyDateTime): number {
@@ -402,9 +403,8 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
   static zone(date: AnyDateTime): TimeZone {
     if (date instanceof DateTime) {
       return date.zone;
-    } else {
-      return TimeZone.utc;
     }
+    return TimeZone.utc();
   }
 
   /** @internal */
@@ -442,5 +442,101 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
   @Lazy
   static form(): Form<DateTime, AnyDateTime> {
     return new DateTimeForm(new DateTime(0));
+  }
+}
+
+/** @internal */
+export const DateTimeInterpolator = (function (_super: typeof Interpolator) {
+  const DateTimeInterpolator = function (d0: DateTime, d1: DateTime): Interpolator<DateTime> {
+    const interpolator = function (u: number): DateTime {
+      const d0 = interpolator[0];
+      const d1 = interpolator[1];
+      return new DateTime(d0.time + u * (d1.time - d0.time), d1.zone);
+    } as Interpolator<DateTime>;
+    Object.setPrototypeOf(interpolator, DateTimeInterpolator.prototype);
+    (interpolator as Mutable<typeof interpolator>)[0] = d0;
+    (interpolator as Mutable<typeof interpolator>)[1] = d1;
+    return interpolator;
+  } as {
+    (d0: DateTime, d1: DateTime): Interpolator<DateTime>;
+
+    /** @internal */
+    prototype: Interpolator<DateTime>;
+  };
+
+  DateTimeInterpolator.prototype = Object.create(_super.prototype);
+  DateTimeInterpolator.prototype.constructor = DateTimeInterpolator;
+
+  return DateTimeInterpolator;
+})(Interpolator);
+
+/** @internal */
+export class DateTimeForm extends Form<DateTime, AnyDateTime> {
+  constructor(unit: DateTime | undefined) {
+    super();
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
+  }
+
+  override readonly unit!: DateTime | undefined;
+
+  override withUnit(unit: DateTime | undefined): Form<DateTime, AnyDateTime> {
+    if (unit !== this.unit) {
+      return new DateTimeForm(unit);
+    } else {
+      return this;
+    }
+  }
+
+  override mold(date: AnyDateTime): Item {
+    date = DateTime.fromAny(date);
+    return Text.from(date.toString());
+  }
+
+  override cast(value: Value): DateTime | undefined {
+    let date: DateTime | null = null;
+    try {
+      date = DateTime.fromValue(value);
+      if (date === void 0) {
+        const millis = value.numberValue(void 0);
+        if (millis !== void 0) {
+          date = new DateTime(millis);
+        } else {
+          const string = value.stringValue(void 0);
+          if (string !== void 0) {
+            date = DateTime.parse(string);
+          }
+        }
+      }
+    } catch (e) {
+      // swallow
+    }
+    return date !== null ? date : void 0;
+  }
+}
+
+/** @internal */
+export class DateTimeParser extends Parser<DateTime> {
+  private readonly dateParser: Parser<DateTimeInit>;
+
+  constructor(dateParser: Parser<DateTimeInit>) {
+    super();
+    this.dateParser = dateParser;
+  }
+
+  override feed(input: Input): Parser<DateTime> {
+    return DateTimeParser.parse(input, this.dateParser);
+  }
+
+  static parse(input: Input, dateParser: Parser<DateTimeInit>): Parser<DateTime> {
+    dateParser = dateParser.feed(input);
+    if (dateParser.isDone()) {
+      return Parser.done(DateTime.fromAny(dateParser.bind()));
+    } else if (dateParser.isError()) {
+      return dateParser.asError();
+    }
+    return new DateTimeParser(dateParser);
   }
 }

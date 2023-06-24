@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Interpolator} from "@swim/util";
@@ -139,9 +138,11 @@ export class Extant extends Value {
     return output;
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Value = new this();
+
   static override extant(): Extant {
-    return new Extant();
+    return this.Value;
   }
 
   static override fromAny(value: AnyExtant): Extant {
@@ -149,8 +150,7 @@ export class Extant extends Value {
       return value;
     } else if (value === null) {
       return Extant.extant();
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 }

@@ -15,22 +15,12 @@
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {Observes} from "@swim/util";
-import type {FastenerOwner} from "./Fastener";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 import type {AnyComponent} from "./Component";
 import type {ComponentFactory} from "./Component";
 import {Component} from "./Component";
-
-/** @public */
-export type ComponentRelationComponent<F extends ComponentRelation<any, any>> =
-  F extends {componentType?: ComponentFactory<infer C>} ? C : never;
-
-/** @public */
-export type ComponentRelationDecorator<F extends ComponentRelation<any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
-};
 
 /** @public */
 export interface ComponentRelationDescriptor<C extends Component = Component> extends FastenerDescriptor {
@@ -41,33 +31,10 @@ export interface ComponentRelationDescriptor<C extends Component = Component> ex
 }
 
 /** @public */
-export type ComponentRelationTemplate<F extends ComponentRelation<any, any>> =
-  ThisType<F> &
-  ComponentRelationDescriptor<ComponentRelationComponent<F>> &
-  Partial<Omit<F, keyof ComponentRelationDescriptor>>;
-
-/** @public */
-export interface ComponentRelationClass<F extends ComponentRelation<any, any> = ComponentRelation<any, any>> extends FastenerClass<F> {
-  /** @override */
-  specialize(template: ComponentRelationDescriptor<any>): ComponentRelationClass<F>;
-
-  /** @override */
-  refine(fastenerClass: ComponentRelationClass<any>): void;
-
-  /** @override */
-  extend<F2 extends F>(className: string | symbol, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
-  extend<F2 extends F>(className: string | symbol, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
-
-  /** @override */
-  define<F2 extends F>(className: string | symbol, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
-  define<F2 extends F>(className: string | symbol, template: ComponentRelationTemplate<F2>): ComponentRelationClass<F2>;
-
-  /** @override */
-  <F2 extends F>(template: ComponentRelationTemplate<F2>): ComponentRelationDecorator<F2>;
-}
-
-/** @public */
 export interface ComponentRelation<O = unknown, C extends Component = Component> extends Fastener<O> {
+  /** @override */
+  get descriptorType(): Proto<ComponentRelationDescriptor<C>>;
+
   /** @override */
   get fastenerType(): Proto<ComponentRelation<any, any>>;
 
@@ -96,13 +63,13 @@ export interface ComponentRelation<O = unknown, C extends Component = Component>
   didUnderive(inlet: ComponentRelation<unknown, C>): void;
 
   /** @override */
-  deriveInlet(): ComponentRelation<unknown, C> | null;
-
-  /** @override */
-  bindInlet(inlet: ComponentRelation<unknown, C>): void;
+  get parent(): ComponentRelation<unknown, C> | null;
 
   /** @override */
   readonly inlet: ComponentRelation<unknown, C> | null;
+
+  /** @override */
+  bindInlet(inlet: ComponentRelation<unknown, C>): void;
 
   /** @protected @override */
   willBindInlet(inlet: ComponentRelation<unknown, C>): void;
@@ -180,7 +147,7 @@ export interface ComponentRelation<O = unknown, C extends Component = Component>
 
 /** @public */
 export const ComponentRelation = (function (_super: typeof Fastener) {
-  const ComponentRelation = _super.extend("ComponentRelation", {}) as ComponentRelationClass;
+  const ComponentRelation = _super.extend("ComponentRelation", {}) as FastenerClass<ComponentRelation<any, any>>;
 
   Object.defineProperty(ComponentRelation.prototype, "fastenerType", {
     value: ComponentRelation,
@@ -209,12 +176,14 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
 
   ComponentRelation.prototype.detachOutlet = function <C extends Component>(this: ComponentRelation<unknown, C>, outlet: ComponentRelation<unknown, C>): void {
     const outlets = this.outlets as ComponentRelation<unknown, C>[] | null;
-    if (outlets !== null) {
-      const index = outlets.indexOf(outlet);
-      if (index >= 0) {
-        outlets.splice(index, 1);
-      }
+    if (outlets === null) {
+      return;
     }
+    const index = outlets.indexOf(outlet);
+    if (index < 0) {
+      return;
+    }
+    outlets.splice(index, 1);
   };
 
   ComponentRelation.prototype.initComponent = function <C extends Component>(this: ComponentRelation<unknown, C>, component: C): void {
@@ -305,7 +274,7 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
     }
   };
 
-  ComponentRelation.construct = function <F extends ComponentRelation<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+  ComponentRelation.construct = function <F extends ComponentRelation<any, any>>(fastener: F | null, owner: F extends ComponentRelation<infer O, any> ? O : never): F {
     fastener = _super.construct.call(this, fastener, owner) as F;
     Object.defineProperty(fastener, "inlet", { // override getter
       value: null,

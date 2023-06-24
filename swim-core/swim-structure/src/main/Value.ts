@@ -16,10 +16,9 @@ import type {Interpolator} from "@swim/util";
 import type {Builder} from "@swim/util";
 import type {AnyItem} from "./Item";
 import {Item} from "./Item";
-import type {Field} from "./Field";
+import {Field} from "./"; // forward import
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
-import {ValueBuilder} from "./"; // forward import
 import {Record} from "./"; // forward import
 import {Data} from "./"; // forward import
 import type {AnyText} from "./Text";
@@ -666,8 +665,68 @@ export abstract class Value extends Item {
       return Record.fromArray(value);
     } else if (typeof value === "object") {
       return Record.fromObject(value as {[key: string]: AnyValue});
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
+  }
+}
+
+/** @internal */
+export class ValueBuilder implements Builder<Item, Value> {
+  /** @internal */
+  record: Record | null;
+  /** @internal */
+  value: Value | null;
+
+  constructor() {
+    this.record = null;
+    this.value = null;
+  }
+
+  push(...items: Item[]): void {
+    for (let i = 0, n = items.length; i < n; i += 1) {
+      const item = items[i]!;
+      if (item instanceof Field) {
+        return this.pushField(item);
+      } else if (item instanceof Value) {
+        return this.pushValue(item);
+      } else {
+        throw new TypeError("" + item);
+      }
+    }
+  }
+
+  /** @internal */
+  pushField(item: Field): void {
+    if (this.record === null) {
+      this.record = Record.create();
+      if (this.value !== null) {
+        this.record.push(this.value);
+        this.value = null;
+      }
+    }
+    this.record.push(item);
+  }
+
+  /** @internal */
+  pushValue(item: Value): void {
+    if (this.record !== null) {
+      this.record.push(item);
+    } else if (this.value === null) {
+      this.value = item;
+    } else {
+      this.record = Record.create();
+      this.record.push(this.value);
+      this.value = null;
+      this.record.push(item);
+    }
+  }
+
+  bind(): Value {
+    if (this.record !== null) {
+      return this.record;
+    } else if (this.value !== null) {
+      return this.value;
+    }
+    return Value.absent();
   }
 }

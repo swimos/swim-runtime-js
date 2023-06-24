@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Interpolator} from "@swim/util";
+import type {Mutable} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import type {AnyItem} from "./Item";
 import {Item} from "./Item";
-import {FieldInterpolator} from "./"; // forward import
 import {Attr} from "./"; // forward import
 import {Slot} from "./"; // forward import
 import type {AnyValue} from "./Value";
@@ -311,9 +311,8 @@ export abstract class Field extends Item {
   override interpolateTo(that: unknown): Interpolator<Item> | null {
     if (that instanceof Field) {
       return FieldInterpolator(this, that);
-    } else {
-      return super.interpolateTo(that);
     }
+    return super.interpolateTo(that);
   }
 
   /** @internal */
@@ -333,12 +332,10 @@ export abstract class Field extends Item {
       } else {
         return Attr.of(name, value);
       }
+    } else if (arguments.length === 1) {
+      return Slot.of(key);
     } else {
-      if (arguments.length === 1) {
-        return Slot.of(key);
-      } else {
-        return Slot.of(key, value);
-      }
+      return Slot.of(key, value);
     }
   }
 
@@ -357,3 +354,66 @@ export abstract class Field extends Item {
     throw new TypeError("" + field);
   }
 }
+
+/** @internal */
+export interface FieldInterpolator extends Interpolator<Field> {
+  /** @internal */
+  readonly keyInterpolator: Interpolator<Value>;
+  /** @internal */
+  readonly valueInterpolator: Interpolator<Value>;
+
+  readonly 0: Field;
+
+  readonly 1: Field;
+
+  equals(that: unknown): boolean;
+}
+
+/** @internal */
+export const FieldInterpolator = (function (_super: typeof Interpolator) {
+  const FieldInterpolator = function (y0: Field, y1: Field): FieldInterpolator {
+    const interpolator = function (u: number): Field {
+      const key = interpolator.keyInterpolator(u);
+      const value = interpolator.valueInterpolator(u);
+      return Slot.of(key, value);
+    } as FieldInterpolator;
+    Object.setPrototypeOf(interpolator, FieldInterpolator.prototype);
+    (interpolator as Mutable<typeof interpolator>).keyInterpolator = y0.key.interpolateTo(y1.key);
+    (interpolator as Mutable<typeof interpolator>).valueInterpolator = y0.value.interpolateTo(y1.value);
+    return interpolator;
+  } as {
+    (y0: Field, y1: Field): FieldInterpolator;
+
+    /** @internal */
+    prototype: FieldInterpolator;
+  };
+
+  FieldInterpolator.prototype = Object.create(_super.prototype);
+  FieldInterpolator.prototype.constructor = FieldInterpolator;
+
+  Object.defineProperty(FieldInterpolator.prototype, 0, {
+    get(this: FieldInterpolator): Field {
+      return Slot.of(this.keyInterpolator[0], this.valueInterpolator[0]);
+    },
+    configurable: true,
+  });
+
+  Object.defineProperty(FieldInterpolator.prototype, 1, {
+    get(this: FieldInterpolator): Field {
+      return Slot.of(this.keyInterpolator[1], this.valueInterpolator[1]);
+    },
+    configurable: true,
+  });
+
+  FieldInterpolator.prototype.equals = function (that: unknown): boolean {
+    if (this === that) {
+      return true;
+    } else if (that instanceof FieldInterpolator) {
+      return this.keyInterpolator.equals(that.keyInterpolator)
+          && this.valueInterpolator.equals(that.valueInterpolator);
+    }
+    return false;
+  };
+
+  return FieldInterpolator;
+})(Interpolator);

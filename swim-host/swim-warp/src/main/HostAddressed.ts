@@ -97,11 +97,11 @@ export abstract class HostAddressed<E extends HostAddressed<E> = HostAddressed<a
 
   static override fromValue<S extends HostAddressedConstructor<Instance<S, HostAddressed<any>>>>(this: S, value: Value): InstanceType<S> | null {
     const header = value.header(this.tag);
-    if (header.isDefined()) {
-      const body = value.body();
-      return new this(body);
+    if (!header.isDefined()) {
+      return null;
     }
-    return null;
+    const body = value.body();
+    return new this(body);
   }
 
   static create<S extends HostAddressedConstructor<Instance<S, HostAddressed<any>>>>(this: S, body?: AnyValue): InstanceType<S> {

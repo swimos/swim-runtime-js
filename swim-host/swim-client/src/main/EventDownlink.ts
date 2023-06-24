@@ -15,18 +15,13 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
+import type {FastenerClass} from "@swim/component";
 import {Value} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
-import type {WarpDownlinkClass} from "./WarpDownlink";
 import type {WarpDownlinkObserver} from "./WarpDownlink";
 import {WarpDownlink} from "./WarpDownlink";
 import {EventDownlinkModel} from "./EventDownlinkModel";
-
-/** @public */
-export type EventDownlinkDecorator<P extends EventDownlink<any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
-};
 
 /** @public */
 export interface EventDownlinkDescriptor extends WarpDownlinkDescriptor {
@@ -34,37 +29,14 @@ export interface EventDownlinkDescriptor extends WarpDownlinkDescriptor {
 }
 
 /** @public */
-export type EventDownlinkTemplate<D extends EventDownlink<any>> =
-  ThisType<D> &
-  EventDownlinkDescriptor &
-  Partial<Omit<D, keyof EventDownlinkDescriptor>>;
-
-/** @public */
-export interface EventDownlinkClass<D extends EventDownlink<any> = EventDownlink<any>> extends WarpDownlinkClass<D> {
-  /** @override */
-  specialize(template: EventDownlinkDescriptor): EventDownlinkClass<D>;
-
-  /** @override */
-  refine(downlinkClass: EventDownlinkClass<any>): void;
-
-  /** @override */
-  extend<D2 extends D>(className: string | symbol, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
-  extend<D2 extends D>(className: string | symbol, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
-
-  /** @override */
-  define<D2 extends D>(className: string | symbol, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
-  define<D2 extends D>(className: string | symbol, template: EventDownlinkTemplate<D2>): EventDownlinkClass<D2>;
-
-  /** @override */
-  <D2 extends D>(template: EventDownlinkTemplate<D2>): EventDownlinkDecorator<D2>;
-}
-
-/** @public */
-export interface EventDownlinkObserver<D extends EventDownlink<any> = EventDownlink> extends WarpDownlinkObserver<D> {
+export interface EventDownlinkObserver<F extends EventDownlink<any> = EventDownlink> extends WarpDownlinkObserver<F> {
 }
 
 /** @public */
 export interface EventDownlink<O = unknown> extends WarpDownlink<O> {
+  /** @override */
+  get descriptorType(): Proto<EventDownlinkDescriptor>;
+
   /** @override */
   readonly observerType?: Class<EventDownlinkObserver>;
 
@@ -79,7 +51,7 @@ export interface EventDownlink<O = unknown> extends WarpDownlink<O> {
 export const EventDownlink = (function (_super: typeof WarpDownlink) {
   const EventDownlink = _super.extend("EventDownlink", {
     relinks: true,
-  }) as EventDownlinkClass;
+  }) as FastenerClass<EventDownlink<any>>;
 
   EventDownlink.prototype.open = function (this: EventDownlink): EventDownlink {
     if (this.model === null) {

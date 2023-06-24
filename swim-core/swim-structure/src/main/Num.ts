@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import {Equivalent} from "@swim/util";
 import {Numbers} from "@swim/util";
-import type {Interpolator} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import {HashGenCacheSet} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Format} from "@swim/codec";
@@ -23,7 +24,6 @@ import type {AnyItem} from "./Item";
 import {Item} from "./Item";
 import type {AnyValue} from "./Value";
 import {Value} from "./Value";
-import {NumInterpolator} from "./"; // forward import
 
 /** @public */
 export type AnyNum = Num | number;
@@ -226,9 +226,8 @@ export class Num extends Value {
   override interpolateTo(that: unknown): Interpolator<Item> | null {
     if (that instanceof Num) {
       return NumInterpolator(this, that);
-    } else {
-      return super.interpolateTo(that);
     }
+    return super.interpolateTo(that);
   }
 
   override get typeOrder(): number {
@@ -289,29 +288,39 @@ export class Num extends Value {
   /** @internal */
   static readonly TypeMask = 0x3;
 
-  @Lazy
-  static get zero(): Num {
-    return new Num(0);
+  /** @internal */
+  static readonly Zero: Num = new this(0);
+
+  static zero(): Num {
+    return this.Zero;
   }
 
-  @Lazy
-  static get negativeZero(): Num {
-    return new Num(-0);
+  /** @internal */
+  static readonly NegativeZero: Num = new this(-0);
+
+  static negativeZero(): Num {
+    return this.NegativeZero;
   }
 
-  @Lazy
-  static get one(): Num {
-    return new Num(1);
+  /** @internal */
+  static readonly One: Num = new this(1);
+
+  static one(): Num {
+    return this.One;
   }
 
-  @Lazy
-  static get negativeOne(): Num {
-    return new Num(-1);
+  /** @internal */
+  static readonly NegativeOne: Num = new this(-1);
+
+  static negativeOne(): Num {
+    return this.NegativeOne;
   }
 
-  @Lazy
-  static get nan(): Num {
-    return new Num(NaN);
+  /** @internal */
+  static readonly NaN: Num = new this(NaN);
+
+  static nan(): Num {
+    return this.NaN;
   }
 
   static uint32(value: number): Num {
@@ -325,19 +334,18 @@ export class Num extends Value {
   static from(value: number): Num {
     if (value === 0) {
       if (1 / value === -Infinity) {
-        return Num.negativeZero;
+        return Num.negativeZero();
       } else {
-        return Num.zero;
+        return Num.zero();
       }
     } else if (value === 1) {
-      return Num.one;
+      return Num.one();
     } else if (value === -1) {
-      return Num.negativeOne;
+      return Num.negativeOne();
     } else if (isNaN(value)) {
-      return Num.nan;
-    } else {
-      return Num.cache.put(new Num(value));
+      return Num.nan();
     }
+    return Num.cache.put(new Num(value));
   }
 
   static override fromAny(value: AnyNum): Num {
@@ -345,21 +353,19 @@ export class Num extends Value {
       return value;
     } else if (typeof value === "number") {
       return Num.from(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
   static parse(value: string): Num {
     if (value === "NaN") {
-      return Num.nan;
-    } else {
-      const num = +value;
-      if (isFinite(num)) {
-        return Num.from(num);
-      }
+      return Num.nan();
     }
-    throw new Error(value);
+    const num = +value;
+    if (!isFinite(num)) {
+      throw new Error(value);
+    }
+    return Num.from(num);
   }
 
   /** @internal */
@@ -369,3 +375,28 @@ export class Num extends Value {
     return new HashGenCacheSet<Num>(cacheSize);
   }
 }
+
+/** @internal */
+export const NumInterpolator = (function (_super: typeof Interpolator) {
+  const NumInterpolator = function (y0: Num, y1: Num): Interpolator<Num> {
+    const interpolator = function (u: number): Num {
+      const y0 = interpolator[0].value;
+      const y1 = interpolator[1].value;
+      return Num.from(y0 + u * (y1 - y0));
+    } as Interpolator<Num>;
+    Object.setPrototypeOf(interpolator, NumInterpolator.prototype);
+    (interpolator as Mutable<typeof interpolator>)[0] = y0;
+    (interpolator as Mutable<typeof interpolator>)[1] = y1;
+    return interpolator;
+  } as {
+    (y0: Num, y1: Num): Interpolator<Num>;
+
+    /** @internal */
+    prototype: Interpolator<Num>;
+  };
+
+  NumInterpolator.prototype = Object.create(_super.prototype);
+  NumInterpolator.prototype.constructor = NumInterpolator;
+
+  return NumInterpolator;
+})(Interpolator);

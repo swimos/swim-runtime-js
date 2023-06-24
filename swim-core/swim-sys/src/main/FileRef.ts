@@ -15,20 +15,10 @@
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {FastenerFlags} from "@swim/component";
-import type {FastenerOwner} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
 import type {Fastener} from "@swim/component";
 import type {FileRelationDescriptor} from "./FileRelation";
-import type {FileRelationClass} from "./FileRelation";
 import {FileRelation} from "./FileRelation";
-
-/** @public */
-export type FileRefValue<F extends FileRef<any, any>> =
-  F extends {value: infer T} ? T : never;
-
-/** @public */
-export type FileRefDecorator<F extends FileRef<any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
-};
 
 /** @public */
 export interface FileRefDescriptor<T = unknown> extends FileRelationDescriptor {
@@ -38,45 +28,12 @@ export interface FileRefDescriptor<T = unknown> extends FileRelationDescriptor {
 }
 
 /** @public */
-export type FileRefTemplate<F extends FileRef<any, any>> =
-  ThisType<F> &
-  FileRefDescriptor<FileRefValue<F>> &
-  Partial<Omit<F, keyof FileRefDescriptor>>;
-
-/** @public */
-export interface FileRefClass<F extends FileRef<any, any> = FileRef<any, any>> extends FileRelationClass<F> {
-  /** @override */
-  specialize(template: FileRefDescriptor<any>): FileRefClass<F>;
-
-  /** @override */
-  refine(fastenerClass: FileRefClass<any>): void;
-
-  /** @override */
-  extend<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
-  extend<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
-
-  /** @override */
-  define<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
-  define<F2 extends F>(className: string, template: FileRefTemplate<F2>): FileRefClass<F2>;
-
-  /** @override */
-  <F2 extends F>(template: FileRefTemplate<F2>): FileRefDecorator<F2>;
-
-  /** @internal */
-  readonly LoadedFlag: FastenerFlags;
-  /** @internal */
-  readonly ModifiedFlag: FastenerFlags;
-
-  /** @internal @override */
-  readonly FlagShift: number;
-  /** @internal @override */
-  readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
 export interface FileRef<O = unknown, T = unknown> extends FileRelation<O, T> {
   (): T | null;
   (fileName: string | undefined): O;
+
+  /** @override */
+  get descriptorType(): Proto<FileRefDescriptor<T>>;
 
   /** @override */
   get fastenerType(): Proto<FileRef<any, any>>;
@@ -130,7 +87,17 @@ export interface FileRef<O = unknown, T = unknown> extends FileRelation<O, T> {
 
 /** @public */
 export const FileRef = (function (_super: typeof FileRelation) {
-  const FileRef = _super.extend("FileRef", {}) as FileRefClass;
+  const FileRef = _super.extend("FileRef", {}) as FastenerClass<FileRef<any, any>> & {
+    /** @internal */
+    readonly LoadedFlag: FastenerFlags;
+    /** @internal */
+    readonly ModifiedFlag: FastenerFlags;
+
+    /** @internal @override */
+    readonly FlagShift: number;
+    /** @internal @override */
+    readonly FlagMask: FastenerFlags;
+  };
 
   Object.defineProperty(FileRef.prototype, "fastenerType", {
     value: FileRef,
@@ -295,9 +262,9 @@ export const FileRef = (function (_super: typeof FileRelation) {
     this.didSetValue(path, newValue, oldValue);
   };
 
-  FileRef.construct = function <F extends FileRef<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+  FileRef.construct = function <F extends FileRef<any, any>>(fastener: F | null, owner: F extends FileRelation<infer O, any> ? F : never): F {
     if (fastener === null) {
-      fastener = function (fileName?: string | undefined): FileRefValue<F> | FastenerOwner<F> {
+      fastener = function (fileName?: string | undefined): F extends FileRelation<infer O, infer T> ? T | O : never {
         if (arguments.length === 0) {
           return fastener!.value;
         } else {

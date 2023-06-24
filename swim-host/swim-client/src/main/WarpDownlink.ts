@@ -23,7 +23,6 @@ import type {Observer} from "@swim/util";
 import type {Consumer} from "@swim/util";
 import type {Consumable} from "@swim/util";
 import type {FastenerFlags} from "@swim/component";
-import type {FastenerOwner} from "@swim/component";
 import type {FastenerDescriptor} from "@swim/component";
 import type {FastenerClass} from "@swim/component";
 import {Fastener} from "@swim/component";
@@ -42,11 +41,6 @@ import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkModel} from "./WarpDownlinkModel";
 
 /** @public */
-export type WarpDownlinkDecorator<P extends WarpDownlink<any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
-};
-
-/** @public */
 export interface WarpDownlinkDescriptor extends FastenerDescriptor {
   extends?: Proto<WarpDownlink<any>> | boolean | null;
   consumed?: boolean;
@@ -61,72 +55,37 @@ export interface WarpDownlinkDescriptor extends FastenerDescriptor {
 }
 
 /** @public */
-export type WarpDownlinkTemplate<D extends WarpDownlink<any>> =
-  ThisType<D> &
-  WarpDownlinkDescriptor &
-  Partial<Omit<D, keyof WarpDownlinkDescriptor>>;
+export interface WarpDownlinkObserver<F extends WarpDownlink<any> = WarpDownlink> extends Observer<F> {
+  onEvent?(body: Value, downlink: F): void;
 
-/** @public */
-export interface WarpDownlinkClass<D extends WarpDownlink<any> = WarpDownlink<any>> extends FastenerClass<D> {
-  /** @override */
-  specialize(template: WarpDownlinkDescriptor): WarpDownlinkClass<D>;
+  onCommand?(body: Value, downlink: F): void;
 
-  /** @override */
-  refine(downlinkClass: WarpDownlinkClass<any>): void;
+  willLink?(downlink: F): void;
 
-  /** @override */
-  extend<D2 extends D>(className: string | symbol, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
-  extend<D2 extends D>(className: string | symbol, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
+  didLink?(downlink: F): void;
 
-  /** @override */
-  define<D2 extends D>(className: string | symbol, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
-  define<D2 extends D>(className: string | symbol, template: WarpDownlinkTemplate<D2>): WarpDownlinkClass<D2>;
+  willSync?(downlink: F): void;
 
-  /** @override */
-  <D2 extends D>(template: WarpDownlinkTemplate<D2>): WarpDownlinkDecorator<D2>;
+  didSync?(downlink: F): void;
 
-  /** @internal */
-  readonly RelinksFlag: FastenerFlags;
-  /** @internal */
-  readonly SyncsFlag: FastenerFlags;
-  /** @internal */
-  readonly ConsumingFlag: FastenerFlags;
+  willUnlink?(downlink: F): void;
 
-  /** @internal @override */
-  readonly FlagShift: number;
-  /** @internal @override */
-  readonly FlagMask: FastenerFlags;
-}
+  didUnlink?(downlink: F): void;
 
-/** @public */
-export interface WarpDownlinkObserver<D extends WarpDownlink<any> = WarpDownlink> extends Observer<D> {
-  onEvent?(body: Value, downlink: D): void;
+  didConnect?(downlink: F): void;
 
-  onCommand?(body: Value, downlink: D): void;
+  didDisconnect?(downlink: F): void;
 
-  willLink?(downlink: D): void;
+  didClose?(downlink: F): void;
 
-  didLink?(downlink: D): void;
-
-  willSync?(downlink: D): void;
-
-  didSync?(downlink: D): void;
-
-  willUnlink?(downlink: D): void;
-
-  didUnlink?(downlink: D): void;
-
-  didConnect?(downlink: D): void;
-
-  didDisconnect?(downlink: D): void;
-
-  didClose?(downlink: D): void;
-
-  didFail?(error: unknown, downlink: D): void;
+  didFail?(error: unknown, downlink: F): void;
 }
 
 /** @public */
 export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Consumable {
+  /** @override */
+  get descriptorType(): Proto<WarpDownlinkDescriptor>;
+
   /** @override */
   get fastenerType(): Proto<WarpDownlink<any>>;
 
@@ -397,9 +356,19 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 
 /** @public */
 export const WarpDownlink = (function (_super: typeof Fastener) {
-  const WarpDownlink = _super.extend("WarpDownlink", {
-    lazy: false,
-  }) as WarpDownlinkClass;
+  const WarpDownlink = _super.extend("WarpDownlink", {}) as FastenerClass<WarpDownlink<any>> & {
+    /** @internal */
+    readonly RelinksFlag: FastenerFlags;
+    /** @internal */
+    readonly SyncsFlag: FastenerFlags;
+    /** @internal */
+    readonly ConsumingFlag: FastenerFlags;
+
+    /** @internal @override */
+    readonly FlagShift: number;
+    /** @internal @override */
+    readonly FlagMask: FastenerFlags;
+  };
 
   Object.defineProperty(WarpDownlink.prototype, "fastenerType", {
     value: WarpDownlink,
@@ -1051,8 +1020,8 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     this.stopConsuming();
   };
 
-  WarpDownlink.construct = function <D extends WarpDownlink<any>>(downlink: D | null, owner: FastenerOwner<D>): D {
-    downlink = _super.construct.call(this, downlink, owner) as D;
+  WarpDownlink.construct = function <F extends WarpDownlink<any>>(downlink: F | null, owner: F extends WarpDownlink<infer O> ? O : never): F {
+    downlink = _super.construct.call(this, downlink, owner) as F;
     const flagsInit = downlink.flagsInit;
     if (flagsInit !== void 0) {
       downlink.initRelinks((flagsInit & WarpDownlink.RelinksFlag) !== 0);
@@ -1070,7 +1039,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     return downlink;
   };
 
-  WarpDownlink.refine = function (downlinkClass: WarpDownlinkClass<any>): void {
+  WarpDownlink.refine = function (downlinkClass: FastenerClass<any>): void {
     _super.refine.call(this, downlinkClass);
     const downlinkPrototype = downlinkClass.prototype;
     let flagsInit = downlinkPrototype.flagsInit;

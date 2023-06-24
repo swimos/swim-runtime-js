@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -139,18 +138,22 @@ export class Bool extends Value {
     return output;
   }
 
-  @Lazy
-  static get true(): Bool {
-    return new Bool(true);
+  /** @internal */
+  static readonly True: Bool = new this(true);
+
+  static true(): Bool {
+    return this.True;
   }
 
-  @Lazy
-  static get false(): Bool {
-    return new Bool(false);
+  /** @internal */
+  static readonly False: Bool = new this(false);
+
+  static false(): Bool {
+    return this.False;
   }
 
   static from(value: boolean): Bool {
-    return value ? Bool.true : Bool.false;
+    return value ? Bool.true() : Bool.false();
   }
 
   static override fromAny(value: AnyBool): Bool {
@@ -158,8 +161,7 @@ export class Bool extends Value {
       return value;
     } else if (typeof value === "boolean") {
       return Bool.from(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 }

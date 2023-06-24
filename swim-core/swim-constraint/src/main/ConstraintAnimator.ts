@@ -16,11 +16,8 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Affinity} from "@swim/component";
 import type {FastenerFlags} from "@swim/component";
-import type {FastenerOwner} from "@swim/component";
-import type {AnimatorValue} from "@swim/component";
-import type {AnimatorValueInit} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
 import type {AnimatorDescriptor} from "@swim/component";
-import type {AnimatorClass} from "@swim/component";
 import {Animator} from "@swim/component";
 import {ConstraintId} from "./ConstraintId";
 import {ConstraintMap} from "./ConstraintMap";
@@ -35,51 +32,10 @@ import {ConstraintScope} from "./"; // forward import
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @public */
-export type ConstraintAnimatorDecorator<A extends Animator<any, any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, A>): (this: T, value: A | undefined) => A;
-};
-
-/** @public */
 export interface ConstraintAnimatorDescriptor<T = unknown, U = T> extends AnimatorDescriptor<T, U> {
   extends?: Proto<ConstraintAnimator<any, any, any>> | boolean | null;
   strength?: AnyConstraintStrength;
   constrained?: boolean;
-}
-
-/** @public */
-export type ConstraintAnimatorTemplate<A extends ConstraintAnimator<any, any, any>> =
-  ThisType<A> &
-  ConstraintAnimatorDescriptor<AnimatorValue<A>, AnimatorValueInit<A>> &
-  Partial<Omit<A, keyof ConstraintAnimatorDescriptor>>;
-
-/** @public */
-export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any, any> = ConstraintAnimator<any, any, any>> extends AnimatorClass<A> {
-  /** @override */
-  specialize(template: ConstraintAnimatorDescriptor<any, any>): ConstraintAnimatorClass<A>;
-
-  /** @override */
-  refine(animatorClass: ConstraintAnimatorClass<any>): void;
-
-  /** @override */
-  extend<A2 extends A>(className: string | symbol, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
-  extend<A2 extends A>(className: string | symbol, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
-
-  /** @override */
-  define<A2 extends A>(className: string | symbol, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
-  define<A2 extends A>(className: string | symbol, template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorClass<A2>;
-
-  /** @override */
-  <A2 extends A>(template: ConstraintAnimatorDescriptor<A2>): ConstraintAnimatorDecorator<A2>;
-
-  /** @internal */
-  readonly ConstrainedFlag: FastenerFlags;
-  /** @internal */
-  readonly ConstrainingFlag: FastenerFlags;
-
-  /** @internal @override */
-  readonly FlagShift: number;
-  /** @internal @override */
-  readonly FlagMask: FastenerFlags;
 }
 
 /** @public */
@@ -198,7 +154,17 @@ export interface ConstraintAnimator<O = unknown, T = unknown, U = T> extends Ani
 
 /** @public */
 export const ConstraintAnimator = (function (_super: typeof Animator) {
-  const ConstraintAnimator = _super.extend("ConstraintAnimator", {}) as ConstraintAnimatorClass;
+  const ConstraintAnimator = _super.extend("ConstraintAnimator", {}) as FastenerClass<ConstraintAnimator<any, any, any>> & {
+    /** @internal */
+    readonly ConstrainedFlag: FastenerFlags;
+    /** @internal */
+    readonly ConstrainingFlag: FastenerFlags;
+
+    /** @internal @override */
+    readonly FlagShift: number;
+    /** @internal @override */
+    readonly FlagMask: FastenerFlags;
+  };
 
   ConstraintAnimator.prototype.isExternal = function (this: ConstraintAnimator): boolean {
     return true;
@@ -344,12 +310,13 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
   });
 
   ConstraintAnimator.prototype.startConstraining = function (this: ConstraintAnimator): void {
-    if ((this.flags & ConstraintAnimator.ConstrainingFlag) === 0) {
-      this.willStartConstraining();
-      this.setFlags(this.flags | ConstraintAnimator.ConstrainingFlag);
-      this.onStartConstraining();
-      this.didStartConstraining();
+    if ((this.flags & ConstraintAnimator.ConstrainingFlag) !== 0) {
+      return;
     }
+    this.willStartConstraining();
+    this.setFlags(this.flags | ConstraintAnimator.ConstrainingFlag);
+    this.onStartConstraining();
+    this.didStartConstraining();
   };
 
   ConstraintAnimator.prototype.willStartConstraining = function (this: ConstraintAnimator): void {
@@ -368,12 +335,13 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
   };
 
   ConstraintAnimator.prototype.stopConstraining = function (this: ConstraintAnimator): void {
-    if ((this.flags & ConstraintAnimator.ConstrainingFlag) !== 0) {
-      this.willStopConstraining();
-      this.setFlags(this.flags & ~ConstraintAnimator.ConstrainingFlag);
-      this.onStopConstraining();
-      this.didStopConstraining();
+    if ((this.flags & ConstraintAnimator.ConstrainingFlag) === 0) {
+      return;
     }
+    this.willStopConstraining();
+    this.setFlags(this.flags & ~ConstraintAnimator.ConstrainingFlag);
+    this.onStopConstraining();
+    this.didStopConstraining();
   };
 
   ConstraintAnimator.prototype.willStopConstraining = function (this: ConstraintAnimator): void {
@@ -425,7 +393,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
     return value !== void 0 && value !== null ? +value : 0;
   };
 
-  ConstraintAnimator.construct = function <A extends ConstraintAnimator<any, any, any>>(animator: A | null, owner: FastenerOwner<A>): A {
+  ConstraintAnimator.construct = function <A extends ConstraintAnimator<any, any, any>>(animator: A | null, owner: A extends ConstraintAnimator<infer O, any, any> ? O : never): A {
     animator = _super.construct.call(this, animator, owner) as A;
     (animator as Mutable<typeof animator>).id = ConstraintId.next();
     (animator as Mutable<typeof animator>).strength = animator.initStrength();
@@ -437,7 +405,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
     return animator;
   };
 
-  ConstraintAnimator.refine = function (animatorClass: ConstraintAnimatorClass<any>): void {
+  ConstraintAnimator.refine = function (animatorClass: FastenerClass<any>): void {
     _super.refine.call(this, animatorClass);
     const animatorPrototype = animatorClass.prototype;
     let flagsInit = animatorPrototype.flagsInit;

@@ -18,27 +18,9 @@ import {Equals} from "@swim/util";
 import {FromAny} from "@swim/util";
 import {Affinity} from "./Affinity";
 import type {FastenerContext} from "./FastenerContext";
-import type {FastenerOwner} from "./Fastener";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
-
-/** @public */
-export type PropertyValue<P extends Property<any, any, any>> =
-  P extends {value: infer T} ? T : never;
-
-/** @public */
-export type PropertyValueInit<P extends Property<any, any, any>> =
-  P extends {valueInit?: infer U} ? U : never;
-
-/** @public */
-export type AnyPropertyValue<P extends Property<any, any, any>> =
-  PropertyValue<P> | PropertyValueInit<P>;
-
-/** @public */
-export type PropertyDecorator<P extends Property<any, any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, P>): (this: T, value: P | undefined) => P;
-};
 
 /** @public */
 export interface PropertyDescriptor<T = unknown, U = T> extends FastenerDescriptor {
@@ -49,38 +31,12 @@ export interface PropertyDescriptor<T = unknown, U = T> extends FastenerDescript
 }
 
 /** @public */
-export type PropertyTemplate<P extends Property<any, any, any>> =
-  ThisType<P> &
-  PropertyDescriptor<PropertyValue<P>, PropertyValueInit<P>> &
-  Partial<Omit<P, keyof PropertyDescriptor>>;
-
-/** @public */
-export interface PropertyClass<P extends Property<any, any, any> = Property<any, any, any>> extends FastenerClass<P> {
-  /** @override */
-  specialize(template: PropertyDescriptor<any, any>): PropertyClass<P>;
-
-  /** @override */
-  refine(propertyClass: PropertyClass<any>): void;
-
-  /** @override */
-  extend<P2 extends P>(className: string | symbol, template: PropertyTemplate<P2>): PropertyClass<P2>;
-  extend<P2 extends P>(className: string | symbol, template: PropertyTemplate<P2>): PropertyClass<P2>;
-
-  /** @override */
-  define<P2 extends P>(className: string | symbol, template: PropertyTemplate<P2>): PropertyClass<P2>;
-  define<P2 extends P>(className: string | symbol, template: PropertyTemplate<P2>): PropertyClass<P2>;
-
-  /** @override */
-  dummy<P2 extends P>(): P2;
-
-  /** @override */
-  <P2 extends P>(template: PropertyTemplate<P2>): PropertyDecorator<P2>;
-}
-
-/** @public */
 export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   (): T;
   (value: T | U, affinity?: Affinity): O;
+
+  /** @override */
+  get descriptorType(): Proto<PropertyDescriptor<T, U>>;
 
   /** @override */
   get fastenerType(): Proto<Property<any, any, any>>;
@@ -107,13 +63,13 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   didUnderive(inlet: Property<unknown, T>): void;
 
   /** @override */
-  deriveInlet(): Property<unknown, T> | null;
-
-  /** @override */
-  bindInlet(inlet: Property<unknown, T, any>): void;
+  get parent(): Property<unknown, T> | null;
 
   /** @override */
   readonly inlet: Property<unknown, T> | null;
+
+  /** @override */
+  bindInlet(inlet: Property<unknown, T, any>): void;
 
   /** @protected @override */
   willBindInlet(inlet: Property<unknown, T>): void;
@@ -203,7 +159,7 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
 
 /** @public */
 export const Property = (function (_super: typeof Fastener) {
-  const Property = _super.extend("Property", {}) as PropertyClass;
+  const Property = _super.extend("Property", {}) as FastenerClass<Property<any, any, any>>;
 
   Object.defineProperty(Property.prototype, "fastenerType", {
     value: Property,
@@ -237,12 +193,14 @@ export const Property = (function (_super: typeof Fastener) {
 
   Property.prototype.detachOutlet = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): void {
     const outlets = this.outlets as Property<unknown, T>[] | null;
-    if (outlets !== null) {
-      const index = outlets.indexOf(outlet);
-      if (index >= 0) {
-        outlets.splice(index, 1);
-      }
+    if (outlets === null) {
+      return;
     }
+    const index = outlets.indexOf(outlet);
+    if (index < 0) {
+      return;
+    }
+    outlets.splice(index, 1);
   };
 
   Property.prototype.getOutletValue = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): T {
@@ -318,21 +276,22 @@ export const Property = (function (_super: typeof Fastener) {
     if (affinity === void 0) {
       affinity = Affinity.Extrinsic;
     }
-    if (this.minAffinity(affinity)) {
-      newValue = this.fromAny(newValue);
-      newValue = this.transformValue(newValue);
-      const oldValue = this.value;
-      if (!this.equalValues(newValue, oldValue)) {
-        this.willSetValue(newValue, oldValue);
-        (this as Mutable<typeof this>).value = newValue;
-        this.onSetValue(newValue, oldValue);
-        this.didSetValue(newValue, oldValue);
-        this.setCoherent(true);
-        this.decohereOutlets();
-      } else {
-        this.setCoherent(true);
-      }
+    if (!this.minAffinity(affinity)) {
+      return;
     }
+    newValue = this.fromAny(newValue);
+    newValue = this.transformValue(newValue);
+    const oldValue = this.value;
+    if (this.equalValues(newValue, oldValue)) {
+      this.setCoherent(true);
+      return;
+    }
+    this.willSetValue(newValue, oldValue);
+    (this as Mutable<typeof this>).value = newValue;
+    this.onSetValue(newValue, oldValue);
+    this.didSetValue(newValue, oldValue);
+    this.setCoherent(true);
+    this.decohereOutlets();
   };
 
   Property.prototype.willSetValue = function <T>(this: Property<unknown, T>, newValue: T, oldValue: T): void {
@@ -370,13 +329,15 @@ export const Property = (function (_super: typeof Fastener) {
   };
 
   Property.prototype.recohere = function (this: Property, t: number): void {
-    if ((this.flags & Fastener.DerivedFlag) !== 0) {
-      const inlet = this.inlet;
-      if (inlet !== null) {
-        const inletValue = this.transformInletValue(inlet.getOutletValue(this));
-        this.setValue(inletValue, Affinity.Reflexive);
-      }
+    if ((this.flags & Fastener.DerivedFlag) === 0) {
+      return;
     }
+    const inlet = this.inlet;
+    if (inlet === null) {
+      return;
+    }
+    const inletValue = this.transformInletValue(inlet.getOutletValue(this));
+    this.setValue(inletValue, Affinity.Reflexive);
   };
 
   Property.prototype.definedValue = function <T>(this: Property<unknown, T>, value: T): boolean {
@@ -391,9 +352,9 @@ export const Property = (function (_super: typeof Fastener) {
     return FromAny.fromAny<T, U>(this.valueType, value);
   };
 
-  Property.construct = function <P extends Property<any, any, any>>(property: P | null, owner: FastenerOwner<P>): P {
+  Property.construct = function <P extends Property<any, any, any>>(property: P | null, owner: P extends Property<infer O, any, any> ? O : never): P {
     if (property === null) {
-      property = function (value?: PropertyValue<P> | PropertyValueInit<P>, affinity?: Affinity): PropertyValue<P> | FastenerOwner<P> {
+      property = function (value?: P extends Property<any, infer T, infer U> ? T | U : never, affinity?: Affinity): P extends Property<infer O, infer T, any> ? T | O : never {
         if (arguments.length === 0) {
           return property!.value;
         } else {
@@ -416,7 +377,7 @@ export const Property = (function (_super: typeof Fastener) {
     return property;
   };
 
-  Property.refine = function (propertyClass: PropertyClass<any>): void {
+  Property.refine = function (propertyClass: FastenerClass<any>): void {
     _super.refine.call(this, propertyClass);
     const propertyProtortype = propertyClass.prototype;
 

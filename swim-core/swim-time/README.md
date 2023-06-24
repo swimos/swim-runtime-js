@@ -15,7 +15,7 @@ current time in the local time zone, or in an optionally specified time zone.
 
 ```typescript
 DateTime.current();
-DateTime.current(TimeZone.utc);
+DateTime.current(TimeZone.utc());
 ```
 
 The `DateTime.fromInit` static method coerces plain JavaScript objects, of type
@@ -29,7 +29,7 @@ DateTime.fromInit({year: 2019});
 DateTime.fromInit({year: 2019, month: 8, day: 12, hour: 5, minute: 16, second: 10});
 // "2019-09-12T05:16:10.000Z"
 
-DateTime.fromInit({year: 2019, month: 8, day: 12, hour: 5, minute: 16, second: 10}, TimeZone.local);
+DateTime.fromInit({year: 2019, month: 8, day: 12, hour: 5, minute: 16, second: 10}, TimeZone.local());
 // "2019-09-11T15:16:10.000Z"
 ```
 
@@ -52,14 +52,14 @@ DateTime.fromAny("2019-08-12T22:54:39.648Z");
 ### TimeZone
 
 The `TimeZone` class represents an immutable offset, in minutes, from Universal
-Coordinated Time (UTC). The `TimeZone.local` and `TimeZone.utc` static methods
-return the current local time zone, and the UTC time zone, respectively.
+Coordinated Time (UTC). The `TimeZone.local()` and `TimeZone.utc()` static
+methods return the current local time zone, and the UTC time zone, respectively.
 
 ```typescript
-TimeZone.local;
+TimeZone.local();
 // TimeZone.forOffset(-420)
 
-TimeZone.utc;
+TimeZone.utc();
 // TimeZone.forOffset(0)
 ```
 
@@ -67,7 +67,7 @@ TimeZone.utc;
 
 A `DateTimeFormat` represents a string encoding that parse date-time strings
 as `DateTime` objects, and format `DateTime` objects as date-time strings.
-The `DateTimeFormat.iso8601` static method returns the standard ISO 8601
+The `DateTimeFormat.iso8601()` static method returns the standard ISO 8601
 date-time format. The `DateTimeFormat.pattern` method returns a
 `DateTimeFormat` that parses and formats date-times according to a
 `strptime`/`strftime`-style format string.
@@ -76,7 +76,7 @@ Use the `parse` method of a `DateTimeFormat` to parse a `DateTime` object from
 a compatible date-time string:
 
 ```typeScript
-DateTimeFormat.iso8601.parse("2019-08-12T16:11:59.586Z");
+DateTimeFormat.iso8601().parse("2019-08-12T16:11:59.586Z");
 // "2019-08-12T16:11:59.586Z
 
 DateTimeFormat.pattern("%Y-%m-%d").parse("2019-08-12");
@@ -91,7 +91,7 @@ to a compatible date-time string. You can also optionally pass a
 `DateTimeFormat` to a `DateTime`'s `toString` method.
 
 ```typescript
-DateTimeFormat.iso8601.format(DateTime.current());
+DateTimeFormat.iso8601().format(DateTime.current());
 // "2019-08-12T16:15:27.045Z"
 
 DateTime.current().toString(DateTimeFormat.pattern("%Y-%m-%d"));

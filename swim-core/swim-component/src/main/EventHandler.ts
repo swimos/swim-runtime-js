@@ -15,20 +15,10 @@
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {FastenerFlags} from "./Fastener";
-import type {FastenerOwner} from "./Fastener";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 import type {Component} from "./Component";
-
-/** @public */
-export type EventHandlerTarget<F extends EventHandler<any, any>> =
-  F extends {target: infer T | null} ? T : never;
-
-/** @public */
-export type EventHandlerDecorator<F extends EventHandler<any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
-};
 
 /** @public */
 export interface EventHandlerDescriptor<T extends EventTarget = EventTarget> extends FastenerDescriptor {
@@ -42,43 +32,12 @@ export interface EventHandlerDescriptor<T extends EventTarget = EventTarget> ext
 }
 
 /** @public */
-export type EventHandlerTemplate<F extends EventHandler<any, any>> =
-  ThisType<F> &
-  EventHandlerDescriptor &
-  Partial<Omit<F, keyof EventHandlerDescriptor>>;
-
-/** @public */
-export interface EventHandlerClass<F extends EventHandler<any, any> = EventHandler<any, any>> extends FastenerClass<F> {
-  /** @override */
-  specialize(template: EventHandlerDescriptor): EventHandlerClass<F>;
-
-  /** @override */
-  refine(fastenerClass: EventHandlerClass<any>): void;
-
-  /** @override */
-  extend<F2 extends F>(className: string | symbol, template: EventHandlerTemplate<F2>): EventHandlerClass<F2>;
-  extend<F2 extends F>(className: string | symbol, template: EventHandlerTemplate<F2>): EventHandlerClass<F2>;
-
-  /** @override */
-  define<F2 extends F>(className: string | symbol, template: EventHandlerTemplate<F2>): EventHandlerClass<F2>;
-  define<F2 extends F>(className: string | symbol, template: EventHandlerTemplate<F2>): EventHandlerClass<F2>;
-
-  /** @override */
-  <F2 extends F>(template: EventHandlerTemplate<F2>): EventHandlerDecorator<F2>;
-
-  /** @internal */
-  readonly DisabledFlag: FastenerFlags;
-
-  /** @internal @override */
-  readonly FlagShift: number;
-  /** @internal @override */
-  readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
 export interface EventHandler<O = unknown, T extends EventTarget = EventTarget> extends Fastener<O>, EventListener {
   /** @override */
   (event: Event): void;
+
+  /** @override */
+  get descriptorType(): Proto<EventHandlerDescriptor<T>>;
 
   /** @override */
   get fastenerType(): Proto<EventHandler<any, any>>;
@@ -170,7 +129,15 @@ export interface EventHandler<O = unknown, T extends EventTarget = EventTarget> 
 
 /** @public */
 export const EventHandler = (function (_super: typeof Fastener) {
-  const EventHandler = _super.extend("EventHandler", {}) as EventHandlerClass;
+  const EventHandler = _super.extend("EventHandler", {}) as FastenerClass<EventHandler<any, any>> & {
+    /** @internal */
+    readonly DisabledFlag: FastenerFlags;
+
+    /** @internal @override */
+    readonly FlagShift: number;
+    /** @internal @override */
+    readonly FlagMask: FastenerFlags;
+  };
 
   Object.defineProperty(EventHandler.prototype, "fastenerType", {
     value: EventHandler,
@@ -378,7 +345,7 @@ export const EventHandler = (function (_super: typeof Fastener) {
     }
   };
 
-  EventHandler.create = function <F extends EventHandler<any, any>>(this: EventHandlerClass<F>, owner: FastenerOwner<F>): F {
+  EventHandler.create = function <F extends EventHandler<any, any>>(owner: F extends EventHandler<infer O, any> ? O : never): F {
     const fastener = _super.create.call(this, owner) as F;
     if (fastener.target === null && fastener.bindsOwner === true &&
         (owner as EventTarget).addEventListener !== void 0 &&
@@ -388,7 +355,7 @@ export const EventHandler = (function (_super: typeof Fastener) {
     return fastener;
   };
 
-  EventHandler.construct = function <F extends EventHandler<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+  EventHandler.construct = function <F extends EventHandler<any, any>>(fastener: F | null, owner: F extends EventHandler<infer O, any> ? O : never): F {
     if (fastener === null) {
       fastener = function (event: Event): void {
         fastener!.handle(event);
@@ -417,7 +384,7 @@ export const EventHandler = (function (_super: typeof Fastener) {
     return fastener;
   };
 
-  EventHandler.refine = function (fastenerClass: EventHandlerClass<any>): void {
+  EventHandler.refine = function (fastenerClass: FastenerClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;

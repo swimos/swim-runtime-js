@@ -18,19 +18,9 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Equals} from "@swim/util";
 import type {FastenerFlags} from "@swim/component";
-import type {FastenerOwner} from "@swim/component";
 import type {FastenerDescriptor} from "@swim/component";
 import type {FastenerClass} from "@swim/component";
 import {Fastener} from "@swim/component";
-
-/** @public */
-export type FileRelationValue<F extends FileRelation<any, any>> =
-  F extends FileRelation<any, infer T> ? T : never;
-
-/** @public */
-export type FileRelationDecorator<F extends FileRelation<any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
-};
 
 /** @public */
 export interface FileRelationDescriptor<T = unknown> extends FastenerDescriptor {
@@ -40,41 +30,10 @@ export interface FileRelationDescriptor<T = unknown> extends FastenerDescriptor 
 }
 
 /** @public */
-export type FileRelationTemplate<F extends FileRelation<any, any>> =
-  ThisType<F> &
-  FileRelationDescriptor<FileRelationValue<F>> &
-  Partial<Omit<F, keyof FileRelationDescriptor>>;
-
-/** @public */
-export interface FileRelationClass<F extends FileRelation<any, any> = FileRelation<any, any>> extends FastenerClass<F> {
-  /** @override */
-  specialize(template: FileRelationDescriptor<any>): FileRelationClass<F>;
-
-  /** @override */
-  refine(fastenerClass: FileRelationClass<any>): void;
-
-  /** @override */
-  extend<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
-  extend<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
-
-  /** @override */
-  define<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
-  define<F2 extends F>(className: string, template: FileRelationTemplate<F2>): FileRelationClass<F2>;
-
-  /** @override */
-  <F2 extends F>(template: FileRelationTemplate<F2>): FileRelationDecorator<F2>;
-
-  /** @internal */
-  readonly ResolvesFlag: FastenerFlags;
-
-  /** @internal @override */
-  readonly FlagShift: number;
-  /** @internal @override */
-  readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
 export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
+  /** @override */
+  get descriptorType(): Proto<FileRelationDescriptor<T>>;
+
   /** @override */
   get fastenerType(): Proto<FileRelation<any, any>>;
 
@@ -129,7 +88,15 @@ export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
 
 /** @public */
 export const FileRelation = (function (_super: typeof Fastener) {
-  const FileRelation = _super.extend("FileRelation", {}) as FileRelationClass;
+  const FileRelation = _super.extend("FileRelation", {}) as FastenerClass<FileRelation<any, any>> & {
+    /** @internal */
+    readonly ResolvesFlag: FastenerFlags;
+
+    /** @internal @override */
+    readonly FlagShift: number;
+    /** @internal @override */
+    readonly FlagMask: FastenerFlags;
+  };
 
   Object.defineProperty(FileRelation.prototype, "fastenerType", {
     value: FileRelation,
@@ -249,7 +216,7 @@ export const FileRelation = (function (_super: typeof Fastener) {
     return Equals(newValue, oldValue);
   };
 
-  FileRelation.construct = function <F extends FileRelation<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+  FileRelation.construct = function <F extends FileRelation<any, any>>(fastener: F | null, owner: F extends FileRelation<infer O, any> ? F : never): F {
     fastener = _super.construct.call(this, fastener, owner) as F;
     const flagsInit = fastener.flagsInit;
     if (flagsInit !== void 0) {
@@ -259,7 +226,7 @@ export const FileRelation = (function (_super: typeof Fastener) {
     return fastener;
   };
 
-  FileRelation.refine = function (fastenerClass: FileRelationClass<any>): void {
+  FileRelation.refine = function (fastenerClass: FastenerClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;

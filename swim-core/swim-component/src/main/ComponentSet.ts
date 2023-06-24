@@ -18,23 +18,12 @@ import {Objects} from "@swim/util";
 import type {Comparator} from "@swim/util";
 import {Affinity} from "./Affinity";
 import type {FastenerFlags} from "./Fastener";
-import type {FastenerOwner} from "./Fastener";
+import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 import type {AnyComponent} from "./Component";
-import type {ComponentFactory} from "./Component";
 import type {Component} from "./Component";
 import type {ComponentRelationDescriptor} from "./ComponentRelation";
-import type {ComponentRelationClass} from "./ComponentRelation";
 import {ComponentRelation} from "./ComponentRelation";
-
-/** @public */
-export type ComponentSetComponent<F extends ComponentSet<any, any>> =
-  F extends {componentType?: ComponentFactory<infer C>} ? C : never;
-
-/** @public */
-export type ComponentSetDecorator<F extends ComponentSet<any, any>> = {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
-};
 
 /** @public */
 export interface ComponentSetDescriptor<C extends Component = Component> extends ComponentRelationDescriptor<C> {
@@ -44,44 +33,11 @@ export interface ComponentSetDescriptor<C extends Component = Component> extends
 }
 
 /** @public */
-export type ComponentSetTemplate<F extends ComponentSet<any, any>> =
-  ThisType<F> &
-  ComponentSetDescriptor<ComponentSetComponent<F>> &
-  Partial<Omit<F, keyof ComponentSetDescriptor>>;
-
-/** @public */
-export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentSet<any, any>> extends ComponentRelationClass<F> {
-  /** @override */
-  specialize(template: ComponentSetDescriptor<any>): ComponentSetClass<F>;
-
-  /** @override */
-  refine(fastenerClass: ComponentSetClass<any>): void;
-
-  /** @override */
-  extend<F2 extends F>(className: string | symbol, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
-  extend<F2 extends F>(className: string | symbol, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
-
-  /** @override */
-  define<F2 extends F>(className: string | symbol, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
-  define<F2 extends F>(className: string | symbol, template: ComponentSetTemplate<F2>): ComponentSetClass<F2>;
-
-  /** @override */
-  <F2 extends F>(template: ComponentSetTemplate<F2>): ComponentSetDecorator<F2>;
-
-  /** @internal */
-  readonly OrderedFlag: FastenerFlags;
-  /** @internal */
-  readonly SortedFlag: FastenerFlags;
-
-  /** @internal @override */
-  readonly FlagShift: number;
-  /** @internal @override */
-  readonly FlagMask: FastenerFlags;
-}
-
-/** @public */
 export interface ComponentSet<O = unknown, C extends Component = Component> extends ComponentRelation<O, C> {
   (component: AnyComponent<C>): O;
+
+  /** @override */
+  get descriptorType(): Proto<ComponentSetDescriptor<C>>;
 
   /** @override */
   get fastenerType(): Proto<ComponentSet<any, any>>;
@@ -108,13 +64,13 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
   didUnderive(inlet: ComponentSet<unknown, C>): void;
 
   /** @override */
-  deriveInlet(): ComponentSet<unknown, C> | null;
-
-  /** @override */
-  bindInlet(inlet: ComponentSet<unknown, C>): void;
+  get parent(): ComponentSet<unknown, C> | null;
 
   /** @override */
   readonly inlet: ComponentSet<unknown, C> | null;
+
+  /** @override */
+  bindInlet(inlet: ComponentSet<unknown, C>): void;
 
   /** @protected @override */
   willBindInlet(inlet: ComponentSet<unknown, C>): void;
@@ -246,7 +202,17 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
 
 /** @public */
 export const ComponentSet = (function (_super: typeof ComponentRelation) {
-  const ComponentSet = _super.extend("ComponentSet", {}) as ComponentSetClass;
+  const ComponentSet = _super.extend("ComponentSet", {}) as FastenerClass<ComponentSet<any, any>> & {
+    /** @internal */
+    readonly OrderedFlag: FastenerFlags;
+    /** @internal */
+    readonly SortedFlag: FastenerFlags;
+
+    /** @internal @override */
+    readonly FlagShift: number;
+    /** @internal @override */
+    readonly FlagMask: FastenerFlags;
+  };
 
   Object.defineProperty(ComponentSet.prototype, "fastenerType", {
     value: ComponentSet,
@@ -670,9 +636,9 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return a.uid < b.uid ? -1 : a.uid > b.uid ? 1 : 0;
   };
 
-  ComponentSet.construct = function <F extends ComponentSet<any, any>>(fastener: F | null, owner: FastenerOwner<F>): F {
+  ComponentSet.construct = function <F extends ComponentSet<any, any>>(fastener: F | null, owner: F extends ComponentSet<infer O, any> ? O : never): F {
     if (fastener === null) {
-      fastener = function (newComponent: AnyComponent<ComponentSetComponent<F>>): FastenerOwner<F> {
+      fastener = function (newComponent: F extends ComponentSet<any, infer C> ? AnyComponent<C> | null : never): F extends ComponentSet<infer O, any> ? O : never {
         fastener!.addComponent(newComponent);
         return fastener!.owner;
       } as F;
@@ -690,7 +656,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return fastener;
   };
 
-  ComponentSet.refine = function (fastenerClass: ComponentSetClass<any>): void {
+  ComponentSet.refine = function (fastenerClass: FastenerClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;

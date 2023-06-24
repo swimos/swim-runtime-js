@@ -67,7 +67,6 @@ export class ProviderSpec extends Suite {
     class TestComponent extends Component {
       @Provider({
         inherits: true,
-        lazy: false,
         createService(): TestService {
           return new TestService();
         },
@@ -99,7 +98,6 @@ export class ProviderSpec extends Suite {
     }
     class TestComponent extends Component {
       @Provider({
-        lazy: false,
         inherits: true,
         createService(): TestService {
           return new TestService();

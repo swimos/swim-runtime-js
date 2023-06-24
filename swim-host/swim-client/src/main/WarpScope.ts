@@ -19,13 +19,13 @@ import {Value} from "@swim/structure";
 import type {AnyUri} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import type {WarpDownlinkModel} from "./WarpDownlinkModel";
-import type {EventDownlinkTemplate} from "./EventDownlink";
+import type {EventDownlinkDescriptor} from "./EventDownlink";
 import {EventDownlink} from "./EventDownlink";
-import type {ValueDownlinkTemplate} from "./ValueDownlink";
+import type {ValueDownlinkDescriptor} from "./ValueDownlink";
 import {ValueDownlink} from "./ValueDownlink";
-import type {ListDownlinkTemplate} from "./ListDownlink";
+import type {ListDownlinkDescriptor} from "./ListDownlink";
 import {ListDownlink} from "./ListDownlink";
-import type {MapDownlinkTemplate} from "./MapDownlink";
+import type {MapDownlinkDescriptor} from "./MapDownlink";
 import {MapDownlink} from "./MapDownlink";
 import {WarpRef} from "./WarpRef";
 import {WarpClient} from "./"; // forward import
@@ -45,7 +45,7 @@ export class WarpScope extends Component implements WarpRef {
   readonly laneUri!: Property<this, Uri | null,AnyUri | null>;
 
   /** @override */
-  downlink(template?: EventDownlinkTemplate<EventDownlink<this>>): EventDownlink<this> {
+  downlink(template?: ThisType<EventDownlink<this>> & EventDownlinkDescriptor & Partial<Omit<EventDownlink<this>, keyof EventDownlinkDescriptor>>): EventDownlink<this> {
     let downlinkClass = EventDownlink;
     if (template !== void 0) {
       downlinkClass = downlinkClass.define("downlink", template);
@@ -54,7 +54,7 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ValueDownlinkTemplate<ValueDownlink<this, V, VU>>): ValueDownlink<this, V, VU> {
+  downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ValueDownlink<this, V, VU>> & ValueDownlinkDescriptor<V, VU> & Partial<Omit<ValueDownlink<this, V, VU>, keyof ValueDownlinkDescriptor<V, VU>>>): ValueDownlink<this, V, VU> {
     let downlinkClass = ValueDownlink;
     if (template !== void 0) {
       downlinkClass = downlinkClass.define("downlinkValue", template);
@@ -63,7 +63,7 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ListDownlinkTemplate<ListDownlink<this, V, VU>>): ListDownlink<this, V, VU> {
+  downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ListDownlink<this, V, VU>> & ListDownlinkDescriptor<V, VU> & Partial<Omit<ListDownlink<this, V, VU>, keyof ListDownlinkDescriptor<V, VU>>>): ListDownlink<this, V, VU> {
     let downlinkClass = ListDownlink;
     if (template !== void 0) {
       downlinkClass = downlinkClass.define("downlinkList", template);
@@ -72,7 +72,7 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: MapDownlinkTemplate<MapDownlink<this, K, V, KU, VU>>): MapDownlink<this, K, V, KU, VU> {
+  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: ThisType<MapDownlink<this, K, V, KU, VU>> & MapDownlinkDescriptor<K, V, KU, VU> & Partial<Omit<MapDownlink<this, K, V, KU, VU>, keyof MapDownlinkDescriptor<K, V, KU, VU>>>): MapDownlink<this, K, V, KU, VU> {
     let downlinkClass = MapDownlink;
     if (template !== void 0) {
       downlinkClass = downlinkClass.define("downlinkMap", template);

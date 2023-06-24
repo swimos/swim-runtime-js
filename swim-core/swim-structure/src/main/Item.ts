@@ -13,17 +13,17 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {Compare} from "@swim/util";
 import {Cursor} from "@swim/util";
 import type {Interpolate} from "@swim/util";
-import type {Interpolator} from "@swim/util";
+import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import {Format} from "@swim/codec";
-import {ItemInterpolator} from "./"; // forward import
 import type {Field} from "./Field";
 import type {AnyValue} from "./Value";
 import {Value} from "./"; // forward import
@@ -526,9 +526,8 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
   static fromAny(item: AnyItem): Item {
     if (item instanceof Item) {
       return item;
-    } else {
-      return Value.fromAny(item);
     }
+    return Value.fromAny(item);
   }
 
   @Lazy
@@ -538,3 +537,26 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
         .commit();
   }
 }
+
+/** @internal */
+export const ItemInterpolator = (function (_super: typeof Interpolator) {
+  const ItemInterpolator = function <Y extends Item>(y0: Y, y1: Y): Interpolator<Y> {
+    const interpolator = function (u: number): Y {
+      return u < 1 ? interpolator[0] : interpolator[1];
+    } as Interpolator<Y>;
+    Object.setPrototypeOf(interpolator, ItemInterpolator.prototype);
+    (interpolator as Mutable<typeof interpolator>)[0] = y0.commit();
+    (interpolator as Mutable<typeof interpolator>)[1] = y1.commit();
+    return interpolator;
+  } as {
+    <Y extends Item>(y0: Y, y1: Y): Interpolator<Y>;
+
+    /** @internal */
+    prototype: Interpolator<any>;
+  };
+
+  ItemInterpolator.prototype = Object.create(_super.prototype);
+  ItemInterpolator.prototype.constructor = ItemInterpolator;
+
+  return ItemInterpolator;
+})(Interpolator);

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import type {AnyItem} from "./Item";
 import {Item} from "./Item";
@@ -84,13 +83,14 @@ export class RecordMap extends Record {
   }
 
   override get tag(): string | undefined {
-    if (this.fieldCount > 0) {
-      const head = this.array![0];
-      if (head instanceof Attr) {
-        return head.key.value;
-      }
+    if (this.fieldCount === 0) {
+      return void 0;
     }
-    return void 0;
+    const head = this.array![0];
+    if (!(head instanceof Attr)) {
+      return void 0;
+    }
+    return head.key.value;
   }
 
   override get target(): Value {
@@ -120,62 +120,58 @@ export class RecordMap extends Record {
       return value;
     } else if (modified) {
       return record;
-    } else {
-      return this;
     }
+    return this;
   }
 
   override head(): Item {
-    if (this.length > 0) {
-      return this.array![0]!;
+    if (this.length === 0) {
+      return Item.absent();
     }
-    return Item.absent();
+    return this.array![0]!;
   }
 
   override tail(): Record {
     const n = this.length;
-    if (n > 0) {
-      return new RecordMapView(this, 1, n);
-    } else {
+    if (n === 0) {
       return Record.empty();
     }
+    return new RecordMapView(this, 1, n);
   }
 
   override body(): Value {
     const n = this.length;
-    if (n > 2) {
-      return new RecordMapView(this, 1, n).branch();
+    if (n === 0 || n === 1) {
+      return Value.absent();
     } else if (n === 2) {
       const item = this.array![1];
       if (item instanceof Value) {
         return item;
-      } else {
-        return Record.of(item);
       }
+      return Record.of(item);
     }
-    return Value.absent();
+    return new RecordMapView(this, 1, n).branch();
   }
 
   override has(key: AnyValue): boolean {
-    if (this.fieldCount !== 0) {
-      key = Value.fromAny(key);
-      const table = this.hashTable()!;
-      const n = table.length;
-      //assert(n > 0);
-      const x = Math.abs(key.hashCode() % n);
-      let i = x;
-      do {
-        const field = table[i];
-        if (field !== void 0) {
-          if (field.key.equals(key)) {
-            return true;
-          }
-        } else {
-          break;
-        }
-        i = (i + 1) % n;
-      } while (i !== x);
+    if (this.fieldCount === 0) {
+      return false;
     }
+    key = Value.fromAny(key);
+    const table = this.hashTable()!;
+    const n = table.length;
+    //assert(n > 0);
+    const x = Math.abs(key.hashCode() % n);
+    let i = x;
+    do {
+      const field = table[i];
+      if (field === void 0) {
+        break;
+      } else if (field.key.equals(key)) {
+        return true;
+      }
+      i = (i + 1) % n;
+    } while (i !== x);
     return false;
   }
 
@@ -215,94 +211,90 @@ export class RecordMap extends Record {
   }
 
   override get(key: AnyValue): Value {
-    if (this.fieldCount > 0) {
-      key = Value.fromAny(key);
-      const table = this.hashTable()!;
-      const n = table.length;
-      //assert(n > 0);
-      const x = Math.abs(key.hashCode() % n);
-      let i = x;
-      do {
-        const field = table[i];
-        if (field !== void 0) {
-          if (field.key.equals(key)) {
-            return field.value;
-          }
-        } else {
-          break;
-        }
-        i = (i + 1) % n;
-      } while (i !== x);
+    if (this.fieldCount === 0) {
+      return Value.absent();
     }
+    key = Value.fromAny(key);
+    const table = this.hashTable()!;
+    const n = table.length;
+    //assert(n > 0);
+    const x = Math.abs(key.hashCode() % n);
+    let i = x;
+    do {
+      const field = table[i];
+      if (field === void 0) {
+        break;
+      } else if (field.key.equals(key)) {
+        return field.value;
+      }
+      i = (i + 1) % n;
+    } while (i !== x);
     return Value.absent();
   }
 
   override getAttr(key: AnyText): Value {
-    if (this.fieldCount > 0) {
-      key = Text.fromAny(key);
-      const table = this.hashTable()!;
-      const n = table.length;
-      //assert(n > 0);
-      const x = Math.abs(key.hashCode() % n);
-      let i = x;
-      do {
-        const field = table[i];
-        if (field !== void 0) {
-          if (field instanceof Attr && field.key.equals(key)) {
-            return field.value;
-          }
-        } else {
-          break;
-        }
-        i = (i + 1) % n;
-      } while (i !== x);
+    if (this.fieldCount === 0) {
+      return Value.absent();
     }
+    key = Text.fromAny(key);
+    const table = this.hashTable()!;
+    const n = table.length;
+    //assert(n > 0);
+    const x = Math.abs(key.hashCode() % n);
+    let i = x;
+    do {
+      const field = table[i];
+      if (field === void 0) {
+        break;
+      } else if (field instanceof Attr && field.key.equals(key)) {
+        return field.value;
+      }
+      i = (i + 1) % n;
+    } while (i !== x);
     return Value.absent();
   }
 
   override getSlot(key: AnyValue): Value {
-    if (this.fieldCount > 0) {
-      key = Value.fromAny(key);
-      const table = this.hashTable()!;
-      const n = table.length;
-      //assert(n > 0);
-      const x = Math.abs(key.hashCode() % n);
-      let i = x;
-      do {
-        const field = table[i];
-        if (field !== void 0) {
-          if (field instanceof Slot && field.key.equals(key)) {
-            return field.value;
-          }
-        } else {
-          break;
-        }
-        i = (i + 1) % n;
-      } while (i !== x);
+    if (this.fieldCount === 0) {
+      return Value.absent();
     }
+    key = Value.fromAny(key);
+    const table = this.hashTable()!;
+    const n = table.length;
+    //assert(n > 0);
+    const x = Math.abs(key.hashCode() % n);
+    let i = x;
+    do {
+      const field = table[i];
+      if (field === void 0) {
+        break;
+      } else if (field instanceof Slot && field.key.equals(key)) {
+        return field.value;
+      }
+      i = (i + 1) % n;
+    } while (i !== x);
     return Value.absent();
   }
 
   override getField(key: AnyValue): Field | undefined {
-    if (this.fieldCount > 0) {
-      key = Value.fromAny(key);
-      const table = this.hashTable()!;
-      const n = table.length;
-      //assert(n > 0);
-      const x = Math.abs(key.hashCode() % n);
-      let i = x;
-      do {
-        const field = table[i];
-        if (field !== void 0) {
-          if (field.key.equals(key)) {
-            return field;
-          }
-        } else {
-          break;
-        }
-        i = (i + 1) % n;
-      } while (i !== x);
+    if (this.fieldCount === 0) {
+      return void 0;
     }
+    key = Value.fromAny(key);
+    const table = this.hashTable()!;
+    const n = table.length;
+    //assert(n > 0);
+    const x = Math.abs(key.hashCode() % n);
+    let i = x;
+    do {
+      const field = table[i];
+      if (field === void 0) {
+        break;
+      } else if (field.key.equals(key)) {
+        return field;
+      }
+      i = (i + 1) % n;
+    } while (i !== x);
     return void 0;
   }
 
@@ -314,11 +306,10 @@ export class RecordMap extends Record {
     if (index < 0) {
       index = n + index;
     }
-    if (index >= 0 && index < n) {
-      return this.array![index]!;
-    } else {
+    if (index < 0 || index >= n) {
       return Item.absent();
     }
+    return this.array![index]!;
   }
 
   override set(key: AnyValue, newValue: Value): this {
@@ -333,16 +324,14 @@ export class RecordMap extends Record {
       } else {
         this.pushAliased(new Slot(key, newValue));
       }
-    } else {
-      if (this.fieldCount > 0) {
-        if (this.table !== null) {
-          this.setMutable(key, newValue);
-        } else {
-          this.updateMutable(key, newValue);
-        }
+    } else if (this.fieldCount > 0) {
+      if (this.table !== null) {
+        this.setMutable(key, newValue);
       } else {
-        this.pushMutable(new Slot(key, newValue));
+        this.updateMutable(key, newValue);
       }
+    } else {
+      this.pushMutable(new Slot(key, newValue));
     }
     return this;
   }
@@ -385,18 +374,15 @@ export class RecordMap extends Record {
     let i = x;
     do {
       const field = table[i];
-      if (field !== void 0) {
-        if (field.key.equals(key)) {
-          if (field.isMutable()) {
-            field.setValue(newValue);
-            return;
-          } else {
-            this.updateMutable(key, newValue);
-            return;
-          }
-        }
-      } else {
+      if (field === void 0) {
         break;
+      } else if (field.key.equals(key)) {
+        if (field.isMutable()) {
+          field.setValue(newValue);
+        } else {
+          this.updateMutable(key, newValue);
+        }
+        return;
       }
       i = (i + 1) % n;
     } while (i !== x);
@@ -433,16 +419,14 @@ export class RecordMap extends Record {
       } else {
         this.pushAliased(new Attr(key, newValue));
       }
-    } else {
-      if (this.fieldCount > 0) {
-        if (this.table !== null) {
-          this.setAttrMutable(key, newValue);
-        } else {
-          this.updateAttrMutable(key, newValue);
-        }
+    } else if (this.fieldCount > 0) {
+      if (this.table !== null) {
+        this.setAttrMutable(key, newValue);
       } else {
-        this.pushMutable(new Attr(key, newValue));
+        this.updateAttrMutable(key, newValue);
       }
+    } else {
+      this.pushMutable(new Attr(key, newValue));
     }
     return this;
   }
@@ -485,17 +469,15 @@ export class RecordMap extends Record {
     let i = x;
     do {
       const field = table[i];
-      if (field !== void 0) {
-        if (field.key.equals(key)) {
-          if (field instanceof Attr && field.isMutable()) {
-            field.setValue(newValue);
-          } else {
-            this.updateAttrMutable(key, newValue);
-          }
-          return;
-        }
-      } else {
+      if (field === void 0) {
         break;
+      } else if (field.key.equals(key)) {
+        if (field instanceof Attr && field.isMutable()) {
+          field.setValue(newValue);
+        } else {
+          this.updateAttrMutable(key, newValue);
+        }
+        return;
       }
       i = (i + 1) % n;
     } while (i !== x);
@@ -532,16 +514,14 @@ export class RecordMap extends Record {
       } else {
         this.pushAliased(new Slot(key, newValue));
       }
-    } else {
-      if (this.fieldCount > 0) {
-        if (this.table !== null) {
-          this.setSlotMutable(key, newValue);
-        } else {
-          this.updateSlotMutable(key, newValue);
-        }
+    } else if (this.fieldCount > 0) {
+      if (this.table !== null) {
+        this.setSlotMutable(key, newValue);
       } else {
-        this.pushMutable(new Slot(key, newValue));
+        this.updateSlotMutable(key, newValue);
       }
+    } else {
+      this.pushMutable(new Slot(key, newValue));
     }
     return this;
   }
@@ -584,17 +564,15 @@ export class RecordMap extends Record {
     let i = x;
     do {
       const field = table[i];
-      if (field !== void 0) {
-        if (field.key.equals(key)) {
-          if (field instanceof Slot && field.isMutable()) {
-            field.setValue(newValue);
-          } else {
-            this.updateSlotMutable(key, newValue);
-          }
-          return;
-        }
-      } else {
+      if (field === void 0) {
         break;
+      } else if (field.key.equals(key)) {
+        if (field instanceof Slot && field.isMutable()) {
+          field.setValue(newValue);
+        } else {
+          this.updateSlotMutable(key, newValue);
+        }
+        return;
       }
       i = (i + 1) % n;
     } while (i !== x);
@@ -687,16 +665,14 @@ export class RecordMap extends Record {
       } else {
         record.pushAliased(new Slot(key, newValue));
       }
-    } else {
-      if (record.fieldCount > 0) {
-        if (record.table !== null) {
-          record.setMutable(key, newValue);
-        } else {
-          record.updateMutable(key, newValue);
-        }
+    } else if (record.fieldCount > 0) {
+      if (record.table !== null) {
+        record.setMutable(key, newValue);
       } else {
-        record.pushMutable(new Slot(key, newValue));
+        record.updateMutable(key, newValue);
       }
+    } else {
+      record.pushMutable(new Slot(key, newValue));
     }
     return record;
   }
@@ -711,16 +687,14 @@ export class RecordMap extends Record {
       } else {
         record.pushAliased(new Attr(key, newValue));
       }
-    } else {
-      if (record.fieldCount > 0) {
-        if (record.table !== null) {
-          record.setAttrMutable(key, newValue);
-        } else {
-          record.updateAttrMutable(key, newValue);
-        }
+    } else if (record.fieldCount > 0) {
+      if (record.table !== null) {
+        record.setAttrMutable(key, newValue);
       } else {
-        record.pushMutable(new Attr(key, newValue));
+        record.updateAttrMutable(key, newValue);
       }
+    } else {
+      record.pushMutable(new Attr(key, newValue));
     }
     return record;
   }
@@ -735,16 +709,14 @@ export class RecordMap extends Record {
       } else {
         record.pushAliased(new Slot(key, newValue));
       }
-    } else {
-      if (record.fieldCount > 0) {
-        if (record.table !== null) {
-          record.setSlotMutable(key, newValue);
-        } else {
-          record.updateSlotMutable(key, newValue);
-        }
+    } else if (record.fieldCount > 0) {
+      if (record.table !== null) {
+        record.setSlotMutable(key, newValue);
       } else {
-        record.pushMutable(new Slot(key, newValue));
+        record.updateSlotMutable(key, newValue);
       }
+    } else {
+      record.pushMutable(new Slot(key, newValue));
     }
     return record;
   }
@@ -1023,12 +995,13 @@ export class RecordMap extends Record {
   }
 
   override commit(): this {
-    if ((this.flags & Record.ImmutableFlag) === 0) {
-      (this as Mutable<this>).flags |= Record.ImmutableFlag;
-      const array = this.array!;
-      for (let i = 0, n = this.length; i < n; i += 1) {
-        array[i]!.commit();
-      }
+    if ((this.flags & Record.ImmutableFlag) !== 0) {
+      return this;
+    }
+    (this as Mutable<this>).flags |= Record.ImmutableFlag;
+    const array = this.array!;
+    for (let i = 0, n = this.length; i < n; i += 1) {
+      array[i]!.commit();
     }
     return this;
   }
@@ -1052,25 +1025,21 @@ export class RecordMap extends Record {
 
   /** @internal */
   static put(table: Field[] | null, field: Field): void {
-    if (table !== null) {
-      const n = table.length;
-      const x = Math.abs(field.key.hashCode() % n);
-      let i = x;
-      do {
-        const item = table[i];
-        if (item !== void 0) {
-          if (field.key.equals(item.key)) {
-            table[i] = field;
-            return;
-          }
-        } else {
-          table[i] = field;
-          return;
-        }
-        i = (i + 1) % n;
-      } while (i !== x);
-      throw new Error();
+    if (table === null) {
+      return;
     }
+    const n = table.length;
+    const x = Math.abs(field.key.hashCode() % n);
+    let i = x;
+    do {
+      const item = table[i];
+      if (item === void 0 || field.key.equals(item.key)) {
+        table[i] = field;
+        return;
+      }
+      i = (i + 1) % n;
+    } while (i !== x);
+    throw new Error();
   }
 
   override evaluate(interpreter: AnyInterpreter): Record {
@@ -1148,36 +1117,36 @@ export class RecordMap extends Record {
     return void 0;
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Empty: RecordMap = new this(null, null, 0, 0, Record.AliasedFlag | Record.ImmutableFlag);
+
   static override empty(): RecordMap {
-    return new RecordMap(null, null, 0, 0, Record.AliasedFlag | Record.ImmutableFlag);
+    return this.Empty;
   }
 
   static override create(initialCapacity?: number): RecordMap {
     if (initialCapacity === void 0) {
       return new RecordMap(null, null, 0, 0, Record.AliasedFlag);
-    } else {
-      return new RecordMap(new Array(initialCapacity), null, 0, 0, 0);
     }
+    return new RecordMap(new Array(initialCapacity), null, 0, 0, 0);
   }
 
   static override of(...items: AnyItem[]): RecordMap {
     const n = items.length;
     if (n === 0) {
       return new RecordMap(null, null, 0, 0, Record.AliasedFlag);
-    } else {
-      const array = new Array(n);
-      let itemCount = 0;
-      let fieldCount = 0;
-      for (let i = 0; i < n; i += 1) {
-        const item = Item.fromAny(items[i]);
-        array[i] = item;
-        itemCount += 1;
-        if (item instanceof Field) {
-          fieldCount += 1;
-        }
-      }
-      return new RecordMap(array, null, itemCount, fieldCount, 0);
     }
+    const array = new Array(n);
+    let itemCount = 0;
+    let fieldCount = 0;
+    for (let i = 0; i < n; i += 1) {
+      const item = Item.fromAny(items[i]);
+      array[i] = item;
+      itemCount += 1;
+      if (item instanceof Field) {
+        fieldCount += 1;
+      }
+    }
+    return new RecordMap(array, null, itemCount, fieldCount, 0);
   }
 }
