@@ -912,6 +912,14 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return null;
   }
 
+  /** @override */
+  attachFastener(fastener: Fastener): void {
+    if (this.mounted) {
+      fastener.mount();
+    }
+    this.bindFastener(fastener);
+  }
+
   /** @internal */
   protected mountFasteners(): void {
     const fastenerNames = FastenerContext.getFastenerNames(this);

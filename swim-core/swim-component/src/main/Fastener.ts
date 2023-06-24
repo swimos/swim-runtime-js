@@ -35,7 +35,8 @@ export interface FastenerDescriptor {
 
 /** @public */
 export interface FastenerDecorator<F extends Fastener<any>> {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value: F | undefined) => F;
+  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value?: F) => F;
+  <T>(target: (this: T) => F, context: ClassGetterDecoratorContext<T, F>): (this: T) => F;
 }
 
 /** @public */
@@ -60,7 +61,7 @@ export interface FastenerClass<F extends Fastener<any> = Fastener<any>> {
 
   extend<F2 extends F>(className: string | symbol, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never): FastenerClass<F2>;
 
-  define<F2 extends F>(className: string | symbol, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never): FastenerClass<F2>;
+  define<F2 extends F>(className: string | symbol, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, extendsClass?: FastenerClass<F>): FastenerClass<F2>;
 
   dummy<F2 extends F>(): F2;
 
@@ -191,7 +192,7 @@ export interface Fastener<O = unknown> {
   /** @internal */
   uninheritInlet(): void;
 
-  unbindInlet(): void;
+  unbindInlet(inlet?: Fastener): void;
 
   /** @protected */
   willUnbindInlet(inlet: Fastener): void;
@@ -552,8 +553,11 @@ export const Fastener = (function (_super: typeof Object) {
     this.didUnbindInlet(inlet);
   };
 
-  Fastener.prototype.unbindInlet = function (this: Fastener): void {
-    const inlet = this.inlet;
+  Fastener.prototype.unbindInlet = function (this: Fastener, inlet?: Fastener | null): void {
+    if (inlet !== void 0 && inlet !== null && inlet !== this.inlet) {
+      return;
+    }
+    inlet = this.inlet;
     if (inlet === null) {
       return;
     }
@@ -784,7 +788,25 @@ export const Fastener = (function (_super: typeof Object) {
     return fastenerClass;
   };
 
-  Fastener.define = function <F extends Fastener<any>, F2 extends F>(className: string | symbol, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never): FastenerClass<F2> {
+  Fastener.define = function <F extends Fastener<any>, F2 extends F>(className: string | symbol, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, extendsClass?: FastenerClass<F>): FastenerClass<F2> {
+    if (typeof template.extends === "boolean") {
+      const extendsDescriptor = Object.getOwnPropertyDescriptor(template, "extends")!;
+      if (template.extends === true) {
+        Object.defineProperty(template, "extends", {
+          value: extendsClass,
+          writable: extendsDescriptor.writable,
+          enumerable: extendsDescriptor.enumerable,
+          configurable: true,
+        });
+      } else if (template.extends === false) {
+        Object.defineProperty(template, "extends", {
+          value: null,
+          writable: extendsDescriptor.writable,
+          enumerable: extendsDescriptor.enumerable,
+          configurable: true,
+        });
+      }
+    }
     const baseClass = this.specialize(template);
     return baseClass.extend(className, template);
   };
