@@ -826,12 +826,13 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   WarpDownlink.prototype.observe = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.inserted(observer, oldObservers);
-    if (oldObservers !== newObservers) {
-      this.willObserve(observer);
-      (this as Mutable<typeof this>).observers = newObservers;
-      this.onObserve(observer);
-      this.didObserve(observer);
+    if (oldObservers === newObservers) {
+      return;
     }
+    this.willObserve(observer);
+    (this as Mutable<typeof this>).observers = newObservers;
+    this.onObserve(observer);
+    this.didObserve(observer);
   };
 
   WarpDownlink.prototype.willObserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
@@ -849,12 +850,13 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   WarpDownlink.prototype.unobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
     const oldObservers = this.observers;
     const newObservers = Arrays.removed(observer, oldObservers);
-    if (oldObservers !== newObservers) {
-      this.willUnobserve(observer);
-      (this as Mutable<typeof this>).observers = newObservers;
-      this.onUnobserve(observer);
-      this.didUnobserve(observer);
+    if (oldObservers === newObservers) {
+      return;
     }
+    this.willUnobserve(observer);
+    (this as Mutable<typeof this>).observers = newObservers;
+    this.onUnobserve(observer);
+    this.didUnobserve(observer);
   };
 
   WarpDownlink.prototype.willUnobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
@@ -872,14 +874,15 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   WarpDownlink.prototype.consume = function (this: WarpDownlink, consumer: Consumer): void {
     const oldConsumers = this.consumers;
     const newConsumerrss = Arrays.inserted(consumer, oldConsumers);
-    if (oldConsumers !== newConsumerrss) {
-      this.willConsume(consumer);
-      (this as Mutable<typeof this>).consumers = newConsumerrss;
-      this.onConsume(consumer);
-      this.didConsume(consumer);
-      if (oldConsumers.length === 0) {
-        this.startConsuming();
-      }
+    if (oldConsumers === newConsumerrss) {
+      return;
+    }
+    this.willConsume(consumer);
+    (this as Mutable<typeof this>).consumers = newConsumerrss;
+    this.onConsume(consumer);
+    this.didConsume(consumer);
+    if (oldConsumers.length === 0) {
+      this.startConsuming();
     }
   };
 
@@ -898,14 +901,15 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   WarpDownlink.prototype.unconsume = function (this: WarpDownlink, consumer: Consumer): void {
     const oldConsumers = this.consumers;
     const newConsumerrss = Arrays.removed(consumer, oldConsumers);
-    if (oldConsumers !== newConsumerrss) {
-      this.willUnconsume(consumer);
-      (this as Mutable<typeof this>).consumers = newConsumerrss;
-      this.onUnconsume(consumer);
-      this.didUnconsume(consumer);
-      if (newConsumerrss.length === 0) {
-        this.stopConsuming();
-      }
+    if (oldConsumers === newConsumerrss) {
+      return;
+    }
+    this.willUnconsume(consumer);
+    (this as Mutable<typeof this>).consumers = newConsumerrss;
+    this.onUnconsume(consumer);
+    this.didUnconsume(consumer);
+    if (newConsumerrss.length === 0) {
+      this.stopConsuming();
     }
   };
 
@@ -930,12 +934,13 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   });
 
   WarpDownlink.prototype.startConsuming = function (this: WarpDownlink): void {
-    if ((this.flags & WarpDownlink.ConsumingFlag) === 0) {
-      this.willStartConsuming();
-      this.setFlags(this.flags | WarpDownlink.ConsumingFlag);
-      this.onStartConsuming();
-      this.didStartConsuming();
+    if ((this.flags & WarpDownlink.ConsumingFlag) !== 0) {
+      return;
     }
+    this.willStartConsuming();
+    this.setFlags(this.flags | WarpDownlink.ConsumingFlag);
+    this.onStartConsuming();
+    this.didStartConsuming();
   };
 
   WarpDownlink.prototype.willStartConsuming = function (this: WarpDownlink): void {
@@ -952,12 +957,13 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   };
 
   WarpDownlink.prototype.stopConsuming = function (this: WarpDownlink): void {
-    if ((this.flags & WarpDownlink.ConsumingFlag) !== 0) {
-      this.willStopConsuming();
-      this.setFlags(this.flags & ~WarpDownlink.ConsumingFlag);
-      this.onStopConsuming();
-      this.didStopConsuming();
+    if ((this.flags & WarpDownlink.ConsumingFlag) === 0) {
+      return;
     }
+    this.willStopConsuming();
+    this.setFlags(this.flags & ~WarpDownlink.ConsumingFlag);
+    this.onStopConsuming();
+    this.didStopConsuming();
   };
 
   WarpDownlink.prototype.willStopConsuming = function (this: WarpDownlink): void {
@@ -978,17 +984,18 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
   WarpDownlink.prototype.close = function (this: WarpDownlink): void {
     const model = this.model;
-    if (model !== null) {
-      (this as Mutable<typeof this>).model = null;
-      model.removeDownlink(this);
+    if (model === null) {
+      return;
+    }
+    (this as Mutable<typeof this>).model = null;
+    model.removeDownlink(this);
 
-      this.didClose();
-      const observers = this.observers;
-      for (let i = 0, n = observers.length; i < n; i += 1) {
-        const observer = observers[i]!;
-        if (observer.didClose !== void 0) {
-          observer.didClose(this);
-        }
+    this.didClose();
+    const observers = this.observers;
+    for (let i = 0, n = observers.length; i < n; i += 1) {
+      const observer = observers[i]!;
+      if (observer.didClose !== void 0) {
+        observer.didClose(this);
       }
     }
   };
