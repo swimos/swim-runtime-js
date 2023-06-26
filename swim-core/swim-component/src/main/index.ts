@@ -16,9 +16,6 @@
 
 export {Affinity} from "./Affinity";
 
-export {FastenerClassMap} from "./FastenerContext";
-export {FastenerFieldMap} from "./FastenerContext";
-export {FastenerNames} from "./FastenerContext";
 export type {FastenerContextClass} from "./FastenerContext";
 export {FastenerContext} from "./FastenerContext";
 

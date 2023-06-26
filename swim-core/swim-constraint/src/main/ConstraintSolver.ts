@@ -212,7 +212,7 @@ export class ConstraintSolver implements ConstraintScope {
 
     // Optimizing after each constraint is removed ensures that the solver
     // remains consistent. It makes the solver API easier to use at a small
-    // tradeoff for speed.
+    // trade-off for speed.
     this.optimize(this.objective);
 
     this.didRemoveConstraint(constraint);
@@ -525,7 +525,7 @@ export class ConstraintSolver implements ConstraintScope {
     return success;
   }
 
-  // Substitutues all instances of the parametric symbol in the tableau
+  // Substitutes all instances of the parametric symbol in the tableau
   // and the objective function with the given row.
   private substitute(symbol: ConstraintSymbol, row: ConstraintRow): void {
     for (let i = 0, n = this.rows.size; i < n; i += 1) {

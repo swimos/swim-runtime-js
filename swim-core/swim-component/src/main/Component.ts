@@ -886,7 +886,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     // hook
   }
 
-  getFastener<F extends Fastener<unknown>>(fastenerName: string | symbol, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
+  getOptionalFastener<K extends keyof this>(fastenerName: K): this[K] | null {
+    return FastenerContext.getOptionalFastener(this, fastenerName);
+  }
+
+  getFastener<F extends Fastener<any>>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
     if (contextType !== void 0 && contextType !== null && !(this instanceof contextType)) {
       return null;
     }
@@ -898,7 +902,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @override */
-  getParentFastener<F extends Fastener<unknown>>(fastenerName: string | symbol, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
+  getParentFastener<F extends Fastener<any>>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
     let parent = this.parent;
     while (parent !== null) {
       const fastener = parent.getFastener(fastenerName, fastenerType, contextType);
@@ -920,9 +924,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected mountFasteners(): void {
-    const fastenerNames = FastenerContext.getFastenerNames(this);
-    for (let i = 0; i < fastenerNames.length; i += 1) {
-      const fastener = this[fastenerNames[i]!];
+    const fastenerSlots = FastenerContext.getFastenerSlots(this);
+    for (let i = 0; i < fastenerSlots.length; i += 1) {
+      const fastener = this[fastenerSlots[i]!];
       if (fastener instanceof Fastener) {
         fastener.mount();
       }
@@ -931,9 +935,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected unmountFasteners(): void {
-    const fastenerNames = FastenerContext.getFastenerNames(this);
-    for (let i = 0; i < fastenerNames.length; i += 1) {
-      const fastener = this[fastenerNames[i]!];
+    const fastenerSlots = FastenerContext.getFastenerSlots(this);
+    for (let i = 0; i < fastenerSlots.length; i += 1) {
+      const fastener = this[fastenerSlots[i]!];
       if (fastener instanceof Fastener) {
         fastener.unmount();
       }
@@ -955,9 +959,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected bindChildFasteners(child: C, target: C | null): void {
-    const fastenerNames = FastenerContext.getFastenerNames(this);
-    for (let i = 0; i < fastenerNames.length; i += 1) {
-      const fastener = this[fastenerNames[i]!];
+    const fastenerSlots = FastenerContext.getFastenerSlots(this);
+    for (let i = 0; i < fastenerSlots.length; i += 1) {
+      const fastener = this[fastenerSlots[i]!];
       if (fastener instanceof Fastener) {
         this.bindChildFastener(fastener, child, target);
       }
@@ -973,9 +977,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected unbindChildFasteners(child: C): void {
-    const fastenerNames = FastenerContext.getFastenerNames(this);
-    for (let i = 0; i < fastenerNames.length; i += 1) {
-      const fastener = this[fastenerNames[i]!];
+    const fastenerSlots = FastenerContext.getFastenerSlots(this);
+    for (let i = 0; i < fastenerSlots.length; i += 1) {
+      const fastener = this[fastenerSlots[i]!];
       if (fastener instanceof Fastener) {
         this.unbindChildFastener(fastener, child);
       }

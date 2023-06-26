@@ -18,7 +18,7 @@ import type {ConstraintStrength} from "./ConstraintStrength";
 
 /** @public */
 export interface ConstraintVariable extends ConstraintSymbol, ConstraintTerm {
-  readonly name: string | symbol;
+  readonly name: PropertyKey;
 
   readonly strength: ConstraintStrength;
 
