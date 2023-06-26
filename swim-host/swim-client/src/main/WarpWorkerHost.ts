@@ -55,11 +55,10 @@ export class WarpWorkerHost extends WarpHost {
       this.port!.postMessage(envelope.toAny());
       this.idleTimer.watch();
     } else if (envelope instanceof CommandMessage) {
-      if (this.sendBuffer.length < this.sendBufferSize.value) {
-        this.sendBuffer.push(envelope);
-      } else {
+      if (this.sendBuffer.length >= this.sendBufferSize.value) {
         throw new Error("send buffer overflow");
       }
+      this.sendBuffer.push(envelope);
       if (!this.connected && this.online.value) {
         this.connect();
       }

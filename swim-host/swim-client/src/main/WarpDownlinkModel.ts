@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import {Arrays} from "@swim/util";
 import {Property} from "@swim/component";
 import type {ComponentFlags} from "@swim/component";
 import {Component} from "@swim/component";
@@ -41,7 +40,7 @@ export class WarpDownlinkModel extends Component {
     this.prio = prio;
     this.rate = rate;
     this.body = body;
-    this.views = Arrays.empty;
+    this.views = null;
   }
 
   readonly hostUri: Uri;
@@ -56,13 +55,15 @@ export class WarpDownlinkModel extends Component {
 
   readonly body: Value;
 
-  readonly views: ReadonlyArray<WarpDownlink>;
+  readonly views: ReadonlySet<WarpDownlink> | null;
 
   keepLinked(): boolean {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      if (views[i]!.relinks) {
-        return true;
+    if (views !== null) {
+      for (const view of views) {
+        if (view.relinks) {
+          return true;
+        }
       }
     }
     return false;
@@ -70,9 +71,11 @@ export class WarpDownlinkModel extends Component {
 
   keepSynced(): boolean {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      if (this.views[i]!.syncs) {
-        return true;
+    if (views !== null) {
+      for (const view of views) {
+        if (view.syncs) {
+          return true;
+        }
       }
     }
     return false;
@@ -106,8 +109,10 @@ export class WarpDownlinkModel extends Component {
 
   protected onConnect(): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.hostDidConnect();
+    if (views !== null) {
+      for (const view of views) {
+        view.hostDidConnect();
+      }
     }
   }
 
@@ -125,9 +130,10 @@ export class WarpDownlinkModel extends Component {
 
   protected onDisconnect(): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      const view = views[i]!;
-      view.hostDidDisconnect();
+    if (views !== null) {
+      for (const view of views) {
+        view.hostDidDisconnect();
+      }
     }
   }
 
@@ -151,16 +157,17 @@ export class WarpDownlinkModel extends Component {
 
   /** @internal */
   setAuthenticated(authenticated: boolean): void {
-    if (authenticated !== ((this.flags & WarpHost.AuthenticatedFlag) !== 0)) {
-      if (authenticated) {
-        this.setFlags(this.flags | WarpHost.AuthenticatedFlag);
-      } else {
-        this.setFlags(this.flags & ~WarpHost.AuthenticatedFlag);
-      }
-      this.willSetAuthenticated(authenticated);
-      this.onSetAuthenticated(authenticated);
-      this.didSetAuthenticated(authenticated);
+    if (authenticated === ((this.flags & WarpHost.AuthenticatedFlag) !== 0)) {
+      return;
     }
+    this.willSetAuthenticated(authenticated);
+    if (authenticated) {
+      this.setFlags(this.flags | WarpHost.AuthenticatedFlag);
+    } else {
+      this.setFlags(this.flags & ~WarpHost.AuthenticatedFlag);
+    }
+    this.onSetAuthenticated(authenticated);
+    this.didSetAuthenticated(authenticated);
   }
 
   protected willSetAuthenticated(authenticated: boolean): void {
@@ -181,16 +188,17 @@ export class WarpDownlinkModel extends Component {
 
   /** @internal */
   setDeauthenticated(deauthenticated: boolean): void {
-    if (deauthenticated !== ((this.flags & WarpHost.DeauthenticatedFlag) !== 0)) {
-      if (deauthenticated) {
-        this.setFlags(this.flags | WarpHost.DeauthenticatedFlag);
-      } else {
-        this.setFlags(this.flags & ~WarpHost.DeauthenticatedFlag);
-      }
-      this.willSetDeauthenticated(deauthenticated);
-      this.onSetDeauthenticated(deauthenticated);
-      this.didSetDeauthenticated(deauthenticated);
+    if (deauthenticated === ((this.flags & WarpHost.DeauthenticatedFlag) !== 0)) {
+      return;
     }
+    this.willSetDeauthenticated(deauthenticated);
+    if (deauthenticated) {
+      this.setFlags(this.flags | WarpHost.DeauthenticatedFlag);
+    } else {
+      this.setFlags(this.flags & ~WarpHost.DeauthenticatedFlag);
+    }
+    this.onSetDeauthenticated(deauthenticated);
+    this.didSetDeauthenticated(deauthenticated);
   }
 
   protected willSetDeauthenticated(deauthenticated: boolean): void {
@@ -209,56 +217,66 @@ export class WarpDownlinkModel extends Component {
   readonly session!: Property<this, Value, AnyValue>;
 
   addDownlink(view: WarpDownlink): void {
-    (this as Mutable<this>).views = Arrays.inserted(view, this.views);
+    let views = this.views as Set<WarpDownlink> | null;
+    if (views === null) {
+      views = new Set<WarpDownlink>();
+      (this as Mutable<this>).views = views;
+    } else if (views.has(view)) {
+      return;
+    }
+    views.add(view);
   }
 
   removeDownlink(view: WarpDownlink): void {
-    const oldViews = this.views;
-    const newViews = Arrays.removed(view, oldViews);
-    if (oldViews !== newViews) {
-      (this as Mutable<this>).views = newViews;
-      if (newViews.length === 0) {
-        const unlinkDelay = this.unlinkDelay.value;
-        if (unlinkDelay < 0) {
-          this.unlink();
-        } else {
-          setTimeout(this.doUnlink.bind(this), unlinkDelay);
-        }
-      }
-      view.close();
+    const views = this.views as Set<WarpDownlink> | null;
+    if (views === null || !views.has(view)) {
+      return;
     }
+    views.delete(view);
+    if (views.size === 0) {
+      const unlinkDelay = this.unlinkDelay.value;
+      if (unlinkDelay < 0) {
+        this.unlink();
+      } else {
+        setTimeout(this.doUnlink.bind(this), unlinkDelay);
+      }
+    }
+    view.close();
   }
 
   sync(): void {
     const host = this.getAncestor(WarpHost);
-    if (host !== null) {
-      const nodeUri = host.unresolve(this.nodeUri);
-      const request = new SyncRequest(nodeUri, this.laneUri, this.prio, this.rate, this.body);
-      this.onSyncRequest(request);
-      host.push(request);
+    if (host === null) {
+      return;
     }
+    const nodeUri = host.unresolve(this.nodeUri);
+    const request = new SyncRequest(nodeUri, this.laneUri, this.prio, this.rate, this.body);
+    this.onSyncRequest(request);
+    host.push(request);
   }
 
   link(): void {
     const host = this.getAncestor(WarpHost);
-    if (host !== null) {
-      const nodeUri = host.unresolve(this.nodeUri);
-      const request = new LinkRequest(nodeUri, this.laneUri, this.prio, this.rate, this.body);
-      this.onLinkRequest(request);
-      host.push(request);
+    if (host === null) {
+      return;
     }
+    const nodeUri = host.unresolve(this.nodeUri);
+    const request = new LinkRequest(nodeUri, this.laneUri, this.prio, this.rate, this.body);
+    this.onLinkRequest(request);
+    host.push(request);
   }
 
   unlink(): void {
     this.setFlags(this.flags & ~WarpDownlinkModel.DownlinkMask | WarpDownlinkModel.UnlinkingFlag);
     const host = this.getAncestor(WarpHost);
-    if (host !== null) {
-      host.unlinkDownlink(this);
+    if (host === null) {
+      return;
     }
+    host.unlinkDownlink(this);
   }
 
   protected doUnlink(): void {
-    if (this.views.length === 0) {
+    if (this.views !== null && this.views.size === 0) {
       this.unlink();
     }
   }
@@ -268,88 +286,108 @@ export class WarpDownlinkModel extends Component {
 
   command(body: AnyValue): void {
     const host = this.getAncestor(WarpHost);
-    if (host !== null) {
-      body = Value.fromAny(body);
-      this.onCommandMessage(body);
-      host.command(this.nodeUri, this.laneUri, body);
+    if (host === null) {
+      return;
     }
+    body = Value.fromAny(body);
+    this.onCommandMessage(body);
+    host.command(this.nodeUri, this.laneUri, body);
   }
 
   onEventMessage(message: EventMessage, host: WarpHost): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.onEventMessage(message);
+    if (views !== null) {
+      for (const view of views) {
+        view.onEventMessage(message);
+      }
     }
   }
 
   onCommandMessage(body: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.onCommandMessage(body);
+    if (views !== null) {
+      for (const view of views) {
+        view.onCommandMessage(body);
+      }
     }
   }
 
   onLinkRequest(request: LinkRequest): void {
     this.setFlags(this.flags | WarpDownlinkModel.LinkingFlag);
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.onLinkRequest(request);
+    if (views !== null) {
+      for (const view of views) {
+        view.onLinkRequest(request);
+      }
     }
   }
 
   onLinkedResponse(response: LinkedResponse, host: WarpHost): void {
     this.setFlags(this.flags & ~WarpDownlinkModel.LinkingFlag | WarpDownlinkModel.LinkedFlag);
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.onLinkedResponse(response);
+    if (views !== null) {
+      for (const view of views) {
+        view.onLinkedResponse(response);
+      }
     }
   }
 
   onSyncRequest(request: SyncRequest): void {
     this.setFlags(this.flags | WarpDownlinkModel.SyncingFlag);
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.onSyncRequest(request);
+    if (views !== null) {
+      for (const view of views) {
+        view.onSyncRequest(request);
+      }
     }
   }
 
   onSyncedResponse(response: SyncedResponse, host: WarpHost): void {
     this.setFlags(this.flags & ~WarpDownlinkModel.SyncingFlag | WarpDownlinkModel.SyncedFlag);
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.onSyncedResponse(response);
+    if (views !== null) {
+      for (const view of views) {
+        view.onSyncedResponse(response);
+      }
     }
   }
 
   onUnlinkRequest(request: UnlinkRequest, host: WarpHost): void {
     this.setFlags(this.flags & ~(WarpDownlinkModel.LinkingFlag | WarpDownlinkModel.SyncingFlag) | WarpDownlinkModel.UnlinkingFlag);
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.onUnlinkRequest(request);
+    if (views !== null) {
+      for (const view of views) {
+        view.onUnlinkRequest(request);
+      }
     }
   }
 
   onUnlinkedResponse(response: UnlinkedResponse, host: WarpHost): void {
     this.setFlags(this.flags & ~WarpDownlinkModel.UnlinkingFlag);
     const views = this.views;
-    if (views.length === 0 || (this.flags & WarpDownlinkModel.DownlinkMask) !== 0) {
-      for (let i = 0, n = views.length; i < n; i += 1) {
-        views[i]!.onUnlinkedResponse(response);
+    if (views === null || views.size === 0 || (this.flags & WarpDownlinkModel.DownlinkMask) !== 0) {
+      if (views !== null) {
+        for (const view of views) {
+          view.onUnlinkedResponse(response);
+        }
       }
       this.close();
-    } else { // concurrently relinked
-      if (this.keepSynced()) {
-        this.sync();
-      } else {
-        this.link();
-      }
+      return;
+    }
+    // Concurrently relinked.
+    if (this.keepSynced()) {
+      this.sync();
+    } else {
+      this.link();
     }
   }
 
   hostDidFail(error: unknown, host: WarpHost): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.hostDidFail(error);
+    if (views !== null) {
+      for (const view of views) {
+        view.hostDidFail(error);
+      }
     }
   }
 
@@ -360,9 +398,11 @@ export class WarpDownlinkModel extends Component {
   protected override onUnmount(): void {
     super.onUnmount();
     const views = this.views;
-    (this as Mutable<this>).views = Arrays.empty;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.close();
+    if (views !== null) {
+      (this as Mutable<this>).views = null;
+      for (const view of views) {
+        view.close();
+      }
     }
   }
 

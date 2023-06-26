@@ -26,20 +26,20 @@ import {Unicode} from "../unicode/Unicode";
 export const Format = (function () {
   const Format = {} as {
     /**
-     * The operting system specific string used to separate lines of text.
+     * The operating system specific string used to separate lines of text.
      */
     readonly lineSeparator: string;
 
     /**
-     * Returns the human-readable [[Display]] string for the givem `object`,
-     * output using the given `settings`. Delegates to [[Display.displa]],
+     * Returns the human-readable [[Display]] string for the given `object`,
+     * output using the given `settings`. Delegates to [[Display.display]],
      * if `object` implements `Display`; otherwise returns the result of
      * `Object.toString`.
      */
     display(object: unknown, settings?: AnyOutputSettings): string;
 
     /**
-     * Returns the developer-readable [[Debug]] string for the givem `object`,
+     * Returns the developer-readable [[Debug]] string for the given `object`,
      * output using the given `settings`. Delegates to [[Debug.debug]], if
      * `object` implements `Debug`; returns a JavaScript string literal, if
      * `object` is a `string`, and returns a JavaScript number literal, if
@@ -319,7 +319,7 @@ export const Format = (function () {
       } else {
         return "" + value;
       }
-    }
+    };
   })();
 
   Format.decimal = function (value: number, precision: number = -1): string {

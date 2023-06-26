@@ -72,13 +72,7 @@ export class Service extends Component<Service> {
   declare readonly observerType?: Class<ServiceObserver>;
 
   protected override willAttachParent(parent: Service): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceWillAttachParent !== void 0) {
-        observer.serviceWillAttachParent(parent, this);
-      }
-    }
+    this.callObservers("serviceWillAttachParent", parent, this);
   }
 
   protected override onAttachParent(parent: Service): void {
@@ -86,23 +80,11 @@ export class Service extends Component<Service> {
   }
 
   protected override didAttachParent(parent: Service): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceDidAttachParent !== void 0) {
-        observer.serviceDidAttachParent(parent, this);
-      }
-    }
+    this.callObservers("serviceDidAttachParent", parent, this);
   }
 
   protected override willDetachParent(parent: Service): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceWillDetachParent !== void 0) {
-        observer.serviceWillDetachParent(parent, this);
-      }
-    }
+    this.callObservers("serviceWillDetachParent", parent, this);
   }
 
   protected override onDetachParent(parent: Service): void {
@@ -110,122 +92,56 @@ export class Service extends Component<Service> {
   }
 
   protected override didDetachParent(parent: Service): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceDidDetachParent !== void 0) {
-        observer.serviceDidDetachParent(parent, this);
-      }
-    }
+    this.callObservers("serviceDidDetachParent", parent, this);
   }
 
   protected override willInsertChild(child: Service, target: Service | null): void {
     super.willInsertChild(child, target);
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceWillInsertChild !== void 0) {
-        observer.serviceWillInsertChild(child, target, this);
-      }
-    }
+    this.callObservers("serviceWillInsertChild", child, target, this);
   }
 
   protected override didInsertChild(child: Service, target: Service | null): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceDidInsertChild !== void 0) {
-        observer.serviceDidInsertChild(child, target, this);
-      }
-    }
+    this.callObservers("serviceDidInsertChild", child, target, this);
     super.didInsertChild(child, target);
   }
 
   protected override willRemoveChild(child: Service): void {
     super.willRemoveChild(child);
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceWillRemoveChild !== void 0) {
-        observer.serviceWillRemoveChild(child, this);
-      }
-    }
+    this.callObservers("serviceWillRemoveChild", child, this);
   }
 
   protected override didRemoveChild(child: Service): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceDidRemoveChild !== void 0) {
-        observer.serviceDidRemoveChild(child, this);
-      }
-    }
+    this.callObservers("serviceDidRemoveChild", child, this);
     super.didRemoveChild(child);
   }
 
   protected override willReinsertChild(child: Service, target: Service | null): void {
     super.willReinsertChild(child, target);
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceWillReinsertChild !== void 0) {
-        observer.serviceWillReinsertChild(child, target, this);
-      }
-    }
+    this.callObservers("serviceWillReinsertChild", child, target, this);
   }
 
   protected override didReinsertChild(child: Service, target: Service | null): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceDidReinsertChild !== void 0) {
-        observer.serviceDidReinsertChild(child, target, this);
-      }
-    }
+    this.callObservers("serviceDidReinsertChild", child, target, this);
     super.didReinsertChild(child, target);
   }
 
   protected override willMount(): void {
     super.willMount();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceWillMount !== void 0) {
-        observer.serviceWillMount(this);
-      }
-    }
+    this.callObservers("serviceWillMount", this);
   }
 
   protected override didMount(): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceDidMount !== void 0) {
-        observer.serviceDidMount(this);
-      }
-    }
+    this.callObservers("serviceDidMount", this);
     super.didMount();
   }
 
   protected override willUnmount(): void {
     super.willUnmount();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceWillUnmount !== void 0) {
-        observer.serviceWillUnmount(this);
-      }
-    }
+    this.callObservers("serviceWillUnmount", this);
   }
 
   protected override didUnmount(): void {
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.serviceDidUnmount !== void 0) {
-        observer.serviceDidUnmount(this);
-      }
-    }
+    this.callObservers("serviceDidUnmount", this);
     super.didUnmount();
   }
 

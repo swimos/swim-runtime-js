@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
-import {HashGenCacheMap} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import {Format} from "@swim/codec";
+import {Base16} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 import {Uri} from "./Uri";
+import {Utf8} from "@swim/codec";
 
 /** @public */
 export type AnyUriFragment = UriFragment | string;
@@ -98,23 +102,18 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     return stringValue;
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Undefined: UriFragment = new this(void 0);
+
   static undefined(): UriFragment {
-    return new UriFragment(void 0);
+    return this.Undefined;
   }
 
   static create(identifier: string | undefined): UriFragment {
-    if (identifier !== void 0) {
-      const cache = UriFragment.cache;
-      const fragment = cache.get(identifier);
-      if (fragment !== void 0) {
-        return fragment;
-      } else {
-        return cache.put(identifier, new UriFragment(identifier));
-      }
-    } else {
+    if (identifier === void 0) {
       return UriFragment.undefined();
     }
+    return new UriFragment(identifier);
   }
 
   static fromAny(value: AnyUriFragment): UriFragment;
@@ -124,19 +123,78 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
       return value;
     } else if (typeof value === "string") {
       return UriFragment.parse(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
-  static parse(fragmentPart: string): UriFragment {
-    return Uri.standardParser.parseFragmentString(fragmentPart);
+  static parse(input: Input): Parser<UriFragment>;
+  static parse(string: string): UriFragment;
+  static parse(string: Input | string): Parser<UriFragment> | UriFragment {
+    const input = typeof string === "string" ? Unicode.stringInput(string) : string;
+    let parser = UriFragmentParser.parse(input);
+    if (typeof string === "string" && input.isCont() && !parser.isError()) {
+      parser = Parser.error(Diagnostic.unexpected(input));
+    }
+    return typeof string === "string" ? parser.bind() : parser;
+  }
+}
+
+/** @internal */
+export class UriFragmentParser extends Parser<UriFragment> {
+  private readonly output: Output<string> | undefined;
+  private readonly c1: number | undefined;
+  private readonly step: number | undefined;
+
+  constructor(output?: Output<string>, c1?: number, step?: number) {
+    super();
+    this.output = output;
+    this.c1 = c1;
+    this.step = step;
   }
 
-  /** @internal */
-  @Lazy
-  static get cache(): HashGenCacheMap<string, UriFragment> {
-    const cacheSize = 32;
-    return new HashGenCacheMap<string, UriFragment>(cacheSize);
+  override feed(input: Input): Parser<UriFragment> {
+    return UriFragmentParser.parse(input, this.output, this.c1, this.step);
+  }
+
+  static parse(input: Input, output?: Output<string>,
+               c1: number = 0, step: number = 1): Parser<UriFragment> {
+    let c = 0;
+    output = output || Utf8.decodedString();
+    do {
+      if (step === 1) {
+        while (input.isCont() && (c = input.head(), Uri.isFragmentChar(c))) {
+          input = input.step();
+          output = output.write(c);
+        }
+        if (input.isCont() && c === 37/*'%'*/) {
+          input = input.step();
+          step = 2;
+        } else if (!input.isEmpty()) {
+          return Parser.done(UriFragment.create(output.bind()));
+        }
+      }
+      if (step === 2) {
+        if (input.isCont() && (c = input.head(), Base16.isDigit(c))) {
+          input = input.step();
+          c1 = c;
+          step = 3;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected("hex digit", input));
+        }
+      }
+      if (step === 3) {
+        if (input.isCont() && (c = input.head(), Base16.isDigit(c))) {
+          input = input.step();
+          output = output.write((Base16.decodeDigit(c1) << 4) | Base16.decodeDigit(c));
+          c1 = 0;
+          step = 1;
+          continue;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected("hex digit", input));
+        }
+      }
+      break;
+    } while (true);
+    return new UriFragmentParser(output, c1, step);
   }
 }

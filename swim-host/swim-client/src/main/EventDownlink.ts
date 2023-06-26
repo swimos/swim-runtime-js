@@ -54,50 +54,50 @@ export const EventDownlink = (function (_super: typeof WarpDownlink) {
   }) as FastenerClass<EventDownlink<any>>;
 
   EventDownlink.prototype.open = function (this: EventDownlink): EventDownlink {
-    if (this.model === null) {
-      const laneUri = this.getLaneUri();
-      if (laneUri === null) {
-        throw new Error("no laneUri");
-      }
-      let nodeUri = this.getNodeUri();
-      if (nodeUri === null) {
-        throw new Error("no nodeUri");
-      }
-      let hostUri = this.getHostUri();
-      if (hostUri === null) {
-        hostUri = nodeUri.endpoint();
-        nodeUri = hostUri.unresolve(nodeUri);
-      }
-      let prio = this.getPrio();
-      if (prio === void 0) {
-        prio = 0;
-      }
-      let rate = this.getRate();
-      if (rate === void 0) {
-        rate = 0;
-      }
-      let body = this.getBody();
-      if (body === null) {
-        body = Value.absent();
-      }
-      const owner = this.owner;
-      if (WarpDownlinkContext.is(owner)) {
-        let model = owner.getDownlink(hostUri, nodeUri, laneUri);
-        if (model !== null) {
-          if (!(model instanceof EventDownlinkModel)) {
-            throw new Error("downlink type mismatch");
-          }
-          model.addDownlink(this);
-        } else {
-          model = new EventDownlinkModel(hostUri, nodeUri, laneUri, prio, rate, body);
-          model.addDownlink(this);
-          owner.openDownlink(model);
-        }
-        (this as Mutable<typeof this>).model = model as EventDownlinkModel;
-      } else {
-        throw new Error("no downlink context");
-      }
+    if (this.model !== null) {
+      return this;
     }
+    const laneUri = this.getLaneUri();
+    if (laneUri === null) {
+      throw new Error("no laneUri");
+    }
+    let nodeUri = this.getNodeUri();
+    if (nodeUri === null) {
+      throw new Error("no nodeUri");
+    }
+    let hostUri = this.getHostUri();
+    if (hostUri === null) {
+      hostUri = nodeUri.endpoint();
+      nodeUri = hostUri.unresolve(nodeUri);
+    }
+    let prio = this.getPrio();
+    if (prio === void 0) {
+      prio = 0;
+    }
+    let rate = this.getRate();
+    if (rate === void 0) {
+      rate = 0;
+    }
+    let body = this.getBody();
+    if (body === null) {
+      body = Value.absent();
+    }
+    const owner = this.owner;
+    if (!WarpDownlinkContext.is(owner)) {
+      throw new Error("no downlink context");
+    }
+    let model = owner.getDownlink(hostUri, nodeUri, laneUri);
+    if (model !== null) {
+      if (!(model instanceof EventDownlinkModel)) {
+        throw new Error("downlink type mismatch");
+      }
+      model.addDownlink(this);
+    } else {
+      model = new EventDownlinkModel(hostUri, nodeUri, laneUri, prio, rate, body);
+      model.addDownlink(this);
+      owner.openDownlink(model);
+    }
+    (this as Mutable<typeof this>).model = model as EventDownlinkModel;
     return this;
   };
 

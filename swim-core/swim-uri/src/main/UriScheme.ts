@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
-import {HashGenCacheMap} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Utf8} from "@swim/codec";
 import {Uri} from "./Uri";
 
 /** @public */
@@ -82,19 +85,15 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     return this.name;
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Undefined: UriScheme = new this("");
+
   static undefined(): UriScheme {
-    return new UriScheme("");
+    return this.Undefined;
   }
 
   static create(schemeName: string): UriScheme {
-    const cache = UriScheme.cache;
-    const scheme = cache.get(schemeName);
-    if (scheme !== void 0) {
-      return scheme;
-    } else {
-      return cache.put(schemeName, new UriScheme(schemeName));
-    }
+    return new UriScheme(schemeName);
   }
 
   static fromAny(value: AnyUriScheme): UriScheme;
@@ -104,19 +103,58 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
       return value;
     } else if (typeof value === "string") {
       return UriScheme.parse(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
-  static parse(schemePart: string): UriScheme {
-    return Uri.standardParser.parseSchemeString(schemePart);
+  static parse(input: Input): Parser<UriScheme>;
+  static parse(string: string): UriScheme;
+  static parse(string: Input | string): Parser<UriScheme> | UriScheme {
+    const input = typeof string === "string" ? Unicode.stringInput(string) : string;
+    let parser = UriSchemeParser.parse(input);
+    if (typeof string === "string" && input.isCont() && !parser.isError()) {
+      parser = Parser.error(Diagnostic.unexpected(input));
+    }
+    return typeof string === "string" ? parser.bind() : parser;
+  }
+}
+
+/** @internal */
+export class UriSchemeParser extends Parser<UriScheme> {
+  private readonly output: Output<string> | undefined;
+  private readonly step: number | undefined;
+
+  constructor(output?: Output<string>, step?: number) {
+    super();
+    this.output = output;
+    this.step = step;
   }
 
-  /** @internal */
-  @Lazy
-  static get cache(): HashGenCacheMap<string, UriScheme> {
-    const cacheSize = 4;
-    return new HashGenCacheMap<string, UriScheme>(cacheSize);
+  override feed(input: Input): Parser<UriScheme> {
+    return UriSchemeParser.parse(input, this.output, this.step);
+  }
+
+  static parse(input: Input, output?: Output<string>, step: number = 1): Parser<UriScheme> {
+    let c = 0;
+    if (step === 1) {
+      if (input.isCont() && (c = input.head(), Uri.isAlpha(c))) {
+        input = input.step();
+        output = output || Utf8.decodedString();
+        output = output.write(Uri.toLowerCase(c));
+        step = 2;
+      } else if (!input.isEmpty()) {
+        return Parser.error(Diagnostic.expected("scheme", input));
+      }
+    }
+    if (step === 2) {
+      while (input.isCont() && (c = input.head(), Uri.isSchemeChar(c))) {
+        input = input.step();
+        output!.write(Uri.toLowerCase(c));
+      }
+      if (!input.isEmpty()) {
+        return Parser.done(UriScheme.create(output!.bind()));
+      }
+    }
+    return new UriSchemeParser(output, step);
   }
 }

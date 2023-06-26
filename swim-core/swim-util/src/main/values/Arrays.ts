@@ -84,7 +84,7 @@ export const Arrays = (function () {
       }
     }
     newArray[n] = newElement;
-    return newArray
+    return newArray;
   };
 
   Arrays.removed = function <T>(oldElement: T, oldArray: ReadonlyArray<T> | null | undefined): ReadonlyArray<T> {
@@ -105,7 +105,7 @@ export const Arrays = (function () {
           i += 1;
           while (i < n) {
             newArray[i - 1] = oldArray![i]!;
-            i += 1
+            i += 1;
           }
           return newArray;
         }

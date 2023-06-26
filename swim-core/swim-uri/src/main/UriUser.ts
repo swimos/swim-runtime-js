@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {HashCode} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import {Format} from "@swim/codec";
+import {Base16} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Utf8} from "@swim/codec";
 import {Uri} from "./Uri";
 
 /** @public */
@@ -45,21 +50,19 @@ export class UriUser implements HashCode, Debug, Display {
   readonly username: string | undefined;
 
   withUsername(username: string | undefined): UriUser {
-    if (username !== this.username) {
-      return this.copy(username, this.password);
-    } else {
+    if (username === this.username) {
       return this;
     }
+    return this.copy(username, this.password);
   }
 
   readonly password: string | undefined;
 
   withPassword(password: string | undefined): UriUser {
-    if (password !== this.password) {
-      return this.copy(this.username, password);
-    } else {
+    if (password === this.password) {
       return this;
     }
+    return this.copy(this.username, password);
   }
 
   protected copy(username: string | undefined, password: string | undefined): UriUser {
@@ -118,17 +121,18 @@ export class UriUser implements HashCode, Debug, Display {
     return Format.display(this);
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Undefined: UriUser = new this(void 0, void 0);
+
   static undefined(): UriUser {
-    return new UriUser(void 0, void 0);
+    return this.Undefined;
   }
 
   static create(username: string | undefined, password?: string | undefined): UriUser {
-    if (username !== void 0 || password !== void 0) {
-      return new UriUser(username, password);
-    } else {
+    if (username === void 0 && password === void 0) {
       return UriUser.undefined();
     }
+    return new UriUser(username, password);
   }
 
   static fromInit(init: UriUserInit): UriUser {
@@ -144,12 +148,118 @@ export class UriUser implements HashCode, Debug, Display {
       return UriUser.fromInit(value);
     } else if (typeof value === "string") {
       return UriUser.parse(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
-  static parse(userPart: string): UriUser {
-    return Uri.standardParser.parseUserString(userPart);
+  static parse(input: Input): Parser<UriUser>;
+  static parse(string: string): UriUser;
+  static parse(string: Input | string): Parser<UriUser> | UriUser {
+    const input = typeof string === "string" ? Unicode.stringInput(string) : string;
+    let parser = UriUserParser.parse(input);
+    if (typeof string === "string" && input.isCont() && !parser.isError()) {
+      parser = Parser.error(Diagnostic.unexpected(input));
+    }
+    return typeof string === "string" ? parser.bind() : parser;
+  }
+}
+
+/** @internal */
+export class UriUserParser extends Parser<UriUser> {
+  private readonly usernameOutput: Output<string> | undefined;
+  private readonly passwordOutput: Output<string> | undefined;
+  private readonly c1: number | undefined;
+  private readonly step: number | undefined;
+
+  constructor(usernameOutput?: Output<string>, passwordOutput?: Output<string>,
+              c1?: number, step?: number) {
+    super();
+    this.usernameOutput = usernameOutput;
+    this.passwordOutput = passwordOutput;
+    this.c1 = c1;
+    this.step = step;
+  }
+
+  override feed(input: Input): Parser<UriUser> {
+    return UriUserParser.parse(input, this.usernameOutput, this.passwordOutput,
+                               this.c1, this.step);
+  }
+
+  static parse(input: Input, usernameOutput?: Output<string>, passwordOutput?: Output<string>,
+               c1: number = 0, step: number = 1): Parser<UriUser> {
+    let c = 0;
+    do {
+      if (step === 1) {
+        usernameOutput = usernameOutput || Utf8.decodedString();
+        while (input.isCont() && (c = input.head(), Uri.isUserChar(c))) {
+          input = input.step();
+          usernameOutput!.write(c);
+        }
+        if (input.isCont() && c === 58/*':'*/) {
+          input = input.step();
+          step = 4;
+        } else if (input.isCont() && c === 37/*'%'*/) {
+          input = input.step();
+          step = 2;
+        } else if (!input.isEmpty()) {
+          return Parser.done(UriUser.create(usernameOutput.bind()));
+        }
+      }
+      if (step === 2) {
+        if (input.isCont() && (c = input.head(), Base16.isDigit(c))) {
+          input = input.step();
+          c1 = c;
+          step = 3;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected("hex digit", input));
+        }
+      }
+      if (step === 3) {
+        if (input.isCont() && (c = input.head(), Base16.isDigit(c))) {
+          input = input.step();
+          usernameOutput!.write((Base16.decodeDigit(c1) << 4) | Base16.decodeDigit(c));
+          c1 = 0;
+          step = 1;
+          continue;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected("hex digit", input));
+        }
+      }
+      if (step === 4) {
+        passwordOutput = passwordOutput || Utf8.decodedString();
+        while (input.isCont() && (c = input.head(), Uri.isUserInfoChar(c))) {
+          input = input.step();
+          passwordOutput.write(c);
+        }
+        if (input.isCont() && c === 37/*'%'*/) {
+          input = input.step();
+          step = 5;
+        } else if (!input.isEmpty()) {
+          return Parser.done(UriUser.create(usernameOutput!.bind(), passwordOutput.bind()));
+        }
+      }
+      if (step === 5) {
+        if (input.isCont() && (c = input.head(), Base16.isDigit(c))) {
+          input = input.step();
+          c1 = c;
+          step = 6;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected("hex digit", input));
+        }
+      }
+      if (step === 6) {
+        if (input.isCont() && (c = input.head(), Base16.isDigit(c))) {
+          input = input.step();
+          passwordOutput!.write((Base16.decodeDigit(c1) << 4) | Base16.decodeDigit(c));
+          c1 = 0;
+          step = 4;
+          continue;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected("hex digit", input));
+        }
+      }
+      break;
+    } while (true);
+    return new UriUserParser(usernameOutput, passwordOutput, c1, step);
   }
 }

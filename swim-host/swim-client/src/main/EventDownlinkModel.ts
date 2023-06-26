@@ -24,5 +24,5 @@ export class EventDownlinkModel extends WarpDownlinkModel {
     super(hostUri, nodeUri, laneUri, prio, rate, body);
   }
 
-  override views!: ReadonlyArray<EventDownlink>;
+  declare readonly views: ReadonlySet<EventDownlink> | null;
 }

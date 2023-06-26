@@ -17,7 +17,6 @@ import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Instance} from "@swim/util";
 import type {Proto} from "@swim/util";
-import {Arrays} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Comparator} from "@swim/util";
 import type {Dictionary} from "@swim/util";
@@ -87,7 +86,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     this.lastChild = null;
     this.childMap = null;
     this.decoherent = null;
-    this.observers = Arrays.empty;
+    this.observers = null;
   }
 
   get componentType(): Class<Component> {
@@ -519,33 +518,33 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   replaceChild(this: C, newChild: C, oldChild: C): C {
     if (oldChild.parent !== this) {
       throw new Error("replacement target is not a child");
+    } else if (newChild === oldChild) {
+      return oldChild;
     }
 
-    if (newChild !== oldChild) {
-      newChild.remove();
-      const target = oldChild.nextSibling;
+    newChild.remove();
+    const target = oldChild.nextSibling;
 
-      if ((oldChild.flags & Component.RemovingFlag) === 0) {
-        oldChild.setFlags(oldChild.flags | Component.RemovingFlag);
-        this.willRemoveChild(oldChild);
-        oldChild.detachParent(this);
-        this.removeChildMap(oldChild);
-        this.onRemoveChild(oldChild);
-        this.didRemoveChild(oldChild);
-        oldChild.setKey(void 0);
-        oldChild.setFlags(oldChild.flags & ~Component.RemovingFlag);
-      }
-
-      newChild.setFlags(newChild.flags | Component.InsertingFlag);
-      newChild.setKey(oldChild.key);
-      this.willInsertChild(newChild, target);
-      this.insertChildMap(newChild);
-      newChild.attachParent(this, target);
-      this.onInsertChild(newChild, target);
-      this.didInsertChild(newChild, target);
-      newChild.cascadeInsert();
-      newChild.setFlags(newChild.flags & ~Component.InsertingFlag);
+    if ((oldChild.flags & Component.RemovingFlag) === 0) {
+      oldChild.setFlags(oldChild.flags | Component.RemovingFlag);
+      this.willRemoveChild(oldChild);
+      oldChild.detachParent(this);
+      this.removeChildMap(oldChild);
+      this.onRemoveChild(oldChild);
+      this.didRemoveChild(oldChild);
+      oldChild.setKey(void 0);
+      oldChild.setFlags(oldChild.flags & ~Component.RemovingFlag);
     }
+
+    newChild.setFlags(newChild.flags | Component.InsertingFlag);
+    newChild.setKey(oldChild.key);
+    this.willInsertChild(newChild, target);
+    this.insertChildMap(newChild);
+    newChild.attachParent(this, target);
+    this.onInsertChild(newChild, target);
+    this.didInsertChild(newChild, target);
+    newChild.cascadeInsert();
+    newChild.setFlags(newChild.flags & ~Component.InsertingFlag);
 
     return oldChild;
   }
@@ -663,17 +662,16 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   reinsertChild(this: C, child: C, target: C | null): void {
     if (child.parent !== this) {
       throw new Error("not a child");
-    }
-    if (target !== null && target.parent !== this) {
+    } else if (target !== null && target.parent !== this) {
       throw new Error("reinsert target is not a child");
+    } else if (child.nextSibling === target) {
+      return;
     }
 
-    if (child.nextSibling !== target) {
-      this.willReinsertChild(child, target);
-      child.reattachParent(target);
-      this.onReinsertChild(child, target);
-      this.didReinsertChild(child, target);
-    }
+    this.willReinsertChild(child, target);
+    child.reattachParent(target);
+    this.onReinsertChild(child, target);
+    this.didReinsertChild(child, target);
   }
 
   protected willReinsertChild(child: C, target: C | null): void {
@@ -1051,17 +1049,19 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @internal */
-  readonly observers: ReadonlyArray<Observes<this>>;
+  readonly observers: ReadonlySet<Observes<this>> | null;
 
   /** @override */
   observe(observer: Observes<this>): void {
-    const oldObservers = this.observers;
-    const newObservers = Arrays.inserted(observer, oldObservers);
-    if (oldObservers === newObservers) {
+    let observers = this.observers as Set<Observes<this>> | null;
+    if (observers === null) {
+      observers = new Set<Observes<this>>();
+      (this as Mutable<this>).observers = observers;
+    } else if (observers.has(observer)) {
       return;
     }
     this.willObserve(observer);
-    (this as Mutable<this>).observers = newObservers;
+    observers.add(observer);
     this.onObserve(observer);
     this.didObserve(observer);
   }
@@ -1080,13 +1080,12 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @override */
   unobserve(observer: Observes<this>): void {
-    const oldObservers = this.observers;
-    const newObservers = Arrays.removed(observer, oldObservers);
-    if (oldObservers === newObservers) {
+    const observers = this.observers as Set<Observes<this>> | null;
+    if (observers === null || !observers.has(observer)) {
       return;
     }
     this.willUnobserve(observer);
-    (this as Mutable<this>).observers = newObservers;
+    observers.delete(observer);
     this.onUnobserve(observer);
     this.didUnobserve(observer);
   }
@@ -1104,9 +1103,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   callObservers<O, K extends keyof ObserverMethods<O>>(this: {readonly observerType?: Class<O>}, key: K, ...args: ObserverParameters<O, K>): void {
-    const observers = (this as Component).observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]! as ObserverMethods<O>;
+    const observers = (this as Component).observers as ReadonlySet<ObserverMethods<O>> | null;
+    if (observers === null) {
+      return;
+    }
+    for (const observer of observers) {
       const method = observer[key];
       if (typeof method === "function") {
         method.call(observer, ...args);

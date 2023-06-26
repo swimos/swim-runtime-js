@@ -114,12 +114,6 @@ An `OrderedMap` has its entries sorted by key order. A `ReducedMap` is an
 `OrderedMap` that memoizes partial combinations of sub-elements to support
 efficient, incremental reduction of continuously mutating datasets.
 
-### Cache implementations
-
-`HashGenCacheMap` and `HashGenCacheSet` implement efficient hashed generational
-caches that discard the least recently used value with the worst hit rate per
-hash bucket.
-
 ### Assertions
 
 The exported `Assert` interface provides a common API for constraint testing

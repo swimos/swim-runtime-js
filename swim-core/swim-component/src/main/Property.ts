@@ -90,7 +90,7 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   didUnbindInlet(inlet: Property<unknown, T>): void;
 
   /** @internal */
-  readonly outlets: ReadonlyArray<Property<unknown, T>> | null;
+  readonly outlets: ReadonlySet<Property<unknown, T>> | null;
 
   /** @internal @override */
   attachOutlet(outlet: Property<unknown, T>): void;
@@ -172,35 +172,21 @@ export const Property = (function (_super: typeof Fastener) {
     this.setValue(inletValue, Affinity.Reflexive);
   };
 
-  Property.prototype.onBindInlet = function <T>(this: Property<unknown, T>, inlet: Property<unknown, T>): void {
-    (this as Mutable<typeof this>).inlet = inlet;
-    _super.prototype.onBindInlet.call(this, inlet);
-  };
-
-  Property.prototype.onUnbindInlet = function <T>(this: Property<unknown, T>, inlet: Property<unknown, T>): void {
-    _super.prototype.onUnbindInlet.call(this, inlet);
-    (this as Mutable<typeof this>).inlet = null;
-  };
-
   Property.prototype.attachOutlet = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): void {
-    let outlets = this.outlets as Property<unknown, T>[] | null;
+    let outlets = this.outlets as Set<Property<unknown, T>> | null;
     if (outlets === null) {
-      outlets = [];
+      outlets = new Set<Property<unknown, T>>();
       (this as Mutable<typeof this>).outlets = outlets;
     }
-    outlets.push(outlet);
+    outlets.add(outlet);
   };
 
   Property.prototype.detachOutlet = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): void {
-    const outlets = this.outlets as Property<unknown, T>[] | null;
+    const outlets = this.outlets as Set<Property<unknown, T>> | null;
     if (outlets === null) {
       return;
     }
-    const index = outlets.indexOf(outlet);
-    if (index < 0) {
-      return;
-    }
-    outlets.splice(index, 1);
+    outlets.delete(outlet);
   };
 
   Property.prototype.getOutletValue = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): T {
@@ -314,8 +300,11 @@ export const Property = (function (_super: typeof Fastener) {
 
   Property.prototype.decohereOutlets = function (this: Property): void {
     const outlets = this.outlets;
-    for (let i = 0, n = outlets !== null ? outlets.length : 0; i < n; i += 1) {
-      this.decohereOutlet(outlets![i]!);
+    if (outlets === null) {
+      return;
+    }
+    for (const outlet of outlets) {
+      this.decohereOutlet(outlet);
     }
   };
 
@@ -329,11 +318,8 @@ export const Property = (function (_super: typeof Fastener) {
   };
 
   Property.prototype.recohere = function (this: Property, t: number): void {
-    if ((this.flags & Fastener.DerivedFlag) === 0) {
-      return;
-    }
-    const inlet = this.inlet;
-    if (inlet === null) {
+    let inlet: Property | null;
+    if ((this.flags & Fastener.DerivedFlag) === 0 || (inlet = this.inlet) === null) {
       return;
     }
     const inletValue = this.transformInletValue(inlet.getOutletValue(this));
@@ -366,12 +352,6 @@ export const Property = (function (_super: typeof Fastener) {
       Object.setPrototypeOf(property, this.prototype);
     }
     property = _super.construct.call(this, property, owner) as P;
-    Object.defineProperty(property, "inlet", { // override getter
-      value: null,
-      writable: true,
-      enumerable: true,
-      configurable: true,
-    });
     (property as Mutable<typeof property>).outlets = null;
     (property as Mutable<typeof property>).value = property.initValue();
     return property;

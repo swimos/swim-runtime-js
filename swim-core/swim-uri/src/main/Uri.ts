@@ -17,13 +17,18 @@ import type {Mutable} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
 import {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import {Format} from "@swim/codec";
 import {Base16} from "@swim/codec";
-import type {Form} from "@swim/structure";
-import {UriException} from "./UriException";
+import {Unicode} from "@swim/codec";
+import type {Item} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Form} from "@swim/structure";
 import type {AnyUriScheme} from "./UriScheme";
 import {UriScheme} from "./"; // forward import
 import type {AnyUriAuthority} from "./UriAuthority";
@@ -43,8 +48,11 @@ import {UriQuery} from "./"; // forward import
 import {UriQueryBuilder} from "./"; // forward import
 import type {AnyUriFragment} from "./UriFragment";
 import {UriFragment} from "./"; // forward import
-import {UriForm} from "./"; // forward import
-import {UriParser} from "./"; // forward import
+import {UriSchemeParser} from "./"; // forward import
+import {UriAuthorityParser} from "./"; // forward import
+import {UriPathParser} from "./"; // forward import
+import {UriQueryParser} from "./"; // forward import
+import {UriFragmentParser} from "./"; // forward import
 
 /** @public */
 export type AnyUri = Uri | UriInit | string;
@@ -86,11 +94,10 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   withScheme(scheme: AnyUriScheme): Uri {
     scheme = UriScheme.fromAny(scheme);
-    if (scheme !== this.scheme) {
-      return this.copy(scheme, this.authority, this.path, this.query, this.fragment);
-    } else {
+    if (scheme === this.scheme) {
       return this;
     }
+    return this.copy(scheme, this.authority, this.path, this.query, this.fragment);
   }
 
   get schemePart(): string {
@@ -113,11 +120,10 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   withAuthority(authority: AnyUriAuthority): Uri {
     authority = UriAuthority.fromAny(authority);
-    if (authority !== this.authority) {
-      return this.copy(this.scheme, authority as UriAuthority, this.path, this.query, this.fragment);
-    } else {
+    if (authority === this.authority) {
       return this;
     }
+    return this.copy(this.scheme, authority as UriAuthority, this.path, this.query, this.fragment);
   }
 
   get authorityPart(): string {
@@ -151,9 +157,10 @@ export class Uri implements HashCode, Compare, Debug, Display {
   withUsername(username: string | undefined, password?: string): Uri {
     if (arguments.length === 1) {
       return this.withAuthority(this.authority.withUsername(username));
-    } else {
+    } else if (arguments.length === 2) {
       return this.withAuthority(this.authority.withUsername(username, password));
     }
+    throw new Error(arguments.toString());
   }
 
   get password(): string | undefined {
@@ -236,11 +243,10 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   withPath(...components: AnyUriPath[]): Uri {
     const path = UriPath.of(...components);
-    if (path !== this.path) {
-      return this.copy(this.scheme, this.authority, path, this.query, this.fragment);
-    } else {
+    if (path === this.path) {
       return this;
     }
+    return this.copy(this.scheme, this.authority, path, this.query, this.fragment);
   }
 
   get pathPart(): string {
@@ -303,11 +309,10 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   withQuery(query: AnyUriQuery): Uri {
     query = UriQuery.fromAny(query);
-    if (query !== this.query) {
-      return this.copy(this.scheme, this.authority, this.path, query, this.fragment);
-    } else {
+    if (query === this.query) {
       return this;
     }
+    return this.copy(this.scheme, this.authority, this.path, query, this.fragment);
   }
 
   get queryPart(): string {
@@ -342,11 +347,10 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   withFragment(fragment: AnyUriFragment): Uri {
     fragment = UriFragment.fromAny(fragment);
-    if (fragment !== this.fragment) {
-      return Uri.create(this.scheme, this.authority, this.path, this.query, fragment);
-    } else {
+    if (fragment === this.fragment) {
       return this;
     }
+    return Uri.create(this.scheme, this.authority, this.path, this.query, fragment);
   }
 
   get fragmentPart(): string {
@@ -366,11 +370,10 @@ export class Uri implements HashCode, Compare, Debug, Display {
   }
 
   endpoint(): Uri {
-    if (this.path.isDefined() || this.query.isDefined() || this.fragment.isDefined()) {
-      return Uri.create(this.scheme, this.authority);
-    } else {
+    if (!this.path.isDefined() && !this.query.isDefined() && !this.fragment.isDefined()) {
       return this;
     }
+    return Uri.create(this.scheme, this.authority);
   }
 
   resolve(relative: AnyUri): Uri {
@@ -399,13 +402,12 @@ export class Uri implements HashCode, Compare, Debug, Display {
                        that.path.removeDotSegments(),
                        that.query,
                        that.fragment);
-    } else {
-      return this.copy(this.scheme,
-                       this.authority,
-                       this.merge(that.path).removeDotSegments(),
-                       that.query,
-                       that.fragment);
     }
+    return this.copy(this.scheme,
+                     this.authority,
+                     this.merge(that.path).removeDotSegments(),
+                     that.query,
+                     that.fragment);
   }
 
   /** @internal */
@@ -414,22 +416,20 @@ export class Uri implements HashCode, Compare, Debug, Display {
       return relative.prependedSlash();
     } else if (this.path.isEmpty()) {
       return relative;
-    } else {
-      return this.path.merge(relative);
     }
+    return this.path.merge(relative);
   }
 
   unresolve(absolute: AnyUri): Uri {
     const that = Uri.fromAny(absolute);
     if (!this.scheme.equals(that.scheme) || !this.authority.equals(that.authority)) {
       return that;
-    } else {
-      return Uri.create(UriScheme.undefined(),
-                        UriAuthority.undefined(),
-                        this.path.unmerge(that.path),
-                        that.query,
-                        that.fragment);
     }
+    return Uri.create(UriScheme.undefined(),
+                      UriAuthority.undefined(),
+                      this.path.unmerge(that.path),
+                      that.query,
+                      that.fragment);
   }
 
   protected copy(scheme: UriScheme, authority: UriAuthority, path: UriPath,
@@ -523,10 +523,15 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return stringValue;
   }
 
-  @Lazy
+  /** @internal */
+  static Empty: Uri | null = null;
+
   static empty(): Uri {
-    return new Uri(UriScheme.undefined(), UriAuthority.undefined(), UriPath.empty(),
-                   UriQuery.undefined(), UriFragment.undefined());
+    if (this.Empty === null) {
+      this.Empty = new Uri(UriScheme.undefined(), UriAuthority.undefined(), UriPath.empty(),
+                           UriQuery.undefined(), UriFragment.undefined());
+    }
+    return this.Empty;
   }
 
   static create(scheme: UriScheme = UriScheme.undefined(),
@@ -534,12 +539,11 @@ export class Uri implements HashCode, Compare, Debug, Display {
                 path: UriPath = UriPath.empty(),
                 query: UriQuery = UriQuery.undefined(),
                 fragment: UriFragment = UriFragment.undefined()): Uri {
-    if (scheme.isDefined() || authority.isDefined() || path.isDefined() ||
-        query.isDefined() || fragment.isDefined()) {
-      return new Uri(scheme, authority, path, query, fragment);
-    } else {
+    if (!scheme.isDefined() && !authority.isDefined() && !path.isDefined()
+        && !query.isDefined() && !fragment.isDefined()) {
       return Uri.empty();
     }
+    return new Uri(scheme, authority, path, query, fragment);
   }
 
   static fromInit(init: UriInit): Uri {
@@ -563,12 +567,11 @@ export class Uri implements HashCode, Compare, Debug, Display {
     if (fragment === void 0 || fragment === null) {
       fragment = UriFragment.undefined();
     }
-    if (scheme.isDefined() || authority.isDefined() || path.isDefined() ||
-        query.isDefined() || fragment.isDefined()) {
-      return new Uri(scheme, authority, path, query, fragment);
-    } else {
+    if (!scheme.isDefined() && !authority.isDefined() && !path.isDefined()
+        && !query.isDefined() && !fragment.isDefined()) {
       return Uri.empty();
     }
+    return new Uri(scheme, authority, path, query, fragment);
   }
 
   static fromAny(value: AnyUri): Uri;
@@ -581,9 +584,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
       return Uri.fromInit(value);
     } else if (typeof value === "string") {
       return Uri.parse(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
   static scheme(scheme: AnyUriScheme): Uri {
@@ -706,13 +708,50 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(void 0, void 0, void 0, void 0, fragment);
   }
 
-  @Lazy
-  static get standardParser(): UriParser {
-    return new UriParser();
-  }
+  /** @internal */
+  static readonly parseCache: Map<string, Uri> = new Map<string, Uri>();
+  /** @internal */
+  static readonly parseCacheCapacity: number = 256;
 
-  static parse(string: string): Uri {
-    return Uri.standardParser.parseAbsoluteString(string);
+  static parse(input: Input): Parser<Uri>;
+  static parse(string: string): Uri;
+  static parse(string: Input | string): Parser<Uri> | Uri {
+    const parseCache = this.parseCache;
+    let uri: Uri | undefined;
+    if (typeof string === "string") {
+      uri = parseCache.get(string);
+      if (uri !== void 0) {
+        parseCache.delete(string);
+      }
+    }
+
+    let parser: Parser<Uri>;
+    if (uri === void 0) {
+      const input = typeof string === "string" ? Unicode.stringInput(string) : string;
+      parser = UriParser.parse(input);
+      if (typeof string === "string" && input.isCont() && !parser.isError()) {
+        parser = Parser.error(Diagnostic.unexpected(input));
+      }
+    }
+
+    if (typeof string === "string") {
+      if (uri === void 0) {
+        uri = parser!.bind();
+      }
+      parseCache.set(string, uri);
+      const capacity = Uri.parseCacheCapacity;
+      let size = parseCache.size;
+      if (size > capacity) {
+        const keys = parseCache.keys();
+        let next: IteratorResult<string>;
+        while (size > capacity && (next = keys.next()).done !== true) {
+          parseCache.delete(next.value);
+          size -= 1;
+        }
+      }
+      return uri;
+    }
+    return parser!;
   }
 
   static pathBuilder(): UriPathBuilder {
@@ -820,27 +859,28 @@ export class Uri implements HashCode, Compare, Debug, Display {
   static toLowerCase(c: number): number {
     if (c >= 65/*'A'*/ && c <= 90/*'Z'*/) {
       return c + (97/*'a'*/ - 65/*'A'*/);
-    } else {
-      return c;
     }
+    return c;
   }
 
   /** @internal */
   static writeScheme<T>(output: Output<T>, scheme: string): Output<T> {
-    for (let i = 0, n = scheme.length; i < n; i += 1) {
+    if (scheme.length === 0 || !Uri.isAlpha(scheme.charCodeAt(0))) {
+      return Output.error(new Error("Invalid scheme: " + scheme));
+    }
+    for (let i = 0; i < scheme.length; i += 1) {
       const c = scheme.charCodeAt(i);
-      if (i > 0 && Uri.isSchemeChar(c) || i === 0 && Uri.isAlpha(c)) {
-        output = output.write(c);
-      } else {
-        output = Output.error(new UriException("Invalid scheme: " + scheme));
+      if (!Uri.isSchemeChar(c)) {
+        return Output.error(new Error("Invalid scheme: " + scheme));
       }
+      output = output.write(c);
     }
     return output;
   }
 
   /** @internal */
   static writeUserInfo<T>(output: Output<T>, userInfo: string): Output<T> {
-    for (let i = 0, n = userInfo.length; i < n; i += 1) {
+    for (let i = 0; i < userInfo.length; i += 1) {
       const c = userInfo.charCodeAt(i);
       if (Uri.isUserInfoChar(c)) {
         output = output.write(c);
@@ -853,7 +893,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   /** @internal */
   static writeUser<T>(output: Output<T>, user: string): Output<T> {
-    for (let i = 0, n = user.length; i < n; i += 1) {
+    for (let i = 0; i < user.length; i += 1) {
       const c = user.charCodeAt(i);
       if (Uri.isUserChar(c)) {
         output = output.write(c);
@@ -866,7 +906,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   /** @internal */
   static writeHost<T>(output: Output<T>, address: string): Output<T> {
-    for (let i = 0, n = address.length; i < n; i += 1) {
+    for (let i = 0; i < address.length; i += 1) {
       const c = address.charCodeAt(i);
       if (Uri.isHostChar(c)) {
         output = output.write(c);
@@ -879,7 +919,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   /** @internal */
   static writeHostLiteral<T>(output: Output<T>, address: string): Output<T> {
-    for (let i = 0, n = address.length; i < n; i += 1) {
+    for (let i = 0; i < address.length; i += 1) {
       const c = address.charCodeAt(i);
       if (Uri.isHostChar(c) || c === 58/*':'*/) {
         output = output.write(c);
@@ -892,7 +932,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   /** @internal */
   static writePathSegment<T>(output: Output<T>, segment: string): Output<T> {
-    for (let i = 0, n = segment.length; i < n; i += 1) {
+    for (let i = 0; i < segment.length; i += 1) {
       const c = segment.charCodeAt(i);
       if (Uri.isPathChar(c)) {
         output = output.write(c);
@@ -905,7 +945,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   /** @internal */
   static writeQuery<T>(output: Output<T>, query: string): Output<T> {
-    for (let i = 0, n = query.length; i < n; i += 1) {
+    for (let i = 0; i < query.length; i += 1) {
       const c = query.charCodeAt(i);
       if (Uri.isQueryChar(c)) {
         output = output.write(c);
@@ -918,7 +958,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   /** @internal */
   static writeParam<T>(output: Output<T>, param: string): Output<T> {
-    for (let i = 0, n = param.length; i < n; i += 1) {
+    for (let i = 0; i < param.length; i += 1) {
       const c = param.charCodeAt(i);
       if (Uri.isParamChar(c)) {
         output = output.write(c);
@@ -931,7 +971,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   /** @internal */
   static writeFragment<T>(output: Output<T>, fragment: string): Output<T> {
-    for (let i = 0, n = fragment.length; i < n; i += 1) {
+    for (let i = 0; i < fragment.length; i += 1) {
       const c = fragment.charCodeAt(i);
       if (Uri.isFragmentChar(c)) {
         output = output.write(c);
@@ -976,5 +1016,234 @@ export class Uri implements HashCode, Compare, Debug, Display {
                    .write(base16.encodeDigit(c >>> 4 & 0xF))
                    .write(base16.encodeDigit(c       & 0xF));
     return output;
+  }
+}
+
+/** @internal */
+export class UriForm extends Form<Uri, AnyUri> {
+  constructor(unit: Uri | undefined) {
+    super();
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
+  }
+
+  override readonly unit!: Uri | undefined;
+
+  override withUnit(unit: Uri | undefined): Form<Uri, AnyUri> {
+    if (unit !== this.unit) {
+      return new UriForm(unit);
+    } else {
+      return this;
+    }
+  }
+
+  override mold(object: AnyUri, item?: Item): Item {
+    object = Uri.fromAny(object);
+    if (item === void 0) {
+      return Text.from(object.toString());
+    } else {
+      return item.concat(Text.from(object.toString()));
+    }
+  }
+
+  override cast(item: Item, object?: Uri): Uri | undefined {
+    const value = item.target;
+    try {
+      const string = value.stringValue();
+      if (typeof string === "string") {
+        return Uri.parse(string);
+      }
+    } catch (error) {
+      // swallow
+    }
+    return void 0;
+  }
+}
+
+/** @internal */
+export class UriParser extends Parser<Uri> {
+  private readonly schemeParser: Parser<UriScheme> | undefined;
+  private readonly authorityParser: Parser<UriAuthority> | undefined;
+  private readonly pathParser: Parser<UriPath> | undefined;
+  private readonly queryParser: Parser<UriQuery> | undefined;
+  private readonly fragmentParser: Parser<UriFragment> | undefined;
+  private readonly step: number | undefined;
+
+  constructor(schemeParser?: Parser<UriScheme>, authorityParser?: Parser<UriAuthority>,
+              pathParser?: Parser<UriPath>, queryParser?: Parser<UriQuery>,
+              fragmentParser?: Parser<UriFragment>, step?: number) {
+    super();
+    this.schemeParser = schemeParser;
+    this.authorityParser = authorityParser;
+    this.pathParser = pathParser;
+    this.queryParser = queryParser;
+    this.fragmentParser = fragmentParser;
+    this.step = step;
+  }
+
+  override feed(input: Input): Parser<Uri> {
+    return UriParser.parse(input, this.schemeParser, this.authorityParser, this.pathParser,
+                           this.queryParser, this.fragmentParser, this.step);
+  }
+
+  static parse(input: Input, schemeParser?: Parser<UriScheme>, authorityParser?: Parser<UriAuthority>,
+               pathParser?: Parser<UriPath>, queryParser?: Parser<UriQuery>,
+               fragmentParser?: Parser<UriFragment>, step: number = 1): Parser<Uri> {
+    let c = 0;
+    if (step === 1) {
+      if (input.isCont()) {
+        const look = input.clone();
+        while (look.isCont() && (c = look.head(), Uri.isSchemeChar(c))) {
+          look.step();
+        }
+        if (look.isCont() && c === 58/*':'*/) {
+          step = 2;
+        } else {
+          step = 3;
+        }
+      } else if (input.isDone()) {
+        step = 3;
+      }
+    }
+    if (step === 2) {
+      if (schemeParser === void 0) {
+        schemeParser = UriSchemeParser.parse(input);
+      } else {
+        schemeParser = schemeParser.feed(input);
+      }
+      if (schemeParser.isDone()) {
+        if (input.isCont() && input.head() === 58/*':'*/) {
+          input = input.step();
+          step = 3;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected(58/*':'*/, input));
+        }
+      } else if (schemeParser.isError()) {
+        return schemeParser.asError();
+      }
+    }
+    if (step === 3) {
+      if (input.isCont()) {
+        c = input.head();
+        if (c === 47/*'/'*/) {
+          input = input.step();
+          step = 4;
+        } else if (c === 63/*'?'*/) {
+          input = input.step();
+          step = 7;
+        } else if (c === 35/*'#'*/) {
+          input = input.step();
+          step = 8;
+        } else {
+          step = 6;
+        }
+      } else if (input.isDone()) {
+        return Parser.done(Uri.create(schemeParser !== void 0 ? schemeParser.bind() : void 0,
+                                      void 0, void 0, void 0, void 0));
+      }
+    }
+    if (step === 4) {
+      if (input.isCont() && input.head() === 47/*'/'*/) {
+        input = input.step();
+        step = 5;
+      } else if (input.isCont()) {
+        const pathBuilder = new UriPathBuilder();
+        pathBuilder.addSlash();
+        pathParser = UriPathParser.parse(input, pathBuilder);
+        step = 6;
+      } else if (input.isDone()) {
+        return Parser.done(Uri.create(schemeParser !== void 0 ? schemeParser.bind() : void 0,
+                                      void 0, UriPath.slash(), void 0, void 0));
+      }
+    }
+    if (step === 5) {
+      if (authorityParser === void 0) {
+        authorityParser = UriAuthorityParser.parse(input);
+      } else {
+        authorityParser = authorityParser.feed(input);
+      }
+      if (authorityParser.isDone()) {
+        if (input.isCont()) {
+          c = input.head();
+          if (c === 63/*'?'*/) {
+            input = input.step();
+            step = 7;
+          } else if (c === 35/*'#'*/) {
+            input = input.step();
+            step = 8;
+          } else {
+            step = 6;
+          }
+        } else if (input.isDone()) {
+          return Parser.done(Uri.create(schemeParser !== void 0 ? schemeParser.bind() : void 0,
+                                        authorityParser !== void 0 ? authorityParser.bind() : void 0,
+                                        void 0, void 0, void 0));
+        }
+      } else if (authorityParser.isError()) {
+        return authorityParser.asError();
+      }
+    }
+    if (step === 6) {
+      if (pathParser === void 0) {
+        pathParser = UriPathParser.parse(input);
+      } else {
+        pathParser = pathParser.feed(input);
+      }
+      if (pathParser.isDone()) {
+        if (input.isCont() && input.head() === 63/*'?'*/) {
+          input = input.step();
+          step = 7;
+        } else if (input.isCont() && input.head() === 35/*'#'*/) {
+          input = input.step();
+          step = 8;
+        } else if (!input.isEmpty()) {
+          return Parser.done(Uri.create(schemeParser !== void 0 ? schemeParser.bind() : void 0,
+                                        authorityParser !== void 0 ? authorityParser.bind() : void 0,
+                                        pathParser.bind(), void 0, void 0));
+        }
+      } else if (pathParser.isError()) {
+        return pathParser.asError();
+      }
+    }
+    if (step === 7) {
+      if (queryParser === void 0) {
+        queryParser = UriQueryParser.parse(input);
+      } else {
+        queryParser = queryParser.feed(input);
+      }
+      if (queryParser.isDone()) {
+        if (input.isCont() && input.head() === 35/*'#'*/) {
+          input = input.step();
+          step = 8;
+        } else if (!input.isEmpty()) {
+          return Parser.done(Uri.create(schemeParser !== void 0 ? schemeParser.bind() : void 0,
+                                        authorityParser !== void 0 ? authorityParser.bind() : void 0,
+                                        pathParser !== void 0 ? pathParser.bind() : void 0,
+                                        queryParser.bind(), void 0));
+        }
+      } else if (queryParser.isError()) {
+        return queryParser.asError();
+      }
+    }
+    if (step === 8) {
+      if (fragmentParser === void 0) {
+        fragmentParser = UriFragmentParser.parse(input);
+      } else {
+        fragmentParser = fragmentParser.feed(input);
+      }
+      if (fragmentParser.isDone()) {
+        return Parser.done(Uri.create(schemeParser !== void 0 ? schemeParser.bind() : void 0,
+                                      authorityParser !== void 0 ? authorityParser.bind() : void 0,
+                                      pathParser !== void 0 ? pathParser.bind() : void 0,
+                                      queryParser !== void 0 ? queryParser.bind() : void 0,
+                                      fragmentParser.bind()));
+      } else if (fragmentParser.isError()) {
+        return fragmentParser.asError();
+      }
+    }
+    return new UriParser(schemeParser, authorityParser, pathParser,
+                         queryParser, fragmentParser, step);
   }
 }

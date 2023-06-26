@@ -155,16 +155,6 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
     configurable: true,
   });
 
-  ComponentRelation.prototype.onBindInlet = function <C extends Component>(this: ComponentRelation<unknown, C>, inlet: ComponentRelation<unknown, C>): void {
-    (this as Mutable<typeof this>).inlet = inlet;
-    _super.prototype.onBindInlet.call(this, inlet);
-  };
-
-  ComponentRelation.prototype.onUnbindInlet = function <C extends Component>(this: ComponentRelation<unknown, C>, inlet: ComponentRelation<unknown, C>): void {
-    _super.prototype.onUnbindInlet.call(this, inlet);
-    (this as Mutable<typeof this>).inlet = null;
-  };
-
   ComponentRelation.prototype.attachOutlet = function <C extends Component>(this: ComponentRelation<unknown, C>, outlet: ComponentRelation<unknown, C>): void {
     let outlets = this.outlets as ComponentRelation<unknown, C>[] | null;
     if (outlets === null) {
@@ -276,12 +266,6 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
 
   ComponentRelation.construct = function <F extends ComponentRelation<any, any>>(fastener: F | null, owner: F extends ComponentRelation<infer O, any> ? O : never): F {
     fastener = _super.construct.call(this, fastener, owner) as F;
-    Object.defineProperty(fastener, "inlet", { // override getter
-      value: null,
-      writable: true,
-      enumerable: true,
-      configurable: true,
-    });
     (fastener as Mutable<typeof fastener>).outlets = null;
     return fastener;
   };

@@ -287,10 +287,15 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
   };
 
   ComponentSet.prototype.setComponents = function <C extends Component>(this: ComponentSet, newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
+    const binds = this.binds;
+    const parent = binds ? this.parentComponent : null;
     const components = this.components;
     for (const componentId in components) {
       if (newComponents[componentId] === void 0) {
-        this.detachComponent(components[componentId]!);
+        const oldComponent = this.detachComponent(components[componentId]!);
+        if (oldComponent !== null && binds && parent !== null && oldComponent.parent === parent) {
+          oldComponent.remove();
+        }
       }
     }
     if ((this.flags & ComponentSet.OrderedFlag) !== 0) {
@@ -302,13 +307,13 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
         const newComponent = orderedComponents[i]!;
         if (components[newComponent.uid] === void 0) {
           const targetComponent = i < n + 1 ? orderedComponents[i + 1] : target;
-          this.attachComponent(newComponent, targetComponent);
+          this.addComponent(newComponent, targetComponent);
         }
       }
     } else {
       for (const componentId in newComponents) {
         if (components[componentId] === void 0) {
-          this.attachComponent(newComponents[componentId]!, target);
+          this.addComponent(newComponents[componentId]!, target);
         }
       }
     }
@@ -513,12 +518,11 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
   };
 
   ComponentSet.prototype.recohere = function (this: ComponentSet, t: number): void {
-    if ((this.flags & Fastener.DerivedFlag) !== 0) {
-      const inlet = this.inlet;
-      if (inlet !== null) {
-        this.setComponents(inlet.components);
-      }
+    let inlet: ComponentSet | null;
+    if ((this.flags & Fastener.DerivedFlag) === 0 || (inlet = this.inlet) === null) {
+      return;
     }
+    this.setComponents(inlet.components);
   };
 
   ComponentSet.prototype.componentKey = function <C extends Component>(this: ComponentSet<unknown, C>, component: C): string | undefined {

@@ -86,12 +86,6 @@ export interface ListDownlink<O = unknown, V = Value, VU = V extends Value ? Any
   setValueForm(valueForm: Form<V, VU>): this;
 
   /** @internal */
-  readonly value?: V; // for type destructuring
-
-  /** @internal */
-  readonly valueInit?: VU; // for type destructuring
-
-  /** @internal */
   readonly stateInit?: STree<Value, Value> | null; // optional prototype property
 
   /** @internal */
@@ -252,11 +246,10 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
 
   ListDownlink.prototype.setState = function (this: ListDownlink, state: STree<Value, Value>): void {
     const model = this.model;
-    if (model !== null) {
-      model.setState(state);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.setState(state);
   };
 
   Object.defineProperty(ListDownlink.prototype, "size", {
@@ -269,219 +262,197 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
 
   ListDownlink.prototype.isEmpty = function (this: ListDownlink): boolean {
     const model = this.model;
-    if (model !== null) {
-      return model.isEmpty();
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    return model.isEmpty();
   };
 
   ListDownlink.prototype.get = function <V>(this: ListDownlink<unknown, V>, index: number, id?: Value): V {
     const model = this.model;
-    if (model !== null) {
-      const value = model.get(index, id);
-      return value.coerce(this.valueForm);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const value = model.get(index, id);
+    return value.coerce(this.valueForm);
   };
 
   ListDownlink.prototype.getEntry = function <V>(this: ListDownlink<unknown, V>, index: number, id?: Value): [V, Value] | undefined {
     const model = this.model;
-    if (model !== null) {
-      const entry = model.getEntry(index, id);
-      if (entry !== void 0) {
-        return [entry[0].coerce(this.valueForm), entry[1]];
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const entry = model.getEntry(index, id);
+    if (entry === void 0) {
+      return void 0;
+    }
+    return [entry[0].coerce(this.valueForm), entry[1]];
   };
 
   ListDownlink.prototype.set = function <V, VU>(this: ListDownlink<unknown, V, VU>, index: number, newObject: V | VU, id?: Value): ListDownlink<unknown, V, VU> {
     const model = this.model;
-    if (model !== null) {
-      const newValue = this.valueForm.mold(newObject);
-      model.set(index, newValue, id);
-      return this;
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const newValue = this.valueForm.mold(newObject);
+    model.set(index, newValue, id);
+    return this;
   };
 
   ListDownlink.prototype.insert = function <V, VU>(this: ListDownlink<unknown, V, VU>, index: number, newObject: V | VU, id?: Value): ListDownlink<unknown, V, VU> {
     const model = this.model;
-    if (model !== null) {
-      const newValue = this.valueForm.mold(newObject);
-      model.insert(index, newValue, id);
-      return this;
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const newValue = this.valueForm.mold(newObject);
+    model.insert(index, newValue, id);
+    return this;
   };
 
   ListDownlink.prototype.remove = function <V>(this: ListDownlink<unknown, V>, index: number, id?: Value): ListDownlink<unknown, V> {
     const model = this.model;
-    if (model !== null) {
-      model.remove(index, id);
-      return this;
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.remove(index, id);
+    return this;
   };
 
   ListDownlink.prototype.push = function <V, VU>(this: ListDownlink<unknown, V, VU>, ...newObjects: (V | VU)[]): number {
     const model = this.model;
-    if (model !== null) {
-      const valueForm = this.valueForm;
-      const newValues = new Array(newObjects.length);
-      for (let i = 0; i < newObjects.length; i += 1) {
-        newValues[i] = valueForm.mold(newObjects[i]!);
-      }
-      return model.push(...newValues);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const valueForm = this.valueForm;
+    const newValues = new Array(newObjects.length);
+    for (let i = 0; i < newObjects.length; i += 1) {
+      newValues[i] = valueForm.mold(newObjects[i]!);
+    }
+    return model.push(...newValues);
   };
 
   ListDownlink.prototype.pop = function <V>(this: ListDownlink<unknown, V>): V {
     const model = this.model;
-    if (model !== null) {
-      const value = model.pop();
-      return value.coerce(this.valueForm);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const value = model.pop();
+    return value.coerce(this.valueForm);
   };
 
   ListDownlink.prototype.unshift = function <V, VU>(this: ListDownlink<unknown, V, VU>, ...newObjects: (V | VU)[]): number {
     const model = this.model;
-    if (model !== null) {
-      const valueForm = this.valueForm;
-      const newValues = new Array(newObjects.length);
-      for (let i = 0; i < newObjects.length; i += 1) {
-        newValues[i] = valueForm.mold(newObjects[i]!);
-      }
-      return model.unshift(...newValues);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const valueForm = this.valueForm;
+    const newValues = new Array(newObjects.length);
+    for (let i = 0; i < newObjects.length; i += 1) {
+      newValues[i] = valueForm.mold(newObjects[i]!);
+    }
+    return model.unshift(...newValues);
   };
 
   ListDownlink.prototype.shift = function <V>(this: ListDownlink<unknown, V>): V {
     const model = this.model;
-    if (model !== null) {
-      const value = model.shift();
-      return value.coerce(this.valueForm);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const value = model.shift();
+    return value.coerce(this.valueForm);
   };
 
   ListDownlink.prototype.move = function <V>(this: ListDownlink<unknown, V>, fromIndex: number, toIndex: number, id?: Value): ListDownlink<unknown, V> {
     const model = this.model;
-    if (model !== null) {
-      model.move(fromIndex, toIndex, id);
-      return this;
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.move(fromIndex, toIndex, id);
+    return this;
   };
 
   ListDownlink.prototype.splice = function <V, VU>(this: ListDownlink<unknown, V, VU>, start: number, deleteCount?: number, ...newObjects: (V | VU)[]): V[] {
     const model = this.model;
-    if (model !== null) {
-      const valueForm = this.valueForm;
-      const newValues = new Array(newObjects.length);
-      for (let i = 0; i < newObjects.length; i += 1) {
-        newValues[i] = valueForm.mold(newObjects[i]!);
-      }
-      const oldValues = this.model!.splice(start, deleteCount, ...newValues);
-      const oldObjects = new Array(oldValues.length);
-      for (let i = 0; i < oldValues.length; i += 1) {
-        oldObjects[i] = oldValues[i]!.coerce(valueForm);
-      }
-      return oldObjects;
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const valueForm = this.valueForm;
+    const newValues = new Array(newObjects.length);
+    for (let i = 0; i < newObjects.length; i += 1) {
+      newValues[i] = valueForm.mold(newObjects[i]!);
+    }
+    const oldValues = this.model!.splice(start, deleteCount, ...newValues);
+    const oldObjects = new Array(oldValues.length);
+    for (let i = 0; i < oldValues.length; i += 1) {
+      oldObjects[i] = oldValues[i]!.coerce(valueForm);
+    }
+    return oldObjects;
   };
 
   ListDownlink.prototype.clear = function (this: ListDownlink): void {
     const model = this.model;
-    if (model !== null) {
-      model.clear();
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.clear();
   };
 
   ListDownlink.prototype.forEach = function <V, T, S>(this: ListDownlink<unknown, V>,
                                                       callback: (this: S | undefined, value: V, index: number, id: Value) => T | void,
                                                       thisArg?: S): T | undefined {
     const model = this.model;
-    if (model !== null) {
-      const valueForm = this.valueForm;
-      if (valueForm as unknown === Form.forValue()) {
-        return model.state.forEach(callback as any, thisArg);
-      } else {
-        return model.state.forEach(function (value: Value, index: number, id: Value): T | void {
-          const object = value.coerce(valueForm);
-          return callback.call(thisArg, object, index, id);
-        }, this);
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const valueForm = this.valueForm;
+    if (valueForm as unknown === Form.forValue()) {
+      return model.state.forEach(callback as any, thisArg);
+    }
+    return model.state.forEach(function (value: Value, index: number, id: Value): T | void {
+      const object = value.coerce(valueForm);
+      return callback.call(thisArg, object, index, id);
+    }, this);
   };
 
   ListDownlink.prototype.values = function <V>(this: ListDownlink<unknown, V>): Cursor<V> {
     const model = this.model;
-    if (model !== null) {
-      const cursor = model.values();
-      const valueForm = this.valueForm;
-      if (valueForm as unknown === Form.forValue()) {
-        return cursor as unknown as Cursor<V>;
-      } else {
-        return new ValueCursor(cursor, valueForm);
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const cursor = model.values();
+    const valueForm = this.valueForm;
+    if (valueForm as unknown === Form.forValue()) {
+      return cursor as unknown as Cursor<V>;
+    }
+    return new ValueCursor(cursor, valueForm);
   };
 
   ListDownlink.prototype.keys = function <V>(this: ListDownlink<unknown, V>): Cursor<Value> {
     const model = this.model;
-    if (model !== null) {
-      return model.keys();
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    return model.keys();
   };
 
   ListDownlink.prototype.entries = function <V>(this: ListDownlink<unknown, V>): Cursor<[Value, V]> {
     const model = this.model;
-    if (model !== null) {
-      const cursor = model.entries();
-      if (this.valueForm as unknown === Form.forValue()) {
-        return cursor as unknown as Cursor<[Value, V]>;
-      } else {
-        return new ValueEntryCursor(cursor, Form.forValue(), this.valueForm);
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const cursor = model.entries();
+    if (this.valueForm as unknown === Form.forValue()) {
+      return cursor as unknown as Cursor<[Value, V]>;
+    }
+    return new ValueEntryCursor(cursor, Form.forValue(), this.valueForm);
   };
 
   ListDownlink.prototype.snapshot = function <V>(this: ListDownlink<unknown, V>): STree<Value, Value> {
     const model = this.model;
-    if (model !== null) {
-      return model.snapshot();
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    return model.snapshot();
   };
 
   ListDownlink.prototype.listWillUpdate = function <V>(this: ListDownlink<unknown, V>, index: number, newValue: Value): Value {
@@ -498,19 +469,18 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (newObject === void 0) {
         newObject = newValue.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.willUpdate !== void 0) {
-          const newResult = observer.willUpdate(index, newObject, this);
-          if (newResult !== void 0) {
-            newObject = newResult;
-            newValue = valueForm.mold(newObject);
-          }
+      for (const observer of observers) {
+        if (observer.willUpdate === void 0) {
+          continue;
+        }
+        const newResult = observer.willUpdate(index, newObject, this);
+        if (newResult !== void 0) {
+          newObject = newResult;
+          newValue = valueForm.mold(newObject);
         }
       }
     }
@@ -530,19 +500,18 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (newObject === void 0) {
         newObject = newValue.coerce(valueForm);
       }
       if (oldObject === void 0) {
         oldObject = oldValue.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.didUpdate !== void 0) {
-          observer.didUpdate(index, newObject, oldObject, this);
+      for (const observer of observers) {
+        if (observer.didUpdate === void 0) {
+          continue;
         }
+        observer.didUpdate(index, newObject, oldObject, this);
       }
     }
   };
@@ -557,16 +526,15 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (object === void 0) {
         object = value.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.willMove !== void 0) {
-          observer.willMove(fromIndex, toIndex, object, this);
+      for (const observer of observers) {
+        if (observer.willMove === void 0) {
+          continue;
         }
+        observer.willMove(fromIndex, toIndex, object, this);
       }
     }
   };
@@ -581,16 +549,15 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (object === void 0) {
         object = value.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.didMove !== void 0) {
-          observer.didMove(fromIndex, toIndex, object, this);
+      for (const observer of observers) {
+        if (observer.didMove === void 0) {
+          continue;
         }
+        observer.didMove(fromIndex, toIndex, object, this);
       }
     }
   };
@@ -599,14 +566,7 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     if (this.willRemove !== void 0) {
       this.willRemove(index);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willRemove !== void 0) {
-        observer.willRemove(index, this);
-      }
-    }
+    this.callObservers("willRemove", index, this);
   };
 
   ListDownlink.prototype.listDidRemove = function <V>(this: ListDownlink<unknown, V>, index: number, oldValue: Value): void {
@@ -619,16 +579,15 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (oldObject === void 0) {
         oldObject = oldValue.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.didRemove !== void 0) {
-          observer.didRemove(index, oldObject, this);
+      for (const observer of observers) {
+        if (observer.didRemove === void 0) {
+          continue;
         }
+        observer.didRemove(index, oldObject, this);
       }
     }
   };
@@ -637,146 +596,105 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     if (this.willDrop !== void 0) {
       this.willDrop(lower);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willDrop !== void 0) {
-        observer.willDrop(lower, this);
-      }
-    }
+    this.callObservers("willDrop", lower, this);
   };
 
   ListDownlink.prototype.listDidDrop = function (this: ListDownlink, lower: number): void {
     if (this.didDrop !== void 0) {
       this.didDrop(lower);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didDrop !== void 0) {
-        observer.didDrop(lower, this);
-      }
-    }
+    this.callObservers("didDrop", lower, this);
   };
 
   ListDownlink.prototype.listWillTake = function (this: ListDownlink, upper: number): void {
     if (this.willTake !== void 0) {
       this.willTake(upper);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willTake !== void 0) {
-        observer.willTake(upper, this);
-      }
-    }
+    this.callObservers("willTake", upper, this);
   };
 
   ListDownlink.prototype.listDidTake = function (this: ListDownlink, upper: number): void {
     if (this.didTake !== void 0) {
       this.didTake(upper);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didTake !== void 0) {
-        observer.didTake(upper, this);
-      }
-    }
+    this.callObservers("didTake", upper, this);
   };
 
   ListDownlink.prototype.listWillClear = function (this: ListDownlink): void {
     if (this.willClear !== void 0) {
       this.willClear();
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willClear !== void 0) {
-        observer.willClear(this);
-      }
-    }
+    this.callObservers("willClear", this);
   };
 
   ListDownlink.prototype.listDidClear = function (this: ListDownlink): void {
     if (this.didClear !== void 0) {
       this.didClear();
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didClear !== void 0) {
-        observer.didClear(this);
-      }
-    }
+    this.callObservers("didClear", this);
   };
 
   ListDownlink.prototype.didAliasModel = function (this: ListDownlink): void {
     const model = this.model;
-    if (model !== null && model.linked) {
-      this.onLinkedResponse();
-      model.state.forEach(function (value: Value, index: number) {
-        this.listDidUpdate(index, value, Value.absent());
-      }, this);
-      if (model.synced) {
-        this.onSyncedResponse();
-      }
+    if (model === null || !model.linked) {
+      return;
+    }
+    this.onLinkedResponse();
+    model.state.forEach(function (value: Value, index: number) {
+      this.listDidUpdate(index, value, Value.absent());
+    }, this);
+    if (model.synced) {
+      this.onSyncedResponse();
     }
   };
 
   ListDownlink.prototype.open = function (this: ListDownlink): ListDownlink {
-    if (this.model === null) {
-      const laneUri = this.getLaneUri();
-      if (laneUri === null) {
-        throw new Error("no laneUri");
+    if (this.model !== null) {
+      return this;
+    }
+    const laneUri = this.getLaneUri();
+    if (laneUri === null) {
+      throw new Error("no laneUri");
+    }
+    let nodeUri = this.getNodeUri();
+    if (nodeUri === null) {
+      throw new Error("no nodeUri");
+    }
+    let hostUri = this.getHostUri();
+    if (hostUri === null) {
+      hostUri = nodeUri.endpoint();
+      nodeUri = hostUri.unresolve(nodeUri);
+    }
+    let prio = this.getPrio();
+    if (prio === void 0) {
+      prio = 0;
+    }
+    let rate = this.getRate();
+    if (rate === void 0) {
+      rate = 0;
+    }
+    let body = this.getBody();
+    if (body === null) {
+      body = Value.absent();
+    }
+    const owner = this.owner;
+    if (!WarpDownlinkContext.is(owner)) {
+      throw new Error("no downlink context");
+    }
+    let model = owner.getDownlink(hostUri, nodeUri, laneUri);
+    if (model !== null) {
+      if (!(model instanceof ListDownlinkModel)) {
+        throw new Error("downlink type mismatch");
       }
-      let nodeUri = this.getNodeUri();
-      if (nodeUri === null) {
-        throw new Error("no nodeUri");
-      }
-      let hostUri = this.getHostUri();
-      if (hostUri === null) {
-        hostUri = nodeUri.endpoint();
-        nodeUri = hostUri.unresolve(nodeUri);
-      }
-      let prio = this.getPrio();
-      if (prio === void 0) {
-        prio = 0;
-      }
-      let rate = this.getRate();
-      if (rate === void 0) {
-        rate = 0;
-      }
-      let body = this.getBody();
-      if (body === null) {
-        body = Value.absent();
-      }
-      const owner = this.owner;
-      if (WarpDownlinkContext.is(owner)) {
-        let model = owner.getDownlink(hostUri, nodeUri, laneUri);
-        if (model !== null) {
-          if (!(model instanceof ListDownlinkModel)) {
-            throw new Error("downlink type mismatch");
-          }
-          model.addDownlink(this);
-          (this as Mutable<typeof this>).model = model as ListDownlinkModel;
-          setTimeout(this.didAliasModel.bind(this));
-        } else {
-          const state = this.initState();
-          model = new ListDownlinkModel(hostUri, nodeUri, laneUri, prio, rate, body, state);
-          model.addDownlink(this);
-          owner.openDownlink(model);
-          (this as Mutable<typeof this>).model = model as ListDownlinkModel;
-        }
-      } else {
-        throw new Error("no downlink context");
-      }
+      model.addDownlink(this);
+      (this as Mutable<typeof this>).model = model as ListDownlinkModel;
+      setTimeout(this.didAliasModel.bind(this));
+    } else {
+      const state = this.initState();
+      model = new ListDownlinkModel(hostUri, nodeUri, laneUri, prio, rate, body, state);
+      model.addDownlink(this);
+      owner.openDownlink(model);
+      (this as Mutable<typeof this>).model = model as ListDownlinkModel;
     }
     return this;
   };

@@ -62,12 +62,6 @@ export interface ValueDownlink<O = unknown, V = Value, VU = V extends Value ? An
   setValueForm(valueForm: Form<V, VU>): this;
 
   /** @internal */
-  readonly value?: V; // for type destructuring
-
-  /** @internal */
-  readonly valueInit?: VU; // for type destructuring
-
-  /** @internal */
   readonly stateInit?: Value | null; // optional prototype property
 
   /** @internal */
@@ -132,31 +126,28 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
 
   ValueDownlink.prototype.setState = function (this: ValueDownlink, state: Value): void {
     const model = this.model;
-    if (model !== null) {
-      model.setState(state);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.setState(state);
   };
 
   ValueDownlink.prototype.get = function <V>(this: ValueDownlink<unknown, V>): V {
     const model = this.model;
-    if (model !== null) {
-      const value = model.get();
-      return value.coerce(this.valueForm);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const value = model.get();
+    return value.coerce(this.valueForm);
   };
 
   ValueDownlink.prototype.set = function <V, VU>(this: ValueDownlink<unknown, V, VU>, object: V | VU): void {
     const model = this.model;
-    if (model !== null) {
-      const value = this.valueForm.mold(object);
-      model.set(value);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const value = this.valueForm.mold(object);
+    model.set(value);
   };
 
   ValueDownlink.prototype.valueWillSet = function <V>(this: ValueDownlink<unknown, V>, newValue: Value): Value {
@@ -173,19 +164,18 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (newObject === void 0) {
         newObject = newValue.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.willSet !== void 0) {
-          const newResult = observer.willSet(newObject, this);
-          if (newResult !== void 0) {
-            newObject = newResult;
-            newValue = valueForm.mold(newObject);
-          }
+      for (const observer of observers) {
+        if (observer.willSet === void 0) {
+          continue;
+        }
+        const newResult = observer.willSet(newObject, this);
+        if (newResult !== void 0) {
+          newObject = newResult;
+          newValue = valueForm.mold(newObject);
         }
       }
     }
@@ -205,81 +195,81 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (newObject === void 0) {
         newObject = newValue.coerce(valueForm);
       }
       if (oldObject === void 0) {
         oldObject = oldValue.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.didSet !== void 0) {
-          observer.didSet(newObject, oldObject, this);
+      for (const observer of observers) {
+        if (observer.didSet === void 0) {
+          continue;
         }
+        observer.didSet(newObject, oldObject, this);
       }
     }
   };
 
   ValueDownlink.prototype.didAliasModel = function <V>(this: ValueDownlink<unknown, V>): void {
     const model = this.model;
-    if (model !== null && model.linked) {
-      this.onLinkedResponse();
-      this.valueDidSet(model.get(), Value.absent());
-      if (model.synced) {
-        this.onSyncedResponse();
-      }
+    if (model === null || !model.linked) {
+      return;
+    }
+    this.onLinkedResponse();
+    this.valueDidSet(model.get(), Value.absent());
+    if (model.synced) {
+      this.onSyncedResponse();
     }
   };
 
   ValueDownlink.prototype.open = function (this: ValueDownlink): ValueDownlink {
-    if (this.model === null) {
-      const laneUri = this.getLaneUri();
-      if (laneUri === null) {
-        throw new Error("no laneUri");
+    if (this.model !== null) {
+      return this;
+    }
+    const laneUri = this.getLaneUri();
+    if (laneUri === null) {
+      throw new Error("no laneUri");
+    }
+    let nodeUri = this.getNodeUri();
+    if (nodeUri === null) {
+      throw new Error("no nodeUri");
+    }
+    let hostUri = this.getHostUri();
+    if (hostUri === null) {
+      hostUri = nodeUri.endpoint();
+      nodeUri = hostUri.unresolve(nodeUri);
+    }
+    let prio = this.getPrio();
+    if (prio === void 0) {
+      prio = 0;
+    }
+    let rate = this.getRate();
+    if (rate === void 0) {
+      rate = 0;
+    }
+    let body = this.getBody();
+    if (body === null) {
+      body = Value.absent();
+    }
+    const owner = this.owner;
+    if (!WarpDownlinkContext.is(owner)) {
+      throw new Error("no downlink context");
+    }
+    let model = owner.getDownlink(hostUri, nodeUri, laneUri);
+    if (model !== null) {
+      if (!(model instanceof ValueDownlinkModel)) {
+        throw new Error("downlink type mismatch");
       }
-      let nodeUri = this.getNodeUri();
-      if (nodeUri === null) {
-        throw new Error("no nodeUri");
-      }
-      let hostUri = this.getHostUri();
-      if (hostUri === null) {
-        hostUri = nodeUri.endpoint();
-        nodeUri = hostUri.unresolve(nodeUri);
-      }
-      let prio = this.getPrio();
-      if (prio === void 0) {
-        prio = 0;
-      }
-      let rate = this.getRate();
-      if (rate === void 0) {
-        rate = 0;
-      }
-      let body = this.getBody();
-      if (body === null) {
-        body = Value.absent();
-      }
-      const owner = this.owner;
-      if (WarpDownlinkContext.is(owner)) {
-        let model = owner.getDownlink(hostUri, nodeUri, laneUri);
-        if (model !== null) {
-          if (!(model instanceof ValueDownlinkModel)) {
-            throw new Error("downlink type mismatch");
-          }
-          model.addDownlink(this);
-          (this as Mutable<typeof this>).model = model as ValueDownlinkModel;
-          setTimeout(this.didAliasModel.bind(this));
-        } else {
-          const state = this.initState();
-          model = new ValueDownlinkModel(hostUri, nodeUri, laneUri, prio, rate, body, state);
-          model.addDownlink(this);
-          owner.openDownlink(model);
-          (this as Mutable<typeof this>).model = model as ValueDownlinkModel;
-        }
-      } else {
-        throw new Error("no downlink context");
-      }
+      model.addDownlink(this);
+      (this as Mutable<typeof this>).model = model as ValueDownlinkModel;
+      setTimeout(this.didAliasModel.bind(this));
+    } else {
+      const state = this.initState();
+      model = new ValueDownlinkModel(hostUri, nodeUri, laneUri, prio, rate, body, state);
+      model.addDownlink(this);
+      owner.openDownlink(model);
+      (this as Mutable<typeof this>).model = model as ValueDownlinkModel;
     }
     return this;
   };

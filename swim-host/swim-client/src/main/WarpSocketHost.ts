@@ -49,11 +49,10 @@ export class WarpSocketHost extends WarpHost {
       this.socket!.send(text);
       this.idleTimer.watch();
     } else if (envelope instanceof CommandMessage) {
-      if (this.sendBuffer.length < this.sendBufferSize.value) {
-        this.sendBuffer.push(envelope);
-      } else {
+      if (this.sendBuffer.length >= this.sendBufferSize.value) {
         throw new Error("send buffer overflow");
       }
+      this.sendBuffer.push(envelope);
       if (!this.connected && this.online.value) {
         this.connect();
       }
@@ -62,31 +61,32 @@ export class WarpSocketHost extends WarpHost {
 
   override connect(): void {
     this.reconnectTimer.cancel();
-
     let socket = this.socket;
-    if (socket === null) {
-      let hostUri = this.hostUri;
-      const schemeName = hostUri.schemeName;
-      if (schemeName === "warp" || schemeName === "swim") {
-        hostUri = hostUri.withSchemeName("ws");
-      } else if (schemeName === "warps" || schemeName === "swims") {
-        hostUri = hostUri.withSchemeName("wss");
-      }
-
-      const wsConstructor = this.wsConstructor.getValue();
-      const wsProtocols = this.wsProtocols.value;
-      if (wsProtocols !== void 0) {
-        socket = new wsConstructor(hostUri.toString(), wsProtocols);
-      } else {
-        socket = new wsConstructor(hostUri.toString());
-      }
-      socket.onopen = this.onWebSocketOpen.bind(this);
-      socket.onmessage = this.onWebSocketMessage.bind(this);
-      socket.onclose = this.onWebSocketClose.bind(this);
-      socket.onerror = this.onWebSocketError.bind(this);
-
-      (this as Mutable<this>).socket = socket;
+    if (socket !== null) {
+      return;
     }
+
+    let hostUri = this.hostUri;
+    const schemeName = hostUri.schemeName;
+    if (schemeName === "warp" || schemeName === "swim") {
+      hostUri = hostUri.withSchemeName("ws");
+    } else if (schemeName === "warps" || schemeName === "swims") {
+      hostUri = hostUri.withSchemeName("wss");
+    }
+
+    const wsConstructor = this.wsConstructor.getValue();
+    const wsProtocols = this.wsProtocols.value;
+    if (wsProtocols !== void 0) {
+      socket = new wsConstructor(hostUri.toString(), wsProtocols);
+    } else {
+      socket = new wsConstructor(hostUri.toString());
+    }
+    socket.onopen = this.onWebSocketOpen.bind(this);
+    socket.onmessage = this.onWebSocketMessage.bind(this);
+    socket.onclose = this.onWebSocketClose.bind(this);
+    socket.onerror = this.onWebSocketError.bind(this);
+
+    (this as Mutable<this>).socket = socket;
   }
 
   override disconnect(): void {
@@ -140,13 +140,14 @@ export class WarpSocketHost extends WarpHost {
   }
 
   protected onWebSocketError(): void {
-    if (this.socket !== null) {
-      this.socket.close();
-      if (!this.online.value) {
-        this.onWebSocketClose(); // force close event
-      } else {
-        this.didFail();
-      }
+    if (this.socket === null) {
+      return;
+    }
+    this.socket.close();
+    if (!this.online.value) {
+      this.onWebSocketClose(); // force close event
+    } else {
+      this.didFail();
     }
   }
 }

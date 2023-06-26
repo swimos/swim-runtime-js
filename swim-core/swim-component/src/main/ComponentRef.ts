@@ -413,11 +413,8 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
   };
 
   ComponentRef.prototype.recohere = function (this: ComponentRef, t: number): void {
-    if ((this.flags & Fastener.DerivedFlag) === 0) {
-      return;
-    }
-    const inlet = this.inlet;
-    if (inlet === null) {
+    let inlet: ComponentRef | null;
+    if ((this.flags & Fastener.DerivedFlag) === 0 || (inlet = this.inlet) === null) {
       return;
     }
     this.setComponent(inlet.component);

@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {Interpolator} from "@swim/util";
-import {HashGenCacheSet} from "@swim/util";
 import type {AnyOutputSettings} from "@swim/codec";
 import {OutputSettings} from "@swim/codec";
 import {Output} from "@swim/codec";
@@ -182,11 +180,7 @@ export class Text extends Value {
     if (n === 0) {
       return Text.empty();
     }
-    let text = new Text(value);
-    if (n <= 64) {
-      text = Text.cache.put(text);
-    }
-    return text;
+    return new Text(value);
   }
 
   static override fromAny(value: AnyText): Text {
@@ -203,13 +197,6 @@ export class Text extends Value {
       settings = OutputSettings.standard();
     }
     return new TextOutput("", settings);
-  }
-
-  /** @internal */
-  @Lazy
-  static get cache(): HashGenCacheSet<Text> {
-    const cacheSize = 128;
-    return new HashGenCacheSet<Text>(cacheSize);
   }
 }
 

@@ -888,13 +888,12 @@ UriFragment.undefined().identifier;
 
 ### UriCache
 
-The `UriCache` class implements an efficient URI resolution cache, relative
-to a fixed base URI, backed by a [Swim Util][util] `HashGenCacheMap`.
-The `resolve` instance method resolves its URI argument relative to the cache's
-base URI, returning a cached instance of the resolved URI when possible.
-The `unresolve` instance method returns the relative components of its URI
-argument, with respect to the cache's base URI, returning a cached instance
-of the unresolved URI when possible.
+The `UriCache` class implements an efficient URI resolution cache, with respect
+to some fixed base URI. The `resolve` instance method resolves its URI argument
+relative to the cache's base URI, returning a cached instance of the resolved
+URI when possible. The `unresolve` instance method returns the relative
+components of its URI argument, with respect to the cache's base URI,
+returning a cached instance of the unresolved URI when possible.
 
 [util]: https://github.com/swimos/swim/tree/main/swim-js/swim-runtime/swim-core/@swim/util
 [codec]: https://github.com/swimos/swim/tree/main/swim-js/swim-runtime/swim-core/@swim/codec

@@ -15,10 +15,11 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
-import {Arrays} from "@swim/util";
 import {Equals} from "@swim/util";
 import type {Observes} from "@swim/util";
 import type {Observable} from "@swim/util";
+import type {ObserverMethods} from "@swim/util";
+import type {ObserverParameters} from "@swim/util";
 import type {Observer} from "@swim/util";
 import type {Consumer} from "@swim/util";
 import type {Consumable} from "@swim/util";
@@ -257,7 +258,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
   hostDidFail(error: unknown): void;
 
   /** @internal */
-  readonly observers: ReadonlyArray<Observes<this>>;
+  readonly observers: ReadonlySet<Observes<this>> | null;
 
   /** @override */
   observe(observer: Observes<this>): void;
@@ -283,8 +284,10 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
   /** @protected */
   didUnobserve(observer: Observes<this>): void;
 
+  callObservers<O, K extends keyof ObserverMethods<O>>(this: {readonly observerType?: Class<O>}, key: K, ...args: ObserverParameters<O, K>): void;
+
   /** @internal */
-  readonly consumers: ReadonlyArray<Consumer>;
+  readonly consumers: ReadonlySet<Consumer> | null;
 
   /** @override */
   consume(consumer: Consumer): void
@@ -647,11 +650,10 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
   WarpDownlink.prototype.command = function (this: WarpDownlink, body: AnyValue): void {
     const model = this.model;
-    if (model !== null) {
-      model.command(body);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.command(body);
   };
 
   WarpDownlink.prototype.onEvent = function (this: WarpDownlink, body: Value): void {
@@ -704,133 +706,69 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
   WarpDownlink.prototype.onEventMessage = function (this: WarpDownlink, message: EventMessage): void {
     this.onEvent(message.body);
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.onEvent !== void 0) {
-        observer.onEvent(message.body, this);
-      }
-    }
+    this.callObservers("onEvent", message.body, this);
   };
 
   WarpDownlink.prototype.onCommandMessage = function (this: WarpDownlink, body: Value): void {
     this.onCommand(body);
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.onCommand !== void 0) {
-        observer.onCommand(body, this);
-      }
-    }
+    this.callObservers("onCommand", body, this);
   };
 
   WarpDownlink.prototype.onLinkRequest = function (this: WarpDownlink, request?: LinkRequest): void {
     this.willLink();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willLink !== void 0) {
-        observer.willLink(this);
-      }
-    }
+    this.callObservers("willLink", this);
   };
 
   WarpDownlink.prototype.onLinkedResponse = function (this: WarpDownlink, response?: LinkedResponse): void {
     this.didLink();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didLink !== void 0) {
-        observer.didLink(this);
-      }
-    }
+    this.callObservers("didLink", this);
   };
 
   WarpDownlink.prototype.onSyncRequest = function (this: WarpDownlink, request?: SyncRequest): void {
     this.willSync();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willSync !== void 0) {
-        observer.willSync(this);
-      }
-    }
+    this.callObservers("willSync", this);
   };
 
   WarpDownlink.prototype.onSyncedResponse = function (this: WarpDownlink, response?: SyncedResponse): void {
     this.didSync();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didSync !== void 0) {
-        observer.didSync(this);
-      }
-    }
+    this.callObservers("didSync", this);
   };
 
   WarpDownlink.prototype.onUnlinkRequest = function (this: WarpDownlink, request?: UnlinkRequest): void {
     this.willUnlink();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willUnlink !== void 0) {
-        observer.willUnlink(this);
-      }
-    }
+    this.callObservers("willUnlink", this);
   };
 
   WarpDownlink.prototype.onUnlinkedResponse = function (this: WarpDownlink, response?: UnlinkedResponse): void {
     this.didUnlink();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didUnlink !== void 0) {
-        observer.didUnlink(this);
-      }
-    }
+    this.callObservers("didUnlink", this);
   };
 
   WarpDownlink.prototype.hostDidConnect = function (this: WarpDownlink): void {
     this.didConnect();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didConnect !== void 0) {
-        observer.didConnect(this);
-      }
-    }
+    this.callObservers("didConnect", this);
   };
 
   WarpDownlink.prototype.hostDidDisconnect = function (this: WarpDownlink): void {
     this.didDisconnect();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didDisconnect !== void 0) {
-        observer.didDisconnect(this);
-      }
-    }
+    this.callObservers("didDisconnect", this);
   };
 
   WarpDownlink.prototype.hostDidFail = function (this: WarpDownlink, error: unknown): void {
     this.didFail(error);
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didFail !== void 0) {
-        observer.didFail(error, this);
-      }
-    }
+    this.callObservers("didFail", error, this);
   };
 
   WarpDownlink.prototype.observe = function (this: WarpDownlink, observer: Observes<typeof this>): void {
-    const oldObservers = this.observers;
-    const newObservers = Arrays.inserted(observer, oldObservers);
-    if (oldObservers === newObservers) {
+    let observers = this.observers as Set<Observes<typeof this>> | null;
+    if (observers === null) {
+      observers = new Set<Observes<typeof this>>();
+      (this as Mutable<typeof this>).observers = observers;
+    } else if (observers.has(observer)) {
       return;
     }
     this.willObserve(observer);
-    (this as Mutable<typeof this>).observers = newObservers;
+    observers.add(observer);
     this.onObserve(observer);
     this.didObserve(observer);
   };
@@ -848,13 +786,12 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   };
 
   WarpDownlink.prototype.unobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
-    const oldObservers = this.observers;
-    const newObservers = Arrays.removed(observer, oldObservers);
-    if (oldObservers === newObservers) {
+    const observers = this.observers as Set<Observes<typeof this>> | null;
+    if (observers === null || !observers.has(observer)) {
       return;
     }
     this.willUnobserve(observer);
-    (this as Mutable<typeof this>).observers = newObservers;
+    observers.delete(observer);
     this.onUnobserve(observer);
     this.didUnobserve(observer);
   };
@@ -871,17 +808,32 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     // hook
   };
 
+  WarpDownlink.prototype.callObservers = function <O, K extends keyof ObserverMethods<O>>(this: {readonly observerType?: Class<O>}, key: K, ...args: ObserverParameters<O, K>): void {
+    const observers = (this as WarpDownlink).observers as ReadonlySet<ObserverMethods<O>> | null;
+    if (observers === null) {
+      return;
+    }
+    for (const observer of observers) {
+      const method = observer[key];
+      if (typeof method === "function") {
+        method.call(observer, ...args);
+      }
+    }
+  } as any;
+
   WarpDownlink.prototype.consume = function (this: WarpDownlink, consumer: Consumer): void {
-    const oldConsumers = this.consumers;
-    const newConsumerrss = Arrays.inserted(consumer, oldConsumers);
-    if (oldConsumers === newConsumerrss) {
+    let consumers = this.consumers as Set<Consumer> | null;
+    if (consumers === null) {
+      consumers = new Set<Consumer>();
+      (this as Mutable<typeof this>).consumers = consumers;
+    } else if (consumers.has(consumer)) {
       return;
     }
     this.willConsume(consumer);
-    (this as Mutable<typeof this>).consumers = newConsumerrss;
+    consumers.add(consumer);
     this.onConsume(consumer);
     this.didConsume(consumer);
-    if (oldConsumers.length === 0) {
+    if (consumers.size === 1 && this.mounted) {
       this.startConsuming();
     }
   };
@@ -899,16 +851,15 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   };
 
   WarpDownlink.prototype.unconsume = function (this: WarpDownlink, consumer: Consumer): void {
-    const oldConsumers = this.consumers;
-    const newConsumerrss = Arrays.removed(consumer, oldConsumers);
-    if (oldConsumers === newConsumerrss) {
+    const consumers = this.consumers as Set<Consumer> | null;
+    if (consumers === null || !consumers.has(consumer)) {
       return;
     }
     this.willUnconsume(consumer);
-    (this as Mutable<typeof this>).consumers = newConsumerrss;
+    consumers.delete(consumer);
     this.onUnconsume(consumer);
     this.didUnconsume(consumer);
-    if (newConsumerrss.length === 0) {
+    if (consumers.size === 0) {
       this.stopConsuming();
     }
   };
@@ -991,13 +942,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     model.removeDownlink(this);
 
     this.didClose();
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didClose !== void 0) {
-        observer.didClose(this);
-      }
-    }
+    this.callObservers("didClose", this);
   };
 
   WarpDownlink.prototype.reopen = function (this: WarpDownlink): void {
@@ -1017,7 +962,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
   WarpDownlink.prototype.onMount = function (this: WarpDownlink): void {
     _super.prototype.onMount.call(this);
-    if (this.consumers.length !== 0) {
+    if (this.consumers !== null && this.consumers.size !== 0) {
       this.startConsuming();
     }
   };
@@ -1034,8 +979,8 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       downlink.initRelinks((flagsInit & WarpDownlink.RelinksFlag) !== 0);
       downlink.initSyncs((flagsInit & WarpDownlink.SyncsFlag) !== 0);
     }
-    (downlink as Mutable<typeof downlink>).observers = Arrays.empty;
-    (downlink as Mutable<typeof downlink>).consumers = Arrays.empty;
+    (downlink as Mutable<typeof downlink>).observers = null;
+    (downlink as Mutable<typeof downlink>).consumers = null;
     (downlink as Mutable<typeof downlink>).hostUri = downlink.initHostUri();
     (downlink as Mutable<typeof downlink>).nodeUri = downlink.initNodeUri();
     (downlink as Mutable<typeof downlink>).laneUri = downlink.initLaneUri();

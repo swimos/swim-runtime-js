@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import * as ws from "ws";
-import {Lazy} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Observer} from "@swim/util";
 import {Affinity} from "@swim/component";
@@ -308,10 +307,14 @@ export class WarpClient extends WarpScope {
     }
   }
 
-  @Lazy
+  /** @internal */
+  static Global: WarpClient | null = null;
+
   static global(): WarpClient {
-    const client = new WarpClient();
-    client.mount();
-    return client;
+    if (this.Global === null) {
+      this.Global = new WarpClient();
+      this.Global.mount();
+    }
+    return this.Global;
   }
 }

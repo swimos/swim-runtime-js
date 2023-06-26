@@ -13,20 +13,25 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
-import {HashGenCacheSet} from "@swim/util";
+import type {Builder} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
-import type {Form} from "@swim/structure";
+import {Format} from "@swim/codec";
+import {Base16} from "@swim/codec";
+import {Unicode} from "@swim/codec";
+import {Utf8} from "@swim/codec";
+import type {Item} from "@swim/structure";
+import {Text} from "@swim/structure";
+import {Form} from "@swim/structure";
 import {Uri} from "./Uri";
-import {UriPathSegment} from "./"; // forward import
-import {UriPathSlash} from "./"; // forward import
-import {UriPathEmpty} from "./"; // forward import
-import {UriPathBuilder} from "./"; // forward import
-import {UriPathForm} from "./"; // forward import
 
 /** @public */
 export type AnyUriPath = UriPath | string[] | string;
@@ -208,9 +213,8 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       return this;
     } else if (that.isAbsolute() || this.isEmpty()) {
       return that.removeDotSegments();
-    } else {
-      return this.merge(that).removeDotSegments();
     }
+    return this.merge(that).removeDotSegments();
   }
 
   removeDotSegments(): UriPath {
@@ -259,30 +263,27 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   }
 
   merge(that: UriPath): UriPath {
-    if (!this.isEmpty()) {
-      const builder = new UriPathBuilder();
-      let prev: UriPath = this;
-      do {
-        const next = prev.tail();
-        if (!next.isEmpty()) {
-          if (prev.isAbsolute()) {
-            builder.addSlash();
-          } else {
-            builder.addSegment(prev.head());
-          }
-          prev = next;
-        } else {
-          if (prev.isAbsolute()) {
-            builder.addSlash();
-          }
-          break;
-        }
-      } while (true);
-      builder.addPath(that);
-      return builder.bind();
-    } else {
+    if (this.isEmpty()) {
       return that;
     }
+    const builder = new UriPathBuilder();
+    let prev: UriPath = this;
+    do {
+      const next = prev.tail();
+      if (next.isEmpty()) {
+        if (prev.isAbsolute()) {
+          builder.addSlash();
+        }
+        break;
+      } else if (prev.isAbsolute()) {
+        builder.addSlash();
+      } else {
+        builder.addSegment(prev.head());
+      }
+      prev = next;
+    } while (true);
+    builder.addPath(that);
+    return builder.bind();
   }
 
   unmerge(relative: UriPath, root: UriPath = relative): UriPath {
@@ -298,26 +299,23 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
         return relative;
       } else if (relative.isRelative()) {
         return relative.prependedSlash();
-      } else {
-        let a = base.tail();
-        let b = relative.tail();
-        if (!a.isEmpty() && b.isEmpty()) {
-          return UriPath.slash();
-        } else if (a.isEmpty() || b.isEmpty()
-            || a.isRelative() != b.isRelative()
-            || a.head() !== b.head()) {
-          return b;
-        } else {
-          a = a.tail();
-          b = b.tail();
-          if (!a.isEmpty() && b.isEmpty()) {
-            return root;
-          } else {
-            base = a;
-            relative = b;
-          }
-        }
       }
+      let a = base.tail();
+      let b = relative.tail();
+      if (!a.isEmpty() && b.isEmpty()) {
+        return UriPath.slash();
+      } else if (a.isEmpty() || b.isEmpty()
+          || a.isRelative() != b.isRelative()
+          || a.head() !== b.head()) {
+        return b;
+      }
+      a = a.tail();
+      b = b.tail();
+      if (!a.isEmpty() && b.isEmpty()) {
+        return root;
+      }
+      base = a;
+      relative = b;
     } while (true);
   }
 
@@ -353,23 +351,6 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     }
     builder.addPath(target);
     return builder.bind();
-  }
-
-  /** @internal */
-  static branch(a: UriPath, b: UriPath): [common: UriPath, a: UriPath, b: UriPath] {
-    const common = new UriPathBuilder();
-    while (!a.isEmpty() && !b.isEmpty()
-        && a.isRelative() === b.isRelative()
-        && a.head() === b.head()) {
-      if (a.isRelative()) {
-        common.addSegment(a.head());
-      } else {
-        common.addSlash();
-      }
-      a = a.tail();
-      b = b.tail();
-    }
-    return [common.bind(), a, b];
   }
 
   toAny(): string[] {
@@ -419,36 +400,23 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
 
   abstract toString(): string;
 
-  /** @internal */
-  static Empty: UriPath | undefined;
-
   static empty(): UriPath {
-    if (this.Empty === void 0) {
-      this.Empty = new UriPathEmpty();
-    }
-    return this.Empty;
+    return UriPathEmpty.Empty;
   }
 
-  /** @internal */
-  static Slash: UriPath | undefined;
-
   static slash(segment?: string | UriPath): UriPath {
-    if (segment !== void 0) {
-      if (typeof segment === "string") {
-        segment = this.segment(segment);
-      }
-      return new UriPathSlash(segment);
-    } else if (this.Slash === void 0) {
-      this.Slash = new UriPathSlash(UriPath.empty());
+    if (segment === void 0) {
+      return UriPathSlash.Slash;
+    } else if (typeof segment === "string") {
+      segment = this.segment(segment);
     }
-    return this.Slash;
+    return new UriPathSlash(segment);
   }
 
   static segment(segment: string, tail?: UriPath): UriPath {
     if (tail === void 0) {
       tail = UriPath.empty();
     }
-    segment = this.cacheSegment(segment);
     return new UriPathSegment(segment, tail);
   }
 
@@ -467,13 +435,19 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       return UriPath.of(...value);
     } else if (typeof value === "string") {
       return UriPath.parse(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
-  static parse(pathPart: string): UriPath {
-    return Uri.standardParser.parsePathString(pathPart);
+  static parse(input: Input): Parser<UriPath>;
+  static parse(string: string): UriPath;
+  static parse(string: Input | string): Parser<UriPath> | UriPath {
+    const input = typeof string === "string" ? Unicode.stringInput(string) : string;
+    let parser = UriPathParser.parse(input);
+    if (typeof string === "string" && input.isCont() && !parser.isError()) {
+      parser = Parser.error(Diagnostic.unexpected(input));
+    }
+    return typeof string === "string" ? parser.bind() : parser;
   }
 
   static builder(): UriPathBuilder {
@@ -484,20 +458,620 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   static pathForm(): Form<UriPath, AnyUriPath> {
     return new UriPathForm(UriPath.empty());
   }
+}
 
+/** @internal */
+export class UriPathEmpty extends UriPath {
   /** @internal */
-  @Lazy
-  static get segmentCache(): HashGenCacheSet<string> {
-    const segmentCacheSize = 64;
-    return new HashGenCacheSet<string>(segmentCacheSize);
+  constructor() {
+    super();
+  }
+
+  override isDefined(): boolean {
+    return false;
+  }
+
+  override isAbsolute(): boolean {
+    return false;
+  }
+
+  override isRelative(): boolean {
+    return true;
+  }
+
+  override isSegment(): boolean {
+    return false;
+  }
+
+  override isEmpty(): boolean {
+    return true;
+  }
+
+  override head(): string {
+    throw new Error("empty path");
+  }
+
+  override tail(): UriPath {
+    throw new Error("empty path");
   }
 
   /** @internal */
-  static cacheSegment(segment: string): string {
-    if (segment.length <= 32) {
-      return this.segmentCache.put(segment);
-    } else {
-      return segment;
+  override setTail(tail: UriPath): void {
+    throw new Error("empty path");
+  }
+
+  /** @internal */
+  override dealias(): UriPath {
+    return this;
+  }
+
+  override parent(): UriPath {
+    return this;
+  }
+
+  override base(): UriPath {
+    return this;
+  }
+
+  override appended(...components: AnyUriPath[]): UriPath {
+    return UriPath.of(...components);
+  }
+
+  override appendedSlash(): UriPath {
+    return UriPath.slash();
+  }
+
+  override appendedSegment(segment: string): UriPath {
+    return UriPath.segment(segment);
+  }
+
+  override prepended(...components: AnyUriPath[]): UriPath {
+    return UriPath.of(...components);
+  }
+
+  override prependedSlash(): UriPath {
+    return UriPath.slash();
+  }
+
+  override prependedSegment(segment: string): UriPath {
+    return UriPath.segment(segment);
+  }
+
+  override merge(that: UriPath): UriPath {
+    return that;
+  }
+
+  override debug<T>(output: Output<T>): Output<T> {
+    output = output.write("UriPath").write(46/*'.'*/).write("empty")
+                   .write(40/*'('*/).write(41/*')'*/);
+    return output;
+  }
+
+  override display<T>(output: Output<T>): Output<T> {
+    return output; // blank
+  }
+
+  override toString(): string {
+    return "";
+  }
+
+  /** @internal */
+  static readonly Empty: UriPathEmpty = new this();
+}
+
+/** @internal */
+export class UriPathSlash extends UriPath {
+  /** @internal */
+  constructor(tail: UriPath) {
+    super();
+    this.rest = tail;
+    this.stringValue = void 0;
+  }
+
+  /** @internal */
+  readonly rest: UriPath;
+
+  override isDefined(): boolean {
+    return true;
+  }
+
+  override isAbsolute(): boolean {
+    return true;
+  }
+
+  override isRelative(): boolean {
+    return false;
+  }
+
+  override isSegment(): boolean {
+    return false;
+  }
+
+  override isEmpty(): boolean {
+    return false;
+  }
+
+  override head(): string {
+    return "/";
+  }
+
+  override tail(): UriPath {
+    return this.rest;
+  }
+
+  /** @internal */
+  override setTail(tail: UriPath): void {
+    (this as Mutable<this>).rest = tail;
+  }
+
+  /** @internal */
+  override dealias(): UriPath {
+    return new UriPathSlash(this.rest);
+  }
+
+  override parent(): UriPath {
+    const tail = this.rest;
+    if (tail.isEmpty()) {
+      return UriPath.empty();
     }
+    const rest = tail.tail();
+    if (rest.isEmpty()) {
+      return UriPath.slash();
+    }
+    return new UriPathSlash(tail.parent());
+  }
+
+  override base(): UriPath {
+    const tail = this.rest;
+    if (tail.isEmpty()) {
+      return this;
+    }
+    return new UriPathSlash(tail.base());
+  }
+
+  override prependedSegment(segment: string): UriPath {
+    return UriPath.segment(segment, this);
+  }
+
+  override debug<T>(output: Output<T>): Output<T> {
+    output = output.write("UriPath").write(46/*'.'*/).write("parse").write(40/*'('*/)
+                   .write(34/*'"'*/) .display(this).write(34/*'"'*/).write(41/*')'*/);
+    return output;
+  }
+
+  override display<T>(output: Output<T>): Output<T> {
+    const stringValue = this.stringValue;
+    if (stringValue !== void 0) {
+      output = output.write(stringValue);
+    } else {
+      output = super.display(output);
+    }
+    return output;
+  }
+
+  /** @internal */
+  readonly stringValue: string | undefined;
+
+  override toString(): string {
+    let stringValue = this.stringValue;
+    if (stringValue === void 0) {
+      stringValue = Format.display(this);
+      (this as Mutable<this>).stringValue = stringValue;
+    }
+    return stringValue;
+  }
+
+  /** @internal */
+  static readonly Slash: UriPathSlash = new UriPathSlash(UriPathEmpty.Empty);
+}
+
+/** @internal */
+export class UriPathSegment extends UriPath {
+  /** @internal */
+  constructor(head: string, tail: UriPath) {
+    super();
+    this.segment = head;
+    this.rest = tail;
+    this.stringValue = void 0;
+  }
+
+  /** @internal */
+  readonly segment: string;
+
+  /** @internal */
+  readonly rest: UriPath;
+
+  override isDefined(): boolean {
+    return true;
+  }
+
+  override isAbsolute(): boolean {
+    return false;
+  }
+
+  override isRelative(): boolean {
+    return true;
+  }
+
+  override isSegment(): boolean {
+    return true;
+  }
+
+  override isEmpty(): boolean {
+    return false;
+  }
+
+  override head(): string {
+    return this.segment;
+  }
+
+  override tail(): UriPath {
+    return this.rest;
+  }
+
+  /** @internal */
+  override setTail(tail: UriPath): void {
+    if (tail instanceof UriPathSegment) {
+      throw new Error("adjacent path segments");
+    }
+    (this as Mutable<this>).rest = tail;
+  }
+
+  /** @internal */
+  override dealias(): UriPath {
+    return new UriPathSegment(this.segment, this.rest);
+  }
+
+  override parent(): UriPath {
+    const tail = this.rest;
+    if (tail.isEmpty()) {
+      return UriPath.empty();
+    }
+    const rest = tail.tail();
+    if (rest.isEmpty()) {
+      return UriPath.empty();
+    }
+    return new UriPathSegment(this.segment, tail.parent());
+  }
+
+  override base(): UriPath {
+    const tail = this.rest;
+    if (tail.isEmpty()) {
+      return UriPath.empty();
+    }
+    return new UriPathSegment(this.segment, tail.base());
+  }
+
+  override prependedSegment(segment: string): UriPath {
+    return UriPath.segment(segment, this.prependedSlash());
+  }
+
+  override debug<T>(output: Output<T>): Output<T> {
+    output = output.write("UriPath").write(46/*'.'*/).write("parse").write(40/*'('*/)
+                   .write(34/*'"'*/).display(this).write(34/*'"'*/).write(41/*')'*/);
+    return output;
+  }
+
+  override display<T>(output: Output<T>): Output<T> {
+    const stringValue = this.stringValue;
+    if (stringValue !== void 0) {
+      output = output.write(stringValue);
+    } else {
+      output = super.display(output);
+    }
+    return output;
+  }
+
+  /** @internal */
+  readonly stringValue: string | undefined;
+
+  override toString(): string {
+    let stringValue = this.stringValue;
+    if (stringValue === void 0) {
+      stringValue = Format.display(this);
+      (this as Mutable<this>).stringValue = stringValue;
+    }
+    return stringValue;
+  }
+}
+
+/** @public */
+export class UriPathBuilder implements Builder<string, UriPath> {
+  /** @internal */
+  first: UriPath;
+  /** @internal */
+  last: UriPath | null;
+  /** @internal */
+  size: number;
+  /** @internal */
+  aliased: number;
+
+  constructor() {
+    this.first = UriPath.empty();
+    this.last = null;
+    this.size = 0;
+    this.aliased = 0;
+  }
+
+  isEmpty(): boolean {
+    return this.size === 0;
+  }
+
+  push(...components: AnyUriPath[]): void {
+    for (let i = 0; i < components.length; i += 1) {
+      const component = components[i]!;
+      if (component instanceof UriPath) {
+        this.addPath(component);
+      } else if (Array.isArray(component)) {
+        this.push(...component);
+      } else if (component === "/") {
+        this.addSlash();
+      } else {
+        this.addSegment(component);
+      }
+    }
+  }
+
+  bind(): UriPath {
+    this.aliased = 0;
+    return this.first;
+  }
+
+  addSlash(): void {
+    const tail = UriPath.slash().dealias();
+    const size = this.size;
+    if (size === 0) {
+      this.first = tail;
+    } else {
+      this.dealias(size - 1).setTail(tail);
+    }
+    this.last = tail;
+    this.size = size + 1;
+    this.aliased += 1;
+  }
+
+  addSegment(segment: string): void {
+    const tail = UriPath.segment(segment, UriPath.empty());
+    let size = this.size;
+    if (size === 0) {
+      this.first = tail;
+    } else {
+      const last = this.dealias(size - 1);
+      if (last.isAbsolute()) {
+        last.setTail(tail);
+      } else {
+        last.setTail(tail.prependedSlash());
+        size += 1;
+        this.aliased += 1;
+      }
+    }
+    this.last = tail;
+    this.size = size + 1;
+    this.aliased += 1;
+  }
+
+  addPath(path: UriPath): void {
+    if (path.isEmpty()) {
+      return;
+    }
+    let size = this.size;
+    if (size === 0) {
+      this.first = path;
+    } else {
+      const last = this.dealias(size - 1);
+      if (last.isAbsolute() || path.isAbsolute()) {
+        last.setTail(path);
+      } else {
+        last.setTail(path.prependedSlash());
+        size += 1;
+        this.aliased += 1;
+      }
+    }
+    size += 1;
+    do {
+      const tail = path.tail();
+      if (tail.isEmpty()) {
+        break;
+      }
+      path = tail;
+      size += 1;
+    } while (true);
+    this.last = path;
+    this.size = size;
+  }
+
+  pop(): UriPath {
+    const size = this.size;
+    const aliased = this.aliased;
+    if (size === 0) {
+      throw new Error("Empty UriPath");
+    } else if (size === 1) {
+      const first = this.first;
+      this.first = first.tail();
+      if (first.tail().isEmpty()) {
+        this.last = null;
+      }
+      this.size = size - 1;
+      if (aliased > 0) {
+        this.aliased = aliased - 1;
+      }
+      return first;
+    } else {
+      const last = this.dealias(size - 2);
+      last.setTail(UriPath.empty());
+      this.last = last;
+      this.size = size - 1;
+      this.aliased = aliased - 1;
+      return last.tail();
+    }
+  }
+
+  /** @internal */
+  dealias(n: number): UriPath {
+    let i = 0;
+    let xi: UriPath | null = null;
+    let xs = this.first;
+    if (this.aliased <= n) {
+      while (i < this.aliased) {
+        xi = xs;
+        xs = xs.tail();
+        i += 1;
+      }
+      while (i <= n) {
+        const xn = xs.dealias();
+        if (i === 0) {
+          this.first = xn;
+        } else {
+          xi!.setTail(xn);
+        }
+        xi = xn;
+        xs = xs.tail();
+        i += 1;
+      }
+      if (i === this.size) {
+        this.last = xi;
+      }
+      this.aliased = i;
+    } else if (n === 0) {
+      xi = this.first;
+    } else if (n === this.size - 1) {
+      xi = this.last;
+    } else {
+      while (i <= n) {
+        xi = xs;
+        xs = xs.tail();
+        i += 1;
+      }
+    }
+    return xi!;
+  }
+
+  /** @override */
+  toString(): string {
+    return this.bind().toString();
+  }
+}
+
+/** @internal */
+export class UriPathForm extends Form<UriPath, AnyUriPath> {
+  constructor(unit: UriPath | undefined) {
+    super();
+    Object.defineProperty(this, "unit", {
+      value: unit,
+      enumerable: true,
+    });
+  }
+
+  override readonly unit!: UriPath | undefined;
+
+  override withUnit(unit: UriPath | undefined): Form<UriPath, AnyUriPath> {
+    if (unit !== this.unit) {
+      return new UriPathForm(unit);
+    } else {
+      return this;
+    }
+  }
+
+  override mold(object: AnyUriPath, item?: Item): Item {
+    object = UriPath.fromAny(object);
+    if (item === void 0) {
+      return Text.from(object.toString());
+    } else {
+      return item.concat(Text.from(object.toString()));
+    }
+  }
+
+  override cast(item: Item, object?: UriPath): UriPath | undefined {
+    const value = item.target;
+    try {
+      const string = value.stringValue();
+      if (typeof string === "string") {
+        return UriPath.parse(string);
+      }
+    } catch (error) {
+      // swallow
+    }
+    return void 0;
+  }
+}
+
+/** @internal */
+export class UriPathParser extends Parser<UriPath> {
+  private readonly builder: UriPathBuilder | undefined;
+  private readonly output: Output<string> | undefined;
+  private readonly c1: number | undefined;
+  private readonly step: number | undefined;
+
+  constructor(builder?: UriPathBuilder, output?: Output<string>,
+              c1?: number, step?: number) {
+    super();
+    this.builder = builder;
+    this.output = output;
+    this.c1 = c1;
+    this.step = step;
+  }
+
+  override feed(input: Input): Parser<UriPath> {
+    return UriPathParser.parse(input, this.builder, this.output, this.c1, this.step);
+  }
+
+  static parse(input: Input, builder?: UriPathBuilder, output?: Output<string>,
+               c1: number = 0, step: number = 1): Parser<UriPath> {
+    let c = 0;
+    do {
+      if (step === 1) {
+        while (input.isCont() && (c = input.head(), Uri.isPathChar(c))) {
+          output = output || Utf8.decodedString();
+          input = input.step();
+          output = output.write(c);
+        }
+        if (input.isCont() && c === 47/*'/'*/) {
+          input = input.step();
+          builder = builder || new UriPathBuilder();
+          if (output !== void 0) {
+            builder.addSegment(output.bind());
+            output = void 0;
+          }
+          builder.addSlash();
+          continue;
+        } else if (input.isCont() && c === 37/*'%'*/) {
+          input = input.step();
+          step = 2;
+        } else if (!input.isEmpty()) {
+          if (output !== void 0) {
+            builder = builder || new UriPathBuilder();
+            builder.addSegment(output.bind());
+          }
+          if (builder !== void 0) {
+            return Parser.done(builder.bind());
+          } else {
+            return Parser.done(UriPath.empty());
+          }
+        }
+      }
+      if (step === 2) {
+        if (input.isCont() && (c = input.head(), Base16.isDigit(c))) {
+          input = input.step();
+          c1 = c;
+          step = 3;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected("hex digit", input));
+        }
+      }
+      if (step === 3) {
+        if (input.isCont() && (c = input.head(), Base16.isDigit(c))) {
+          output = output || Utf8.decodedString();
+          input = input.step();
+          output = output.write((Base16.decodeDigit(c1) << 4) | Base16.decodeDigit(c));
+          c1 = 0;
+          step = 1;
+          continue;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected("hex digit", input));
+        }
+      }
+      break;
+    } while (true);
+    return new UriPathParser(builder, output, c1, step);
   }
 }

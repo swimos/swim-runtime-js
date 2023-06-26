@@ -97,15 +97,16 @@ export class WarpSocketHostWorker {
 
   protected onDisconnectSignal(request: DisconnectSignal): void {
     const socket = this.socket;
-    if (socket !== null) {
-      socket.onopen = null;
-      socket.onmessage = null;
-      socket.onclose = null;
-      socket.onerror = null;
-      (this as Mutable<this>).socket = null;
-      socket.close();
-      this.onDisconnect();
+    if (socket === null) {
+      return;
     }
+    socket.onopen = null;
+    socket.onmessage = null;
+    socket.onclose = null;
+    socket.onerror = null;
+    (this as Mutable<this>).socket = null;
+    socket.close();
+    this.onDisconnect();
   }
 
   protected onReceiveUnexpectedSignal(signal: Signal): void {
@@ -129,41 +130,43 @@ export class WarpSocketHostWorker {
 
   connect(): void {
     let socket = this.socket;
-    if (socket === null) {
-      let WebSocketConstructor: typeof WebSocket;
-      if (this.options.WebSocket !== void 0) {
-        WebSocketConstructor = this.options.WebSocket;
-      } else if (typeof WebSocket !== "undefined") {
-        WebSocketConstructor = WebSocket;
-      } else if (WarpSocketHostWorker.WebSocket !== null) {
-        WebSocketConstructor = WarpSocketHostWorker.WebSocket;
-      } else {
-        throw new Error("Missing WebSocket implementation");
-      }
-      let hostUri = this.hostUri;
-      const schemeName = hostUri.schemeName;
-      if (schemeName === "warp" || schemeName === "swim") {
-        hostUri = hostUri.withSchemeName("ws");
-      } else if (schemeName === "warps" || schemeName === "swims") {
-        hostUri = hostUri.withSchemeName("wss");
-      }
-      if (this.options.protocols !== void 0) {
-        socket = new WebSocketConstructor(hostUri.toString(), this.options.protocols);
-      } else {
-        socket = new WebSocketConstructor(hostUri.toString());
-      }
-      (this as Mutable<this>).socket = socket;
-      socket.onopen = this.onWebSocketOpen.bind(this);
-      socket.onmessage = this.onWebSocketMessage.bind(this);
-      socket.onclose = this.onWebSocketClose.bind(this);
-      socket.onerror = this.onWebSocketError.bind(this);
+    if (socket !== null) {
+      return;
     }
+    let WebSocketConstructor: typeof WebSocket;
+    if (this.options.WebSocket !== void 0) {
+      WebSocketConstructor = this.options.WebSocket;
+    } else if (typeof WebSocket !== "undefined") {
+      WebSocketConstructor = WebSocket;
+    } else if (WarpSocketHostWorker.WebSocket !== null) {
+      WebSocketConstructor = WarpSocketHostWorker.WebSocket;
+    } else {
+      throw new Error("Missing WebSocket implementation");
+    }
+    let hostUri = this.hostUri;
+    const schemeName = hostUri.schemeName;
+    if (schemeName === "warp" || schemeName === "swim") {
+      hostUri = hostUri.withSchemeName("ws");
+    } else if (schemeName === "warps" || schemeName === "swims") {
+      hostUri = hostUri.withSchemeName("wss");
+    }
+    if (this.options.protocols !== void 0) {
+      socket = new WebSocketConstructor(hostUri.toString(), this.options.protocols);
+    } else {
+      socket = new WebSocketConstructor(hostUri.toString());
+    }
+    (this as Mutable<this>).socket = socket;
+    socket.onopen = this.onWebSocketOpen.bind(this);
+    socket.onmessage = this.onWebSocketMessage.bind(this);
+    socket.onclose = this.onWebSocketClose.bind(this);
+    socket.onerror = this.onWebSocketError.bind(this);
   }
 
   close(): void {
-    if (this.socket !== null) {
-      this.socket.close();
+    if (this.socket === null) {
+      return;
     }
+    this.socket.close();
   }
 
   protected onConnect(): void {
@@ -187,11 +190,10 @@ export class WarpSocketHostWorker {
       const text = envelope.toRecon();
       this.socket!.send(text);
     } else {
-      if (this.sendBuffer.length < this.sendBufferSize) {
-        this.sendBuffer.push(envelope);
-      } else {
+      if (this.sendBuffer.length >= this.sendBufferSize) {
         throw new Error("send buffer overflow");
       }
+      this.sendBuffer.push(envelope);
       this.connect();
     }
   }
@@ -218,21 +220,23 @@ export class WarpSocketHostWorker {
 
   protected onWebSocketClose(): void {
     const socket = this.socket;
-    if (socket !== null) {
-      socket.onopen = null;
-      socket.onmessage = null;
-      socket.onclose = null;
-      socket.onerror = null;
-      (this as Mutable<this>).socket = null;
-      this.onDisconnect();
+    if (socket === null) {
+      return;
     }
+    socket.onopen = null;
+    socket.onmessage = null;
+    socket.onclose = null;
+    socket.onerror = null;
+    (this as Mutable<this>).socket = null;
+    this.onDisconnect();
   }
 
   protected onWebSocketError(): void {
-    if (this.socket !== null) {
-      this.onError();
-      this.socket.close();
+    if (this.socket === null) {
+      return;
     }
+    this.onError();
+    this.socket.close();
   }
 
   static readonly SendBufferSize: number = 1024;

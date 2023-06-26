@@ -173,7 +173,7 @@ export interface Fastener<O = unknown> {
 
   get parent(): Fastener | null;
 
-  get inlet(): Fastener | null;
+  readonly inlet: Fastener | null;
 
   /** @internal */
   inheritInlet(): void;
@@ -492,17 +492,6 @@ export const Fastener = (function (_super: typeof Object) {
     configurable: true,
   });
 
-  Object.defineProperty(Fastener.prototype, "inlet", {
-    get: function (this: Fastener): Fastener | null {
-      if ((this.flags & Fastener.InheritsFlag) !== 0) {
-        return this.parent;
-      }
-      return null;
-    },
-    enumerable: true,
-    configurable: true,
-  });
-
   Fastener.prototype.inheritInlet = function (this: Fastener): void {
     if ((this.flags & Fastener.InheritsFlag) === 0) {
       return;
@@ -513,6 +502,7 @@ export const Fastener = (function (_super: typeof Object) {
     }
     this.willBindInlet(inlet);
     inlet.attachOutlet(this);
+    (this as Mutable<typeof this>).inlet = inlet;
     this.onBindInlet(inlet);
     this.didBindInlet(inlet);
   };
@@ -521,6 +511,7 @@ export const Fastener = (function (_super: typeof Object) {
     this.setInherits(false);
     this.willBindInlet(inlet);
     inlet.attachOutlet(this);
+    (this as Mutable<typeof this>).inlet = inlet;
     this.onBindInlet(inlet);
     this.didBindInlet(inlet);
   };
@@ -549,6 +540,7 @@ export const Fastener = (function (_super: typeof Object) {
     }
     this.willUnbindInlet(inlet);
     inlet.detachOutlet(this);
+    (this as Mutable<typeof this>).inlet = null;
     this.onUnbindInlet(inlet);
     this.didUnbindInlet(inlet);
   };
@@ -563,6 +555,7 @@ export const Fastener = (function (_super: typeof Object) {
     }
     this.willUnbindInlet(inlet);
     inlet.detachOutlet(this);
+    (this as Mutable<typeof this>).inlet = null;
     this.onUnbindInlet(inlet);
     this.didUnbindInlet(inlet);
   };
@@ -682,8 +675,9 @@ export const Fastener = (function (_super: typeof Object) {
     if (fastener === null) {
       fastener = Object.create(this.prototype) as F;
     }
-    (fastener as Mutable<typeof fastener>).owner = owner;
     (fastener as Mutable<typeof fastener>).flags = 0;
+    (fastener as Mutable<typeof fastener>).owner = owner;
+    (fastener as Mutable<typeof fastener>).inlet = null;
     const flagsInit = fastener.flagsInit;
     if (flagsInit !== void 0) {
       fastener.initAffinity(flagsInit & Affinity.Mask);

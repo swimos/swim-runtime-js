@@ -91,18 +91,6 @@ export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends V
   setValueForm(valueForm: Form<V, VU>): this;
 
   /** @internal */
-  readonly key?: K; // for type destructuring
-
-  /** @internal */
-  readonly keyInit?: KU; // for type destructuring
-
-  /** @internal */
-  readonly value?: V; // for type destructuring
-
-  /** @internal */
-  readonly valueInit?: VU; // for type destructuring
-
-  /** @internal */
   readonly stateInit?: BTree<Value, Value> | null; // optional prototype property
 
   /** @internal */
@@ -283,11 +271,10 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
 
   MapDownlink.prototype.setState = function (this: MapDownlink, state: BTree<Value, Value>): void {
     const model = this.model;
-    if (model !== null) {
-      model.setState(state);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.setState(state);
   };
 
   Object.defineProperty(MapDownlink.prototype, "size", {
@@ -305,334 +292,292 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
 
   MapDownlink.prototype.has = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, key: K | KU): boolean {
     const model = this.model;
-    if (model !== null) {
-      const keyObject = this.keyForm.mold(key);
-      return model.has(keyObject);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const keyObject = this.keyForm.mold(key);
+    return model.has(keyObject);
   };
 
   MapDownlink.prototype.get = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, key: K | KU): V {
     const model = this.model;
-    if (model !== null) {
-      const keyObject = this.keyForm.mold(key);
-      const value = model.get(keyObject);
-      return value.coerce(this.valueForm);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const keyObject = this.keyForm.mold(key);
+    const value = model.get(keyObject);
+    return value.coerce(this.valueForm);
   };
 
   MapDownlink.prototype.getEntry = function <K, V>(this: MapDownlink<unknown, K, V>, index: number): [K, V] | undefined {
     const model = this.model;
-    if (model !== null) {
-      const entry = model.getEntry(index);
-      if (entry !== void 0) {
-        return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const entry = model.getEntry(index);
+    if (entry === void 0) {
+      return void 0;
+    }
+    return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
   };
 
   MapDownlink.prototype.firstKey = function <K, V>(this: MapDownlink<unknown, K, V>): K | undefined {
     const model = this.model;
-    if (model !== null) {
-      const key = model.state.firstKey();
-      if (key !== void 0) {
-        return key.coerce(this.keyForm);
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const key = model.state.firstKey();
+    if (key === void 0) {
+      return void 0;
+    }
+    return key.coerce(this.keyForm);
   };
 
   MapDownlink.prototype.firstValue = function <K, V>(this: MapDownlink<unknown, K, V>): V | undefined {
     const model = this.model;
-    if (model !== null) {
-      const value = model.state.firstValue();
-      if (value !== void 0) {
-        return value.coerce(this.valueForm);
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const value = model.state.firstValue();
+    if (value === void 0) {
+      return void 0;
+    }
+    return value.coerce(this.valueForm);
   };
 
   MapDownlink.prototype.firstEntry = function <K, V>(this: MapDownlink<unknown, K, V>): [K, V] | undefined {
     const model = this.model;
-    if (model !== null) {
-      const entry = model.state.firstEntry();
-      if (entry !== void 0) {
-        return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const entry = model.state.firstEntry();
+    if (entry === void 0) {
+      return void 0;
+    }
+    return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
   };
 
   MapDownlink.prototype.lastKey = function <K, V>(this: MapDownlink<unknown, K, V>): K | undefined {
     const model = this.model;
-    if (model !== null) {
-      const key = model.state.lastKey();
-      if (key !== void 0) {
-        return key.coerce(this.keyForm);
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const key = model.state.lastKey();
+    if (key === void 0) {
+      return void 0;
+    }
+    return key.coerce(this.keyForm);
   };
 
   MapDownlink.prototype.lastValue = function <K, V>(this: MapDownlink<unknown, K, V>): V | undefined {
     const model = this.model;
-    if (model !== null) {
-      const value = model.state.lastValue();
-      if (value !== void 0) {
-        return value.coerce(this.valueForm);
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const value = model.state.lastValue();
+    if (value === void 0) {
+      return void 0;
+    }
+    return value.coerce(this.valueForm);
   };
 
   MapDownlink.prototype.lastEntry = function <K, V>(this: MapDownlink<unknown, K, V>): [K, V] | undefined {
     const model = this.model;
-    if (model !== null) {
-      const entry = model.state.lastEntry();
-      if (entry !== void 0) {
-        return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const entry = model.state.lastEntry();
+    if (entry === void 0) {
+      return void 0;
+    }
+    return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
   };
 
   MapDownlink.prototype.nextKey = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): K | undefined {
     const model = this.model;
-    if (model !== null) {
-      const key = this.keyForm.mold(keyObject);
-      const nextKey = model.state.nextKey(key);
-      if (nextKey !== void 0) {
-        return nextKey.coerce(this.keyForm);
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const key = this.keyForm.mold(keyObject);
+    const nextKey = model.state.nextKey(key);
+    if (nextKey === void 0) {
+      return void 0;
+    }
+    return nextKey.coerce(this.keyForm);
   };
 
   MapDownlink.prototype.nextValue = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): V | undefined {
     const model = this.model;
-    if (model !== null) {
-      const key = this.keyForm.mold(keyObject);
-      const nextValue = model.state.nextValue(key);
-      if (nextValue !== void 0) {
-        return nextValue.coerce(this.valueForm);
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const key = this.keyForm.mold(keyObject);
+    const nextValue = model.state.nextValue(key);
+    if (nextValue === void 0) {
+      return void 0;
+    }
+    return nextValue.coerce(this.valueForm);
   };
 
   MapDownlink.prototype.nextEntry = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): [K, V] | undefined {
     const model = this.model;
-    if (model !== null) {
-      const key = this.keyForm.mold(keyObject);
-      const nextEntry = model.state.nextEntry(key);
-      if (nextEntry !== void 0) {
-        return [nextEntry[0].coerce(this.keyForm), nextEntry[1].coerce(this.valueForm)];
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const key = this.keyForm.mold(keyObject);
+    const nextEntry = model.state.nextEntry(key);
+    if (nextEntry === void 0) {
+      return void 0;
+    }
+    return [nextEntry[0].coerce(this.keyForm), nextEntry[1].coerce(this.valueForm)];
   };
 
   MapDownlink.prototype.previousKey = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): K | undefined {
     const model = this.model;
-    if (model !== null) {
-      const key = this.keyForm.mold(keyObject);
-      const previousKey = model.state.previousKey(key);
-      if (previousKey !== void 0) {
-        return previousKey.coerce(this.keyForm);
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const key = this.keyForm.mold(keyObject);
+    const previousKey = model.state.previousKey(key);
+    if (previousKey === void 0) {
+      return void 0;
+    }
+    return previousKey.coerce(this.keyForm);
   };
 
   MapDownlink.prototype.previousValue = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): V | undefined {
     const model = this.model;
-    if (model !== null) {
-      const key = this.keyForm.mold(keyObject);
-      const previousValue = model.state.previousValue(key);
-      if (previousValue !== void 0) {
-        return previousValue.coerce(this.valueForm);
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const key = this.keyForm.mold(keyObject);
+    const previousValue = model.state.previousValue(key);
+    if (previousValue === void 0) {
+      return void 0;
+    }
+    return previousValue.coerce(this.valueForm);
   };
 
   MapDownlink.prototype.previousEntry = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): [K, V] | undefined {
     const model = this.model;
-    if (model !== null) {
-      const key = this.keyForm.mold(keyObject);
-      const previousEntry = model.state.previousEntry(key);
-      if (previousEntry !== void 0) {
-        return [previousEntry[0].coerce(this.keyForm), previousEntry[1].coerce(this.valueForm)];
-      } else {
-        return void 0;
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const key = this.keyForm.mold(keyObject);
+    const previousEntry = model.state.previousEntry(key);
+    if (previousEntry === void 0) {
+      return void 0;
+    }
+    return [previousEntry[0].coerce(this.keyForm), previousEntry[1].coerce(this.valueForm)];
   };
 
   MapDownlink.prototype.set = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, key: K | KU, newValue: V | VU): MapDownlink<unknown, K, V, KU, VU> {
     const model = this.model;
-    if (model !== null) {
-      const keyObject = this.keyForm.mold(key);
-      const newObject = this.valueForm.mold(newValue);
-      model.set(keyObject, newObject);
-      return this;
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const keyObject = this.keyForm.mold(key);
+    const newObject = this.valueForm.mold(newValue);
+    model.set(keyObject, newObject);
+    return this;
   };
 
   MapDownlink.prototype.delete = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, key: K | KU): boolean {
     const model = this.model;
-    if (model !== null) {
-      const keyObject = this.keyForm.mold(key);
-      return model.delete(keyObject);
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const keyObject = this.keyForm.mold(key);
+    return model.delete(keyObject);
   };
 
   MapDownlink.prototype.drop = function <K, V>(this: MapDownlink<unknown, K, V>, lower: number): MapDownlink<unknown, K, V> {
     const model = this.model;
-    if (model !== null) {
-      model.drop(lower);
-      return this;
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.drop(lower);
+    return this;
   };
 
   MapDownlink.prototype.take = function <K, V>(this: MapDownlink<unknown, K, V>, upper: number): MapDownlink<unknown, K, V> {
     const model = this.model;
-    if (model !== null) {
-      model.take(upper);
-      return this;
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.take(upper);
+    return this;
   };
 
   MapDownlink.prototype.clear = function <K, V>(this: MapDownlink<unknown, K, V>): void {
     const model = this.model;
-    if (model !== null) {
-      model.clear();
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    model.clear();
   };
 
   MapDownlink.prototype.forEach = function<K, V, T, S>(this: MapDownlink<unknown, K, V>,
                                                        callback: (this: S | undefined, key: K, value: V) => T | void,
                                                        thisArg?: S): T | undefined {
     const model = this.model;
-    if (model !== null) {
-      const keyForm = this.keyForm;
-      const valueForm = this.valueForm;
-      if (keyForm as unknown === Form.forValue() && valueForm as unknown === Form.forValue()) {
-        return model.state.forEach(callback as any, thisArg);
-      } else {
-        return model.state.forEach(function (key: Value, value: Value): T | void {
-          const keyObject = key.coerce(keyForm);
-          const object = value.coerce(valueForm);
-          return callback.call(thisArg, keyObject, object);
-        }, this);
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const keyForm = this.keyForm;
+    const valueForm = this.valueForm;
+    if (keyForm as unknown === Form.forValue() && valueForm as unknown === Form.forValue()) {
+      return model.state.forEach(callback as any, thisArg);
+    }
+    return model.state.forEach(function (key: Value, value: Value): T | void {
+      const keyObject = key.coerce(keyForm);
+      const object = value.coerce(valueForm);
+      return callback.call(thisArg, keyObject, object);
+    }, this);
   };
 
   MapDownlink.prototype.keys = function <K, V>(this: MapDownlink<unknown, K, V>): Cursor<K> {
     const model = this.model;
-    if (model !== null) {
-      const cursor = model.keys();
-      if (this.keyForm as unknown === Form.forValue()) {
-        return cursor as unknown as Cursor<K>;
-      } else {
-        return new ValueCursor(cursor, this.keyForm);
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const cursor = model.keys();
+    if (this.keyForm as unknown === Form.forValue()) {
+      return cursor as unknown as Cursor<K>;
+    }
+    return new ValueCursor(cursor, this.keyForm);
   };
 
   MapDownlink.prototype.values = function <K, V>(this: MapDownlink<unknown, K, V>): Cursor<V> {
     const model = this.model;
-    if (model !== null) {
-      const cursor = model.values();
-      if (this.valueForm as unknown === Form.forValue()) {
-        return cursor as unknown as Cursor<V>;
-      } else {
-        return new ValueCursor(cursor, this.valueForm);
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const cursor = model.values();
+    if (this.valueForm as unknown === Form.forValue()) {
+      return cursor as unknown as Cursor<V>;
+    }
+    return new ValueCursor(cursor, this.valueForm);
   };
 
   MapDownlink.prototype.entries = function <K, V>(this: MapDownlink<unknown, K, V>): Cursor<[K, V]> {
     const model = this.model;
-    if (model !== null) {
-      const cursor = model.entries();
-      if (this.keyForm as unknown === Form.forValue() && this.valueForm as unknown === Form.forValue()) {
-        return cursor as unknown as Cursor<[K, V]>;
-      } else {
-        return new ValueEntryCursor(cursor, this.keyForm, this.valueForm);
-      }
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    const cursor = model.entries();
+    if (this.keyForm as unknown === Form.forValue() && this.valueForm as unknown === Form.forValue()) {
+      return cursor as unknown as Cursor<[K, V]>;
+    }
+    return new ValueEntryCursor(cursor, this.keyForm, this.valueForm);
   };
 
   MapDownlink.prototype.snapshot = function <K, V>(this: MapDownlink<unknown, K, V>): BTree<Value, Value> {
     const model = this.model;
-    if (model !== null) {
-      return model.snapshot();
-    } else {
+    if (model === null) {
       throw new Error("unopened downlink");
     }
+    return model.snapshot();
   };
 
   MapDownlink.prototype.mapWillUpdate = function <K, V>(this: MapDownlink<unknown, K, V>, key: Value, newValue: Value): Value {
@@ -652,22 +597,21 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (keyObject === void 0) {
         keyObject = key.coerce(keyForm);
       }
       if (newObject === void 0) {
         newObject = newValue.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.willUpdate !== void 0) {
-          const newResult = observer.willUpdate(keyObject, newObject, this);
-          if (newResult !== void 0) {
-            newObject = newResult;
-            newValue = valueForm.mold(newObject);
-          }
+      for (const observer of observers) {
+        if (observer.willUpdate === void 0) {
+          continue;
+        }
+        const newResult = observer.willUpdate(keyObject, newObject, this);
+        if (newResult !== void 0) {
+          newObject = newResult;
+          newValue = valueForm.mold(newObject);
         }
       }
     }
@@ -690,8 +634,7 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (keyObject === void 0) {
         keyObject = key.coerce(keyForm);
       }
@@ -701,11 +644,11 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       if (oldObject === void 0) {
         oldObject = oldValue.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.didUpdate !== void 0) {
-          observer.didUpdate(keyObject, newObject, oldObject, this);
+      for (const observer of observers) {
+        if (observer.didUpdate === void 0) {
+          continue;
         }
+        observer.didUpdate(keyObject, newObject, oldObject, this);
       }
     }
   };
@@ -720,16 +663,15 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (keyObject === void 0) {
         keyObject = key.coerce(keyForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.willRemove !== void 0) {
-          observer.willRemove(keyObject, this);
+      for (const observer of observers) {
+        if (observer.willRemove === void 0) {
+          continue;
         }
+        observer.willRemove(keyObject, this);
       }
     }
   };
@@ -747,19 +689,18 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     const observers = this.observers;
-    const observerCount = observers.length;
-    if (observerCount !== 0) {
+    if (observers !== null && observers.size !== 0) {
       if (keyObject === void 0) {
         keyObject = key.coerce(keyForm);
       }
       if (oldObject === void 0) {
         oldObject = oldValue.coerce(valueForm);
       }
-      for (let i = 0; i < observerCount; i += 1) {
-        const observer = observers[i]!;
-        if (observer.didRemove !== void 0) {
-          observer.didRemove(keyObject, oldObject, this);
+      for (const observer of observers) {
+        if (observer.didRemove === void 0) {
+          continue;
         }
+        observer.didRemove(keyObject, oldObject, this);
       }
     }
   };
@@ -768,146 +709,105 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     if (this.willDrop !== void 0) {
       this.willDrop(lower);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willDrop !== void 0) {
-        observer.willDrop(lower, this);
-      }
-    }
+    this.callObservers("willDrop", lower, this);
   };
 
   MapDownlink.prototype.mapDidDrop = function <K, V>(this: MapDownlink<unknown, K, V>, lower: number): void {
     if (this.didDrop !== void 0) {
       this.didDrop(lower);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didDrop !== void 0) {
-        observer.didDrop(lower, this);
-      }
-    }
+    this.callObservers("didDrop", lower, this);
   };
 
   MapDownlink.prototype.mapWillTake = function <K, V>(this: MapDownlink<unknown, K, V>, upper: number): void {
     if (this.willTake !== void 0) {
       this.willTake(upper);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willTake !== void 0) {
-        observer.willTake(upper, this);
-      }
-    }
+    this.callObservers("willTake", upper, this);
   };
 
   MapDownlink.prototype.mapDidTake = function <K, V>(this: MapDownlink<unknown, K, V>, upper: number): void {
     if (this.didTake !== void 0) {
       this.didTake(upper);
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didTake !== void 0) {
-        observer.didTake(upper, this);
-      }
-    }
+    this.callObservers("didTake", upper, this);
   };
 
   MapDownlink.prototype.mapWillClear = function <K, V>(this: MapDownlink<unknown, K, V>): void {
     if (this.willClear !== void 0) {
       this.willClear();
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.willClear !== void 0) {
-        observer.willClear(this);
-      }
-    }
+    this.callObservers("willClear", this);
   };
 
   MapDownlink.prototype.mapDidClear = function <K, V>(this: MapDownlink<unknown, K, V>): void {
     if (this.didClear !== void 0) {
       this.didClear();
     }
-
-    const observers = this.observers;
-    for (let i = 0, n = observers.length; i < n; i += 1) {
-      const observer = observers[i]!;
-      if (observer.didClear !== void 0) {
-        observer.didClear(this);
-      }
-    }
+    this.callObservers("didClear", this);
   };
 
   MapDownlink.prototype.didAliasModel = function (this: MapDownlink): void {
     const model = this.model;
-    if (model !== null && model.linked) {
-      this.onLinkedResponse();
-      model.state.forEach(function (key: Value, value: Value): void {
-        this.mapDidUpdate(key, value, Value.absent());
-      }, this);
-      if (model.synced) {
-        this.onSyncedResponse();
-      }
+    if (model === null || !model.linked) {
+      return;
+    }
+    this.onLinkedResponse();
+    model.state.forEach(function (key: Value, value: Value): void {
+      this.mapDidUpdate(key, value, Value.absent());
+    }, this);
+    if (model.synced) {
+      this.onSyncedResponse();
     }
   };
 
   MapDownlink.prototype.open = function (this: MapDownlink): MapDownlink {
-    if (this.model === null) {
-      const laneUri = this.getLaneUri();
-      if (laneUri === null) {
-        throw new Error("no laneUri");
+    if (this.model !== null) {
+      return this;
+    }
+    const laneUri = this.getLaneUri();
+    if (laneUri === null) {
+      throw new Error("no laneUri");
+    }
+    let nodeUri = this.getNodeUri();
+    if (nodeUri === null) {
+      throw new Error("no nodeUri");
+    }
+    let hostUri = this.getHostUri();
+    if (hostUri === null) {
+      hostUri = nodeUri.endpoint();
+      nodeUri = hostUri.unresolve(nodeUri);
+    }
+    let prio = this.getPrio();
+    if (prio === void 0) {
+      prio = 0;
+    }
+    let rate = this.getRate();
+    if (rate === void 0) {
+      rate = 0;
+    }
+    let body = this.getBody();
+    if (body === null) {
+      body = Value.absent();
+    }
+    const owner = this.owner;
+    if (!WarpDownlinkContext.is(owner)) {
+      throw new Error("no downlink context");
+    }
+    let model = owner.getDownlink(hostUri, nodeUri, laneUri);
+    if (model !== null) {
+      if (!(model instanceof MapDownlinkModel)) {
+        throw new Error("downlink type mismatch");
       }
-      let nodeUri = this.getNodeUri();
-      if (nodeUri === null) {
-        throw new Error("no nodeUri");
-      }
-      let hostUri = this.getHostUri();
-      if (hostUri === null) {
-        hostUri = nodeUri.endpoint();
-        nodeUri = hostUri.unresolve(nodeUri);
-      }
-      let prio = this.getPrio();
-      if (prio === void 0) {
-        prio = 0;
-      }
-      let rate = this.getRate();
-      if (rate === void 0) {
-        rate = 0;
-      }
-      let body = this.getBody();
-      if (body === null) {
-        body = Value.absent();
-      }
-      const owner = this.owner;
-      if (WarpDownlinkContext.is(owner)) {
-        let model = owner.getDownlink(hostUri, nodeUri, laneUri);
-        if (model !== null) {
-          if (!(model instanceof MapDownlinkModel)) {
-            throw new Error("downlink type mismatch");
-          }
-          model.addDownlink(this);
-          (this as Mutable<typeof this>).model = model as MapDownlinkModel;
-          setTimeout(this.didAliasModel.bind(this));
-        } else {
-          const state = this.initState();
-          model = new MapDownlinkModel(hostUri, nodeUri, laneUri, prio, rate, body, state);
-          model.addDownlink(this);
-          owner.openDownlink(model);
-          (this as Mutable<typeof this>).model = model as MapDownlinkModel;
-        }
-      } else {
-        throw new Error("no downlink context");
-      }
+      model.addDownlink(this);
+      (this as Mutable<typeof this>).model = model as MapDownlinkModel;
+      setTimeout(this.didAliasModel.bind(this));
+    } else {
+      const state = this.initState();
+      model = new MapDownlinkModel(hostUri, nodeUri, laneUri, prio, rate, body, state);
+      model.addDownlink(this);
+      owner.openDownlink(model);
+      (this as Mutable<typeof this>).model = model as MapDownlinkModel;
     }
     return this;
   };

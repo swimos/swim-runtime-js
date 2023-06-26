@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
-import {HashGenCacheMap} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import {Format} from "@swim/codec";
-import {Uri} from "./Uri";
+import {Base10} from "@swim/codec";
+import {Unicode} from "@swim/codec";
 
 /** @public */
 export type AnyUriPort = UriPort | number | string;
@@ -88,25 +90,20 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return "" + this.number;
   }
 
-  @Lazy
+  /** @internal */
+  static readonly Undefined: UriPort = new this(0);
+
   static undefined(): UriPort {
-    return new UriPort(0);
+    return this.Undefined;
   }
 
   static create(number: number): UriPort {
-    if (number === 0) {
-      return UriPort.undefined();
-    } else if (number > 0) {
-      const cache = UriPort.cache;
-      const port = cache.get(number);
-      if (port !== void 0) {
-        return port;
-      } else {
-        return cache.put(number, new UriPort(number));
-      }
-    } else {
+    if (number < 0) {
       throw new TypeError("" + number);
+    } else if (number === 0) {
+      return UriPort.undefined();
     }
+    return new UriPort(number);
   }
 
   static fromAny(value: AnyUriPort): UriPort
@@ -118,19 +115,44 @@ export class UriPort implements HashCode, Compare, Debug, Display {
       return UriPort.create(value);
     } else if (typeof value === "string") {
       return UriPort.parse(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
-  static parse(portPart: string): UriPort {
-    return Uri.standardParser.parsePortString(portPart);
+  static parse(input: Input): Parser<UriPort>;
+  static parse(string: string): UriPort;
+  static parse(string: Input | string): Parser<UriPort> | UriPort {
+    const input = typeof string === "string" ? Unicode.stringInput(string) : string;
+    let parser = UriPortParser.parse(input);
+    if (typeof string === "string" && input.isCont() && !parser.isError()) {
+      parser = Parser.error(Diagnostic.unexpected(input));
+    }
+    return typeof string === "string" ? parser.bind() : parser;
+  }
+}
+
+/** @internal */
+export class UriPortParser extends Parser<UriPort> {
+  private readonly number: number | undefined;
+
+  constructor(number?: number) {
+    super();
+    this.number = number;
   }
 
-  /** @internal */
-  @Lazy
-  static get cache(): HashGenCacheMap<number, UriPort> {
-    const cacheSize = 16;
-    return new HashGenCacheMap<number, UriPort>(cacheSize);
+  override feed(input: Input): Parser<UriPort> {
+    return UriPortParser.parse(input, this.number);
+  }
+
+  static parse(input: Input, number: number = 0): Parser<UriPort> {
+    let c = 0;
+    while (input.isCont() && (c = input.head(), Base10.isDigit(c))) {
+      input = input.step();
+      number = 10 * number + Base10.decodeDigit(c);
+    }
+    if (!input.isEmpty()) {
+      return Parser.done(UriPort.create(number));
+    }
+    return new UriPortParser(number);
   }
 }

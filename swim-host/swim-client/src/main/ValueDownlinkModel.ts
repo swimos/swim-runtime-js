@@ -31,7 +31,7 @@ export class ValueDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  override readonly views!: ReadonlyArray<ValueDownlink<unknown>>;
+  declare readonly views: ReadonlySet<ValueDownlink<unknown, unknown, unknown>> | null;
 
   /** @internal */
   readonly state: Value;
@@ -66,16 +66,20 @@ export class ValueDownlinkModel extends WarpDownlinkModel {
 
   protected valueWillSet(newValue: Value): Value {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      newValue = views[i]!.valueWillSet(newValue);
+    if (views !== null) {
+      for (const view of views) {
+        newValue = view.valueWillSet(newValue);
+      }
     }
     return newValue;
   }
 
   protected valueDidSet(newValue: Value, oldValue: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.valueDidSet(newValue, oldValue);
+    if (views !== null) {
+      for (const view of views) {
+        view.valueDidSet(newValue, oldValue);
+      }
     }
   }
 }

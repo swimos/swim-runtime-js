@@ -35,7 +35,7 @@ export class ListDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  override readonly views!: ReadonlyArray<ListDownlink<unknown>>;
+  declare readonly views: ReadonlySet<ListDownlink<unknown, unknown, unknown>> | null;
 
   /** @internal */
   readonly state: STree<Value, Value>;
@@ -93,24 +93,23 @@ export class ListDownlinkModel extends WarpDownlinkModel {
   override remove(index?: number, key?: Value): this | void {
     if (arguments.length === 0) {
       super.remove();
-    } else {
-      if (key !== void 0) {
-        index = this.state.lookup(key, index);
-        if (index < 0) {
-          throw new RangeError("" + key);
-        }
+      return;
+    } else if (key !== void 0) {
+      index = this.state.lookup(key, index);
+      if (index < 0) {
+        throw new RangeError("" + key);
       }
-      if (index! < 0 || index! > this.state.length) {
-        throw new RangeError("" + index);
-      }
-      this.listWillRemove(index!);
-      const oldEntry = this.state.getEntry(index!)!;
-      this.state.remove(index!);
-      this.listDidRemove(index!, oldEntry[1]);
-      const header = Record.create(2).slot("key", oldEntry[0]).slot("index", index!);
-      this.command(Record.create(1).attr("remove", header));
-      return this;
     }
+    if (index! < 0 || index! > this.state.length) {
+      throw new RangeError("" + index);
+    }
+    this.listWillRemove(index!);
+    const oldEntry = this.state.getEntry(index!)!;
+    this.state.remove(index!);
+    this.listDidRemove(index!, oldEntry[1]);
+    const header = Record.create(2).slot("key", oldEntry[0]).slot("index", index!);
+    this.command(Record.create(1).attr("remove", header));
+    return this;
   }
 
   push(...newValues: Value[]): number {
@@ -128,17 +127,16 @@ export class ListDownlinkModel extends WarpDownlinkModel {
 
   pop(): Value {
     const index = this.state.length - 1;
-    if (index >= 0) {
-      this.listWillRemove(index);
-      const oldEntry = this.state.getEntry(index)!;
-      this.state.remove(index);
-      this.listDidRemove(index, oldEntry[1]);
-      const header = Record.create(2).slot("key", oldEntry[0]).slot("index", index);
-      this.command(Record.create(1).attr("remove", header));
-      return oldEntry[1];
-    } else {
+    if (index < 0) {
       return Value.absent();
     }
+    this.listWillRemove(index);
+    const oldEntry = this.state.getEntry(index)!;
+    this.state.remove(index);
+    this.listDidRemove(index, oldEntry[1]);
+    const header = Record.create(2).slot("key", oldEntry[0]).slot("index", index);
+    this.command(Record.create(1).attr("remove", header));
+    return oldEntry[1];
   }
 
   unshift(...newValues: Value[]): number {
@@ -154,17 +152,16 @@ export class ListDownlinkModel extends WarpDownlinkModel {
   }
 
   shift(): Value {
-    if (this.state.length > 0) {
-      this.listWillRemove(0);
-      const oldEntry = this.state.getEntry(0)!;
-      this.state.remove(0);
-      this.listDidRemove(0, oldEntry[1]);
-      const header = Record.create(2).slot("key", oldEntry[0]).slot("index", 0);
-      this.command(Record.create(1).attr("remove", header));
-      return oldEntry[1];
-    } else {
+    if (this.state.length <= 0) {
       return Value.absent();
     }
+    this.listWillRemove(0);
+    const oldEntry = this.state.getEntry(0)!;
+    this.state.remove(0);
+    this.listDidRemove(0, oldEntry[1]);
+    const header = Record.create(2).slot("key", oldEntry[0]).slot("index", 0);
+    this.command(Record.create(1).attr("remove", header));
+    return oldEntry[1];
   }
 
   move(fromIndex: number, toIndex: number, key?: Value): this {
@@ -306,12 +303,13 @@ export class ListDownlinkModel extends WarpDownlinkModel {
 
   protected onMoveEvent(fromIndex: number, toIndex: number, key: Value): void {
     toIndex = Math.min(Math.max(0, toIndex), this.state.length);
-    if (fromIndex !== toIndex) {
-      const value = this.state.get(fromIndex) || Value.absent();
-      this.listWillMove(fromIndex, toIndex, value);
-      this.state.remove(fromIndex).insert(toIndex, value, key);
-      this.listDidMove(fromIndex, toIndex, value);
+    if (fromIndex === toIndex) {
+      return;
     }
+    const value = this.state.get(fromIndex) || Value.absent();
+    this.listWillMove(fromIndex, toIndex, value);
+    this.state.remove(fromIndex).insert(toIndex, value, key);
+    this.listDidMove(fromIndex, toIndex, value);
   }
 
   protected onRemoveEvent(index: number, key: Value): void {
@@ -341,86 +339,110 @@ export class ListDownlinkModel extends WarpDownlinkModel {
 
   protected listWillUpdate(index: number, newValue: Value): Value {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      newValue = views[i]!.listWillUpdate(index, newValue);
+    if (views !== null) {
+      for (const view of views) {
+        newValue = view.listWillUpdate(index, newValue);
+      }
     }
     return newValue;
   }
 
   protected listDidUpdate(index: number, newValue: Value, oldValue: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listDidUpdate(index, newValue, oldValue);
+    if (views !== null) {
+      for (const view of views) {
+        view.listDidUpdate(index, newValue, oldValue);
+      }
     }
   }
 
   protected listWillMove(fromIndex: number, toIndex: number, value: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listWillMove(fromIndex, toIndex, value);
+    if (views !== null) {
+      for (const view of views) {
+        view.listWillMove(fromIndex, toIndex, value);
+      }
     }
   }
 
   protected listDidMove(fromIndex: number, toIndex: number, value: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listDidMove(fromIndex, toIndex, value);
+    if (views !== null) {
+      for (const view of views) {
+        view.listDidMove(fromIndex, toIndex, value);
+      }
     }
   }
 
   protected listWillRemove(index: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listWillRemove(index);
+    if (views !== null) {
+      for (const view of views) {
+        view.listWillRemove(index);
+      }
     }
   }
 
   protected listDidRemove(index: number, oldValue: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listDidRemove(index, oldValue);
+    if (views !== null) {
+      for (const view of views) {
+        view.listDidRemove(index, oldValue);
+      }
     }
   }
 
   protected listWillDrop(lower: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listWillDrop(lower);
+    if (views !== null) {
+      for (const view of views) {
+        view.listWillDrop(lower);
+      }
     }
   }
 
   protected listDidDrop(lower: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listDidDrop(lower);
+    if (views !== null) {
+      for (const view of views) {
+        view.listDidDrop(lower);
+      }
     }
   }
 
   protected listWillTake(upper: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listWillTake(upper);
+    if (views !== null) {
+      for (const view of views) {
+        view.listWillTake(upper);
+      }
     }
   }
 
   protected listDidTake(upper: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listDidTake(upper);
+    if (views !== null) {
+      for (const view of views) {
+        view.listDidTake(upper);
+      }
     }
   }
 
   protected listWillClear(): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listWillClear();
+    if (views !== null) {
+      for (const view of views) {
+        view.listWillClear();
+      }
     }
   }
 
   protected listDidClear(): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.listDidClear();
+    if (views !== null) {
+      for (const view of views) {
+        view.listDidClear();
+      }
     }
   }
 }

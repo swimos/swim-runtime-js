@@ -40,6 +40,4 @@ export * from "./consumable";
 
 export * from "./collections";
 
-export * from "./cache";
-
 export * from "./assert";

@@ -35,7 +35,7 @@ export class MapDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  override readonly views!: ReadonlyArray<MapDownlink<unknown, unknown>>;
+  declare readonly views: ReadonlySet<MapDownlink<unknown, unknown, unknown, unknown, unknown>> | null;
 
   /** @internal */
   readonly state: BTree<Value, Value>;
@@ -71,17 +71,16 @@ export class MapDownlinkModel extends WarpDownlinkModel {
   }
 
   delete(key: Value): boolean {
-    if (this.state.has(key)) {
-      this.mapWillRemove(key);
-      const oldValue = this.state.get(key) ?? Value.absent();
-      this.state.delete(key);
-      this.mapDidRemove(key, oldValue);
-      const header = Record.create(1).slot("key", key);
-      this.command(Record.create(1).attr("remove", header));
-      return true;
-    } else {
+    if (!this.state.has(key)) {
       return false;
     }
+    this.mapWillRemove(key);
+    const oldValue = this.state.get(key) ?? Value.absent();
+    this.state.delete(key);
+    this.mapDidRemove(key, oldValue);
+    const header = Record.create(1).slot("key", key);
+    this.command(Record.create(1).attr("remove", header));
+    return true;
   }
 
   drop(lower: number): this {
@@ -190,72 +189,92 @@ export class MapDownlinkModel extends WarpDownlinkModel {
 
   protected mapWillUpdate(key: Value, newValue: Value): Value {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      newValue = views[i]!.mapWillUpdate(key, newValue);
+    if (views !== null) {
+      for (const view of views) {
+        newValue = view.mapWillUpdate(key, newValue);
+      }
     }
     return newValue;
   }
 
   protected mapDidUpdate(key: Value, newValue: Value, oldValue: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapDidUpdate(key, newValue, oldValue);
+    if (views !== null) {
+      for (const view of views) {
+        view.mapDidUpdate(key, newValue, oldValue);
+      }
     }
   }
 
   protected mapWillRemove(key: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapWillRemove(key);
+    if (views !== null) {
+      for (const view of views) {
+        view.mapWillRemove(key);
+      }
     }
   }
 
   protected mapDidRemove(key: Value, oldValue: Value): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapDidRemove(key, oldValue);
+    if (views !== null) {
+      for (const view of views) {
+        view.mapDidRemove(key, oldValue);
+      }
     }
   }
 
   protected mapWillDrop(lower: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapWillDrop(lower);
+    if (views !== null) {
+      for (const view of views) {
+        view.mapWillDrop(lower);
+      }
     }
   }
 
   protected mapDidDrop(lower: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapDidDrop(lower);
+    if (views !== null) {
+      for (const view of views) {
+        view.mapDidDrop(lower);
+      }
     }
   }
 
   protected mapWillTake(upper: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapWillTake(upper);
+    if (views !== null) {
+      for (const view of views) {
+        view.mapWillTake(upper);
+      }
     }
   }
 
   protected mapDidTake(upper: number): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapDidTake(upper);
+    if (views !== null) {
+      for (const view of views) {
+        view.mapDidTake(upper);
+      }
     }
   }
 
   protected mapWillClear(): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapWillClear();
+    if (views !== null) {
+      for (const view of views) {
+        view.mapWillClear();
+      }
     }
   }
 
   protected mapDidClear(): void {
     const views = this.views;
-    for (let i = 0, n = views.length; i < n; i += 1) {
-      views[i]!.mapDidClear();
+    if (views !== null) {
+      for (const view of views) {
+        view.mapDidClear();
+      }
     }
   }
 }

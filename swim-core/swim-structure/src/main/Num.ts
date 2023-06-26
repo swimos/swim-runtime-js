@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Equivalent} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Interpolator} from "@swim/util";
-import {HashGenCacheSet} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Format} from "@swim/codec";
 import type {AnyItem} from "./Item";
@@ -345,7 +343,7 @@ export class Num extends Value {
     } else if (isNaN(value)) {
       return Num.nan();
     }
-    return Num.cache.put(new Num(value));
+    return new Num(value);
   }
 
   static override fromAny(value: AnyNum): Num {
@@ -366,13 +364,6 @@ export class Num extends Value {
       throw new Error(value);
     }
     return Num.from(num);
-  }
-
-  /** @internal */
-  @Lazy
-  static get cache(): HashGenCacheSet<Num> {
-    const cacheSize = 128;
-    return new HashGenCacheSet<Num>(cacheSize);
   }
 }
 

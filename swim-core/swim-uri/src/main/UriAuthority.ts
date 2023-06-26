@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Diagnostic} from "@swim/codec";
+import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
+import {Parser} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import {Format} from "@swim/codec";
-import {Uri} from "./Uri";
+import {Unicode} from "@swim/codec";
 import type {AnyUriUser} from "./UriUser";
 import type {UriUserInit} from "./UriUser";
 import {UriUser} from "./"; // forward import
@@ -29,6 +31,9 @@ import type {AnyUriHost} from "./UriHost";
 import {UriHost} from "./"; // forward import
 import type {AnyUriPort} from "./UriPort";
 import {UriPort} from "./"; // forward import
+import {UriUserParser} from "./"; // forward import
+import {UriHostParser} from "./"; // forward import
+import {UriPortParser} from "./"; // forward import
 
 /** @public */
 export type AnyUriAuthority = UriAuthority | UriAuthorityInit | string;
@@ -61,11 +66,10 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
 
   withUser(user: AnyUriUser): UriAuthority {
     user = UriUser.fromAny(user);
-    if (user !== this.user) {
-      return this.copy(user as UriUser, this.host, this.port);
-    } else {
+    if (user === this.user) {
       return this;
     }
+    return this.copy(user as UriUser, this.host, this.port);
   }
 
   get userPart(): string {
@@ -83,9 +87,10 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
   withUsername(username: string | undefined, password?: string): UriAuthority {
     if (arguments.length === 1) {
       return this.withUser(this.user.withUsername(username));
-    } else {
+    } else if (arguments.length === 2) {
       return this.withUser(UriUser.create(username, password));
     }
+    throw new Error(arguments.toString());
   }
 
   get password(): string | undefined {
@@ -100,11 +105,10 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
 
   withHost(host: AnyUriHost): UriAuthority {
     host = UriHost.fromAny(host);
-    if (host !== this.host) {
-      return this.copy(this.user, host, this.port);
-    } else {
+    if (host === this.host) {
       return this;
     }
+    return this.copy(this.user, host, this.port);
   }
 
   get hostPart(): string {
@@ -147,11 +151,10 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
 
   withPort(port: AnyUriPort): UriAuthority {
     port = UriPort.fromAny(port);
-    if (port !== this.port) {
-      return this.copy(this.user, this.host, port);
-    } else {
+    if (port === this.port) {
       return this;
     }
+    return this.copy(this.user, this.host, port);
   }
 
   get portPart(): string {
@@ -260,19 +263,23 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return stringValue;
   }
 
-  @Lazy
+  /** @internal */
+  static Undefined: UriAuthority | null = null;
+
   static undefined(): UriAuthority {
-    return new UriAuthority(UriUser.undefined(), UriHost.undefined(), UriPort.undefined());
+    if (this.Undefined === null) {
+      this.Undefined = new UriAuthority(UriUser.undefined(), UriHost.undefined(), UriPort.undefined());
+    }
+    return this.Undefined;
   }
 
   static create(user: UriUser = UriUser.undefined(),
                 host: UriHost = UriHost.undefined(),
                 port: UriPort = UriPort.undefined()): UriAuthority {
-    if (user.isDefined() || host.isDefined() || port.isDefined()) {
-      return new UriAuthority(user, host, port);
-    } else {
+    if (!user.isDefined() && !host.isDefined() && !port.isDefined()) {
       return UriAuthority.undefined();
     }
+    return new UriAuthority(user, host, port);
   }
 
   static fromInit(init: UriAuthorityInit): UriAuthority {
@@ -300,9 +307,8 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
       return UriAuthority.fromInit(value);
     } else if (typeof value === "string") {
       return UriAuthority.parse(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
   static user(user: AnyUriUser): UriAuthority {
@@ -365,7 +371,106 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return UriAuthority.create(void 0, void 0, port);
   }
 
-  static parse(authorityPart: string): UriAuthority {
-    return Uri.standardParser.parseAuthorityString(authorityPart);
+  static parse(input: Input): Parser<UriAuthority>;
+  static parse(string: string): UriAuthority;
+  static parse(string: Input | string): Parser<UriAuthority> | UriAuthority {
+    const input = typeof string === "string" ? Unicode.stringInput(string) : string;
+    let parser = UriAuthorityParser.parse(input);
+    if (typeof string === "string" && input.isCont() && !parser.isError()) {
+      parser = Parser.error(Diagnostic.unexpected(input));
+    }
+    return typeof string === "string" ? parser.bind() : parser;
+  }
+}
+
+/** @internal */
+export class UriAuthorityParser extends Parser<UriAuthority> {
+  private readonly userParser: Parser<UriUser> | undefined;
+  private readonly hostParser: Parser<UriHost> | undefined;
+  private readonly portParser: Parser<UriPort> | undefined;
+  private readonly step: number | undefined;
+
+  constructor(userParser?: Parser<UriUser>, hostParser?: Parser<UriHost>,
+              portParser?: Parser<UriPort>, step?: number) {
+    super();
+    this.userParser = userParser;
+    this.hostParser = hostParser;
+    this.portParser = portParser;
+    this.step = step;
+  }
+
+  override feed(input: Input): Parser<UriAuthority> {
+    return UriAuthorityParser.parse(input, this.userParser, this.hostParser,
+                                    this.portParser, this.step);
+  }
+
+  static parse(input: Input, userParser?: Parser<UriUser>, hostParser?: Parser<UriHost>,
+               portParser?: Parser<UriPort>, step: number = 1): Parser<UriAuthority> {
+    let c = 0;
+    if (step === 1) {
+      if (input.isCont()) {
+        const look = input.clone();
+        while (look.isCont() && (c = look.head(), c !== 64/*'@'*/ && c !== 47/*'/'*/)) {
+          look.step();
+        }
+        if (look.isCont() && c === 64/*'@'*/) {
+          step = 2;
+        } else {
+          step = 3;
+        }
+      } else if (input.isDone()) {
+        step = 3;
+      }
+    }
+    if (step === 2) {
+      if (userParser === void 0) {
+        userParser = UriUserParser.parse(input);
+      } else {
+        userParser = userParser.feed(input);
+      }
+      if (userParser.isDone()) {
+        if (input.isCont() && input.head() === 64/*'@'*/) {
+          input = input.step();
+          step = 3;
+        } else if (!input.isEmpty()) {
+          return Parser.error(Diagnostic.expected(64/*'@'*/, input));
+        }
+      } else if (userParser.isError()) {
+        return userParser.asError();
+      }
+    }
+    if (step === 3) {
+      if (hostParser === void 0) {
+        hostParser = UriHostParser.parse(input);
+      } else {
+        hostParser = hostParser.feed(input);
+      }
+      if (hostParser.isDone()) {
+        if (input.isCont() && input.head() === 58/*':'*/) {
+          input = input.step();
+          step = 4;
+        } else if (!input.isEmpty()) {
+          return Parser.done(UriAuthority.create(userParser !== void 0 ? userParser.bind() : void 0,
+                                                 hostParser.bind()));
+        }
+      } else if (hostParser.isError()) {
+        return hostParser.asError();
+      }
+    }
+    if (step === 4) {
+      if (portParser === void 0) {
+        portParser = UriPortParser.parse(input);
+      } else {
+        portParser = portParser.feed(input);
+      }
+      if (portParser.isDone()) {
+        return Parser.done(UriAuthority.create(userParser !== void 0 ? userParser.bind() : void 0,
+                                               hostParser!.bind(),
+                                               portParser.bind()));
+      } else if (portParser.isError()) {
+        return portParser.asError();
+      }
+    }
+    return new UriAuthorityParser(userParser, hostParser, portParser, step);
   }
 }
