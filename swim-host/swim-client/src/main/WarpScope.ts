@@ -48,7 +48,7 @@ export class WarpScope extends Component implements WarpRef {
   downlink(template?: ThisType<EventDownlink<this>> & EventDownlinkDescriptor & Partial<Omit<EventDownlink<this>, keyof EventDownlinkDescriptor>>): EventDownlink<this> {
     let downlinkClass = EventDownlink;
     if (template !== void 0) {
-      downlinkClass = downlinkClass.define("downlink", template);
+      downlinkClass = downlinkClass.define("downlink", template) as typeof EventDownlink;
     }
     return downlinkClass.create(this);
   }
@@ -57,7 +57,7 @@ export class WarpScope extends Component implements WarpRef {
   downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ValueDownlink<this, V, VU>> & ValueDownlinkDescriptor<V, VU> & Partial<Omit<ValueDownlink<this, V, VU>, keyof ValueDownlinkDescriptor<V, VU>>>): ValueDownlink<this, V, VU> {
     let downlinkClass = ValueDownlink;
     if (template !== void 0) {
-      downlinkClass = downlinkClass.define("downlinkValue", template);
+      downlinkClass = downlinkClass.define("downlinkValue", template) as typeof ValueDownlink;
     }
     return downlinkClass.create(this);
   }
@@ -66,7 +66,7 @@ export class WarpScope extends Component implements WarpRef {
   downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ListDownlink<this, V, VU>> & ListDownlinkDescriptor<V, VU> & Partial<Omit<ListDownlink<this, V, VU>, keyof ListDownlinkDescriptor<V, VU>>>): ListDownlink<this, V, VU> {
     let downlinkClass = ListDownlink;
     if (template !== void 0) {
-      downlinkClass = downlinkClass.define("downlinkList", template);
+      downlinkClass = downlinkClass.define("downlinkList", template) as typeof ListDownlink;
     }
     return downlinkClass.create(this);
   }
@@ -75,7 +75,7 @@ export class WarpScope extends Component implements WarpRef {
   downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: ThisType<MapDownlink<this, K, V, KU, VU>> & MapDownlinkDescriptor<K, V, KU, VU> & Partial<Omit<MapDownlink<this, K, V, KU, VU>, keyof MapDownlinkDescriptor<K, V, KU, VU>>>): MapDownlink<this, K, V, KU, VU> {
     let downlinkClass = MapDownlink;
     if (template !== void 0) {
-      downlinkClass = downlinkClass.define("downlinkMap", template);
+      downlinkClass = downlinkClass.define("downlinkMap", template) as typeof MapDownlink;
     }
     return downlinkClass.create(this);
   }

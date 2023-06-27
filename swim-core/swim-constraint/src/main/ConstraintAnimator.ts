@@ -16,8 +16,8 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Affinity} from "@swim/component";
 import type {FastenerFlags} from "@swim/component";
-import type {FastenerClass} from "@swim/component";
 import type {AnimatorDescriptor} from "@swim/component";
+import type {AnimatorClass} from "@swim/component";
 import {Animator} from "@swim/component";
 import {ConstraintId} from "./ConstraintId";
 import {ConstraintMap} from "./ConstraintMap";
@@ -36,6 +36,19 @@ export interface ConstraintAnimatorDescriptor<T = unknown, U = T> extends Animat
   extends?: Proto<ConstraintAnimator<any, any, any>> | boolean | null;
   strength?: AnyConstraintStrength;
   constrained?: boolean;
+}
+
+/** @public */
+export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any, any> = ConstraintAnimator<any, any, any>> extends AnimatorClass<A> {
+  /** @internal */
+  readonly ConstrainedFlag: FastenerFlags;
+  /** @internal */
+  readonly ConstrainingFlag: FastenerFlags;
+
+  /** @internal @override */
+  readonly FlagShift: number;
+  /** @internal @override */
+  readonly FlagMask: FastenerFlags;
 }
 
 /** @public */
@@ -154,17 +167,7 @@ export interface ConstraintAnimator<O = unknown, T = unknown, U = T> extends Ani
 
 /** @public */
 export const ConstraintAnimator = (function (_super: typeof Animator) {
-  const ConstraintAnimator = _super.extend("ConstraintAnimator", {}) as FastenerClass<ConstraintAnimator<any, any, any>> & {
-    /** @internal */
-    readonly ConstrainedFlag: FastenerFlags;
-    /** @internal */
-    readonly ConstrainingFlag: FastenerFlags;
-
-    /** @internal @override */
-    readonly FlagShift: number;
-    /** @internal @override */
-    readonly FlagMask: FastenerFlags;
-  };
+  const ConstraintAnimator = _super.extend("ConstraintAnimator", {}) as ConstraintAnimatorClass;
 
   ConstraintAnimator.prototype.isExternal = function (this: ConstraintAnimator): boolean {
     return true;
@@ -405,7 +408,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
     return animator;
   };
 
-  ConstraintAnimator.refine = function (animatorClass: FastenerClass<any>): void {
+  ConstraintAnimator.refine = function (animatorClass: ConstraintAnimatorClass<any>): void {
     _super.refine.call(this, animatorClass);
     const animatorPrototype = animatorClass.prototype;
     let flagsInit = animatorPrototype.flagsInit;

@@ -13,7 +13,9 @@
 // limitations under the License.
 
 export type {FileRelationDescriptor} from "./FileRelation";
+export type {FileRelationClass} from "./FileRelation";
 export {FileRelation} from "./FileRelation";
 
 export type {FileRefDescriptor} from "./FileRef";
+export type {FileRefClass} from "./FileRef";
 export {FileRef} from "./FileRef";

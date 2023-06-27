@@ -30,6 +30,17 @@ export interface FileRelationDescriptor<T = unknown> extends FastenerDescriptor 
 }
 
 /** @public */
+export interface FileRelationClass<F extends FileRelation<any, any> = FileRelation<any, any>> extends FastenerClass<F> {
+  /** @internal */
+  readonly ResolvesFlag: FastenerFlags;
+
+  /** @internal @override */
+  readonly FlagShift: number;
+  /** @internal @override */
+  readonly FlagMask: FastenerFlags;
+}
+
+/** @public */
 export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
   /** @override */
   get descriptorType(): Proto<FileRelationDescriptor<T>>;
@@ -88,15 +99,7 @@ export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
 
 /** @public */
 export const FileRelation = (function (_super: typeof Fastener) {
-  const FileRelation = _super.extend("FileRelation", {}) as FastenerClass<FileRelation<any, any>> & {
-    /** @internal */
-    readonly ResolvesFlag: FastenerFlags;
-
-    /** @internal @override */
-    readonly FlagShift: number;
-    /** @internal @override */
-    readonly FlagMask: FastenerFlags;
-  };
+  const FileRelation = _super.extend("FileRelation", {}) as FileRelationClass;
 
   Object.defineProperty(FileRelation.prototype, "fastenerType", {
     value: FileRelation,
@@ -226,7 +229,7 @@ export const FileRelation = (function (_super: typeof Fastener) {
     return fastener;
   };
 
-  FileRelation.refine = function (fastenerClass: FastenerClass<any>): void {
+  FileRelation.refine = function (fastenerClass: FileRelationClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;

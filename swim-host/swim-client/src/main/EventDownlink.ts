@@ -15,10 +15,10 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
-import type {FastenerClass} from "@swim/component";
 import {Value} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
+import type {WarpDownlinkClass} from "./WarpDownlink";
 import type {WarpDownlinkObserver} from "./WarpDownlink";
 import {WarpDownlink} from "./WarpDownlink";
 import {EventDownlinkModel} from "./EventDownlinkModel";
@@ -26,6 +26,10 @@ import {EventDownlinkModel} from "./EventDownlinkModel";
 /** @public */
 export interface EventDownlinkDescriptor extends WarpDownlinkDescriptor {
   extends?: Proto<EventDownlink<any>> | boolean | null;
+}
+
+/** @public */
+export interface EventDownlinkClass<F extends EventDownlink<any> = EventDownlink<any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
@@ -51,7 +55,7 @@ export interface EventDownlink<O = unknown> extends WarpDownlink<O> {
 export const EventDownlink = (function (_super: typeof WarpDownlink) {
   const EventDownlink = _super.extend("EventDownlink", {
     relinks: true,
-  }) as FastenerClass<EventDownlink<any>>;
+  }) as EventDownlinkClass;
 
   EventDownlink.prototype.open = function (this: EventDownlink): EventDownlink {
     if (this.model !== null) {

@@ -16,7 +16,6 @@ import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {Cursor} from "@swim/util";
-import type {FastenerClass} from "@swim/component";
 import type {STree} from "@swim/collections";
 import type {AnyValue} from "@swim/structure";
 import {Value} from "@swim/structure";
@@ -25,6 +24,7 @@ import {ValueCursor} from "@swim/structure";
 import {ValueEntryCursor} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
+import type {WarpDownlinkClass} from "./WarpDownlink";
 import type {WarpDownlinkObserver} from "./WarpDownlink";
 import {WarpDownlink} from "./WarpDownlink";
 import {ListDownlinkModel} from "./ListDownlinkModel";
@@ -35,6 +35,10 @@ export interface ListDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlin
   valueForm?: Form<V, VU>;
   /** @internal */
   stateInit?: STree<Value, Value> | null;
+}
+
+/** @public */
+export interface ListDownlinkClass<F extends ListDownlink<any, any, any> = ListDownlink<any, any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
@@ -218,7 +222,7 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
   const ListDownlink = _super.extend("ListDownlink", {
     relinks: true,
     syncs: true,
-  }) as FastenerClass<ListDownlink<any, any, any>>;
+  }) as ListDownlinkClass;
 
   ListDownlink.prototype.initValueForm = function <V, VU>(this: ListDownlink<unknown, V, VU>): Form<V, VU> {
     let valueForm = (Object.getPrototypeOf(this) as ListDownlink<unknown, V, VU>).valueForm as Form<V, VU> | undefined;

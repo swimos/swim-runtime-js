@@ -15,12 +15,12 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
-import type {FastenerClass} from "@swim/component";
 import type {AnyValue} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Form} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
+import type {WarpDownlinkClass} from "./WarpDownlink";
 import type {WarpDownlinkObserver} from "./WarpDownlink";
 import {WarpDownlink} from "./WarpDownlink";
 import {ValueDownlinkModel} from "./ValueDownlinkModel";
@@ -31,6 +31,10 @@ export interface ValueDownlinkDescriptor<V = unknown, VU = V> extends WarpDownli
   valueForm?: Form<V, VU>;
   /** @internal */
   stateInit?: Value | null;
+}
+
+/** @public */
+export interface ValueDownlinkClass<F extends ValueDownlink<any, any, any> = ValueDownlink<any, any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
@@ -98,7 +102,7 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
   const ValueDownlink = _super.extend("ValueDownlink", {
     relinks: true,
     syncs: true,
-  }) as FastenerClass<ValueDownlink<any, any, any>>;
+  }) as ValueDownlinkClass;
 
   ValueDownlink.prototype.initValueForm = function <V, VU>(this: ValueDownlink<unknown, V, VU>): Form<V, VU> {
     let valueForm = (Object.getPrototypeOf(this) as ValueDownlink<unknown, V, VU>).valueForm as Form<V, VU> | undefined;

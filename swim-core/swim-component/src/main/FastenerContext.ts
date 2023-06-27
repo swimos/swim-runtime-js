@@ -43,7 +43,9 @@ export interface FastenerContext {
 /** @public */
 export const FastenerContext = (function () {
   const FastenerContext = {} as {
-    getOptionalFastener<O, K extends keyof O>(owner: O, fastenerName: K): O[K] | null;
+    tryFastener<O, K extends keyof O, F extends O[K] = O[K]>(owner: O, fastenerName: K): F extends Fastener<any> ? F | null : null;
+
+    getFastenerClass<O, K extends keyof O>(owner: O, fastenerName: K): O[K] extends Fastener<any> ? FastenerClass<O[K]> | null : null;
 
     getFastenerSlot<O>(owner: O, fastenerName: keyof O): keyof O | undefined;
 
@@ -83,10 +85,17 @@ export const FastenerContext = (function () {
     readonly FastenerSlots: unique symbol;
   };
 
-  FastenerContext.getOptionalFastener = function <O, K extends keyof O>(owner: O, fastenerName: K): O[K] | null {
+  FastenerContext.tryFastener = function <O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends Fastener<any> ? F | null : null {
     const fastenerSlot = FastenerContext.getFastenerSlot(owner, fastenerName);
-    const fastener = fastenerSlot !== void 0 ? owner[fastenerSlot] as O[K] | undefined : void 0;
-    return fastener !== void 0 ? fastener : null;
+    const fastener = fastenerSlot !== void 0 ? owner[fastenerSlot] : void 0;
+    return (fastener !== void 0 ? fastener : null) as F extends Fastener<any> ? F | null : null;
+  };
+
+  FastenerContext.getFastenerClass = function <O, K extends keyof O>(owner: O, fastenerName: K): O[K] extends Fastener<any> ? FastenerClass<O[K]> | null : null {
+    const contextClass = (owner as object).constructor as Partial<FastenerContextClass>;
+    const fastenerClassMap = contextClass[FastenerContext.FastenerClassMap];
+    const fastenerClass = fastenerClassMap !== void 0 ? fastenerClassMap[fastenerName] : void 0;
+    return fastenerClass !== void 0 ? fastenerClass as O[K] extends Fastener<any> ? FastenerClass<O[K]> : never : null;
   };
 
   FastenerContext.getFastenerSlot = function <O>(owner: O, fastenerName: PropertyKey): keyof O | undefined {
@@ -201,12 +210,12 @@ export const FastenerContext = (function () {
   FastenerContext.initFastenerClass = function <F extends Fastener<any>>(owner: F extends Fastener<infer O> ? O : never, baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, fastenerName: PropertyKey, fastenerSlot: PropertyKey, fastenerClass: FastenerClass<F> | null): FastenerClass<F> {
     const contextClass = FastenerContext.initOwner(owner);
     const fastenerClassMap = contextClass[FastenerContext.FastenerClassMap];
-    const superFastenerClass = fastenerClassMap[fastenerSlot];
+    const superFastenerClass = fastenerClassMap[fastenerName];
     if (fastenerClass === null) {
       fastenerClass = baseClass.define(fastenerName, template, superFastenerClass);
     }
     if (superFastenerClass !== fastenerClass) {
-      fastenerClassMap[fastenerSlot] = fastenerClass;
+      fastenerClassMap[fastenerName] = fastenerClass;
       if (superFastenerClass === void 0) {
         contextClass[FastenerContext.FastenerSlots].push(fastenerSlot);
       }

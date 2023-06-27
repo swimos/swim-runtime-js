@@ -14,14 +14,18 @@
 
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
-import type {FastenerClass} from "./Fastener";
 import type {EventHandlerDescriptor} from "./EventHandler";
+import type {EventHandlerClass} from "./EventHandler";
 import {EventHandler} from "./EventHandler";
 
 /** @public */
 export interface EventTimerDescriptor<T extends EventTarget = EventTarget> extends EventHandlerDescriptor<T> {
   extends?: Proto<EventTimer<any, any>> | boolean | null;
   delay?: number;
+}
+
+/** @public */
+export interface EventTimerClass<F extends EventTimer<any, any> = EventTimer<any, any>> extends EventHandlerClass<F> {
 }
 
 /** @public */
@@ -106,7 +110,7 @@ export interface EventTimer<O = unknown, T extends EventTarget = EventTarget> ex
 
 /** @public */
 export const EventTimer = (function (_super: typeof EventHandler) {
-  const EventTimer = _super.extend("EventTimer", {}) as FastenerClass<EventTimer<any, any>>;
+  const EventTimer = _super.extend("EventTimer", {}) as EventTimerClass;
 
   EventTimer.prototype.defer = function (this: EventTimer, event: Event): void {
     this.throttle(event);

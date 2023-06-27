@@ -31,6 +31,10 @@ export interface ComponentRelationDescriptor<C extends Component = Component> ex
 }
 
 /** @public */
+export interface ComponentRelationClass<F extends ComponentRelation<any, any> = ComponentRelation<any, any>> extends FastenerClass<F> {
+}
+
+/** @public */
 export interface ComponentRelation<O = unknown, C extends Component = Component> extends Fastener<O> {
   /** @override */
   get descriptorType(): Proto<ComponentRelationDescriptor<C>>;
@@ -147,7 +151,7 @@ export interface ComponentRelation<O = unknown, C extends Component = Component>
 
 /** @public */
 export const ComponentRelation = (function (_super: typeof Fastener) {
-  const ComponentRelation = _super.extend("ComponentRelation", {}) as FastenerClass<ComponentRelation<any, any>>;
+  const ComponentRelation = _super.extend("ComponentRelation", {}) as ComponentRelationClass;
 
   Object.defineProperty(ComponentRelation.prototype, "fastenerType", {
     value: ComponentRelation,

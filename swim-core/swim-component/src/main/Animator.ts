@@ -20,14 +20,29 @@ import {Easing} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Affinity} from "./Affinity";
 import type {FastenerFlags} from "./Fastener";
-import type {FastenerClass} from "./Fastener";
 import type {PropertyDescriptor} from "./Property";
+import type {PropertyClass} from "./Property";
 import {Property} from "./Property";
 
 /** @public */
 export interface AnimatorDescriptor<T = unknown, U = T> extends PropertyDescriptor<T, U> {
   extends?: Proto<Animator<any, any, any>> | boolean | null;
   transition?: Timing | null;
+}
+
+/** @public */
+export interface AnimatorClass<A extends Animator<any, any, any> = Animator<any, any, any>> extends PropertyClass<A> {
+  /** @internal */
+  readonly TweeningFlag: FastenerFlags;
+  /** @internal */
+  readonly DivergedFlag: FastenerFlags;
+  /** @internal */
+  readonly InterruptFlag: FastenerFlags;
+
+  /** @internal @override */
+  readonly FlagShift: number;
+  /** @internal @override */
+  readonly FlagMask: FastenerFlags;
 }
 
 /** @public */
@@ -135,19 +150,7 @@ export interface Animator<O = unknown, T = unknown, U = T> extends Property<O, T
 
 /** @public */
 export const Animator = (function (_super: typeof Property) {
-  const Animator = _super.extend("Animator", {}) as FastenerClass<Animator<any, any, any>> & {
-    /** @internal */
-    readonly TweeningFlag: FastenerFlags;
-    /** @internal */
-    readonly DivergedFlag: FastenerFlags;
-    /** @internal */
-    readonly InterruptFlag: FastenerFlags;
-
-    /** @internal @override */
-    readonly FlagShift: number;
-    /** @internal @override */
-    readonly FlagMask: FastenerFlags;
-  };
+  const Animator = _super.extend("Animator", {}) as AnimatorClass;
 
   Animator.prototype.onDerive = function <T>(this: Animator<unknown, T>, inlet: Property<unknown, T>): void {
     let newValue: T;

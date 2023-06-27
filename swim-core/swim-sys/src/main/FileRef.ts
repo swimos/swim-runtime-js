@@ -15,9 +15,9 @@
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {FastenerFlags} from "@swim/component";
-import type {FastenerClass} from "@swim/component";
 import type {Fastener} from "@swim/component";
 import type {FileRelationDescriptor} from "./FileRelation";
+import type {FileRelationClass} from "./FileRelation";
 import {FileRelation} from "./FileRelation";
 
 /** @public */
@@ -25,6 +25,19 @@ export interface FileRefDescriptor<T = unknown> extends FileRelationDescriptor {
   extends?: Proto<FileRef<any, any>> | boolean | null;
   fileName?: string;
   value?: T;
+}
+
+/** @public */
+export interface FileRefClass<F extends FileRef<any, any> = FileRef<any, any>> extends FileRelationClass<F> {
+  /** @internal */
+  readonly LoadedFlag: FastenerFlags;
+  /** @internal */
+  readonly ModifiedFlag: FastenerFlags;
+
+  /** @internal @override */
+  readonly FlagShift: number;
+  /** @internal @override */
+  readonly FlagMask: FastenerFlags;
 }
 
 /** @public */
@@ -87,17 +100,7 @@ export interface FileRef<O = unknown, T = unknown> extends FileRelation<O, T> {
 
 /** @public */
 export const FileRef = (function (_super: typeof FileRelation) {
-  const FileRef = _super.extend("FileRef", {}) as FastenerClass<FileRef<any, any>> & {
-    /** @internal */
-    readonly LoadedFlag: FastenerFlags;
-    /** @internal */
-    readonly ModifiedFlag: FastenerFlags;
-
-    /** @internal @override */
-    readonly FlagShift: number;
-    /** @internal @override */
-    readonly FlagMask: FastenerFlags;
-  };
+  const FileRef = _super.extend("FileRef", {}) as FileRefClass;
 
   Object.defineProperty(FileRef.prototype, "fastenerType", {
     value: FileRef,

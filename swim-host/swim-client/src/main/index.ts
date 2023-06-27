@@ -16,26 +16,31 @@ export {WarpDownlinkContext} from "./WarpDownlinkContext";
 
 export {WarpDownlinkModel} from "./WarpDownlinkModel";
 export type {WarpDownlinkDescriptor} from "./WarpDownlink";
+export type {WarpDownlinkClass} from "./WarpDownlink";
 export type {WarpDownlinkObserver} from "./WarpDownlink";
 export {WarpDownlink} from "./WarpDownlink";
 
 export {EventDownlinkModel} from "./EventDownlinkModel";
 export type {EventDownlinkDescriptor} from "./EventDownlink";
+export type {EventDownlinkClass} from "./EventDownlink";
 export type {EventDownlinkObserver} from "./EventDownlink";
 export {EventDownlink} from "./EventDownlink";
 
 export {ValueDownlinkModel} from "./ValueDownlinkModel";
 export type {ValueDownlinkDescriptor} from "./ValueDownlink";
+export type {ValueDownlinkClass} from "./ValueDownlink";
 export type {ValueDownlinkObserver} from "./ValueDownlink";
 export {ValueDownlink} from "./ValueDownlink";
 
 export {ListDownlinkModel} from "./ListDownlinkModel";
 export type {ListDownlinkDescriptor} from "./ListDownlink";
+export type {ListDownlinkClass} from "./ListDownlink";
 export type {ListDownlinkObserver} from "./ListDownlink";
 export {ListDownlink} from "./ListDownlink";
 
 export {MapDownlinkModel} from "./MapDownlinkModel";
 export type {MapDownlinkDescriptor} from "./MapDownlink";
+export type {MapDownlinkClass} from "./MapDownlink";
 export type {MapDownlinkObserver} from "./MapDownlink";
 export {MapDownlink} from "./MapDownlink";
 

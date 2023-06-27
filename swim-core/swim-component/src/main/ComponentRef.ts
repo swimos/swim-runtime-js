@@ -15,17 +15,23 @@
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Affinity} from "./Affinity";
-import type {FastenerClass} from "./Fastener";
+import {FastenerContext} from "./FastenerContext";
 import {Fastener} from "./Fastener";
 import type {AnyComponent} from "./Component";
 import type {Component} from "./Component";
 import type {ComponentRelationDescriptor} from "./ComponentRelation";
+import type {ComponentRelationClass} from "./ComponentRelation";
 import {ComponentRelation} from "./ComponentRelation";
 
 /** @public */
 export interface ComponentRefDescriptor<C extends Component = Component> extends ComponentRelationDescriptor<C> {
   extends?: Proto<ComponentRef<any, any>> | boolean | null;
   componentKey?: string | boolean;
+}
+
+/** @public */
+export interface ComponentRefClass<F extends ComponentRef<any, any> = ComponentRef<any, any>> extends ComponentRelationClass<F> {
+  tryComponent<O, K extends keyof O, F extends O[K] = O[K]>(owner: O, fastenerName: K): F extends ComponentRef<any, infer C> ? C | null : null;
 }
 
 /** @public */
@@ -140,7 +146,7 @@ export interface ComponentRef<O = unknown, C extends Component = Component> exte
 
 /** @public */
 export const ComponentRef = (function (_super: typeof ComponentRelation) {
-  const ComponentRef = _super.extend("ComponentRef", {}) as FastenerClass<ComponentRef<any, any>>;
+  const ComponentRef = _super.extend("ComponentRef", {}) as ComponentRefClass;
 
   Object.defineProperty(ComponentRef.prototype, "fastenerType", {
     value: ComponentRef,
@@ -420,6 +426,14 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     this.setComponent(inlet.component);
   };
 
+  ComponentRef.tryComponent = function <O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends ComponentRef<any, infer C> ? C | null : null {
+    const componentRef = FastenerContext.tryFastener(owner, fastenerName) as ComponentRef | null;
+    if (componentRef !== null) {
+      return componentRef.component as any;
+    }
+    return null as any;
+  };
+
   ComponentRef.construct = function <F extends ComponentRef<any, any>>(fastener: F | null, owner: F extends ComponentRef<infer O, any> ? O : never): F {
     if (fastener === null) {
       fastener = function (component?: F extends ComponentRef<any, infer C> ? AnyComponent<C> | null : never, target?: Component | null, key?: string): F extends ComponentRelation<infer O, infer C> ? C | O | null : never {
@@ -438,7 +452,7 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
     return fastener;
   };
 
-  ComponentRef.refine = function (fastenerClass: FastenerClass<any>): void {
+  ComponentRef.refine = function (fastenerClass: ComponentRefClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
 

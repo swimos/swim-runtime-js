@@ -25,6 +25,10 @@ export interface TimerDescriptor extends FastenerDescriptor {
 }
 
 /** @public */
+export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerClass<F> {
+}
+
+/** @public */
 export interface Timer<O = unknown> extends Fastener<O> {
   (): void;
 
@@ -104,7 +108,7 @@ export interface Timer<O = unknown> extends Fastener<O> {
 
 /** @public */
 export const Timer = (function (_super: typeof Fastener) {
-  const Timer = _super.extend("Timer", {}) as FastenerClass<Timer<any>>;
+  const Timer = _super.extend("Timer", {}) as TimerClass;
 
   Object.defineProperty(Timer.prototype, "fastenerType", {
     value: Timer,

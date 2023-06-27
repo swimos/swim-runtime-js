@@ -18,11 +18,11 @@ import {Objects} from "@swim/util";
 import type {Comparator} from "@swim/util";
 import {Affinity} from "./Affinity";
 import type {FastenerFlags} from "./Fastener";
-import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 import type {AnyComponent} from "./Component";
 import type {Component} from "./Component";
 import type {ComponentRelationDescriptor} from "./ComponentRelation";
+import type {ComponentRelationClass} from "./ComponentRelation";
 import {ComponentRelation} from "./ComponentRelation";
 
 /** @public */
@@ -30,6 +30,19 @@ export interface ComponentSetDescriptor<C extends Component = Component> extends
   extends?: Proto<ComponentSet<any, any>> | boolean | null;
   ordered?: boolean;
   sorted?: boolean;
+}
+
+/** @public */
+export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentSet<any, any>> extends ComponentRelationClass<F> {
+  /** @internal */
+  readonly OrderedFlag: FastenerFlags;
+  /** @internal */
+  readonly SortedFlag: FastenerFlags;
+
+  /** @internal @override */
+  readonly FlagShift: number;
+  /** @internal @override */
+  readonly FlagMask: FastenerFlags;
 }
 
 /** @public */
@@ -202,17 +215,7 @@ export interface ComponentSet<O = unknown, C extends Component = Component> exte
 
 /** @public */
 export const ComponentSet = (function (_super: typeof ComponentRelation) {
-  const ComponentSet = _super.extend("ComponentSet", {}) as FastenerClass<ComponentSet<any, any>> & {
-    /** @internal */
-    readonly OrderedFlag: FastenerFlags;
-    /** @internal */
-    readonly SortedFlag: FastenerFlags;
-
-    /** @internal @override */
-    readonly FlagShift: number;
-    /** @internal @override */
-    readonly FlagMask: FastenerFlags;
-  };
+  const ComponentSet = _super.extend("ComponentSet", {}) as ComponentSetClass;
 
   Object.defineProperty(ComponentSet.prototype, "fastenerType", {
     value: ComponentSet,
@@ -660,7 +663,7 @@ export const ComponentSet = (function (_super: typeof ComponentRelation) {
     return fastener;
   };
 
-  ComponentSet.refine = function (fastenerClass: FastenerClass<any>): void {
+  ComponentSet.refine = function (fastenerClass: ComponentSetClass<any>): void {
     _super.refine.call(this, fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
     let flagsInit = fastenerPrototype.flagsInit;

@@ -32,6 +32,17 @@ export interface EventHandlerDescriptor<T extends EventTarget = EventTarget> ext
 }
 
 /** @public */
+export interface EventHandlerClass<F extends EventHandler<any, any> = EventHandler<any, any>> extends FastenerClass<F> {
+  /** @internal */
+  readonly DisabledFlag: FastenerFlags;
+
+  /** @internal @override */
+  readonly FlagShift: number;
+  /** @internal @override */
+  readonly FlagMask: FastenerFlags;
+}
+
+/** @public */
 export interface EventHandler<O = unknown, T extends EventTarget = EventTarget> extends Fastener<O>, EventListener {
   /** @override */
   (event: Event): void;
@@ -129,15 +140,7 @@ export interface EventHandler<O = unknown, T extends EventTarget = EventTarget> 
 
 /** @public */
 export const EventHandler = (function (_super: typeof Fastener) {
-  const EventHandler = _super.extend("EventHandler", {}) as FastenerClass<EventHandler<any, any>> & {
-    /** @internal */
-    readonly DisabledFlag: FastenerFlags;
-
-    /** @internal @override */
-    readonly FlagShift: number;
-    /** @internal @override */
-    readonly FlagMask: FastenerFlags;
-  };
+  const EventHandler = _super.extend("EventHandler", {}) as EventHandlerClass;
 
   Object.defineProperty(EventHandler.prototype, "fastenerType", {
     value: EventHandler,

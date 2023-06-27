@@ -56,6 +56,21 @@ export interface WarpDownlinkDescriptor extends FastenerDescriptor {
 }
 
 /** @public */
+export interface WarpDownlinkClass<F extends WarpDownlink<any> = WarpDownlink<any>> extends FastenerClass<F> {
+  /** @internal */
+  readonly RelinksFlag: FastenerFlags;
+  /** @internal */
+  readonly SyncsFlag: FastenerFlags;
+  /** @internal */
+  readonly ConsumingFlag: FastenerFlags;
+
+  /** @internal @override */
+  readonly FlagShift: number;
+  /** @internal @override */
+  readonly FlagMask: FastenerFlags;
+}
+
+/** @public */
 export interface WarpDownlinkObserver<F extends WarpDownlink<any> = WarpDownlink> extends Observer<F> {
   onEvent?(body: Value, downlink: F): void;
 
@@ -359,19 +374,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 
 /** @public */
 export const WarpDownlink = (function (_super: typeof Fastener) {
-  const WarpDownlink = _super.extend("WarpDownlink", {}) as FastenerClass<WarpDownlink<any>> & {
-    /** @internal */
-    readonly RelinksFlag: FastenerFlags;
-    /** @internal */
-    readonly SyncsFlag: FastenerFlags;
-    /** @internal */
-    readonly ConsumingFlag: FastenerFlags;
-
-    /** @internal @override */
-    readonly FlagShift: number;
-    /** @internal @override */
-    readonly FlagMask: FastenerFlags;
-  };
+  const WarpDownlink = _super.extend("WarpDownlink", {}) as WarpDownlinkClass;
 
   Object.defineProperty(WarpDownlink.prototype, "fastenerType", {
     value: WarpDownlink,
@@ -991,7 +994,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     return downlink;
   };
 
-  WarpDownlink.refine = function (downlinkClass: FastenerClass<any>): void {
+  WarpDownlink.refine = function (downlinkClass: WarpDownlinkClass<any>): void {
     _super.refine.call(this, downlinkClass);
     const downlinkPrototype = downlinkClass.prototype;
     let flagsInit = downlinkPrototype.flagsInit;

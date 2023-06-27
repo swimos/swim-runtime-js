@@ -886,8 +886,8 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     // hook
   }
 
-  getOptionalFastener<K extends keyof this>(fastenerName: K): this[K] | null {
-    return FastenerContext.getOptionalFastener(this, fastenerName);
+  tryFastener<K extends keyof this, F extends this[K] = this[K]>(fastenerName: K): F extends Fastener<any> ? F | null : null {
+    return FastenerContext.tryFastener(this, fastenerName);
   }
 
   getFastener<F extends Fastener<any>>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {

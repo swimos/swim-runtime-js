@@ -33,9 +33,11 @@ export {ConstraintConstant} from "./ConstraintConstant";
 export type {ConstraintVariable} from "./ConstraintVariable";
 
 export type {ConstraintPropertyDescriptor} from "./ConstraintProperty";
+export type {ConstraintPropertyClass} from "./ConstraintProperty";
 export {ConstraintProperty} from "./ConstraintProperty";
 
 export type {ConstraintAnimatorDescriptor} from "./ConstraintAnimator";
+export type {ConstraintAnimatorClass} from "./ConstraintAnimator";
 export {ConstraintAnimator} from "./ConstraintAnimator";
 
 export type {ConstraintRelation} from "./ConstraintRelation";

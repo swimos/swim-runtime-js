@@ -17,7 +17,6 @@ import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {Cursor} from "@swim/util";
 import type {OrderedMap} from "@swim/util";
-import type {FastenerClass} from "@swim/component";
 import type {BTree} from "@swim/collections";
 import type {AnyValue} from "@swim/structure";
 import {Value} from "@swim/structure";
@@ -26,6 +25,7 @@ import {ValueCursor} from "@swim/structure";
 import {ValueEntryCursor} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
+import type {WarpDownlinkClass} from "./WarpDownlink";
 import type {WarpDownlinkObserver} from "./WarpDownlink";
 import {WarpDownlink} from "./WarpDownlink";
 import {MapDownlinkModel} from "./MapDownlinkModel";
@@ -37,6 +37,10 @@ export interface MapDownlinkDescriptor<K = unknown, V = unknown, KU = K, VU = V>
   valueForm?: Form<V, VU>;
   /** @internal */
   stateInit?: BTree<Value, Value> | null;
+}
+
+/** @public */
+export interface MapDownlinkClass<F extends MapDownlink<any, any, any, any, any> = MapDownlink<any, any, any, any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
@@ -227,7 +231,7 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
   const MapDownlink = _super.extend("MapDownlink", {
     relinks: true,
     syncs: true,
-  }) as FastenerClass<MapDownlink<any, any, any, any, any>>;
+  }) as MapDownlinkClass;
 
   MapDownlink.prototype.initKeyForm = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>): Form<K, KU> {
     let keyForm = (Object.getPrototypeOf(this) as MapDownlink<unknown, K,V, KU, VU>).keyForm as Form<K, KU> | undefined;

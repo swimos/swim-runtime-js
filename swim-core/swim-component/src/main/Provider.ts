@@ -16,6 +16,7 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {Observes} from "@swim/util";
 import {Affinity} from "./Affinity";
+import {FastenerContext} from "./FastenerContext";
 import type {FastenerFlags} from "./Fastener";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
@@ -30,6 +31,19 @@ export interface ProviderDescriptor<S extends Service = Service> extends Fastene
   serviceKey?: string | boolean;
   creates?: boolean;
   observes?: boolean;
+}
+
+/** @public */
+export interface ProviderClass<P extends Provider<any, any> = Provider<any, any>> extends FastenerClass<P> {
+  tryService<O, K extends keyof O, F extends O[K] = O[K]>(owner: O, fastenerName: K): F extends Provider<any, infer S> ? S | null : null;
+
+  /** @internal */
+  readonly ManagedFlag: FastenerFlags;
+
+  /** @internal @override */
+  readonly FlagShift: number;
+  /** @internal @override */
+  readonly FlagMask: FastenerFlags;
 }
 
 /** @public */
@@ -176,15 +190,7 @@ export const Provider = (function (_super: typeof Fastener) {
     affinity: Affinity.Inherited,
     inherits: true,
     creates: true,
-  }) as FastenerClass<Provider<any, any>> & {
-    /** @internal */
-    readonly ManagedFlag: FastenerFlags;
-
-    /** @internal @override */
-    readonly FlagShift: number;
-    /** @internal @override */
-    readonly FlagMask: FastenerFlags;
-  };
+  }) as ProviderClass;
 
   Object.defineProperty(Provider.prototype, "fastenerType", {
     value: Provider,
@@ -403,6 +409,14 @@ export const Provider = (function (_super: typeof Fastener) {
       this.unmountService(service);
     }
     _super.prototype.onUnmount.call(this);
+  };
+
+  Provider.tryService = function <O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends Provider<any, infer S> ? S | null : null {
+    const provider = FastenerContext.tryFastener(owner, fastenerName) as Provider | null;
+    if (provider !== null) {
+      return provider.service as any;
+    }
+    return null as any;
   };
 
   Provider.create = function <P extends Provider<any, any>>(owner: P extends Provider<infer O, any> ? O : never): P {

@@ -28,29 +28,35 @@ export {Fastener} from "./Fastener";
 // Property
 
 export type {PropertyDescriptor} from "./Property";
+export type {PropertyClass} from "./Property";
 export {Property} from "./Property";
 
 // Animator
 
 export type {AnimatorDescriptor} from "./Animator";
+export type {AnimatorClass} from "./Animator";
 export {Animator} from "./Animator";
 
 // Timer
 
 export type {TimerDescriptor} from "./Timer";
+export type {TimerClass} from "./Timer";
 export {Timer} from "./Timer";
 
 // Event
 
 export type {EventHandlerDescriptor} from "./EventHandler";
+export type {EventHandlerClass} from "./EventHandler";
 export {EventHandler} from "./EventHandler";
 
 export type {EventTimerDescriptor} from "./EventTimer";
+export type {EventTimerClass} from "./EventTimer";
 export {EventTimer} from "./EventTimer";
 
 // Provider
 
 export type {ProviderDescriptor} from "./Provider";
+export type {ProviderClass} from "./Provider";
 export {Provider} from "./Provider";
 
 // Component
@@ -65,12 +71,15 @@ export type {ComponentObserver} from "./Component";
 export {Component} from "./Component";
 
 export type {ComponentRelationDescriptor} from "./ComponentRelation";
+export type {ComponentRelationClass} from "./ComponentRelation";
 export {ComponentRelation} from "./ComponentRelation";
 
 export type {ComponentRefDescriptor} from "./ComponentRef";
+export type {ComponentRefClass} from "./ComponentRef";
 export {ComponentRef} from "./ComponentRef";
 
 export type {ComponentSetDescriptor} from "./ComponentSet";
+export type {ComponentSetClass} from "./ComponentSet";
 export {ComponentSet} from "./ComponentSet";
 
 // Service

@@ -17,7 +17,7 @@ import type {Proto} from "@swim/util";
 import {Equals} from "@swim/util";
 import {FromAny} from "@swim/util";
 import {Affinity} from "./Affinity";
-import type {FastenerContext} from "./FastenerContext";
+import {FastenerContext} from "./FastenerContext";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
@@ -28,6 +28,13 @@ export interface PropertyDescriptor<T = unknown, U = T> extends FastenerDescript
   valueType?: unknown;
   value?: T | U;
   updateFlags?: number;
+}
+
+/** @public */
+export interface PropertyClass<P extends Property<any, any, any> = Property<any, any, any>> extends FastenerClass<P> {
+  tryValue<O, K extends keyof O, F extends O[K] = O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any> ? T : undefined;
+
+  tryValueOr<O, K extends keyof O, E, F extends O[K] = O[K]>(owner: O, fastenerName: K, elseValue: E): F extends Property<any, infer T, any> ? NonNullable<T> | E : E;
 }
 
 /** @public */
@@ -159,7 +166,7 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
 
 /** @public */
 export const Property = (function (_super: typeof Fastener) {
-  const Property = _super.extend("Property", {}) as FastenerClass<Property<any, any, any>>;
+  const Property = _super.extend("Property", {}) as PropertyClass;
 
   Object.defineProperty(Property.prototype, "fastenerType", {
     value: Property,
@@ -336,6 +343,26 @@ export const Property = (function (_super: typeof Fastener) {
 
   Property.prototype.fromAny = function <T, U>(this: Property<unknown, T, U>, value: T | U): T {
     return FromAny.fromAny<T, U>(this.valueType, value);
+  };
+
+  Property.tryValue = function <O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any> ? T : undefined {
+    const property = FastenerContext.tryFastener(owner, fastenerName) as Property | null;
+    if (property !== null) {
+      return property.value as any;
+    }
+    const propertyClass = FastenerContext.getFastenerClass(owner, fastenerName) as PropertyClass | null;
+    if (propertyClass !== null) {
+      return propertyClass.prototype.value as any;
+    }
+    return void 0 as any;
+  };
+
+  Property.tryValueOr = function <O, K extends keyof O, E, F extends O[K] = O[K]>(owner: O, fastenerName: K, elseValue: E): F extends Property<any, infer T, any> ? NonNullable<T> | E : E {
+    let value: (F extends Property<any, infer T, any> ? T : undefined) | E = this.tryValue(owner, fastenerName);
+    if (value === void 0 || value === null) {
+      value = elseValue;
+    }
+    return value as F extends Property<any, infer T, any> ? NonNullable<T> | E : E;
   };
 
   Property.construct = function <P extends Property<any, any, any>>(property: P | null, owner: P extends Property<infer O, any, any> ? O : never): P {
