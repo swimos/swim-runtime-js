@@ -92,7 +92,6 @@ export class Diagnostic implements Display {
     return output;
   }
 
-
   private static display<T>(output: Output<T>, input: Input, start: Mark, end: Mark,
                             severity: Severity, message: string | undefined,
                             note: string | undefined, cause: Diagnostic | null,

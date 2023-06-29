@@ -305,7 +305,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
   readonly consumers: ReadonlySet<Consumer> | null;
 
   /** @override */
-  consume(consumer: Consumer): void
+  consume(consumer: Consumer): void;
 
   /** @protected */
   willConsume(consumer: Consumer): void;
@@ -317,7 +317,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
   didConsume(consumer: Consumer): void;
 
   /** @override */
-  unconsume(consumer: Consumer): void
+  unconsume(consumer: Consumer): void;
 
   /** @protected */
   willUnconsume(consumer: Consumer): void;

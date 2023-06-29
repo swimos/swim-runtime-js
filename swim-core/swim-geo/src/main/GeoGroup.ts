@@ -90,7 +90,7 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
       let lngMax = -Infinity;
       let latMax = -Infinity;
       const shapes = this.shapes;
-      for (let i = 0, n = shapes.length; i < n; i += 1) {
+      for (let i = 0; i < shapes.length; i += 1) {
         const shape = shapes[i]!;
         lngMin = Math.min(lngMin, shape.lngMin);
         latMin = Math.min(latMin, shape.latMin);
