@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Murmur3} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -306,7 +305,6 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
     return Format.debug(this);
   }
 
-  @Lazy
   static root(): GeoTile {
     return new GeoTile(0, 0, 0);
   }
