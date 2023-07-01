@@ -14,35 +14,74 @@
 
 import {Unit} from "@swim/unit";
 import {Suite} from "@swim/unit";
-import {RuntimeSuite} from "./runtime/RuntimeSuite";
-import {MappingSuite} from "./mapping/MappingSuite";
-import {InterpolateSuite} from "./interpolate/InterpolateSuite";
-import {TransitionSuite} from "./transition/TransitionSuite";
-import {ScaleSuite} from "./scale/ScaleSuite";
+import {Murmur3Spec} from "./Murmur3Spec";
+import {LazySpec} from "./LazySpec";
+import {PiecewiseSpec} from "./PiecewiseSpec";
+import {InterpolatorSpec} from "./InterpolatorSpec";
+import {TimingSpec} from "./TimingSpec";
+import {EasingSpec} from "./EasingSpec";
+import {TweeningSpec} from "./TweeningSpec";
+import {LinearDomainSpec} from "./LinearDomainSpec";
+import {LinearRangeSpec} from "./LinearRangeSpec";
+import {LinearScaleSpec} from "./LinearScaleSpec";
 
 export class UtilSuite extends Suite {
+  // Runtime
   @Unit
-  runtimeSuite(): Suite {
-    return new RuntimeSuite();
+  murmur3Spec(): Suite {
+    return new Murmur3Spec();
   }
 
   @Unit
-  mappingSuite(): Suite {
-    return new MappingSuite();
+  lazySpec(): Suite {
+    return new LazySpec();
+  }
+
+  // Mapping
+
+  @Unit
+  piecewiseSpec(): Suite {
+    return new PiecewiseSpec();
+  }
+
+  // Interpolate
+
+  @Unit
+  interpolatorSpec(): Suite {
+    return new InterpolatorSpec();
+  }
+
+  // Transition
+
+  @Unit
+  timingSpec(): Suite {
+    return new TimingSpec();
   }
 
   @Unit
-  interpolateSuite(): Suite {
-    return new InterpolateSuite();
+  easingSpec(): Suite {
+    return new EasingSpec();
   }
 
   @Unit
-  transitionSuite(): Suite {
-    return new TransitionSuite();
+  tweeningSpec(): Suite {
+    return new TweeningSpec();
+  }
+
+  // Scale
+
+  @Unit
+  linearDomainSpec(): Suite {
+    return new LinearDomainSpec();
   }
 
   @Unit
-  scaleSuite(): Suite {
-    return new ScaleSuite();
+  linearRangeSpec(): Suite {
+    return new LinearRangeSpec();
+  }
+
+  @Unit
+  linearScaleSpec(): Suite {
+    return new LinearScaleSpec();
   }
 }

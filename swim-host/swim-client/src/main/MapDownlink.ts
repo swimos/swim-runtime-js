@@ -147,9 +147,8 @@ export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends V
 
   clear(): void;
 
-  forEach<T>(callback: (key: K, value: V) => T | void): T | undefined;
-  forEach<T, S>(callback: (this: S, key: K, value: V) => T | void,
-                thisArg: S): T | undefined;
+  forEach<T>(callback: (value: V, key: K, map: MapDownlink<unknown, K, V, KU, VU>) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, value: V, key: K, map: MapDownlink<unknown, K, V, KU, VU>) => T | void, thisArg: S): T | undefined;
 
   keys(): Cursor<K>;
 
@@ -522,7 +521,7 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
   };
 
   MapDownlink.prototype.forEach = function<K, V, T, S>(this: MapDownlink<unknown, K, V>,
-                                                       callback: (this: S | undefined, key: K, value: V) => T | void,
+                                                       callback: (this: S | undefined, value: V, key: K, map: MapDownlink<unknown, K, V>) => T | void,
                                                        thisArg?: S): T | undefined {
     const model = this.model;
     if (model === null) {
@@ -531,12 +530,14 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     const keyForm = this.keyForm;
     const valueForm = this.valueForm;
     if (keyForm as unknown === Form.forValue() && valueForm as unknown === Form.forValue()) {
-      return model.state.forEach(callback as any, thisArg);
+      return model.state.forEach(function (value: Value, key: Value): T | void {
+        return callback.call(thisArg, value as V, key as K, this);
+      }, this);
     }
-    return model.state.forEach(function (key: Value, value: Value): T | void {
-      const keyObject = key.coerce(keyForm);
+    return model.state.forEach(function (value: Value, key: Value): T | void {
       const object = value.coerce(valueForm);
-      return callback.call(thisArg, keyObject, object);
+      const keyObject = key.coerce(keyForm);
+      return callback.call(thisArg, object, keyObject, this);
     }, this);
   };
 

@@ -427,22 +427,22 @@ export class Diagnostic implements Display {
 
   private static formatSeverity<T>(output: Output<T>, severity: Severity): Output<T> {
     switch (severity.level) {
-      case Severity.FATAL_LEVEL:
-      case Severity.ALERT_LEVEL:
-      case Severity.ERROR_LEVEL:
+      case Severity.FatalLevel:
+      case Severity.AlertLevel:
+      case Severity.ErrorLevel:
         output = OutputStyle.redBold(output);
         break;
-      case Severity.WARNING_LEVEL:
+      case Severity.WarningLevel:
         output = OutputStyle.yellowBold(output);
         break;
-      case Severity.NOTE_LEVEL:
+      case Severity.NoteLevel:
         output = OutputStyle.greenBold(output);
         break;
-      case Severity.INFO_LEVEL:
+      case Severity.InfoLevel:
         output = OutputStyle.cyanBold(output);
         break;
-      case Severity.DEBUG_LEVEL:
-      case Severity.TRACE_LEVEL:
+      case Severity.DebugLevel:
+      case Severity.TraceLevel:
       default:
         output = OutputStyle.magentaBold(output);
     }

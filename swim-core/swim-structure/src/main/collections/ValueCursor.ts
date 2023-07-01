@@ -55,13 +55,12 @@ export class ValueCursor<V> extends Cursor<V> {
     return this.cursor.nextIndex();
   }
 
-  override next(): {value?: V, done: boolean} {
-    const {value, done} = this.cursor.next();
-    if (value !== void 0) {
-      return {value: value.coerce(this.form), done};
-    } else {
-      return {done};
+  override next(): IteratorResult<V> {
+    const next = this.cursor.next();
+    if (next.done === true) {
+      return next;
     }
+    return {done: false, value: next.value.coerce(this.form)};
   }
 
   override hasPrevious(): boolean {
@@ -72,13 +71,12 @@ export class ValueCursor<V> extends Cursor<V> {
     return this.cursor.previousIndex();
   }
 
-  override previous(): {value?: V, done: boolean} {
-    const {value, done} = this.cursor.previous();
-    if (value !== void 0) {
-      return {value: value.coerce(this.form), done};
-    } else {
-      return {done};
+  override previous(): IteratorResult<V> {
+    const previous = this.cursor.previous();
+    if (previous.done === true) {
+      return previous;
     }
+    return {done: false, value: previous.value.coerce(this.form)};
   }
 
   override delete(): void {

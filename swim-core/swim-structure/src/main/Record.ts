@@ -723,8 +723,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   }
 
   abstract override forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
-  abstract override forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
-                                  thisArg: S): T | undefined;
+  abstract override forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void, thisArg: S): T | undefined;
 
   override iterator(): Cursor<Item> {
     return new RecordCursor(this);
@@ -1064,15 +1063,15 @@ export class RecordCursor extends Cursor<Item> {
     return this.index - this.lower;
   }
 
-  override next(): {value?: Item, done: boolean} {
+  override next(): IteratorResult<Item> {
     (this as Mutable<this>).direction = 1;
     const index = this.index;
     if (index >= this.upper) {
       (this as Mutable<this>).index = this.upper;
-      return {done: true};
+      return {done: true, value: void 0};
     }
     (this as Mutable<this>).index = index + 1;
-    return {value: this.record.getItem(index), done: this.index === this.upper};
+    return {done: this.index === this.upper, value: this.record.getItem(index)};
   }
 
   override hasPrevious(): boolean {
@@ -1083,15 +1082,15 @@ export class RecordCursor extends Cursor<Item> {
     return this.index - this.lower - 1;
   }
 
-  override previous(): {value?: Item, done: boolean} {
+  override previous(): IteratorResult<Item> {
     (this as Mutable<this>).direction = -1;
     const index = this.index - 1;
     if (index < this.lower) {
       (this as Mutable<this>).index = 0;
-      return {done: true};
+      return {done: true, value: void 0};
     }
     (this as Mutable<this>).index = index;
-    return {value: this.record.getItem(index), done: index === this.lower};
+    return {done: index === this.lower, value: this.record.getItem(index)};
   }
 
   override set(newItem: Item): void {

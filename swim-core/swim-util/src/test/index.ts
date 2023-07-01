@@ -12,11 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "./runtime";
-export * from "./mapping";
-export * from "./interpolate";
-export * from "./transition";
-export * from "./scale";
+// Runtime
+
+export {Murmur3Spec} from "./Murmur3Spec";
+export {LazySpec} from "./LazySpec";
+
+// Mapping
+
+export {PiecewiseSpec} from "./PiecewiseSpec";
+
+// Interpolate
+
+export {InterpolatorSpec} from "./InterpolatorSpec";
+
+// Transition
+
+export {TimingSpec} from "./TimingSpec";
+export {EasingSpec} from "./EasingSpec";
+export {TweeningSpec} from "./TweeningSpec";
+
+// Scale
+
+export {LinearDomainSpec} from "./LinearDomainSpec";
+export {LinearRangeSpec} from "./LinearRangeSpec";
+export {LinearScaleSpec} from "./LinearScaleSpec";
+
+// Suite
+
 export {UtilSuite} from "./UtilSuite";
 
 export {UtilSuite as default} from "./UtilSuite";

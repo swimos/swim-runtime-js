@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Interpolate} from "@swim/util";
@@ -27,13 +30,23 @@ import {R2Box} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import type {AnyGeoShape} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
-import type {AnyGeoPoint} from "./GeoPoint";
+import {AnyGeoPoint} from "./GeoPoint";
 import {GeoPoint} from "./GeoPoint";
+import {AnyGeoSegment} from "./GeoSegment";
 import {GeoSegment} from "./GeoSegment";
+import {AnyGeoTile} from "./GeoTile";
 import {GeoTile} from "./GeoTile";
 
 /** @public */
 export type AnyGeoBox = GeoBox | GeoBoxInit;
+
+/** @public */
+export const AnyGeoBox = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyGeoBox {
+    return instance instanceof GeoBox
+        || GeoBoxInit[Symbol.hasInstance](instance);
+  },
+};
 
 /** @public */
 export interface GeoBoxInit {
@@ -42,6 +55,13 @@ export interface GeoBoxInit {
   lngMax: number;
   latMax: number;
 }
+
+/** @public */
+export const GeoBoxInit = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoBoxInit {
+    return Objects.hasAllKeys<GeoBoxInit>(instance, "lngMin", "latMin", "lngMax", "latMax");
+  },
+};
 
 /** @public */
 export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, Equivalent, Debug {
@@ -109,13 +129,13 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     if (typeof that === "number") {
       return this.lngMin <= that && that <= this.lngMax
           && this.latMin <= y! && y! <= this.latMax;
-    } else if (GeoPoint.isAny(that)) {
+    } else if (AnyGeoPoint[Symbol.hasInstance](that)) {
       return this.containsPoint(GeoPoint.fromAny(that));
-    } else if (GeoSegment.isAny(that)) {
+    } else if (AnyGeoSegment[Symbol.hasInstance](that)) {
       return this.containsSegment(GeoSegment.fromAny(that));
-    } else if (GeoTile.isAny(that)) {
+    } else if (AnyGeoTile[Symbol.hasInstance](that)) {
       return this.containsTile(GeoTile.fromAny(that));
-    } else if (GeoBox.isAny(that)) {
+    } else if (AnyGeoBox[Symbol.hasInstance](that)) {
       return this.containsBox(GeoBox.fromAny(that));
     }
     throw new TypeError("" + that);
@@ -148,13 +168,13 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
   }
 
   override intersects(that: AnyGeoPoint | AnyGeoBox): boolean {
-    if (GeoPoint.isAny(that)) {
+    if (AnyGeoPoint[Symbol.hasInstance](that)) {
       return this.intersectsPoint(GeoPoint.fromAny(that));
-    } else if (GeoSegment.isAny(that)) {
+    } else if (AnyGeoSegment[Symbol.hasInstance](that)) {
       return this.intersectsSegment(GeoSegment.fromAny(that));
-    } else if (GeoTile.isAny(that)) {
+    } else if (AnyGeoTile[Symbol.hasInstance](that)) {
       return this.intersectsTile(GeoTile.fromAny(that));
-    } else if (GeoBox.isAny(that)) {
+    } else if (AnyGeoBox[Symbol.hasInstance](that)) {
       return this.intersectsBox(GeoBox.fromAny(that));
     }
     throw new TypeError("" + that);
@@ -186,9 +206,8 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
             || (R2Box.intersectsSegment(lng0 - lngMax, lng1 - lngMax, lng0, lat0, lng1, lat1) && R2Box.hitY > latMin && R2Box.hitY < latMax)
             || (R2Box.intersectsSegment(lat0 - latMax, lat1 - latMax, lng0, lat0, lng1, lat1) && R2Box.hitX > lngMin && R2Box.hitX < lngMax)) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   /** @internal */
@@ -257,9 +276,8 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
   interpolateTo(that: unknown): Interpolator<GeoBox> | null {
     if (that instanceof GeoBox) {
       return GeoBoxInterpolator(this, that);
-    } else {
-      return null;
     }
+    return null;
   }
 
   equivalentTo(that: unknown, epsilon?: number): boolean {
@@ -301,18 +319,14 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     return Format.debug(this);
   }
 
-  /** @internal */
-  static readonly Undefined: GeoBox = new this(Infinity, Infinity, -Infinity, -Infinity);
-
+  @Lazy
   static undefined(): GeoBox {
-    return this.Undefined;
+    return new GeoBox(Infinity, Infinity, -Infinity, -Infinity);
   }
 
-  /** @internal */
-  static readonly Global: GeoBox = new this(-180, -90, 180, 90);
-
+  @Lazy
   static globe(): GeoBox {
-    return this.Global;
+    return new GeoBox(-180, -90, 180, 90);
   }
 
   static of(lngMin: number, latMin: number, lngMax?: number, latMax?: number): GeoBox {
@@ -329,31 +343,15 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     return new GeoBox(value.lngMin, value.latMin, value.lngMax, value.latMax);
   }
 
-  static override fromAny(value: AnyGeoBox): GeoBox {
+  static override fromAny<T extends AnyGeoBox | null | undefined>(value: T): GeoBox | Uninitable<T>;
+  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyGeoBox | null | undefined>(value: T): GeoBox | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoBox) {
-      return value;
-    } else if (GeoBox.isInit(value)) {
+      return value as GeoBox | Uninitable<T>;
+    } else if (GeoBoxInit[Symbol.hasInstance](value)) {
       return GeoBox.fromInit(value);
     }
     throw new TypeError("" + value);
-  }
-
-  /** @internal */
-  static isInit(value: unknown): value is GeoBoxInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as GeoBoxInit;
-      return typeof init.lngMin === "number"
-          && typeof init.latMin === "number"
-          && typeof init.lngMax === "number"
-          && typeof init.latMax === "number";
-    }
-    return false;
-  }
-
-  /** @internal */
-  static override isAny(value: unknown): value is AnyGeoBox {
-    return value instanceof GeoBox
-        || GeoBox.isInit(value);
   }
 }
 

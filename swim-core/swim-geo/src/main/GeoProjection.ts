@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Objects} from "@swim/util";
 import type {AnyR2Point} from "@swim/math";
 import type {R2Point} from "@swim/math";
 import type {AnyGeoPoint} from "./GeoPoint";
@@ -27,19 +28,8 @@ export interface GeoProjection {
 }
 
 /** @public */
-export const GeoProjection = (function () {
-  const GeoProjection = {} as {
-    is(object: unknown): object is GeoProjection;
-  };
-
-  GeoProjection.is = function (object: unknown): object is GeoProjection {
-    if (object !== void 0 && object !== null) {
-      const projection = object as GeoProjection;
-      return typeof projection.project === "function"
-          && typeof projection.unproject === "function";
-    }
-    return false;
-  };
-
-  return GeoProjection;
-})();
+export const GeoProjection = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoProjection {
+    return Objects.hasAllKeys<GeoProjection>(instance, "project", "unproject");
+  },
+};

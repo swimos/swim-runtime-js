@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Proto} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {FastenerDecorator} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import type {Fastener} from "./Fastener";
@@ -225,11 +226,9 @@ export const FastenerContext = (function () {
 
   Object.defineProperty(FastenerContext, Symbol.hasInstance, {
     value: function (instance: unknown): instance is FastenerContext {
-      if (instance === null || typeof instance !== "object" && typeof instance !== "function") {
-        return false;
-      }
-      return "getParentFastener" in (instance as FastenerContext);
+      return Objects.hasAnyKey<FastenerContext>(instance, "getParentFastener");
     },
+    enumerable: true,
     configurable: true,
   });
 

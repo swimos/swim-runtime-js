@@ -24,6 +24,15 @@ import {GeoGroup} from "./GeoGroup";
 export type GeoJsonPosition = [number, number] | [number, number, number];
 
 /** @public */
+export const GeoJsonPosition = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonPosition {
+    return Array.isArray(instance)
+        && ((instance.length === 2 && typeof instance[0] === "number" && typeof instance[1] === "number")
+         || (instance.length === 3 && typeof instance[0] === "number" && typeof instance[1] === "number" && typeof instance[2] === "number"));
+  },
+};
+
+/** @public */
 export type GeoJsonBbox = [number, number, number, number]
                         | [number, number, number, number, number, number];
 
@@ -44,33 +53,27 @@ export type GeoJson = GeoJsonGeometry
                     | GeoJsonFeatureCollection;
 
 /** @public */
-export const GeoJson = (function () {
-  const GeoJson = {} as {
-    is(value: unknown): value is GeoJson;
-    toShape(geometry: GeoJsonGeometry): GeoShape;
-    toShape(feature: GeoJsonFeature): GeoShape | null;
-    toShape(collection: GeoJsonFeatureCollection): Array<GeoShape | null>;
-    toShape(object: GeoJson): GeoShape | null | Array<GeoShape | null>;
-  };
-
-  GeoJson.is = function (value: unknown): value is GeoJson {
-    return GeoJsonGeometry.is(value)
-        || GeoJsonFeature.is(value)
-        || GeoJsonFeatureCollection.is(value);
-  };
-
-  GeoJson.toShape = function (object: GeoJson): GeoShape | null | Array<GeoShape | null> {
+export const GeoJson = {
+  toShape: function (object: GeoJson): GeoShape | (GeoShape | null)[] | null {
     if (object.type === "Feature") {
       return GeoJsonFeature.toShape(object);
     } else if (object.type === "FeatureCollection") {
       return GeoJsonFeatureCollection.toShapes(object);
-    } else {
-      return GeoJsonGeometry.toShape(object);
     }
-  } as typeof GeoJson.toShape;
+    return GeoJsonGeometry.toShape(object);
+  } as {
+    (geometry: GeoJsonGeometry): GeoShape;
+    (feature: GeoJsonFeature): GeoShape | null;
+    (collection: GeoJsonFeatureCollection): (GeoShape | null)[] | null;
+    (object: GeoJson): GeoShape | (GeoShape | null)[] | null;
+  },
 
-  return GeoJson;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJson {
+    return GeoJsonGeometry[Symbol.hasInstance](instance)
+        || GeoJsonFeature[Symbol.hasInstance](instance)
+        || GeoJsonFeatureCollection[Symbol.hasInstance](instance);
+  },
+};
 
 /** @public */
 export type GeoJsonGeometryType = "Point"
@@ -96,29 +99,8 @@ export type GeoJsonGeometry = GeoJsonPoint
                             | GeoJsonGeometryCollection;
 
 /** @public */
-export const GeoJsonGeometry = (function () {
-  const GeoJsonGeometry = {} as {
-    is(value: unknown): value is GeoJsonGeometry;
-    toShape(object: GeoJsonGeometry): GeoShape;
-  };
-
-  GeoJsonGeometry.is = function (value: unknown): value is GeoJsonGeometry {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonGeometry;
-      return (object.type === "Point"
-           || object.type === "MultiPoint"
-           || object.type === "LineString"
-           || object.type === "MultiLineString"
-           || object.type === "Polygon"
-           || object.type === "MultiPolygon")
-          && Array.isArray(object.coordinates)
-          || object.type === "GeometryCollection"
-          && Array.isArray(object.geometries);
-    }
-    return false;
-  };
-
-  GeoJsonGeometry.toShape = function (object: GeoJsonGeometry): GeoShape {
+export const GeoJsonGeometry = {
+  toShape(object: GeoJsonGeometry): GeoShape {
     if (object.type === "Point") {
       return GeoJsonPoint.toShape(object);
     } else if (object.type === "MultiPoint") {
@@ -135,10 +117,18 @@ export const GeoJsonGeometry = (function () {
       return GeoJsonGeometryCollection.toShape(object);
     }
     throw new TypeError("" + object);
-  };
+  },
 
-  return GeoJsonGeometry;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonGeometry {
+    return GeoJsonPoint[Symbol.hasInstance](instance)
+        || GeoJsonMultiPoint[Symbol.hasInstance](instance)
+        || GeoJsonLineString[Symbol.hasInstance](instance)
+        || GeoJsonMultiLineString[Symbol.hasInstance](instance)
+        || GeoJsonPolygon[Symbol.hasInstance](instance)
+        || GeoJsonMultiPolygon[Symbol.hasInstance](instance)
+        || GeoJsonGeometryCollection[Symbol.hasInstance](instance);
+  },
+};
 
 /** @public */
 export interface GeoJsonPoint extends GeoJsonGeometryObject {
@@ -147,28 +137,18 @@ export interface GeoJsonPoint extends GeoJsonGeometryObject {
 }
 
 /** @public */
-export const GeoJsonPoint = (function () {
-  const GeoJsonPoint = {} as {
-    is(value: unknown): value is GeoJsonPoint;
-    toShape(object: GeoJsonPoint): GeoPoint;
-  };
-
-  GeoJsonPoint.is = function (value: unknown): value is GeoJsonPoint {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonPoint;
-      return object.type === "Point"
-          && Array.isArray(object.coordinates);
-    }
-    return false;
-  };
-
-  GeoJsonPoint.toShape = function (object: GeoJsonPoint): GeoPoint {
+export const GeoJsonPoint = {
+  toShape(object: GeoJsonPoint): GeoPoint {
     const position = object.coordinates;
     return new GeoPoint(position[0], position[1]);
-  };
+  },
 
-  return GeoJsonPoint;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonPoint {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonPoint).type === "Point"
+        && GeoJsonPosition[Symbol.hasInstance]((instance as GeoJsonPoint).coordinates);
+  },
+};
 
 /** @public */
 export interface GeoJsonMultiPoint extends GeoJsonGeometryObject {
@@ -177,22 +157,8 @@ export interface GeoJsonMultiPoint extends GeoJsonGeometryObject {
 }
 
 /** @public */
-export const GeoJsonMultiPoint = (function () {
-  const GeoJsonMultiPoint = {} as {
-    is(value: unknown): value is GeoJsonMultiPoint;
-    toShape(object: GeoJsonMultiPoint): GeoGroup<GeoPoint>;
-  };
-
-  GeoJsonMultiPoint.is = function (value: unknown): value is GeoJsonMultiPoint {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonMultiPoint;
-      return object.type === "MultiPoint"
-          && Array.isArray(object.coordinates);
-    }
-    return false;
-  };
-
-  GeoJsonMultiPoint.toShape = function (object: GeoJsonMultiPoint): GeoGroup<GeoPoint> {
+export const GeoJsonMultiPoint = {
+  toShape(object: GeoJsonMultiPoint): GeoGroup<GeoPoint> {
     const positions = object.coordinates;
     const n = positions.length;
     const shapes = new Array<GeoPoint>(n);
@@ -201,10 +167,14 @@ export const GeoJsonMultiPoint = (function () {
       shapes[i] = new GeoPoint(position[0], position[1]);
     }
     return new GeoGroup(shapes);
-  };
+  },
 
-  return GeoJsonMultiPoint;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonMultiPoint {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonMultiPoint).type === "MultiPoint"
+        && Array.isArray((instance as GeoJsonMultiPoint).coordinates);
+  },
+};
 
 /** @public */
 export interface GeoJsonLineString extends GeoJsonGeometryObject {
@@ -213,22 +183,8 @@ export interface GeoJsonLineString extends GeoJsonGeometryObject {
 }
 
 /** @public */
-export const GeoJsonLineString = (function () {
-  const GeoJsonLineString = {} as {
-    is(value: unknown): value is GeoJsonLineString;
-    toShape(object: GeoJsonLineString): GeoSpline;
-  };
-
-  GeoJsonLineString.is = function (value: unknown): value is GeoJsonLineString {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonLineString;
-      return object.type === "LineString"
-          && Array.isArray(object.coordinates);
-    }
-    return false;
-  };
-
-  GeoJsonLineString.toShape = function (object: GeoJsonLineString): GeoSpline {
+export const GeoJsonLineString = {
+  toShape(object: GeoJsonLineString): GeoSpline {
     const lineString = object.coordinates;
     const n = lineString.length;
     if (n === 0) {
@@ -243,10 +199,14 @@ export const GeoJsonLineString = (function () {
       curves[i - 1] = new GeoSegment(lng, lat, (lng = position[0], lng), (lat = position[1], lat));
     }
     return new GeoSpline(curves, false);
-  };
+  },
 
-  return GeoJsonLineString;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonLineString {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonLineString).type === "LineString"
+        && Array.isArray((instance as GeoJsonLineString).coordinates);
+  },
+};
 
 /** @public */
 export interface GeoJsonMultiLineString extends GeoJsonGeometryObject {
@@ -255,22 +215,8 @@ export interface GeoJsonMultiLineString extends GeoJsonGeometryObject {
 }
 
 /** @public */
-export const GeoJsonMultiLineString = (function () {
-  const GeoJsonMultiLineString = {} as {
-    is(value: unknown): value is GeoJsonMultiLineString;
-    toShape(object: GeoJsonMultiLineString): GeoGroup<GeoSpline>;
-  };
-
-  GeoJsonMultiLineString.is = function (value: unknown): value is GeoJsonMultiLineString {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonMultiLineString;
-      return object.type === "MultiLineString"
-          && Array.isArray(object.coordinates);
-    }
-    return false;
-  };
-
-  GeoJsonMultiLineString.toShape = function (object: GeoJsonMultiLineString): GeoGroup<GeoSpline> {
+export const GeoJsonMultiLineString = {
+  toShape(object: GeoJsonMultiLineString): GeoGroup<GeoSpline> {
     const multiLineString = object.coordinates;
     const n = multiLineString.length;
     const shapes = new Array<GeoSpline>(n);
@@ -292,10 +238,14 @@ export const GeoJsonMultiLineString = (function () {
       shapes[i] = new GeoSpline(curves, false);
     }
     return new GeoGroup(shapes);
-  };
+  },
 
-  return GeoJsonMultiLineString;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonMultiLineString {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonMultiLineString).type === "MultiLineString"
+        && Array.isArray((instance as GeoJsonMultiLineString).coordinates);
+  },
+};
 
 /** @public */
 export interface GeoJsonPolygon extends GeoJsonGeometryObject {
@@ -304,22 +254,8 @@ export interface GeoJsonPolygon extends GeoJsonGeometryObject {
 }
 
 /** @public */
-export const GeoJsonPolygon = (function () {
-  const GeoJsonPolygon = {} as {
-    is(value: unknown): value is GeoJsonPolygon;
-    toShape(object: GeoJsonPolygon): GeoPath;
-  };
-
-  GeoJsonPolygon.is = function (value: unknown): value is GeoJsonPolygon {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonPolygon;
-      return object.type === "Polygon"
-          && Array.isArray(object.coordinates);
-    }
-    return false;
-  };
-
-  GeoJsonPolygon.toShape = function (object: GeoJsonPolygon): GeoPath {
+export const GeoJsonPolygon = {
+  toShape(object: GeoJsonPolygon): GeoPath {
     const polygons = object.coordinates;
     const n = polygons.length;
     const splines = new Array<GeoSpline>(n);
@@ -341,10 +277,14 @@ export const GeoJsonPolygon = (function () {
       splines[i] = new GeoSpline(curves, true);
     }
     return new GeoPath(splines);
-  };
+  },
 
-  return GeoJsonPolygon;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonPolygon {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonPolygon).type === "Polygon"
+        && Array.isArray((instance as GeoJsonPolygon).coordinates);
+  },
+};
 
 /** @public */
 export interface GeoJsonMultiPolygon extends GeoJsonGeometryObject {
@@ -353,22 +293,8 @@ export interface GeoJsonMultiPolygon extends GeoJsonGeometryObject {
 }
 
 /** @public */
-export const GeoJsonMultiPolygon = (function () {
-  const GeoJsonMultiPolygon = {} as {
-    is(value: unknown): value is GeoJsonMultiPolygon;
-    toShape(object: GeoJsonMultiPolygon): GeoGroup<GeoPath>;
-  };
-
-  GeoJsonMultiPolygon.is = function (value: unknown): value is GeoJsonMultiPolygon {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonMultiPolygon;
-      return object.type === "MultiPolygon"
-          && Array.isArray(object.coordinates);
-    }
-    return false;
-  };
-
-  GeoJsonMultiPolygon.toShape = function (object: GeoJsonMultiPolygon): GeoGroup<GeoPath> {
+export const GeoJsonMultiPolygon = {
+  toShape(object: GeoJsonMultiPolygon): GeoGroup<GeoPath> {
     const multiPolygon = object.coordinates;
     const n = multiPolygon.length;
     const shapes = new Array<GeoPath>(n);
@@ -396,10 +322,14 @@ export const GeoJsonMultiPolygon = (function () {
       shapes[i] = new GeoPath(splines);
     }
     return new GeoGroup(shapes);
-  };
+  },
 
-  return GeoJsonMultiPolygon;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonMultiPolygon {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonMultiPolygon).type === "MultiPolygon"
+        && Array.isArray((instance as GeoJsonMultiPolygon).coordinates);
+  },
+};
 
 /** @public */
 export interface GeoJsonGeometryCollection extends GeoJsonGeometryObject {
@@ -408,22 +338,8 @@ export interface GeoJsonGeometryCollection extends GeoJsonGeometryObject {
 }
 
 /** @public */
-export const GeoJsonGeometryCollection = (function () {
-  const GeoJsonGeometryCollection = {} as {
-    is(value: unknown): value is GeoJsonGeometryCollection;
-    toShape(object: GeoJsonGeometryCollection): GeoGroup;
-  };
-
-  GeoJsonGeometryCollection.is = function (value: unknown): value is GeoJsonGeometryCollection {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonGeometryCollection;
-      return object.type === "GeometryCollection"
-          && Array.isArray(object.geometries);
-    }
-    return false;
-  };
-
-  GeoJsonGeometryCollection.toShape = function (object: GeoJsonGeometryCollection): GeoGroup {
+export const GeoJsonGeometryCollection = {
+  toShape(object: GeoJsonGeometryCollection): GeoGroup {
     const geometries = object.geometries;
     const n = geometries.length;
     const shapes = new Array<GeoShape>(n);
@@ -431,10 +347,14 @@ export const GeoJsonGeometryCollection = (function () {
       shapes[i] = GeoJsonGeometry.toShape(geometries[i]!);
     }
     return new GeoGroup(shapes);
-  };
+  },
 
-  return GeoJsonGeometryCollection;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonGeometryCollection {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonGeometryCollection).type === "GeometryCollection"
+        && Array.isArray((instance as GeoJsonGeometryCollection).geometries);
+  },
+};
 
 /** @public */
 export type GeoJsonProperties = {[name: string]: unknown};
@@ -448,29 +368,19 @@ export interface GeoJsonFeature<G extends GeoJsonGeometry = GeoJsonGeometry, P =
 }
 
 /** @public */
-export const GeoJsonFeature = (function () {
-  const GeoJsonFeature = {} as {
-    is(value: unknown): value is GeoJsonFeature;
-    toShape(feature: GeoJsonFeature): GeoShape | null;
-  };
-
-  GeoJsonFeature.is = function (value: unknown): value is GeoJsonFeature {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonFeature;
-      return object.type === "Feature"
-          && GeoJsonGeometry.is(object.geometry)
-          && typeof object.properties === "object";
-    }
-    return false;
-  };
-
-  GeoJsonFeature.toShape = function (feature: GeoJsonFeature): GeoShape | null {
+export const GeoJsonFeature = {
+  toShape(feature: GeoJsonFeature): GeoShape | null {
     const geometry = feature.geometry;
     return geometry !== null ? GeoJsonGeometry.toShape(geometry) : null;
-  };
+  },
 
-  return GeoJsonFeature;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonFeature {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonFeature).type === "Feature"
+        && GeoJsonGeometry[Symbol.hasInstance]((instance as GeoJsonFeature).geometry)
+        && typeof (instance as GeoJsonFeature).properties === "object";
+  },
+};
 
 /** @public */
 export interface GeoJsonFeatureCollection<G extends GeoJsonGeometry = GeoJsonGeometry, P = GeoJsonProperties> extends GeoJsonObject {
@@ -479,22 +389,8 @@ export interface GeoJsonFeatureCollection<G extends GeoJsonGeometry = GeoJsonGeo
 }
 
 /** @public */
-export const GeoJsonFeatureCollection = (function () {
-  const GeoJsonFeatureCollection = {} as {
-    is(value: unknown): value is GeoJsonFeatureCollection;
-    toShapes(object: GeoJsonFeatureCollection): Array<GeoShape | null>;
-  };
-
-  GeoJsonFeatureCollection.is = function (value: unknown): value is GeoJsonFeatureCollection {
-    if (typeof value === "object" && value !== null) {
-      const object = value as GeoJsonFeatureCollection;
-      return object.type === "FeatureCollection"
-          && Array.isArray(object.features);
-    }
-    return false;
-  };
-
-  GeoJsonFeatureCollection.toShapes = function (object: GeoJsonFeatureCollection): Array<GeoShape | null> {
+export const GeoJsonFeatureCollection = {
+  toShapes(object: GeoJsonFeatureCollection): (GeoShape | null)[] {
     const features = object.features;
     const n = features.length;
     const shapes = new Array<GeoShape | null>(n);
@@ -502,7 +398,11 @@ export const GeoJsonFeatureCollection = (function () {
       shapes[i] = GeoJsonFeature.toShape(features[i]!);
     }
     return shapes;
-  };
+  },
 
-  return GeoJsonFeatureCollection;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is GeoJsonFeatureCollection {
+    return instance !== null && typeof instance === "object"
+        && (instance as GeoJsonFeatureCollection).type === "FeatureCollection"
+        && Array.isArray((instance as GeoJsonFeatureCollection).features);
+  },
+};

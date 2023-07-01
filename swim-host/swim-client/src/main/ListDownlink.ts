@@ -127,8 +127,7 @@ export interface ListDownlink<O = unknown, V = Value, VU = V extends Value ? Any
   clear(): void;
 
   forEach<T, S>(callback: (value: V, index: number, id: Value) => T | void): T | undefined;
-  forEach<T, S>(callback: (this: S, value: V, index: number, id: Value) => T | void,
-                thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S, value: V, index: number, id: Value) => T | void, thisArg: S): T | undefined;
 
   values(): Cursor<V>;
 

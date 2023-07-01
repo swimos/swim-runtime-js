@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {KeysCursor} from "./KeysCursor";
-export {ValuesCursor} from "./ValuesCursor";
 export {NodeCursor} from "./NodeCursor";
 
 export {BTreeContext} from "./BTreeContext";
@@ -21,11 +19,11 @@ export {BTree} from "./BTree";
 export {BTreePage} from "./BTreePage";
 export {BTreeLeaf} from "./BTreeLeaf";
 export {BTreeNode} from "./BTreeNode";
-export {BTreeNodeCursor} from "./BTreeNodeCursor";
+export {BTreeNodeCursor} from "./BTreeNode";
 
 export {STreeContext} from "./STreeContext";
 export {STree} from "./STree";
 export {STreePage} from "./STreePage";
 export {STreeLeaf} from "./STreeLeaf";
 export {STreeNode} from "./STreeNode";
-export {STreeNodeCursor} from "./STreeNodeCursor";
+export {STreeNodeCursor} from "./STreeNode";

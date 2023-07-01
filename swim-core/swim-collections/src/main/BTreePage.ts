@@ -13,10 +13,9 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import type {Cursor} from "@swim/util";
-import {KeysCursor} from "./KeysCursor";
-import {ValuesCursor} from "./ValuesCursor";
+import {Cursor} from "@swim/util";
 import type {BTreeContext} from "./BTreeContext";
+import type {BTree} from "./BTree";
 import {BTreeLeaf} from "./"; // forward import
 
 /** @internal */
@@ -66,37 +65,37 @@ export abstract class BTreePage<K, V, U> {
   abstract reduced(identity: U, accumulator: (result: U, element: V) => U,
                    combiner: (result: U, result2: U) => U): BTreePage<K, V, U>;
 
-  abstract forEach<T, S>(callback: (this: S, key: K, value: V) => T | void,
-                         thisArg: S): T | undefined;
+  abstract forEach<T, S>(callback: (this: S, value: V, key: K, tree: BTree<K, V, U>) => T | void,
+                         thisArg: S, tree: BTree<K, V, U>): T | undefined;
 
-  abstract forEachKey<T, S>(callback: (this: S, key: K) => T | void,
-                            thisArg: S): T | undefined;
+  abstract forEachKey<T, S>(callback: (this: S, key: K, tree: BTree<K, V, U>) => T | void,
+                            thisArg: S, tree: BTree<K, V, U>): T | undefined;
 
-  abstract forEachValue<T, S>(callback: (this: S, value: V) => T | void,
-                              thisArg: S): T | undefined;
+  abstract forEachValue<T, S>(callback: (this: S, value: V, tree: BTree<K, V, U>) => T | void,
+                              thisArg: S, tree: BTree<K, V, U>): T | undefined;
 
   keys(): Cursor<K> {
-    return new KeysCursor(this.entries());
+    return Cursor.keys(this.entries());
   }
 
   values(): Cursor<V> {
-    return new ValuesCursor(this.entries());
+    return Cursor.values(this.entries());
   }
 
   abstract entries(): Cursor<[K, V]>;
 
   reverseKeys(): Cursor<K> {
-    return new KeysCursor(this.reverseEntries());
+    return Cursor.keys(this.reverseEntries());
   }
 
   reverseValues(): Cursor<V> {
-    return new ValuesCursor(this.reverseEntries());
+    return Cursor.values(this.reverseEntries());
   }
 
   abstract reverseEntries(): Cursor<[K, V]>;
 
   @Lazy
   static empty<K, V, U>(): BTreeLeaf<K, V, U> {
-    return new BTreeLeaf([], void 0 as U | undefined);
+    return new BTreeLeaf<K, V, U>([], void 0);
   }
 }

@@ -111,13 +111,12 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
   pop(): V | undefined {
     const oldRoot = this.root;
     const index = oldRoot.size - 1;
-    if (index >= 0) {
-      const oldValue = oldRoot.get(index);
-      this.root = oldRoot.removed(index, this);
-      return oldValue;
-    } else {
+    if (index < 0) {
       return void 0;
     }
+    const oldValue = oldRoot.get(index);
+    this.root = oldRoot.removed(index, this);
+    return oldValue;
   }
 
   unshift(...newValues: V[]): number {
@@ -131,13 +130,12 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
 
   shift(): V | undefined {
     const oldRoot = this.root;
-    if (oldRoot.size > 0) {
-      const oldValue = oldRoot.get(0);
-      this.root = oldRoot.removed(0, this);
-      return oldValue;
-    } else {
+    if (oldRoot.size === 0) {
       return void 0;
     }
+    const oldValue = oldRoot.get(0);
+    this.root = oldRoot.removed(0, this);
+    return oldValue;
   }
 
   move(fromIndex: number, toIndex: number, id?: I): this {
@@ -187,10 +185,10 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
   drop(lower: number): this {
     const oldRoot = this.root;
     if (lower > 0 && oldRoot.size > 0) {
-      if (lower < oldRoot.size) {
-        this.root = oldRoot.drop(lower, this);
-      } else {
+      if (lower >= oldRoot.size) {
         this.root = STreePage.empty();
+      } else {
+        this.root = oldRoot.drop(lower, this);
       }
     }
     return this;
@@ -199,10 +197,10 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
   take(upper: number): this {
     const oldRoot = this.root;
     if (upper < oldRoot.size && oldRoot.size > 0) {
-      if (upper > 0) {
-        this.root = oldRoot.take(upper, this);
-      } else {
+      if (upper <= 0) {
         this.root = STreePage.empty();
+      } else {
+        this.root = oldRoot.take(upper, this);
       }
     }
     return this;
@@ -212,12 +210,16 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
     this.root = STreePage.empty();
   }
 
-  forEach<T>(callback: (value: V, index: number, id: I) => T | void): T | undefined;
-  forEach<T, S>(callback: (this: S, value: V, index: number, id: I) => T | void,
+  forEach<T>(callback: (value: V, index: number, id: I, tree: STree<V, I>) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, value: V, index: number, id: I, tree: STree<V, I>) => T | void,
                 thisArg: S): T | undefined;
-  forEach<T, S>(callback: (this: S | undefined, value: V, index: number, id: I) => T | void,
+  forEach<T, S>(callback: (this: S | undefined, value: V, index: number, id: I, tree: STree<V, I>) => T | void,
                 thisArg?: S): T | undefined {
-    return this.root.forEach(callback, thisArg, 0);
+    return this.root.forEach(callback, thisArg, 0, this);
+  }
+
+  [Symbol.iterator](): Cursor<V> {
+    return this.root.values();
   }
 
   keys(): Cursor<I> {

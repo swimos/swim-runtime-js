@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import {Murmur3} from "@swim/util";
-import {Numbers} from "@swim/util";
-import {Constructors} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
@@ -24,12 +27,24 @@ import {R2Box} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import type {AnyGeoShape} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
+import {AnyGeoPoint} from "./GeoPoint";
 import {GeoPoint} from "./GeoPoint";
-import {GeoBox} from "./GeoBox";
+import {AnyGeoSegment} from "./GeoSegment";
 import {GeoSegment} from "./GeoSegment";
+import {AnyGeoBox} from "./"; // forward import
+import {GeoBox} from "./"; // forward import
 
 /** @public */
 export type AnyGeoTile = GeoTile | GeoTileInit | GeoTileTuple;
+
+/** @public */
+export const AnyGeoTile = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyGeoTile {
+    return instance instanceof GeoTile
+        || GeoTileInit[Symbol.hasInstance](instance)
+        || GeoTileTuple[Symbol.hasInstance](instance);
+  },
+};
 
 /** @public */
 export interface GeoTileInit {
@@ -39,7 +54,21 @@ export interface GeoTileInit {
 }
 
 /** @public */
+export const GeoTileInit = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoTileInit {
+    return Objects.hasAllKeys<GeoTileInit>(instance, "x", "y", "z");
+  },
+};
+
+/** @public */
 export type GeoTileTuple = [number, number, number];
+
+/** @public */
+export const GeoTileTuple = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoTileTuple {
+    return Array.isArray(instance) && instance.length === 3;
+  },
+};
 
 /** @public */
 export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
@@ -135,13 +164,13 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
     if (typeof that === "number") {
       return this.lngMin <= that && that <= this.lngMax
           && this.latMin <= lat! && lat! <= this.latMax;
-    } else if (GeoPoint.isAny(that)) {
+    } else if (AnyGeoPoint[Symbol.hasInstance](that)) {
       return this.containsPoint(GeoPoint.fromAny(that));
-    } else if (GeoSegment.isAny(that)) {
+    } else if (AnyGeoSegment[Symbol.hasInstance](that)) {
       return this.containsSegment(GeoSegment.fromAny(that));
-    } else if (GeoTile.isAny(that)) {
+    } else if (AnyGeoTile[Symbol.hasInstance](that)) {
       return this.containsTile(GeoTile.fromAny(that));
-    } else if (GeoBox.isAny(that)) {
+    } else if (AnyGeoBox[Symbol.hasInstance](that)) {
       return this.containsBox(GeoBox.fromAny(that));
     }
     throw new TypeError("" + that);
@@ -174,13 +203,13 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
   }
 
   override intersects(that: AnyGeoShape): boolean {
-    if (GeoPoint.isAny(that)) {
+    if (AnyGeoPoint[Symbol.hasInstance](that)) {
       return this.intersectsPoint(GeoPoint.fromAny(that));
-    } else if (GeoSegment.isAny(that)) {
+    } else if (AnyGeoSegment[Symbol.hasInstance](that)) {
       return this.intersectsSegment(GeoSegment.fromAny(that));
-    } else if (GeoTile.isAny(that)) {
+    } else if (AnyGeoTile[Symbol.hasInstance](that)) {
       return this.intersectsTile(GeoTile.fromAny(that));
-    } else if (GeoBox.isAny(that)) {
+    } else if (AnyGeoBox[Symbol.hasInstance](that)) {
       return this.intersectsBox(GeoBox.fromAny(that));
     }
     throw new TypeError("" + that);
@@ -212,9 +241,8 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
             || (R2Box.intersectsSegment(lng0 - lngMax, lng1 - lngMax, lng0, lat0, lng1, lat1) && R2Box.hitY > latMin && R2Box.hitY < latMax)
             || (R2Box.intersectsSegment(lat0 - latMax, lat1 - latMax, lng0, lat0, lng1, lat1) && R2Box.hitX > lngMin && R2Box.hitX < lngMax)) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   /** @internal */
@@ -305,6 +333,7 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
     return Format.debug(this);
   }
 
+  @Lazy
   static root(): GeoTile {
     return new GeoTile(0, 0, 0);
   }
@@ -321,42 +350,17 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
     return new GeoTile(value[0], value[1], value[2]);
   }
 
-  static override fromAny(value: AnyGeoTile): GeoTile {
+  static override fromAny<T extends AnyGeoTile | null | undefined>(value: T): GeoTile | Uninitable<T>;
+  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyGeoTile | null | undefined>(value: T): GeoTile | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoTile) {
-      return value;
-    } else if (GeoTile.isInit(value)) {
+      return value as GeoTile | Uninitable<T>;
+    } else if (GeoTileInit[Symbol.hasInstance](value)) {
       return GeoTile.fromInit(value);
-    } else if (GeoTile.isTuple(value)) {
+    } else if (GeoTileTuple[Symbol.hasInstance](value)) {
       return GeoTile.fromTuple(value);
     }
     throw new TypeError("" + value);
-  }
-
-  /** @internal */
-  static isInit(value: unknown): value is GeoTileInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as GeoTileInit;
-      return typeof init.x === "number"
-          && typeof init.y === "number"
-          && typeof init.z === "number";
-    }
-    return false;
-  }
-
-  /** @internal */
-  static isTuple(value: unknown): value is GeoTileTuple {
-    return Array.isArray(value)
-        && value.length === 3
-        && typeof value[0] === "number"
-        && typeof value[1] === "number"
-        && typeof value[2] === "number";
-  }
-
-  /** @internal */
-  static override isAny(value: unknown): value is AnyGeoTile {
-    return value instanceof GeoTile
-        || GeoTile.isInit(value)
-        || GeoTile.isTuple(value);
   }
 
   /** @internal */

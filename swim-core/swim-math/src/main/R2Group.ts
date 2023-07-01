@@ -141,7 +141,7 @@ export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equ
   }
 
   /** @internal */
-  static readonly Empty: R2Group = new this(Arrays.empty);
+  static readonly Empty: R2Group = new this(Arrays.empty());
 
   static empty<S extends R2Shape>(): R2Group<S> {
     return this.Empty as R2Group<S>;

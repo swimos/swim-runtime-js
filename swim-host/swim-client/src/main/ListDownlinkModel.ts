@@ -226,10 +226,8 @@ export class ListDownlinkModel extends WarpDownlinkModel {
   }
 
   forEach<T>(callback: (value: Value, index: number, key: Value) => T | void): T | undefined;
-  forEach<T, S>(callback: (this: S, value: Value, index: number, key: Value) => T | void,
-                thisArg: S): T | undefined;
-  forEach<T, S>(callback: (this: S | undefined, value: Value, index: number, key: Value) => T | void,
-                thisArg?: S): T | undefined {
+  forEach<T, S>(callback: (this: S, value: Value, index: number, key: Value) => T | void, thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, value: Value, index: number, key: Value) => T | void, thisArg?: S): T | undefined {
     return this.state.forEach(callback, thisArg);
   }
 

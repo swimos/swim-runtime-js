@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import type {Cursor} from "@swim/util";
+import {NodeCursor} from "./NodeCursor";
 import type {STreeContext} from "./STreeContext";
+import type {STree} from "./STree";
 import {STreePage} from "./STreePage";
-import {STreeNodeCursor} from "./"; // forward import
 
 /** @internal */
 export class STreeNode<V, I> extends STreePage<V, I> {
@@ -74,15 +75,12 @@ export class STreeNode<V, I> extends STreePage<V, I> {
     const i = x === 0 ? index : index - this.knots[x - 1]!;
     const oldPage = this.pages[x]!;
     const newPage = oldPage.updated(i, newValue, tree);
-    if (oldPage !== newPage) {
-      if (oldPage.size !== newPage.size && tree.pageShouldSplit(newPage)) {
-        return this.updatedPageSplit(x, newPage, oldPage);
-      } else {
-        return this.updatedPage(x, newPage, oldPage);
-      }
-    } else {
+    if (oldPage === newPage) {
       return this;
+    } else if (oldPage.size !== newPage.size && tree.pageShouldSplit(newPage)) {
+      return this.updatedPageSplit(x, newPage, oldPage);
     }
+    return this.updatedPage(x, newPage, oldPage);
   }
 
   /** @internal */
@@ -94,7 +92,10 @@ export class STreeNode<V, I> extends STreePage<V, I> {
     const oldKnots = this.knots;
     let newKnots: number[];
     let newSize: number;
-    if (oldPages.length - 1 > 0) {
+    if (oldPages.length - 1 <= 0) {
+      newKnots = [];
+      newSize = 0;
+    } else {
       newKnots = oldKnots.slice(0);
       if (x > 0) {
         newSize = oldKnots[x - 1]!;
@@ -106,9 +107,6 @@ export class STreeNode<V, I> extends STreePage<V, I> {
         newKnots[i] = newSize;
       }
       newSize += newPages[newKnots.length]!.size;
-    } else {
-      newKnots = [];
-      newSize = 0;
     }
 
     return new STreeNode(newPages, newKnots, newSize);
@@ -161,15 +159,12 @@ export class STreeNode<V, I> extends STreePage<V, I> {
     const subIndex = x === 0 ? index : index - this.knots[x - 1]!;
     const oldPage = this.pages[x]!;
     const newPage = oldPage.inserted(subIndex, newValue, id, tree);
-    if (oldPage !== newPage) {
-      if (tree.pageShouldSplit(newPage)) {
-        return this.updatedPageSplit(x, newPage, oldPage);
-      } else {
-        return this.updatedPage(x, newPage, oldPage);
-      }
-    } else {
+    if (oldPage === newPage) {
       return this;
+    } else if (tree.pageShouldSplit(newPage)) {
+      return this.updatedPageSplit(x, newPage, oldPage);
     }
+    return this.updatedPage(x, newPage, oldPage);
   }
 
   override removed(index: number, tree: STreeContext<V, I>): STreePage<V, I> {
@@ -182,11 +177,10 @@ export class STreeNode<V, I> extends STreePage<V, I> {
     const subIndex = x === 0 ? index : index - this.knots[x - 1]!;
     const oldPage = this.pages[x]!;
     const newPage = oldPage.removed(subIndex, tree);
-    if (oldPage !== newPage) {
-      return this.replacedPage(x, newPage, oldPage, tree);
-    } else {
+    if (oldPage === newPage) {
       return this;
     }
+    return this.replacedPage(x, newPage, oldPage, tree);
   }
 
   /** @internal */
@@ -195,9 +189,8 @@ export class STreeNode<V, I> extends STreePage<V, I> {
     if (!newPage.isEmpty()) {
       if (newPage instanceof STreeNode && tree.pageShouldMerge(newPage)) {
         return this.updatedPageMerge(x, newPage, oldPage);
-      } else {
-        return this.updatedPage(x, newPage, oldPage);
       }
+      return this.updatedPage(x, newPage, oldPage);
     } else if (this.pages.length > 2) {
       return this.removedPage(x, newPage, oldPage);
     } else if (this.pages.length > 1) {
@@ -206,9 +199,8 @@ export class STreeNode<V, I> extends STreePage<V, I> {
       } else {
         return this.pages[0]!;
       }
-    } else {
-      return STreePage.empty();
     }
+    return STreePage.empty();
   }
 
   /** @internal */
@@ -225,13 +217,13 @@ export class STreeNode<V, I> extends STreePage<V, I> {
     const oldKnots = this.knots;
     const newKnots = new Array<number>(oldKnots.length - 1);
     let newSize: number;
-    if (x > 0) {
+    if (x <= 0) {
+      newSize = 0;
+    } else {
       for (let i = 0; i < x; i += 1) {
         newKnots[i] = oldKnots[i]!;
       }
       newSize = oldKnots[x - 1]!;
-    } else {
-      newSize = 0;
     }
     for (let i = x; i < newKnots.length; i += 1) {
       newSize += newPages[i]!.size;
@@ -243,101 +235,91 @@ export class STreeNode<V, I> extends STreePage<V, I> {
   }
 
   override drop(lower: number, tree: STreeContext<V, I>): STreePage<V, I> {
-    if (lower > 0) {
-      if (lower < this.size) {
-        let x = this.lookup(lower);
-        if (x >= 0) {
-          x += 1;
-        } else {
-          x = -(x + 1);
-        }
-        lower = x === 0 ? lower : lower - this.knots[x - 1]!;
-        const oldPages = this.pages;
-        const n = oldPages.length - x;
-        if (n > 1) {
-          let newNode: STreeNode<V, I>;
-          if (x > 0) {
-            const newPages = new Array<STreePage<V, I>>(n);
-            for (let i = 0; i < n; i += 1) {
-              newPages[i] = oldPages[i + x]!;
-            }
-            newNode = STreeNode.create(newPages);
-          } else {
-            newNode = this;
-          }
-          if (lower > 0) {
-            const oldPage = oldPages[x]!;
-            const newPage = oldPage.drop(lower, tree);
-            return newNode.replacedPage(0, newPage, oldPage, tree);
-          } else {
-            return newNode;
-          }
-        } else {
-          return oldPages[x]!.drop(lower, tree);
-        }
-      } else {
-        return STreePage.empty();
-      }
-    } else {
+    if (lower <= 0) {
       return this;
+    } else if (lower >= this.size) {
+      return STreePage.empty();
     }
+    let x = this.lookup(lower);
+    if (x >= 0) {
+      x += 1;
+    } else {
+      x = -(x + 1);
+    }
+    lower = x === 0 ? lower : lower - this.knots[x - 1]!;
+    const oldPages = this.pages;
+    const n = oldPages.length - x;
+    if (n <= 1) {
+      return oldPages[x]!.drop(lower, tree);
+    }
+    let newNode: STreeNode<V, I>;
+    if (x <= 0) {
+      newNode = this;
+    } else {
+      const newPages = new Array<STreePage<V, I>>(n);
+      for (let i = 0; i < n; i += 1) {
+        newPages[i] = oldPages[i + x]!;
+      }
+      newNode = STreeNode.create(newPages);
+    }
+    if (lower <= 0) {
+      return newNode;
+    }
+    const oldPage = oldPages[x]!;
+    const newPage = oldPage.drop(lower, tree);
+    return newNode.replacedPage(0, newPage, oldPage, tree);
   }
 
   override take(upper: number, tree: STreeContext<V, I>): STreePage<V, I> {
-    if (upper < this.size) {
-      if (upper > 0) {
-        let x = this.lookup(upper);
-        if (x >= 0) {
-          x += 1;
-        } else {
-          x = -(x + 1);
-        }
-        upper = x === 0 ? upper : upper - this.knots[x - 1]!;
-        const oldPages = this.pages;
-        const n = upper === 0 ? x : x + 1;
-        if (n > 1) {
-          let newNode: STreeNode<V, I>;
-          if (x < oldPages.length) {
-            const newPages = new Array<STreePage<V, I>>(n);
-            for (let i = 0; i < n; i += 1) {
-              newPages[i] = oldPages[i]!;
-            }
-            const newKnots = new Array<number>(n - 1);
-            for (let i = 0; i < newKnots.length; i += 1) {
-              newKnots[i] = this.knots[i]!;
-            }
-            const newSize = newKnots[n - 2]! + newPages[n - 1]!.size;
-            newNode = new STreeNode(newPages, newKnots, newSize);
-          } else {
-            newNode = this;
-          }
-          if (upper > 0) {
-            const oldPage = oldPages[x]!;
-            const newPage = oldPage.take(upper, tree);
-            return newNode.replacedPage(x, newPage, oldPage, tree);
-          } else {
-            return newNode;
-          }
-        } else if (upper > 0) {
-          return oldPages[0]!.take(upper, tree);
-        } else {
-          return oldPages[0]!;
-        }
-      } else {
-        return STreePage.empty();
-      }
-    } else {
+    if (upper >= this.size) {
       return this;
+    } else if (upper <= 0) {
+      return STreePage.empty();
     }
+    let x = this.lookup(upper);
+    if (x >= 0) {
+      x += 1;
+    } else {
+      x = -(x + 1);
+    }
+    upper = x === 0 ? upper : upper - this.knots[x - 1]!;
+    const oldPages = this.pages;
+    const n = upper === 0 ? x : x + 1;
+    if (n <= 1) {
+      if (upper > 0) {
+        return oldPages[0]!.take(upper, tree);
+      } else {
+        return oldPages[0]!;
+      }
+    }
+    let newNode: STreeNode<V, I>;
+    if (x >= oldPages.length) {
+      newNode = this;
+    } else {
+      const newPages = new Array<STreePage<V, I>>(n);
+      for (let i = 0; i < n; i += 1) {
+        newPages[i] = oldPages[i]!;
+      }
+      const newKnots = new Array<number>(n - 1);
+      for (let i = 0; i < newKnots.length; i += 1) {
+        newKnots[i] = this.knots[i]!;
+      }
+      const newSize = newKnots[n - 2]! + newPages[n - 1]!.size;
+      newNode = new STreeNode(newPages, newKnots, newSize);
+    }
+    if (upper <= 0) {
+      return newNode;
+    }
+    const oldPage = oldPages[x]!;
+    const newPage = oldPage.take(upper, tree);
+    return newNode.replacedPage(x, newPage, oldPage, tree);
   }
 
   override balanced(tree: STreeContext<V, I>): STreeNode<V, I> {
-    if (this.pages.length > 1 && tree.pageShouldSplit(this)) {
-      const x = this.knots.length >>> 1;
-      return this.split(x);
-    } else {
+    if (this.pages.length <= 1 || !tree.pageShouldSplit(this)) {
       return this;
     }
+    return this.split(this.knots.length >>> 1);
   }
 
   override split(x: number): STreeNode<V, I> {
@@ -384,24 +366,24 @@ export class STreeNode<V, I> extends STreePage<V, I> {
 
     const newKnots = new Array<number>(y - 1);
     let newSize;
-    if (y > 0) {
+    if (y <= 0) {
+      newSize = 0;
+    } else {
       newSize = newPages[0]!.size;
       for (let i = 1; i < y; i += 1) {
         newKnots[i - 1] = newSize;
         newSize += newPages[i]!.size;
       }
-    } else {
-      newSize = 0;
     }
 
     return new STreeNode(newPages, newKnots, newSize);
   }
 
-  override forEach<T, S>(callback: (this: S, value: V, index: number, id: I) => T | void,
-                         thisArg: S, offset: number): T | undefined {
+  override forEach<T, S>(callback: (this: S, value: V, index: number, id: I, tree: STree<V, I>) => T | void,
+                         thisArg: S, offset: number, tree: STree<V, I>): T | undefined {
     for (let i = 0; i < this.pages.length; i += 1) {
       const page = this.pages[i]!;
-      const result = page.forEach(callback, thisArg, offset);
+      const result = page.forEach(callback, thisArg, offset, tree);
       if (result !== void 0) {
         return result;
       }
@@ -444,5 +426,25 @@ export class STreeNode<V, I> extends STreePage<V, I> {
     }
     size += pages[knots.length]!.size;
     return new STreeNode(pages, knots, size);
+  }
+}
+
+/** @internal */
+export class STreeNodeCursor<V, I> extends NodeCursor<[I, V], STreePage<V, I>> {
+  constructor(pages: readonly STreePage<V, I>[], index: number = 0,
+              childIndex: number = 0, childCursor: Cursor<[I, V]> | null = null) {
+    super(pages, index, childIndex, childCursor);
+  }
+
+  protected override pageSize(page: STreePage<V, I>): number {
+    return page.size;
+  }
+
+  protected override pageCursor(page: STreePage<V, I>): Cursor<[I, V]> {
+    return page.entries();
+  }
+
+  protected override reversePageCursor(page: STreePage<V, I>): Cursor<[I, V]> {
+    return page.reverseEntries();
   }
 }

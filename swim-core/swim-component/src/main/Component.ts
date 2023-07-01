@@ -1140,7 +1140,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   static fromInit<S extends Class<Instance<S, Component>>>(this: S, init: Inits<InstanceType<S>>): InstanceType<S> {
     let type: Creatable<InstanceType<S>>;
-    if ((typeof init === "object" && init !== null || typeof init === "function") && Creatable.is((init as ComponentInit).type)) {
+    if ((typeof init === "object" && init !== null || typeof init === "function") && Creatable[Symbol.hasInstance]((init as ComponentInit).type)) {
       type = (init as ComponentInit).type as Creatable<InstanceType<S>>;
     } else {
       type = this as unknown as Creatable<InstanceType<S>>;
@@ -1159,7 +1159,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
       } else {
         throw new TypeError(value + " not an instance of " + this);
       }
-    } else if (Creatable.is(value)) {
+    } else if (Creatable[Symbol.hasInstance](value)) {
       return (value as Creatable<InstanceType<S>>).create();
     } else {
       return (this as unknown as ComponentFactory<InstanceType<S>>).fromInit(value as Inits<InstanceType<S>>);

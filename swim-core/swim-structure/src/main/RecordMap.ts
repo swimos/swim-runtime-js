@@ -1103,10 +1103,8 @@ export class RecordMap extends Record {
   }
 
   override forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
-  override forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
-                         thisArg: S): T | undefined;
-  override forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
-                         thisArg?: S): T | undefined {
+  override forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void, thisArg: S): T | undefined;
+  override forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void, thisArg?: S): T | undefined {
     const array = this.array!;
     for (let i = 0, n = this.length; i < n; i += 1) {
       const result = callback.call(thisArg, array[i]!, i);

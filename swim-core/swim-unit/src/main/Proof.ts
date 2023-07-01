@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {OutputSettings} from "@swim/codec";
+import type {OutputSettings} from "@swim/codec";
 import type {Output} from "@swim/codec";
 import {OutputStyle} from "@swim/codec";
 import {Format} from "@swim/codec";

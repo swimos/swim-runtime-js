@@ -105,15 +105,13 @@ export class ConstraintMap<K extends ConstraintId, V> {
     this.array.length = 0;
   }
 
-  forEach<T>(callback: (key: K, value: V) => T | void): T | undefined;
-  forEach<T, S>(callback: (this: S, key: K, value: V) => T | void,
-                thisArg: S): T | undefined;
-  forEach<T, S>(callback: (this: S | undefined, key: K, value: V) => T | void,
-                thisArg?: S): T | undefined {
+  forEach<T>(callback: (value: V, key: K) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, value: V, key: K) => T | void, thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, value: V, key: K) => T | void, thisArg?: S): T | undefined {
     const array = this.array;
     for (let i = 0, n = array.length; i < n; i += 1) {
       const item = array[i]!;
-      const result = callback.call(thisArg, item[0], item[1]);
+      const result = callback.call(thisArg, item[1], item[0]);
       if (result !== void 0) {
         return result;
       }

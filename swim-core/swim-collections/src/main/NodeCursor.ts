@@ -16,7 +16,7 @@ import {Cursor} from "@swim/util";
 
 /** @internal */
 export abstract class NodeCursor<T, P> extends Cursor<T> {
-  constructor(pages: ReadonlyArray<P>, index: number,
+  constructor(pages: readonly P[], index: number,
               childIndex: number, childCursor: Cursor<T> | null) {
     super();
     this.pages = pages;
@@ -26,7 +26,7 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
   }
 
   /** @internal */
-  readonly pages: ReadonlyArray<P>;
+  readonly pages: readonly P[];
 
   /** @internal */
   index: number;
@@ -48,9 +48,8 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
       if (this.childCursor !== null) {
         if (!this.childCursor.isEmpty()) {
           return false;
-        } else {
-          this.childCursor = null;
         }
+        this.childCursor = null;
       } else if (this.childIndex < this.pages.length) {
         this.childCursor = this.pageCursor(this.pages[this.childIndex]!);
         this.childIndex += 1;
@@ -66,17 +65,14 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
       if (this.childCursor !== null) {
         if (!this.childCursor.isEmpty()) {
           return this.childCursor.head();
-        } else {
-          this.childCursor = null;
         }
+        this.childCursor = null;
+      } else if (this.childIndex < this.pages.length) {
+        this.childCursor = this.pageCursor(this.pages[this.childIndex]!);
+        this.childIndex += 1;
       } else {
-        if (this.childIndex < this.pages.length) {
-          this.childCursor = this.pageCursor(this.pages[this.childIndex]!);
-          this.childIndex += 1;
-        } else {
-          this.childIndex = this.pages.length;
-          throw new Error("empty");
-        }
+        this.childIndex = this.pages.length;
+        throw new Error("empty");
       }
     } while (true);
   }
@@ -87,17 +83,14 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
         if (!this.childCursor.isEmpty()) {
           this.index += 1;
           return;
-        } else {
-          this.childCursor = null;
         }
+        this.childCursor = null;
+      } else if (this.childIndex < this.pages.length) {
+        this.childCursor = this.pageCursor(this.pages[this.childIndex]!);
+        this.childIndex += 1;
       } else {
-        if (this.childIndex < this.pages.length) {
-          this.childCursor = this.pageCursor(this.pages[this.childIndex]!);
-          this.childIndex += 1;
-        } else {
-          this.childIndex = this.pages.length;
-          throw new Error("empty");
-        }
+        this.childIndex = this.pages.length;
+        throw new Error("empty");
       }
     } while (true);
   }
@@ -124,10 +117,9 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
             count = 0;
           }
           break;
-        } else {
-          this.index += pageSize;
-          count -= pageSize;
         }
+        this.index += pageSize;
+        count -= pageSize;
       } else {
         break;
       }
@@ -139,9 +131,8 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
       if (this.childCursor !== null) {
         if (this.childCursor.hasNext()) {
           return true;
-        } else {
-          this.childCursor = null;
         }
+        this.childCursor = null;
       } else if (this.childIndex < this.pages.length) {
         this.childCursor = this.pageCursor(this.pages[this.childIndex]!);
         this.childIndex += 1;
@@ -156,23 +147,20 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
     return this.index;
   }
 
-  override next(): {value?: T, done: boolean} {
+  override next(): IteratorResult<T> {
     do {
       if (this.childCursor !== null) {
         if (this.childCursor.hasNext()) {
           this.index += 1;
           return this.childCursor.next();
-        } else {
-          this.childCursor = null;
         }
+        this.childCursor = null;
+      } else if (this.childIndex < this.pages.length) {
+        this.childCursor = this.pageCursor(this.pages[this.childIndex]!);
+        this.childIndex += 1;
       } else {
-        if (this.childIndex < this.pages.length) {
-          this.childCursor = this.pageCursor(this.pages[this.childIndex]!);
-          this.childIndex += 1;
-        } else {
-          this.childIndex = this.pages.length;
-          return {done: true};
-        }
+        this.childIndex = this.pages.length;
+        return {done: true, value: void 0};
       }
     } while (true);
   }
@@ -182,9 +170,8 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
       if (this.childCursor !== null) {
         if (this.childCursor.hasPrevious()) {
           return true;
-        } else {
-          this.childCursor = null;
         }
+        this.childCursor = null;
       } else if (this.childIndex > 0) {
         this.childCursor = this.reversePageCursor(this.pages[this.childIndex - 1]!);
         this.childIndex -= 1;
@@ -199,21 +186,20 @@ export abstract class NodeCursor<T, P> extends Cursor<T> {
     return this.index - 1;
   }
 
-  override previous(): {value?: T, done: boolean} {
+  override previous(): IteratorResult<T> {
     do {
       if (this.childCursor !== null) {
         if (this.childCursor.hasPrevious()) {
           this.index -= 1;
           return this.childCursor.previous();
-        } else {
-          this.childCursor = null;
         }
+        this.childCursor = null;
       } else if (this.childIndex > 0) {
         this.childCursor = this.reversePageCursor(this.pages[this.childIndex - 1]!);
         this.childIndex -= 1;
       } else {
         this.childIndex = 0;
-        return {done: true};
+        return {done: true, value: void 0};
       }
     } while (true);
   }

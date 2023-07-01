@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Arrays} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {Equals} from "@swim/util";
 import type {Equivalent} from "@swim/util";
+import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
@@ -27,7 +29,7 @@ import {GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import type {GeoCurve} from "./GeoCurve";
 import type {GeoSplineContext} from "./GeoSpline";
-import type {AnyGeoSpline} from "./GeoSpline";
+import {AnyGeoSpline} from "./GeoSpline";
 import type {GeoSplinePoints} from "./GeoSpline";
 import {GeoSplineBuilder} from "./GeoSpline";
 import {GeoSpline} from "./GeoSpline";
@@ -41,11 +43,27 @@ export interface GeoPathContext extends GeoSplineContext {
 export type AnyGeoPath = GeoPath | GeoPathSplines | AnyGeoSpline;
 
 /** @public */
-export type GeoPathSplines = ReadonlyArray<AnyGeoSpline>;
+export const AnyGeoPath = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyGeoPath {
+    return instance instanceof GeoPath
+        || GeoPathSplines[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
+export const GeoPathSplines = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoPathSplines {
+    return Array.isArray(instance) && instance.length !== 0
+        && AnyGeoSpline[Symbol.hasInstance](instance[0]!);
+  },
+};
+
+/** @public */
+export type GeoPathSplines = readonly AnyGeoSpline[];
 
 /** @public */
 export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
-  constructor(splines: ReadonlyArray<GeoSpline>) {
+  constructor(splines: readonly GeoSpline[]) {
     super();
     this.splines = splines;
     this.boundingBox = null;
@@ -55,7 +73,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     return this.splines.length !== 0;
   }
 
-  readonly splines: ReadonlyArray<GeoSpline>;
+  readonly splines: readonly GeoSpline[];
 
   override get lngMin(): number {
     return this.bounds.lngMin;
@@ -215,10 +233,8 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
   }
 
   forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
-  forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
-                     thisArg: S): R | undefined;
-  forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
-                     thisArg?: S): R | undefined {
+  forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void, thisArg: S): R | undefined;
+  forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void, thisArg?: S): R | undefined {
     const splines = this.splines;
     for (let i = 0, n = splines.length; i < n; i += 1) {
       const spline = splines[i]!;
@@ -280,8 +296,13 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     return Format.debug(this);
   }
 
+  static builder(): GeoPathBuilder {
+    return new GeoPathBuilder();
+  }
+
+  @Lazy
   static empty(): GeoPath {
-    return new GeoPath([]);
+    return new GeoPath(Arrays.empty());
   }
 
   static of(...splines: GeoSpline[]): GeoPath {
@@ -309,35 +330,17 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     return new GeoPath(splines);
   }
 
-  static override fromAny(value: AnyGeoPath): GeoPath;
-  static override fromAny(value: AnyGeoShape): GeoShape;
-  static override fromAny(value: AnyGeoPath | AnyGeoShape): GeoShape {
+  static override fromAny<T extends AnyGeoPath | null | undefined>(value: T): GeoPath | Uninitable<T>;
+  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyGeoPath | null | undefined>(value: T): GeoPath | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoPath) {
-      return value;
-    } else if (GeoPath.isSplines(value)) {
+      return value as GeoPath | Uninitable<T>;
+    } else if (GeoPathSplines[Symbol.hasInstance](value)) {
       return GeoPath.fromSplines(value);
-    } else if (GeoSpline.isAnySpline(value)) {
-      return GeoPath.of(GeoSpline.fromAny(value));
-    } else {
-      return GeoShape.fromAny(value);
+    } else if (AnyGeoSpline[Symbol.hasInstance](value)) {
+      return GeoPath.of(GeoSpline.fromAny(value as AnyGeoSpline));
     }
-  }
-
-  static builder(): GeoPathBuilder {
-    return new GeoPathBuilder();
-  }
-
-  /** @internal */
-  static isSplines(value: unknown): value is GeoPathSplines {
-    return Array.isArray(value)
-        && value.length > 0
-        && GeoSpline.isAnySpline(value[0]!);
-  }
-
-  /** @internal */
-  static isAnyPath(value: unknown): value is AnyGeoPath {
-    return value instanceof GeoPath
-        || GeoPath.isSplines(value);
+    throw new TypeError("" + value);
   }
 }
 

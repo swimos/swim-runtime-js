@@ -342,7 +342,7 @@ export const Property = (function (_super: typeof Fastener) {
   };
 
   Property.prototype.fromAny = function <T, U>(this: Property<unknown, T, U>, value: T | U): T {
-    return FromAny.fromAny<T, U>(this.valueType, value);
+    return FromAny<T, U>(this.valueType, value);
   };
 
   Property.tryValue = function <O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any> ? T : undefined {

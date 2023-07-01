@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Numbers} from "@swim/util";
-import {Constructors} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Equivalent} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -32,13 +35,36 @@ import {GeoShape} from "./GeoShape";
 export type AnyGeoPoint = GeoPoint | GeoPointInit | GeoPointTuple;
 
 /** @public */
+export const AnyGeoPoint = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyGeoPoint {
+    return instance instanceof GeoPoint
+        || GeoPointInit[Symbol.hasInstance](instance)
+        || GeoPointTuple[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
 export interface GeoPointInit {
   lng: number;
   lat: number;
 }
 
 /** @public */
+export const GeoPointInit = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoPointInit {
+    return Objects.hasAllKeys<GeoPointInit>(instance, "lng", "lat");
+  },
+};
+
+/** @public */
 export type GeoPointTuple = [number, number];
+
+/** @public */
+export const GeoPointTuple = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoPointTuple {
+    return Array.isArray(instance) && instance.length === 2;
+  },
+};
 
 /**
  * A geographic point represented by a WGS84 longitude and latitude.
@@ -161,18 +187,14 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return Format.debug(this);
   }
 
-  /** @internal */
-  static readonly Origin: GeoPoint = new this(0, 0);
-
-  static origin(): GeoPoint {
-    return this.Origin;
+  @Lazy
+  static undefined(): GeoPoint {
+    return new GeoPoint(NaN, NaN);
   }
 
-  /** @internal */
-  static readonly Undefined: GeoPoint = new this(NaN, NaN);
-
-  static undefined(): GeoPoint {
-    return this.Undefined;
+  @Lazy
+  static origin(): GeoPoint {
+    return new GeoPoint(0, 0);
   }
 
   static of(lng: number, lat: number): GeoPoint {
@@ -187,12 +209,14 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return new GeoPoint(value[0], value[1]);
   }
 
-  static override fromAny(value: AnyGeoPoint): GeoPoint {
+  static override fromAny<T extends AnyGeoPoint | null | undefined>(value: T): GeoPoint | Uninitable<T>;
+  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyGeoPoint | null | undefined>(value: T): GeoPoint | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoPoint) {
-      return value;
-    } else if (GeoPoint.isInit(value)) {
+      return value as GeoPoint | Uninitable<T>;
+    } else if (GeoPointInit[Symbol.hasInstance](value)) {
       return GeoPoint.fromInit(value);
-    } else if (GeoPoint.isTuple(value)) {
+    } else if (GeoPointTuple[Symbol.hasInstance](value)) {
       return GeoPoint.fromTuple(value);
     }
     throw new TypeError("" + value);
@@ -218,31 +242,6 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
   static normalizeLat(lat: number): number {
     lat = Math.min(Math.max(-90 + Equivalent.Epsilon, lat), 90 - Equivalent.Epsilon);
     return lat;
-  }
-
-  /** @internal */
-  static isInit(value: unknown): value is GeoPointInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as GeoPointInit;
-      return typeof init.lng === "number"
-          && typeof init.lat === "number";
-    }
-    return false;
-  }
-
-  /** @internal */
-  static isTuple(value: unknown): value is GeoPointTuple {
-    return Array.isArray(value)
-        && value.length === 2
-        && typeof value[0] === "number"
-        && typeof value[1] === "number";
-  }
-
-  /** @internal */
-  static override isAny(value: unknown): value is AnyGeoPoint {
-    return value instanceof GeoPoint
-        || GeoPoint.isInit(value)
-        || GeoPoint.isTuple(value);
   }
 }
 

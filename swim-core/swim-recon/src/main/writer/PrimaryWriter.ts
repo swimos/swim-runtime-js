@@ -55,13 +55,13 @@ export class PrimaryWriter<I, V> extends Writer {
     while (next !== void 0 || items.hasNext()) {
       let item: I | undefined;
       if (next === void 0) {
-        item = items.next().value!;
+        item = items.next().value as I;
       } else {
         item = next;
         next = void 0;
       }
       if (items.hasNext()) {
-        next = items.next().value!;
+        next = items.next().value as I;
       }
       if (!inParens && !first) {
         size += 1; // ' '

@@ -59,13 +59,12 @@ export class ValueEntryCursor<K, V> extends Cursor<[K, V]> {
     return this.cursor.nextIndex();
   }
 
-  override next(): {value?: [K, V], done: boolean} {
-    const {value, done} = this.cursor.next();
-    if (value !== void 0) {
-      return {value: [value[0].coerce(this.keyForm), value[1].coerce(this.valueForm)], done};
-    } else {
-      return {done};
+  override next(): IteratorResult<[K, V]> {
+    const next = this.cursor.next();
+    if (next.done === true) {
+      return next;
     }
+    return {done: false, value: [next.value[0].coerce(this.keyForm), next.value[1].coerce(this.valueForm)]};
   }
 
   override hasPrevious(): boolean {
@@ -76,13 +75,12 @@ export class ValueEntryCursor<K, V> extends Cursor<[K, V]> {
     return this.cursor.previousIndex();
   }
 
-  override previous(): {value?: [K, V], done: boolean} {
-    const {value, done} = this.cursor.previous();
-    if (value !== void 0) {
-      return {value: [value[0].coerce(this.keyForm), value[1].coerce(this.valueForm)], done};
-    } else {
-      return {done};
+  override previous(): IteratorResult<[K, V]> {
+    const previous = this.cursor.previous();
+    if (previous.done === true) {
+      return previous;
     }
+    return {done: false, value: [previous.value[0].coerce(this.keyForm), previous.value[1].coerce(this.valueForm)]};
   }
 
   override delete(): void {

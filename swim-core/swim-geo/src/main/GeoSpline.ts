@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -22,8 +23,7 @@ import {R2Segment} from "@swim/math";
 import {R2Spline} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import type {AnyGeoShape} from "./GeoShape";
-import {GeoShape} from "./GeoShape";
-import type {AnyGeoPoint} from "./GeoPoint";
+import {AnyGeoPoint} from "./GeoPoint";
 import {GeoPoint} from "./GeoPoint";
 import type {GeoCurveContext} from "./GeoCurve";
 import {GeoCurve} from "./GeoCurve";
@@ -39,7 +39,23 @@ export interface GeoSplineContext extends GeoCurveContext {
 export type AnyGeoSpline = GeoSpline | GeoSplinePoints;
 
 /** @public */
-export type GeoSplinePoints = ReadonlyArray<AnyGeoPoint>;
+export const AnyGeoSpline = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyGeoSpline {
+    return instance instanceof GeoSpline
+        || GeoSplinePoints[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
+export type GeoSplinePoints = readonly AnyGeoPoint[];
+
+/** @public */
+export const GeoSplinePoints = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoSplinePoints {
+    return Array.isArray(instance) && instance.length >= 2
+        && AnyGeoPoint[Symbol.hasInstance](instance[0]!);
+  },
+};
 
 /** @public */
 export class GeoSpline extends GeoCurve implements Debug {
@@ -187,15 +203,14 @@ export class GeoSpline extends GeoCurve implements Debug {
       let p0 = f.project(curve.lng0, curve.lat0);
       while (i < n) {
         curve = oldCurves[i]!;
-        if (curve instanceof GeoSegment) {
-          // project next point
-          const p1 = f.project(curve.lng1, curve.lat1);
-          newCurves[i] = new R2Segment(p0.x, p0.y, p1.x, p1.y);
-          p0 = p1;
-          i += 1;
-        } else {
+        if (!(curve instanceof GeoSegment)) {
           break;
         }
+        // project next point
+        const p1 = f.project(curve.lng1, curve.lat1);
+        newCurves[i] = new R2Segment(p0.x, p0.y, p1.x, p1.y);
+        p0 = p1;
+        i += 1;
       }
     }
 
@@ -234,10 +249,8 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   override forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
-  override forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
-                              thisArg: S): R | undefined;
-  override forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
-                              thisArg?: S): R | undefined {
+  override forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void, thisArg: S): R | undefined;
+  override forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void, thisArg?: S): R | undefined {
     const curves = this.curves;
     const n = curves.length;
     if (n === 0) {
@@ -259,10 +272,8 @@ export class GeoSpline extends GeoCurve implements Debug {
   }
 
   override forEachCoordRest<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
-  override forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
-                                  thisArg: S): R | undefined;
-  override forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
-                                  thisArg?: S): R | undefined {
+  override forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void, thisArg: S): R | undefined;
+  override forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void, thisArg?: S): R | undefined {
     const curves = this.curves;
     for (let i = 0, n = curves.length; i < n; i += 1) {
       const curve = curves[i]!;
@@ -327,6 +338,10 @@ export class GeoSpline extends GeoCurve implements Debug {
     return new GeoSpline(curves, true);
   }
 
+  static builder(): GeoSplineBuilder {
+    return new GeoSplineBuilder();
+  }
+
   static fromPoints(points: GeoSplinePoints): GeoSpline {
     const n = points.length;
     if (n === 0 || n === 1) {
@@ -344,33 +359,15 @@ export class GeoSpline extends GeoCurve implements Debug {
     return new GeoSpline(curves, closed);
   }
 
-  static override fromAny(value: AnyGeoSpline): GeoSpline;
-  static override fromAny(value: AnyGeoShape): GeoShape;
-  static override fromAny(value: AnyGeoSpline | AnyGeoShape): GeoShape {
+  static override fromAny<T extends AnyGeoSpline | null | undefined>(value: T): GeoSpline | Uninitable<T>;
+  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyGeoSpline | null | undefined>(value: T): GeoSpline | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoSpline) {
-      return value;
-    } else if (GeoSpline.isPoints(value)) {
+      return value as GeoSpline | Uninitable<T>;
+    } else if (GeoSplinePoints[Symbol.hasInstance](value)) {
       return GeoSpline.fromPoints(value);
-    } else {
-      return GeoShape.fromAny(value);
     }
-  }
-
-  static builder(): GeoSplineBuilder {
-    return new GeoSplineBuilder();
-  }
-
-  /** @internal */
-  static isPoints(value: unknown): value is GeoSplinePoints {
-    return Array.isArray(value)
-        && value.length >= 2
-        && GeoPoint.isAny(value[0]!);
-  }
-
-  /** @internal */
-  static isAnySpline(value: unknown): value is AnyGeoSpline {
-    return value instanceof GeoSpline
-        || GeoSpline.isPoints(value);
+    throw new TypeError("" + value);
   }
 }
 

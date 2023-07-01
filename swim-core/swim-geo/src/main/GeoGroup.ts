@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import {Arrays} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {Equals} from "@swim/util";
 import type {Equivalent} from "@swim/util";
+import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
@@ -142,14 +143,12 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     return Format.debug(this);
   }
 
-  /** @internal */
-  static readonly Empty: GeoGroup = new this(Arrays.empty);
-
+  @Lazy
   static empty<S extends GeoShape>(): GeoGroup<S> {
-    return this.Empty as GeoGroup<S>;
+    return new GeoGroup<S>(Arrays.empty());
   }
 
   static of<S extends GeoShape>(...shapes: S[]): GeoGroup<S> {
-    return new GeoGroup(shapes);
+    return new GeoGroup<S>(shapes);
   }
 }

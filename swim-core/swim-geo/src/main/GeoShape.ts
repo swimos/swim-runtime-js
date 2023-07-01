@@ -12,22 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Equals} from "@swim/util";
 import type {R2Shape} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import type {GeoPointInit} from "./GeoPoint";
-import type {GeoPointTuple} from "./GeoPoint";
+import {GeoPointInit} from "./"; // forward import
+import {GeoPointTuple} from "./"; // forward import
 import {GeoPoint} from "./"; // forward import
-import type {GeoSegmentInit} from "./GeoSegment";
+import {GeoSegmentInit} from "./"; // forward import
 import {GeoSegment} from "./"; // forward import
-import type {GeoBoxInit} from "./GeoBox";
+import {GeoBoxInit} from "./"; // forward import
 import {GeoBox} from "./"; // forward import
-import type {GeoTileInit} from "./GeoTile";
-import type {GeoTileTuple} from "./GeoTile";
+import {GeoTileInit} from "./"; // forward import
+import {GeoTileTuple} from "./"; // forward import
 import {GeoTile} from "./"; // forward import
 
 /** @public */
 export type AnyGeoShape = GeoShape | GeoPointInit | GeoPointTuple | GeoSegmentInit | GeoTileInit | GeoTileTuple | GeoBoxInit;
+
+/** @public */
+export const AnyGeoShape = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyGeoShape {
+    return instance instanceof GeoShape
+        || GeoPointInit[Symbol.hasInstance](instance)
+        || GeoPointTuple[Symbol.hasInstance](instance)
+        || GeoSegmentInit[Symbol.hasInstance](instance)
+        || GeoTileInit[Symbol.hasInstance](instance)
+        || GeoTileTuple[Symbol.hasInstance](instance)
+        || GeoBoxInit[Symbol.hasInstance](instance);
+  },
+};
 
 /** @public */
 export abstract class GeoShape implements Equals {
@@ -61,32 +75,22 @@ export abstract class GeoShape implements Equals {
 
   abstract equals(that: unknown): boolean;
 
-  static fromAny(value: AnyGeoShape): GeoShape {
+  static fromAny<T extends AnyGeoShape | null | undefined>(value: T): GeoShape | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoShape) {
-      return value;
-    } else if (GeoPoint.isInit(value)) {
+      return value as GeoShape | Uninitable<T>;
+    } else if (GeoPointInit[Symbol.hasInstance](value)) {
       return GeoPoint.fromInit(value);
-    } else if (GeoPoint.isTuple(value)) {
+    } else if (GeoPointTuple[Symbol.hasInstance](value)) {
       return GeoPoint.fromTuple(value);
-    } else if (GeoSegment.isInit(value)) {
+    } else if (GeoSegmentInit[Symbol.hasInstance](value)) {
       return GeoSegment.fromInit(value);
-    } else if (GeoTile.isInit(value)) {
+    } else if (GeoTileInit[Symbol.hasInstance](value)) {
       return GeoTile.fromInit(value);
-    } else if (GeoTile.isTuple(value)) {
+    } else if (GeoTileTuple[Symbol.hasInstance](value)) {
       return GeoTile.fromTuple(value);
-    } else if (GeoBox.isInit(value)) {
+    } else if (GeoBoxInit[Symbol.hasInstance](value)) {
       return GeoBox.fromInit(value);
     }
     throw new TypeError("" + value);
-  }
-
-  /** @internal */
-  static isAny(value: unknown): value is AnyGeoShape {
-    return value instanceof GeoShape
-        || GeoPoint.isInit(value)
-        || GeoPoint.isTuple(value)
-        || GeoSegment.isInit(value)
-        || GeoTile.isInit(value)
-        || GeoBox.isInit(value);
   }
 }

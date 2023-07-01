@@ -463,10 +463,8 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
   }
 
   forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
-  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
-                thisArg: S): T | undefined;
-  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | undefined,
-                thisArg?: S): T | undefined {
+  forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void, thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | undefined, thisArg?: S): T | undefined {
     return callback.call(thisArg, this, 0);
   }
 

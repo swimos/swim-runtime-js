@@ -68,13 +68,13 @@ export class BlockWriter<I, V> extends Writer {
     while (next !== void 0 || items.hasNext()) {
       let item: I | undefined;
       if (next === void 0 ) {
-        item = items.next().value!;
+        item = items.next().value as I;
       } else {
         item = next;
         next = void 0;
       }
       if (items.hasNext()) {
-        next = items.next().value!;
+        next = items.next().value as I;
       }
       if (recon.isExpression(item)) {
         markupSafe = false;
@@ -190,13 +190,13 @@ export class BlockWriter<I, V> extends Writer {
           break;
         } else {
           if (next === void 0) {
-            item = items.next().value!;
+            item = items.next().value as I;
           } else {
             item = next;
             next = void 0;
           }
           if (items.hasNext()) {
-            next = items.next().value!;
+            next = items.next().value as I;
           }
           if (recon.isExpression(item)) {
             markupSafe = false;

@@ -14,19 +14,20 @@
 
 import {Cursor} from "@swim/util";
 import type {BTreeContext} from "./BTreeContext";
+import type {BTree} from "./BTree";
 import {BTreePage} from "./BTreePage";
 import {BTreeNode} from "./"; // forward import
 
 /** @internal */
 export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
-  constructor(slots: ReadonlyArray<[K, V]>, fold: U | undefined) {
+  constructor(slots: readonly [K, V][], fold: U | undefined) {
     super();
     this.slots = slots;
     this.fold = fold;
   }
 
   /** @internal */
-  readonly slots: ReadonlyArray<[K, V]>;
+  readonly slots: readonly [K, V][];
 
   override get arity(): number {
     return this.slots.length;
@@ -56,11 +57,10 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
 
   override get(key: K, tree: BTreeContext<K, V>): V | undefined {
     const x = this.lookup(key, tree);
-    if (x >= 0) {
-      return this.slots[x]![1];
-    } else {
+    if (x < 0) {
       return void 0;
     }
+    return this.slots[x]![1];
   }
 
   override getEntry(index: number): [K, V] | undefined {
@@ -69,20 +69,18 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
 
   override firstEntry(): [K, V] | undefined {
     const slots = this.slots;
-    if (slots.length !== 0) {
-      return slots[0];
-    } else {
+    if (slots.length === 0) {
       return void 0;
     }
+    return slots[0];
   }
 
   override lastEntry(): [K, V] | undefined {
     const slots = this.slots;
-    if (slots.length !== 0) {
-      return slots[slots.length - 1];
-    } else {
+    if (slots.length === 0) {
       return void 0;
     }
+    return slots[slots.length - 1];
   }
 
   override nextEntry(key: K, tree: BTreeContext<K, V>): [K, V] | undefined {
@@ -109,22 +107,20 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
     let x = this.lookup(key, tree);
     if (x >= 0) {
       return this.updatedSlot(x, key, newValue);
-    } else {
-      x = -(x + 1);
-      return this.insertedSlot(x, key, newValue);
     }
+    x = -(x + 1);
+    return this.insertedSlot(x, key, newValue);
   }
 
   /** @internal */
   updatedSlot(x: number, key: K, newValue: V): BTreeLeaf<K, V, U> {
     const oldSlots = this.slots;
-    if (newValue !== oldSlots[x]![1]) {
-      const newSlots = oldSlots.slice(0);
-      newSlots[x] = [key, newValue];
-      return new BTreeLeaf(newSlots, void 0 as U | undefined);
-    } else {
+    if (newValue === oldSlots[x]![1]) {
       return this;
     }
+    const newSlots = oldSlots.slice(0);
+    newSlots[x] = [key, newValue];
+    return new BTreeLeaf<K, V, U>(newSlots, void 0);
   }
 
   /** @internal */
@@ -139,20 +135,17 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
     for (let i = x; i < n - 1; i += 1) {
       newSlots[i + 1] = oldSlots[i]!;
     }
-    return new BTreeLeaf(newSlots, void 0 as U | undefined);
+    return new BTreeLeaf<K, V, U>(newSlots, void 0);
   }
 
   override removed(key: K, tree: BTreeContext<K, V>): BTreeLeaf<K, V, U> {
     const x = this.lookup(key, tree);
-    if (x >= 0) {
-      if (this.slots.length > 1) {
-        return this.removedSlot(x);
-      } else {
-        return BTreePage.empty();
-      }
-    } else {
+    if (x < 0) {
       return this;
+    } else if (this.slots.length <= 1) {
+      return BTreePage.empty();
     }
+    return this.removedSlot(x);
   }
 
   /** @internal */
@@ -165,52 +158,44 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
     for (let i = x; i < newSlots.length; i += 1) {
       newSlots[i] = oldSlots[i + 1]!;
     }
-    return new BTreeLeaf(newSlots, void 0 as U | undefined);
+    return new BTreeLeaf<K, V, U>(newSlots, void 0);
   }
 
   override drop(lower: number, tree: BTreeContext<K, V>): BTreeLeaf<K, V, U> {
-    if (lower > 0) {
-      const oldSlots = this.slots;
-      if (lower < oldSlots.length) {
-        const size = oldSlots.length - lower;
-        const newSlots = new Array<[K, V]>(size);
-        for (let i = 0; i < size; i += 1) {
-          newSlots[i] = oldSlots[i + lower]!;
-        }
-        return new BTreeLeaf(newSlots, void 0 as U | undefined);
-      } else {
-        return BTreePage.empty();
-      }
-    } else {
+    const oldSlots = this.slots;
+    if (lower <= 0) {
       return this;
+    } else if (lower >= oldSlots.length) {
+      return BTreePage.empty();
     }
+    const size = oldSlots.length - lower;
+    const newSlots = new Array<[K, V]>(size);
+    for (let i = 0; i < size; i += 1) {
+      newSlots[i] = oldSlots[i + lower]!;
+    }
+    return new BTreeLeaf<K, V, U>(newSlots, void 0);
   }
 
   override take(upper: number, tree: BTreeContext<K, V>): BTreeLeaf<K, V, U> {
     const oldSlots = this.slots;
-    if (upper < oldSlots.length) {
-      if (upper > 0) {
-        const newSlots = new Array<[K, V]>(upper);
-        for (let i = 0; i < upper; i += 1) {
-          newSlots[i] = oldSlots[i]!;
-        }
-        return new BTreeLeaf(newSlots, void 0 as U | undefined);
-      } else {
-        return BTreePage.empty();
-      }
-    } else {
+    if (upper >= oldSlots.length) {
       return this;
+    } else if (upper <= 0) {
+      return BTreePage.empty();
     }
+    const newSlots = new Array<[K, V]>(upper);
+    for (let i = 0; i < upper; i += 1) {
+      newSlots[i] = oldSlots[i]!;
+    }
+    return new BTreeLeaf<K, V, U>(newSlots, void 0);
   }
 
   override balanced(tree: BTreeContext<K, V>): BTreePage<K, V, U> {
     const n = this.slots.length;
-    if (n > 1 && tree.pageShouldSplit(this)) {
-      const x = n >>> 1;
-      return this.split(x);
-    } else {
+    if (n <= 1 || !tree.pageShouldSplit(this)) {
       return this;
     }
+    return this.split(n >>> 1);
   }
 
   override split(x: number): BTreeNode<K, V, U> {
@@ -232,7 +217,7 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
     for (let i = 0; i < x; i += 1) {
       newSlots[i] = oldSlots[i]!;
     }
-    return new BTreeLeaf(newSlots, void 0 as U | undefined);
+    return new BTreeLeaf<K, V, U>(newSlots, void 0);
   }
 
   override splitRight(x: number): BTreeLeaf<K, V, U> {
@@ -242,29 +227,28 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
     for (let i = 0; i < y; i += 1) {
       newSlots[i] = oldSlots[i + x]!;
     }
-    return new BTreeLeaf(newSlots, void 0 as U | undefined);
+    return new BTreeLeaf<K, V, U>(newSlots, void 0);
   }
 
   override reduced(identity: U, accumulator: (result: U, element: V) => U,
                    combiner: (result: U, result2: U) => U): BTreeLeaf<K, V, U> {
-    if (this.fold === void 0) {
-      const slots = this.slots;
-      let fold = identity;
-      for (let i = 0, n = slots.length; i < n; i += 1) {
-        fold = accumulator(fold, slots[i]![1]);
-      }
-      return new BTreeLeaf(slots, fold);
-    } else {
+    if (this.fold !== void 0) {
       return this;
     }
+    const slots = this.slots;
+    let fold = identity;
+    for (let i = 0, n = slots.length; i < n; i += 1) {
+      fold = accumulator(fold, slots[i]![1]);
+    }
+    return new BTreeLeaf<K, V, U>(slots, fold);
   }
 
-  override forEach<T, S>(callback: (this: S, key: K, value: V) => T | void,
-                         thisArg: S): T | undefined {
+  override forEach<T, S>(callback: (this: S, value: V, key: K, tree: BTree<K, V, U>) => T | void,
+                         thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const slots = this.slots;
     for (let i = 0, n = slots.length; i < n; i += 1) {
       const slot = slots[i]!;
-      const result = callback.call(thisArg, slot[0], slot[1]);
+      const result = callback.call(thisArg, slot[1], slot[0], tree);
       if (result !== void 0) {
         return result;
       }
@@ -272,12 +256,12 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
     return void 0;
   }
 
-  override forEachKey<T, S>(callback: (this: S, key: K) => T | void,
-                            thisArg: S): T | undefined {
+  override forEachKey<T, S>(callback: (this: S, key: K, tree: BTree<K, V, U>) => T | void,
+                            thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const slots = this.slots;
     for (let i = 0, n = slots.length; i < n; i += 1) {
       const slot = slots[i]!;
-      const result = callback.call(thisArg, slot[0]);
+      const result = callback.call(thisArg, slot[0], tree);
       if (result !== void 0) {
         return result;
       }
@@ -285,12 +269,12 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
     return void 0;
   }
 
-  override forEachValue<T, S>(callback: (this: S, value: V) => T | void,
-                              thisArg: S): T | undefined {
+  override forEachValue<T, S>(callback: (this: S, value: V, tree: BTree<K, V, U>) => T | void,
+                              thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const slots = this.slots;
     for (let i = 0, n = slots.length; i < n; i += 1) {
       const slot = slots[i]!;
-      const result = callback.call(thisArg, slot[1]);
+      const result = callback.call(thisArg, slot[1], tree);
       if (result !== void 0) {
         return result;
       }

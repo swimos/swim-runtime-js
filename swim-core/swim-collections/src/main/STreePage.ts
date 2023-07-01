@@ -13,10 +13,9 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import type {Cursor} from "@swim/util";
-import {KeysCursor} from "./KeysCursor";
-import {ValuesCursor} from "./ValuesCursor";
+import {Cursor} from "@swim/util";
 import type {STreeContext} from "./STreeContext";
+import type {STree} from "./STree";
 import {STreeLeaf} from "./"; // forward import
 
 /** @internal */
@@ -49,31 +48,31 @@ export abstract class STreePage<V = unknown, I = unknown> {
 
   abstract splitRight(index: number): STreePage<V, I>;
 
-  abstract forEach<T, S>(callback: (this: S, value: V, index: number, id: I) => T | void,
-                         thisArg: S, offset: number): T | undefined;
+  abstract forEach<T, S>(callback: (this: S, value: V, index: number, id: I, tree: STree<V, I>) => T | void,
+                         thisArg: S, offset: number, tree: STree<V, I>): T | undefined;
 
   keys(): Cursor<I> {
-    return new KeysCursor(this.entries());
+    return Cursor.keys(this.entries());
   }
 
   values(): Cursor<V> {
-    return new ValuesCursor(this.entries());
+    return Cursor.values(this.entries());
   }
 
   abstract entries(): Cursor<[I, V]>;
 
   reverseKeys(): Cursor<I> {
-    return new KeysCursor(this.reverseEntries());
+    return Cursor.keys(this.reverseEntries());
   }
 
   reverseValues(): Cursor<V> {
-    return new ValuesCursor(this.reverseEntries());
+    return Cursor.values(this.reverseEntries());
   }
 
   abstract reverseEntries(): Cursor<[I, V]>;
 
   @Lazy
   static empty<V, I>(): STreeLeaf<V, I> {
-    return new STreeLeaf([]);
+    return new STreeLeaf<V, I>([]);
   }
 }

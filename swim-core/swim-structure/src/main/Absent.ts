@@ -137,10 +137,8 @@ export class Absent extends Value {
   }
 
   override forEach<T>(callback: (item: Item, index: number) => T | void): T | undefined;
-  override forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void,
-                         thisArg: S): T | undefined;
-  override forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void,
-                         thisArg?: S): T | undefined {
+  override forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void, thisArg: S): T | undefined;
+  override forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void, thisArg?: S): T | undefined {
     return void 0;
   }
 

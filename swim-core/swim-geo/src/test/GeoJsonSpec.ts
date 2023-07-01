@@ -15,13 +15,13 @@
 import type {Exam} from "@swim/unit";
 import {Test} from "@swim/unit";
 import {Suite} from "@swim/unit";
-import {GeoJson} from "@swim/geo";
 import type {GeoShape} from "@swim/geo";
 import {GeoPoint} from "@swim/geo";
 import {GeoSegment} from "@swim/geo";
 import {GeoSpline} from "@swim/geo";
 import {GeoPath} from "@swim/geo";
 import {GeoGroup} from "@swim/geo";
+import {GeoJson} from "@swim/geo";
 
 export class GeoJsonSpec extends Suite {
   @Test

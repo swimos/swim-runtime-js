@@ -14,6 +14,7 @@
 
 import {Cursor} from "@swim/util";
 import type {STreeContext} from "./STreeContext";
+import type {STree} from "./STree";
 import {STreePage} from "./STreePage";
 import {STreeNode} from "./"; // forward import
 
@@ -66,7 +67,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     if (oldSlot !== void 0 && newValue !== oldSlot[1]) {
       const newValues = oldItems.slice(0);
       newValues[index] = [oldSlot[0], newValue];
-      return new STreeLeaf(newValues);
+      return new STreeLeaf<V, I>(newValues);
     } else {
       return this;
     }
@@ -93,7 +94,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     for (let i = index; i < oldSlots.length; i += 1) {
       newSlots[i + 1] = oldSlots[i]!;
     }
-    return new STreeLeaf(newSlots);
+    return new STreeLeaf<V, I>(newSlots);
   }
 
   override removed(index: number, tree: STreeContext<V, I>): STreeLeaf<V, I> {
@@ -117,7 +118,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     for (let i = index; i < newSlots.length; i += 1) {
       newSlots[i] = oldSlots[i + 1]!;
     }
-    return new STreeLeaf(newSlots);
+    return new STreeLeaf<V, I>(newSlots);
   }
 
   override drop(lower: number, tree: STreeContext<V, I>): STreeLeaf<V, I> {
@@ -129,7 +130,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
         for (let i = 0; i < size; i += 1) {
           newSlots[i] = oldSlots[i + lower]!;
         }
-        return new STreeLeaf(newSlots);
+        return new STreeLeaf<V, I>(newSlots);
       } else {
         return STreePage.empty();
       }
@@ -146,7 +147,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
         for (let i = 0; i < upper; i += 1) {
           newSlots[i] = oldSlots[i]!;
         }
-        return new STreeLeaf(newSlots);
+        return new STreeLeaf<V, I>(newSlots);
       } else {
         return STreePage.empty();
       }
@@ -183,7 +184,7 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     for (let i = 0; i < index; i += 1) {
       newSlots[i] = oldSlots[i]!;
     }
-    return new STreeLeaf(newSlots);
+    return new STreeLeaf<V, I>(newSlots);
   }
 
   override splitRight(index: number): STreeLeaf<V, I> {
@@ -193,14 +194,14 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     for (let i = 0; i < newSize; i += 1) {
       newSlots[i] = oldSlots[i + index]!;
     }
-    return new STreeLeaf(newSlots);
+    return new STreeLeaf<V, I>(newSlots);
   }
 
-  override forEach<T, S>(callback: (this: S, value: V, index: number, id: I) => T | void,
-                         thisArg: S, offset: number): T | undefined {
+  override forEach<T, S>(callback: (this: S, value: V, index: number, id: I, tree: STree<V, I>) => T | void,
+                         thisArg: S, offset: number, tree: STree<V, I>): T | undefined {
     for (let i = 0; i < this.slots.length; i += 1) {
       const slot = this.slots[i]!;
-      const result = callback.call(thisArg, slot[1], offset + i, slot[0]);
+      const result = callback.call(thisArg, slot[1], offset + i, slot[0], tree);
       if (result !== void 0) {
         return result;
       }

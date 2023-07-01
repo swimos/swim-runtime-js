@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -33,12 +35,27 @@ import {GeoCurve} from "./GeoCurve";
 export type AnyGeoSegment = GeoSegment | GeoSegmentInit;
 
 /** @public */
+export const AnyGeoSegment = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyGeoSegment {
+    return instance instanceof GeoSegment
+        || GeoSegmentInit[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
 export interface GeoSegmentInit {
   lng0: number;
   lat0: number;
   lng1: number;
   lat1: number;
 }
+
+/** @public */
+export const GeoSegmentInit = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoSegmentInit {
+    return Objects.hasAllKeys<GeoSegmentInit>(instance, "lng0", "lat0", "lng1", "lat1");
+  },
+};
 
 /** @public */
 export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, HashCode, Debug {
@@ -159,10 +176,8 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   }
 
   override forEachCoord<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
-  override forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
-                              thisArg: S): R | undefined;
-  override forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | undefined,
-                              thisArg?: S): R | undefined {
+  override forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void, thisArg: S): R | undefined;
+  override forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | undefined, thisArg?: S): R | undefined {
     let result: R | void;
     result = callback.call(thisArg, this.lng0, this.lat0);
     if (result !== void 0) {
@@ -176,10 +191,8 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   }
 
   override forEachCoordRest<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
-  override forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
-                                  thisArg: S): R | undefined;
-  override forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void,
-                                  thisArg?: S): R | undefined {
+  override forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void, thisArg: S): R | undefined;
+  override forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void, thisArg?: S): R | undefined {
     const result = callback.call(thisArg, this.lng1, this.lat1);
     if (result !== void 0) {
       return result;
@@ -252,31 +265,15 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     return new GeoSegment(value.lng0, value.lat0, value.lng1, value.lat1);
   }
 
-  static override fromAny(value: AnyGeoSegment): GeoSegment {
+  static override fromAny<T extends AnyGeoSegment | null | undefined>(value: T): GeoSegment | Uninitable<T>;
+  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyGeoSegment | null | undefined>(value: T): GeoSegment | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoSegment) {
-      return value;
-    } else if (GeoSegment.isInit(value)) {
+      return value as GeoSegment | Uninitable<T>;
+    } else if (GeoSegmentInit[Symbol.hasInstance](value)) {
       return GeoSegment.fromInit(value);
     }
     throw new TypeError("" + value);
-  }
-
-  /** @internal */
-  static isInit(value: unknown): value is GeoSegmentInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as GeoSegmentInit;
-      return typeof init.lng0 === "number"
-          && typeof init.lat0 === "number"
-          && typeof init.lng1 === "number"
-          && typeof init.lat1 === "number";
-    }
-    return false;
-  }
-
-  /** @internal */
-  static override isAny(value: unknown): value is AnyGeoSegment {
-    return value instanceof GeoSegment
-        || GeoSegment.isInit(value);
   }
 }
 

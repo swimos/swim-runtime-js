@@ -14,48 +14,48 @@
 
 export {GeoProjection} from "./GeoProjection";
 
-export type {AnyGeoShape} from "./GeoShape";
+export {AnyGeoShape} from "./GeoShape";
 export {GeoShape} from "./GeoShape";
 
-export type {AnyGeoPoint} from "./GeoPoint";
-export type {GeoPointInit} from "./GeoPoint";
-export type {GeoPointTuple} from "./GeoPoint";
+export {AnyGeoPoint} from "./GeoPoint";
+export {GeoPointInit} from "./GeoPoint";
+export {GeoPointTuple} from "./GeoPoint";
 export {GeoPoint} from "./GeoPoint";
 export {GeoPointInterpolator} from "./GeoPoint";
 
 export type {GeoCurveContext} from "./GeoCurve";
 export {GeoCurve} from "./GeoCurve";
 
-export type {AnyGeoSegment} from "./GeoSegment";
-export type {GeoSegmentInit} from "./GeoSegment";
+export {AnyGeoSegment} from "./GeoSegment";
+export {GeoSegmentInit} from "./GeoSegment";
 export {GeoSegment} from "./GeoSegment";
 export {GeoSegmentInterpolator} from "./GeoSegment";
 
 export type {GeoSplineContext} from "./GeoSpline";
-export type {AnyGeoSpline} from "./GeoSpline";
-export type {GeoSplinePoints} from "./GeoSpline";
+export {AnyGeoSpline} from "./GeoSpline";
+export {GeoSplinePoints} from "./GeoSpline";
 export {GeoSpline} from "./GeoSpline";
 export {GeoSplineBuilder} from "./GeoSpline";
 
 export type {GeoPathContext} from "./GeoPath";
-export type {AnyGeoPath} from "./GeoPath";
-export type {GeoPathSplines} from "./GeoPath";
+export {AnyGeoPath} from "./GeoPath";
+export {GeoPathSplines} from "./GeoPath";
 export {GeoPath} from "./GeoPath";
 export {GeoPathBuilder} from "./GeoPath";
 
-export type {AnyGeoTile} from "./GeoTile";
-export type {GeoTileInit} from "./GeoTile";
-export type {GeoTileTuple} from "./GeoTile";
+export {AnyGeoTile} from "./GeoTile";
+export {GeoTileInit} from "./GeoTile";
+export {GeoTileTuple} from "./GeoTile";
 export {GeoTile} from "./GeoTile";
 
-export type {AnyGeoBox} from "./GeoBox";
-export type {GeoBoxInit} from "./GeoBox";
+export {AnyGeoBox} from "./GeoBox";
+export {GeoBoxInit} from "./GeoBox";
 export {GeoBox} from "./GeoBox";
 export {GeoBoxInterpolator} from "./GeoBox";
 
 export {GeoGroup} from "./GeoGroup";
 
-export type {GeoJsonPosition} from "./GeoJson";
+export {GeoJsonPosition} from "./GeoJson";
 export type {GeoJsonBbox} from "./GeoJson";
 export type {GeoJsonType} from "./GeoJson";
 export type {GeoJsonObject} from "./GeoJson";
