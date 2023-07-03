@@ -27,13 +27,13 @@ import {R2Box} from "./R2Box";
 
 /** @public */
 export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equals, Equivalent, Debug {
-  constructor(shapes: ReadonlyArray<S>) {
+  constructor(shapes: readonly S[]) {
     super();
     this.shapes = shapes;
     this.boundingBox = null;
   }
 
-  readonly shapes: ReadonlyArray<S>;
+  readonly shapes: readonly S[];
 
   isDefined(): boolean {
     return this.shapes.length !== 0;

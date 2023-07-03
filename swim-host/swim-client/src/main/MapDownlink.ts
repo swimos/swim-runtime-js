@@ -758,7 +758,7 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return;
     }
     this.onLinkedResponse();
-    model.state.forEach(function (key: Value, value: Value): void {
+    model.state.forEach(function (value: Value, key: Value): void {
       this.mapDidUpdate(key, value, Value.absent());
     }, this);
     if (model.synced) {

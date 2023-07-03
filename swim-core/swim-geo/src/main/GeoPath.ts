@@ -74,6 +74,20 @@ export class GeoPath extends GeoShape implements Debug {
     return this.splines.length !== 0;
   }
 
+  isClosed(): boolean {
+    const splines = this.splines;
+    if (splines.length === 0) {
+      return false;
+    }
+    for (let i = 0; i < splines.length; i += 1) {
+      const spline = splines[i]!;
+      if (!spline.isClosed()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   readonly splines: readonly GeoSpline[];
 
   override get lngMin(): number {

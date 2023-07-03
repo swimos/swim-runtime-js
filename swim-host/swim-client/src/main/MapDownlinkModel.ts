@@ -106,7 +106,7 @@ export class MapDownlinkModel extends WarpDownlinkModel {
     this.command(Record.create(1).attr("clear"));
   }
 
-  forEach<T>(callback: (key: Value, value: Value) => T | void): T | undefined;
+  forEach<T>(callback: (value: Value, key: Value) => T | void): T | undefined;
   forEach<T, S>(callback: (this: S, value: Value, key: Value) => T | void, thisArg: S): T | undefined;
   forEach<T, S>(callback: (this: S | undefined, value: Value, key: Value) => T | void, thisArg?: S): T | undefined {
     return this.state.forEach(callback, thisArg);

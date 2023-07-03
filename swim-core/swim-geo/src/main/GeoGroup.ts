@@ -27,7 +27,7 @@ import {GeoBox} from "./GeoBox";
 
 /** @public */
 export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements Debug {
-  constructor(shapes: ReadonlyArray<S>) {
+  constructor(shapes: readonly S[]) {
     super();
     this.shapes = shapes;
     this.boundingBox = null;
@@ -40,7 +40,7 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     return this.shapes.length !== 0;
   }
 
-  readonly shapes: ReadonlyArray<S>;
+  readonly shapes: readonly S[];
 
   override get lngMin(): number {
     return this.bounds.lngMin;
