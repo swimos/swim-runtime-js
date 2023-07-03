@@ -14,29 +14,59 @@
 
 import {Unit} from "@swim/unit";
 import {Suite} from "@swim/unit";
-import {LengthSuite} from "./length/LengthSuite";
-import {AngleSuite} from "./angle/AngleSuite";
-import {R2Suite} from "./r2/R2Suite";
-import {TransformSuite} from "./transform/TransformSuite";
+import {LengthParserSpec} from "./LengthParserSpec";
+import {AngleParserSpec} from "./AngleParserSpec";
+import {R2CurveParserSpec} from "./R2CurveParserSpec";
+import {R2SplineBuilderSpec} from "./R2SplineBuilderSpec";
+import {R2SplineParserSpec} from "./R2SplineParserSpec";
+import {R2PathBuilderSpec} from "./R2PathBuilderSpec";
+import {R2PathParserSpec} from "./R2PathParserSpec";
+import {R2PathWriterSpec} from "./R2PathWriterSpec";
+import {TransformParserSpec} from "./TransformParserSpec";
 
 export class MathSuite extends Suite {
   @Unit
-  lengthSuite(): Suite {
-    return new LengthSuite();
+  lengthParserSpec(): Suite {
+    return new LengthParserSpec();
   }
 
   @Unit
-  angleSuite(): Suite {
-    return new AngleSuite();
+  angleParserSpec(): Suite {
+    return new AngleParserSpec();
   }
 
   @Unit
-  r2Suite(): Suite {
-    return new R2Suite();
+  r2CurveParserSpec(): Suite {
+    return new R2CurveParserSpec();
   }
 
   @Unit
-  transformSuite(): Suite {
-    return new TransformSuite();
+  r2SplineBuilderSpec(): Suite {
+    return new R2SplineBuilderSpec();
+  }
+
+  @Unit
+  r2SplineParserSpec(): Suite {
+    return new R2SplineParserSpec();
+  }
+
+  @Unit
+  r2PathBuilderSpec(): Suite {
+    return new R2PathBuilderSpec();
+  }
+
+  @Unit
+  r2PathParserSpec(): Suite {
+    return new R2PathParserSpec();
+  }
+
+  @Unit
+  r2PathWriterSpec(): Suite {
+    return new R2PathWriterSpec();
+  }
+
+  @Unit
+  transformParserSpec(): Suite {
+    return new TransformParserSpec();
   }
 }

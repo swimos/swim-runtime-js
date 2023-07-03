@@ -14,8 +14,6 @@
 
 import type {Mutable} from "@swim/util";
 import {Lazy} from "@swim/util";
-import type {Equals} from "@swim/util";
-import type {Equivalent} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
@@ -28,12 +26,15 @@ import {GeoShape} from "./GeoShape";
 import {GeoBox} from "./GeoBox";
 
 /** @public */
-export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements Equals, Equivalent, Debug {
+export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements Debug {
   constructor(shapes: ReadonlyArray<S>) {
     super();
     this.shapes = shapes;
     this.boundingBox = null;
   }
+
+  /** @internal */
+  declare typeid?: "GeoGroup";
 
   isDefined(): boolean {
     return this.shapes.length !== 0;
@@ -104,7 +105,7 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     return boundingBox;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoGroup) {
@@ -122,6 +123,7 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     return false;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     const shapes = this.shapes;
     const n = shapes.length;

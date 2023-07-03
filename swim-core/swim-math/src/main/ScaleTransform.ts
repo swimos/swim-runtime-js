@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Numbers} from "@swim/util";
@@ -27,9 +28,21 @@ import type {Item} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
 import {R2Point} from "./R2Point";
+import type {AnyTransform} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransform} from "./"; // forward import
+
+/** @public */
+export type AnyScaleTransform = ScaleTransform | string;
+
+/** @public */
+export const AnyScaleTransform = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyScaleTransform {
+    return instance instanceof ScaleTransform
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class ScaleTransform extends Transform {
@@ -161,9 +174,11 @@ export class ScaleTransform extends Transform {
     return new ScaleTransform(x, y);
   }
 
-  static override fromAny(value: ScaleTransform | string): ScaleTransform {
+  static override fromAny<T extends AnyScaleTransform | null | undefined>(value: T): ScaleTransform | Uninitable<T>;
+  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyScaleTransform | null | undefined>(value: T): ScaleTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof ScaleTransform) {
-      return value;
+      return value as ScaleTransform | Uninitable<T>;
     } else if (typeof value === "string") {
       return ScaleTransform.parse(value);
     }

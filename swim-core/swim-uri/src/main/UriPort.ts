@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Strings} from "@swim/util";
+import type {Uninitable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Strings} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
@@ -27,6 +29,15 @@ import {Unicode} from "@swim/codec";
 
 /** @public */
 export type AnyUriPort = UriPort | number | string;
+
+/** @public */
+export const AnyUriPort = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUriPort {
+    return instance instanceof UriPort
+        || typeof instance === "number"
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class UriPort implements HashCode, Compare, Debug, Display {
@@ -49,6 +60,7 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return this.number;
   }
 
+  /** @override */
   compareTo(that: unknown): number {
     if (that instanceof UriPort) {
       return this.number < that.number ? -1 : this.number > that.number ? 1 : 0;
@@ -56,6 +68,7 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return NaN;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -65,10 +78,12 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Strings.hash(this.toString());
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("UriPort").write(46/*'.'*/);
     if (this.isDefined()) {
@@ -81,20 +96,20 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return output;
   }
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     output = Format.displayNumber(output, this.number);
     return output;
   }
 
+  /** @override */
   toString(): string {
     return "" + this.number;
   }
 
-  /** @internal */
-  static readonly Undefined: UriPort = new this(0);
-
+  @Lazy
   static undefined(): UriPort {
-    return this.Undefined;
+    return new UriPort(0);
   }
 
   static create(number: number): UriPort {
@@ -106,11 +121,9 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return new UriPort(number);
   }
 
-  static fromAny(value: AnyUriPort): UriPort
-  static fromAny(value: AnyUriPort | null | undefined): UriPort | null | undefined
-  static fromAny(value: AnyUriPort | null | undefined): UriPort | null | undefined {
+  static fromAny<T extends AnyUriPort | null | undefined>(value: T): UriPort | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriPort) {
-      return value;
+      return value as UriPort | Uninitable<T>;
     } else if (typeof value === "number") {
       return UriPort.create(value);
     } else if (typeof value === "string") {

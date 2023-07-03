@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
@@ -33,7 +34,7 @@ import {PxLength} from "./Length";
 import type {AnyAngle} from "./Angle";
 import {Angle} from "./Angle";
 import {DegAngle} from "./Angle";
-import type {R2Operator} from "./R2Operator";
+import type {R2Operator} from "./R2Function";
 import type {R2Point} from "./R2Point";
 import {IdentityTransform} from "./"; // forward import
 import {TranslateTransform} from "./"; // forward import
@@ -52,6 +53,14 @@ import {TransformListParser} from "./"; // forward import
 
 /** @public */
 export type AnyTransform = Transform | string;
+
+/** @public */
+export const AnyTransform = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyTransform {
+    return instance instanceof Transform
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export abstract class Transform implements R2Operator, Interpolate<Transform>, HashCode, Equivalent, Debug {
@@ -127,6 +136,7 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
 
   abstract toValue(): Value;
 
+  /** @override */
   interpolateTo(that: Transform): Interpolator<Transform>;
   interpolateTo(that: unknown): Interpolator<Transform> | null;
   interpolateTo(that: unknown): Interpolator<Transform> | null {
@@ -138,22 +148,28 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
 
   abstract conformsTo(that: Transform): boolean;
 
+  /** @override */
   abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
+  /** @override */
   abstract equals(that: unknown): boolean;
 
+  /** @override */
   abstract hashCode(): number;
 
+  /** @override */
   abstract debug<T>(output: Output<T>): Output<T>;
 
+  /** @override */
   abstract toString(): string;
 
   toAttributeString(): string {
     return this.toString();
   }
 
+  @Lazy
   static identity(): Transform {
-    return IdentityTransform.Identity;
+    return new IdentityTransform();
   }
 
   static translate(x: AnyLength, y: AnyLength): TranslateTransform {
@@ -259,9 +275,9 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
     throw new TypeError("" + component);
   }
 
-  static fromAny(value: AnyTransform): Transform {
+  static fromAny<T extends AnyTransform | null | undefined>(value: T): Transform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Transform) {
-      return value;
+      return value as Transform | Uninitable<T>;
     } else if (typeof value === "string") {
       return Transform.parse(value);
     }
@@ -302,12 +318,6 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
   static form(): Form<Transform, AnyTransform> {
     return new TransformForm(Transform.identity());
   }
-
-  /** @internal */
-  static isAny(value: unknown): value is AnyTransform {
-    return value instanceof Transform
-        || typeof value === "string";
-  }
 }
 
 /** @internal */
@@ -323,11 +333,10 @@ export class TransformForm extends Form<Transform, AnyTransform> {
   override readonly unit!: Transform | undefined;
 
   override withUnit(unit: Transform | undefined): Form<Transform, AnyTransform> {
-    if (unit !== this.unit) {
-      return new TransformForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new TransformForm(unit);
   }
 
   override mold(transform: AnyTransform): Item {

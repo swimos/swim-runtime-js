@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Strings} from "@swim/util";
+import type {Uninitable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
+import {Strings} from "@swim/util";
+import {Objects} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
@@ -30,10 +33,28 @@ import {Uri} from "./Uri";
 export type AnyUriUser = UriUser | UriUserInit | string;
 
 /** @public */
+export const AnyUriUser = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUriUser {
+    return instance instanceof UriUser
+        || UriUserInit[Symbol.hasInstance](instance)
+        || typeof instance === "string";
+  },
+};
+
+/** @public */
 export interface UriUserInit {
+  /** @internal */
+  typeid?: "UriUserInit" | "UriAuthorityInit" | "UriInit";
   username?: string;
   password?: string;
 }
+
+/** @public */
+export const UriUserInit = {
+  [Symbol.hasInstance](instance: unknown): instance is UriUserInit {
+    return Objects.hasAnyKey<UriUserInit>(instance, "username", "password");
+  },
+};
 
 /** @public */
 export class UriUser implements HashCode, Debug, Display {
@@ -42,6 +63,9 @@ export class UriUser implements HashCode, Debug, Display {
     this.username = username;
     this.password = password;
   }
+
+  /** @internal */
+  declare typeid?: "UriUser";
 
   isDefined(): boolean {
     return this.username !== void 0;
@@ -82,6 +106,7 @@ export class UriUser implements HashCode, Debug, Display {
     return user;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -91,10 +116,12 @@ export class UriUser implements HashCode, Debug, Display {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Strings.hash(this.toString());
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("UriUser").write(46/*'.'*/);
     if (this.isDefined()) {
@@ -106,6 +133,7 @@ export class UriUser implements HashCode, Debug, Display {
     return output;
   }
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     if (this.username !== void 0) {
       output = Uri.writeUser(output, this.username);
@@ -117,15 +145,14 @@ export class UriUser implements HashCode, Debug, Display {
     return output;
   }
 
+  /** @override */
   toString(): string {
     return Format.display(this);
   }
 
-  /** @internal */
-  static readonly Undefined: UriUser = new this(void 0, void 0);
-
+  @Lazy
   static undefined(): UriUser {
-    return this.Undefined;
+    return new UriUser(void 0, void 0);
   }
 
   static create(username: string | undefined, password?: string | undefined): UriUser {
@@ -139,11 +166,9 @@ export class UriUser implements HashCode, Debug, Display {
     return UriUser.create(init.username, init.password);
   }
 
-  static fromAny(value: AnyUriUser): UriUser;
-  static fromAny(value: AnyUriUser | null | undefined): UriUser | null | undefined;
-  static fromAny(value: AnyUriUser | null | undefined): UriUser | null | undefined {
+  static fromAny<T extends AnyUriUser | null | undefined>(value: T): UriUser | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriUser) {
-      return value;
+      return value as UriUser | Uninitable<T>;
     } else if (typeof value === "object") {
       return UriUser.fromInit(value);
     } else if (typeof value === "string") {

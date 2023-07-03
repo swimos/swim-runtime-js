@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Strings} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Strings} from "@swim/util";
 import type {PairBuilder} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
@@ -31,6 +33,15 @@ import {Uri} from "./Uri";
 
 /** @public */
 export type AnyUriQuery = UriQuery | {[key: string]: string} | string;
+
+/** @public */
+export const AnyUriQuery = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUriQuery {
+    return instance instanceof UriQuery
+        || typeof instance === "object" && instance !== null
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export abstract class UriQuery implements HashCode, Compare, Debug, Display {
@@ -100,7 +111,7 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     if (!updated) {
       builder.addParam(key, value);
     }
-    return builder.bind();
+    return builder.build();
   }
 
   removed(key: string): UriQuery {
@@ -118,7 +129,7 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     if (!updated) {
       return this;
     }
-    return builder.bind();
+    return builder.build();
   }
 
   appended(key: string | undefined, value: string): UriQuery;
@@ -127,7 +138,7 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     const builder = new UriQueryBuilder();
     builder.addQuery(this);
     builder.add(key as any, value as any);
-    return builder.bind();
+    return builder.build();
   }
 
   prepended(key: string | undefined, value: string): UriQuery;
@@ -136,7 +147,7 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     const builder = new UriQueryBuilder();
     builder.add(key as any, value as any);
     builder.addQuery(this);
-    return builder.bind();
+    return builder.build();
   }
 
   toAny(params?: {[key: string]: string}): {[key: string]: string} | undefined {
@@ -158,6 +169,7 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     return params;
   }
 
+  /** @override */
   compareTo(that: UriQuery): number {
     if (that instanceof UriQuery) {
       return this.toString().localeCompare(that.toString());
@@ -165,6 +177,7 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     return NaN;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -174,12 +187,15 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Strings.hash(this.toString());
   }
 
+  /** @override */
   abstract debug<T>(output: Output<T>): Output<T>;
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     let query: UriQuery = this;
     let first = true;
@@ -200,10 +216,16 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     return output;
   }
 
+  /** @override */
   abstract toString(): string;
 
+  static builder(): UriQueryBuilder {
+    return new UriQueryBuilder();
+  }
+
+  @Lazy
   static undefined(): UriQuery {
-    return UriQueryUndefined.Undefined;
+    return new UriQueryUndefined();
   }
 
   static param(value: string, tail?: UriQuery): UriQuery;
@@ -220,15 +242,13 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     return new UriQueryParam(key, value as string, tail);
   }
 
-  static fromAny(value: AnyUriQuery): UriQuery;
-  static fromAny(value: AnyUriQuery | null | undefined): UriQuery | null | undefined;
-  static fromAny(value: AnyUriQuery | null | undefined): UriQuery | null | undefined {
+  static fromAny<T extends AnyUriQuery | null | undefined>(value: T): UriQuery | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriQuery) {
-      return value;
+      return value as UriQuery | Uninitable<T>;
     } else if (typeof value === "object") {
       const builder = new UriQueryBuilder();
       builder.add(value);
-      return builder.bind();
+      return builder.build();
     } else if (typeof value === "string") {
       return UriQuery.parse(value);
     }
@@ -244,10 +264,6 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
       parser = Parser.error(Diagnostic.unexpected(input));
     }
     return typeof string === "string" ? parser.bind() : parser;
-  }
-
-  static builder(): UriQueryBuilder {
-    return new UriQueryBuilder();
   }
 }
 
@@ -300,7 +316,7 @@ export class UriQueryUndefined extends UriQuery {
   override appended(key: AnyUriQuery | undefined, value?: string): UriQuery {
     const builder = new UriQueryBuilder();
     builder.add(key as any, value as any);
-    return builder.bind();
+    return builder.build();
   }
 
   override prepended(key: string | undefined, value: string): UriQuery;
@@ -308,7 +324,7 @@ export class UriQueryUndefined extends UriQuery {
   override prepended(key: AnyUriQuery | undefined, value?: string): UriQuery {
     const builder = new UriQueryBuilder();
     builder.add(key as any, value as any);
-    return builder.bind();
+    return builder.build();
   }
 
   override debug<T>(output: Output<T>): Output<T> {
@@ -324,9 +340,6 @@ export class UriQueryUndefined extends UriQuery {
   override toString(): string {
     return "";
   }
-
-  /** @internal */
-  static readonly Undefined: UriQueryUndefined = new this();
 }
 
 /** @internal */
@@ -445,7 +458,7 @@ export class UriQueryBuilder implements PairBuilder<string | undefined, string, 
     }
   }
 
-  bind(): UriQuery {
+  build(): UriQuery {
     this.aliased = 0;
     return this.first;
   }
@@ -534,7 +547,7 @@ export class UriQueryBuilder implements PairBuilder<string | undefined, string, 
 
   /** @override */
   toString(): string {
-    return this.bind().toString();
+    return this.build().toString();
   }
 }
 
@@ -586,7 +599,7 @@ export class UriQueryParser extends Parser<UriQuery> {
         } else if (!input.isEmpty()) {
           builder = builder || new UriQueryBuilder();
           builder.addParam(keyOutput.bind());
-          return Parser.done(builder.bind());
+          return Parser.done(builder.build());
         }
       }
       if (step === 2) {
@@ -629,7 +642,7 @@ export class UriQueryParser extends Parser<UriQuery> {
         } else if (!input.isEmpty()) {
           builder = builder || new UriQueryBuilder();
           builder.addParam(keyOutput!.bind(), valueOutput.bind());
-          return Parser.done(builder.bind());
+          return Parser.done(builder.build());
         }
       }
       if (step === 5) {

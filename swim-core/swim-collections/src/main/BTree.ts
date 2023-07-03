@@ -246,11 +246,11 @@ export class BTree<K = unknown, V = unknown, U = never> extends BTreeContext<K, 
   /** @internal */
   protected copy(root: BTreePage<K, V, U>): BTree<K, V, U> {
     const tree = new BTree(root);
-    if (tree.compare !== this.compare) {
-      tree.compare = this.compare;
-    }
     if (tree.pageSplitSize !== this.pageSplitSize) {
       tree.pageSplitSize = this.pageSplitSize;
+    }
+    if (tree.compare !== this.compare) {
+      tree.compare = this.compare;
     }
     return tree;
   }

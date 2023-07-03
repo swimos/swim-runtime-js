@@ -17,9 +17,9 @@
  * @public
  */
 export const Lazy: {
+  <F extends () => unknown>(target: F, context?: ClassMethodDecoratorContext<ThisParameterType<F>, F>): F;
   <T, R>(target: (this: T) => R, context?: ClassGetterDecoratorContext<T, R>): (this: T) => R;
-  <T, R, F extends (this: T) => R>(target: F, context?: ClassMethodDecoratorContext<T, F>): F;
-} = function <T, R>(target: (this: T) => R, context?: ClassGetterDecoratorContext<T, R> | ClassMethodDecoratorContext<T, (this: T) => R>): (this: T) => R {
+} = function <T, R>(target: (this: T) => R, context?: ClassMethodDecoratorContext<T, (this: T) => R> | ClassGetterDecoratorContext<T, R>): (this: T) => R {
   let defined = false;
   let value: R;
   return function (this: T): R {

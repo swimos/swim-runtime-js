@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
@@ -28,9 +29,21 @@ import {Length} from "./Length";
 import {PxLength} from "./Length";
 import {LengthParser} from "./Length";
 import {R2Point} from "./R2Point";
+import type {AnyTransform} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransform} from "./"; // forward import
+
+/** @public */
+export type AnyTranslateTransform = TranslateTransform | string;
+
+/** @public */
+export const AnyTranslateTransform = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyTranslateTransform {
+    return instance instanceof TranslateTransform
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class TranslateTransform extends Transform {
@@ -159,9 +172,8 @@ export class TranslateTransform extends Transform {
       return "translate(" + this.x.pxValue() + ",0)";
     } else if (!this.x.isDefined() && this.y.isDefined()) {
       return "translate(0," + this.y.pxValue() + ")";
-    } else {
-      return "translate(" + this.x.pxValue() + "," + this.y.pxValue() + ")";
     }
+    return "translate(" + this.x.pxValue() + "," + this.y.pxValue() + ")";
   }
 
   static override fromCssTransformComponent(component: CSSTranslate): TranslateTransform {
@@ -174,9 +186,11 @@ export class TranslateTransform extends Transform {
     return new TranslateTransform(x, y);
   }
 
-  static override fromAny(value: TranslateTransform | string): TranslateTransform {
+  static override fromAny<T extends AnyTranslateTransform | null | undefined>(value: T): TranslateTransform | Uninitable<T>;
+  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyTranslateTransform | null | undefined>(value: T): TranslateTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof TranslateTransform) {
-      return value;
+      return value as TranslateTransform | Uninitable<T>;
     } else if (typeof value === "string") {
       return TranslateTransform.parse(value);
     }

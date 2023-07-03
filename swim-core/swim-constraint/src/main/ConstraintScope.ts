@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Objects} from "@swim/util";
 import type {AnyConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintVariable} from "./ConstraintVariable";
 import type {ConstraintProperty} from "./ConstraintProperty";
-import type {ConstraintRelation} from "./ConstraintRelation";
-import type {AnyConstraintStrength} from "./ConstraintStrength";
+import type {ConstraintRelation} from "./Constraint";
+import type {AnyConstraintStrength} from "./Constraint";
 import type {Constraint} from "./Constraint";
 
 /** @public */
@@ -42,18 +43,8 @@ export interface ConstraintScope {
 }
 
 /** @public */
-export const ConstraintScope = (function () {
-  const ConstraintScope = {} as {
-    is(object: unknown): object is ConstraintScope;
-  };
-
-  ConstraintScope.is = function (object: unknown): object is ConstraintScope {
-    if (typeof object === "object" && object !== null || typeof object === "function") {
-      const constraintScope = object as ConstraintScope;
-      return "constraint" in constraintScope;
-    }
-    return false;
-  };
-
-  return ConstraintScope;
-})();
+export const ConstraintScope = {
+  [Symbol.hasInstance](instance: unknown): instance is ConstraintScope {
+    return Objects.hasAllKeys<ConstraintScope>(instance, "constraint", "constraintVariable");
+  },
+};

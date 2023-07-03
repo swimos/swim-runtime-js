@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Interpolator} from "@swim/util";
@@ -27,8 +29,20 @@ import type {Item} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
 import {R2Point} from "./R2Point";
+import type {AnyTransform} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
+
+/** @public */
+export type AnyAffineTransform = AffineTransform | string;
+
+/** @public */
+export const AnyAffineTransform = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyAffineTransform {
+    return instance instanceof AffineTransform
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class AffineTransform extends Transform {
@@ -191,16 +205,16 @@ export class AffineTransform extends Transform {
     return stringValue;
   }
 
-  /** @internal */
-  static readonly Identity: AffineTransform = new this(1, 0, 0, 1, 0, 0);
-
+  @Lazy
   static override identity(): AffineTransform {
-    return this.Identity;
+    return new AffineTransform(1, 0, 0, 1, 0, 0);
   }
 
-  static override fromAny(value: AffineTransform | string): AffineTransform {
+  static override fromAny<T extends AnyAffineTransform | null | undefined>(value: T): AffineTransform | Uninitable<T>;
+  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyAffineTransform | null | undefined>(value: T): AffineTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof AffineTransform) {
-      return value;
+      return value as AffineTransform | Uninitable<T>;
     } else if (typeof value === "string") {
       return AffineTransform.parse(value);
     }

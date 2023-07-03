@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Objects} from "@swim/util";
 import type {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintVariable} from "./ConstraintVariable";
 
@@ -25,18 +26,8 @@ export interface ConstraintTerm extends ConstraintExpression {
 }
 
 /** @public */
-export const ConstraintTerm = (function () {
-  const ConstraintTerm = {} as {
-    is(value: unknown): value is ConstraintTerm;
-  };
-
-  ConstraintTerm.is = function (value: unknown): value is ConstraintTerm {
-    if (typeof value === "object" && value !== null || typeof value === "function") {
-      const term = value as ConstraintTerm;
-      return "coefficient" in term && "variable" in term;
-    }
-    return false;
-  };
-
-  return ConstraintTerm;
-})();
+export const ConstraintTerm = {
+  [Symbol.hasInstance](instance: unknown): instance is ConstraintTerm {
+    return Objects.hasAllKeys<ConstraintTerm>(instance, "coefficient", "variable");
+  },
+};

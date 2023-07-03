@@ -108,9 +108,8 @@ export class LibraryScope extends Scope {
     const task = this.getTask(taskConfig.class);
     if (task instanceof LibraryTask) {
       return task.run(taskConfig.options);
-    } else {
-      return TaskStatus.Skipped;
     }
+    return TaskStatus.Skipped;
   }
 
   override writeName<T>(output: Output<T>): Output<T> {

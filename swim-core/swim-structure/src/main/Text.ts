@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {Interpolator} from "@swim/util";
@@ -168,11 +169,9 @@ export class Text extends Value {
     return this.value;
   }
 
-  /** @internal */
-  static readonly Empty: Text = new this("");
-
+  @Lazy
   static override empty(): Text {
-    return this.Empty;
+    return new Text("");
   }
 
   static from(value: string): Text {

@@ -42,20 +42,19 @@ export class WatchTask extends LibraryTask {
 
   override async exec(): Promise<TaskStatus> {
     const baseDir = this.baseDir.value;
-    if (baseDir !== void 0) {
-      const watcher = new chokidar.FSWatcher({
-        ignoreInitial: true,
-      });
-      watcher.on("add", this.onAdd.bind(this));
-      watcher.on("addDir", this.onAddDir.bind(this));
-      watcher.on("change", this.onChange.bind(this));
-      watcher.on("unlink", this.onUnlink.bind(this));
-      watcher.on("unlinkDir", this.onUnlinkDir.bind(this));
-      watcher.add(baseDir);
-      return TaskStatus.Success;
-    } else {
+    if (baseDir === void 0) {
       return TaskStatus.Pending;
     }
+    const watcher = new chokidar.FSWatcher({
+      ignoreInitial: true,
+    });
+    watcher.on("add", this.onAdd.bind(this));
+    watcher.on("addDir", this.onAddDir.bind(this));
+    watcher.on("change", this.onChange.bind(this));
+    watcher.on("unlink", this.onUnlink.bind(this));
+    watcher.on("unlinkDir", this.onUnlinkDir.bind(this));
+    watcher.add(baseDir);
+    return TaskStatus.Success;
   }
 
   protected onAdd(path: string, stats: FS.Stats | undefined): void {

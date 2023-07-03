@@ -15,23 +15,22 @@
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import {ConstraintMap} from "./ConstraintMap";
 import type {AnyConstraintExpression} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintVariable} from "./ConstraintVariable";
 
 /** @public */
 export class ConstraintSum implements ConstraintExpression, Debug {
-  constructor(terms: ConstraintMap<ConstraintVariable, number>, constant: number) {
+  constructor(terms: ReadonlyMap<ConstraintVariable, number>, constant: number) {
     this.terms = terms;
     this.constant = constant;
   }
 
   isConstant(): boolean {
-    return this.terms.isEmpty();
+    return this.terms.size === 0;
   }
 
-  readonly terms: ConstraintMap<ConstraintVariable, number>;
+  readonly terms: ReadonlyMap<ConstraintVariable, number>;
 
   readonly constant: number;
 
@@ -40,49 +39,38 @@ export class ConstraintSum implements ConstraintExpression, Debug {
   }
 
   negative(): ConstraintExpression {
-    const oldTerms = this.terms;
-    const newTerms = new ConstraintMap<ConstraintVariable, number>();
-    for (let i = 0, n = oldTerms.size; i < n; i += 1) {
-      const [variable, coefficient] = oldTerms.getEntry(i)!;
-      newTerms.set(variable, -coefficient);
+    const terms = new Map<ConstraintVariable, number>();
+    for (const [variable, coefficient] of this.terms) {
+      terms.set(variable, -coefficient);
     }
-    return new ConstraintSum(newTerms, -this.constant);
+    return new ConstraintSum(terms, -this.constant);
   }
 
   minus(that: AnyConstraintExpression): ConstraintExpression {
-    if (typeof that === "number") {
-      that = ConstraintExpression.constant(that);
-    } else {
-      that = that.negative();
-    }
+    that = ConstraintExpression.fromAny(that).negative();
     return ConstraintExpression.sum(this, that);
   }
 
   times(scalar: number): ConstraintExpression {
-    const oldTerms = this.terms;
-    const newTerms = new ConstraintMap<ConstraintVariable, number>();
-    for (let i = 0, n = oldTerms.size; i < n; i += 1) {
-      const [variable, coefficient] = oldTerms.getEntry(i)!;
-      newTerms.set(variable, coefficient * scalar);
+    const terms = new Map<ConstraintVariable, number>();
+    for (const [variable, coefficient] of this.terms) {
+      terms.set(variable, coefficient * scalar);
     }
-    return new ConstraintSum(newTerms, this.constant * scalar);
+    return new ConstraintSum(terms, this.constant * scalar);
   }
 
   divide(scalar: number): ConstraintExpression {
-    const oldTerms = this.terms;
-    const newTerms = new ConstraintMap<ConstraintVariable, number>();
-    for (let i = 0, n = oldTerms.size; i < n; i += 1) {
-      const [variable, coefficient] = oldTerms.getEntry(i)!;
-      newTerms.set(variable, coefficient / scalar);
+    const terms = new Map<ConstraintVariable, number>();
+    for (const [variable, coefficient] of this.terms) {
+      terms.set(variable, coefficient / scalar);
     }
-    return new ConstraintSum(newTerms, this.constant / scalar);
+    return new ConstraintSum(terms, this.constant / scalar);
   }
 
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("ConstraintExpression").write(46/*'.'*/).write("sum").write(40/*'('*/);
-    const n = this.terms.size;
-    for (let i = 0; i < n; i += 1) {
-      const [variable, coefficient] = this.terms.getEntry(i)!;
+    let i = 0;
+    for (const [variable, coefficient] of this.terms) {
       if (i > 0) {
         output = output.write(", ");
       }
@@ -91,9 +79,10 @@ export class ConstraintSum implements ConstraintExpression, Debug {
       } else {
         output = output.debug(ConstraintExpression.product(coefficient, variable));
       }
+      i += 1;
     }
     if (this.constant !== 0) {
-      if (n > 0) {
+      if (i !== 0) {
         output = output.write(", ");
       }
       output = output.debug(this.constant);

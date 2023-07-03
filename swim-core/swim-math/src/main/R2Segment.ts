@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
@@ -32,18 +34,35 @@ import type {AnyR2Shape} from "./R2Shape";
 import {R2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";
 import type {R2CurveContext} from "./R2Curve";
-import {R2BezierCurve} from "./R2BezierCurve";
+import {R2BezierCurve} from "./R2Curve";
 
 /** @public */
 export type AnyR2Segment = R2Segment | R2SegmentInit;
 
 /** @public */
+export const AnyR2Segment = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyR2Segment {
+    return instance instanceof R2Segment
+        || R2SegmentInit[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
 export interface R2SegmentInit {
+  /** @internal */
+  typeid?: "R2SegmentInit";
   x0: number;
   y0: number;
   x1: number;
   y1: number;
 }
+
+/** @public */
+export const R2SegmentInit = {
+  [Symbol.hasInstance](instance: unknown): instance is R2SegmentInit {
+    return Objects.hasAllKeys<R2SegmentInit>(instance, "x0", "y0", "x1", "y1");
+  },
+};
 
 /** @public */
 export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, HashCode, Debug {
@@ -54,6 +73,9 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
     this.x1 = x1;
     this.y1 = y1;
   }
+
+  /** @internal */
+  declare typeid?: "R2Segment";
 
   isDefined(): boolean {
     return isFinite(this.x0) && isFinite(this.y0)
@@ -138,10 +160,8 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
       return this.intersectsPoint(that);
     } else if (that instanceof R2Segment) {
       return this.intersectsSegment(that);
-    } else {
-      return (that as R2Shape).intersects(this);
     }
-    return false;
+    return that.intersects(this);
   }
 
   /** @internal */
@@ -170,12 +190,11 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
       return sr >= 0 ? 0 < t1 && t0 < 1 : 0 < t0 && t1 < 1;
     } else if (rs === 0) { // parallel
       return false;
-    } else {
-      const pqs = pqx * sy - pqy * sx;
-      const t = pqs / rs; // (q − p) × s / (r × s)
-      const u = pqr / rs; // (q − p) × r / (r × s)
-      return 0 <= t && t <= 1 && 0 <= u && u <= 1;
     }
+    const pqs = pqx * sy - pqy * sx;
+    const t = pqs / rs; // (q − p) × s / (r × s)
+    const u = pqr / rs; // (q − p) × r / (r × s)
+    return 0 <= t && t <= 1 && 0 <= u && u <= 1;
   }
 
   override split(u: number): [R2Segment, R2Segment] {
@@ -233,6 +252,7 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
     return output;
   }
 
+  /** @override */
   interpolateTo(that: R2Segment): Interpolator<R2Segment>;
   interpolateTo(that: unknown): Interpolator<R2Segment> | null;
   interpolateTo(that: unknown): Interpolator<R2Segment> | null {
@@ -264,12 +284,14 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
         Constructors.hash(R2Segment), Numbers.hash(this.x0)), Numbers.hash(this.y0)),
         Numbers.hash(this.x1)), Numbers.hash(this.y1)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("R2Segment").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.x0).write(", ").debug(this.y0).write(", ")
@@ -285,35 +307,19 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
     return new R2Segment(x0, y0, x1, y1);
   }
 
-  static fromInit(value: R2SegmentInit): R2Segment {
-    return new R2Segment(value.x0, value.y0, value.x1, value.y1);
-  }
-
-  static override fromAny(value: AnyR2Segment): R2Segment {
+  static override fromAny<T extends AnyR2Segment | null | undefined>(value: T): R2Segment | Uninitable<T>;
+  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyR2Segment | null | undefined>(value: T): R2Segment | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Segment) {
-      return value;
-    } else if (R2Segment.isInit(value)) {
+      return value as R2Segment | Uninitable<T>;
+    } else if (R2SegmentInit[Symbol.hasInstance](value)) {
       return R2Segment.fromInit(value);
     }
     throw new TypeError("" + value);
   }
 
-  /** @internal */
-  static isInit(value: unknown): value is R2SegmentInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as R2SegmentInit;
-      return typeof init.x0 === "number"
-          && typeof init.y0 === "number"
-          && typeof init.x1 === "number"
-          && typeof init.y1 === "number";
-    }
-    return false;
-  }
-
-  /** @internal */
-  static override isAny(value: unknown): value is AnyR2Segment {
-    return value instanceof R2Segment
-        || R2Segment.isInit(value);
+  static fromInit(init: R2SegmentInit): R2Segment {
+    return new R2Segment(init.x0, init.y0, init.x1, init.y1);
   }
 }
 

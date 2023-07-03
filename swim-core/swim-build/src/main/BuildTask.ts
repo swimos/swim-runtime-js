@@ -36,12 +36,11 @@ export class BuildTask extends LibraryTask {
 
   override async exec(options?: BuildTaskOptions): Promise<TaskStatus> {
     const packageScope = this.packageScope;
-    if (packageScope === null || packageScope.libraryDependencyTaskStatus(void 0, BuildTask) !== TaskStatus.Failure) {
-      return this.build(options);
-    } else {
+    if (packageScope !== null && packageScope.libraryDependencyTaskStatus(void 0, BuildTask) === TaskStatus.Failure) {
       this.logWarning("unable to build");
       return TaskStatus.Pending;
     }
+    return this.build(options);
   }
 
   protected async build(options?: BuildTaskOptions): Promise<TaskStatus> {

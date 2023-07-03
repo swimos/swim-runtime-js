@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Equals} from "@swim/util";
 import {Arrays} from "@swim/util";
@@ -32,6 +33,8 @@ export type AnyCmd = Cmd | CmdInit | string;
 
 /** @public */
 export interface CmdInit {
+  /** @internal */
+  typeid?: "CmdInit";
   id?: string;
   name: string;
   desc?: string;
@@ -55,6 +58,9 @@ export class Cmd implements Equals, Debug {
     this.base = base;
   }
 
+  /** @internal */
+  declare typeid?: "Cmd";
+
   readonly id: string;
 
   readonly name: string;
@@ -66,7 +72,7 @@ export class Cmd implements Equals, Debug {
     return this;
   }
 
-  readonly opts: ReadonlyArray<Opt>;
+  readonly opts: readonly Opt[];
 
   withOpt(opt: AnyOpt): this {
     opt = Opt.fromAny(opt);
@@ -74,15 +80,15 @@ export class Cmd implements Equals, Debug {
     return this;
   }
 
-  readonly args: ReadonlyArray<Arg>;
+  readonly args: readonly Arg[];
 
   withArg(arg: AnyArg): this {
     arg = Arg.fromAny(arg);
-    (this.args as Arg[]).push(arg as Arg);
+    (this.args as Arg[]).push(arg);
     return this;
   }
 
-  readonly cmds: ReadonlyArray<Cmd>;
+  readonly cmds: readonly Cmd[];
 
   withCmd(cmd: AnyCmd): this {
     cmd = Cmd.fromAny(cmd);
@@ -190,31 +196,32 @@ export class Cmd implements Equals, Debug {
   }
 
   run(): void {
-    if (this.exec !== null) {
-      const opts: {[name: string]: string | undefined} = {};
-      const args: string[] = [];
-      let cmd: Cmd | null = this;
-      do {
-        for (let optIndex = 0; optIndex < cmd.opts.length; optIndex += 1) {
-          const opt = cmd.opts[optIndex]!;
-          const value = opt.getValue();
-          if (value !== void 0) {
-            opts[opt.name] = value;
-          } else if (opt.defs) {
-            opts[opt.name] = void 0;
-          }
-        }
-        for (let argIndex = cmd.args.length - 1; argIndex >= 0; argIndex -= 1) {
-          const arg = cmd.args[argIndex]!;
-          const argValue = arg.value;
-          if (argValue !== void 0) {
-            args.unshift(argValue);
-          }
-        }
-        cmd = cmd.base;
-      } while (cmd !== null);
-      this.exec.call(this, opts, args);
+    if (this.exec === null) {
+      return;
     }
+    const opts: {[name: string]: string | undefined} = {};
+    const args: string[] = [];
+    let cmd: Cmd | null = this;
+    do {
+      for (let optIndex = 0; optIndex < cmd.opts.length; optIndex += 1) {
+        const opt = cmd.opts[optIndex]!;
+        const value = opt.getValue();
+        if (value !== void 0) {
+          opts[opt.name] = value;
+        } else if (opt.defs) {
+          opts[opt.name] = void 0;
+        }
+      }
+      for (let argIndex = cmd.args.length - 1; argIndex >= 0; argIndex -= 1) {
+        const arg = cmd.args[argIndex]!;
+        const argValue = arg.value;
+        if (argValue !== void 0) {
+          args.unshift(argValue);
+        }
+      }
+      cmd = cmd.base;
+    } while (cmd !== null);
+    this.exec.call(this, opts, args);
   }
 
   /** @internal */
@@ -402,16 +409,15 @@ export class Cmd implements Equals, Debug {
     return new Cmd(id, init.name, init.desc, opts, args, cmds, exec, null);
   }
 
-  static fromAny(value: AnyCmd): Cmd {
-    if (value instanceof Cmd) {
-      return value;
+  static fromAny<T extends AnyCmd | null | undefined>(value: T): Cmd | Uninitable<T> {
+    if (value === void 0 || value === null || value instanceof Cmd) {
+      return value as Cmd | Uninitable<T>;
     } else if (typeof value === "string") {
       return new Cmd(value, value, void 0, [], [], [], null, null);
-    } else if (typeof value === "object" && value !== null) {
+    } else if (typeof value === "object") {
       return Cmd.fromInit(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 
   static help(): Cmd {

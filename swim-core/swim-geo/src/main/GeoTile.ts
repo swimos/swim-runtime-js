@@ -16,7 +16,6 @@ import type {Uninitable} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
-import type {Equivalent} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Objects} from "@swim/util";
@@ -48,6 +47,8 @@ export const AnyGeoTile = {
 
 /** @public */
 export interface GeoTileInit {
+  /** @internal */
+  typeid?: "GeoTileInit";
   x: number;
   y: number;
   z: number;
@@ -71,13 +72,16 @@ export const GeoTileTuple = {
 };
 
 /** @public */
-export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
+export class GeoTile extends GeoShape implements HashCode, Debug {
   constructor(x: number, y: number, z: number) {
     super();
     this.x = x;
     this.y = y;
     this.z = z;
   }
+
+  /** @internal */
+  declare typeid?: "GeoTile";
 
   readonly x: number;
 
@@ -297,7 +301,7 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
     };
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoTile) {
@@ -317,11 +321,13 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(GeoTile),
         Numbers.hash(this.x)), Numbers.hash(this.y)), Numbers.hash(this.z)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("GeoTile").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.x).write(", ").debug(this.y).write(", ")
@@ -342,14 +348,6 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
     return new GeoTile(x, y, z);
   }
 
-  static fromInit(value: GeoTileInit): GeoTile {
-    return new GeoTile(value.x, value.y, value.z);
-  }
-
-  static fromTuple(value: GeoTileTuple): GeoTile {
-    return new GeoTile(value[0], value[1], value[2]);
-  }
-
   static override fromAny<T extends AnyGeoTile | null | undefined>(value: T): GeoTile | Uninitable<T>;
   static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
   static override fromAny<T extends AnyGeoTile | null | undefined>(value: T): GeoTile | Uninitable<T> {
@@ -361,6 +359,14 @@ export class GeoTile extends GeoShape implements HashCode, Equivalent, Debug {
       return GeoTile.fromTuple(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static fromInit(init: GeoTileInit): GeoTile {
+    return new GeoTile(init.x, init.y, init.z);
+  }
+
+  static fromTuple(tuple: GeoTileTuple): GeoTile {
+    return new GeoTile(tuple[0], tuple[1], tuple[2]);
   }
 
   /** @internal */

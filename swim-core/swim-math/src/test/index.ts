@@ -12,10 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export * from "./length";
-export * from "./angle";
-export * from "./r2";
-export * from "./transform";
+export {LengthParserSpec} from "./LengthParserSpec";
+
+export {AngleParserSpec} from "./AngleParserSpec";
+
+export {R2CurveParserSpec} from "./R2CurveParserSpec";
+export {R2SplineBuilderSpec} from "./R2SplineBuilderSpec";
+export {R2SplineParserSpec} from "./R2SplineParserSpec";
+export {R2PathBuilderSpec} from "./R2PathBuilderSpec";
+export {R2PathParserSpec} from "./R2PathParserSpec";
+export {R2PathWriterSpec} from "./R2PathWriterSpec";
+
+export {TransformParserSpec} from "./TransformParserSpec";
+
 export {MathSuite} from "./MathSuite";
 
 export {MathSuite as default} from "./MathSuite";

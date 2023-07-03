@@ -14,14 +14,14 @@
 
 // Time Zone
 
-export type {AnyTimeZone} from "./TimeZone";
+export {AnyTimeZone} from "./TimeZone";
 export {TimeZone} from "./TimeZone";
 export {TimeZoneForm} from "./TimeZone";
 
 // Date Time
 
-export type {AnyDateTime} from "./DateTime";
-export type {DateTimeInit} from "./DateTime";
+export {AnyDateTime} from "./DateTime";
+export {DateTimeInit} from "./DateTime";
 export {DateTime} from "./DateTime";
 export {DateTimeInterpolator} from "./DateTime";
 export {DateTimeForm} from "./DateTime";

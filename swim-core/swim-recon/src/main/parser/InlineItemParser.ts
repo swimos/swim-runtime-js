@@ -68,13 +68,13 @@ export class InlineItemParser<I, V> extends Parser<V> {
         } else if (builder === void 0) {
           return Parser.done(recon.extant());
         } else {
-          return Parser.done(builder.bind());
+          return Parser.done(builder.build());
         }
       } else if (input.isDone()) {
         if (builder === void 0) {
           return Parser.done(recon.extant());
         } else {
-          return Parser.done(builder.bind());
+          return Parser.done(builder.build());
         }
       }
     }
@@ -101,10 +101,10 @@ export class InlineItemParser<I, V> extends Parser<V> {
           valueParser = recon.parseMarkup(input, builder);
           step = 5;
         } else {
-          return Parser.done(builder!.bind());
+          return Parser.done(builder!.build());
         }
       } else if (input.isDone()) {
-        return Parser.done(builder!.bind());
+        return Parser.done(builder!.build());
       }
     }
     if (step === 4) {
@@ -114,7 +114,7 @@ export class InlineItemParser<I, V> extends Parser<V> {
       if (valueParser!.isDone()) {
         builder = builder || recon.valueBuilder();
         builder.push(recon.item(valueParser!.bind()));
-        return Parser.done(builder.bind());
+        return Parser.done(builder.build());
       } else if (valueParser!.isError()) {
         return valueParser!;
       }
@@ -124,7 +124,7 @@ export class InlineItemParser<I, V> extends Parser<V> {
         valueParser = valueParser!.feed(input);
       }
       if (valueParser!.isDone()) {
-        return Parser.done(builder!.bind());
+        return Parser.done(builder!.build());
       } else if (valueParser!.isError()) {
         return valueParser!;
       }

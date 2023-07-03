@@ -208,14 +208,14 @@ export class SelectorParser<I, V> extends Parser<V> {
             step = 11;
           } else if (builder !== void 0) {
             builder.push(recon.item(selector!));
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           } else {
             return Parser.done(selector!);
           }
         } else if (input.isDone()) {
           if (builder !== void 0) {
             builder.push(recon.item(selector!));
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           } else {
             return Parser.done(selector!);
           }

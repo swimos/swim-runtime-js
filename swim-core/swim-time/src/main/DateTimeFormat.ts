@@ -46,7 +46,7 @@ export abstract class DateTimeFormat {
   format(date: AnyDateTime): string {
     date = DateTime.fromAny(date);
     let output = Unicode.stringOutput();
-    output = this.writeDate(output, date as DateTime);
+    output = this.writeDate(output, date);
     return output.bind();
   }
 

@@ -99,7 +99,7 @@ export const TimeScale = (function (_super: typeof ContinuousScale) {
     } else {
       x0 = DateTime.fromAny(x0 as AnyDateTime);
       x1 = DateTime.fromAny(x1!);
-      domain = TimeDomain(x0 as DateTime, x1 as DateTime);
+      domain = TimeDomain(x0, x1);
     }
     return TimeScale(domain, this.range);
   };

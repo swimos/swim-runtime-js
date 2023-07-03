@@ -796,7 +796,7 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       body = Value.absent();
     }
     const owner = this.owner;
-    if (!WarpDownlinkContext.is(owner)) {
+    if (!WarpDownlinkContext[Symbol.hasInstance](owner)) {
       throw new Error("no downlink context");
     }
     let model = owner.getDownlink(hostUri, nodeUri, laneUri);

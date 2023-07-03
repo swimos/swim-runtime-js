@@ -29,11 +29,10 @@ export class NumberForm extends Form<number> {
   override readonly unit!: number | undefined;
 
   override withUnit(unit: number | undefined): Form<number> {
-    if (unit !== this.unit) {
-      return new NumberForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new NumberForm(unit);
   }
 
   override mold(object: number, item?: Item): Item {

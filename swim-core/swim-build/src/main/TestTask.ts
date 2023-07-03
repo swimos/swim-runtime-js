@@ -27,29 +27,28 @@ export class TestTask extends PackageTask {
     const packageConfig = await packageScope.package.getOrLoadIfExists(null);
     const packageScripts = packageConfig !== null ? packageConfig.scripts : void 0;
     const testScript = packageScripts !== void 0 ? packageScripts.test : void 0;
-    if (testScript !== void 0) {
-      return new Promise<TaskStatus>((resolve, reject): void => {
-        this.logBegin("testing");
-        const t0 = Date.now();
-        const testProcess = exec(testScript!, {cwd: this.baseDir.value}, (error) => {
-          const dt = Date.now() - t0;
-          if (error === null) {
-            this.logSuccess("tested", dt);
-            resolve(TaskStatus.Success);
-          } else {
-            this.logFailure("failed to test");
-            resolve(TaskStatus.Failure);
-          }
-        });
-        testProcess.stdout!.on("data", function (data: string): void {
-          process.stdout.write(data);
-        });
-        testProcess.stderr!.on("data", function (data: string): void {
-          process.stderr.write(data);
-        });
-      });
-    } else {
+    if (testScript === void 0) {
       return TaskStatus.Pending;
     }
+    return new Promise<TaskStatus>((resolve, reject): void => {
+      this.logBegin("testing");
+      const t0 = Date.now();
+      const testProcess = exec(testScript!, {cwd: this.baseDir.value}, (error) => {
+        const dt = Date.now() - t0;
+        if (error === null) {
+          this.logSuccess("tested", dt);
+          resolve(TaskStatus.Success);
+        } else {
+          this.logFailure("failed to test");
+          resolve(TaskStatus.Failure);
+        }
+      });
+      testProcess.stdout!.on("data", function (data: string): void {
+        process.stdout.write(data);
+      });
+      testProcess.stderr!.on("data", function (data: string): void {
+        process.stderr.write(data);
+      });
+    });
   }
 }

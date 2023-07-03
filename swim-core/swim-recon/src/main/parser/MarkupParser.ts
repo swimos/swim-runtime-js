@@ -78,7 +78,7 @@ export class MarkupParser<I, V> extends Parser<V> {
             if (textOutput !== void 0) {
               builder.push(recon.item(textOutput.bind()));
             }
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           } else if (c === 64/*'@'*/) {
             builder = builder || recon.recordBuilder();
             if (textOutput !== void 0) {

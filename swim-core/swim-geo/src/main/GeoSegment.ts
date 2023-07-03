@@ -44,6 +44,8 @@ export const AnyGeoSegment = {
 
 /** @public */
 export interface GeoSegmentInit {
+  /** @internal */
+  typeid?: "GeoSegmentInit";
   lng0: number;
   lat0: number;
   lng1: number;
@@ -66,6 +68,9 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     this.lng1 = lng1;
     this.lat1 = lat1;
   }
+
+  /** @internal */
+  declare typeid?: "GeoSegment";
 
   isDefined(): boolean {
     return isFinite(this.lng0) && isFinite(this.lat0)
@@ -144,7 +149,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     } else if (that instanceof GeoSegment) {
       return this.intersectsSegment(that);
     } else {
-      return (that as GeoShape).intersects(this);
+      return that.intersects(this);
     }
     return false;
   }
@@ -209,6 +214,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     };
   }
 
+  /** @override */
   interpolateTo(that: GeoSegment): Interpolator<GeoSegment>;
   interpolateTo(that: unknown): Interpolator<GeoSegment> | null;
   interpolateTo(that: unknown): Interpolator<GeoSegment> | null {
@@ -240,12 +246,14 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
         Constructors.hash(GeoSegment), Numbers.hash(this.lng0)), Numbers.hash(this.lat0)),
         Numbers.hash(this.lng1)), Numbers.hash(this.lat1)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("GeoSegment").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.lng0).write(", ").debug(this.lat0).write(", ")
@@ -261,10 +269,6 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     return new GeoSegment(lng0, lat0, lng1, lat1);
   }
 
-  static fromInit(value: GeoSegmentInit): GeoSegment {
-    return new GeoSegment(value.lng0, value.lat0, value.lng1, value.lat1);
-  }
-
   static override fromAny<T extends AnyGeoSegment | null | undefined>(value: T): GeoSegment | Uninitable<T>;
   static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
   static override fromAny<T extends AnyGeoSegment | null | undefined>(value: T): GeoSegment | Uninitable<T> {
@@ -274,6 +278,10 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
       return GeoSegment.fromInit(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static fromInit(init: GeoSegmentInit): GeoSegment {
+    return new GeoSegment(init.lng0, init.lat0, init.lng1, init.lat1);
   }
 }
 

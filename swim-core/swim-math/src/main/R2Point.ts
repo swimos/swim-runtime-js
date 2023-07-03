@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
+import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
-import type {Equivalent} from "@swim/util";
-import type {HashCode} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -33,21 +35,49 @@ import {R2Shape} from "./R2Shape";
 export type AnyR2Point = R2Point | R2PointInit | R2PointTuple;
 
 /** @public */
+export const AnyR2Point = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyR2Point {
+    return instance instanceof R2Point
+        || R2PointInit[Symbol.hasInstance](instance)
+        || R2PointTuple[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
 export interface R2PointInit {
+  /** @internal */
+  typeid?: "R2PointInit";
   x: number;
   y: number;
 }
 
 /** @public */
+export const R2PointInit = {
+  [Symbol.hasInstance](instance: unknown): instance is R2PointInit {
+    return Objects.hasAllKeys<R2PointInit>(instance, "x", "y");
+  },
+};
+
+/** @public */
 export type R2PointTuple = [number, number];
 
 /** @public */
-export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, Equivalent, Debug {
+export const R2PointTuple = {
+  [Symbol.hasInstance](instance: unknown): instance is R2PointTuple {
+    return Array.isArray(instance) && instance.length === 2;
+  },
+};
+
+/** @public */
+export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, Debug {
   constructor(x: number, y: number) {
     super();
     this.x = x;
     this.y = y;
   }
+
+  /** @internal */
+  declare typeid?: "R2Point";
 
   isDefined(): boolean {
     return isFinite(this.x) && isFinite(this.y);
@@ -82,9 +112,8 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
   minus(that: R2Vector | R2Point): R2Point | R2Vector {
     if (that instanceof R2Vector) {
       return new R2Point(this.x - that.x, this.y - that.y);
-    } else {
-      return new R2Vector(this.x - that.x, this.y - that.y);
     }
+    return new R2Vector(this.x - that.x, this.y - that.y);
   }
 
   override contains(that: AnyR2Shape): boolean;
@@ -105,7 +134,7 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
 
   override intersects(that: AnyR2Shape): boolean {
     that = R2Shape.fromAny(that);
-    return (that as R2Shape).intersects(this);
+    return that.intersects(this);
   }
 
   override transform(f: R2Function): R2Point {
@@ -119,6 +148,7 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     };
   }
 
+  /** @override */
   interpolateTo(that: R2Point): Interpolator<R2Point>;
   interpolateTo(that: unknown): Interpolator<R2Point> | null;
   interpolateTo(that: unknown): Interpolator<R2Point> | null {
@@ -128,7 +158,7 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return null;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Point) {
@@ -138,7 +168,7 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Point) {
@@ -147,11 +177,13 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(R2Point),
         Numbers.hash(this.x)), Numbers.hash(this.y)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("R2Point").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.x).write(", ").debug(this.y).write(41/*')'*/);
@@ -162,66 +194,39 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return Format.debug(this);
   }
 
-  /** @internal */
-  static readonly Origin: R2Point = new this(0, 0);
-
-  static origin(): R2Point {
-    return this.Origin;
+  @Lazy
+  static undefined(): R2Point {
+    return new R2Point(NaN, NaN);
   }
 
-  /** @internal */
-  static readonly Undefined: R2Point = new this(NaN, NaN);
-
-  static undefined(): R2Point {
-    return this.Undefined;
+  @Lazy
+  static origin(): R2Point {
+    return new R2Point(0, 0);
   }
 
   static of(x: number, y: number): R2Point {
     return new R2Point(x, y);
   }
 
-  static fromInit(value: R2PointInit): R2Point {
-    return new R2Point(value.x, value.y);
-  }
-
-  static fromTuple(value: R2PointTuple): R2Point {
-    return new R2Point(value[0], value[1]);
-  }
-
-  static override fromAny(value: AnyR2Point): R2Point {
+  static override fromAny<T extends AnyR2Point | null | undefined>(value: T): R2Point | Uninitable<T>;
+  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyR2Point | null | undefined>(value: T): R2Point | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Point) {
-      return value;
-    } else if (R2Point.isInit(value)) {
+      return value as R2Point | Uninitable<T>;
+    } else if (R2PointInit[Symbol.hasInstance](value)) {
       return R2Point.fromInit(value);
-    } else if (R2Point.isTuple(value)) {
+    } else if (R2PointTuple[Symbol.hasInstance](value)) {
       return R2Point.fromTuple(value);
     }
     throw new TypeError("" + value);
   }
 
-  /** @internal */
-  static isInit(value: unknown): value is R2PointInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as R2PointInit;
-      return typeof init.x === "number"
-          && typeof init.y === "number";
-    }
-    return false;
+  static fromInit(init: R2PointInit): R2Point {
+    return new R2Point(init.x, init.y);
   }
 
-  /** @internal */
-  static isTuple(value: unknown): value is R2PointTuple {
-    return Array.isArray(value)
-        && value.length === 2
-        && typeof value[0] === "number"
-        && typeof value[1] === "number";
-  }
-
-  /** @internal */
-  static override isAny(value: unknown): value is AnyR2Point {
-    return value instanceof R2Point
-        || R2Point.isInit(value)
-        || R2Point.isTuple(value);
+  static fromTuple(tuple: R2PointTuple): R2Point {
+    return new R2Point(tuple[0], tuple[1]);
   }
 }
 

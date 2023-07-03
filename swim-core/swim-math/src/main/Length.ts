@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
-import type {Mutable} from "@swim/util";
-import {Numbers} from "@swim/util";
-import {Constructors} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
@@ -46,7 +47,16 @@ export interface LengthBasis {
 }
 
 /** @public */
-export type AnyLength = Length | string | number;
+export type AnyLength = Length | number | string;
+
+/** @public */
+export const AnyLength = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyLength {
+    return instance instanceof Length
+        || typeof instance === "number"
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export abstract class Length implements Interpolate<Length>, HashCode, Equivalent, Compare, Debug {
@@ -142,6 +152,7 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
 
   abstract toCssValue(): CSSUnitValue | null;
 
+  /** @override */
   interpolateTo(that: Length): Interpolator<Length>;
   interpolateTo(that: unknown): Interpolator<Length> | null;
   interpolateTo(that: unknown): Interpolator<Length> | null {
@@ -151,16 +162,22 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     return null;
   }
 
+  /** @override */
   abstract compareTo(that: unknown): number;
 
+  /** @override */
   abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
+  /** @override */
   abstract equals(that: unknown): boolean;
 
+  /** @override */
   abstract hashCode(): number;
 
+  /** @override */
   abstract debug<T>(output: Output<T>): Output<T>;
 
+  /** @override */
   abstract toString(): string;
 
   static zero(units?: LengthUnits): Length {
@@ -214,9 +231,9 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     throw new TypeError("" + value);
   }
 
-  static fromAny(value: AnyLength, defaultUnits?: LengthUnits): Length {
+  static fromAny<T extends AnyLength | null | undefined>(value: T, defaultUnits?: LengthUnits): Length | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Length) {
-      return value;
+      return value as Length | Uninitable<T>;
     } else if (typeof value === "number") {
       return Length.of(value, defaultUnits);
     } else if (typeof value === "string") {
@@ -263,13 +280,6 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
   @Lazy
   static form(): Form<Length, AnyLength> {
     return new LengthForm(void 0, Length.zero());
-  }
-
-  /** @internal */
-  static isAny(value: unknown): value is AnyLength {
-    return value instanceof Length
-        || typeof value === "number"
-        || typeof value === "string";
   }
 
   /** @internal */
@@ -394,16 +404,14 @@ export class PxLength extends Length {
     return this.value + "px";
   }
 
-  /** @internal */
-  static readonly Zero: PxLength = new this(0);
-
+  @Lazy
   static override zero(): PxLength {
-    return this.Zero;
+    return new PxLength(0);
   }
 
   static override of(value: number): PxLength {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new PxLength(value);
   }
@@ -478,16 +486,14 @@ export class EmLength extends Length {
     return this.value + "em";
   }
 
-  /** @internal */
-  static readonly Zero: EmLength = new this(0);
-
+  @Lazy
   static override zero(): EmLength {
-    return this.Zero;
+    return new EmLength(0);
   }
 
   static override of(value: number): EmLength {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new EmLength(value);
   }
@@ -562,16 +568,14 @@ export class RemLength extends Length {
     return this.value + "rem";
   }
 
-  /** @internal */
-  static readonly Zero: RemLength = new this(0);
-
+  @Lazy
   static override zero(): RemLength {
-    return this.Zero;
+    return new RemLength(0);
   }
 
   static override of(value: number): RemLength {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new RemLength(value);
   }
@@ -646,16 +650,14 @@ export class PctLength extends Length {
     return this.value + "%";
   }
 
-  /** @internal */
-  static readonly Zero: PctLength = new this(0);
-
+  @Lazy
   static override zero(): PctLength {
-    return this.Zero;
+    return new PctLength(0);
   }
 
   static override of(value: number): PctLength {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new PctLength(value);
   }
@@ -719,16 +721,14 @@ export class UnitlessLength extends Length {
     return this.value + "";
   }
 
-  /** @internal */
-  static readonly Zero: UnitlessLength = new this(0);
-
+  @Lazy
   static override zero(): UnitlessLength {
-    return this.Zero;
+    return new UnitlessLength(0);
   }
 
   static override of(value: number): UnitlessLength {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new UnitlessLength(value);
   }
@@ -775,11 +775,10 @@ export class LengthForm extends Form<Length, AnyLength> {
   override readonly unit!: Length | undefined;
 
   override withUnit(unit: Length | undefined): Form<Length, AnyLength> {
-    if (unit !== this.unit) {
-      return new LengthForm(this.defaultUnits, unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new LengthForm(this.defaultUnits, unit);
   }
 
   override mold(length: AnyLength): Item {

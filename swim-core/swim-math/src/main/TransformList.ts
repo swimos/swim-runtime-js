@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Input} from "@swim/codec";
@@ -24,10 +25,22 @@ import type {Item} from "@swim/structure";
 import type {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
 import {R2Point} from "./R2Point";
+import type {AnyTransform} from "./Transform";
 import {Transform} from "./Transform";
 import {TransformParser} from "./Transform";
 import {AffineTransform} from "./AffineTransform";
 import {IdentityTransform} from "./IdentityTransform";
+
+/** @public */
+export type AnyTransformList = TransformList | string;
+
+/** @public */
+export const AnyTransformList = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyTransformList {
+    return instance instanceof TransformList
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class TransformList extends Transform {
@@ -120,11 +133,10 @@ export class TransformList extends Transform {
     for (let i = 0, n = transforms.length; i < n; i += 1) {
       const transform = transforms[i]!;
       const component = transform.toCssTransformComponent();
-      if (component !== null) {
-        components[i] = component;
-      } else {
+      if (component === null) {
         return null;
       }
+      components[i] = component;
     }
     return new CSSTransformValue(components);
   }
@@ -228,14 +240,14 @@ export class TransformList extends Transform {
     if (stringValue === void 0) {
       const transforms = this.transforms;
       const n = transforms.length;
-      if (n > 0) {
+      if (n === 0) {
+        stringValue = "none";
+      } else {
         stringValue = transforms[0]!.toString();
         for (let i = 1; i < n; i += 1) {
           stringValue += " ";
           stringValue += transforms[i]!.toString();
         }
-      } else {
-        stringValue = "none";
       }
       (this as Mutable<this>).stringValue = stringValue;
     }
@@ -256,9 +268,11 @@ export class TransformList extends Transform {
     return s;
   }
 
-  static override fromAny(value: TransformList | string): TransformList {
+  static override fromAny<T extends AnyTransformList | null | undefined>(value: T): TransformList | Uninitable<T>;
+  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyTransformList | null | undefined>(value: T): TransformList | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof TransformList) {
-      return value;
+      return value as TransformList | Uninitable<T>;
     } else if (typeof value === "string") {
       return TransformList.parse(value);
     }
@@ -363,14 +377,15 @@ export const TransformListInterpolator = (function (_super: typeof Interpolator)
       return true;
     } else if (that instanceof TransformListInterpolator) {
       const n = this.interpolators.length;
-      if (n === that.interpolators.length) {
-        for (let i = 0; i < n; i += 1) {
-          if (!this.interpolators[i]!.equals(that.interpolators[i]!)) {
-            return false;
-          }
-        }
-        return true;
+      if (n !== that.interpolators.length) {
+        return false;
       }
+      for (let i = 0; i < n; i += 1) {
+        if (!this.interpolators[i]!.equals(that.interpolators[i]!)) {
+          return false;
+        }
+      }
+      return true;
     }
     return false;
   };

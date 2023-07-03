@@ -26,7 +26,7 @@ export interface Builder<I, O> {
   /**
    * Returns the output result of this builder.
    */
-  bind(): O;
+  build(): O;
 }
 
 /**
@@ -44,5 +44,5 @@ export interface PairBuilder<K, V, O> {
   /**
    * Returns the output result of this builder.
    */
-  bind(): O;
+  build(): O;
 }

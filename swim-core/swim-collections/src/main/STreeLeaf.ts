@@ -42,11 +42,10 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
 
   override get(index: number): V | undefined {
     const slot = this.slots[index];
-    if (slot !== void 0) {
-      return slot[1];
-    } else {
+    if (slot === void 0) {
       return void 0;
     }
+    return slot[1];
   }
 
   override getEntry(index: number): [I, V] | undefined {
@@ -64,13 +63,12 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
   updatedItem(index: number, newValue: V): STreeLeaf<V, I> {
     const oldItems = this.slots;
     const oldSlot = oldItems[index];
-    if (oldSlot !== void 0 && newValue !== oldSlot[1]) {
-      const newValues = oldItems.slice(0);
-      newValues[index] = [oldSlot[0], newValue];
-      return new STreeLeaf<V, I>(newValues);
-    } else {
+    if (oldSlot === void 0 || newValue === oldSlot[1]) {
       return this;
     }
+    const newValues = oldItems.slice(0);
+    newValues[index] = [oldSlot[0], newValue];
+    return new STreeLeaf<V, I>(newValues);
   }
 
   override inserted(index: number, newValue: V, id: I | undefined, tree: STreeContext<V, I>): STreeLeaf<V, I> {
@@ -101,11 +99,10 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
     if (index < 0 || index >= this.slots.length) {
       throw new RangeError("" + index);
     }
-    if (this.slots.length > 1) {
-      return this.removedSlot(index);
-    } else {
+    if (this.slots.length <= 1) {
       return STreePage.empty();
     }
+    return this.removedSlot(index);
   }
 
   /** @internal */
@@ -123,46 +120,39 @@ export class STreeLeaf<V, I> extends STreePage<V, I> {
 
   override drop(lower: number, tree: STreeContext<V, I>): STreeLeaf<V, I> {
     const oldSlots = this.slots;
-    if (lower > 0 && oldSlots.length > 0) {
-      if (lower < oldSlots.length) {
-        const size = oldSlots.length - lower;
-        const newSlots = new Array<[I, V]>(size);
-        for (let i = 0; i < size; i += 1) {
-          newSlots[i] = oldSlots[i + lower]!;
-        }
-        return new STreeLeaf<V, I>(newSlots);
-      } else {
-        return STreePage.empty();
-      }
-    } else {
+    if (lower <= 0 || oldSlots.length === 0) {
       return this;
+    } else if (lower >= oldSlots.length) {
+      return STreePage.empty();
     }
+    const size = oldSlots.length - lower;
+    const newSlots = new Array<[I, V]>(size);
+    for (let i = 0; i < size; i += 1) {
+      newSlots[i] = oldSlots[i + lower]!;
+    }
+    return new STreeLeaf<V, I>(newSlots);
   }
 
   override take(upper: number, tree: STreeContext<V, I>): STreeLeaf<V, I> {
     const oldSlots = this.slots;
-    if (upper < oldSlots.length && oldSlots.length > 0) {
-      if (upper > 0) {
-        const newSlots = new Array<[I, V]>(upper);
-        for (let i = 0; i < upper; i += 1) {
-          newSlots[i] = oldSlots[i]!;
-        }
-        return new STreeLeaf<V, I>(newSlots);
-      } else {
-        return STreePage.empty();
-      }
-    } else {
+    if (upper >= oldSlots.length || oldSlots.length === 0) {
       return this;
+    } else if (upper <= 0) {
+      return STreePage.empty();
     }
+    const newSlots = new Array<[I, V]>(upper);
+    for (let i = 0; i < upper; i += 1) {
+      newSlots[i] = oldSlots[i]!;
+    }
+    return new STreeLeaf<V, I>(newSlots);
   }
 
   override balanced(tree: STreeContext<V, I>): STreePage<V, I> {
     const size = this.slots.length;
-    if (size > 1 && tree.pageShouldSplit(this)) {
-      return this.split(size >>> 1);
-    } else {
+    if (size <= 1 || !tree.pageShouldSplit(this)) {
       return this;
     }
+    return this.split(size >>> 1);
   }
 
   override split(index: number): STreeNode<V, I> {

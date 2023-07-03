@@ -101,7 +101,4 @@ export class IdentityTransform extends Transform {
     }
     return null;
   }
-
-  /** @internal */
-  static readonly Identity: IdentityTransform = new this();
 }

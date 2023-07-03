@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Equals} from "@swim/util";
 import type {Equivalent} from "@swim/util";
@@ -101,7 +102,7 @@ export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equ
     return boundingBox;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Group) {
@@ -110,7 +111,7 @@ export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equ
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Group) {
@@ -119,6 +120,7 @@ export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equ
     return false;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     const shapes = this.shapes;
     const n = shapes.length;
@@ -140,11 +142,9 @@ export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equ
     return Format.debug(this);
   }
 
-  /** @internal */
-  static readonly Empty: R2Group = new this(Arrays.empty());
-
+  @Lazy
   static empty<S extends R2Shape>(): R2Group<S> {
-    return this.Empty as R2Group<S>;
+    return new R2Group(Arrays.empty());
   }
 
   static of<S extends R2Shape>(...shapes: S[]): R2Group<S> {

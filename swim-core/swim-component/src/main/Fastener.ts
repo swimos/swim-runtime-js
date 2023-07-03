@@ -281,7 +281,7 @@ export const Fastener = (function (_super: typeof Object) {
 
   Object.defineProperty(Fastener.prototype, "affinity", {
     get(this: Fastener): Affinity {
-      return this.flags & Affinity.Mask;
+      return (this.flags & Affinity.Mask) as Affinity;
     },
     enumerable: true,
     configurable: true,
@@ -296,7 +296,7 @@ export const Fastener = (function (_super: typeof Object) {
   };
 
   Fastener.prototype.minAffinity = function (this: Fastener, newAffinity: Affinity): boolean {
-    const oldAffinity = this.flags & Affinity.Mask;
+    const oldAffinity = (this.flags & Affinity.Mask) as Affinity;
     if (newAffinity === Affinity.Reflexive) {
       newAffinity = oldAffinity;
     } else if ((newAffinity & ~Affinity.Mask) !== 0) {
@@ -315,7 +315,7 @@ export const Fastener = (function (_super: typeof Object) {
     if ((newAffinity & ~Affinity.Mask) !== 0) {
       throw new Error("invalid affinity: " + newAffinity);
     }
-    const oldAffinity = this.flags & Affinity.Mask;
+    const oldAffinity = (this.flags & Affinity.Mask) as Affinity;
     if (newAffinity === oldAffinity) {
       return;
     }
@@ -680,7 +680,7 @@ export const Fastener = (function (_super: typeof Object) {
     (fastener as Mutable<typeof fastener>).inlet = null;
     const flagsInit = fastener.flagsInit;
     if (flagsInit !== void 0) {
-      fastener.initAffinity(flagsInit & Affinity.Mask);
+      fastener.initAffinity((flagsInit & Affinity.Mask) as Affinity);
       fastener.initInherits((flagsInit & Fastener.InheritsFlag) !== 0);
     }
     return fastener;

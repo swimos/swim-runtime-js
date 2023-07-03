@@ -121,12 +121,13 @@ export const FileRelation = (function (_super: typeof Fastener) {
 
   FileRelation.prototype.setBaseDir = function (this: FileRelation, newBaseDir: string | undefined): void {
     const oldBaseDir = this.baseDir;
-    if (newBaseDir !== oldBaseDir) {
-      this.willSetBaseDir(newBaseDir, oldBaseDir);
-      (this as Mutable<typeof this>).baseDir = newBaseDir;
-      this.onSetBaseDir(newBaseDir, oldBaseDir);
-      this.didSetBaseDir(newBaseDir, oldBaseDir);
+    if (newBaseDir === oldBaseDir) {
+      return;
     }
+    this.willSetBaseDir(newBaseDir, oldBaseDir);
+    (this as Mutable<typeof this>).baseDir = newBaseDir;
+    this.onSetBaseDir(newBaseDir, oldBaseDir);
+    this.didSetBaseDir(newBaseDir, oldBaseDir);
   };
 
   FileRelation.prototype.willSetBaseDir = function (this: FileRelation, newBaseDir: string | undefined, oldBaseDir: string | undefined): void {
@@ -166,27 +167,25 @@ export const FileRelation = (function (_super: typeof Fastener) {
   };
 
   FileRelation.prototype.resolveFile = async function (this: FileRelation, baseDir: string | undefined, fileName: string | undefined): Promise<string | undefined> {
-    if (fileName !== void 0) {
-      if (baseDir === void 0) {
-        baseDir = process.cwd();
-      }
-      const resolves = this.resolves;
-      do {
-        const path = Path.resolve(baseDir, fileName);
-        if (this.exists(path)) {
-          return path;
-        }
-        if (resolves === true) {
-          const parentDir = Path.dirname(baseDir);
-          if (baseDir !== parentDir) {
-            baseDir = parentDir;
-            continue;
-          }
-        }
-        break;
-      } while (true);
+    if (fileName === void 0) {
+      return;
+    } else if (baseDir === void 0) {
+      baseDir = process.cwd();
     }
-    return void 0;
+    const resolves = this.resolves;
+    do {
+      const path = Path.resolve(baseDir, fileName);
+      if (this.exists(path)) {
+        return path;
+      } else if (resolves === true) {
+        const parentDir = Path.dirname(baseDir);
+        if (baseDir !== parentDir) {
+          baseDir = parentDir;
+          continue;
+        }
+      }
+      return void 0;
+    } while (true);
   };
 
   FileRelation.prototype.exists = function (this: FileRelation, path: string): boolean {

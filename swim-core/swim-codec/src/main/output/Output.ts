@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import type {Builder} from "@swim/util";
 import {OutputException} from "./OutputException";
 import type {AnyOutputSettings} from "./OutputSettings";
 import {OutputSettings} from "./OutputSettings";
@@ -71,7 +70,7 @@ import {Format} from "../"; // forward import
  * @see [[Writer]]
  * @public
  */
-export abstract class Output<T = unknown> implements Builder<number, T> {
+export abstract class Output<T = unknown> {
   /**
    * Returns `true` when the next [[write write(number)]] will succeed.
    * i.e. this `Output` is in the _cont_ state.
@@ -85,7 +84,7 @@ export abstract class Output<T = unknown> implements Builder<number, T> {
   abstract isFull(): boolean;
 
   /**
-   * Returns `true` when no `write` will ever again suucced.
+   * Returns `true` when no `write` will ever again succeed.
    * i.e. this `Output` is in the _done_ state.
    */
   abstract isDone(): boolean;

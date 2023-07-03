@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -27,6 +28,8 @@ export type AnyArg = Arg | ArgInit | string;
 
 /** @public */
 export interface ArgInit {
+  /** @internal */
+  typeid?: "ArgInit";
   readonly name: string;
   readonly value?: string;
   readonly optional?: boolean;
@@ -39,6 +42,9 @@ export class Arg implements HashCode, Debug {
     this.value = value;
     this.optional = optional;
   }
+
+  /** @internal */
+  declare typeid?: "Arg";
 
   readonly name: string;
 
@@ -99,15 +105,14 @@ export class Arg implements HashCode, Debug {
     return new Arg(init.name, init.value, init.optional !== void 0 ? init.optional : false);
   }
 
-  static fromAny(value: AnyArg): Arg {
-    if (value instanceof Arg) {
-      return value;
+  static fromAny<T extends AnyArg | null | undefined>(value: T): Arg | Uninitable<T> {
+    if (value === void 0 || value === null || value instanceof Arg) {
+      return value as Arg | Uninitable<T>;
     } else if (typeof value === "string") {
       return new Arg(value, void 0, false);
-    } else if (typeof value === "object" && value !== null) {
+    } else if (typeof value === "object") {
       return Arg.fromInit(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 }

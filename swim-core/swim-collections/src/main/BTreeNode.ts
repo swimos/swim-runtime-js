@@ -332,13 +332,12 @@ export class BTreeNode<K, V, U> extends BTreePage<K, V, U> {
     let x = 0;
     while (x < oldPages.length) {
       const size = oldPages[x]!.size;
-      if (size <= lower) {
-        newSize -= size;
-        lower -= size;
-        x += 1;
-      } else {
+      if (size > lower) {
         break;
       }
+      newSize -= size;
+      lower -= size;
+      x += 1;
     }
     const newArity = oldPages.length - x;
     if (newArity <= 1) {
@@ -379,11 +378,10 @@ export class BTreeNode<K, V, U> extends BTreePage<K, V, U> {
       const size = oldPages[x]!.size;
       newSize += size;
       x += 1;
-      if (size <= upper) {
-        upper -= size;
-      } else {
+      if (size > upper) {
         break;
       }
+      upper -= size;
     }
     const newArity = upper === 0 ? x : x + 1;
     if (newArity <= 1) {

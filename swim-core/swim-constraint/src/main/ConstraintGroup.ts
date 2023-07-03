@@ -15,9 +15,9 @@
 import type {Mutable} from "@swim/util";
 import type {AnyConstraintExpression} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
-import type {ConstraintRelation} from "./ConstraintRelation";
-import type {AnyConstraintStrength} from "./ConstraintStrength";
-import {ConstraintStrength} from "./ConstraintStrength";
+import type {ConstraintRelation} from "./Constraint";
+import type {AnyConstraintStrength} from "./Constraint";
+import {ConstraintStrength} from "./Constraint";
 import {Constraint} from "./Constraint";
 import type {ConstraintScope} from "./ConstraintScope";
 
@@ -34,9 +34,7 @@ export class ConstraintGroup {
   constraint(lhs: AnyConstraintExpression, relation: ConstraintRelation,
              rhs?: AnyConstraintExpression, strength?: AnyConstraintStrength): Constraint {
     lhs = ConstraintExpression.fromAny(lhs);
-    if (rhs !== void 0) {
-      rhs = ConstraintExpression.fromAny(rhs);
-    }
+    rhs = ConstraintExpression.fromAny(rhs);
     const expression = rhs !== void 0 ? lhs.minus(rhs) : lhs;
     if (strength === void 0) {
       strength = ConstraintStrength.Required;
@@ -65,12 +63,13 @@ export class ConstraintGroup {
 
   removeConstraint(constraint: Constraint): void {
     const constraints = this.constraints as Constraint[];
-    if (constraints !== void 0) {
-      const index = constraints.indexOf(constraint);
-      if (index >= 0) {
-        constraints.splice(index, 1);
-        constraint.constrain(false);
-      }
+    if (constraints === void 0) {
+      return;
+    }
+    const index = constraints.indexOf(constraint);
+    if (index >= 0) {
+      constraints.splice(index, 1);
+      constraint.constrain(false);
     }
   }
 

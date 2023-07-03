@@ -13,21 +13,18 @@
 // limitations under the License.
 
 /** @public */
-export const Random = (function () {
-  const Random = {} as {
-    fillBytes(array: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void;
-  };
-
-  if (typeof window !== "undefined" && window.crypto !== void 0) {
-    Random.fillBytes = function (array: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void {
-      window.crypto.getRandomValues(array);
-    };
-  } else if (typeof window !== "undefined" && (window as any).msCrypto !== void 0) {
-    Random.fillBytes = function (array: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void {
-      ((window as any).msCrypto as Crypto).getRandomValues(array);
-    };
-  } else {
-    Random.fillBytes = function (array: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void {
+export const Random = {
+  fillBytes: (function () {
+    if (typeof window !== "undefined" && window.crypto !== void 0) {
+      return function (array: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void {
+        window.crypto.getRandomValues(array);
+      };
+    } else if (typeof window !== "undefined" && (window as any).msCrypto !== void 0) {
+      return function (array: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void {
+        ((window as any).msCrypto as Crypto).getRandomValues(array);
+      };
+    }
+    return function (array: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array): void {
       if (array instanceof Int8Array) {
         for (let i = 0; i < array.length; i += 1) {
           array[i] = 128 - Math.round(Math.random() * 256);
@@ -56,7 +53,5 @@ export const Random = (function () {
         throw new TypeError("" + array);
       }
     };
-  }
-
-  return Random;
-})();
+  })(),
+};

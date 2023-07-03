@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Strings} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Strings} from "@swim/util";
+import {Objects} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import {Output} from "@swim/codec";
@@ -58,13 +60,31 @@ import {UriFragmentParser} from "./"; // forward import
 export type AnyUri = Uri | UriInit | string;
 
 /** @public */
+export const AnyUri = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUri {
+    return instance instanceof Uri
+        || UriInit[Symbol.hasInstance](instance)
+        || typeof instance === "string";
+  },
+};
+
+/** @public */
 export interface UriInit extends UriAuthorityInit {
+  /** @internal */
+  typeid?: "UriInit";
   scheme?: AnyUriScheme;
   authority?: AnyUriAuthority;
   path?: AnyUriPath;
   query?: AnyUriQuery;
   fragment?: AnyUriFragment;
 }
+
+/** @public */
+export const UriInit = {
+  [Symbol.hasInstance](instance: unknown): instance is UriInit {
+    return Objects.hasAnyKey<UriInit>(instance, "scheme", "authority", "path", "query", "fragment");
+  },
+};
 
 /** @public */
 export class Uri implements HashCode, Compare, Debug, Display {
@@ -79,6 +99,9 @@ export class Uri implements HashCode, Compare, Debug, Display {
     this.hashValue = void 0;
     this.stringValue = void 0;
   }
+
+  /** @internal */
+  declare typeid?: "Uri";
 
   isDefined(): boolean {
     return this.scheme.isDefined() || this.authority.isDefined() || this.path.isDefined()
@@ -123,7 +146,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     if (authority === this.authority) {
       return this;
     }
-    return this.copy(this.scheme, authority as UriAuthority, this.path, this.query, this.fragment);
+    return this.copy(this.scheme, authority, this.path, this.query, this.fragment);
   }
 
   get authorityPart(): string {
@@ -451,6 +474,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return uri;
   }
 
+  /** @override */
   compareTo(that: Uri): number {
     if (that instanceof Uri) {
       return this.toString().localeCompare(that.toString());
@@ -458,6 +482,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return NaN;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -470,6 +495,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
   /** @internal */
   readonly hashValue: number | undefined;
 
+  /** @override */
   hashCode(): number {
     let hashValue = this.hashValue;
     if (hashValue === void 0) {
@@ -479,6 +505,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return hashValue;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("Uri").write(46/*'.'*/);
     if (this.isDefined()) {
@@ -492,6 +519,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
   /** @internal */
   readonly stringValue: string | undefined;
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     const stringValue = this.stringValue;
     if (stringValue !== void 0) {
@@ -514,6 +542,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return output;
   }
 
+  /** @override */
   toString(): string {
     let stringValue = this.stringValue;
     if (stringValue === void 0) {
@@ -523,15 +552,10 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return stringValue;
   }
 
-  /** @internal */
-  static Empty: Uri | null = null;
-
+  @Lazy
   static empty(): Uri {
-    if (this.Empty === null) {
-      this.Empty = new Uri(UriScheme.undefined(), UriAuthority.undefined(), UriPath.empty(),
-                           UriQuery.undefined(), UriFragment.undefined());
-    }
-    return this.Empty;
+    return new Uri(UriScheme.undefined(), UriAuthority.undefined(), UriPath.empty(),
+                         UriQuery.undefined(), UriFragment.undefined());
   }
 
   static create(scheme: UriScheme = UriScheme.undefined(),
@@ -546,46 +570,24 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return new Uri(scheme, authority, path, query, fragment);
   }
 
-  static fromInit(init: UriInit): Uri {
-    let scheme = UriScheme.fromAny(init.scheme);
-    if (scheme === void 0 || scheme === null) {
-      scheme = UriScheme.undefined();
-    }
-    let authority = UriAuthority.fromAny(init.authority !== void 0 ? init.authority : init);
-    if (authority === void 0 || authority === null) {
-      authority = UriAuthority.undefined();
-    }
-    let path = UriPath.fromAny(init.path);
-    if (path === void 0 || path === null) {
-      path = UriPath.empty();
-    }
-    let query = UriQuery.fromAny(init.query);
-    if (query === void 0 || query === null) {
-      query = UriQuery.undefined();
-    }
-    let fragment = UriFragment.fromAny(init.fragment);
-    if (fragment === void 0 || fragment === null) {
-      fragment = UriFragment.undefined();
-    }
-    if (!scheme.isDefined() && !authority.isDefined() && !path.isDefined()
-        && !query.isDefined() && !fragment.isDefined()) {
-      return Uri.empty();
-    }
-    return new Uri(scheme, authority, path, query, fragment);
-  }
-
-  static fromAny(value: AnyUri): Uri;
-  static fromAny(value: AnyUri | null): Uri | null;
-  static fromAny(value: AnyUri | null | undefined): Uri | null | undefined;
-  static fromAny(value: AnyUri | null | undefined): Uri | null | undefined {
+  static fromAny<T extends AnyUri | null | undefined>(value: T): Uri | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Uri) {
-      return value;
+      return value as Uri | Uninitable<T>;
     } else if (typeof value === "object") {
       return Uri.fromInit(value);
     } else if (typeof value === "string") {
       return Uri.parse(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static fromInit(init: UriInit): Uri {
+    const scheme = UriScheme.fromAny(init.scheme);
+    const authority = UriAuthority.fromAny(init.authority);
+    const path = UriPath.fromAny(init.path);
+    const query = UriQuery.fromAny(init.query);
+    const fragment = UriFragment.fromAny(init.fragment);
+    return this.create(scheme, authority, path, query, fragment);
   }
 
   static scheme(scheme: AnyUriScheme): Uri {
@@ -605,7 +607,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   static authority(authority: AnyUriAuthority): Uri {
     authority = UriAuthority.fromAny(authority);
-    return Uri.create(void 0, authority as UriAuthority, void 0, void 0, void 0);
+    return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
 
   static authorityPart(authorityPart: string): Uri {
@@ -709,14 +711,18 @@ export class Uri implements HashCode, Compare, Debug, Display {
   }
 
   /** @internal */
-  static readonly parseCache: Map<string, Uri> = new Map<string, Uri>();
+  static ParseCacheCapacity: number = 256;
+
   /** @internal */
-  static readonly parseCacheCapacity: number = 256;
+  @Lazy
+  static parseCache(): Map<string, Uri> {
+    return new Map<string, Uri>();
+  }
 
   static parse(input: Input): Parser<Uri>;
   static parse(string: string): Uri;
   static parse(string: Input | string): Parser<Uri> | Uri {
-    const parseCache = this.parseCache;
+    const parseCache = this.parseCache();
     let uri: Uri | undefined;
     if (typeof string === "string") {
       uri = parseCache.get(string);
@@ -739,7 +745,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
         uri = parser!.bind();
       }
       parseCache.set(string, uri);
-      const capacity = Uri.parseCacheCapacity;
+      const capacity = Uri.ParseCacheCapacity;
       let size = parseCache.size;
       if (size > capacity) {
         const keys = parseCache.keys();
@@ -1032,11 +1038,10 @@ export class UriForm extends Form<Uri, AnyUri> {
   override readonly unit!: Uri | undefined;
 
   override withUnit(unit: Uri | undefined): Form<Uri, AnyUri> {
-    if (unit !== this.unit) {
-      return new UriForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new UriForm(unit);
   }
 
   override mold(object: AnyUri, item?: Item): Item {

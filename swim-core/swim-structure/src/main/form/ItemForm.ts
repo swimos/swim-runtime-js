@@ -29,11 +29,10 @@ export class ItemForm extends Form<Item, AnyItem> {
   override readonly unit!: Item | undefined;
 
   override withUnit(unit: Item | undefined): Form<Item> {
-    if (unit !== this.unit) {
-      return new ItemForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new ItemForm(unit);
   }
 
   override mold(object: AnyItem, item?: Item): Item {

@@ -18,3 +18,8 @@ export interface R2Function {
 
   transformY(x: number, y: number): number;
 }
+
+/** @public */
+export interface R2Operator extends R2Function {
+  inverse(): R2Operator;
+}

@@ -61,37 +61,39 @@ export class WatcherScope extends Scope {
 
   rebuild(): Promise<void> {
     let rebuildPromise = this.rebuildPromise;
-    if (rebuildPromise === null) {
-      const packageNames = this.getInvalidatedPackages();
-
-      this.changedPackages = {};
-      this.changedPackageCount = 0;
-      this.buildTimer.cancel();
-
-      const t0 = Date.now();
-      this.onRebuildBegin(packageNames);
-      const workspace = this.workspace.getService();
-      rebuildPromise = workspace.runPackageLibraryTasks(this.buildConfigs, packageNames, this.libraryNames);
-      rebuildPromise = rebuildPromise.then(this.onRebuildSuccess.bind(this, packageNames, t0), this.onRebuildFailure.bind(this));
-      this.rebuildPromise = rebuildPromise;
+    if (rebuildPromise !== null) {
+      return rebuildPromise;
     }
+
+    const packageNames = this.getInvalidatedPackages();
+    this.changedPackages = {};
+    this.changedPackageCount = 0;
+    this.buildTimer.cancel();
+
+    const t0 = Date.now();
+    this.onRebuildBegin(packageNames);
+    const workspace = this.workspace.getService();
+    rebuildPromise = workspace.runPackageLibraryTasks(this.buildConfigs, packageNames, this.libraryNames);
+    rebuildPromise = rebuildPromise.then(this.onRebuildSuccess.bind(this, packageNames, t0), this.onRebuildFailure.bind(this));
+    this.rebuildPromise = rebuildPromise;
     return rebuildPromise;
   }
 
   protected onRebuildBegin(packageNames: string[]): void {
-    if (packageNames.length !== 0) {
-      let output = Unicode.stringOutput(OutputSettings.styled());
-      output = OutputStyle.magentaBold(output);
-      output = output.write("rebuilding");
-      output = OutputStyle.reset(output);
-      output = this.writePackageNames(output, packageNames);
-      output = output.write(" ");
-      output = OutputStyle.gray(output);
-      output = output.write("...");
-      output = OutputStyle.reset(output);
-      console.log(output.bind());
-      console.log("");
+    if (packageNames.length === 0) {
+      return;
     }
+    let output = Unicode.stringOutput(OutputSettings.styled());
+    output = OutputStyle.magentaBold(output);
+    output = output.write("rebuilding");
+    output = OutputStyle.reset(output);
+    output = this.writePackageNames(output, packageNames);
+    output = output.write(" ");
+    output = OutputStyle.gray(output);
+    output = output.write("...");
+    output = OutputStyle.reset(output);
+    console.log(output.bind());
+    console.log("");
   }
 
   protected onRebuildSuccess(packageNames: string[], t0: number): void {
@@ -138,25 +140,27 @@ export class WatcherScope extends Scope {
   changedPackageCount: number;
 
   rebuildPackage(packageScope: PackageScope): void {
-    if (this.changedPackages[packageScope.name] === void 0) {
-      let output = Unicode.stringOutput(OutputSettings.styled());
-      output = OutputStyle.magentaBold(output);
-      output = output.write("modified");
-      output = OutputStyle.reset(output);
-      output = output.write(" ");
-      output = OutputStyle.bold(output);
-      output = output.write(packageScope.name);
-      output = OutputStyle.reset(output);
-      output = output.write(" ");
-      output = OutputStyle.gray(output);
-      output = output.write("...");
-      output = OutputStyle.reset(output);
-      console.log(output.bind());
-
-      this.changedPackages[packageScope.name] = packageScope;
-      this.changedPackageCount += 1;
-      this.debounceRebuild();
+    if (this.changedPackages[packageScope.name] !== void 0) {
+      return;
     }
+
+    let output = Unicode.stringOutput(OutputSettings.styled());
+    output = OutputStyle.magentaBold(output);
+    output = output.write("modified");
+    output = OutputStyle.reset(output);
+    output = output.write(" ");
+    output = OutputStyle.bold(output);
+    output = output.write(packageScope.name);
+    output = OutputStyle.reset(output);
+    output = output.write(" ");
+    output = OutputStyle.gray(output);
+    output = output.write("...");
+    output = OutputStyle.reset(output);
+    console.log(output.bind());
+
+    this.changedPackages[packageScope.name] = packageScope;
+    this.changedPackageCount += 1;
+    this.debounceRebuild();
   }
 
   debounceRebuild(): void {
@@ -179,13 +183,13 @@ export class WatcherScope extends Scope {
     const changedPackages = this.changedPackages;
     const changedPackageCount = this.changedPackageCount;
     let changedPackageNames: string[] | undefined;
-    if (changedPackageCount !== 0) {
+    if (changedPackageCount === 0) {
+      changedPackageNames = this.packageNames;
+    } else {
       changedPackageNames = [];
       for (const packageName in changedPackages) {
         changedPackageNames.push(packageName);
       }
-    } else {
-      changedPackageNames = this.packageNames;
     }
 
     const workspace = this.workspace.getService();
@@ -226,12 +230,13 @@ export class WatcherScope extends Scope {
 
   build(): Promise<void> {
     let rebuildPromise = this.rebuildPromise;
-    if (rebuildPromise === null) {
-      const workspace = this.workspace.getService();
-      rebuildPromise = workspace.runPackageLibraryDependencyTasks(this.buildConfigs, this.packageNames, this.libraryNames);
-      rebuildPromise = rebuildPromise.then(this.onBuildSuccess.bind(this), this.onBuildFailure.bind(this));
-      this.rebuildPromise = rebuildPromise;
+    if (rebuildPromise !== null) {
+      return rebuildPromise;
     }
+    const workspace = this.workspace.getService();
+    rebuildPromise = workspace.runPackageLibraryDependencyTasks(this.buildConfigs, this.packageNames, this.libraryNames);
+    rebuildPromise = rebuildPromise.then(this.onBuildSuccess.bind(this), this.onBuildFailure.bind(this));
+    this.rebuildPromise = rebuildPromise;
     return rebuildPromise;
   }
 

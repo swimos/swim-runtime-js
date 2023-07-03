@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable} from "@swim/util";
-import {ConstraintId} from "./ConstraintId";
+import {Lazy} from "@swim/util";
 import type {Constraint} from "./Constraint";
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @public */
-export interface ConstraintSymbol extends ConstraintId {
+export interface ConstraintSymbol {
   /** @internal */
   isExternal(): boolean;
 
@@ -39,19 +38,15 @@ export interface ConstraintSymbol extends ConstraintId {
 }
 
 /** @public */
-export const ConstraintSymbol = {} as {
+export const ConstraintSymbol = {
   /** @internal */
-  readonly invalid: ConstraintSymbol; // defined by ConstraintInvalid
+  invalid: Lazy(function (): ConstraintSymbol {
+    return new ConstraintInvalid();
+  }),
 };
 
 /** @internal */
 export class ConstraintSlack implements ConstraintSymbol {
-  constructor() {
-    this.id = ConstraintId.next();
-  }
-
-  readonly id: number;
-
   isExternal(): boolean {
     return false;
   }
@@ -79,12 +74,6 @@ export class ConstraintSlack implements ConstraintSymbol {
 
 /** @internal */
 export class ConstraintDummy implements ConstraintSymbol {
-  constructor() {
-    this.id = ConstraintId.next();
-  }
-
-  readonly id: number;
-
   isExternal(): boolean {
     return false;
   }
@@ -112,12 +101,6 @@ export class ConstraintDummy implements ConstraintSymbol {
 
 /** @internal */
 export class ConstraintError implements ConstraintSymbol {
-  constructor() {
-    this.id = ConstraintId.next();
-  }
-
-  readonly id: number;
-
   isExternal(): boolean {
     return false;
   }
@@ -145,10 +128,6 @@ export class ConstraintError implements ConstraintSymbol {
 
 /** @internal */
 export class ConstraintInvalid implements ConstraintSymbol {
-  get id(): number {
-    return -1;
-  }
-
   isExternal(): boolean {
     return false;
   }
@@ -173,4 +152,3 @@ export class ConstraintInvalid implements ConstraintSymbol {
     // nop
   }
 }
-(ConstraintSymbol as Mutable<typeof ConstraintSymbol>).invalid = new ConstraintInvalid();

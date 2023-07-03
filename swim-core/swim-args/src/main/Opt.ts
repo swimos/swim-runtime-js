@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import type {Equals} from "@swim/util";
 import {Arrays} from "@swim/util";
@@ -26,6 +27,8 @@ export type AnyOpt = Opt | OptInit | string;
 
 /** @public */
 export interface OptInit {
+  /** @internal */
+  typeid?: "OptInit";
   name: string;
   flag?: string;
   desc?: string;
@@ -35,13 +38,16 @@ export interface OptInit {
 /** @public */
 export class Opt implements Equals, Debug {
   constructor(name: string, flag: string | undefined, desc: string | undefined,
-              args: ReadonlyArray<Arg>, defs: number) {
+              args: readonly Arg[], defs: number) {
     this.name = name;
     this.flag = flag;
     this.desc = desc;
     this.args = args;
     this.defs = defs;
   }
+
+  /** @internal */
+  declare typeid?: "Opt";
 
   readonly name: string;
 
@@ -59,12 +65,12 @@ export class Opt implements Equals, Debug {
     return this;
   }
 
-  readonly args: ReadonlyArray<Arg>;
+  readonly args: readonly Arg[];
 
   /** @internal */
   withArg(arg: AnyArg): this {
     arg = Arg.fromAny(arg);
-    (this.args as Arg[]).push(arg as Arg);
+    (this.args as Arg[]).push(arg);
     return this;
   }
 
@@ -96,12 +102,11 @@ export class Opt implements Equals, Debug {
     for (let argIndex = 0; argIndex < argCount && paramIndex < paramCount; argIndex += 1) {
       const arg = args[argIndex]!;
       const param = params[paramIndex]!;
-      if (!arg.optional || param.charCodeAt(0) !== 45/*'-'*/) {
-        arg.withValue(param);
-        paramIndex += 1;
-      } else {
+      if (arg.optional && param.charCodeAt(0) === 45/*'-'*/) {
         break;
       }
+      arg.withValue(param);
+      paramIndex += 1;
     }
     return paramIndex;
   }
@@ -165,15 +170,14 @@ export class Opt implements Equals, Debug {
     return new Opt(init.name, init.flag, init.desc, args, 0);
   }
 
-  static fromAny(value: AnyOpt): Opt {
-    if (value instanceof Opt) {
-      return value;
+  static fromAny<T extends AnyOpt | null | undefined>(value: T): Opt | Uninitable<T> {
+    if (value === void 0 || value === null || value instanceof Opt) {
+      return value as Opt | Uninitable<T>;
     } else if (typeof value === "string") {
       return new Opt(value, void 0, void 0, [], 0);
-    } else if (typeof value === "object" && value !== null) {
+    } else if (typeof value === "object") {
       return Opt.fromInit(value);
-    } else {
-      throw new TypeError("" + value);
     }
+    throw new TypeError("" + value);
   }
 }

@@ -12,36 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable} from "@swim/util";
+/** @public */
+export type Affinity = 0 | 1 | 2 | 3 | 4;
 
 /** @public */
-export type Affinity = number;
+export const Affinity: {
+  readonly Transient: 0;
+  readonly Inherited: 1;
+  readonly Intrinsic: 2;
+  readonly Extrinsic: 3;
 
-/** @public */
-export const Affinity = (function () {
-  const Affinity = {} as {
-    readonly Transient: Affinity;
-    readonly Inherited: Affinity;
-    readonly Intrinsic: Affinity;
-    readonly Extrinsic: Affinity;
+  readonly Reflexive: 4;
 
-    readonly Reflexive: Affinity;
+  /** @internal */
+  readonly Shift: number;
+  /** @internal */
+  readonly Mask: number;
+} = Object.freeze({
+  Transient: 0,
+  Inherited: 1,
+  Intrinsic: 2,
+  Extrinsic: 3,
 
-    /** @internal */
-    readonly Shift: number;
-    /** @internal */
-    readonly Mask: number;
-  };
+  Reflexive: 4,
 
-  (Affinity as Mutable<typeof Affinity>).Transient = 0;
-  (Affinity as Mutable<typeof Affinity>).Inherited = 1;
-  (Affinity as Mutable<typeof Affinity>).Intrinsic = 2;
-  (Affinity as Mutable<typeof Affinity>).Extrinsic = 3;
-
-  (Affinity as Mutable<typeof Affinity>).Reflexive = 1 << 2;
-
-  (Affinity as Mutable<typeof Affinity>).Shift = 2;
-  (Affinity as Mutable<typeof Affinity>).Mask = (1 << Affinity.Shift) - 1;
-
-  return Affinity;
-})();
+  Shift: 2,
+  Mask: (1 << 2) - 1,
+});

@@ -91,36 +91,32 @@ export abstract class Task extends Scope {
     const parent = this.parent;
     if (parent !== null) {
       return parent.writeBegin(output, phrase);
-    } else {
-      return super.writeBegin(output, phrase);
     }
+    return super.writeBegin(output, phrase);
   }
 
   override writeSuccess<T>(output: Output<T>, phrase: string, dt?: number): Output<T> {
     const parent = this.parent;
     if (parent !== null) {
       return parent.writeSuccess(output, phrase, dt);
-    } else {
-      return super.writeSuccess(output, phrase, dt);
     }
+    return super.writeSuccess(output, phrase, dt);
   }
 
   override writeFailure<T>(output: Output<T>, phrase: string): Output<T> {
     const parent = this.parent;
     if (parent !== null) {
       return parent.writeFailure(output, phrase);
-    } else {
-      return super.writeFailure(output, phrase);
     }
+    return super.writeFailure(output, phrase);
   }
 
   override writeWarning<T>(output: Output<T>, phrase: string): Output<T> {
     const parent = this.parent;
     if (parent !== null) {
       return parent.writeWarning(output, phrase);
-    } else {
-      return super.writeWarning(output, phrase);
     }
+    return super.writeWarning(output, phrase);
   }
 
   writeCommand<T>(output: Output<T>, command: string, args: readonly string[]): Output<T> {

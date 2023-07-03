@@ -80,9 +80,8 @@ export class R2EllipticCurve extends R2Curve implements Debug {
     const phi = this.phi;
     if (phi === 0) {
       return this.cx + dx;
-    } else {
-      return this.cx + dx * Math.cos(phi) - dy * Math.sin(phi);
     }
+    return this.cx + dx * Math.cos(phi) - dy * Math.sin(phi);
   }
 
   override interpolateY(u: number): number {
@@ -94,9 +93,8 @@ export class R2EllipticCurve extends R2Curve implements Debug {
     const phi = this.phi;
     if (phi === 0) {
       return this.cy + dy;
-    } else {
-      return this.cy + dx * Math.sin(phi) + dy * Math.cos(phi);
     }
+    return this.cy + dx * Math.sin(phi) + dy * Math.cos(phi);
   }
 
   override interpolate(u: number): R2Point {
@@ -108,10 +106,9 @@ export class R2EllipticCurve extends R2Curve implements Debug {
     const phi = this.phi;
     if (phi === 0) {
       return new R2Point(this.cx + dx, this.cy + dy);
-    } else {
-      return new R2Point(this.cx + dx * Math.cos(phi) - dy * Math.sin(phi),
-                         this.cy + dx * Math.sin(phi) + dy * Math.cos(phi));
     }
+    return new R2Point(this.cx + dx * Math.cos(phi) - dy * Math.sin(phi),
+                       this.cy + dx * Math.sin(phi) + dy * Math.cos(phi));
   }
 
   override contains(that: AnyR2Shape): boolean;
@@ -289,6 +286,7 @@ export class R2EllipticCurve extends R2Curve implements Debug {
     return false;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("R2Curve").write(46/*'.'*/).write("elliptic").write(40/*'('*/)
                    .debug(this.cx).write(", ").debug(this.cy).write(", ")

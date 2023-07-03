@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Numbers} from "@swim/util";
-import {Constructors} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {HashCode} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -28,17 +31,37 @@ import {Format} from "@swim/codec";
 export type AnyR2Vector = R2Vector | R2VectorInit;
 
 /** @public */
+export const AnyR2Vector = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyR2Vector {
+    return instance instanceof R2Vector
+        || R2VectorInit[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
 export interface R2VectorInit {
+  /** @internal */
+  typeid?: "R2VectorInit";
   x: number;
   y: number;
 }
 
 /** @public */
-export class R2Vector implements Interpolate<R2Vector>, HashCode, Equivalent, Debug {
+export const R2VectorInit = {
+  [Symbol.hasInstance](instance: unknown): instance is R2VectorInit {
+    return Objects.hasAllKeys<R2VectorInit>(instance, "x", "y");
+  },
+};
+
+/** @public */
+export class R2Vector implements Interpolate<R2Vector>, Equivalent, HashCode, Debug {
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
+
+  /** @internal */
+  declare typeid?: "R2Vector";
 
   isDefined(): boolean {
     return isFinite(this.x) && isFinite(this.y);
@@ -71,6 +94,7 @@ export class R2Vector implements Interpolate<R2Vector>, HashCode, Equivalent, De
     };
   }
 
+  /** @override */
   interpolateTo(that: R2Vector): Interpolator<R2Vector>;
   interpolateTo(that: unknown): Interpolator<R2Vector> | null;
   interpolateTo(that: unknown): Interpolator<R2Vector> | null {
@@ -80,6 +104,7 @@ export class R2Vector implements Interpolate<R2Vector>, HashCode, Equivalent, De
     return null;
   }
 
+  /** @override */
   equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
@@ -90,6 +115,7 @@ export class R2Vector implements Interpolate<R2Vector>, HashCode, Equivalent, De
     return false;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -99,59 +125,44 @@ export class R2Vector implements Interpolate<R2Vector>, HashCode, Equivalent, De
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(R2Vector),
         Numbers.hash(this.x)), Numbers.hash(this.y)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("R2Vector").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.x).write(", ").debug(this.y).write(41/*')'*/);
     return output;
   }
 
+  /** @override */
   toString(): string {
     return Format.debug(this);
   }
 
-  /** @internal */
-  static readonly Zero: R2Vector = new this(0, 0);
-
+  @Lazy
   static zero(): R2Vector {
-    return this.Zero;
+    return new R2Vector(0, 0);
   }
 
   static of(x: number, y: number): R2Vector {
     return new R2Vector(x, y);
   }
 
-  static fromInit(init: R2VectorInit): R2Vector {
-    return new R2Vector(init.x, init.y);
-  }
-
-  static fromAny(value: AnyR2Vector): R2Vector {
+  static fromAny<T extends AnyR2Vector | null | undefined>(value: T): R2Vector | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Vector) {
-      return value;
-    } else if (R2Vector.isInit(value)) {
+      return value as R2Vector | Uninitable<T>;
+    } else if (R2VectorInit[Symbol.hasInstance](value)) {
       return R2Vector.fromInit(value);
     }
     throw new TypeError("" + value);
   }
 
-  /** @internal */
-  static isInit(value: unknown): value is R2VectorInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as R2VectorInit;
-      return typeof init.x === "number"
-          && typeof init.y === "number";
-    }
-    return false;
-  }
-
-  /** @internal */
-  static isAny(value: unknown): value is AnyR2Vector {
-    return value instanceof R2Vector
-        || R2Vector.isInit(value);
+  static fromInit(init: R2VectorInit): R2Vector {
+    return new R2Vector(init.x, init.y);
   }
 }
 

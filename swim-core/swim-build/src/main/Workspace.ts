@@ -403,10 +403,10 @@ export class Workspace extends Service {
   static async load(path: string): Promise<Workspace | null> {
     const baseDir = Path.resolve(process.cwd(), path);
     const packageScope = await Scope.load(baseDir);
-    if (packageScope !== null) {
-      packageScope.mount();
-      return packageScope.workspace.service;
+    if (packageScope === null) {
+      return null;
     }
-    return null;
+    packageScope.mount();
+    return packageScope.workspace.service;
   }
 }

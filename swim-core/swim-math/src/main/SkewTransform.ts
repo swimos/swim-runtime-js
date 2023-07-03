@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
@@ -28,9 +29,21 @@ import {Angle} from "./Angle";
 import {DegAngle} from "./Angle";
 import {AngleParser} from "./Angle";
 import {R2Point} from "./R2Point";
+import type {AnyTransform} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransform} from "./"; // forward import
+
+/** @public */
+export type AnySkewTransform = SkewTransform | string;
+
+/** @public */
+export const AnySkewTransform = {
+  [Symbol.hasInstance](instance: unknown): instance is AnySkewTransform {
+    return instance instanceof SkewTransform
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class SkewTransform extends Transform {
@@ -160,9 +173,8 @@ export class SkewTransform extends Transform {
       return "skewX(" + this.x.degValue() + ")";
     } else if (!this.x.isDefined() && this.y.isDefined()) {
       return "skewY(" + this.y.degValue() + ")";
-    } else {
-      return "skew(" + this.x.degValue() + "," + this.y.degValue() + ")";
     }
+    return "skew(" + this.x.degValue() + "," + this.y.degValue() + ")";
   }
 
   static override fromCssTransformComponent(component: CSSSkew): SkewTransform {
@@ -175,9 +187,11 @@ export class SkewTransform extends Transform {
     return new SkewTransform(x, y);
   }
 
-  static override fromAny(value: SkewTransform | string): SkewTransform {
+  static override fromAny<T extends AnySkewTransform | null | undefined>(value: T): SkewTransform | Uninitable<T>;
+  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
+  static override fromAny<T extends AnySkewTransform | null | undefined>(value: T): SkewTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof SkewTransform) {
-      return value;
+      return value as SkewTransform | Uninitable<T>;
     } else if (typeof value === "string") {
       return SkewTransform.parse(value);
     }

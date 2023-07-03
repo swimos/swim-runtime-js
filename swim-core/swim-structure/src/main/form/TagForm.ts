@@ -42,11 +42,10 @@ export class TagForm<T, U = T> extends Form<T, U> {
   override readonly unit!: T | undefined; // // getter defined below to work around useDefineForClassFields lunacy
 
   override withUnit(unit: T | undefined): Form<T, U> {
-    if (unit !== this.unit) {
-      return new TagForm(this.form.withUnit(unit), this.tag);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new TagForm(this.form.withUnit(unit), this.tag);
   }
 
   override mold(object: T | U, item?: Item): Item {

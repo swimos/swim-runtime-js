@@ -15,7 +15,6 @@
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import {ConstraintMap} from "./ConstraintMap";
 import type {AnyConstraintExpression} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
@@ -36,8 +35,8 @@ export class ConstraintProduct implements ConstraintTerm, Debug {
 
   readonly variable: ConstraintVariable;
 
-  get terms(): ConstraintMap<ConstraintVariable, number> {
-    const terms = new ConstraintMap<ConstraintVariable, number>();
+  get terms(): ReadonlyMap<ConstraintVariable, number> {
+    const terms = new Map<ConstraintVariable, number>();
     terms.set(this.variable, this.coefficient);
     return terms;
   }
@@ -52,9 +51,8 @@ export class ConstraintProduct implements ConstraintTerm, Debug {
       return ConstraintExpression.product(this.coefficient + that.coefficient, this.variable);
     } else if (this.variable === that) {
       return ConstraintExpression.product(this.coefficient + 1, this.variable);
-    } else {
-      return ConstraintExpression.sum(this, that);
     }
+    return ConstraintExpression.sum(this, that);
   }
 
   negative(): ConstraintTerm {
@@ -67,9 +65,8 @@ export class ConstraintProduct implements ConstraintTerm, Debug {
       return ConstraintExpression.product(this.coefficient - that.coefficient, this.variable);
     } else if (this.variable === that) {
       return ConstraintExpression.product(this.coefficient - 1, this.variable);
-    } else {
-      return ConstraintExpression.sum(this, that.negative());
     }
+    return ConstraintExpression.sum(this, that.negative());
   }
 
   times(scalar: number): ConstraintExpression {

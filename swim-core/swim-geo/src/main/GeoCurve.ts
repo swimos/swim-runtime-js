@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Equals} from "@swim/util";
-import type {Equivalent} from "@swim/util";
 import type {R2Curve} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {GeoShape} from "./GeoShape";
@@ -27,7 +25,7 @@ export interface GeoCurveContext {
 }
 
 /** @public */
-export abstract class GeoCurve extends GeoShape implements Equals, Equivalent {
+export abstract class GeoCurve extends GeoShape {
   abstract interpolateLng(u: number): number;
 
   abstract interpolateLat(u: number): number;
@@ -45,8 +43,6 @@ export abstract class GeoCurve extends GeoShape implements Equals, Equivalent {
   abstract forEachCoordRest<R>(callback: (lng: number, lat: number) => R | void): R | undefined;
   abstract forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void,
                                   thisArg: S): R | undefined;
-
-  abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
   abstract override equals(that: unknown): boolean;
 }

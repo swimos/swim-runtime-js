@@ -29,11 +29,10 @@ export class StringForm extends Form<string> {
   override readonly unit!: string | undefined;
 
   override withUnit(unit: string | undefined): Form<string> {
-    if (unit !== this.unit) {
-      return new StringForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new StringForm(unit);
   }
 
   override mold(object: string, item?: Item): Item {

@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Equals} from "@swim/util";
+import type {Equivalent} from "@swim/util";
 import type {R2Shape} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
 import {GeoPointInit} from "./"; // forward import
@@ -28,7 +29,13 @@ import {GeoTileTuple} from "./"; // forward import
 import {GeoTile} from "./"; // forward import
 
 /** @public */
-export type AnyGeoShape = GeoShape | GeoPointInit | GeoPointTuple | GeoSegmentInit | GeoTileInit | GeoTileTuple | GeoBoxInit;
+export type AnyGeoShape = GeoShape
+                        | GeoPointInit
+                        | GeoPointTuple
+                        | GeoSegmentInit
+                        | GeoTileInit
+                        | GeoTileTuple
+                        | GeoBoxInit;
 
 /** @public */
 export const AnyGeoShape = {
@@ -44,7 +51,10 @@ export const AnyGeoShape = {
 };
 
 /** @public */
-export abstract class GeoShape implements Equals {
+export abstract class GeoShape implements Equals, Equivalent {
+  /** @internal */
+  declare typeid?: string;
+
   abstract readonly lngMin: number;
 
   abstract readonly latMin: number;
@@ -73,6 +83,10 @@ export abstract class GeoShape implements Equals {
     return new GeoBox(this.lngMin, this.latMin, this.lngMax, this.latMax);
   }
 
+  /** @override */
+  abstract equivalentTo(that: unknown, epsilon?: number): boolean
+
+  /** @override */
   abstract equals(that: unknown): boolean;
 
   static fromAny<T extends AnyGeoShape | null | undefined>(value: T): GeoShape | Uninitable<T> {

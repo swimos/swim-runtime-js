@@ -62,18 +62,18 @@ export class LintTask extends LibraryTask {
   readonly eslintrc!: FileRef<this, eslint.ESLint.Options | null>;
 
   override async exec(): Promise<TaskStatus> {
-    let status = TaskStatus.Pending;
     const compileTask = this.getPeerTask(CompileTask);
-    if (compileTask !== null && compileTask.emitCount !== 0) {
-      this.logBegin("linting");
-      const t0 = Date.now();
-      status = await this.lint(compileTask.emittedSourceFiles);
-      const dt = Date.now() - t0;
-      if (status === TaskStatus.Success) {
-        this.logSuccess("linted", dt);
-      } else {
-        this.logFailure("failed to lint");
-      }
+    if (compileTask === null || compileTask.emitCount === 0) {
+      return TaskStatus.Pending;
+    }
+    this.logBegin("linting");
+    const t0 = Date.now();
+    const status = await this.lint(compileTask.emittedSourceFiles);
+    const dt = Date.now() - t0;
+    if (status === TaskStatus.Success) {
+      this.logSuccess("linted", dt);
+    } else {
+      this.logFailure("failed to lint");
     }
     return status;
   }
@@ -98,11 +98,7 @@ export class LintTask extends LibraryTask {
         throw error;
       }
     }
-    if (this.fatalErrorCount === 0) {
-      return TaskStatus.Success;
-    } else {
-      return TaskStatus.Failure;
-    }
+    return this.fatalErrorCount === 0 ? TaskStatus.Success : TaskStatus.Failure;
   }
 
   protected onLintResult(result: eslint.ESLint.LintResult): void {

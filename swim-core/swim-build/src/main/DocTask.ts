@@ -26,28 +26,27 @@ export class DocTask extends PackageTask {
     const packageScope = this.packageScope!;
     const packageConfig = await packageScope.package.getOrLoadIfExists(null);
     const packageScripts = packageConfig !== null ? packageConfig.scripts : void 0;
-    const doScript = packageScripts !== void 0 ? packageScripts.doc : void 0;
-    if (doScript !== void 0) {
-      return new Promise<TaskStatus>((resolve, reject): void => {
-        this.logBegin("documenting");
-        const t0 = Date.now();
-        ChildProcess.exec(doScript!, {cwd: this.baseDir.value}, (error, stdout, stderr) => {
-          const dt = Date.now() - t0;
-          console.log(stdout);
-          if (stderr.length !== 0) {
-            console.error(stderr);
-          }
-          if (error === null) {
-            this.logSuccess("documented", dt);
-            resolve(TaskStatus.Success);
-          } else {
-            this.logFailure("failed to document");
-            resolve(TaskStatus.Failure);
-          }
-        });
-      });
-    } else {
+    const docScript = packageScripts !== void 0 ? packageScripts.doc : void 0;
+    if (docScript === void 0) {
       return TaskStatus.Pending;
     }
+    return new Promise<TaskStatus>((resolve, reject): void => {
+      this.logBegin("documenting");
+      const t0 = Date.now();
+      ChildProcess.exec(docScript!, {cwd: this.baseDir.value}, (error, stdout, stderr) => {
+        const dt = Date.now() - t0;
+        console.log(stdout);
+        if (stderr.length !== 0) {
+          console.error(stderr);
+        }
+        if (error === null) {
+          this.logSuccess("documented", dt);
+          resolve(TaskStatus.Success);
+        } else {
+          this.logFailure("failed to document");
+          resolve(TaskStatus.Failure);
+        }
+      });
+    });
   }
 }

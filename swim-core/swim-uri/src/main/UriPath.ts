@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Lazy} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Strings} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Strings} from "@swim/util";
 import type {Builder} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
@@ -35,6 +36,15 @@ import {Uri} from "./Uri";
 
 /** @public */
 export type AnyUriPath = UriPath | string[] | string;
+
+/** @public */
+export const AnyUriPath = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUriPath {
+    return instance instanceof UriPath
+        || Array.isArray(instance)
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export abstract class UriPath implements HashCode, Compare, Debug, Display {
@@ -67,12 +77,11 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     let i = 0;
     let path: UriPath = this;
     while (!path.isEmpty()) {
-      if (i < index) {
-        i += 1;
-        path = path.tail();
-      } else {
+      if (i >= index) {
         return path.head();
       }
+      i += 1;
+      path = path.tail();
     }
     return void 0;
   }
@@ -100,9 +109,8 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       const tail = path.tail();
       if (tail.isEmpty()) {
         return path.isRelative() ? path.head() : "";
-      } else {
-        path = tail;
       }
+      path = tail;
     } while (true);
   }
 
@@ -110,7 +118,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     const builder = new UriPathBuilder();
     builder.addPath(this.base());
     builder.addSegment(name);
-    return builder.bind();
+    return builder.build();
   }
 
   body(): UriPath {
@@ -122,7 +130,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     do {
       const tail = path.tail();
       if (tail.isEmpty()) {
-        return builder.bind();
+        return builder.build();
       } else if (path.isSegment()) {
         builder.addSegment(path.head());
       } else if (path.isAbsolute()) {
@@ -141,9 +149,8 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       const tail = path.tail();
       if (tail.isEmpty()) {
         return path;
-      } else {
-        path = tail;
       }
+      path = tail;
     } while (true);
   }
 
@@ -161,39 +168,37 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   }
 
   appended(...components: AnyUriPath[]): UriPath {
-    if (arguments.length > 0) {
-      const builder = new UriPathBuilder();
-      builder.addPath(this);
-      builder.push(...components);
-      return builder.bind();
-    } else {
+    if (arguments.length === 0) {
       return this;
     }
+    const builder = new UriPathBuilder();
+    builder.addPath(this);
+    builder.push(...components);
+    return builder.build();
   }
 
   appendedSlash(): UriPath {
     const builder = new UriPathBuilder();
     builder.addPath(this);
     builder.addSlash();
-    return builder.bind();
+    return builder.build();
   }
 
   appendedSegment(segment: string): UriPath {
     const builder = new UriPathBuilder();
     builder.addPath(this);
     builder.addSegment(segment);
-    return builder.bind();
+    return builder.build();
   }
 
   prepended(...components: AnyUriPath[]): UriPath {
-    if (arguments.length > 0) {
-      const builder = new UriPathBuilder();
-      builder.push(...components);
-      builder.addPath(this);
-      return builder.bind();
-    } else {
+    if (arguments.length === 0) {
       return this;
     }
+    const builder = new UriPathBuilder();
+    builder.push(...components);
+    builder.addPath(this);
+    return builder.build();
   }
 
   prependedSlash(): UriPath {
@@ -203,9 +208,8 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   prependedSegment(segment: string): UriPath {
     if (this.isEmpty() || this.isAbsolute()) {
       return UriPath.segment(segment, this);
-    } else {
-      return UriPath.segment(segment, this.prependedSlash());
     }
+    return UriPath.segment(segment, this.prependedSlash());
   }
 
   resolve(that: UriPath): UriPath {
@@ -259,7 +263,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
         path = path.tail();
       }
     }
-    return builder.bind();
+    return builder.build();
   }
 
   merge(that: UriPath): UriPath {
@@ -283,7 +287,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       prev = next;
     } while (true);
     builder.addPath(that);
-    return builder.bind();
+    return builder.build();
   }
 
   unmerge(relative: UriPath, root: UriPath = relative): UriPath {
@@ -350,7 +354,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       builder.addSlash();
     }
     builder.addPath(target);
-    return builder.bind();
+    return builder.build();
   }
 
   toAny(): string[] {
@@ -363,6 +367,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return components;
   }
 
+  /** @override */
   compareTo(that: unknown): number {
     if (that instanceof UriPath) {
       return this.toString().localeCompare(that.toString());
@@ -370,6 +375,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return NaN;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -379,12 +385,15 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Strings.hash(this.toString());
   }
 
+  /** @override */
   abstract debug<T>(output: Output<T>): Output<T>;
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     let path: UriPath = this;
     while (!path.isEmpty()) {
@@ -398,15 +407,21 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return output;
   }
 
+  /** @override */
   abstract toString(): string;
 
+  static builder(): UriPathBuilder {
+    return new UriPathBuilder();
+  }
+
+  @Lazy
   static empty(): UriPath {
-    return UriPathEmpty.Empty;
+    return new UriPathEmpty();
   }
 
   static slash(segment?: string | UriPath): UriPath {
     if (segment === void 0) {
-      return UriPathSlash.Slash;
+      return UriPathSlash.slash();
     } else if (typeof segment === "string") {
       segment = this.segment(segment);
     }
@@ -423,14 +438,12 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   static of(...components: AnyUriPath[]): UriPath {
     const builder = new UriPathBuilder();
     builder.push(...components);
-    return builder.bind();
+    return builder.build();
   }
 
-  static fromAny(value: AnyUriPath): UriPath;
-  static fromAny(value: AnyUriPath | null | undefined): UriPath | null | undefined;
-  static fromAny(value: AnyUriPath | null | undefined): UriPath | null | undefined {
+  static fromAny<T extends AnyUriPath | null | undefined>(value: T): UriPath | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriPath) {
-      return value;
+      return value as UriPath | Uninitable<T>;
     } else if (Array.isArray(value)) {
       return UriPath.of(...value);
     } else if (typeof value === "string") {
@@ -448,10 +461,6 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       parser = Parser.error(Diagnostic.unexpected(input));
     }
     return typeof string === "string" ? parser.bind() : parser;
-  }
-
-  static builder(): UriPathBuilder {
-    return new UriPathBuilder();
   }
 
   @Lazy
@@ -554,9 +563,6 @@ export class UriPathEmpty extends UriPath {
   override toString(): string {
     return "";
   }
-
-  /** @internal */
-  static readonly Empty: UriPathEmpty = new this();
 }
 
 /** @internal */
@@ -662,7 +668,10 @@ export class UriPathSlash extends UriPath {
   }
 
   /** @internal */
-  static readonly Slash: UriPathSlash = new UriPathSlash(UriPathEmpty.Empty);
+  @Lazy
+  static override slash(): UriPathSlash {
+    return new UriPathSlash(UriPath.empty());
+  }
 }
 
 /** @internal */
@@ -812,7 +821,7 @@ export class UriPathBuilder implements Builder<string, UriPath> {
     }
   }
 
-  bind(): UriPath {
+  build(): UriPath {
     this.aliased = 0;
     return this.first;
   }
@@ -896,14 +905,13 @@ export class UriPathBuilder implements Builder<string, UriPath> {
         this.aliased = aliased - 1;
       }
       return first;
-    } else {
-      const last = this.dealias(size - 2);
-      last.setTail(UriPath.empty());
-      this.last = last;
-      this.size = size - 1;
-      this.aliased = aliased - 1;
-      return last.tail();
     }
+    const last = this.dealias(size - 2);
+    last.setTail(UriPath.empty());
+    this.last = last;
+    this.size = size - 1;
+    this.aliased = aliased - 1;
+    return last.tail();
   }
 
   /** @internal */
@@ -948,7 +956,7 @@ export class UriPathBuilder implements Builder<string, UriPath> {
 
   /** @override */
   toString(): string {
-    return this.bind().toString();
+    return this.build().toString();
   }
 }
 
@@ -965,10 +973,10 @@ export class UriPathForm extends Form<UriPath, AnyUriPath> {
   override readonly unit!: UriPath | undefined;
 
   override withUnit(unit: UriPath | undefined): Form<UriPath, AnyUriPath> {
-    if (unit !== this.unit) {
-      return new UriPathForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
+    } else {
+      return new UriPathForm(unit);
     }
   }
 
@@ -1043,7 +1051,7 @@ export class UriPathParser extends Parser<UriPath> {
             builder.addSegment(output.bind());
           }
           if (builder !== void 0) {
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           } else {
             return Parser.done(UriPath.empty());
           }

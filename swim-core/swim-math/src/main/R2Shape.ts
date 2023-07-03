@@ -12,22 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
+import type {Equals} from "@swim/util";
+import type {Equivalent} from "@swim/util";
 import type {R2Function} from "./R2Function";
-import type {R2PointInit} from "./R2Point";
-import type {R2PointTuple} from "./R2Point";
+import {R2PointInit} from "./"; // forward import
+import {R2PointTuple} from "./"; // forward import
 import {R2Point} from "./"; // forward import
-import type {R2SegmentInit} from "./R2Segment";
+import {R2SegmentInit} from "./"; // forward import
 import {R2Segment} from "./"; // forward import
-import type {R2BoxInit} from "./R2Box";
+import {R2Path} from "./"; // forward import
+import {R2BoxInit} from "./"; // forward import
 import {R2Box} from "./"; // forward import
-import type {R2CircleInit} from "./R2Circle";
+import {R2CircleInit} from "./"; // forward import
 import {R2Circle} from "./"; // forward import
 
 /** @public */
-export type AnyR2Shape = R2Shape | R2PointInit | R2PointTuple | R2SegmentInit | R2BoxInit | R2CircleInit;
+export type AnyR2Shape = R2Shape
+                       | R2PointInit
+                       | R2PointTuple
+                       | R2SegmentInit
+                       | R2BoxInit
+                       | R2CircleInit
+                       | string;
 
 /** @public */
-export abstract class R2Shape {
+export const AnyR2Shape = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyR2Shape {
+    return instance instanceof R2Shape
+        || R2PointInit[Symbol.hasInstance](instance)
+        || R2PointTuple[Symbol.hasInstance](instance)
+        || R2SegmentInit[Symbol.hasInstance](instance)
+        || R2BoxInit[Symbol.hasInstance](instance)
+        || R2Circle[Symbol.hasInstance](instance)
+        || typeof instance === "string";
+  },
+};
+
+/** @public */
+export abstract class R2Shape implements Equals, Equivalent {
+  /** @internal */
+  declare typeid?: string;
+
   abstract readonly xMin: number;
 
   abstract readonly yMin: number;
@@ -56,30 +82,28 @@ export abstract class R2Shape {
     return new R2Box(this.xMin, this.yMin, this.xMax, this.yMax);
   }
 
-  static fromAny(value: AnyR2Shape): R2Shape {
+  /** @override */
+  abstract equivalentTo(that: unknown, epsilon?: number): boolean
+
+  /** @override */
+  abstract equals(that: unknown): boolean;
+
+  static fromAny<T extends AnyR2Shape | null | undefined>(value: T): R2Shape | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Shape) {
-      return value;
-    } else if (R2Point.isInit(value)) {
+      return value as R2Shape | Uninitable<T>;
+    } else if (R2PointInit[Symbol.hasInstance](value)) {
       return R2Point.fromInit(value);
-    } else if (R2Point.isTuple(value)) {
+    } else if (R2PointTuple[Symbol.hasInstance](value)) {
       return R2Point.fromTuple(value);
-    } else if (R2Segment.isInit(value)) {
+    } else if (R2SegmentInit[Symbol.hasInstance](value)) {
       return R2Segment.fromInit(value);
-    } else if (R2Box.isInit(value)) {
+    } else if (R2BoxInit[Symbol.hasInstance](value)) {
       return R2Box.fromInit(value);
-    } else if (R2Circle.isInit(value)) {
+    } else if (R2CircleInit[Symbol.hasInstance](value)) {
       return R2Circle.fromInit(value);
+    } else if (typeof value === "string") {
+      return R2Path.parse(value);
     }
     throw new TypeError("" + value);
-  }
-
-  /** @internal */
-  static isAny(value: unknown): value is AnyR2Shape {
-    return value instanceof R2Shape
-        || R2Point.isInit(value)
-        || R2Point.isTuple(value)
-        || R2Segment.isInit(value)
-        || R2Box.isInit(value)
-        || R2Circle.isInit(value);
   }
 }

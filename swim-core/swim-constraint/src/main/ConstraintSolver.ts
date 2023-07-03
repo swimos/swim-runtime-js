@@ -14,7 +14,6 @@
 
 import type {Mutable} from "@swim/util";
 import {Equivalent} from "@swim/util";
-import {ConstraintMap} from "./ConstraintMap";
 import {ConstraintSymbol} from "./ConstraintSymbol";
 import {ConstraintSlack} from "./ConstraintSymbol";
 import {ConstraintError} from "./ConstraintSymbol";
@@ -23,9 +22,9 @@ import type {AnyConstraintExpression} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintVariable} from "./ConstraintVariable";
 import {ConstraintProperty} from "./ConstraintProperty";
-import type {ConstraintRelation} from "./ConstraintRelation";
-import type {AnyConstraintStrength} from "./ConstraintStrength";
-import {ConstraintStrength} from "./ConstraintStrength";
+import type {ConstraintRelation} from "./Constraint";
+import type {AnyConstraintStrength} from "./Constraint";
+import {ConstraintStrength} from "./Constraint";
 import {Constraint} from "./Constraint";
 import type {ConstraintScope} from "./ConstraintScope";
 import {ConstraintRow} from "./ConstraintRow";
@@ -46,23 +45,23 @@ export interface ConstraintVariableBinding {
 /** @public */
 export class ConstraintSolver implements ConstraintScope {
   constructor() {
-    this.constraints = new ConstraintMap();
-    this.constraintVariables = new ConstraintMap();
-    this.rows = new ConstraintMap();
+    this.constraints = new Map();
+    this.constraintVariables = new Map();
+    this.rows = new Map();
     this.infeasible = [];
-    this.objective = new ConstraintRow(this, null, new ConstraintMap(), 0);
+    this.objective = new ConstraintRow(this, null, new Map(), 0);
     this.artificial = null;
-    this.invalidated = new ConstraintMap();
+    this.invalidated = new Map();
   }
 
   /** @internal */
-  readonly constraints: ConstraintMap<Constraint, ConstraintTag>;
+  readonly constraints: Map<Constraint, ConstraintTag>;
 
   /** @internal */
-  readonly constraintVariables: ConstraintMap<ConstraintVariable, ConstraintVariableBinding>;
+  readonly constraintVariables: Map<ConstraintVariable, ConstraintVariableBinding>;
 
   /** @internal */
-  readonly rows: ConstraintMap<ConstraintSymbol, ConstraintRow>;
+  readonly rows: Map<ConstraintSymbol, ConstraintRow>;
 
   /** @internal */
   readonly infeasible: ConstraintSymbol[];
@@ -74,14 +73,12 @@ export class ConstraintSolver implements ConstraintScope {
   readonly artificial: ConstraintRow | null;
 
   /** @internal */
-  readonly invalidated: ConstraintMap<ConstraintSymbol, ConstraintRow | null>;
+  readonly invalidated: Map<ConstraintSymbol, ConstraintRow | null>;
 
   constraint(lhs: AnyConstraintExpression, relation: ConstraintRelation,
              rhs?: AnyConstraintExpression, strength?: AnyConstraintStrength): Constraint {
     lhs = ConstraintExpression.fromAny(lhs);
-    if (rhs !== void 0) {
-      rhs = ConstraintExpression.fromAny(rhs);
-    }
+    rhs = ConstraintExpression.fromAny(rhs);
     const expression = rhs !== void 0 ? lhs.minus(rhs) : lhs;
     if (strength === void 0) {
       strength = ConstraintStrength.Required;
@@ -102,9 +99,7 @@ export class ConstraintSolver implements ConstraintScope {
       return;
     }
 
-    const terms = constraint.expression.terms;
-    for (let i = 0, n = terms.size; i < n; i += 1) {
-      const variable = terms.getEntry(i)![0];
+    for (const variable of constraint.expression.terms.keys()) {
       variable.addConstraintCondition(constraint, this);
     }
 
@@ -126,11 +121,10 @@ export class ConstraintSolver implements ConstraintScope {
     // and the new dummy marker can enter the basis. If the constant is
     // non-zero, then it represents an unsatisfiable constraint.
     if (subject.isInvalid() && row.isDummy()) {
-      if (Math.abs(row.constant) < Equivalent.Epsilon) {
-        subject = tag.marker;
-      } else {
+      if (Math.abs(row.constant) >= Equivalent.Epsilon) {
         throw new Error("unsatisfiable constraint");
       }
+      subject = tag.marker;
     }
 
     // If an entering symbol still isn't found, then the row must be added
@@ -175,9 +169,7 @@ export class ConstraintSolver implements ConstraintScope {
 
     this.removeConstraintRow(constraint);
 
-    const terms = constraint.expression.terms;
-    for (let i = 0, n = terms.size; i < n; i += 1) {
-      const variable = terms.getEntry(i)![0];
+    for (const variable of constraint.expression.terms.keys()) {
       variable.removeConstraintCondition(constraint, this);
     }
   }
@@ -191,7 +183,7 @@ export class ConstraintSolver implements ConstraintScope {
 
     this.willRemoveConstraint(constraint);
 
-    this.constraints.remove(constraint);
+    this.constraints.delete(constraint);
 
     // Remove the error effects from the objective function *before* pivoting,
     // or substitutions into the objective will lead to incorrect solver results.
@@ -200,12 +192,13 @@ export class ConstraintSolver implements ConstraintScope {
     // If the marker is basic, simply drop the row. Otherwise pivot the marker
     // into the basis and then drop the row.
     const marker = tag.marker;
-    if (this.rows.remove(marker) === void 0) {
+    if (!this.rows.delete(marker)) {
       const leaving = this.getMarkerLeavingSymbol(marker);
       if (leaving.isInvalid()) {
         throw new Error("failed to find leaving row");
       }
-      const row = this.rows.remove(leaving)!;
+      const row = this.rows.get(leaving)!;
+      this.rows.delete(leaving);
       row.solveForEx(leaving, marker);
       this.substitute(marker, row);
     }
@@ -291,7 +284,7 @@ export class ConstraintSolver implements ConstraintScope {
 
     this.willRemoveConstraintVariable(variable);
 
-    this.constraintVariables.remove(variable);
+    this.constraintVariables.delete(variable);
     this.removeConstraintRow(binding.constraint);
 
     this.didRemoveConstraintVariable(variable);
@@ -310,50 +303,50 @@ export class ConstraintSolver implements ConstraintScope {
     if (binding === void 0) {
       throw new Error("unbound variable");
     }
-
     const oldState = binding.state;
-    if (oldState !== newState) {
-      binding.state = newState;
-      const delta = newState - oldState;
+    if (oldState === newState) {
+      return;
+    }
 
-      this.willSetConstraintVariable(variable, newState, oldState);
+    binding.state = newState;
+    const delta = newState - oldState;
 
-      // Check first if the positive error variable is basic.
-      const marker = binding.tag.marker;
-      let row = this.rows.get(marker);
-      if (row !== void 0) {
-        if (row.add(-delta) < 0) {
-          this.infeasible.push(marker);
-        }
-        this.dualOptimize();
-        return;
-      }
+    this.willSetConstraintVariable(variable, newState, oldState);
 
-      // Check next if the negative error variable is basic.
-      const other = binding.tag.other;
-      row = this.rows.get(other);
-      if (row !== void 0) {
-        if (row.add(delta) < 0) {
-          this.infeasible.push(other);
-        }
-        this.dualOptimize();
-        return;
-      }
-
-      // Otherwise update each row where the error variables exist.
-      for (let i = 0, n = this.rows.size; i < n; i += 1) {
-        const [symbol, row] = this.rows.getEntry(i)!;
-        const coefficient = row.coefficientFor(marker);
-        if (coefficient !== 0 && row.add(delta * coefficient) < 0 && !symbol.isExternal()) {
-          this.infeasible.push(symbol);
-        }
+    // Check first if the positive error variable is basic.
+    const marker = binding.tag.marker;
+    let row = this.rows.get(marker);
+    if (row !== void 0) {
+      if (row.add(-delta) < 0) {
+        this.infeasible.push(marker);
       }
       this.dualOptimize();
-
-      this.didSetConstraintVariable(variable, newState, oldState);
-
-      this.updateSolution();
+      return;
     }
+
+    // Check next if the negative error variable is basic.
+    const other = binding.tag.other;
+    row = this.rows.get(other);
+    if (row !== void 0) {
+      if (row.add(delta) < 0) {
+        this.infeasible.push(other);
+      }
+      this.dualOptimize();
+      return;
+    }
+
+    // Otherwise update each row where the error variables exist.
+    for (const [symbol, row] of this.rows) {
+      const coefficient = row.coefficientFor(marker);
+      if (coefficient !== 0 && row.add(delta * coefficient) < 0 && !symbol.isExternal()) {
+        this.infeasible.push(symbol);
+      }
+    }
+    this.dualOptimize();
+
+    this.didSetConstraintVariable(variable, newState, oldState);
+
+    this.updateSolution();
   }
 
   protected willSetConstraintVariable(variable: ConstraintVariable, newState: number, oldState: number): void {
@@ -374,14 +367,14 @@ export class ConstraintSolver implements ConstraintScope {
   /** @internal */
   updateSolution(): void {
     const invalidated = this.invalidated;
-    if (!invalidated.isEmpty()) {
-      (this as Mutable<this>).invalidated = new ConstraintMap();
-      for (let i = 0, n = invalidated.size; i < n; i += 1) {
-        const symbol = invalidated.getEntry(i)![0];
-        const row = this.rows.get(symbol);
-        if (row !== void 0) {
-          symbol.updateConstraintSolution(row.constant);
-        }
+    if (invalidated.size === 0) {
+      return;
+    }
+    (this as Mutable<this>).invalidated = new Map();
+    for (const symbol of invalidated.keys()) {
+      const row = this.rows.get(symbol);
+      if (row !== void 0) {
+        symbol.updateConstraintSolution(row.constant);
       }
     }
   }
@@ -398,19 +391,18 @@ export class ConstraintSolver implements ConstraintScope {
   // be inverted so the constant becomes positive.
   private createRow(constraint: Constraint): {row: ConstraintRow, tag: ConstraintTag} {
     const expression = constraint.expression;
-    const row = new ConstraintRow(this, null, new ConstraintMap(), expression.constant);
+    const row = new ConstraintRow(this, null, new Map(), expression.constant);
 
     // Substitute the current basic variables into the row.
-    const terms = expression.terms;
-    for (let i = 0, n = terms.size; i < n; i += 1) {
-      const [variable, coefficient] = terms.getEntry(i)!;
-      if (Math.abs(coefficient) >= Equivalent.Epsilon) {
-        const basic = this.rows.get(variable);
-        if (basic !== void 0) {
-          row.insertRow(basic, coefficient);
-        } else {
-          row.insertSymbol(variable, coefficient);
-        }
+    for (const [variable, coefficient] of expression.terms) {
+      if (Math.abs(coefficient) < Equivalent.Epsilon) {
+        continue;
+      }
+      const basic = this.rows.get(variable);
+      if (basic !== void 0) {
+        row.insertRow(basic, coefficient);
+      } else {
+        row.insertSymbol(variable, coefficient);
       }
     }
 
@@ -418,7 +410,7 @@ export class ConstraintSolver implements ConstraintScope {
     const objective = this.objective;
     const relation = constraint.relation;
     const strength = constraint.strength;
-    const tag = {marker: ConstraintSymbol.invalid, other: ConstraintSymbol.invalid};
+    const tag = {marker: ConstraintSymbol.invalid(), other: ConstraintSymbol.invalid()};
     if (relation === "le" || relation === "ge") {
       const coefficient = relation === "le" ? 1 : -1;
       const slack = new ConstraintSlack();
@@ -430,21 +422,19 @@ export class ConstraintSolver implements ConstraintScope {
         row.insertSymbol(error, -coefficient);
         objective.insertSymbol(error, strength);
       }
+    } else if (strength < ConstraintStrength.Required) {
+      const eplus = new ConstraintError();
+      const eminus = new ConstraintError();
+      tag.marker = eplus;
+      tag.other = eminus;
+      row.insertSymbol(eplus, -1); // v = eplus - eminus
+      row.insertSymbol(eminus, 1); // v - eplus + eminus = 0
+      objective.insertSymbol(eplus, strength);
+      objective.insertSymbol(eminus, strength);
     } else {
-      if (strength < ConstraintStrength.Required) {
-        const eplus = new ConstraintError();
-        const eminus = new ConstraintError();
-        tag.marker = eplus;
-        tag.other = eminus;
-        row.insertSymbol(eplus, -1); // v = eplus - eminus
-        row.insertSymbol(eminus, 1); // v - eplus + eminus = 0
-        objective.insertSymbol(eplus, strength);
-        objective.insertSymbol(eminus, strength);
-      } else {
-        const dummy = new ConstraintDummy();
-        tag.marker = dummy;
-        row.insertSymbol(dummy);
-      }
+      const dummy = new ConstraintDummy();
+      tag.marker = dummy;
+      row.insertSymbol(dummy);
     }
 
     // Ensure the row has a positive constant.
@@ -467,8 +457,7 @@ export class ConstraintSolver implements ConstraintScope {
   //
   // If a subject cannot be found, an invalid symbol will be returned.
   private chooseSubject(row: ConstraintRow, tag: ConstraintTag): ConstraintSymbol {
-    for (let i = 0, n = row.cells.size; i < n; i += 1) {
-      const symbol = row.cells.getEntry(i)![0];
+    for (const symbol of row.cells.keys()) {
       if (symbol.isExternal()) {
         return symbol;
       }
@@ -483,7 +472,7 @@ export class ConstraintSolver implements ConstraintScope {
         return tag.other;
       }
     }
-    return ConstraintSymbol.invalid;
+    return ConstraintSymbol.invalid();
   }
 
   // Adds the row to the tableau using an artificial variable; returns `false`
@@ -502,8 +491,9 @@ export class ConstraintSolver implements ConstraintScope {
 
     // If the artificial variable is basic, pivot the row so that
     // it becomes non-basic. If the row is constant, exit early.
-    const basic = this.rows.remove(artificial);
+    const basic = this.rows.get(artificial);
     if (basic !== void 0) {
+      this.rows.delete(artificial);
       if (basic.isConstant()) {
         return success;
       }
@@ -518,8 +508,8 @@ export class ConstraintSolver implements ConstraintScope {
     }
 
     // Remove the artificial variable from the tableau.
-    for (let i = 0, n = this.rows.size; i < n; i += 1) {
-      this.rows.getEntry(i)![1].removeSymbol(artificial);
+    for (const row of this.rows.values()) {
+      row.removeSymbol(artificial);
     }
     this.objective.removeSymbol(artificial);
     return success;
@@ -528,8 +518,7 @@ export class ConstraintSolver implements ConstraintScope {
   // Substitutes all instances of the parametric symbol in the tableau
   // and the objective function with the given row.
   private substitute(symbol: ConstraintSymbol, row: ConstraintRow): void {
-    for (let i = 0, n = this.rows.size; i < n; i += 1) {
-      const [key, value] = this.rows.getEntry(i)!;
+    for (const [key, value] of this.rows) {
       value.substitute(symbol, row);
       if (value.constant < 0 && !key.isExternal()) {
         this.infeasible.push(key);
@@ -556,7 +545,8 @@ export class ConstraintSolver implements ConstraintScope {
         throw new Error("objective is unbounded");
       }
       // Pivot the entering symbol into the basis.
-      const row = this.rows.remove(leaving)!;
+      const row = this.rows.get(leaving)!;
+      this.rows.delete(leaving);
       row.setSymbol(entering);
       row.solveForEx(leaving, entering);
       this.substitute(entering, row);
@@ -574,18 +564,19 @@ export class ConstraintSolver implements ConstraintScope {
     let leaving: ConstraintSymbol | undefined;
     while ((leaving = this.infeasible.pop(), leaving !== void 0)) {
       const row = this.rows.get(leaving);
-      if (row !== void 0 && row.constant < 0) {
-        const entering = this.getDualEnteringSymbol(row);
-        if (entering.isInvalid()) {
-          throw new Error("dual optimize failed");
-        }
-        // Pivot the entering symbol into the basis.
-        this.rows.remove(leaving);
-        row.setSymbol(entering);
-        row.solveForEx(leaving, entering);
-        this.substitute(entering, row);
-        this.rows.set(entering, row);
+      if (row === void 0 || row.constant >= 0) {
+        continue;
       }
+      const entering = this.getDualEnteringSymbol(row);
+      if (entering.isInvalid()) {
+        throw new Error("dual optimize failed");
+      }
+      // Pivot the entering symbol into the basis.
+      this.rows.delete(leaving);
+      row.setSymbol(entering);
+      row.solveForEx(leaving, entering);
+      this.substitute(entering, row);
+      this.rows.set(entering, row);
     }
   }
 
@@ -595,13 +586,12 @@ export class ConstraintSolver implements ConstraintScope {
   // has a coefficient less than zero. If no symbol meets the criteria then the
   // objective function is at a minimum, and an invalid symbol is returned.
   private getEnteringSymbol(objective: ConstraintRow): ConstraintSymbol {
-    for (let i = 0, n = objective.cells.size; i < n; i += 1) {
-      const [symbol, value] = objective.cells.getEntry(i)!;
+    for (const [symbol, value] of objective.cells) {
       if (value < 0 && !symbol.isDummy()) {
         return symbol;
       }
     }
-    return ConstraintSymbol.invalid;
+    return ConstraintSymbol.invalid();
   }
 
   // Returns the entering symbol for the dual optimize operation.
@@ -612,16 +602,16 @@ export class ConstraintSolver implements ConstraintScope {
   // the criteria, an invalid symbol is returned.
   private getDualEnteringSymbol(row: ConstraintRow): ConstraintSymbol {
     let ratio = Number.MAX_VALUE;
-    let entering = ConstraintSymbol.invalid;
-    for (let i = 0, n = row.cells.size; i < n; i += 1) {
-      const [symbol, value] = row.cells.getEntry(i)!;
-      if (value > 0 && !symbol.isDummy()) {
-        const coefficient = this.objective.coefficientFor(symbol);
-        const coratio = coefficient / value;
-        if (coratio < ratio) {
-          ratio = coratio;
-          entering = symbol;
-        }
+    let entering = ConstraintSymbol.invalid();
+    for (const [symbol, value] of row.cells) {
+      if (value <= 0 || symbol.isDummy()) {
+        continue;
+      }
+      const coefficient = this.objective.coefficientFor(symbol);
+      const coratio = coefficient / value;
+      if (coratio < ratio) {
+        ratio = coratio;
+        entering = symbol;
       }
     }
     return entering;
@@ -632,18 +622,19 @@ export class ConstraintSolver implements ConstraintScope {
   // objective function is unbounded.
   private getLeavingSymbol(entering: ConstraintSymbol): ConstraintSymbol {
     let ratio = Number.MAX_VALUE;
-    let found = ConstraintSymbol.invalid;
-    for (let i = 0, n = this.rows.size; i < n; i += 1) {
-      const [symbol, row] = this.rows.getEntry(i)!;
-      if (!symbol.isExternal()) {
-        const coefficient = row.coefficientFor(entering);
-        if (coefficient < 0) {
-          const coratio = -row.constant / coefficient;
-          if (coratio < ratio) {
-            ratio = coratio;
-            found = symbol;
-          }
-        }
+    let found = ConstraintSymbol.invalid();
+    for (const [symbol, row] of this.rows) {
+      if (symbol.isExternal()) {
+        continue;
+      }
+      const coefficient = row.coefficientFor(entering);
+      if (coefficient >= 0) {
+        continue;
+      }
+      const coratio = -row.constant / coefficient;
+      if (coratio < ratio) {
+        ratio = coratio;
+        found = symbol;
       }
     }
     return found;
@@ -652,7 +643,7 @@ export class ConstraintSolver implements ConstraintScope {
   // Returns a symbol corresponding to a basic row which holds the given marker
   // variable. The row will be chosen according to the following precedence:
   //
-  // 1) The row with a restricted basic varible and a negative coefficient
+  // 1) The row with a restricted basic variable and a negative coefficient
   //    for the marker with the smallest ratio of `-constant / coefficient`.
   // 2) The row with a restricted basic variable and the smallest ratio of
   //    `constant / coefficient`.
@@ -664,11 +655,10 @@ export class ConstraintSolver implements ConstraintScope {
   private getMarkerLeavingSymbol(marker: ConstraintSymbol): ConstraintSymbol {
     let r1 = Number.MAX_VALUE;
     let r2 = Number.MAX_VALUE;
-    let first = ConstraintSymbol.invalid;
-    let second = ConstraintSymbol.invalid;
-    let third = ConstraintSymbol.invalid;
-    for (let i = 0, n = this.rows.size; i < n; i += 1) {
-      const [symbol, row] = this.rows.getEntry(i)!;
+    let first = ConstraintSymbol.invalid();
+    let second = ConstraintSymbol.invalid();
+    let third = ConstraintSymbol.invalid();
+    for (const [symbol, row] of this.rows) {
       const coefficient = row.coefficientFor(marker);
       if (coefficient === 0) {
         continue;
@@ -721,12 +711,11 @@ export class ConstraintSolver implements ConstraintScope {
   // Returns the first Slack or Error symbol in the row. If no such symbol
   // is present, an invalid symbol will be returned.
   private anyPivotableSymbol(row: ConstraintRow): ConstraintSymbol {
-    for (let i = 0, n = row.cells.size; i < n; i += 1) {
-      const symbol = row.cells.getEntry(i)![0];
+    for (const symbol of row.cells.keys()) {
       if (symbol instanceof ConstraintSlack || symbol instanceof ConstraintError) {
         return symbol;
       }
     }
-    return ConstraintSymbol.invalid;
+    return ConstraintSymbol.invalid();
   }
 }

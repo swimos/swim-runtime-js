@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {ConstraintId} from "./ConstraintId";
-
-export {ConstraintMap} from "./ConstraintMap";
-
 export {ConstraintSymbol} from "./ConstraintSymbol";
 export {ConstraintSlack} from "./ConstraintSymbol";
 export {ConstraintDummy} from "./ConstraintSymbol";
 export {ConstraintError} from "./ConstraintSymbol";
 export {ConstraintInvalid} from "./ConstraintSymbol";
 
-export type {AnyConstraintExpression} from "./ConstraintExpression";
+export {AnyConstraintExpression} from "./ConstraintExpression";
 export {ConstraintExpression} from "./ConstraintExpression";
 
 export {ConstraintSum} from "./ConstraintSum";
@@ -40,10 +36,10 @@ export type {ConstraintAnimatorDescriptor} from "./ConstraintAnimator";
 export type {ConstraintAnimatorClass} from "./ConstraintAnimator";
 export {ConstraintAnimator} from "./ConstraintAnimator";
 
-export type {ConstraintRelation} from "./ConstraintRelation";
-export type {AnyConstraintStrength} from "./ConstraintStrength";
-export type {ConstraintStrengthInit} from "./ConstraintStrength";
-export {ConstraintStrength} from "./ConstraintStrength";
+export type {ConstraintRelation} from "./Constraint";
+export type {AnyConstraintStrength} from "./Constraint";
+export type {ConstraintStrengthInit} from "./Constraint";
+export {ConstraintStrength} from "./Constraint";
 export {Constraint} from "./Constraint";
 
 export {ConstraintGroup} from "./ConstraintGroup";

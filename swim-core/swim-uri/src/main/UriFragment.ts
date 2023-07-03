@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Strings} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Strings} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
@@ -30,6 +32,14 @@ import {Utf8} from "@swim/codec";
 
 /** @public */
 export type AnyUriFragment = UriFragment | string;
+
+/** @public */
+export const AnyUriFragment = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUriFragment {
+    return instance instanceof UriFragment
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class UriFragment implements HashCode, Compare, Debug, Display {
@@ -49,6 +59,7 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     return this.identifier;
   }
 
+  /** @override */
   compareTo(that: UriFragment): number {
     if (that instanceof UriFragment) {
       return this.toString().localeCompare(that.toString());
@@ -56,6 +67,7 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     return NaN;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -65,10 +77,12 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Strings.hash(this.identifier);
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("UriFragment").write(46/*'.'*/);
     if (this.isDefined()) {
@@ -80,6 +94,7 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     return output;
   }
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     const stringValue = this.stringValue;
     if (stringValue !== void 0) {
@@ -93,6 +108,7 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
   /** @internal */
   readonly stringValue: string | undefined;
 
+  /** @override */
   toString(): string {
     let stringValue = this.stringValue;
     if (stringValue === void 0) {
@@ -102,11 +118,9 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     return stringValue;
   }
 
-  /** @internal */
-  static readonly Undefined: UriFragment = new this(void 0);
-
+  @Lazy
   static undefined(): UriFragment {
-    return this.Undefined;
+    return new UriFragment(void 0);
   }
 
   static create(identifier: string | undefined): UriFragment {
@@ -116,11 +130,9 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     return new UriFragment(identifier);
   }
 
-  static fromAny(value: AnyUriFragment): UriFragment;
-  static fromAny(value: AnyUriFragment | null | undefined): UriFragment | null | undefined;
-  static fromAny(value: AnyUriFragment | null | undefined): UriFragment | null | undefined {
+  static fromAny<T extends AnyUriFragment | null | undefined>(value: T): UriFragment | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriFragment) {
-      return value;
+      return value as UriFragment | Uninitable<T>;
     } else if (typeof value === "string") {
       return UriFragment.parse(value);
     }

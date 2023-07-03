@@ -62,14 +62,14 @@ export class BlockParser<I, V> extends Parser<V> {
             step = 7;
           } else {
             if (builder !== void 0) {
-              return Parser.done(builder.bind());
+              return Parser.done(builder.build());
             } else {
               return Parser.done(recon.absent());
             }
           }
         } else if (input.isDone()) {
           if (builder !== void 0) {
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           } else {
             return Parser.done(recon.absent());
           }
@@ -103,7 +103,7 @@ export class BlockParser<I, V> extends Parser<V> {
           }
         } else if (input.isDone()) {
           builder!.push(recon.item(keyParser!.bind()));
-          return Parser.done(builder!.bind());
+          return Parser.done(builder!.build());
         }
       }
       if (step === 4) {
@@ -114,7 +114,7 @@ export class BlockParser<I, V> extends Parser<V> {
           step = 5;
         } else if (input.isDone()) {
           builder!.push(recon.slot(keyParser!.bind()));
-          return Parser.done(builder!.bind());
+          return Parser.done(builder!.build());
         }
       }
       if (step === 5) {
@@ -146,10 +146,10 @@ export class BlockParser<I, V> extends Parser<V> {
             input = input.step();
             step = 7;
           } else {
-            return Parser.done(builder!.bind());
+            return Parser.done(builder!.build());
           }
         } else if (input.isDone()) {
-          return Parser.done(builder!.bind());
+          return Parser.done(builder!.build());
         }
       }
       if (step === 7) {

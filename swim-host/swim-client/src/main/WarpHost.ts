@@ -280,16 +280,16 @@ export abstract class WarpHost extends Component {
 
   /** @internal */
   setAuthenticated(authenticated: boolean): void {
-    if (authenticated !== ((this.flags & WarpHost.AuthenticatedFlag) !== 0)) {
-      if (authenticated) {
-        this.setFlags(this.flags | WarpHost.AuthenticatedFlag);
-      } else {
-        this.setFlags(this.flags & ~WarpHost.AuthenticatedFlag);
-      }
-      this.willSetAuthenticated(authenticated);
-      this.onSetAuthenticated(authenticated);
-      this.didSetAuthenticated(authenticated);
+    if (authenticated === ((this.flags & WarpHost.AuthenticatedFlag) !== 0)) {
+      return;
+    } else if (authenticated) {
+      this.setFlags(this.flags | WarpHost.AuthenticatedFlag);
+    } else {
+      this.setFlags(this.flags & ~WarpHost.AuthenticatedFlag);
     }
+    this.willSetAuthenticated(authenticated);
+    this.onSetAuthenticated(authenticated);
+    this.didSetAuthenticated(authenticated);
   }
 
   protected willSetAuthenticated(authenticated: boolean): void {
@@ -319,16 +319,16 @@ export abstract class WarpHost extends Component {
 
   /** @internal */
   setDeauthenticated(deauthenticated: boolean): void {
-    if (deauthenticated !== ((this.flags & WarpHost.DeauthenticatedFlag) !== 0)) {
-      if (deauthenticated) {
-        this.setFlags(this.flags | WarpHost.DeauthenticatedFlag);
-      } else {
-        this.setFlags(this.flags & ~WarpHost.DeauthenticatedFlag);
-      }
-      this.willSetDeauthenticated(deauthenticated);
-      this.onSetDeauthenticated(deauthenticated);
-      this.didSetDeauthenticated(deauthenticated);
+    if (deauthenticated === ((this.flags & WarpHost.DeauthenticatedFlag) !== 0)) {
+      return;
+    } else if (deauthenticated) {
+      this.setFlags(this.flags | WarpHost.DeauthenticatedFlag);
+    } else {
+      this.setFlags(this.flags & ~WarpHost.DeauthenticatedFlag);
     }
+    this.willSetDeauthenticated(deauthenticated);
+    this.onSetDeauthenticated(deauthenticated);
+    this.didSetDeauthenticated(deauthenticated);
   }
 
   protected willSetDeauthenticated(deauthenticated: boolean): void {
@@ -392,15 +392,16 @@ export abstract class WarpHost extends Component {
 
   /** @internal */
   unlinkDownlink(downlink: WarpDownlinkModel): void {
-    if (this.connected) {
-      const nodeUri = this.resolve(downlink.nodeUri);
-      const laneUri = downlink.laneUri;
-      const nodeDownlinks = this.downlinks[nodeUri.toString()];
-      if (nodeDownlinks !== void 0 && nodeDownlinks[laneUri.toString()] !== void 0) {
-        const request = new UnlinkRequest(this.unresolve(nodeUri), laneUri, Value.absent());
-        downlink.onUnlinkRequest(request, this);
-        this.push(request);
-      }
+    if (!this.connected) {
+      return;
+    }
+    const nodeUri = this.resolve(downlink.nodeUri);
+    const laneUri = downlink.laneUri;
+    const nodeDownlinks = this.downlinks[nodeUri.toString()];
+    if (nodeDownlinks !== void 0 && nodeDownlinks[laneUri.toString()] !== void 0) {
+      const request = new UnlinkRequest(this.unresolve(nodeUri), laneUri, Value.absent());
+      downlink.onUnlinkRequest(request, this);
+      this.push(request);
     }
   }
 
@@ -484,15 +485,16 @@ export abstract class WarpHost extends Component {
     const nodeUri = this.resolve(downlink.nodeUri);
     const laneUri = downlink.laneUri;
     const nodeDownlinks = this.downlinks[nodeUri.toString()];
-    if (nodeDownlinks !== void 0 && nodeDownlinks[laneUri.toString()] !== void 0) {
-      (this as Mutable<this>).downlinkCount -= 1;
-      delete nodeDownlinks[laneUri.toString()];
-      if (Objects.isEmpty(nodeDownlinks)) {
-        delete this.downlinks[nodeUri.toString()];
-      }
-      if (this.downlinkCount === 0) {
-        this.idleTimer.watch();
-      }
+    if (nodeDownlinks === void 0 || nodeDownlinks[laneUri.toString()] === void 0) {
+      return;
+    }
+    (this as Mutable<this>).downlinkCount -= 1;
+    delete nodeDownlinks[laneUri.toString()];
+    if (Objects.isEmpty(nodeDownlinks)) {
+      delete this.downlinks[nodeUri.toString()];
+    }
+    if (this.downlinkCount === 0) {
+      this.idleTimer.watch();
     }
   }
 
@@ -555,13 +557,15 @@ export abstract class WarpHost extends Component {
     const nodeUri = this.resolve(message.node);
     const laneUri = message.lane;
     const nodeDownlinks = this.downlinks[nodeUri.toString()];
-    if (nodeDownlinks !== void 0) {
-      const downlink = nodeDownlinks[laneUri.toString()];
-      if (downlink !== void 0) {
-        const resolvedMessage = message.withNode(nodeUri);
-        downlink.onEventMessage(resolvedMessage, this);
-      }
+    if (nodeDownlinks === void 0) {
+      return;
     }
+    const downlink = nodeDownlinks[laneUri.toString()];
+    if (downlink === void 0) {
+      return;
+    }
+    const resolvedMessage = message.withNode(nodeUri);
+    downlink.onEventMessage(resolvedMessage, this);
   }
 
   protected onCommandMessage(message: CommandMessage): void {
@@ -576,13 +580,15 @@ export abstract class WarpHost extends Component {
     const nodeUri = this.resolve(response.node);
     const laneUri = response.lane;
     const nodeDownlinks = this.downlinks[nodeUri.toString()];
-    if (nodeDownlinks !== void 0) {
-      const downlink = nodeDownlinks[laneUri.toString()];
-      if (downlink !== void 0) {
-        const resolvedResponse = response.withNode(nodeUri);
-        downlink.onLinkedResponse(resolvedResponse, this);
-      }
+    if (nodeDownlinks === void 0) {
+      return;
     }
+    const downlink = nodeDownlinks[laneUri.toString()];
+    if (downlink === void 0) {
+      return;
+    }
+    const resolvedResponse = response.withNode(nodeUri);
+    downlink.onLinkedResponse(resolvedResponse, this);
   }
 
   protected onSyncRequest(request: SyncRequest): void {
@@ -593,13 +599,15 @@ export abstract class WarpHost extends Component {
     const nodeUri = this.resolve(response.node);
     const laneUri = response.lane;
     const nodeDownlinks = this.downlinks[nodeUri.toString()];
-    if (nodeDownlinks !== void 0) {
-      const downlink = nodeDownlinks[laneUri.toString()];
-      if (downlink !== void 0) {
-        const resolvedResponse = response.withNode(nodeUri);
-        downlink.onSyncedResponse(resolvedResponse, this);
-      }
+    if (nodeDownlinks === void 0) {
+      return;
     }
+    const downlink = nodeDownlinks[laneUri.toString()];
+    if (downlink === void 0) {
+      return;
+    }
+    const resolvedResponse = response.withNode(nodeUri);
+    downlink.onSyncedResponse(resolvedResponse, this);
   }
 
   protected onUnlinkRequest(request: UnlinkRequest): void {
@@ -610,13 +618,15 @@ export abstract class WarpHost extends Component {
     const nodeUri = this.resolve(response.node);
     const laneUri = response.lane;
     const nodeDownlinks = this.downlinks[nodeUri.toString()];
-    if (nodeDownlinks !== void 0) {
-      const downlink = nodeDownlinks[laneUri.toString()];
-      if (downlink !== void 0) {
-        const resolvedResponse = response.withNode(nodeUri);
-        downlink.onUnlinkedResponse(resolvedResponse, this);
-      }
+    if (nodeDownlinks === void 0) {
+      return;
     }
+    const downlink = nodeDownlinks[laneUri.toString()];
+    if (downlink === void 0) {
+      return;
+    }
+    const resolvedResponse = response.withNode(nodeUri);
+    downlink.onUnlinkedResponse(resolvedResponse, this);
   }
 
   protected onAuthRequest(request: AuthRequest): void {

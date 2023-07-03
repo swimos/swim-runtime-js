@@ -46,30 +46,31 @@ export class BundleTask extends LibraryTask {
       return rollupConfig;
     },
     willSetValue(path: string, rollupConfig: rollup.RollupOptions[] | null): void {
-      if (rollupConfig !== null) {
-        this.owner.caches.length = rollupConfig.length;
-        for (let i = 0; i < rollupConfig.length; i += 1) {
-          const rollupOptions = rollupConfig[i]!;
-          rollupOptions.cache = this.owner.caches[i];
-        }
+      if (rollupConfig === null) {
+        return;
+      }
+      this.owner.caches.length = rollupConfig.length;
+      for (let i = 0; i < rollupConfig.length; i += 1) {
+        const rollupOptions = rollupConfig[i]!;
+        rollupOptions.cache = this.owner.caches[i];
       }
     },
   })
   readonly rollupConfig!: FileRef<this, rollup.RollupOptions[] | null>;
 
   override async exec(): Promise<TaskStatus> {
-    let status = TaskStatus.Pending;
     const rollupConfig = await this.rollupConfig.getOrLoadIfExists(null);
-    if (rollupConfig !== null) {
-      this.logBegin("bundling");
-      const t0 = Date.now();
-      status = await this.bundle(rollupConfig);
-      const dt = Date.now() - t0;
-      if (status === TaskStatus.Success) {
-        this.logSuccess("bundled", dt);
-      } else {
-        this.logFailure("failed to bundle");
-      }
+    if (rollupConfig === null) {
+      return TaskStatus.Pending;
+    }
+    this.logBegin("bundling");
+    const t0 = Date.now();
+    const status = await this.bundle(rollupConfig);
+    const dt = Date.now() - t0;
+    if (status === TaskStatus.Success) {
+      this.logSuccess("bundled", dt);
+    } else {
+      this.logFailure("failed to bundle");
     }
     return status;
   }

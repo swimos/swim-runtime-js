@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {AnyItem} from "./Item";
 import {Item} from "./Item";
 import {Field} from "./Field";
@@ -1115,11 +1116,9 @@ export class RecordMap extends Record {
     return void 0;
   }
 
-  /** @internal */
-  static readonly Empty: RecordMap = new this(null, null, 0, 0, Record.AliasedFlag | Record.ImmutableFlag);
-
+  @Lazy
   static override empty(): RecordMap {
-    return this.Empty;
+    return new RecordMap(null, null, 0, 0, Record.AliasedFlag | Record.ImmutableFlag);
   }
 
   static override create(initialCapacity?: number): RecordMap {

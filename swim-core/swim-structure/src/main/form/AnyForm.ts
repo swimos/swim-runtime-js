@@ -29,11 +29,10 @@ export class AnyForm extends Form<AnyItem> {
   override readonly unit!: AnyItem | undefined;
 
   override withUnit(unit: AnyItem | undefined): Form<AnyItem> {
-    if (unit !== this.unit) {
-      return new AnyForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new AnyForm(unit);
   }
 
   override mold(object: AnyItem, item?: Item): Item {

@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ConstraintMap} from "./ConstraintMap";
+import type {Uninitable} from "@swim/util";
+import {Lazy} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {ConstraintVariable} from "./ConstraintVariable";
 import {ConstraintSum} from "./"; // forward import
 import {ConstraintTerm} from "./"; // forward import
@@ -23,8 +25,16 @@ import {ConstraintConstant} from "./"; // forward import
 export type AnyConstraintExpression = ConstraintExpression | number;
 
 /** @public */
+export const AnyConstraintExpression = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyConstraintExpression {
+    return ConstraintExpression[Symbol.hasInstance](instance)
+        || typeof instance === "number";
+  },
+};
+
+/** @public */
 export interface ConstraintExpression {
-  readonly terms: ConstraintMap<ConstraintVariable, number>;
+  readonly terms: ReadonlyMap<ConstraintVariable, number>;
 
   readonly constant: number;
 
@@ -42,74 +52,64 @@ export interface ConstraintExpression {
 }
 
 /** @public */
-export const ConstraintExpression = (function () {
-  const ConstraintExpression = {} as {
-    fromAny(value: AnyConstraintExpression): ConstraintExpression;
+export const ConstraintExpression = {
+  zero: Lazy(function (): ConstraintConstant {
+    return new ConstraintConstant(0);
+  }),
 
-    sum(...expressions: AnyConstraintExpression[]): ConstraintSum;
-
-    product(coefficient: number, variable: ConstraintVariable): ConstraintProduct;
-
-    constant(value: number): ConstraintConstant;
-
-    readonly zero: ConstraintConstant; // defined by ConstraintConstant
-  };
-
-  ConstraintExpression.fromAny = function (value: AnyConstraintExpression): ConstraintExpression {
-    if (typeof value === "number") {
-      return ConstraintExpression.constant(value);
-    } else {
-      return value;
+  constant(value: number): ConstraintConstant {
+    if (value === 0) {
+      return ConstraintExpression.zero();
     }
-  };
+    return new ConstraintConstant(value);
+  },
 
-  ConstraintExpression.sum = function (...expressions: AnyConstraintExpression[]): ConstraintSum {
-    const terms = new ConstraintMap<ConstraintVariable, number>();
+  sum(...expressions: AnyConstraintExpression[]): ConstraintSum {
+    const terms = new Map<ConstraintVariable, number>();
     let constant = 0;
-    for (let i = 0, n = expressions.length; i < n; i += 1) {
+    for (let i = 0; i < expressions.length; i += 1) {
       const expression = expressions[i]!;
       if (typeof expression === "number") {
         constant += expression;
-      } else if (ConstraintTerm.is(expression)) {
+      } else if (ConstraintTerm[Symbol.hasInstance](expression)) {
         const variable = expression.variable;
-        if (variable !== null) {
-          const field = terms.getField(variable);
-          if (field !== void 0) {
-            field[1] += expression.coefficient;
-          } else {
-            terms.set(variable, expression.coefficient);
-          }
-        } else {
+        if (variable === null) {
           constant += expression.constant;
+        } else {
+          let value = terms.get(variable);
+          if (value === void 0) {
+            value = 0;
+          }
+          terms.set(variable, value + expression.coefficient);
         }
       } else {
-        const subterms = expression.terms;
-        for (let j = 0, k = subterms.size; j < k; j += 1) {
-          const [variable, coefficient] = subterms.getEntry(j)!;
-          const field = terms.getField(variable);
-          if (field !== void 0) {
-            field[1] += coefficient;
-          } else {
-            terms.set(variable, coefficient);
+        for (const [variable, coefficient] of expression.terms) {
+          let value = terms.get(variable);
+          if (value === void 0) {
+            value = 0;
           }
+          terms.set(variable, value + coefficient);
         }
         constant += expression.constant;
       }
     }
     return new ConstraintSum(terms, constant);
-  };
+  },
 
-  ConstraintExpression.product = function (coefficient: number, variable: ConstraintVariable): ConstraintProduct {
+  product(coefficient: number, variable: ConstraintVariable): ConstraintProduct {
     return new ConstraintProduct(coefficient, variable);
-  };
+  },
 
-  ConstraintExpression.constant = function (value: number): ConstraintConstant {
-    if (value === 0) {
-      return ConstraintExpression.zero;
-    } else {
-      return new ConstraintConstant(value);
+  fromAny<T extends AnyConstraintExpression | null | undefined>(value: T): ConstraintExpression | Uninitable<T> {
+    if (value == void 0 || value === null || ConstraintExpression[Symbol.hasInstance](value)) {
+      return value as ConstraintExpression | Uninitable<T>;
+    } else if (typeof value === "number") {
+      return ConstraintExpression.constant(value);
     }
-  };
+    throw new TypeError("" + value);
+  },
 
-  return ConstraintExpression;
-})();
+  [Symbol.hasInstance](instance: unknown): instance is ConstraintExpression {
+    return Objects.hasAllKeys<ConstraintExpression>(instance, "terms", "constant");
+  },
+};

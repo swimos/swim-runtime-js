@@ -274,9 +274,8 @@ export class PackageScope extends Scope {
     const task = this.getTask(taskConfig.class);
     if (task instanceof PackageTask) {
       return task.run(taskConfig.options);
-    } else {
-      return TaskStatus.Skipped;
     }
+    return TaskStatus.Skipped;
   }
 
   async runLibraryTasks(taskConfigs: TaskConfig | readonly TaskConfig[], libraryNames?: string[] | string): Promise<void> {
@@ -383,82 +382,83 @@ export class PackageScope extends Scope {
     if (oldVersion === void 0 && this.package.value !== null) {
       oldVersion = this.package.value.version;
     }
+    if (oldVersion === void 0) {
+      return void 0;
+    }
 
-    if (oldVersion !== void 0) {
-      const snapshotIndex = oldVersion.lastIndexOf("-");
-      if (snapshotIndex >= 0) {
-        oldSemanticVersion = oldVersion.substr(0, snapshotIndex);
-        oldSnapshotVersion = oldVersion.substr(snapshotIndex + 1);
-        const uidIndex = oldSnapshotVersion.indexOf(".");
-        if (uidIndex >= 0) {
-          oldSnapshotTag = oldSnapshotVersion.substr(0, uidIndex);
-          oldSnapshotUid = oldSnapshotVersion.substr(uidIndex + 1);
-          if (isFinite(+oldSnapshotTag)) {
-            oldSnapshotUid = oldSnapshotTag;
-            oldSnapshotTag = void 0;
-          }
-        } else if (!isFinite(+oldSnapshotVersion)) {
-          oldSnapshotTag = oldSnapshotVersion;
-        } else {
-          oldSnapshotUid = oldSnapshotVersion;
+    const snapshotIndex = oldVersion.lastIndexOf("-");
+    if (snapshotIndex < 0) {
+      oldSemanticVersion = oldVersion;
+    } else {
+      oldSemanticVersion = oldVersion.substr(0, snapshotIndex);
+      oldSnapshotVersion = oldVersion.substr(snapshotIndex + 1);
+      const uidIndex = oldSnapshotVersion.indexOf(".");
+      if (uidIndex >= 0) {
+        oldSnapshotTag = oldSnapshotVersion.substr(0, uidIndex);
+        oldSnapshotUid = oldSnapshotVersion.substr(uidIndex + 1);
+        if (isFinite(+oldSnapshotTag)) {
+          oldSnapshotUid = oldSnapshotTag;
+          oldSnapshotTag = void 0;
         }
-        if (oldSnapshotUid !== void 0) {
-          const incIndex = oldSnapshotUid.lastIndexOf(".");
-          if (incIndex >= 0) {
-            oldSnapshotDate = oldSnapshotUid.substr(0, incIndex);
-            oldSnapshotInc = oldSnapshotUid.substr(incIndex + 1);
-          } else {
-            oldSnapshotDate = oldSnapshotUid;
-          }
+      } else if (!isFinite(+oldSnapshotVersion)) {
+        oldSnapshotTag = oldSnapshotVersion;
+      } else {
+        oldSnapshotUid = oldSnapshotVersion;
+      }
+      if (oldSnapshotUid !== void 0) {
+        const incIndex = oldSnapshotUid.lastIndexOf(".");
+        if (incIndex >= 0) {
+          oldSnapshotDate = oldSnapshotUid.substr(0, incIndex);
+          oldSnapshotInc = oldSnapshotUid.substr(incIndex + 1);
+        } else {
+          oldSnapshotDate = oldSnapshotUid;
+        }
+      }
+    }
+    if (newSemanticVersion === void 0) {
+      newSemanticVersion = oldSemanticVersion;
+    }
+
+    newVersion = newSemanticVersion;
+
+    if (tag !== void 0 || typeof snapshot === "string" || snapshot === true) {
+      if (typeof snapshot === "string") {
+        newSnapshotDate = snapshot;
+      } else {
+        const today = new Date();
+        const year = "" + today.getUTCFullYear();
+        let month = "" + (today.getUTCMonth() + 1);
+        while (month.length < 2) month = "0" + month;
+        let day = "" + today.getUTCDate();
+        while (day.length < 2) day = "0" + day;
+        newSnapshotDate = year + month + day;
+      }
+
+      newSnapshotTag = tag !== void 0 ? tag : oldSnapshotTag;
+
+      if (newSemanticVersion === oldSemanticVersion && newSnapshotTag === oldSnapshotTag && newSnapshotDate === oldSnapshotDate) {
+        if (isFinite(+(oldSnapshotInc as any))) {
+          newSnapshotInc = "" + (+(oldSnapshotInc as any) + 1);
+        } else {
+          newSnapshotInc = "1";
+        }
+      }
+
+      newSnapshotUid = newSnapshotDate;
+      if (newSnapshotInc !== void 0) {
+        newSnapshotUid += "." + newSnapshotInc;
+      }
+
+      if (newSnapshotTag !== void 0) {
+        newSnapshotVersion = newSnapshotTag;
+        if (typeof snapshot === "string" || snapshot === true) {
+          newSnapshotVersion += "." + newSnapshotUid;
         }
       } else {
-        oldSemanticVersion = oldVersion;
-      }
-      if (newSemanticVersion === void 0) {
-        newSemanticVersion = oldSemanticVersion;
+        newSnapshotVersion = newSnapshotUid;
       }
 
-      newVersion = newSemanticVersion;
-
-      if (tag !== void 0 || typeof snapshot === "string" || snapshot === true) {
-        if (typeof snapshot === "string") {
-          newSnapshotDate = snapshot;
-        } else {
-          const today = new Date();
-          const year = "" + today.getUTCFullYear();
-          let month = "" + (today.getUTCMonth() + 1);
-          while (month.length < 2) month = "0" + month;
-          let day = "" + today.getUTCDate();
-          while (day.length < 2) day = "0" + day;
-          newSnapshotDate = year + month + day;
-        }
-
-        newSnapshotTag = tag !== void 0 ? tag : oldSnapshotTag;
-
-        if (newSemanticVersion === oldSemanticVersion && newSnapshotTag === oldSnapshotTag && newSnapshotDate === oldSnapshotDate) {
-          if (isFinite(+(oldSnapshotInc as any))) {
-            newSnapshotInc = "" + (+(oldSnapshotInc as any) + 1);
-          } else {
-            newSnapshotInc = "1";
-          }
-        }
-
-        newSnapshotUid = newSnapshotDate;
-        if (newSnapshotInc !== void 0) {
-          newSnapshotUid += "." + newSnapshotInc;
-        }
-
-        if (newSnapshotTag !== void 0) {
-          newSnapshotVersion = newSnapshotTag;
-          if (typeof snapshot === "string" || snapshot === true) {
-            newSnapshotVersion += "." + newSnapshotUid;
-          }
-        } else {
-          newSnapshotVersion = newSnapshotUid;
-        }
-
-        newVersion += "-" + newSnapshotVersion;
-      }
+      newVersion += "-" + newSnapshotVersion;
     }
 
     return newVersion;
@@ -494,22 +494,24 @@ export class PackageScope extends Scope {
   async initLibraryScope(libraryScope: LibraryScope): Promise<void> {
     const compileTask = libraryScope.compile.getComponent();
     const tsconfig = await compileTask.tsconfig.getOrLoadIfExists(null);
-    if (tsconfig !== null) {
-      if (tsconfig.fileNames.length !== 0) {
-        this.appendChild(libraryScope, libraryScope.name);
+    if (tsconfig === null) {
+      return;
+    } else if (tsconfig.fileNames.length !== 0) {
+      this.appendChild(libraryScope, libraryScope.name);
+    }
+    const projectReferences = tsconfig.projectReferences;
+    if (projectReferences === void 0) {
+      return;
+    }
+    for (let i = 0; i < projectReferences.length; i += 1) {
+      const projectReference = projectReferences[i]!;
+      if (projectReference.circular) {
+        continue;
       }
-      const projectReferences = tsconfig.projectReferences;
-      if (projectReferences !== void 0) {
-        for (let i = 0; i < projectReferences.length; i += 1) {
-          const projectReference = projectReferences[i]!;
-          if (!projectReference.circular) {
-            const packageDir = projectReference.path;
-            const packageScope = await Scope.load(packageDir);
-            if (packageScope !== null) {
-              this.appendChild(packageScope, packageScope.name);
-            }
-          }
-        }
+      const packageDir = projectReference.path;
+      const packageScope = await Scope.load(packageDir);
+      if (packageScope !== null) {
+        this.appendChild(packageScope, packageScope.name);
       }
     }
   }
@@ -540,20 +542,20 @@ export class PackageScope extends Scope {
     const packageScope = new PackageScope("");
     packageScope.baseDir.setValue(baseDir);
     const packageConfig = await packageScope.package.loadIfExists(void 0, null);
-    if (packageConfig !== null) {
-      packageScope.setName(packageConfig.name);
-      packageScope.deps.insertComponent();
-      packageScope.libs.insertComponent();
-      packageScope.test.insertComponent();
-      packageScope.doc.insertComponent();
-      packageScope.version.insertComponent();
-      packageScope.publish.insertComponent();
-      packageScope.clean.insertComponent();
-      packageScope.workspace; // instantiate
-      await packageScope.initChildren();
-      return packageScope;
+    if (packageConfig === null) {
+      return null;
     }
-    return null;
+    packageScope.setName(packageConfig.name);
+    packageScope.deps.insertComponent();
+    packageScope.libs.insertComponent();
+    packageScope.test.insertComponent();
+    packageScope.doc.insertComponent();
+    packageScope.version.insertComponent();
+    packageScope.publish.insertComponent();
+    packageScope.clean.insertComponent();
+    packageScope.workspace; // instantiate
+    await packageScope.initChildren();
+    return packageScope;
   }
 
   /** @internal */

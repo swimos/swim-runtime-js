@@ -691,7 +691,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return this;
   }
 
-  bind(): Record {
+  build(): Record {
     return this;
   }
 

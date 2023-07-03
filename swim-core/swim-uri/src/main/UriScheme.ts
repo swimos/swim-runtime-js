@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Strings} from "@swim/util";
+import type {Uninitable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Strings} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
@@ -27,6 +29,14 @@ import {Uri} from "./Uri";
 
 /** @public */
 export type AnyUriScheme = UriScheme | string;
+
+/** @public */
+export const AnyUriScheme = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUriScheme {
+    return instance instanceof UriScheme
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class UriScheme implements HashCode, Compare, Debug, Display {
@@ -45,6 +55,7 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     return this.name.length !== 0 ? this.name : void 0;
   }
 
+  /** @override */
   compareTo(that: unknown): number {
     if (that instanceof UriScheme) {
       return this.name.localeCompare(that.name);
@@ -52,6 +63,7 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     return NaN;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -61,10 +73,12 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Strings.hash(this.name);
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("UriScheme").write(46/*'.'*/);
     if (this.isDefined()) {
@@ -76,31 +90,29 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     return output;
   }
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     output = Uri.writeScheme(output, this.name);
     return output;
   }
 
+  /** @override */
   toString(): string {
     return this.name;
   }
 
-  /** @internal */
-  static readonly Undefined: UriScheme = new this("");
-
+  @Lazy
   static undefined(): UriScheme {
-    return this.Undefined;
+    return new UriScheme("");
   }
 
   static create(schemeName: string): UriScheme {
     return new UriScheme(schemeName);
   }
 
-  static fromAny(value: AnyUriScheme): UriScheme;
-  static fromAny(value: AnyUriScheme | null | undefined): UriScheme | null | undefined;
-  static fromAny(value: AnyUriScheme | null | undefined): UriScheme | null | undefined {
+  static fromAny<T extends AnyUriScheme | null | undefined>(value: T): UriScheme | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriScheme) {
-      return value;
+      return value as UriScheme | Uninitable<T>;
     } else if (typeof value === "string") {
       return UriScheme.parse(value);
     }

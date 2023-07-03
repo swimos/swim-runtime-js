@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Objects} from "@swim/util";
 import type {AnyValue} from "@swim/structure";
 import type {Value} from "@swim/structure";
 import type {AnyUri} from "@swim/uri";
@@ -54,32 +55,8 @@ export interface WarpRef extends WarpDownlinkContext {
 }
 
 /** @public */
-export const WarpRef = (function () {
-  const WarpRef = {} as {
-    /** @internal */
-    has<K extends keyof WarpRef>(object: unknown, key: K): object is Required<Pick<WarpRef, K>>;
-
-    /** @internal */
-    is(object: unknown): object is WarpRef;
-  };
-
-  WarpRef.has = function <K extends keyof WarpRef>(object: unknown, key: K): object is Required<Pick<WarpRef, K>> {
-    if (typeof object === "object" && object !== null || typeof object === "function") {
-      return key in object;
-    }
-    return false;
-  };
-
-  WarpRef.is = function (object: unknown): object is WarpRef {
-    if (typeof object === "object" && object !== null || typeof object === "function") {
-      const warpRef = object as WarpRef;
-      return "downlink" in warpRef
-          && "downlinkValue" in warpRef
-          && "downlinkList" in warpRef
-          && "downlinkMap" in warpRef;
-    }
-    return false;
-  };
-
-  return WarpRef;
-})();
+export const WarpRef = {
+  [Symbol.hasInstance](instance: unknown): instance is WarpRef {
+    return Objects.hasAllKeys<WarpRef>(instance, "downlink", "downlinkValue", "downlinkList", "downlinkMap");
+  },
+};

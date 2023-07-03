@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import {ConstraintMap} from "./ConstraintMap";
 import type {AnyConstraintExpression} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
@@ -40,8 +38,8 @@ export class ConstraintConstant implements ConstraintTerm, Debug {
     return null;
   }
 
-  get terms(): ConstraintMap<ConstraintVariable, number> {
-    return new ConstraintMap<ConstraintVariable, number>();
+  get terms(): ReadonlyMap<ConstraintVariable, number> {
+    return new Map<ConstraintVariable, number>();
   }
 
   readonly constant: number;
@@ -50,9 +48,8 @@ export class ConstraintConstant implements ConstraintTerm, Debug {
     that = ConstraintExpression.fromAny(that);
     if (that instanceof ConstraintConstant) {
       return ConstraintExpression.constant(this.constant + that.constant);
-    } else {
-      return ConstraintExpression.sum(this, that);
     }
+    return ConstraintExpression.sum(this, that);
   }
 
   negative(): ConstraintTerm {
@@ -63,9 +60,8 @@ export class ConstraintConstant implements ConstraintTerm, Debug {
     that = ConstraintExpression.fromAny(that);
     if (that instanceof ConstraintConstant) {
       return ConstraintExpression.constant(this.constant - that.constant);
-    } else {
-      return ConstraintExpression.sum(this, that.negative());
     }
+    return ConstraintExpression.sum(this, that.negative());
   }
 
   times(scalar: number): ConstraintExpression {
@@ -79,7 +75,7 @@ export class ConstraintConstant implements ConstraintTerm, Debug {
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("ConstraintExpression").write(46/*'.'*/);
     if (this.constant === 0) {
-      output = output.write("zero");
+      output = output.write("zero").write(40/*'('*/).write(41/*')'*/);
     } else {
       output = output.write("constant").write(40/*'('*/).debug(this.constant).write(41/*')'*/);
     }
@@ -90,4 +86,3 @@ export class ConstraintConstant implements ConstraintTerm, Debug {
     return Format.debug(this);
   }
 }
-(ConstraintExpression as Mutable<typeof ConstraintExpression>).zero = new ConstraintConstant(0);

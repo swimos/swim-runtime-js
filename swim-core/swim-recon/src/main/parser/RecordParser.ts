@@ -67,7 +67,7 @@ export class RecordParser<I, V> extends Parser<V> {
           builder = builder || recon.recordBuilder();
           if (c === 125/*'}'*/) {
             input = input.step();
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           } else if (c === 35/*'#'*/) {
             input = input.step();
             step = 8;
@@ -116,7 +116,7 @@ export class RecordParser<I, V> extends Parser<V> {
           step = 6;
         } else if (input.isDone()) {
           builder!.push(recon.slot(keyParser!.bind()));
-          return Parser.done(builder!.bind());
+          return Parser.done(builder!.build());
         }
       }
       if (step === 6) {
@@ -149,7 +149,7 @@ export class RecordParser<I, V> extends Parser<V> {
             step = 8;
           } else if (c === 125/*'}'*/) {
             input = input.step();
-            return Parser.done(builder!.bind());
+            return Parser.done(builder!.build());
           } else {
             return Parser.error(Diagnostic.expected("'}', ';', ',', or newline", input));
           }

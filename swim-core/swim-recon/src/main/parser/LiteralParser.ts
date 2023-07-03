@@ -79,13 +79,13 @@ export class LiteralParser<I, V> extends Parser<V> {
         } else if (builder === void 0) {
           return Parser.done(recon.extant());
         } else {
-          return Parser.done(builder.bind());
+          return Parser.done(builder.build());
         }
       } else if (input.isDone()) {
         if (builder === void 0) {
           return Parser.done(recon.extant());
         } else {
-          return Parser.done(builder.bind());
+          return Parser.done(builder.build());
         }
       }
     }
@@ -96,7 +96,7 @@ export class LiteralParser<I, V> extends Parser<V> {
       if (valueParser!.isDone()) {
         builder = builder || recon.valueBuilder();
         builder.push(recon.item(valueParser!.bind()));
-        return Parser.done(builder.bind());
+        return Parser.done(builder.build());
       } else if (valueParser!.isError()) {
         return valueParser!.asError();
       }
@@ -106,7 +106,7 @@ export class LiteralParser<I, V> extends Parser<V> {
         valueParser = valueParser!.feed(input);
       }
       if (valueParser!.isDone()) {
-        return Parser.done(builder!.bind());
+        return Parser.done(builder!.build());
       } else if (valueParser!.isError()) {
         return valueParser!.asError();
       }
@@ -133,7 +133,7 @@ export class LiteralParser<I, V> extends Parser<V> {
           input = input.step();
           builder = builder || recon.valueBuilder();
           builder.push(recon.item(valueParser!.bind()));
-          return Parser.done(builder.bind());
+          return Parser.done(builder.build());
         } else {
           return Parser.error(Diagnostic.expected(41/*')'*/, input));
         }

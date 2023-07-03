@@ -27,23 +27,22 @@ export class CleanTask extends PackageTask {
     const packageConfig = await packageScope.package.getOrLoadIfExists(null);
     const packageScripts = packageConfig !== null ? packageConfig.scripts : void 0;
     const cleanScript = packageScripts !== void 0 ? packageScripts.clean : void 0;
-    if (cleanScript !== void 0) {
-      return new Promise<TaskStatus>((resolve, reject): void => {
-        this.logBegin("cleaning");
-        ChildProcess.exec(cleanScript!, {cwd: this.baseDir.value}, (error, stdout, stderr) => {
-          console.log(stdout);
-          if (stderr) {
-            console.error(stderr);
-          }
-          if (error === null) {
-            resolve(TaskStatus.Success);
-          } else {
-            reject(error);
-          }
-        });
-      });
-    } else {
+    if (cleanScript === void 0) {
       return TaskStatus.Pending;
     }
+    return new Promise<TaskStatus>((resolve, reject): void => {
+      this.logBegin("cleaning");
+      ChildProcess.exec(cleanScript!, {cwd: this.baseDir.value}, (error, stdout, stderr) => {
+        console.log(stdout);
+        if (stderr) {
+          console.error(stderr);
+        }
+        if (error === null) {
+          resolve(TaskStatus.Success);
+        } else {
+          reject(error);
+        }
+      });
+    });
   }
 }

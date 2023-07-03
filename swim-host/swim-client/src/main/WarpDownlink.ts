@@ -16,6 +16,7 @@ import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Equals} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Observes} from "@swim/util";
 import type {Observable} from "@swim/util";
 import type {ObserverMethods} from "@swim/util";
@@ -38,7 +39,7 @@ import type {SyncRequest} from "@swim/warp";
 import type {SyncedResponse} from "@swim/warp";
 import type {UnlinkRequest} from "@swim/warp";
 import type {UnlinkedResponse} from "@swim/warp";
-import {WarpDownlinkContext} from "./WarpDownlinkContext";
+import type {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkModel} from "./WarpDownlinkModel";
 
 /** @public */
@@ -387,7 +388,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   };
 
   WarpDownlink.prototype.initHostUri = function (this: WarpDownlink): Uri | null {
-    let hostUri = (Object.getPrototypeOf(this) as WarpDownlink).hostUri as Uri | null | undefined;
+    let hostUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink).hostUri;
     if (hostUri === void 0) {
       hostUri = null;
     }
@@ -396,7 +397,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
   WarpDownlink.prototype.getHostUri = function (this: WarpDownlink): Uri | null {
     let hostUri = this.hostUri;
-    if (hostUri === null && WarpDownlinkContext.has(this.owner, "hostUri")) {
+    if (hostUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "hostUri")) {
       hostUri = this.owner.hostUri();
     }
     return hostUri;
@@ -414,7 +415,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   };
 
   WarpDownlink.prototype.initNodeUri = function (this: WarpDownlink): Uri | null {
-    let nodeUri = (Object.getPrototypeOf(this) as WarpDownlink).nodeUri as Uri | null | undefined;
+    let nodeUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink).nodeUri;
     if (nodeUri === void 0) {
       nodeUri = null;
     }
@@ -423,7 +424,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
   WarpDownlink.prototype.getNodeUri = function (this: WarpDownlink): Uri | null {
     let nodeUri = this.nodeUri;
-    if (nodeUri === null && WarpDownlinkContext.has(this.owner, "nodeUri")) {
+    if (nodeUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "nodeUri")) {
       nodeUri = this.owner.nodeUri();
     }
     return nodeUri;
@@ -441,7 +442,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
   };
 
   WarpDownlink.prototype.initLaneUri = function (this: WarpDownlink): Uri | null {
-    let laneUri = (Object.getPrototypeOf(this) as WarpDownlink).laneUri as Uri | null | undefined;
+    let laneUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink).laneUri;
     if (laneUri === void 0) {
       laneUri = null;
     }
@@ -450,7 +451,7 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
   WarpDownlink.prototype.getLaneUri = function (this: WarpDownlink): Uri | null {
     let laneUri = this.laneUri;
-    if (laneUri === null && WarpDownlinkContext.has(this.owner, "laneUri")) {
+    if (laneUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "laneUri")) {
       laneUri = this.owner.laneUri();
     }
     return laneUri;

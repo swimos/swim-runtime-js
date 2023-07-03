@@ -52,18 +52,18 @@ export class ApiTask extends LibraryTask {
   readonly extractorConfig!: FileRef<this, ExtractorConfig | null>;
 
   override async exec(): Promise<TaskStatus> {
-    let status = TaskStatus.Pending;
     const extractorConfig = await this.extractorConfig.getOrLoadIfExists(null);
-    if (extractorConfig !== null) {
-      this.logBegin("typing");
-      const t0 = Date.now();
-      status = await this.extractApi(extractorConfig);
-      const dt = Date.now() - t0;
-      if (status === TaskStatus.Success) {
-        this.logSuccess("typed", dt);
-      } else {
-        this.logFailure("failed to type");
-      }
+    if (extractorConfig === null) {
+      return TaskStatus.Pending;
+    }
+    this.logBegin("typing");
+    const t0 = Date.now();
+    const status = await this.extractApi(extractorConfig);
+    const dt = Date.now() - t0;
+    if (status === TaskStatus.Success) {
+      this.logSuccess("typed", dt);
+    } else {
+      this.logFailure("failed to type");
     }
     return status;
   }
@@ -78,11 +78,7 @@ export class ApiTask extends LibraryTask {
       showDiagnostics: false,
       messageCallback: this.onExtractorMessage.bind(this),
     });
-    if (result.succeeded) {
-      return TaskStatus.Success;
-    } else {
-      return TaskStatus.Failure;
-    }
+    return result.succeeded ? TaskStatus.Success : TaskStatus.Failure;
   }
 
   protected onExtractorMessage(message: ExtractorMessage): void {
@@ -95,38 +91,40 @@ export class ApiTask extends LibraryTask {
     const sourceFilePath = message.sourceFilePath;
     const sourceFileLine = message.sourceFileLine;
     const sourceFileColumn = message.sourceFileColumn;
-    if (sourceFilePath !== void 0 && sourceFileLine !== void 0 && sourceFileColumn !== void 0) {
-      const tag = Mark.at(0, sourceFileLine, sourceFileColumn, message.text);
-
-      let severity: Severity;
-      switch (message.logLevel) {
-        case "error": severity = Severity.error(); break;
-        case "warning": severity = Severity.warning(); break;
-        case "info": severity = Severity.info(); break;
-        case "verbose": severity = Severity.debug(); break;
-        case "none":
-        default: return null;
-      }
-
-      const source = FS.readFileSync(sourceFilePath, "utf8");
-      const input = Unicode.stringInput(source).withId(sourceFilePath);
-      return new Diagnostic(input, tag, severity, message.messageId, void 0, null);
+    if (sourceFilePath === void 0 || sourceFileLine === void 0 || sourceFileColumn === void 0) {
+      return null;
     }
-    return null;
+    const tag = Mark.at(0, sourceFileLine, sourceFileColumn, message.text);
+
+    let severity: Severity;
+    switch (message.logLevel) {
+      case "error": severity = Severity.error(); break;
+      case "warning": severity = Severity.warning(); break;
+      case "info": severity = Severity.info(); break;
+      case "verbose": severity = Severity.debug(); break;
+      case "none":
+      default: return null;
+    }
+
+    const source = FS.readFileSync(sourceFilePath, "utf8");
+    const input = Unicode.stringInput(source).withId(sourceFilePath);
+    return new Diagnostic(input, tag, severity, message.messageId, void 0, null);
   }
 
   protected logMessage(message: ExtractorMessage): void {
     const diagnostic = this.diagnose(message);
-    if (diagnostic !== null) {
-      console.log(diagnostic.toString(OutputSettings.styled()));
+    if (diagnostic === null) {
+      return;
     }
+    console.log(diagnostic.toString(OutputSettings.styled()));
   }
 
   /** @internal */
   static mkdir(dir: string): void {
-    if (!FS.existsSync(dir)) {
-      this.mkdir(Path.dirname(dir));
-      FS.mkdirSync(dir);
+    if (FS.existsSync(dir)) {
+      return;
     }
+    this.mkdir(Path.dirname(dir));
+    FS.mkdirSync(dir);
   }
 }

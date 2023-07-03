@@ -25,7 +25,7 @@ import type {R2Function} from "./R2Function";
 import type {AnyR2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";
 import type {R2CurveContext} from "./R2Curve";
-import {R2BezierCurve} from "./R2BezierCurve";
+import {R2BezierCurve} from "./R2Curve";
 
 /** @public */
 export class R2CubicCurve extends R2BezierCurve implements Debug {
@@ -224,6 +224,7 @@ export class R2CubicCurve extends R2BezierCurve implements Debug {
     return false;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("R2Curve").write(46/*'.'*/).write("cubic").write(40/*'('*/)
                    .debug(this.x0).write(", ").debug(this.y0).write(", ")

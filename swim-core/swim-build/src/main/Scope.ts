@@ -73,25 +73,23 @@ export abstract class Scope extends Component<Scope> {
     const task = this.getTask(taskConfig.class);
     if (task !== null) {
       return task.run(taskConfig.options);
-    } else {
-      return TaskStatus.Skipped;
     }
+    return TaskStatus.Skipped;
   }
 
   async runTasks(taskConfigs: TaskConfig | readonly TaskConfig[]): Promise<TaskStatus> {
     if ("class" in taskConfigs) {
       return this.runTask(taskConfigs);
-    } else {
-      let runStatus = TaskStatus.Skipped;
-      for (let i = 0; i < taskConfigs.length; i += 1) {
-        const taskClass = taskConfigs[i]!;
-        const taskStatus = await this.runTask(taskClass);
-        if (taskStatus > runStatus) {
-          runStatus = taskStatus;
-        }
-      }
-      return runStatus;
     }
+    let runStatus = TaskStatus.Skipped;
+    for (let i = 0; i < taskConfigs.length; i += 1) {
+      const taskClass = taskConfigs[i]!;
+      const taskStatus = await this.runTask(taskClass);
+      if (taskStatus > runStatus) {
+        runStatus = taskStatus;
+      }
+    }
+    return runStatus;
   }
 
   @Provider({

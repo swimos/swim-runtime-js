@@ -105,7 +105,7 @@ export class PrimaryParser<I, V> extends Parser<V> {
             if (exprParser !== void 0) {
               return exprParser;
             } else {
-              return Parser.done(builder!.bind());
+              return Parser.done(builder!.build());
             }
           } else {
             return Parser.error(Diagnostic.expected(41/*')'*/, input));

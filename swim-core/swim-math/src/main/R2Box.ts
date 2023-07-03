@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
+import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
-import type {Equivalent} from "@swim/util";
-import type {HashCode} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -34,7 +36,17 @@ import {R2Circle} from "./R2Circle";
 export type AnyR2Box = R2Box | R2BoxInit;
 
 /** @public */
+export const AnyR2Box = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyR2Box {
+    return instance instanceof R2Box
+        || R2BoxInit[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
 export interface R2BoxInit {
+  /** @internal */
+  typeid?: "R2BoxInit";
   xMin: number;
   yMin: number;
   xMax: number;
@@ -42,7 +54,14 @@ export interface R2BoxInit {
 }
 
 /** @public */
-export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equivalent, Debug {
+export const R2BoxInit = {
+  [Symbol.hasInstance](instance: unknown): instance is R2BoxInit {
+    return Objects.hasAllKeys<R2BoxInit>(instance, "xMin", "yMin", "xMax", "yMax");
+  },
+};
+
+/** @public */
+export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debug {
   constructor(xMin: number, yMin: number, xMax: number, yMax: number) {
     super();
     this.xMin = xMin;
@@ -50,6 +69,9 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
     this.xMax = xMax;
     this.yMax = yMax;
   }
+
+  /** @internal */
+  declare typeid?: "R2Box";
 
   isDefined(): boolean {
     return isFinite(this.xMin) && isFinite(this.yMin)
@@ -159,10 +181,8 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
       return this.intersectsBox(that);
     } else if (that instanceof R2Circle) {
       return this.intersectsCircle(that);
-    } else {
-      return (that as R2Shape).intersects(this);
     }
-    return false;
+    return that.intersects(this);
   }
 
   /** @internal */
@@ -191,9 +211,8 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
             || (R2Box.intersectsSegment(x0 - xMax, x1 - xMax, x0, y0, x1, y1) && R2Box.hitY > yMin && R2Box.hitY < yMax)
             || (R2Box.intersectsSegment(y0 - yMax, y1 - yMax, x0, y0, x1, y1) && R2Box.hitX > xMin && R2Box.hitX < xMax)) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   /** @internal */
@@ -201,13 +220,13 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
   /** @internal */
   static hitY: number = 0; // stack local hit register
   static intersectsSegment(d0: number, d1: number, x0: number, y0: number, x1: number, y1: number): boolean {
-    if (d0 !== d1 || d0 * d1 < 0) {
-      const scale = -d0 / (d1 - d0);
-      R2Box.hitX = x0 + (x1 - x0) * scale;
-      R2Box.hitY = y0 + (y1 - y0) * scale;
-      return true;
+    if (d0 === d1 && d0 * d1 >= 0) {
+      return false;
     }
-    return false;
+    const scale = -d0 / (d1 - d0);
+    R2Box.hitX = x0 + (x1 - x0) * scale;
+    R2Box.hitY = y0 + (y1 - y0) * scale;
+    return true;
   }
 
   /** @internal */
@@ -245,6 +264,7 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
     };
   }
 
+  /** @override */
   interpolateTo(that: R2Box): Interpolator<R2Box>;
   interpolateTo(that: unknown): Interpolator<R2Box> | null;
   interpolateTo(that: unknown): Interpolator<R2Box> | null {
@@ -254,7 +274,7 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
     return null;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Box) {
@@ -266,7 +286,7 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Box) {
@@ -276,12 +296,14 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
         Constructors.hash(R2Box), Numbers.hash(this.xMin)), Numbers.hash(this.yMin)),
         Numbers.hash(this.xMax)), Numbers.hash(this.yMax)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("R2Box").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.xMin).write(", ").debug(this.yMin).write(", ")
@@ -293,11 +315,9 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
     return Format.debug(this);
   }
 
-  /** @internal */
-  static readonly Undefined: R2Box = new this(Infinity, Infinity, -Infinity, -Infinity);
-
+  @Lazy
   static undefined(): R2Box {
-    return this.Undefined;
+    return new R2Box(Infinity, Infinity, -Infinity, -Infinity);
   }
 
   static of(xMin: number, yMin: number, xMax?: number, yMax?: number): R2Box {
@@ -310,35 +330,19 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Equi
     return new R2Box(xMin, yMin, xMax, yMax);
   }
 
-  static fromInit(value: R2BoxInit): R2Box {
-    return new R2Box(value.xMin, value.yMin, value.xMax, value.yMax);
-  }
-
-  static override fromAny(value: AnyR2Box): R2Box {
+  static override fromAny<T extends AnyR2Box | null | undefined>(value: T): R2Box | Uninitable<T>;
+  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyR2Box | null | undefined>(value: T): R2Box | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Box) {
-      return value;
-    } else if (R2Box.isInit(value)) {
+      return value as R2Box | Uninitable<T>;
+    } else if (R2BoxInit[Symbol.hasInstance](value)) {
       return R2Box.fromInit(value);
     }
     throw new TypeError("" + value);
   }
 
-  /** @internal */
-  static isInit(value: unknown): value is R2BoxInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as R2BoxInit;
-      return typeof init.xMin === "number"
-          && typeof init.yMin === "number"
-          && typeof init.xMax === "number"
-          && typeof init.yMax === "number";
-    }
-    return false;
-  }
-
-  /** @internal */
-  static override isAny(value: unknown): value is AnyR2Box {
-    return value instanceof R2Box
-        || R2Box.isInit(value);
+  static fromInit(init: R2BoxInit): R2Box {
+    return new R2Box(init.xMin, init.yMin, init.xMax, init.yMax);
   }
 }
 

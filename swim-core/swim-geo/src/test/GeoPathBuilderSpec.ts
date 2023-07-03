@@ -25,7 +25,7 @@ export class GeoPathBuilderSpec extends Suite {
     const builder = GeoPath.builder();
     builder.moveTo(0, 1);
     builder.lineTo(1, 0);
-    const spline = builder.bind();
+    const spline = builder.build();
     exam.equal(spline, GeoPath.of(GeoSpline.open(GeoSegment.of(0, 1, 1, 0))));
   }
 }

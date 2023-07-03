@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import {Equivalent} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Interpolator} from "@swim/util";
@@ -286,39 +287,29 @@ export class Num extends Value {
   /** @internal */
   static readonly TypeMask = 0x3;
 
-  /** @internal */
-  static readonly Zero: Num = new this(0);
-
+  @Lazy
   static zero(): Num {
-    return this.Zero;
+    return new Num(0);
   }
 
-  /** @internal */
-  static readonly NegativeZero: Num = new this(-0);
-
+  @Lazy
   static negativeZero(): Num {
-    return this.NegativeZero;
+    return new Num(-0);
   }
 
-  /** @internal */
-  static readonly One: Num = new this(1);
-
+  @Lazy
   static one(): Num {
-    return this.One;
+    return new Num(1);
   }
 
-  /** @internal */
-  static readonly NegativeOne: Num = new this(-1);
-
+  @Lazy
   static negativeOne(): Num {
-    return this.NegativeOne;
+    return new Num(-1);
   }
 
-  /** @internal */
-  static readonly NaN: Num = new this(NaN);
-
+  @Lazy
   static nan(): Num {
-    return this.NaN;
+    return new Num(NaN);
   }
 
   static uint32(value: number): Num {

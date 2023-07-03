@@ -87,19 +87,12 @@ export class CompileTask extends LibraryTask {
 
     let status = ts.ExitStatus.Success;
     let invalidatedProject: ts.InvalidatedProject<ts.EmitAndSemanticDiagnosticsBuilderProgram> | undefined;
-    while (invalidatedProject = solutionBuilder.getNextInvalidatedProject(), invalidatedProject !== void 0) {
+    while (status === ts.ExitStatus.Success && (invalidatedProject = solutionBuilder.getNextInvalidatedProject()) !== void 0) {
       this.invalidated = true;
       status = invalidatedProject.done();
-      if (status !== ts.ExitStatus.Success) {
-        break;
-      }
     }
 
-    if (status === ts.ExitStatus.Success) {
-      return TaskStatus.Success;
-    } else {
-      return TaskStatus.Failure;
-    }
+    return status === ts.ExitStatus.Success ? TaskStatus.Success : TaskStatus.Failure;
   }
 
   protected createSolutionBuilderHost(): ts.SolutionBuilderHost<ts.EmitAndSemanticDiagnosticsBuilderProgram> {
@@ -117,20 +110,15 @@ export class CompileTask extends LibraryTask {
     const workspace = this.workspace.getService();
     const libraryDir = Path.dirname(fileName);
     const libraryScope = workspace.getLibrary(libraryDir);
-    if (libraryScope !== null) {
-      const compileTask = libraryScope.getTask(CompileTask);
-      if (compileTask !== null) {
-        const tsconfig = compileTask.tsconfig.value;
-        if (tsconfig !== null) {
-          if (tsconfig.options.composite === true) {
-            const packageScope = libraryScope.packageScope;
-            if (packageScope !== null) {
-              tsconfig.projectReferences = this.injectProjectReferences(packageScope, tsconfig.projectReferences);
-            }
-          }
-          return tsconfig;
-        }
+    let compileTask: CompileTask | null;
+    let tsconfig: ts.ParsedCommandLine | null;
+    if (libraryScope !== null && (compileTask = libraryScope.getTask(CompileTask)) !== null
+        && (tsconfig = compileTask.tsconfig.value) !== null) {
+      let packageScope: PackageScope | null;
+      if (tsconfig.options.composite === true && (packageScope = libraryScope.packageScope) !== null) {
+        tsconfig.projectReferences = this.injectProjectReferences(packageScope, tsconfig.projectReferences);
       }
+      return tsconfig;
     }
     return ts.getParsedCommandLineOfConfigFile(fileName, void 0, ts.sys as unknown as ts.ParseConfigFileHost);
   }
@@ -207,24 +195,23 @@ export class CompileTask extends LibraryTask {
     }
 
     const file = error.file;
-    if (file !== void 0) {
-      let tag: Tag;
-      const startOffset = error.start!;
-      const startPosition = file.getLineAndCharacterOfPosition(startOffset);
-      if (error.length! > 1) {
-        const start = Mark.at(startOffset, startPosition.line + 1, startPosition.character + 1);
-        const endOffset = startOffset + error.length! - 1;
-        const endPosition = file.getLineAndCharacterOfPosition(endOffset);
-        const end = Mark.at(endOffset, endPosition.line + 1, endPosition.character + 1, message);
-        tag = Span.from(start, end);
-      } else {
-        tag = Mark.at(startOffset, startPosition.line + 1, startPosition.character + 1, message);
-      }
-      const input = Unicode.stringInput(file.text).withId(file.fileName);
-      return new Diagnostic(input, tag, severity, "" + error.code, void 0, null);
-    } else {
+    if (file === void 0) {
       return new Diagnostic(Input.done(), Mark.at(0, 1, 1, message), severity, "" + error.code, void 0, null);
     }
+    let tag: Tag;
+    const startOffset = error.start!;
+    const startPosition = file.getLineAndCharacterOfPosition(startOffset);
+    if (error.length! <= 1) {
+      tag = Mark.at(startOffset, startPosition.line + 1, startPosition.character + 1, message);
+    } else {
+      const start = Mark.at(startOffset, startPosition.line + 1, startPosition.character + 1);
+      const endOffset = startOffset + error.length! - 1;
+      const endPosition = file.getLineAndCharacterOfPosition(endOffset);
+      const end = Mark.at(endOffset, endPosition.line + 1, endPosition.character + 1, message);
+      tag = Span.from(start, end);
+    }
+    const input = Unicode.stringInput(file.text).withId(file.fileName);
+    return new Diagnostic(input, tag, severity, "" + error.code, void 0, null);
   }
 
   protected logDiagnostic(diagnostic: ts.Diagnostic): void {

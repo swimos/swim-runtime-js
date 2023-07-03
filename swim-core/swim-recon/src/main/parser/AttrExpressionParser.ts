@@ -65,13 +65,13 @@ export class AttrExpressionParser<I, V> extends Parser<V> {
           } else if (builder === void 0) {
             return Parser.done(recon.extant());
           } else {
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           }
         } else if (input.isDone()) {
           if (builder === void 0) {
             return Parser.done(recon.extant());
           } else {
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           }
         }
       }
@@ -149,10 +149,10 @@ export class AttrExpressionParser<I, V> extends Parser<V> {
             step = 1;
             continue;
           } else {
-            return Parser.done(builder!.bind());
+            return Parser.done(builder!.build());
           }
         } else if (input.isDone()) {
-          return Parser.done(builder!.bind());
+          return Parser.done(builder!.build());
         }
       }
       break;

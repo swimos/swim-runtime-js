@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Cursor} from "@swim/util";
@@ -186,11 +187,9 @@ export class Absent extends Value {
     return output;
   }
 
-  /** @internal */
-  static readonly Value = new this();
-
+  @Lazy
   static override absent(): Absent {
-    return this.Value;
+    return new Absent();
   }
 
   static override fromAny(value: AnyAbsent): Absent {

@@ -35,7 +35,7 @@ export abstract class Form<T, U = T> {
   /**
    * Returns the key of the tag attribute that distinguishes structures of this
    * `Form`; returns `undefined` if this `Form` has no distinguishing tag
-   * attribute. Used to accelerate distrcrimination of polymorphic structural
+   * attribute. Used to accelerate discrimination of polymorphic structural
    * types with nominal type hints.
    */
   declare readonly tag: string | undefined; // getter defined below to work around useDefineForClassFields lunacy
@@ -45,11 +45,10 @@ export abstract class Form<T, U = T> {
    * given `tag` name.
    */
   withTag(tag: string | undefined): Form<T, U> {
-    if (tag !== void 0 && tag !== this.tag) {
-      return new TagForm(this, tag);
-    } else {
+    if (tag === void 0 || tag === this.tag) {
       return this;
     }
+    return new TagForm(this, tag);
   }
 
   /**
@@ -63,11 +62,10 @@ export abstract class Form<T, U = T> {
    * Returns a version of this `Form` with the given `unit` value.
    */
   withUnit(unit: T | undefined): Form<T, U> {
-    if (unit !== this.unit) {
-      return new UnitForm(this, unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new UnitForm(this, unit);
   }
 
   /**

@@ -14,6 +14,7 @@
 
 import * as ws from "ws";
 import type {Class} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {Observer} from "@swim/util";
 import {Affinity} from "@swim/component";
 import {Property} from "@swim/component";
@@ -307,14 +308,10 @@ export class WarpClient extends WarpScope {
     }
   }
 
-  /** @internal */
-  static Global: WarpClient | null = null;
-
+  @Lazy
   static global(): WarpClient {
-    if (this.Global === null) {
-      this.Global = new WarpClient();
-      this.Global.mount();
-    }
-    return this.Global;
+    const client = new WarpClient();
+    client.mount();
+    return client;
   }
 }

@@ -29,11 +29,10 @@ export class BooleanForm extends Form<boolean> {
   override readonly unit!: boolean | undefined;
 
   override withUnit(unit: boolean | undefined): Form<boolean> {
-    if (unit !== this.unit) {
-      return new BooleanForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new BooleanForm(unit);
   }
 
   override mold(object: boolean, item?: Item): Item {

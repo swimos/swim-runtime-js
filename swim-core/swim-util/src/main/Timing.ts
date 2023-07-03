@@ -27,7 +27,7 @@ export type AnyTiming = Timing | TimingInit;
 /** @public */
 export interface TimingInit {
   /** @internal */
-  readonly typeid?: "TimingInit";
+  typeid?: "TimingInit";
   easing?: AnyEasing;
   t0?: number;
   t1?: number;
@@ -37,7 +37,7 @@ export interface TimingInit {
 /** @public */
 export interface Timing extends Domain<number> {
   /** @internal */
-  readonly typeid?: "Timing";
+  typeid?: "Timing";
 
   /** @override */
   readonly 0: number;
@@ -94,9 +94,9 @@ export const Timing = (function (_super: typeof Domain) {
     /** @internal */
     prototype: Timing;
 
-    fromInit(init: TimingInit): Timing;
-
     fromAny<T extends AnyTiming | boolean | null | undefined>(value: T): Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T>;
+
+    fromInit(init: TimingInit): Timing;
   };
 
   Timing.prototype = Object.create(_super.prototype);
@@ -167,6 +167,15 @@ export const Timing = (function (_super: typeof Domain) {
     return "Timing(" + this.easing + ", " + this[0] + ", " + this[1] + ")";
   };
 
+  Timing.fromAny = function <T extends AnyTiming | boolean | null | undefined>(value: T): Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T> {
+    if (value === void 0 || value === null || typeof value === "boolean" || value instanceof Timing) {
+      return value as Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T>;
+    } else if (typeof value === "object") {
+      return this.fromInit(value);
+    }
+    throw new TypeError("" + value);
+  };
+
   Timing.fromInit = function (init: TimingInit): Timing {
     let easing = init.easing;
     if (easing === void 0) {
@@ -188,15 +197,6 @@ export const Timing = (function (_super: typeof Domain) {
       }
     }
     return Timing(easing, t0, t1);
-  };
-
-  Timing.fromAny = function <T extends AnyTiming | boolean | null | undefined>(value: T): Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T> {
-    if (value === void 0 || value === null || typeof value === "boolean" || value instanceof Timing) {
-      return value as Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T>;
-    } else if (typeof value === "object") {
-      return this.fromInit(value);
-    }
-    throw new TypeError("" + value);
   };
 
   return Timing;

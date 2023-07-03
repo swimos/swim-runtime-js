@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Mutable} from "@swim/util";
 import {Equivalent} from "@swim/util";
-import type {ConstraintMap} from "./ConstraintMap";
 import type {ConstraintSymbol} from "./ConstraintSymbol";
 import {ConstraintDummy} from "./ConstraintSymbol";
 import type {ConstraintSolver} from "./ConstraintSolver";
@@ -22,7 +20,7 @@ import type {ConstraintSolver} from "./ConstraintSolver";
 /** @internal */
 export class ConstraintRow {
   constructor(solver: ConstraintSolver, symbol: ConstraintSymbol | null,
-              cells: ConstraintMap<ConstraintSymbol, number>, constant: number) {
+              cells: Map<ConstraintSymbol, number>, constant: number) {
     this.solver = solver;
     this.symbol = symbol;
     this.cells = cells;
@@ -31,33 +29,33 @@ export class ConstraintRow {
 
   readonly solver: ConstraintSolver;
 
-  readonly symbol: ConstraintSymbol | null;
+  symbol: ConstraintSymbol | null;
 
   /** @internal */
   setSymbol(symbol: ConstraintSymbol | null): void {
-    (this as Mutable<this>).symbol = symbol;
+    this.symbol = symbol;
     this.invalidate();
   }
 
-  readonly cells: ConstraintMap<ConstraintSymbol, number>;
+  readonly cells: Map<ConstraintSymbol, number>;
 
-  readonly constant: number;
+  constant: number;
 
   /** @internal */
   setConstant(constant: number): void {
-    if (this.constant !== constant) {
-      (this as Mutable<this>).constant = constant;
-      this.invalidate();
+    if (this.constant === constant) {
+      return;
     }
+    this.constant = constant;
+    this.invalidate();
   }
 
   isConstant(): boolean {
-    return this.cells.isEmpty();
+    return this.cells.size === 0;
   }
 
   isDummy(): boolean {
-    for (let i = 0, n = this.cells.size; i < n; i += 1) {
-      const symbol = this.cells.getEntry(i)![0];
+    for (const symbol of this.cells.keys()) {
       if (!(symbol instanceof ConstraintDummy)) {
         return false;
       }
@@ -66,7 +64,7 @@ export class ConstraintRow {
   }
 
   clone(): ConstraintRow {
-    return new ConstraintRow(this.solver, this.symbol, this.cells.clone(), this.constant);
+    return new ConstraintRow(this.solver, this.symbol, new Map(this.cells), this.constant);
   }
 
   add(value: number): number {
@@ -78,7 +76,7 @@ export class ConstraintRow {
   insertSymbol(symbol: ConstraintSymbol, coefficient: number = 1): void {
     coefficient += this.cells.get(symbol) ?? 0;
     if (Math.abs(coefficient) < Equivalent.Epsilon) {
-      this.cells.remove(symbol);
+      this.cells.delete(symbol);
     } else {
       this.cells.set(symbol, coefficient);
     }
@@ -86,33 +84,32 @@ export class ConstraintRow {
 
   insertRow(that: ConstraintRow, coefficient: number): void {
     this.setConstant(this.constant + that.constant * coefficient);
-    for (let i = 0, n = that.cells.size; i < n; i += 1) {
-      const [symbol, value] = that.cells.getEntry(i)!;
+    for (const [symbol, value] of that.cells) {
       this.insertSymbol(symbol, value * coefficient);
     }
   }
 
   removeSymbol(symbol: ConstraintSymbol): void {
-    this.cells.remove(symbol);
+    this.cells.delete(symbol);
   }
 
   negate(): void {
     this.setConstant(-this.constant);
-    for (let i = 0, n = this.cells.size; i < n; i += 1) {
-      const entry = this.cells.getEntry(i)!;
-      entry[1] = -entry[1];
+    for (const [symbol, value] of this.cells) {
+      this.cells.set(symbol, -value);
     }
   }
 
   solveFor(symbol: ConstraintSymbol): void {
-    const value = this.cells.remove(symbol);
-    if (value !== void 0) {
-      const coefficient = -1 / value;
-      this.setConstant(this.constant * coefficient);
-      for (let i = 0, n = this.cells.size; i < n; i += 1) {
-        const entry = this.cells.getEntry(i)!;
-        entry[1] *= coefficient;
-      }
+    const value = this.cells.get(symbol);
+    if (value === void 0) {
+      return;
+    }
+    this.cells.delete(symbol);
+    const coefficient = -1 / value;
+    this.setConstant(this.constant * coefficient);
+    for (const [symbol, value] of this.cells) {
+      this.cells.set(symbol, value * coefficient);
     }
   }
 
@@ -127,8 +124,9 @@ export class ConstraintRow {
   }
 
   substitute(symbol: ConstraintSymbol, row: ConstraintRow): void {
-    const value = this.cells.remove(symbol);
+    const value = this.cells.get(symbol);
     if (value !== void 0) {
+      this.cells.delete(symbol);
       this.insertRow(row, value);
     }
   }

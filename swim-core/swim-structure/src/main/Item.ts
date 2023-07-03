@@ -472,14 +472,18 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
     return Cursor.unary(this);
   }
 
+  [Symbol.iterator](): Cursor<Item> {
+    return this.iterator();
+  }
+
+  /** @override */
   interpolateTo(that: Item): Interpolator<Item>;
   interpolateTo(that: unknown): Interpolator<Item> | null;
   interpolateTo(that: unknown): Interpolator<Item> | null {
     if (that instanceof Item) {
       return ItemInterpolator(this, that);
-    } else {
-      return null;
     }
+    return null;
   }
 
   /**
@@ -489,22 +493,29 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
    */
   abstract readonly typeOrder: number;
 
+  /** @override */
   abstract compareTo(that: unknown): number;
 
+  /** @override */
   abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
   abstract keyEquals(key: unknown): boolean;
 
+  /** @override */
   abstract equals(that: unknown): boolean;
 
+  /** @override */
   abstract hashCode(): number;
 
+  /** @override */
   abstract debug<T>(output: Output<T>): Output<T>;
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     return this.debug(output);
   }
 
+  /** @override */
   toString(): string {
     return Format.debug(this);
   }

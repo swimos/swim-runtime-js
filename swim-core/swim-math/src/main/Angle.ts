@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
+import type {Mutable} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
-import type {Mutable} from "@swim/util";
-import {Numbers} from "@swim/util";
-import {Constructors} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Numbers} from "@swim/util";
+import {Constructors} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
@@ -40,6 +41,15 @@ export type AngleUnits = "deg" | "rad" | "grad" | "turn";
 
 /** @public */
 export type AnyAngle = Angle | string | number;
+
+/** @public */
+export const AnyAngle = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyAngle {
+    return instance instanceof Angle
+        || typeof instance === "number"
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent, Compare, Debug {
@@ -134,6 +144,7 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
 
   abstract toCssValue(): CSSUnitValue | null;
 
+  /** @override */
   interpolateTo(that: Angle): Interpolator<Angle>;
   interpolateTo(that: unknown): Interpolator<Angle> | null;
   interpolateTo(that: unknown): Interpolator<Angle> | null {
@@ -143,16 +154,22 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     return null;
   }
 
+  /** @override */
   abstract compareTo(that: unknown): number;
 
+  /** @override */
   abstract equivalentTo(that: unknown, epsilon?: number): boolean;
 
+  /** @override */
   abstract equals(that: unknown): boolean;
 
+  /** @override */
   abstract hashCode(): number;
 
+  /** @override */
   abstract debug<T>(output: Output<T>): Output<T>;
 
+  /** @override */
   abstract toString(): string;
 
   static zero(units?: AngleUnits): Angle {
@@ -200,9 +217,9 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     throw new TypeError("" + value);
   }
 
-  static fromAny(value: AnyAngle, defaultUnits?: AngleUnits): Angle {
+  static fromAny<T extends AnyAngle | null | undefined>(value: T, defaultUnits?: AngleUnits): Angle | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Angle) {
-      return value;
+      return value as Angle | Uninitable<T>;
     } else if (typeof value === "number") {
       return Angle.of(value, defaultUnits);
     } else if (typeof value === "string") {
@@ -249,13 +266,6 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
   @Lazy
   static form(): Form<Angle, AnyAngle> {
     return new AngleForm(void 0, Angle.zero());
-  }
-
-  /** @internal */
-  static isAny(value: unknown): value is AnyAngle {
-    return value instanceof Angle
-        || typeof value === "number"
-        || typeof value === "string";
   }
 }
 
@@ -336,16 +346,14 @@ export class DegAngle extends Angle {
     return this.value + "deg";
   }
 
-  /** @internal */
-  static readonly Zero: DegAngle = new this(0);
-
+  @Lazy
   static override zero(): DegAngle {
-    return this.Zero;
+    return new DegAngle(0);
   }
 
   static override of(value: number): DegAngle {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new DegAngle(value);
   }
@@ -428,16 +436,14 @@ export class RadAngle extends Angle {
     return this.value + "rad";
   }
 
-  /** @internal */
-  static readonly Zero: RadAngle = new this(0);
-
+  @Lazy
   static override zero(): RadAngle {
-    return this.Zero;
+    return new RadAngle(0);
   }
 
   static override of(value: number): RadAngle {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new RadAngle(value);
   }
@@ -520,16 +526,14 @@ export class GradAngle extends Angle {
     return this.value + "grad";
   }
 
-  /** @internal */
-  static readonly Zero: GradAngle = new this(0);
-
+  @Lazy
   static override zero(): GradAngle {
-    return this.Zero;
+    return new GradAngle(0);
   }
 
   static override of(value: number): GradAngle {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new GradAngle(value);
   }
@@ -612,16 +616,14 @@ export class TurnAngle extends Angle {
     return this.value + "turn";
   }
 
-  /** @internal */
-  static readonly Zero: TurnAngle = new this(0);
-
+  @Lazy
   static override zero(): TurnAngle {
-    return this.Zero;
+    return new TurnAngle(0);
   }
 
   static override of(value: number): TurnAngle {
     if (value === 0) {
-      return this.Zero;
+      return this.zero();
     }
     return new TurnAngle(value);
   }
@@ -668,11 +670,10 @@ export class AngleForm extends Form<Angle, AnyAngle> {
   override readonly unit!: Angle | undefined;
 
   override withUnit(unit: Angle | undefined): Form<Angle, AnyAngle> {
-    if (unit !== this.unit) {
-      return new AngleForm(this.defaultUnits, unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new AngleForm(this.defaultUnits, unit);
   }
 
   override mold(angle: AnyAngle): Item {

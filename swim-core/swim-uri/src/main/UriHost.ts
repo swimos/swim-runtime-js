@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Strings} from "@swim/util";
+import type {Uninitable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Strings} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
@@ -29,6 +31,14 @@ import {Uri} from "./Uri";
 
 /** @public */
 export type AnyUriHost = UriHost | string;
+
+/** @public */
+export const AnyUriHost = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUriHost {
+    return instance instanceof UriHost
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export abstract class UriHost implements HashCode, Compare, Debug, Display {
@@ -58,6 +68,7 @@ export abstract class UriHost implements HashCode, Compare, Debug, Display {
     return this.toString();
   }
 
+  /** @override */
   compareTo(that: unknown): number {
     if (that instanceof UriHost) {
       return this.toString().localeCompare(that.toString());
@@ -65,6 +76,7 @@ export abstract class UriHost implements HashCode, Compare, Debug, Display {
     return NaN;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -74,18 +86,23 @@ export abstract class UriHost implements HashCode, Compare, Debug, Display {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Strings.hash(this.toString());
   }
 
+  /** @override */
   abstract debug<T>(output: Output<T>): Output<T>;
 
+  /** @override */
   abstract display<T>(output: Output<T>): Output<T>;
 
+  /** @override */
   abstract toString(): string;
 
+  @Lazy
   static undefined(): UriHost {
-    return UriHostUndefined.Undefined;
+    return new UriHostUndefined();
   }
 
   static hostname(name: string): UriHost {
@@ -100,11 +117,9 @@ export abstract class UriHost implements HashCode, Compare, Debug, Display {
     return new UriHostIPv6(ipv6);
   }
 
-  static fromAny(value: AnyUriHost): UriHost;
-  static fromAny(value: AnyUriHost | null | undefined): UriHost | null | undefined;
-  static fromAny(value: AnyUriHost | null | undefined): UriHost | null | undefined {
+  static fromAny<T extends AnyUriHost | null | undefined>(value: T): UriHost | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriHost) {
-      return value;
+      return value as UriHost | Uninitable<T>;
     } else if (typeof value === "string") {
       return UriHost.parse(value);
     }
@@ -151,9 +166,6 @@ export class UriHostUndefined extends UriHost {
   override toString(): string {
     return "";
   }
-
-  /** @internal */
-  static readonly Undefined: UriHostUndefined = new this();
 }
 
 /** @internal */

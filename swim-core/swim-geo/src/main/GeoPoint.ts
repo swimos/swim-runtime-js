@@ -14,8 +14,8 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Equivalent} from "@swim/util";
 import {Numbers} from "@swim/util";
@@ -45,6 +45,8 @@ export const AnyGeoPoint = {
 
 /** @public */
 export interface GeoPointInit {
+  /** @internal */
+  typeid?: "GeoPointInit";
   lng: number;
   lat: number;
 }
@@ -70,12 +72,15 @@ export const GeoPointTuple = {
  * A geographic point represented by a WGS84 longitude and latitude.
  * @public
  */
-export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCode, Equivalent, Debug {
+export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCode, Debug {
   constructor(lng: number, lat: number) {
     super();
     this.lng = lng;
     this.lat = lat;
   }
+
+  /** @internal */
+  declare typeid?: "GeoPoint";
 
   isDefined(): boolean {
     return isFinite(this.lng) && isFinite(this.lat);
@@ -119,7 +124,7 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
 
   override intersects(that: AnyGeoShape): boolean {
     that = GeoShape.fromAny(that);
-    return (that as GeoShape).intersects(this);
+    return that.intersects(this);
   }
 
   override project(f: GeoProjection): R2Point {
@@ -144,6 +149,7 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     };
   }
 
+  /** @override */
   interpolateTo(that: GeoPoint): Interpolator<GeoPoint>;
   interpolateTo(that: unknown): Interpolator<GeoPoint> | null;
   interpolateTo(that: unknown): Interpolator<GeoPoint> | null {
@@ -153,7 +159,7 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return null;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoPoint) {
@@ -172,11 +178,13 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Constructors.hash(GeoPoint),
         Numbers.hash(this.lng)), Numbers.hash(this.lat)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("GeoPoint").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.lng).write(", ").debug(this.lat).write(41/*')'*/);
@@ -201,14 +209,6 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return new GeoPoint(lng, lat);
   }
 
-  static fromInit(value: GeoPointInit): GeoPoint {
-    return new GeoPoint(value.lng, value.lat);
-  }
-
-  static fromTuple(value: GeoPointTuple): GeoPoint {
-    return new GeoPoint(value[0], value[1]);
-  }
-
   static override fromAny<T extends AnyGeoPoint | null | undefined>(value: T): GeoPoint | Uninitable<T>;
   static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
   static override fromAny<T extends AnyGeoPoint | null | undefined>(value: T): GeoPoint | Uninitable<T> {
@@ -220,6 +220,14 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
       return GeoPoint.fromTuple(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static fromInit(init: GeoPointInit): GeoPoint {
+    return new GeoPoint(init.lng, init.lat);
+  }
+
+  static fromTuple(tuple: GeoPointTuple): GeoPoint {
+    return new GeoPoint(tuple[0], tuple[1]);
   }
 
   static normalized(lng: number, lat: number): GeoPoint {

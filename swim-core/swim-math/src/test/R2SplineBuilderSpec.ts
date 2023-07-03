@@ -24,7 +24,7 @@ export class R2SplineBuilderSpec extends Suite {
     const builder = R2Spline.builder();
     builder.moveTo(0, 1);
     builder.lineTo(1, 0);
-    const spline = builder.bind();
+    const spline = builder.build();
     exam.equal(spline, R2Spline.open(R2Curve.linear(0, 1, 1, 0)));
   }
 
@@ -33,7 +33,7 @@ export class R2SplineBuilderSpec extends Suite {
     const builder = R2Spline.builder();
     builder.moveTo(0, 1);
     builder.quadraticCurveTo(0, 0, 1, 0);
-    const spline = builder.bind();
+    const spline = builder.build();
     exam.equal(spline, R2Spline.open(R2Curve.quadratic(0, 1, 0, 0, 1, 0)));
   }
 
@@ -42,7 +42,7 @@ export class R2SplineBuilderSpec extends Suite {
     const builder = R2Spline.builder();
     builder.moveTo(-1, 0);
     builder.bezierCurveTo(-0.5, 1, 0.5, 1, 1, 0);
-    const spline = builder.bind();
+    const spline = builder.build();
     exam.equal(spline, R2Spline.open(R2Curve.cubic(-1, 0, -0.5, 1, 0.5, 1, 1, 0)));
   }
 }

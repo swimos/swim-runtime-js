@@ -27,36 +27,38 @@ export class LibsTask extends PackageTask {
   override async exec(): Promise<TaskStatus> {
     const packageScope = this.packageScope!;
     const libraries = packageScope.getLibraries();
-    if (libraries !== null) {
-      let output = Unicode.stringOutput(OutputSettings.styled());
-      const parent = this.parent;
-      output = (parent !== null ? parent : this).writeName(output);
-      output = output.write(" ");
-      output = OutputStyle.cyanBold(output);
-      output = output.write("libraries");
+    if (libraries === null) {
+      return TaskStatus.Success;
+    }
+
+    let output = Unicode.stringOutput(OutputSettings.styled());
+    const parent = this.parent;
+    output = (parent !== null ? parent : this).writeName(output);
+    output = output.write(" ");
+    output = OutputStyle.cyanBold(output);
+    output = output.write("libraries");
+    output = OutputStyle.reset(output);
+    console.log(output.bind());
+
+    let libraryCount = 0;
+    for (const libraryName in libraries) {
+      output = Unicode.stringOutput(OutputSettings.styled());
+      output = output.write(" - ");
+      output = OutputStyle.yellow(output);
+      output = output.write(libraryName);
       output = OutputStyle.reset(output);
       console.log(output.bind());
-
-      let libraryCount = 0;
-      for (const libraryName in libraries) {
-        output = Unicode.stringOutput(OutputSettings.styled());
-        output = output.write(" - ");
-        output = OutputStyle.yellow(output);
-        output = output.write(libraryName);
-        output = OutputStyle.reset(output);
-        console.log(output.bind());
-        libraryCount += 1;
-      }
-      if (libraryCount === 0) {
-        output = Unicode.stringOutput(OutputSettings.styled());
-        output = output.write(" - ");
-        output = OutputStyle.gray(output);
-        output = output.write("none");
-        output = OutputStyle.reset(output);
-        console.log(output.bind());
-      }
-      console.log("");
+      libraryCount += 1;
     }
+    if (libraryCount === 0) {
+      output = Unicode.stringOutput(OutputSettings.styled());
+      output = output.write(" - ");
+      output = OutputStyle.gray(output);
+      output = output.write("none");
+      output = OutputStyle.reset(output);
+      console.log(output.bind());
+    }
+    console.log("");
 
     return TaskStatus.Success;
   }

@@ -32,11 +32,10 @@ export class UnitForm<T, U = T> extends Form<T, U> {
   override readonly tag: string | undefined; // // getter defined below to work around useDefineForClassFields lunacy
 
   override withTag(tag: string | undefined): Form<T, U> {
-    if (tag !== this.tag) {
-      return new UnitForm(this.form.withTag(tag), this.unit);
-    } else {
+    if (tag === this.tag) {
       return this;
     }
+    return new UnitForm(this.form.withTag(tag), this.unit);
   }
 
   override readonly unit!: T | undefined;

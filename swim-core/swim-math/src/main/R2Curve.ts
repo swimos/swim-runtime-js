@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Equals} from "@swim/util";
-import type {Equivalent} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {AnyOutputSettings} from "@swim/codec";
@@ -51,7 +49,7 @@ export interface R2CurveContext {
 }
 
 /** @public */
-export abstract class R2Curve extends R2Shape implements Equals, Equivalent {
+export abstract class R2Curve extends R2Shape {
   abstract interpolateX(u: number): number;
 
   abstract interpolateY(u: number): number;
@@ -96,10 +94,6 @@ export abstract class R2Curve extends R2Shape implements Equals, Equivalent {
     return output.toString();
   }
 
-  abstract equivalentTo(that: unknown, epsilon?: number): boolean;
-
-  abstract equals(that: unknown): boolean;
-
   static linear(x0: number, y0: number, x1: number, y1: number): R2Curve {
     return new R2Segment(x0, y0, x1, y1);
   }
@@ -134,6 +128,11 @@ export abstract class R2Curve extends R2Shape implements Equals, Equivalent {
     }
     return parser.bind();
   }
+}
+
+/** @public */
+export abstract class R2BezierCurve extends R2Curve {
+  abstract override transform(f: R2Function): R2BezierCurve;
 }
 
 /** @internal */

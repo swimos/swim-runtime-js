@@ -41,47 +41,49 @@ export class VersionTask extends PackageTask {
   override async exec(options?: VersionTaskOptions): Promise<TaskStatus> {
     const packageVersions = options !== void 0 ? options.packageVersions : void 0;
     const packageScope = this.packageScope;
-    if (packageVersions !== void 0 && packageScope !== null) {
-      const packageConfigPath = packageScope.package.path;
-      const oldPackageConfig = packageScope.package.value;
-      if (packageConfigPath !== void 0 && oldPackageConfig !== null) {
-        this.logBegin("updating");
-        const newPackageConfig = this.updatedPackageConfig(packageScope, oldPackageConfig, packageVersions);
-        if (newPackageConfig !== null) {
-          if (options === void 0 || options.dryRun !== true) {
-            let output = Unicode.stringOutput(OutputSettings.styled());
-            output = OutputStyle.greenBold(output);
-            output = output.write("writing updates");
-            output = OutputStyle.reset(output);
-            output = output.write(" ");
-            output = OutputStyle.faint(output);
-            output = output.write("to");
-            output = OutputStyle.reset(output);
-            output = output.write(" ");
-            output = OutputStyle.gray(output);
-            output = output.write(packageConfigPath);
-            output = OutputStyle.reset(output);
-            console.log(output.bind());
-            packageScope.package.store(void 0, newPackageConfig);
-          } else {
-            let output = Unicode.stringOutput(OutputSettings.styled());
-            output = OutputStyle.yellowBold(output);
-            output = output.write("not writing updates");
-            output = OutputStyle.reset(output);
-            output = output.write(" ");
-            output = OutputStyle.faint(output);
-            output = output.write("to");
-            output = OutputStyle.reset(output);
-            output = output.write(" ");
-            output = OutputStyle.gray(output);
-            output = output.write(packageConfigPath);
-            output = OutputStyle.reset(output);
-            console.log(output.bind());
-          }
-        }
-        console.log("");
+    if (packageVersions === void 0 || packageScope === null) {
+      return TaskStatus.Success;
+    }
+    const packageConfigPath = packageScope.package.path;
+    const oldPackageConfig = packageScope.package.value;
+    if (packageConfigPath === void 0 || oldPackageConfig === null) {
+      return TaskStatus.Success;
+    }
+    this.logBegin("updating");
+    const newPackageConfig = this.updatedPackageConfig(packageScope, oldPackageConfig, packageVersions);
+    if (newPackageConfig !== null) {
+      if (options === void 0 || options.dryRun !== true) {
+        let output = Unicode.stringOutput(OutputSettings.styled());
+        output = OutputStyle.greenBold(output);
+        output = output.write("writing updates");
+        output = OutputStyle.reset(output);
+        output = output.write(" ");
+        output = OutputStyle.faint(output);
+        output = output.write("to");
+        output = OutputStyle.reset(output);
+        output = output.write(" ");
+        output = OutputStyle.gray(output);
+        output = output.write(packageConfigPath);
+        output = OutputStyle.reset(output);
+        console.log(output.bind());
+        packageScope.package.store(void 0, newPackageConfig);
+      } else {
+        let output = Unicode.stringOutput(OutputSettings.styled());
+        output = OutputStyle.yellowBold(output);
+        output = output.write("not writing updates");
+        output = OutputStyle.reset(output);
+        output = output.write(" ");
+        output = OutputStyle.faint(output);
+        output = output.write("to");
+        output = OutputStyle.reset(output);
+        output = output.write(" ");
+        output = OutputStyle.gray(output);
+        output = output.write(packageConfigPath);
+        output = OutputStyle.reset(output);
+        console.log(output.bind());
       }
     }
+    console.log("");
     return TaskStatus.Success;
   }
 
@@ -103,7 +105,9 @@ export class VersionTask extends PackageTask {
         output = output.write("" + oldValue);
         output = OutputStyle.reset(output);
         const newVersion = packageVersions[packageScope.name];
-        if (newVersion !== void 0 && newVersion !== oldValue) {
+        if (newVersion === void 0 || newVersion === oldValue) {
+          newPackageConfig[key] = oldValue;
+        } else {
           newPackageConfig[key] = newVersion;
           modified = true;
           output = output.write(" ");
@@ -114,8 +118,6 @@ export class VersionTask extends PackageTask {
           output = OutputStyle.green(output);
           output = output.write(newVersion);
           output = OutputStyle.reset(output);
-        } else {
-          newPackageConfig[key] = oldValue;
         }
         console.log(output.bind());
       } else if (key in VersionTask.DependencyKeys && oldValue !== void 0) {
@@ -155,7 +157,9 @@ export class VersionTask extends PackageTask {
     for (const packageName in oldDependencies) {
       const oldVersion = oldDependencies[packageName]!;
       const newVersion = packageVersions[packageName];
-      if (newVersion !== void 0 && newVersion !== oldVersion) {
+      if (newVersion === void 0 || newVersion === oldVersion) {
+        newDependencies[packageName] = oldVersion;
+      } else {
         newDependencies[packageName] = newVersion;
         modified = true;
         let output = Unicode.stringOutput(OutputSettings.styled());
@@ -179,8 +183,6 @@ export class VersionTask extends PackageTask {
         output = output.write(newVersion);
         output = OutputStyle.reset(output);
         console.log(output.bind());
-      } else {
-        newDependencies[packageName] = oldVersion;
       }
     }
     return modified ? newDependencies : null;

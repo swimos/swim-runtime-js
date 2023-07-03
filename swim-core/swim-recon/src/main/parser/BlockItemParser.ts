@@ -80,13 +80,13 @@ export class BlockItemParser<I, V> extends Parser<V> {
           } else if (builder === void 0) {
             return Parser.done(recon.extant());
           } else {
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           }
         } else if (input.isDone()) {
           if (builder === void 0) {
             return Parser.done(recon.extant());
           } else {
-            return Parser.done(builder.bind());
+            return Parser.done(builder.build());
           }
         }
       }
@@ -111,7 +111,7 @@ export class BlockItemParser<I, V> extends Parser<V> {
           step = 1;
           continue;
         } else if (input.isDone()) {
-          return Parser.done(builder!.bind());
+          return Parser.done(builder!.build());
         }
       }
       if (step === 4) {
@@ -146,10 +146,10 @@ export class BlockItemParser<I, V> extends Parser<V> {
           if (input.head() === 64/*'@'*/) {
             step = 1;
           } else {
-            return Parser.done(builder!.bind());
+            return Parser.done(builder!.build());
           }
         } else if (input.isDone()) {
-          return Parser.done(builder!.bind());
+          return Parser.done(builder!.build());
         }
       }
       break;

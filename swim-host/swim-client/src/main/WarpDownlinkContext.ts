@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Objects} from "@swim/util";
 import type {Uri} from "@swim/uri";
 import type {WarpDownlinkModel} from "./WarpDownlinkModel";
 
@@ -31,29 +32,8 @@ export interface WarpDownlinkContext {
 }
 
 /** @public */
-export const WarpDownlinkContext = (function () {
-  const WarpDownlinkContext = {} as {
-    /** @internal */
-    has<K extends keyof WarpDownlinkContext>(object: unknown, key: K): object is Required<Pick<WarpDownlinkContext, K>>;
-
-    /** @internal */
-    is(object: unknown): object is WarpDownlinkContext;
-  };
-
-  WarpDownlinkContext.has = function <K extends keyof WarpDownlinkContext>(object: unknown, key: K): object is Required<Pick<WarpDownlinkContext, K>> {
-    if (typeof object === "object" && object !== null || typeof object === "function") {
-      return key in object;
-    }
-    return false;
-  };
-
-  WarpDownlinkContext.is = function (object: unknown): object is WarpDownlinkContext {
-    if (typeof object === "object" && object !== null || typeof object === "function") {
-      const downlinkContext = object as WarpDownlinkContext;
-      return "openDownlink" in downlinkContext;
-    }
-    return false;
-  };
-
-  return WarpDownlinkContext;
-})();
+export const WarpDownlinkContext = {
+  [Symbol.hasInstance](instance: unknown): instance is WarpDownlinkContext {
+    return Objects.hasAllKeys<WarpDownlinkContext>(instance, "getDownlink", "openDownlink");
+  },
+};

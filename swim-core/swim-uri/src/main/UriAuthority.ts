@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Strings} from "@swim/util";
+import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
+import {Strings} from "@swim/util";
+import {Objects} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
@@ -39,13 +42,29 @@ import {UriPortParser} from "./"; // forward import
 export type AnyUriAuthority = UriAuthority | UriAuthorityInit | string;
 
 /** @public */
+export const AnyUriAuthority = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyUriAuthority {
+    return instance instanceof UriAuthority
+        || UriAuthorityInit[Symbol.hasInstance](instance)
+        || typeof instance === "string";
+  },
+};
+
+/** @public */
 export interface UriAuthorityInit extends UriUserInit {
   /** @internal */
-  hashValue?: never, // force type ambiguity between UriAuthorityInit and UriAuthority
+  typeid?: "UriAuthorityInit" | "UriInit";
   user?: AnyUriUser;
   host?: AnyUriHost;
   port?: AnyUriPort;
 }
+
+/** @public */
+export const UriAuthorityInit = {
+  [Symbol.hasInstance](instance: unknown): instance is UriAuthorityInit {
+    return Objects.hasAnyKey<UriAuthorityInit>(instance, "user", "host", "port");
+  },
+};
 
 /** @public */
 export class UriAuthority implements HashCode, Compare, Debug, Display {
@@ -58,6 +77,9 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     this.stringValue = void 0;
   }
 
+  /** @internal */
+  declare typeid?: "UriAuthority";
+
   isDefined(): boolean {
     return this.user.isDefined() || this.host.isDefined() || this.port.isDefined();
   }
@@ -69,7 +91,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     if (user === this.user) {
       return this;
     }
-    return this.copy(user as UriUser, this.host, this.port);
+    return this.copy(user, this.host, this.port);
   }
 
   get userPart(): string {
@@ -194,6 +216,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return authority;
   }
 
+  /** @override */
   compareTo(that: unknown): number {
     if (that instanceof UriAuthority) {
       return this.toString().localeCompare(that.toString());
@@ -201,6 +224,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return NaN;
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -213,6 +237,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
   /** @internal */
   readonly hashValue: number | undefined;
 
+  /** @override */
   hashCode(): number {
     let hashValue = this.hashValue;
     if (hashValue === void 0) {
@@ -222,6 +247,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return hashValue;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("UriAuthority").write(46/*'.'*/);
     if (this.isDefined()) {
@@ -233,6 +259,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return output;
   }
 
+  /** @override */
   display<T>(output: Output<T>): Output<T> {
     const stringValue = this.stringValue;
     if (stringValue !== void 0) {
@@ -254,6 +281,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
   /** @internal */
   readonly stringValue: string | undefined;
 
+  /** @override */
   toString(): string {
     let stringValue = this.stringValue;
     if (stringValue === void 0) {
@@ -263,14 +291,9 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return stringValue;
   }
 
-  /** @internal */
-  static Undefined: UriAuthority | null = null;
-
+  @Lazy
   static undefined(): UriAuthority {
-    if (this.Undefined === null) {
-      this.Undefined = new UriAuthority(UriUser.undefined(), UriHost.undefined(), UriPort.undefined());
-    }
-    return this.Undefined;
+    return new UriAuthority(UriUser.undefined(), UriHost.undefined(), UriPort.undefined());
   }
 
   static create(user: UriUser = UriUser.undefined(),
@@ -282,27 +305,9 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return new UriAuthority(user, host, port);
   }
 
-  static fromInit(init: UriAuthorityInit): UriAuthority {
-    let user = UriUser.fromAny(init.user !== void 0 ? init.user : init);
-    if (user === void 0 || user === null) {
-      user = UriUser.undefined();
-    }
-    let host = UriHost.fromAny(init.host);
-    if (host === void 0 || host === null) {
-      host = UriHost.undefined();
-    }
-    let port = UriPort.fromAny(init.port);
-    if (port === void 0 || port === null) {
-      port = UriPort.undefined();
-    }
-    return UriAuthority.create(user, host, port);
-  }
-
-  static fromAny(value: AnyUriAuthority): UriAuthority;
-  static fromAny(value: AnyUriAuthority | null | undefined): UriAuthority | null | undefined;
-  static fromAny(value: AnyUriAuthority | null | undefined): UriAuthority | null | undefined {
+  static fromAny<T extends AnyUriAuthority | null | undefined>(value: T): UriAuthority | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriAuthority) {
-      return value;
+      return value as UriAuthority | Uninitable<T>;
     } else if (typeof value === "object") {
       return UriAuthority.fromInit(value);
     } else if (typeof value === "string") {
@@ -311,64 +316,71 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     throw new TypeError("" + value);
   }
 
+  static fromInit(init: UriAuthorityInit): UriAuthority {
+    const user = UriUser.fromAny(init.user);
+    const host = UriHost.fromAny(init.host);
+    const port = UriPort.fromAny(init.port);
+    return this.create(user, host, port);
+  }
+
   static user(user: AnyUriUser): UriAuthority {
     user = UriUser.fromAny(user);
-    return UriAuthority.create(user as UriUser, void 0, void 0);
+    return this.create(user, void 0, void 0);
   }
 
   static userPart(userPart: string): UriAuthority {
     const user = UriUser.parse(userPart);
-    return UriAuthority.create(user, void 0, void 0);
+    return this.create(user, void 0, void 0);
   }
 
   static username(username: string, password?: string | undefined): UriAuthority {
     const user = UriUser.create(username, password);
-    return UriAuthority.create(user, void 0, void 0);
+    return this.create(user, void 0, void 0);
   }
 
   static password(password: string): UriAuthority {
     const user = UriUser.create("", password);
-    return UriAuthority.create(user, void 0, void 0);
+    return this.create(user, void 0, void 0);
   }
 
   static host(host: AnyUriHost): UriAuthority {
     host = UriHost.fromAny(host);
-    return UriAuthority.create(void 0, host, void 0);
+    return this.create(void 0, host, void 0);
   }
 
   static hostPart(hostPart: string): UriAuthority {
     const host = UriHost.parse(hostPart);
-    return UriAuthority.create(void 0, host, void 0);
+    return this.create(void 0, host, void 0);
   }
 
   static hostName(hostName: string): UriAuthority {
     const host = UriHost.hostname(hostName);
-    return UriAuthority.create(void 0, host, void 0);
+    return this.create(void 0, host, void 0);
   }
 
   static hostIPv4(hostIPv4: string): UriAuthority {
     const host = UriHost.ipv4(hostIPv4);
-    return UriAuthority.create(void 0, host, void 0);
+    return this.create(void 0, host, void 0);
   }
 
   static hostIPv6(hostIPv6: string): UriAuthority {
     const host = UriHost.ipv6(hostIPv6);
-    return UriAuthority.create(void 0, host, void 0);
+    return this.create(void 0, host, void 0);
   }
 
   static port(port: AnyUriPort): UriAuthority {
     port = UriPort.fromAny(port);
-    return UriAuthority.create(void 0, void 0, port);
+    return this.create(void 0, void 0, port);
   }
 
   static portPart(portPart: string): UriAuthority {
     const port = UriPort.parse(portPart);
-    return UriAuthority.create(void 0, void 0, port);
+    return this.create(void 0, void 0, port);
   }
 
   static portNumber(portNumber: number): UriAuthority {
     const port = UriPort.create(portNumber);
-    return UriAuthority.create(void 0, void 0, port);
+    return this.create(void 0, void 0, port);
   }
 
   static parse(input: Input): Parser<UriAuthority>;

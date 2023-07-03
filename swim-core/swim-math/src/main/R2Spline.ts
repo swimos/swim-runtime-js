@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {AnyOutputSettings} from "@swim/codec";
@@ -307,6 +308,7 @@ export class R2Spline extends R2Curve implements Debug {
     return false;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     const curves = this.curves;
     const n = curves.length;
@@ -328,8 +330,13 @@ export class R2Spline extends R2Curve implements Debug {
     return Format.debug(this);
   }
 
+  static builder(): R2SplineBuilder {
+    return new R2SplineBuilder();
+  }
+
+  @Lazy
   static empty(): R2Spline {
-    return new R2Spline([], false);
+    return new R2Spline(Arrays.empty(), false);
   }
 
   static open(...curves: R2Curve[]): R2Spline {
@@ -338,10 +345,6 @@ export class R2Spline extends R2Curve implements Debug {
 
   static closed(...curves: R2Curve[]): R2Spline {
     return new R2Spline(curves, true);
-  }
-
-  static builder(): R2SplineBuilder {
-    return new R2SplineBuilder();
   }
 
   static override parse(string: string): R2Spline {
@@ -490,16 +493,14 @@ export class R2SplineBuilder implements R2SplineContext {
       }
     } else if (rs === 0) { // parallel
       return NaN;
-    } else {
-      const pqs = pqx * sy - pqy * sx;
-      const t = pqs / rs; // (q − p) × s / (r × s)
-      const u = pqr / rs; // (q − p) × r / (r × s)
-      if (0 <= t && t <= 1 && 0 <= u && u <= 1) {
-        return t;
-      } else {
-        return NaN;
-      }
     }
+    const pqs = pqx * sy - pqy * sx;
+    const t = pqs / rs; // (q − p) × s / (r × s)
+    const u = pqr / rs; // (q − p) × r / (r × s)
+    if (t < 0 || t > 1 || u < 0 || u > 1) {
+      return NaN;
+    }
+    return t;
   }
 
   arc(cx: number, cy: number, r: number, a0: number, a1: number, ccw: boolean = false): void {
@@ -542,7 +543,7 @@ export class R2SplineBuilder implements R2SplineContext {
     this.y = y;
   }
 
-  bind(): R2Spline {
+  build(): R2Spline {
     this.aliased = true;
     return new R2Spline(this.curves, this.closed);
   }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -138,18 +139,14 @@ export class Bool extends Value {
     return output;
   }
 
-  /** @internal */
-  static readonly True: Bool = new this(true);
-
+  @Lazy
   static true(): Bool {
-    return this.True;
+    return new Bool(true);
   }
 
-  /** @internal */
-  static readonly False: Bool = new this(false);
-
+  @Lazy
   static false(): Bool {
-    return this.False;
+    return new Bool(false);
   }
 
   static from(value: boolean): Bool {

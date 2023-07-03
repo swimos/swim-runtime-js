@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import {Random} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Numbers} from "@swim/util";
@@ -390,11 +391,9 @@ export class Data extends Value {
   /** @internal */
   static readonly ImmutableFlag: number = 1 << 1;
 
-  /** @internal */
-  static readonly Empty: Data = new this(null, 0, Data.AliasedFlag | Data.ImmutableFlag);
-
+  @Lazy
   static override empty(): Data {
-    return this.Empty;
+    return new Data(null, 0, Data.AliasedFlag | Data.ImmutableFlag);
   }
 
   static create(initialCapacity?: number): Data {

@@ -14,12 +14,11 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import {Lazy} from "@swim/util";
 import {Murmur3} from "@swim/util";
+import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Objects} from "@swim/util";
-import type {Equivalent} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
@@ -50,6 +49,8 @@ export const AnyGeoBox = {
 
 /** @public */
 export interface GeoBoxInit {
+  /** @internal */
+  typeid?: "GeoBoxInit";
   lngMin: number;
   latMin: number;
   lngMax: number;
@@ -64,7 +65,7 @@ export const GeoBoxInit = {
 };
 
 /** @public */
-export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, Equivalent, Debug {
+export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, Debug {
   constructor(lngMin: number, latMin: number, lngMax: number, latMax: number) {
     super();
     this.lngMin = lngMin;
@@ -72,6 +73,9 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     this.lngMax = lngMax;
     this.latMax = latMax;
   }
+
+  /** @internal */
+  declare typeid?: "GeoBox";
 
   isDefined(): boolean {
     return isFinite(this.lngMin) && isFinite(this.latMin)
@@ -271,6 +275,7 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     };
   }
 
+  /** @override */
   interpolateTo(that: GeoBox): Interpolator<GeoBox>;
   interpolateTo(that: unknown): Interpolator<GeoBox> | null;
   interpolateTo(that: unknown): Interpolator<GeoBox> | null {
@@ -280,7 +285,7 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     return null;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoBox) {
@@ -302,12 +307,14 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Murmur3.mix(
         Constructors.hash(GeoBox), Numbers.hash(this.lngMin)), Numbers.hash(this.latMin)),
         Numbers.hash(this.lngMax)), Numbers.hash(this.latMax)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("GeoBox").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.lngMin).write(", ").debug(this.latMin).write(", ")
@@ -339,10 +346,6 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
     return new GeoBox(lngMin, latMin, lngMax, latMax);
   }
 
-  static fromInit(value: GeoBoxInit): GeoBox {
-    return new GeoBox(value.lngMin, value.latMin, value.lngMax, value.latMax);
-  }
-
   static override fromAny<T extends AnyGeoBox | null | undefined>(value: T): GeoBox | Uninitable<T>;
   static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
   static override fromAny<T extends AnyGeoBox | null | undefined>(value: T): GeoBox | Uninitable<T> {
@@ -352,6 +355,10 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, E
       return GeoBox.fromInit(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static fromInit(init: GeoBoxInit): GeoBox {
+    return new GeoBox(init.lngMin, init.latMin, init.lngMax, init.latMax);
   }
 }
 

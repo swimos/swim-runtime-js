@@ -15,8 +15,6 @@
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Lazy} from "@swim/util";
-import type {Equals} from "@swim/util";
-import type {Equivalent} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
@@ -62,12 +60,15 @@ export const GeoPathSplines = {
 export type GeoPathSplines = readonly AnyGeoSpline[];
 
 /** @public */
-export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
+export class GeoPath extends GeoShape implements Debug {
   constructor(splines: readonly GeoSpline[]) {
     super();
     this.splines = splines;
     this.boundingBox = null;
   }
+
+  /** @internal */
+  declare typeid?: "GeoPath";
 
   isDefined(): boolean {
     return this.splines.length !== 0;
@@ -246,7 +247,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     return void 0;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof GeoPath) {
@@ -264,6 +265,7 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     return false;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     const splines = this.splines;
     const n = splines.length;
@@ -317,19 +319,6 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
     return new GeoPath([new GeoSpline(curves, true)]);
   }
 
-  static fromPoints(points: GeoSplinePoints): GeoPath {
-    return new GeoPath([GeoSpline.fromPoints(points)]);
-  }
-
-  static fromSplines(values: GeoPathSplines): GeoPath {
-    const n = values.length;
-    const splines = new Array<GeoSpline>(n);
-    for (let i = 0; i < n; i += 1) {
-      splines[i] = GeoSpline.fromAny(values[i]!);
-    }
-    return new GeoPath(splines);
-  }
-
   static override fromAny<T extends AnyGeoPath | null | undefined>(value: T): GeoPath | Uninitable<T>;
   static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
   static override fromAny<T extends AnyGeoPath | null | undefined>(value: T): GeoPath | Uninitable<T> {
@@ -341,6 +330,19 @@ export class GeoPath extends GeoShape implements Equals, Equivalent, Debug {
       return GeoPath.of(GeoSpline.fromAny(value as AnyGeoSpline));
     }
     throw new TypeError("" + value);
+  }
+
+  static fromSplines(values: GeoPathSplines): GeoPath {
+    const n = values.length;
+    const splines = new Array<GeoSpline>(n);
+    for (let i = 0; i < n; i += 1) {
+      splines[i] = GeoSpline.fromAny(values[i]!);
+    }
+    return new GeoPath(splines);
+  }
+
+  static fromPoints(points: GeoSplinePoints): GeoPath {
+    return new GeoPath([GeoSpline.fromPoints(points)]);
   }
 }
 
@@ -359,7 +361,7 @@ export class GeoPathBuilder implements GeoPathContext {
   moveTo(lng: number, lat: number): void {
     let builder = this.builder;
     if (builder !== null) {
-      const spline = builder.bind();
+      const spline = builder.build();
       if (spline.isDefined()) {
         this.splines.push(spline);
       }
@@ -385,11 +387,11 @@ export class GeoPathBuilder implements GeoPathContext {
     builder.lineTo(lng, lat);
   }
 
-  bind(): GeoPath {
+  build(): GeoPath {
     const splines = this.splines.slice(0);
     const builder = this.builder;
     if (builder !== null) {
-      const spline = builder.bind();
+      const spline = builder.build();
       if (spline.isDefined()) {
         splines.push(spline);
       }

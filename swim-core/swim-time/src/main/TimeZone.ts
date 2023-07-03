@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import {Murmur3} from "@swim/util";
+import type {HashCode} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
-import type {HashCode} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
@@ -28,6 +29,15 @@ import {Form} from "@swim/structure";
 
 /** @public */
 export type AnyTimeZone = TimeZone | string | number;
+
+/** @public */
+export const AnyTimeZone = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyTimeZone {
+    return instance instanceof TimeZone
+        || typeof instance === "string"
+        || typeof instance === "number";
+  },
+};
 
 /** @public */
 export class TimeZone implements HashCode, Debug {
@@ -49,6 +59,7 @@ export class TimeZone implements HashCode, Debug {
     return this.offset === -new Date().getTimezoneOffset();
   }
 
+  /** @override */
   equals(that: unknown): boolean {
     if (this === that) {
       return true;
@@ -58,10 +69,12 @@ export class TimeZone implements HashCode, Debug {
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Constructors.hash(TimeZone), Numbers.hash(this.offset)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("TimeZone").write(46/*'.'*/);
     if (this.name === "UTC" && this.offset === 0) {
@@ -76,25 +89,19 @@ export class TimeZone implements HashCode, Debug {
     return output;
   }
 
+  /** @override */
   toString(): string {
     return Format.debug(this);
   }
 
-  /** @internal */
-  static readonly UTC: TimeZone = new this("UTC", 0);
-
+  @Lazy
   static utc(): TimeZone {
-    return this.UTC;
+    return new TimeZone("UTC", 0);
   }
 
-  /** @internal */
-  static Local: TimeZone | null = null;
-
+  @Lazy
   static local(): TimeZone {
-    if (this.Local === null) {
-      this.Local = this.forOffset(-new Date().getTimezoneOffset());
-    }
-    return this.Local;
+    return this.forOffset(-new Date().getTimezoneOffset());
   }
 
   static create(name: string | undefined, offset: number): TimeZone {
@@ -118,12 +125,9 @@ export class TimeZone implements HashCode, Debug {
     }
   }
 
-  static fromAny(value: AnyTimeZone): TimeZone;
-  static fromAny(value: AnyTimeZone | null): TimeZone | null;
-  static fromAny(value: AnyTimeZone | null | undefined): TimeZone | null | undefined;
-  static fromAny(value: AnyTimeZone | null | undefined): TimeZone | null | undefined {
+  static fromAny<T extends AnyTimeZone | null | undefined>(value: T): TimeZone | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof TimeZone) {
-      return value;
+      return value as TimeZone | Uninitable<T>;
     } else if (typeof value === "string") {
       const zone = TimeZone.forName(value);
       if (zone !== null) {
@@ -147,13 +151,6 @@ export class TimeZone implements HashCode, Debug {
     return null;
   }
 
-  /** @internal */
-  static isAny(value: unknown): value is AnyTimeZone {
-    return value instanceof TimeZone
-        || typeof value === "string"
-        || typeof value === "number";
-  }
-
   @Lazy
   static form(): Form<TimeZone, AnyTimeZone> {
     return new TimeZoneForm(TimeZone.utc());
@@ -173,11 +170,10 @@ export class TimeZoneForm extends Form<TimeZone, AnyTimeZone> {
   override readonly unit!: TimeZone | undefined;
 
   override withUnit(unit: TimeZone | undefined): Form<TimeZone, AnyTimeZone> {
-    if (unit !== this.unit) {
-      return new TimeZoneForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new TimeZoneForm(unit);
   }
 
   override mold(zone: AnyTimeZone): Item {

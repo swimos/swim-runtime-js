@@ -19,13 +19,11 @@ import type {FastenerFlags} from "@swim/component";
 import type {AnimatorDescriptor} from "@swim/component";
 import type {AnimatorClass} from "@swim/component";
 import {Animator} from "@swim/component";
-import {ConstraintId} from "./ConstraintId";
-import {ConstraintMap} from "./ConstraintMap";
 import type {AnyConstraintExpression} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
 import type {ConstraintVariable} from "./ConstraintVariable";
-import type {AnyConstraintStrength} from "./ConstraintStrength";
+import type {AnyConstraintStrength} from "./Constraint";
 import {ConstraintStrength} from "./"; // forward import
 import type {Constraint} from "./Constraint";
 import {ConstraintScope} from "./"; // forward import
@@ -53,9 +51,6 @@ export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any, 
 
 /** @public */
 export interface ConstraintAnimator<O = unknown, T = unknown, U = T> extends Animator<O, T, U>, ConstraintVariable {
-  /** @internal @override */
-  readonly id: number;
-
   /** @internal @override */
   isExternal(): boolean;
 
@@ -89,7 +84,7 @@ export interface ConstraintAnimator<O = unknown, T = unknown, U = T> extends Ani
   get variable(): ConstraintVariable | null;
 
   /** @override */
-  get terms(): ConstraintMap<ConstraintVariable, number>;
+  get terms(): ReadonlyMap<ConstraintVariable, number>;
 
   /** @override */
   get constant(): number;
@@ -220,8 +215,8 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
   });
 
   Object.defineProperty(ConstraintAnimator.prototype, "terms", {
-    get(this: ConstraintAnimator): ConstraintMap<ConstraintVariable, number> {
-      const terms = new ConstraintMap<ConstraintVariable, number>();
+    get(this: ConstraintAnimator): ReadonlyMap<ConstraintVariable, number> {
+      const terms = new Map<ConstraintVariable, number>();
       terms.set(this, 1);
       return terms;
     },
@@ -237,9 +232,8 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
     that = ConstraintExpression.fromAny(that);
     if (this === that) {
       return ConstraintExpression.product(2, this);
-    } else {
-      return ConstraintExpression.sum(this, that);
     }
+    return ConstraintExpression.sum(this, that);
   };
 
   ConstraintAnimator.prototype.negative = function (this: ConstraintAnimator): ConstraintTerm {
@@ -249,10 +243,9 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
   ConstraintAnimator.prototype.minus = function (this: ConstraintAnimator, that: AnyConstraintExpression): ConstraintExpression {
     that = ConstraintExpression.fromAny(that);
     if (this === that) {
-      return ConstraintExpression.zero;
-    } else {
-      return ConstraintExpression.sum(this, that.negative());
+      return ConstraintExpression.zero();
     }
+    return ConstraintExpression.sum(this, that.negative());
   };
 
   ConstraintAnimator.prototype.times = function (this: ConstraintAnimator, scalar: number): ConstraintExpression {
@@ -328,7 +321,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
 
   ConstraintAnimator.prototype.onStartConstraining = function (this: ConstraintAnimator): void {
     const constraintScope = this.owner;
-    if (ConstraintScope.is(constraintScope)) {
+    if (ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.addConstraintVariable(this);
     }
   };
@@ -353,7 +346,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
 
   ConstraintAnimator.prototype.onStopConstraining = function (this: ConstraintAnimator): void {
     const constraintScope = this.owner;
-    if (ConstraintScope.is(constraintScope)) {
+    if (ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.removeConstraintVariable(this);
     }
   };
@@ -365,7 +358,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
   ConstraintAnimator.prototype.updateConstraintVariable = function (this: ConstraintAnimator): void {
     const constraintScope = this.owner;
     const value = this.value;
-    if (value !== void 0 && ConstraintScope.is(constraintScope)) {
+    if (value !== void 0 && ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.setConstraintVariable(this, this.toNumber(value));
     }
   };
@@ -373,7 +366,7 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
   ConstraintAnimator.prototype.onSetValue = function <T>(this: ConstraintAnimator<unknown, T>, newValue: T, oldValue: T): void {
     _super.prototype.onSetValue.call(this, newValue, oldValue);
     const constraintScope = this.owner;
-    if (this.constraining && ConstraintScope.is(constraintScope)) {
+    if (this.constraining && ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.setConstraintVariable(this, newValue !== void 0 && newValue !== null ? this.toNumber(newValue) : 0);
     }
   };
@@ -398,7 +391,6 @@ export const ConstraintAnimator = (function (_super: typeof Animator) {
 
   ConstraintAnimator.construct = function <A extends ConstraintAnimator<any, any, any>>(animator: A | null, owner: A extends ConstraintAnimator<infer O, any, any> ? O : never): A {
     animator = _super.construct.call(this, animator, owner) as A;
-    (animator as Mutable<typeof animator>).id = ConstraintId.next();
     (animator as Mutable<typeof animator>).strength = animator.initStrength();
     (animator as Mutable<typeof animator>).conditionCount = 0;
     const flagsInit = animator.flagsInit;

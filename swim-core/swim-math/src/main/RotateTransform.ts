@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
@@ -27,9 +28,21 @@ import {Record} from "@swim/structure";
 import {Angle} from "./Angle";
 import {AngleParser} from "./Angle";
 import {R2Point} from "./R2Point";
+import type {AnyTransform} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransform} from "./"; // forward import
+
+/** @public */
+export type AnyRotateTransform = RotateTransform | string;
+
+/** @public */
+export const AnyRotateTransform = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyRotateTransform {
+    return instance instanceof RotateTransform
+        || typeof instance === "string";
+  },
+};
 
 /** @public */
 export class RotateTransform extends Transform {
@@ -149,9 +162,11 @@ export class RotateTransform extends Transform {
     return new RotateTransform(angle);
   }
 
-  static override fromAny(value: RotateTransform | string): RotateTransform {
+  static override fromAny<T extends AnyRotateTransform | null | undefined>(value: T): RotateTransform | Uninitable<T>;
+  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyRotateTransform | null | undefined>(value: T): RotateTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof RotateTransform) {
-      return value;
+      return value as RotateTransform | Uninitable<T>;
     } else if (typeof value === "string") {
       return RotateTransform.parse(value);
     }

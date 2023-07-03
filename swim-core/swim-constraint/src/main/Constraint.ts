@@ -12,27 +12,74 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import {ConstraintId} from "./ConstraintId";
 import type {ConstraintExpression} from "./ConstraintExpression";
-import type {ConstraintRelation} from "./ConstraintRelation";
-import {ConstraintStrength} from "./ConstraintStrength";
 import type {ConstraintScope} from "./ConstraintScope";
 
 /** @public */
-export class Constraint implements ConstraintId, Debug {
+export type ConstraintRelation = "le" | "eq" | "ge";
+
+/** @public */
+export type AnyConstraintStrength = ConstraintStrength | ConstraintStrengthInit;
+
+/** @public */
+export type ConstraintStrengthInit = "required" | "strong" | "medium" | "weak";
+
+/** @public */
+export type ConstraintStrength = number;
+
+/** @public */
+export const ConstraintStrength: {
+  readonly Required: ConstraintStrength;
+  readonly Strong: ConstraintStrength;
+  readonly Medium: ConstraintStrength;
+  readonly Weak: ConstraintStrength;
+  readonly Unbound: ConstraintStrength;
+
+  clip(strength: ConstraintStrength): ConstraintStrength;
+
+  fromAny<T extends AnyConstraintStrength | null | undefined>(strength: T): ConstraintStrength | Uninitable<T>;
+} = {
+  Required: 1001001000,
+  Strong: 1000000,
+  Medium: 1000,
+  Weak: 1,
+  Unbound: -1,
+
+  clip(strength: ConstraintStrength): ConstraintStrength {
+    return Math.min(Math.max(0, strength), ConstraintStrength.Required);
+  },
+
+  fromAny<T extends AnyConstraintStrength | null | undefined>(strength: T): ConstraintStrength | Uninitable<T> {
+    if (strength === void 0 || strength === null) {
+      return strength as ConstraintStrength | Uninitable<T>;
+    } else if (typeof strength === "number") {
+      return ConstraintStrength.clip(strength);
+    } else if (strength === "required") {
+      return ConstraintStrength.Required;
+    } else if (strength === "strong") {
+      return ConstraintStrength.Strong;
+    } else if (strength === "medium") {
+      return ConstraintStrength.Medium;
+    } else if (strength === "weak") {
+      return ConstraintStrength.Weak;
+    }
+    throw new TypeError("" + strength);
+  },
+};
+
+/** @public */
+export class Constraint implements Debug {
   constructor(scope: ConstraintScope, expression: ConstraintExpression,
               relation: ConstraintRelation, strength: ConstraintStrength) {
-    this.id = ConstraintId.next();
     this.scope = scope;
     this.expression = expression;
     this.relation = relation;
     this.strength = strength;
   }
-
-  readonly id: number;
 
   readonly scope: ConstraintScope;
 

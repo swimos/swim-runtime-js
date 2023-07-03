@@ -721,7 +721,7 @@ export class ValueBuilder implements Builder<Item, Value> {
     }
   }
 
-  bind(): Value {
+  build(): Value {
     if (this.record !== null) {
       return this.record;
     } else if (this.value !== null) {

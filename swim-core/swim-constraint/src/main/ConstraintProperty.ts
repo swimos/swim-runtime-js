@@ -19,8 +19,6 @@ import type {FastenerFlags} from "@swim/component";
 import type {PropertyDescriptor} from "@swim/component";
 import type {PropertyClass} from "@swim/component";
 import {Property} from "@swim/component";
-import {ConstraintId} from "./ConstraintId";
-import {ConstraintMap} from "./ConstraintMap";
 import type {AnyConstraintExpression} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
@@ -54,9 +52,6 @@ export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any, 
 /** @public */
 export interface ConstraintProperty<O = unknown, T = unknown, U = T> extends Property<O, T, U>, ConstraintVariable {
   /** @internal @override */
-  readonly id: number;
-
-  /** @internal @override */
   isExternal(): boolean;
 
   /** @internal @override */
@@ -89,7 +84,7 @@ export interface ConstraintProperty<O = unknown, T = unknown, U = T> extends Pro
   get variable(): ConstraintVariable | null;
 
   /** @override */
-  get terms(): ConstraintMap<ConstraintVariable, number>;
+  get terms(): ReadonlyMap<ConstraintVariable, number>;
 
   /** @override */
   get constant(): number;
@@ -220,8 +215,8 @@ export const ConstraintProperty = (function (_super: typeof Property) {
   });
 
   Object.defineProperty(ConstraintProperty.prototype, "terms", {
-    get(this: ConstraintProperty): ConstraintMap<ConstraintVariable, number> {
-      const terms = new ConstraintMap<ConstraintVariable, number>();
+    get(this: ConstraintProperty): ReadonlyMap<ConstraintVariable, number> {
+      const terms = new Map<ConstraintVariable, number>();
       terms.set(this, 1);
       return terms;
     },
@@ -237,9 +232,8 @@ export const ConstraintProperty = (function (_super: typeof Property) {
     that = ConstraintExpression.fromAny(that);
     if (this === that) {
       return ConstraintExpression.product(2, this);
-    } else {
-      return ConstraintExpression.sum(this, that);
     }
+    return ConstraintExpression.sum(this, that);
   };
 
   ConstraintProperty.prototype.negative = function (this: ConstraintProperty): ConstraintTerm {
@@ -249,10 +243,9 @@ export const ConstraintProperty = (function (_super: typeof Property) {
   ConstraintProperty.prototype.minus = function (this: ConstraintProperty, that: AnyConstraintExpression): ConstraintExpression {
     that = ConstraintExpression.fromAny(that);
     if (this === that) {
-      return ConstraintExpression.zero;
-    } else {
-      return ConstraintExpression.sum(this, that.negative());
+      return ConstraintExpression.zero();
     }
+    return ConstraintExpression.sum(this, that.negative());
   };
 
   ConstraintProperty.prototype.times = function (this: ConstraintProperty, scalar: number): ConstraintExpression {
@@ -328,7 +321,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
 
   ConstraintProperty.prototype.onStartConstraining = function (this: ConstraintProperty): void {
     const constraintScope = this.owner;
-    if (ConstraintScope.is(constraintScope)) {
+    if (ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.addConstraintVariable(this);
     }
   };
@@ -353,7 +346,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
 
   ConstraintProperty.prototype.onStopConstraining = function (this: ConstraintProperty): void {
     const constraintScope = this.owner;
-    if (ConstraintScope.is(constraintScope)) {
+    if (ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.removeConstraintVariable(this);
     }
   };
@@ -365,7 +358,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
   ConstraintProperty.prototype.updateConstraintVariable = function (this: ConstraintProperty): void {
     const constraintScope = this.owner;
     const value = this.value;
-    if (value !== void 0 && ConstraintScope.is(constraintScope)) {
+    if (value !== void 0 && ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.setConstraintVariable(this, this.toNumber(value));
     }
   };
@@ -373,7 +366,7 @@ export const ConstraintProperty = (function (_super: typeof Property) {
   ConstraintProperty.prototype.onSetValue = function <T>(this: ConstraintProperty<unknown, T>, newValue: T, oldValue: T): void {
     _super.prototype.onSetValue.call(this, newValue, oldValue);
     const constraintScope = this.owner;
-    if (this.constraining && ConstraintScope.is(constraintScope)) {
+    if (this.constraining && ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.setConstraintVariable(this, newValue !== void 0 && newValue !== null ? this.toNumber(newValue) : 0);
     }
   };
@@ -398,7 +391,6 @@ export const ConstraintProperty = (function (_super: typeof Property) {
 
   ConstraintProperty.construct = function <P extends ConstraintProperty<any, any, any>>(property: P | null, owner: P extends ConstraintProperty<infer O, any, any> ? O : never): P {
     property = _super.construct.call(this, property, owner) as P;
-    (property as Mutable<typeof property>).id = ConstraintId.next();
     (property as Mutable<typeof property>).strength = property.initStrength();
     (property as Mutable<typeof property>).conditionCount = 0;
     const flagsInit = property.flagsInit;

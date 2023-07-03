@@ -110,46 +110,47 @@ export class ConsoleReport implements Report {
   /** @override */
   didRunSpec(suite: Suite): void {
     this.testDepth -= 1;
-    if (this.testDepth === 0) {
-      let output = Unicode.stringOutput(this.outputSettings);
-      if (this.failCount === 0) {
-        OutputStyle.greenBold(output);
-        output = output.write("success");
-        OutputStyle.reset(output);
-      } else {
-        OutputStyle.redBold(output);
-        output = output.write("failure");
-        OutputStyle.reset(output);
-      }
-      output = output.write(58/*':'*/);
-      if (this.passCount !== 0) {
-        output = output.write(32/*' '*/);
-        output = output.display(this.passCount);
-        output = output.write(32/*' '*/);
-        output = output.write(this.passCount !== 1 ? "exams" : "exam");
-        output = output.write(32/*' '*/);
-        if (this.failCount === 0) {
-          OutputStyle.green(output);
-        }
-        output = output.write("passed");
-        if (this.failCount === 0) {
-          OutputStyle.reset(output);
-        }
-      }
-      if (this.failCount !== 0) {
-        if (this.passCount !== 0) {
-          output = output.write(59/*';'*/);
-        }
-        output = output.write(32/*' '*/);
-        output = output.display(this.failCount);
-        output = output.write(32/*' '*/);
-        output = output.write(this.failCount !== 1 ? "exams" : "exam");
-        output = output.write(32/*' '*/);
-        OutputStyle.red(output);
-        output = output.write("failed");
-        OutputStyle.reset(output);
-      }
-      console.log(output.toString());
+    if (this.testDepth !== 0) {
+      return;
     }
+    let output = Unicode.stringOutput(this.outputSettings);
+    if (this.failCount === 0) {
+      OutputStyle.greenBold(output);
+      output = output.write("success");
+      OutputStyle.reset(output);
+    } else {
+      OutputStyle.redBold(output);
+      output = output.write("failure");
+      OutputStyle.reset(output);
+    }
+    output = output.write(58/*':'*/);
+    if (this.passCount !== 0) {
+      output = output.write(32/*' '*/);
+      output = output.display(this.passCount);
+      output = output.write(32/*' '*/);
+      output = output.write(this.passCount !== 1 ? "exams" : "exam");
+      output = output.write(32/*' '*/);
+      if (this.failCount === 0) {
+        OutputStyle.green(output);
+      }
+      output = output.write("passed");
+      if (this.failCount === 0) {
+        OutputStyle.reset(output);
+      }
+    }
+    if (this.failCount !== 0) {
+      if (this.passCount !== 0) {
+        output = output.write(59/*';'*/);
+      }
+      output = output.write(32/*' '*/);
+      output = output.display(this.failCount);
+      output = output.write(32/*' '*/);
+      output = output.write(this.failCount !== 1 ? "exams" : "exam");
+      output = output.write(32/*' '*/);
+      OutputStyle.red(output);
+      output = output.write("failed");
+      OutputStyle.reset(output);
+    }
+    console.log(output.toString());
   }
 }

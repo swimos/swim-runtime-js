@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
-import type {Equals} from "@swim/util";
-import type {Equivalent} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
 import type {AnyOutputSettings} from "@swim/codec";
 import {OutputSettings} from "@swim/codec";
@@ -44,7 +44,15 @@ export interface R2PathContext extends R2SplineContext {
 export type AnyR2Path = R2Path | string;
 
 /** @public */
-export class R2Path extends R2Shape implements Equals, Equivalent, Debug {
+export const AnyR2Path = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyR2Path {
+    return instance instanceof R2Path
+        || typeof instance === "string";
+  },
+};
+
+/** @public */
+export class R2Path extends R2Shape implements Debug {
   constructor(splines: ReadonlyArray<R2Spline>) {
     super();
     this.splines = splines;
@@ -245,7 +253,7 @@ export class R2Path extends R2Shape implements Equals, Equivalent, Debug {
     return pathString;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Path) {
@@ -254,7 +262,7 @@ export class R2Path extends R2Shape implements Equals, Equivalent, Debug {
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Path) {
@@ -263,6 +271,7 @@ export class R2Path extends R2Shape implements Equals, Equivalent, Debug {
     return false;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     const splines = this.splines;
     const n = splines.length;
@@ -299,8 +308,13 @@ export class R2Path extends R2Shape implements Equals, Equivalent, Debug {
     return Format.debug(this);
   }
 
+  static builder(): R2PathBuilder {
+    return new R2PathBuilder();
+  }
+
+  @Lazy
   static empty(): R2Path {
-    return new R2Path([]);
+    return new R2Path(Arrays.empty());
   }
 
   static of(...splines: R2Spline[]): R2Path {
@@ -315,17 +329,15 @@ export class R2Path extends R2Shape implements Equals, Equivalent, Debug {
     return new R2Path([new R2Spline(curves, true)]);
   }
 
-  static override fromAny(value: AnyR2Path | AnyR2Shape): R2Path {
+  static override fromAny<T extends AnyR2Path | null | undefined>(value: T): R2Path | Uninitable<T>;
+  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): R2Path | never;
+  static override fromAny<T extends AnyR2Path | null | undefined>(value: T): R2Path | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Path) {
-      return value;
+      return value as R2Path | Uninitable<T>;
     } else if (typeof value === "string") {
       return R2Path.parse(value);
     }
     throw new TypeError("" + value);
-  }
-
-  static builder(): R2PathBuilder {
-    return new R2PathBuilder();
   }
 
   static parse(string: string): R2Path {
@@ -361,7 +373,7 @@ export class R2PathBuilder implements R2PathContext {
   moveTo(x: number, y: number): void {
     let builder = this.builder;
     if (builder !== null) {
-      const spline = builder.bind();
+      const spline = builder.build();
       if (spline.isDefined()) {
         this.splines.push(spline);
       }
@@ -443,11 +455,11 @@ export class R2PathBuilder implements R2PathContext {
     }
   }
 
-  bind(): R2Path {
+  build(): R2Path {
     const splines = this.splines.slice(0);
     const builder = this.builder;
     if (builder !== null) {
-      const spline = builder.bind();
+      const spline = builder.build();
       if (spline.isDefined()) {
         splines.push(spline);
       }

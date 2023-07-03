@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
@@ -305,6 +306,7 @@ export class GeoSpline extends GeoCurve implements Debug {
     return false;
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     const curves = this.curves;
     const n = curves.length;
@@ -326,8 +328,13 @@ export class GeoSpline extends GeoCurve implements Debug {
     return Format.debug(this);
   }
 
+  static builder(): GeoSplineBuilder {
+    return new GeoSplineBuilder();
+  }
+
+  @Lazy
   static empty(): GeoSpline {
-    return new GeoSpline([], false);
+    return new GeoSpline(Arrays.empty(), false);
   }
 
   static open(...curves: GeoCurve[]): GeoSpline {
@@ -338,8 +345,15 @@ export class GeoSpline extends GeoCurve implements Debug {
     return new GeoSpline(curves, true);
   }
 
-  static builder(): GeoSplineBuilder {
-    return new GeoSplineBuilder();
+  static override fromAny<T extends AnyGeoSpline | null | undefined>(value: T): GeoSpline | Uninitable<T>;
+  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyGeoSpline | null | undefined>(value: T): GeoSpline | Uninitable<T> {
+    if (value === void 0 || value === null || value instanceof GeoSpline) {
+      return value as GeoSpline | Uninitable<T>;
+    } else if (GeoSplinePoints[Symbol.hasInstance](value)) {
+      return GeoSpline.fromPoints(value);
+    }
+    throw new TypeError("" + value);
   }
 
   static fromPoints(points: GeoSplinePoints): GeoSpline {
@@ -357,17 +371,6 @@ export class GeoSpline extends GeoCurve implements Debug {
     }
     const closed = p0.equals(p1);
     return new GeoSpline(curves, closed);
-  }
-
-  static override fromAny<T extends AnyGeoSpline | null | undefined>(value: T): GeoSpline | Uninitable<T>;
-  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyGeoSpline | null | undefined>(value: T): GeoSpline | Uninitable<T> {
-    if (value === void 0 || value === null || value instanceof GeoSpline) {
-      return value as GeoSpline | Uninitable<T>;
-    } else if (GeoSplinePoints[Symbol.hasInstance](value)) {
-      return GeoSpline.fromPoints(value);
-    }
-    throw new TypeError("" + value);
   }
 }
 
@@ -435,7 +438,7 @@ export class GeoSplineBuilder implements GeoSplineContext {
     this.lat = lat;
   }
 
-  bind(): GeoSpline {
+  build(): GeoSpline {
     this.aliased = true;
     return new GeoSpline(this.curves, this.closed);
   }

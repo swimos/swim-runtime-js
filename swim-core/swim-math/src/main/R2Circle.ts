@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
+import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -34,11 +36,28 @@ import {R2Box} from "./R2Box";
 export type AnyR2Circle = R2Circle | R2CircleInit;
 
 /** @public */
+export const AnyR2Circle = {
+  [Symbol.hasInstance](instance: unknown): instance is AnyR2Circle {
+    return instance instanceof R2Circle
+        || R2CircleInit[Symbol.hasInstance](instance);
+  },
+};
+
+/** @public */
 export interface R2CircleInit {
+  /** @internal */
+  typeid?: "R2CircleInit";
   cx: number;
   cy: number;
   r: number;
 }
+
+/** @public */
+export const R2CircleInit = {
+  [Symbol.hasInstance](instance: unknown): instance is R2CircleInit {
+    return Objects.hasAllKeys<R2CircleInit>(instance, "cx", "cy", "r");
+  },
+};
 
 /** @public */
 export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode, Equivalent, Debug {
@@ -48,6 +67,9 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     this.cy = cy;
     this.r = r;
   }
+
+  /** @internal */
+  declare typeid?: "R2Circle";
 
   isDefined(): boolean {
     return isFinite(this.cx) && isFinite(this.cy) && isFinite(this.r);
@@ -144,10 +166,8 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
       return this.intersectsBox(that);
     } else if (that instanceof R2Circle) {
       return this.intersectsCircle(that);
-    } else {
-      return (that as R2Shape).intersects(this);
     }
-    return false;
+    return that.intersects(this);
   }
 
   /** @internal */
@@ -223,6 +243,7 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     };
   }
 
+  /** @override */
   interpolateTo(that: R2Circle): Interpolator<R2Circle>;
   interpolateTo(that: unknown): Interpolator<R2Circle> | null;
   interpolateTo(that: unknown): Interpolator<R2Circle> | null {
@@ -232,7 +253,7 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     return null;
   }
 
-  equivalentTo(that: unknown, epsilon?: number): boolean {
+  override equivalentTo(that: unknown, epsilon?: number): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Circle) {
@@ -243,7 +264,7 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     return false;
   }
 
-  equals(that: unknown): boolean {
+  override equals(that: unknown): boolean {
     if (this === that) {
       return true;
     } else if (that instanceof R2Circle) {
@@ -252,11 +273,13 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     return false;
   }
 
+  /** @override */
   hashCode(): number {
     return Murmur3.mash(Murmur3.mix(Murmur3.mix(Murmur3.mix(Constructors.hash(R2Circle),
         Numbers.hash(this.cx)), Numbers.hash(this.cy)), Numbers.hash(this.r)));
   }
 
+  /** @override */
   debug<T>(output: Output<T>): Output<T> {
     output = output.write("R2Circle").write(46/*'.'*/).write("of").write(40/*'('*/)
                    .debug(this.cx).write(", ").debug(this.cy).write(", ")
@@ -272,34 +295,19 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     return new R2Circle(cx, cy, r);
   }
 
-  static fromInit(value: R2CircleInit): R2Circle {
-    return new R2Circle(value.cx, value.cy, value.r);
-  }
-
-  static override fromAny(value: AnyR2Circle): R2Circle {
+  static override fromAny<T extends AnyR2Circle | null | undefined>(value: T): R2Circle | Uninitable<T>;
+  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): never;
+  static override fromAny<T extends AnyR2Circle | null | undefined>(value: T): R2Circle | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Circle) {
-      return value;
-    } else if (R2Circle.isInit(value)) {
+      return value as R2Circle | Uninitable<T>;
+    } else if (R2CircleInit[Symbol.hasInstance](value)) {
       return R2Circle.fromInit(value);
     }
     throw new TypeError("" + value);
   }
 
-  /** @internal */
-  static isInit(value: unknown): value is R2CircleInit {
-    if (typeof value === "object" && value !== null) {
-      const init = value as R2CircleInit;
-      return typeof init.cx === "number"
-          && typeof init.cy === "number"
-          && typeof init.r === "number";
-    }
-    return false;
-  }
-
-  /** @internal */
-  static override isAny(value: unknown): value is AnyR2Circle {
-    return value instanceof R2Circle
-        || R2Circle.isInit(value);
+  static fromInit(init: R2CircleInit): R2Circle {
+    return new R2Circle(init.cx, init.cy, init.r);
   }
 }
 

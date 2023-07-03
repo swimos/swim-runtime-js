@@ -211,10 +211,8 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
   }
 
   forEach<T>(callback: (value: V, index: number, id: I, tree: STree<V, I>) => T | void): T | undefined;
-  forEach<T, S>(callback: (this: S, value: V, index: number, id: I, tree: STree<V, I>) => T | void,
-                thisArg: S): T | undefined;
-  forEach<T, S>(callback: (this: S | undefined, value: V, index: number, id: I, tree: STree<V, I>) => T | void,
-                thisArg?: S): T | undefined {
+  forEach<T, S>(callback: (this: S, value: V, index: number, id: I, tree: STree<V, I>) => T | void, thisArg: S): T | undefined;
+  forEach<T, S>(callback: (this: S | undefined, value: V, index: number, id: I, tree: STree<V, I>) => T | void, thisArg?: S): T | undefined {
     return this.root.forEach(callback, thisArg, 0, this);
   }
 
@@ -253,14 +251,14 @@ export class STree<V = unknown, I = unknown> extends STreeContext<V, I> {
   /** @internal */
   protected copy(root: STreePage<V, I>): STree<V, I> {
     const tree = new STree(root);
+    if (tree.pageSplitSize !== this.pageSplitSize) {
+      tree.pageSplitSize = this.pageSplitSize;
+    }
     if (tree.identify !== this.identify) {
       tree.identify = this.identify;
     }
     if (tree.compare !== this.compare) {
       tree.compare = this.compare;
-    }
-    if (tree.pageSplitSize !== this.pageSplitSize) {
-      tree.pageSplitSize = this.pageSplitSize;
     }
     return tree;
   }

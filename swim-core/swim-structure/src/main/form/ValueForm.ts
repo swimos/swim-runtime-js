@@ -30,11 +30,10 @@ export class ValueForm extends Form<Value, AnyValue> {
   override readonly unit!: Value | undefined;
 
   override withUnit(unit: Value | undefined): Form<Value> {
-    if (unit !== this.unit) {
-      return new ValueForm(unit);
-    } else {
+    if (unit === this.unit) {
       return this;
     }
+    return new ValueForm(unit);
   }
 
   override mold(object: AnyValue, item?: Item): Item {
