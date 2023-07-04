@@ -63,7 +63,6 @@ export {Provider} from "./Provider";
 
 export type {ComponentFlags} from "./Component";
 export type {AnyComponent} from "./Component";
-export type {ComponentInit} from "./Component";
 export type {ComponentFactory} from "./Component";
 export type {ComponentClass} from "./Component";
 export type {ComponentConstructor} from "./Component";

@@ -70,11 +70,6 @@ export {ToAny} from "./ToAny";
 export type {Creates} from "./Creatable";
 export {Creatable} from "./Creatable";
 
-// Initable
-
-export type {Inits} from "./Initable";
-export {Initable} from "./Initable";
-
 // Observable
 
 export type {Observes} from "./Observable";

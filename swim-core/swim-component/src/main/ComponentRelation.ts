@@ -263,9 +263,8 @@ export const ComponentRelation = (function (_super: typeof Fastener) {
     const componentType = this.componentType;
     if (componentType !== void 0) {
       return componentType.fromAny(value);
-    } else {
-      return Component.fromAny(value) as C;
     }
+    return Component.fromAny(value) as C;
   };
 
   ComponentRelation.construct = function <F extends ComponentRelation<any, any>>(fastener: F | null, owner: F extends ComponentRelation<infer O, any> ? O : never): F {

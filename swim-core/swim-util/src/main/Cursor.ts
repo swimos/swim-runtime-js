@@ -302,10 +302,7 @@ export class KeysCursor<K, V> extends Cursor<K> {
 
   override next(): IteratorResult<K> {
     const next = this.cursor.next();
-    if (next.done === true) {
-      return next;
-    }
-    return {done: false, value: next.value[0]};
+    return {done: next.done, value: next.value !== void 0 ? next.value[0] : void 0};
   }
 
   override hasPrevious(): boolean {
@@ -318,10 +315,7 @@ export class KeysCursor<K, V> extends Cursor<K> {
 
   override previous(): IteratorResult<K> {
     const previous = this.cursor.previous();
-    if (previous.done === true) {
-      return previous;
-    }
-    return {done: false, value: previous.value[0]};
+    return {done: previous.done, value: previous.value !== void 0 ? previous.value[0] : void 0};
   }
 
   override delete(): void {
@@ -365,10 +359,7 @@ export class ValuesCursor<K, V> extends Cursor<V> {
 
   override next(): IteratorResult<V> {
     const next = this.cursor.next();
-    if (next.done === true) {
-      return next;
-    }
-    return {done: false, value: next.value[1]};
+    return {done: next.done, value: next.value !== void 0 ? next.value[1] : void 0};
   }
 
   override hasPrevious(): boolean {
@@ -381,10 +372,7 @@ export class ValuesCursor<K, V> extends Cursor<V> {
 
   override previous(): IteratorResult<V> {
     const previous = this.cursor.previous();
-    if (previous.done === true) {
-      return previous;
-    }
-    return {done: false, value: previous.value[1]};
+    return {done: previous.done, value: previous.value !== void 0 ? previous.value[1] : void 0};
   }
 
   override delete(): void {

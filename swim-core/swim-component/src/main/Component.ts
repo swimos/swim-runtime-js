@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Instance} from "@swim/util";
 import type {Proto} from "@swim/util";
@@ -24,8 +24,6 @@ import type {MutableDictionary} from "@swim/util";
 import type {FromAny} from "@swim/util";
 import type {AnyTiming} from "@swim/util";
 import {Creatable} from "@swim/util";
-import type {Inits} from "@swim/util";
-import type {Initable} from "@swim/util";
 import type {Observes} from "@swim/util";
 import type {Observable} from "@swim/util";
 import type {ObserverMethods} from "@swim/util";
@@ -43,20 +41,10 @@ import {ComponentRelation} from "./"; // forward import
 export type ComponentFlags = number;
 
 /** @public */
-export type AnyComponent<C extends Component<any> = Component> = C | ComponentFactory<C> | Inits<C>;
-
-/** @public */
-export interface ComponentInit {
-  /** @internal */
-  uid?: never, // force type ambiguity between Component and ComponentInit
-  type?: Creatable<Component>;
-  key?: string;
-  children?: AnyComponent[];
-}
+export type AnyComponent<C extends Component<any> = Component> = C | ComponentFactory<C>;
 
 /** @public */
 export interface ComponentFactory<C extends Component<any> = Component, U = AnyComponent<C>> extends Creatable<C>, FromAny<C, U> {
-  fromInit(init: Inits<C>): C;
 }
 
 /** @public */
@@ -74,7 +62,7 @@ export interface ComponentObserver<C extends Component = Component> extends Obse
 }
 
 /** @public */
-export class Component<C extends Component<C> = Component<any>> implements HashCode, FastenerContext, Initable<ComponentInit>, Observable {
+export class Component<C extends Component<C> = Component<any>> implements HashCode, FastenerContext, Observable {
   constructor() {
     this.uid = (this.constructor as typeof Component).uid();
     this.key = void 0;
@@ -1129,41 +1117,22 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return Murmur3.mash(Murmur3.mixString(0, this.uid));
   }
 
-  /** @override */
-  init(init: ComponentInit): void {
-    // hook
-  }
-
   static create<S extends new () => InstanceType<S>>(this: S): InstanceType<S> {
     return new this();
   }
 
-  static fromInit<S extends Class<Instance<S, Component>>>(this: S, init: Inits<InstanceType<S>>): InstanceType<S> {
-    let type: Creatable<InstanceType<S>>;
-    if ((typeof init === "object" && init !== null || typeof init === "function") && Creatable[Symbol.hasInstance]((init as ComponentInit).type)) {
-      type = (init as ComponentInit).type as Creatable<InstanceType<S>>;
-    } else {
-      type = this as unknown as Creatable<InstanceType<S>>;
-    }
-    const component = type.create();
-    (component as Initable<Inits<InstanceType<S>>>).init(init);
-    return component;
-  }
-
   static fromAny<S extends Class<Instance<S, Component>>>(this: S, value: AnyComponent<InstanceType<S>>): InstanceType<S> {
     if (value === void 0 || value === null) {
-      return value as InstanceType<S>;
+      return value;
     } else if (value instanceof Component) {
-      if (value instanceof this) {
-        return value;
-      } else {
+      if (!((value as Component) instanceof this)) {
         throw new TypeError(value + " not an instance of " + this);
       }
+      return value;
     } else if (Creatable[Symbol.hasInstance](value)) {
       return (value as Creatable<InstanceType<S>>).create();
-    } else {
-      return (this as unknown as ComponentFactory<InstanceType<S>>).fromInit(value as Inits<InstanceType<S>>);
     }
+    throw new TypeError("" + value);
   }
 
   /** @internal */
