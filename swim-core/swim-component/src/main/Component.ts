@@ -803,12 +803,12 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   protected onMount(): void {
-    this.requireUpdate(this.mountFlags);
-    this.mountFasteners();
+    // hook
   }
 
   protected didMount(): void {
-    // hook
+    this.requireUpdate(this.mountFlags);
+    this.mountFasteners();
   }
 
   /** @internal */
@@ -845,11 +845,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   protected willUnmount(): void {
-    // hook
+    this.unmountFasteners();
   }
 
   protected onUnmount(): void {
-    this.unmountFasteners();
+    // hook
   }
 
   protected didUnmount(): void {
