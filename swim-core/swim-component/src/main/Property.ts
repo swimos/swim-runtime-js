@@ -15,6 +15,7 @@
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Equals} from "@swim/util";
+import {Objects} from "@swim/util";
 import {FromAny} from "@swim/util";
 import {Affinity} from "./Affinity";
 import {FastenerContext} from "./FastenerContext";
@@ -23,22 +24,22 @@ import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 
 /** @public */
-export interface PropertyDescriptor<T = unknown, U = T> extends FastenerDescriptor {
-  extends?: Proto<Property<any, any, any>> | boolean | null;
+export interface PropertyDescriptor<T, U> extends FastenerDescriptor {
+  extends?: Proto<Property> | boolean | null;
   valueType?: unknown;
   value?: T | U;
   updateFlags?: number;
 }
 
 /** @public */
-export interface PropertyClass<P extends Property<any, any, any> = Property<any, any, any>> extends FastenerClass<P> {
-  tryValue<O, K extends keyof O, F extends O[K] = O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any> ? T : undefined;
+export interface PropertyClass<P extends Property = Property> extends FastenerClass<P> {
+  tryValue<O, K extends keyof O, F extends O[K] = O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any, any> ? T : undefined;
 
-  tryValueOr<O, K extends keyof O, E, F extends O[K] = O[K]>(owner: O, fastenerName: K, elseValue: E): F extends Property<any, infer T, any> ? NonNullable<T> | E : E;
+  tryValueOr<O, K extends keyof O, E, F extends O[K] = O[K]>(owner: O, fastenerName: K, elseValue: E): F extends Property<any, infer T, any, any> ? NonNullable<T> | E : E;
 }
 
 /** @public */
-export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
+export interface Property<O = any, T = any, U = T, I = T> extends Fastener<O> {
   (): T;
   (value: T | U, affinity?: Affinity): O;
 
@@ -46,74 +47,74 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   get descriptorType(): Proto<PropertyDescriptor<T, U>>;
 
   /** @override */
-  get fastenerType(): Proto<Property<any, any, any>>;
+  get fastenerType(): Proto<Property>;
 
   /** @internal @override */
-  setDerived(derived: boolean, inlet: Property<unknown, T>): void;
+  setDerived(derived: boolean, inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  willDerive(inlet: Property<unknown, T>): void;
+  willDerive(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  onDerive(inlet: Property<unknown, T>): void;
+  onDerive(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  didDerive(inlet: Property<unknown, T>): void;
+  didDerive(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  willUnderive(inlet: Property<unknown, T>): void;
+  willUnderive(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  onUnderive(inlet: Property<unknown, T>): void;
+  onUnderive(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  didUnderive(inlet: Property<unknown, T>): void;
+  didUnderive(inlet: Property<any, I, any, any>): void;
 
   /** @override */
-  get parent(): Property<unknown, T> | null;
+  get parent(): Property<any, I, any, any> | null;
 
   /** @override */
-  readonly inlet: Property<unknown, T> | null;
+  readonly inlet: Property<any, I, any, any> | null;
 
   /** @override */
-  bindInlet(inlet: Property<unknown, T, any>): void;
+  bindInlet<I2 extends I>(inlet: Property<any, I2, any, any>): void;
 
   /** @protected @override */
-  willBindInlet(inlet: Property<unknown, T>): void;
+  willBindInlet(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  onBindInlet(inlet: Property<unknown, T>): void;
+  onBindInlet(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  didBindInlet(inlet: Property<unknown, T>): void;
+  didBindInlet(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  willUnbindInlet(inlet: Property<unknown, T>): void;
+  willUnbindInlet(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  onUnbindInlet(inlet: Property<unknown, T>): void;
+  onUnbindInlet(inlet: Property<any, I, any, any>): void;
 
   /** @protected @override */
-  didUnbindInlet(inlet: Property<unknown, T>): void;
+  didUnbindInlet(inlet: Property<any, I, any, any>): void;
+
+  get inletValue(): I | undefined;
+
+  getInletValue(): NonNullable<I>;
+
+  getInletValueOr<E>(elseValue: E): NonNullable<I> | E;
+
+  transformInletValue(inletValue: I): T;
 
   /** @internal */
-  readonly outlets: ReadonlySet<Property<unknown, T>> | null;
+  readonly outlets: ReadonlySet<Property<any, any, any, T>> | null;
 
   /** @internal @override */
-  attachOutlet(outlet: Property<unknown, T>): void;
+  attachOutlet(outlet: Property<any, any, any, T>): void;
 
   /** @internal @override */
-  detachOutlet(outlet: Property<unknown, T>): void;
+  detachOutlet(outlet: Property<any, any, any, T>): void;
 
-  getOutletValue(outlet: Property<unknown, T>): T;
-
-  get inletValue(): T | undefined;
-
-  getInletValue(): NonNullable<T>;
-
-  getInletValueOr<E>(elseValue: E): NonNullable<T> | E;
-
-  transformInletValue(inletValue: T): T;
+  getOutletValue(outlet: Property<any, any, any, T>): T;
 
   /** @internal */
   readonly valueType?: unknown; // optional prototype property
@@ -149,7 +150,7 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
   decohereOutlets(): void;
 
   /** @internal @protected */
-  decohereOutlet(outlet: Property<unknown, T>): void;
+  decohereOutlet(outlet: Property<any, T, any, any>): void;
 
   /** @override */
   recohere(t: number): void;
@@ -165,51 +166,22 @@ export interface Property<O = unknown, T = unknown, U = T> extends Fastener<O> {
 }
 
 /** @public */
-export const Property = (function (_super: typeof Fastener) {
-  const Property = _super.extend("Property", {}) as PropertyClass;
+export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<Property<O, T, U, I>, PropertyClass<P>>("Property", {
+  get fastenerType(): Proto<Property> {
+    return Property;
+  },
 
-  Object.defineProperty(Property.prototype, "fastenerType", {
-    value: Property,
-    enumerable: true,
-    configurable: true,
-  });
-
-  Property.prototype.onDerive = function <T>(this: Property<unknown, T>, inlet: Property<unknown, T>): void {
+  onDerive(inlet: Property<any, I, any, any>): void {
     const inletValue = this.transformInletValue(inlet.getOutletValue(this));
     this.setValue(inletValue, Affinity.Reflexive);
-  };
+  },
 
-  Property.prototype.attachOutlet = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): void {
-    let outlets = this.outlets as Set<Property<unknown, T>> | null;
-    if (outlets === null) {
-      outlets = new Set<Property<unknown, T>>();
-      (this as Mutable<typeof this>).outlets = outlets;
-    }
-    outlets.add(outlet);
-  };
+  get inletValue(): I | undefined {
+    const inlet = this.inlet;
+    return inlet !== null ? inlet.getOutletValue(this) : void 0;
+  },
 
-  Property.prototype.detachOutlet = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): void {
-    const outlets = this.outlets as Set<Property<unknown, T>> | null;
-    if (outlets === null) {
-      return;
-    }
-    outlets.delete(outlet);
-  };
-
-  Property.prototype.getOutletValue = function <T>(this: Property<unknown, T>, outlet: Property<unknown, T>): T {
-    return this.value;
-  };
-
-  Object.defineProperty(Property.prototype, "inletValue", {
-    get: function <T>(this: Property<unknown, T>): T | undefined {
-      const inlet = this.inlet;
-      return inlet !== null ? inlet.getOutletValue(this) : void 0;
-    },
-    enumerable: true,
-    configurable: true,
-  });
-
-  Property.prototype.getInletValue = function <T>(this: Property<unknown, T>): NonNullable<T> {
+  getInletValue(): NonNullable<I> {
     const inletValue = this.inletValue;
     if (inletValue === void 0 || inletValue === null) {
       let message = inletValue + " ";
@@ -220,26 +192,47 @@ export const Property = (function (_super: typeof Fastener) {
       message += "inlet value";
       throw new TypeError(message);
     }
-    return inletValue as NonNullable<T>;
-  };
+    return inletValue;
+  },
 
-  Property.prototype.getInletValueOr = function <T, E>(this: Property<unknown, T>, elseValue: E): NonNullable<T> | E {
-    let inletValue: T | E | undefined = this.inletValue;
+  getInletValueOr<E>(elseValue: E): NonNullable<I> | E {
+    let inletValue: I | E | undefined = this.inletValue;
     if (inletValue === void 0 || inletValue === null) {
       inletValue = elseValue;
     }
-    return inletValue as NonNullable<T> | E;
-  };
+    return inletValue as NonNullable<I> | E;
+  },
 
-  Property.prototype.transformInletValue = function <T>(this: Property<unknown, T>, inletValue: T): T {
-    return inletValue;
-  };
+  transformInletValue(inletValue: I): T {
+    return inletValue as unknown as T;
+  },
 
-  Property.prototype.initValue = function <T>(this: Property<unknown, T>): T {
+  attachOutlet(outlet: Property<any, any, any, T>): void {
+    let outlets = this.outlets as Set<Property<any, any, any, T>> | null;
+    if (outlets === null) {
+      outlets = new Set<Property<any, any, any, T>>();
+      (this as Mutable<typeof this>).outlets = outlets;
+    }
+    outlets.add(outlet);
+  },
+
+  detachOutlet(outlet: Property<any, any, any, T>): void {
+    const outlets = this.outlets as Set<Property<any, any, any, T>> | null;
+    if (outlets === null) {
+      return;
+    }
+    outlets.delete(outlet);
+  },
+
+  getOutletValue(outlet: Property<any, any, any, T>): T {
+    return this.value;
+  },
+
+  initValue(): T {
     return (Object.getPrototypeOf(this) as Property<unknown, T>).value;
-  };
+  },
 
-  Property.prototype.getValue = function <T>(this: Property<unknown, T>): NonNullable<T> {
+  getValue(): NonNullable<T> {
     const value = this.value;
     if (value === void 0 || value === null) {
       let message = value + " ";
@@ -250,22 +243,22 @@ export const Property = (function (_super: typeof Fastener) {
       message += "value";
       throw new TypeError(message);
     }
-    return value as NonNullable<T>;
-  };
+    return value;
+  },
 
-  Property.prototype.getValueOr = function <T, E>(this: Property<unknown, T>, elseValue: E): NonNullable<T> | E {
+  getValueOr<E>(elseValue: E): NonNullable<T> | E {
     let value: T | E = this.value;
     if (value === void 0 || value === null) {
       value = elseValue;
     }
     return value as NonNullable<T> | E;
-  };
+  },
 
-  Property.prototype.transformValue = function <T>(this: Property<unknown, T>, value: T): T {
+  transformValue(value: T): T {
     return value;
-  };
+  },
 
-  Property.prototype.setValue = function <T, U>(this: Property<unknown, T, U>, newValue: T | U, affinity?: Affinity): void {
+  setValue(newValue: T | U, affinity?: Affinity): void {
     if (affinity === void 0) {
       affinity = Affinity.Extrinsic;
     }
@@ -285,27 +278,25 @@ export const Property = (function (_super: typeof Fastener) {
     this.didSetValue(newValue, oldValue);
     this.setCoherent(true);
     this.decohereOutlets();
-  };
+  },
 
-  Property.prototype.willSetValue = function <T>(this: Property<unknown, T>, newValue: T, oldValue: T): void {
+  willSetValue(newValue: T, oldValue: T): void {
     // hook
-  };
+  },
 
-  Property.prototype.onSetValue = function <T>(this: Property<unknown, T>, newValue: T, oldValue: T): void {
+  onSetValue(newValue: T, oldValue: T): void {
     const updateFlags = this.updateFlags;
     const owner = this.owner;
-    if (updateFlags === void 0 || owner === null || typeof owner !== "object" && typeof owner !== "function"
-        || !("requireUpdate" in owner)) {
-      return;
+    if (updateFlags !== void 0 && Objects.hasAllKeys<FastenerContext>(owner, "requireUpdate")) {
+      owner.requireUpdate!(updateFlags);
     }
-    (owner as FastenerContext).requireUpdate!(updateFlags);
-  };
+  },
 
-  Property.prototype.didSetValue = function <T>(this: Property<unknown, T>, newValue: T, oldValue: T): void {
+  didSetValue(newValue: T, oldValue: T): void {
     // hook
-  };
+  },
 
-  Property.prototype.decohereOutlets = function (this: Property): void {
+  decohereOutlets(): void {
     const outlets = this.outlets;
     if (outlets === null) {
       return;
@@ -313,39 +304,40 @@ export const Property = (function (_super: typeof Fastener) {
     for (const outlet of outlets) {
       this.decohereOutlet(outlet);
     }
-  };
+  },
 
-  Property.prototype.decohereOutlet = function (this: Property, outlet: Property): void {
+  decohereOutlet(outlet: Property<any, T, any, any>): void {
     if ((outlet.flags & Fastener.DerivedFlag) === 0 && Math.min(this.flags & Affinity.Mask, Affinity.Intrinsic) >= (outlet.flags & Affinity.Mask)) {
       outlet.setDerived(true, this);
     } else if ((outlet.flags & Fastener.DerivedFlag) !== 0 && (outlet.flags & Fastener.DecoherentFlag) === 0) {
       outlet.setCoherent(false);
       outlet.decohere();
     }
-  };
+  },
 
-  Property.prototype.recohere = function (this: Property, t: number): void {
-    let inlet: Property | null;
+  recohere(t: number): void {
+    let inlet: Property<any, I, any, any> | null;
     if ((this.flags & Fastener.DerivedFlag) === 0 || (inlet = this.inlet) === null) {
       return;
     }
     const inletValue = this.transformInletValue(inlet.getOutletValue(this));
     this.setValue(inletValue, Affinity.Reflexive);
-  };
+  },
 
-  Property.prototype.definedValue = function <T>(this: Property<unknown, T>, value: T): boolean {
+  definedValue(value: T): boolean {
     return value !== void 0 && value !== null;
-  };
+  },
 
-  Property.prototype.equalValues = function <T>(this: Property<unknown, T>, newValue: T, oldValue: T | undefined): boolean {
+  equalValues(newValue: T, oldValue: T | undefined): boolean {
     return Equals(newValue, oldValue);
-  };
+  },
 
-  Property.prototype.fromAny = function <T, U>(this: Property<unknown, T, U>, value: T | U): T {
+  fromAny(value: T | U): T {
     return FromAny<T, U>(this.valueType, value);
-  };
-
-  Property.tryValue = function <O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any> ? T : undefined {
+  },
+},
+{
+  tryValue<O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any, any> ? T : undefined {
     const property = FastenerContext.tryFastener(owner, fastenerName) as Property | null;
     if (property !== null) {
       return property.value as any;
@@ -355,19 +347,19 @@ export const Property = (function (_super: typeof Fastener) {
       return propertyClass.prototype.value as any;
     }
     return void 0 as any;
-  };
+  },
 
-  Property.tryValueOr = function <O, K extends keyof O, E, F extends O[K] = O[K]>(owner: O, fastenerName: K, elseValue: E): F extends Property<any, infer T, any> ? NonNullable<T> | E : E {
-    let value: (F extends Property<any, infer T, any> ? T : undefined) | E = this.tryValue(owner, fastenerName);
+  tryValueOr<O, K extends keyof O, E, F extends O[K] = O[K]>(owner: O, fastenerName: K, elseValue: E): F extends Property<any, infer T, any, any> ? NonNullable<T> | E : E {
+    let value: (F extends Property<any, infer T, any, any> ? T : undefined) | E = this.tryValue(owner, fastenerName);
     if (value === void 0 || value === null) {
       value = elseValue;
     }
-    return value as F extends Property<any, infer T, any> ? NonNullable<T> | E : E;
-  };
+    return value as F extends Property<any, infer T, any, any> ? NonNullable<T> | E : E;
+  },
 
-  Property.construct = function <P extends Property<any, any, any>>(property: P | null, owner: P extends Property<infer O, any, any> ? O : never): P {
+  construct(property: P | null, owner: P extends Fastener<infer O> ? O : never): P {
     if (property === null) {
-      property = function (value?: P extends Property<any, infer T, infer U> ? T | U : never, affinity?: Affinity): P extends Property<infer O, infer T, any> ? T | O : never {
+      property = function (value?: P extends Property<any, infer T, infer U, any> ? T | U : never, affinity?: Affinity): P extends Property<infer O, infer T, any> ? T | O : never {
         if (arguments.length === 0) {
           return property!.value;
         } else {
@@ -375,17 +367,21 @@ export const Property = (function (_super: typeof Fastener) {
           return property!.owner;
         }
       } as P;
-      delete (property as Partial<Mutable<P>>).name; // don't clobber prototype name
+      Object.defineProperty(property, "name", {
+        value: this.prototype.name,
+        enumerable: true,
+        configurable: true,
+      });
       Object.setPrototypeOf(property, this.prototype);
     }
-    property = _super.construct.call(this, property, owner) as P;
+    property = super.construct(property, owner) as P;
     (property as Mutable<typeof property>).outlets = null;
     (property as Mutable<typeof property>).value = property.initValue();
     return property;
-  };
+  },
 
-  Property.refine = function (propertyClass: FastenerClass<any>): void {
-    _super.refine.call(this, propertyClass);
+  refine(propertyClass: FastenerClass<any>): void {
+    super.refine(propertyClass);
     const propertyProtortype = propertyClass.prototype;
 
     if (Object.prototype.hasOwnProperty.call(propertyProtortype, "value")) {
@@ -395,7 +391,5 @@ export const Property = (function (_super: typeof Fastener) {
         configurable: true,
       });
     }
-  };
-
-  return Property;
-})(Fastener);
+  },
+}))();

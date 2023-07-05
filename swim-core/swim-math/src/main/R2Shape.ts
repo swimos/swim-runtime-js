@@ -54,6 +54,8 @@ export abstract class R2Shape implements Equals, Equivalent {
   /** @internal */
   declare typeid?: string;
 
+  abstract isDefined(): boolean;
+
   abstract readonly xMin: number;
 
   abstract readonly yMin: number;

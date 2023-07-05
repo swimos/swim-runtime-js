@@ -73,7 +73,7 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debu
   /** @internal */
   declare typeid?: "R2Box";
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return isFinite(this.xMin) && isFinite(this.yMin)
         && isFinite(this.xMax) && isFinite(this.yMax);
   }

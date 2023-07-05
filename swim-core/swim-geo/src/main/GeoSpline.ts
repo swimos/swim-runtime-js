@@ -72,7 +72,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   /** @internal */
   readonly closed: boolean;
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return this.curves.length !== 0;
   }
 

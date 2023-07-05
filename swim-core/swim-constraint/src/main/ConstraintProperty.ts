@@ -50,7 +50,7 @@ export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any, 
 }
 
 /** @public */
-export interface ConstraintProperty<O = unknown, T = unknown, U = T> extends Property<O, T, U>, ConstraintVariable {
+export interface ConstraintProperty<O = unknown, T = unknown, U = T, I = T> extends Property<O, T, U, I>, ConstraintVariable {
   /** @internal @override */
   isExternal(): boolean;
 

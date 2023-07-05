@@ -64,7 +64,9 @@ export type R2PointTuple = [number, number];
 /** @public */
 export const R2PointTuple = {
   [Symbol.hasInstance](instance: unknown): instance is R2PointTuple {
-    return Array.isArray(instance) && instance.length === 2;
+    return Array.isArray(instance) && instance.length === 2
+        && typeof instance[0] === "number"
+        && typeof instance[1] === "number";
   },
 };
 
@@ -79,7 +81,7 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
   /** @internal */
   declare typeid?: "R2Point";
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return isFinite(this.x) && isFinite(this.y);
   }
 

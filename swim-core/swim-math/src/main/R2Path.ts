@@ -62,7 +62,7 @@ export class R2Path extends R2Shape implements Debug {
 
   readonly splines: ReadonlyArray<R2Spline>;
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return this.splines.length !== 0;
   }
 

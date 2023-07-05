@@ -50,7 +50,7 @@ export interface ConstraintAnimatorClass<A extends ConstraintAnimator<any, any, 
 }
 
 /** @public */
-export interface ConstraintAnimator<O = unknown, T = unknown, U = T> extends Animator<O, T, U>, ConstraintVariable {
+export interface ConstraintAnimator<O = unknown, T = unknown, U = T, I = T> extends Animator<O, T, U, I>, ConstraintVariable {
   /** @internal @override */
   isExternal(): boolean;
 

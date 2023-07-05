@@ -35,7 +35,7 @@ export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equ
 
   readonly shapes: readonly S[];
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return this.shapes.length !== 0;
   }
 

@@ -64,7 +64,9 @@ export type GeoPointTuple = [number, number];
 /** @public */
 export const GeoPointTuple = {
   [Symbol.hasInstance](instance: unknown): instance is GeoPointTuple {
-    return Array.isArray(instance) && instance.length === 2;
+    return Array.isArray(instance) && instance.length === 2
+        && typeof instance[0] === "number"
+        && typeof instance[1] === "number";
   },
 };
 
@@ -82,7 +84,7 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
   /** @internal */
   declare typeid?: "GeoPoint";
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return isFinite(this.lng) && isFinite(this.lat);
   }
 

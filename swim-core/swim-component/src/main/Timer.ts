@@ -20,23 +20,23 @@ import {Fastener} from "./Fastener";
 
 /** @public */
 export interface TimerDescriptor extends FastenerDescriptor {
-  extends?: Proto<Timer<any>> | boolean | null;
+  extends?: Proto<Timer> | boolean | null;
   delay?: number;
 }
 
 /** @public */
-export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerClass<F> {
+export interface TimerClass<F extends Timer = Timer> extends FastenerClass<F> {
 }
 
 /** @public */
-export interface Timer<O = unknown> extends Fastener<O> {
+export interface Timer<O = any> extends Fastener<O> {
   (): void;
 
   /** @override */
   get descriptorType(): Proto<TimerDescriptor>;
 
   /** @override */
-  get fastenerType(): Proto<Timer<any>>;
+  get fastenerType(): Proto<Timer>;
 
   /** @protected */
   fire(): void;
@@ -107,106 +107,83 @@ export interface Timer<O = unknown> extends Fastener<O> {
 }
 
 /** @public */
-export const Timer = (function (_super: typeof Fastener) {
-  const Timer = _super.extend("Timer", {}) as TimerClass;
+export const Timer = (<O, F extends Timer>() => Fastener.extend<Timer<O>, TimerClass<F>>("Timer", {
+  get fastenerType(): Proto<Timer> {
+    return Timer;
+  },
 
-  Object.defineProperty(Timer.prototype, "fastenerType", {
-    value: Timer,
-    enumerable: true,
-    configurable: true,
-  });
-
-  Timer.prototype.fire = function (this: Timer): void {
+  fire(): void {
     // hook
-  };
+  },
 
-  Timer.prototype.initDelay = function (this: Timer): number {
+  initDelay(): number {
     let delay = (Object.getPrototypeOf(this) as Timer).delay as number | undefined;
     if (delay === void 0) {
       delay = 0;
     }
     return Math.max(0, delay);
-  };
+  },
 
-  Timer.prototype.setDelay = function (this: Timer, delay: number): void {
+  setDelay(delay: number): void {
     (this as Mutable<typeof this>).delay = Math.max(0, delay);
-  };
+  },
 
-  Object.defineProperty(Timer.prototype, "elapsed", {
-    get: function (this: Timer): number | undefined {
-      const deadline = this.deadline;
-      if (deadline !== void 0) {
-        return Math.max(0, performance.now() - (deadline - this.delay));
-      } else {
-        return void 0;
-      }
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get elapsed(): number | undefined {
+    const deadline = this.deadline;
+    if (deadline === void 0) {
+      return void 0;
+    }
+    return Math.max(0, performance.now() - (deadline - this.delay));
+  },
 
-  Object.defineProperty(Timer.prototype, "remaining", {
-    get: function (this: Timer): number | undefined {
-      const deadline = this.deadline;
-      if (deadline !== void 0) {
-        return Math.max(0, deadline - performance.now());
-      } else {
-        return void 0;
-      }
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get remaining(): number | undefined {
+    const deadline = this.deadline;
+    if (deadline === void 0) {
+      return void 0;
+    }
+    return Math.max(0, deadline - performance.now());
+  },
 
-  Object.defineProperty(Timer.prototype, "scheduled", {
-    get: function (this: Timer): boolean {
-      return this.timeout !== void 0;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get scheduled(): boolean {
+    return this.timeout !== void 0;
+  },
 
-  Timer.prototype.schedule = function (this: Timer, delay?: number): void {
-    let timeout = this.timeout;
-    if (timeout === void 0) {
-      if (delay === void 0) {
-        delay = this.delay;
-      } else {
-        this.setDelay(delay);
-      }
-      this.willSchedule(delay);
-      (this as Mutable<typeof this>).deadline = performance.now() + delay;
-      timeout = this.setTimeout(this, delay);
-      (this as Mutable<typeof this>).timeout = timeout;
-      this.onSchedule(delay);
-      this.didSchedule(delay);
-    } else {
+  schedule(delay?: number): void {
+    if (this.timeout !== void 0) {
       throw new Error("timer already scheduled; call throttle or debounce to reschedule");
+    } else if (delay === void 0) {
+      delay = this.delay;
+    } else {
+      this.setDelay(delay);
     }
-  };
+    this.willSchedule(delay);
+    (this as Mutable<typeof this>).deadline = performance.now() + delay;
+    (this as Mutable<typeof this>).timeout = this.setTimeout(this, delay);
+    this.onSchedule(delay);
+    this.didSchedule(delay);
+  },
 
-  Timer.prototype.throttle = function (this: Timer, delay?: number): void {
-    let timeout = this.timeout;
-    if (timeout === void 0) {
-      if (delay === void 0) {
-        delay = this.delay;
-      } else {
-        this.setDelay(delay);
-      }
-      this.willSchedule(delay);
-      (this as Mutable<typeof this>).deadline = performance.now() + delay;
-      timeout = this.setTimeout(this, delay);
-      (this as Mutable<typeof this>).timeout = timeout;
-      this.onSchedule(delay);
-      this.didSchedule(delay);
+  throttle(delay?: number): void {
+    if (this.timeout !== void 0) {
+      return;
+    } else if (delay === void 0) {
+      delay = this.delay;
+    } else {
+      this.setDelay(delay);
     }
-  };
+    this.willSchedule(delay);
+    (this as Mutable<typeof this>).deadline = performance.now() + delay;
+    (this as Mutable<typeof this>).timeout = this.setTimeout(this, delay);
+    this.onSchedule(delay);
+    this.didSchedule(delay);
+  },
 
-  Timer.prototype.debounce = function (this: Timer, delay?: number): void {
-    let timeout = this.timeout;
+  debounce(delay?: number): void {
+    const timeout = this.timeout;
     if (timeout !== void 0) {
       this.willCancel();
       (this as Mutable<typeof this>).timeout = void 0;
+      (this as Mutable<typeof this>).deadline = void 0;
       this.clearTimeout(timeout);
       this.onCancel();
       this.didCancel();
@@ -218,96 +195,99 @@ export const Timer = (function (_super: typeof Fastener) {
     }
     this.willSchedule(delay);
     (this as Mutable<typeof this>).deadline = performance.now() + delay;
-    timeout = this.setTimeout(this, delay);
-    (this as Mutable<typeof this>).timeout = timeout;
+    (this as Mutable<typeof this>).timeout = this.setTimeout(this, delay);
     this.onSchedule(delay);
     this.didSchedule(delay);
-  };
+  },
 
-  Timer.prototype.willSchedule = function (this: Timer, delay: number): void {
+  willSchedule(delay: number): void {
     // hook
-  };
+  },
 
-  Timer.prototype.onSchedule = function (this: Timer, delay: number): void {
+  onSchedule(delay: number): void {
     // hook
-  };
+  },
 
-  Timer.prototype.didSchedule = function (this: Timer, delay: number): void {
+  didSchedule(delay: number): void {
     // hook
-  };
+  },
 
-  Timer.prototype.cancel = function (this: Timer): void {
+  cancel(): void {
     const timeout = this.timeout;
-    if (timeout !== void 0) {
-      this.willCancel();
-      (this as Mutable<typeof this>).timeout = void 0;
-      (this as Mutable<typeof this>).deadline = void 0;
-      this.clearTimeout(timeout);
-      this.onCancel();
-      this.didCancel();
+    if (timeout === void 0) {
+      return;
     }
-  };
+    this.willCancel();
+    (this as Mutable<typeof this>).timeout = void 0;
+    (this as Mutable<typeof this>).deadline = void 0;
+    this.clearTimeout(timeout);
+    this.onCancel();
+    this.didCancel();
+  },
 
-  Timer.prototype.willCancel = function (this: Timer): void {
+  willCancel(): void {
     // hook
-  };
+  },
 
-  Timer.prototype.onCancel = function (this: Timer): void {
+  onCancel(): void {
     // hook
-  };
+  },
 
-  Timer.prototype.didCancel = function (this: Timer): void {
+  didCancel(): void {
     // hook
-  };
+  },
 
-  Timer.prototype.expire = function (this: Timer): void {
+  expire(): void {
     (this as Mutable<typeof this>).timeout = void 0;
     (this as Mutable<typeof this>).deadline = void 0;
     this.willExpire();
     this.fire();
     this.onExpire();
     this.didExpire();
-  };
+  },
 
-  Timer.prototype.willExpire = function (this: Timer): void {
+  willExpire(): void {
     // hook
-  };
+  },
 
-  Timer.prototype.onExpire = function (this: Timer): void {
+  onExpire(): void {
     // hook
-  };
+  },
 
-  Timer.prototype.didExpire = function (this: Timer): void {
+  didExpire(): void {
     // hook
-  };
+  },
 
-  Timer.prototype.setTimeout = function (this: Timer, callback: () => void, delay: number): unknown {
+  setTimeout(callback: () => void, delay: number): unknown {
     return setTimeout(callback, delay);
-  };
+  },
 
-  Timer.prototype.clearTimeout = function (this: Timer, timeout: unknown): void {
+  clearTimeout(timeout: unknown): void {
     clearTimeout(timeout as any);
-  };
+  },
 
-  Timer.prototype.onUnmount = function (this: Timer): void {
-    _super.prototype.onUnmount.call(this);
+  onUnmount(): void {
+    super.onUnmount();
     this.cancel();
-  };
-
-  Timer.construct = function <F extends Timer<any>>(fastener: F | null, owner: F extends Timer<infer O> ? O : never): F {
+  },
+},
+{
+  construct(fastener: F | null, owner: F extends Fastener<infer O> ? O : never): F {
     if (fastener === null) {
       fastener = function (): void {
         fastener!.expire();
       } as F;
-      delete (fastener as Partial<Mutable<F>>).name; // don't clobber prototype name
+      Object.defineProperty(fastener, "name", {
+        value: this.prototype.name,
+        enumerable: true,
+        configurable: true,
+      });
       Object.setPrototypeOf(fastener, this.prototype);
     }
-    fastener = _super.construct.call(this, fastener, owner) as F;
+    fastener = super.construct.call(this, fastener, owner) as F;
     (fastener as Mutable<typeof fastener>).delay = fastener.initDelay();
     (fastener as Mutable<typeof fastener>).deadline = 0;
     (fastener as Mutable<typeof fastener>).timeout = void 0;
     return fastener;
-  };
-
-  return Timer;
-})(Fastener);
+  },
+}))();

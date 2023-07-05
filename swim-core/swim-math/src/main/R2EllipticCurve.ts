@@ -41,6 +41,13 @@ export class R2EllipticCurve extends R2Curve implements Debug {
     this.da = da;
   }
 
+  override isDefined(): boolean {
+    return isFinite(this.cx) && isFinite(this.cy)
+        && isFinite(this.rx) && isFinite(this.ry)
+        && isFinite(this.phi)
+        && isFinite(this.a0) && isFinite(this.da);
+  }
+
   readonly cx: number;
 
   readonly cy: number;

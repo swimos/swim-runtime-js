@@ -39,7 +39,7 @@ export class R2QuadraticCurve extends R2BezierCurve implements Debug {
     this.y2 = y2;
   }
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return isFinite(this.x0) && isFinite(this.y0)
         && isFinite(this.x1) && isFinite(this.y1)
         && isFinite(this.x2) && isFinite(this.y2);

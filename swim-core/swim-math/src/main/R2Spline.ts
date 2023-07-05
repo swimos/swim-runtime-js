@@ -61,7 +61,7 @@ export class R2Spline extends R2Curve implements Debug {
   /** @internal */
   readonly closed: boolean;
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return this.curves.length !== 0;
   }
 

@@ -83,6 +83,10 @@ export class GeoTile extends GeoShape implements HashCode, Debug {
   /** @internal */
   declare typeid?: "GeoTile";
 
+  override isDefined(): boolean {
+    return true;
+  }
+
   readonly x: number;
 
   readonly y: number;

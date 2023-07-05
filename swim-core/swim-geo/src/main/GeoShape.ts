@@ -22,6 +22,8 @@ import {GeoPointTuple} from "./"; // forward import
 import {GeoPoint} from "./"; // forward import
 import {GeoSegmentInit} from "./"; // forward import
 import {GeoSegment} from "./"; // forward import
+import {GeoSplinePoints} from "./"; // forward import
+import {GeoSpline} from "./"; // forward import
 import {GeoBoxInit} from "./"; // forward import
 import {GeoBox} from "./"; // forward import
 import {GeoTileInit} from "./"; // forward import
@@ -33,6 +35,7 @@ export type AnyGeoShape = GeoShape
                         | GeoPointInit
                         | GeoPointTuple
                         | GeoSegmentInit
+                        | GeoSplinePoints
                         | GeoTileInit
                         | GeoTileTuple
                         | GeoBoxInit;
@@ -44,6 +47,7 @@ export const AnyGeoShape = {
         || GeoPointInit[Symbol.hasInstance](instance)
         || GeoPointTuple[Symbol.hasInstance](instance)
         || GeoSegmentInit[Symbol.hasInstance](instance)
+        || GeoSplinePoints[Symbol.hasInstance](instance)
         || GeoTileInit[Symbol.hasInstance](instance)
         || GeoTileTuple[Symbol.hasInstance](instance)
         || GeoBoxInit[Symbol.hasInstance](instance);
@@ -54,6 +58,8 @@ export const AnyGeoShape = {
 export abstract class GeoShape implements Equals, Equivalent {
   /** @internal */
   declare typeid?: string;
+
+  abstract isDefined(): boolean;
 
   abstract readonly lngMin: number;
 
@@ -98,6 +104,8 @@ export abstract class GeoShape implements Equals, Equivalent {
       return GeoPoint.fromTuple(value);
     } else if (GeoSegmentInit[Symbol.hasInstance](value)) {
       return GeoSegment.fromInit(value);
+    } else if (GeoSplinePoints[Symbol.hasInstance](value)) {
+      return GeoSpline.fromPoints(value);
     } else if (GeoTileInit[Symbol.hasInstance](value)) {
       return GeoTile.fromInit(value);
     } else if (GeoTileTuple[Symbol.hasInstance](value)) {

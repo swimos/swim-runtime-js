@@ -77,7 +77,7 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, D
   /** @internal */
   declare typeid?: "GeoBox";
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return isFinite(this.lngMin) && isFinite(this.latMin)
         && isFinite(this.lngMax) && isFinite(this.latMax);
   }

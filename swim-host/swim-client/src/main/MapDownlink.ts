@@ -827,7 +827,11 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
           return downlink!.owner;
         }
       } as F;
-      delete (downlink as Partial<Mutable<F>>).name; // don't clobber prototype name
+      Object.defineProperty(downlink, "name", {
+        value: this.prototype.name,
+        enumerable: true,
+        configurable: true,
+      });
       Object.setPrototypeOf(downlink, this.prototype);
     }
     downlink = _super.construct.call(this, downlink, owner) as F;

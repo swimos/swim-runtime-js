@@ -72,7 +72,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   /** @internal */
   declare typeid?: "GeoSegment";
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return isFinite(this.lng0) && isFinite(this.lat0)
         && isFinite(this.lng1) && isFinite(this.lat1);
   }

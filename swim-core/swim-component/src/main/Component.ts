@@ -874,11 +874,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     // hook
   }
 
-  tryFastener<K extends keyof this, F extends this[K] = this[K]>(fastenerName: K): F extends Fastener<any> ? F | null : null {
+  tryFastener<K extends keyof this, F extends this[K] = this[K]>(fastenerName: K): F extends Fastener ? F | null : null {
     return FastenerContext.tryFastener(this, fastenerName);
   }
 
-  getFastener<F extends Fastener<any>>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
+  getFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
     if (contextType !== void 0 && contextType !== null && !(this instanceof contextType)) {
       return null;
     }
@@ -890,7 +890,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @override */
-  getParentFastener<F extends Fastener<any>>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
+  getParentFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
     let parent = this.parent;
     while (parent !== null) {
       const fastener = parent.getFastener(fastenerName, fastenerType, contextType);
@@ -981,9 +981,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
-  setProperty<P extends {[K in keyof this as this[K] extends Property<any, any, any> ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timingOrAffinity: Affinity | AnyTiming | boolean | null | undefined): void;
-  setProperty<P extends {[K in keyof this as this[K] extends Property<any, any, any> ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timing?: AnyTiming | boolean | null, affinity?: Affinity): void;
-  setProperty<P extends {[K in keyof this as this[K] extends Property<any, any, any> ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timing?: Affinity | AnyTiming | boolean | null, affinity?: Affinity): void {
+  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timingOrAffinity: Affinity | AnyTiming | boolean | null | undefined): void;
+  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timing?: AnyTiming | boolean | null, affinity?: Affinity): void;
+  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timing?: Affinity | AnyTiming | boolean | null, affinity?: Affinity): void {
     if (typeof timing === "number") {
       affinity = timing;
       timing = void 0;
@@ -996,9 +996,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
-  setProperties<P extends {[K in keyof this as this[K] extends Property<any, any, any> ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timingOrAffinity: Affinity | AnyTiming | boolean | null | undefined): void;
-  setProperties<P extends {[K in keyof this as this[K] extends Property<any, any, any> ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timing?: AnyTiming | boolean | null, affinity?: Affinity): void;
-  setProperties<P extends {[K in keyof this as this[K] extends Property<any, any, any> ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timing?: Affinity | AnyTiming | boolean | null, affinity?: Affinity): void {
+  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timingOrAffinity: Affinity | AnyTiming | boolean | null | undefined): void;
+  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timing?: AnyTiming | boolean | null, affinity?: Affinity): void;
+  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timing?: Affinity | AnyTiming | boolean | null, affinity?: Affinity): void {
     if (typeof timing === "number") {
       affinity = timing;
       timing = void 0;

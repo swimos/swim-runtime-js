@@ -444,7 +444,11 @@ export const ComponentRef = (function (_super: typeof ComponentRelation) {
           return fastener!.owner;
         }
       } as F;
-      delete (fastener as Partial<Mutable<F>>).name; // don't clobber prototype name
+      Object.defineProperty(fastener, "name", {
+        value: this.prototype.name,
+        enumerable: true,
+        configurable: true,
+      });
       Object.setPrototypeOf(fastener, this.prototype);
     }
     fastener = _super.construct.call(this, fastener, owner) as F;

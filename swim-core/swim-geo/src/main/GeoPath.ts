@@ -70,7 +70,7 @@ export class GeoPath extends GeoShape implements Debug {
   /** @internal */
   declare typeid?: "GeoPath";
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return this.splines.length !== 0;
   }
 

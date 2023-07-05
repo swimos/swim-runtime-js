@@ -71,7 +71,7 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
   /** @internal */
   declare typeid?: "R2Circle";
 
-  isDefined(): boolean {
+  override isDefined(): boolean {
     return isFinite(this.cx) && isFinite(this.cy) && isFinite(this.r);
   }
 
