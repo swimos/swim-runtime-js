@@ -57,7 +57,7 @@ export abstract class Cursor<T> implements IterableIterator<T> {
     return new UnaryCursor<T>(value);
   }
 
-  static array<T>(array: ReadonlyArray<T>, index?: number, limit?: number): Cursor<T> {
+  static array<T>(array: readonly T[], index?: number, limit?: number): Cursor<T> {
     if (index === void 0) {
       index = 0;
     }
@@ -190,7 +190,7 @@ export class UnaryCursor<T> extends Cursor<T> {
 
 /** @internal */
 export class ArrayCursor<T> extends Cursor<T> {
-  constructor(array: ReadonlyArray<T>, index: number, limit: number) {
+  constructor(array: readonly T[], index: number, limit: number) {
     super();
     this.array = array;
     this.index = index;
@@ -198,7 +198,7 @@ export class ArrayCursor<T> extends Cursor<T> {
   }
 
   /** @internal */
-  readonly array: ReadonlyArray<T>;
+  readonly array: readonly T[];
 
   /** @internal */
   index: number;

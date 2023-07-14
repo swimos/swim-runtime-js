@@ -13,17 +13,17 @@
 // limitations under the License.
 
 import {Objects} from "@swim/util";
-import type {AnyR2Point} from "@swim/math";
+import type {R2PointLike} from "@swim/math";
 import type {R2Point} from "@swim/math";
-import type {AnyGeoPoint} from "./GeoPoint";
+import type {GeoPointLike} from "./GeoPoint";
 import type {GeoPoint} from "./GeoPoint";
 
 /** @public */
 export interface GeoProjection {
-  project(lnglat: AnyGeoPoint): R2Point;
+  project(lnglat: GeoPointLike): R2Point;
   project(lng: number, lat: number): R2Point;
 
-  unproject(point: AnyR2Point): GeoPoint;
+  unproject(point: R2PointLike): GeoPoint;
   unproject(x: number, y: number): GeoPoint;
 }
 

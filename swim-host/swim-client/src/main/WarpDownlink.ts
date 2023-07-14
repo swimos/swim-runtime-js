@@ -28,9 +28,9 @@ import type {FastenerFlags} from "@swim/component";
 import type {FastenerDescriptor} from "@swim/component";
 import type {FastenerClass} from "@swim/component";
 import {Fastener} from "@swim/component";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import type {EventMessage} from "@swim/warp";
 import type {LinkRequest} from "@swim/warp";
@@ -43,15 +43,15 @@ import type {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkModel} from "./WarpDownlinkModel";
 
 /** @public */
-export interface WarpDownlinkDescriptor extends FastenerDescriptor {
+export interface WarpDownlinkDescriptor<R> extends FastenerDescriptor<R> {
   extends?: Proto<WarpDownlink<any>> | boolean | null;
   consumed?: boolean;
-  hostUri?: AnyUri | null;
-  nodeUri?: AnyUri | null;
-  laneUri?: AnyUri | null;
+  hostUri?: UriLike | null;
+  nodeUri?: UriLike | null;
+  laneUri?: UriLike | null;
   prio?: number;
   rate?: number;
-  body?: AnyValue | null;
+  body?: ValueLike | null;
   relinks?: boolean;
   syncs?: boolean;
 }
@@ -72,7 +72,7 @@ export interface WarpDownlinkClass<F extends WarpDownlink<any> = WarpDownlink<an
 }
 
 /** @public */
-export interface WarpDownlinkObserver<F extends WarpDownlink<any> = WarpDownlink> extends Observer<F> {
+export interface WarpDownlinkObserver<F extends WarpDownlink<any> = WarpDownlink<any>> extends Observer<F> {
   onEvent?(body: Value, downlink: F): void;
 
   onCommand?(body: Value, downlink: F): void;
@@ -99,24 +99,21 @@ export interface WarpDownlinkObserver<F extends WarpDownlink<any> = WarpDownlink
 }
 
 /** @public */
-export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Consumable {
+export interface WarpDownlink<R = any> extends Fastener<R>, Observable, Consumable {
   /** @override */
-  get descriptorType(): Proto<WarpDownlinkDescriptor>;
+  get descriptorType(): Proto<WarpDownlinkDescriptor<R>>;
 
   /** @override */
   get fastenerType(): Proto<WarpDownlink<any>>;
 
   /** @override */
-  readonly observerType?: Class<WarpDownlinkObserver>;
+  readonly observerType?: Class<WarpDownlinkObserver<any>>;
 
   /** @protected */
   readonly consumed?: boolean; // optional prototype property
 
   /** @internal */
   readonly model: WarpDownlinkModel | null;
-
-  /** @protected @override */
-  onDerive(inlet: WarpDownlink): void;
 
   /** @protected */
   initHostUri(): Uri | null;
@@ -125,7 +122,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 
   getHostUri(): Uri | null;
 
-  setHostUri(hostUri: AnyUri | null): this;
+  setHostUri(hostUri: UriLike | null): this;
 
   /** @protected */
   initNodeUri(): Uri | null;
@@ -134,7 +131,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 
   getNodeUri(): Uri | null;
 
-  setNodeUri(nodeUri: AnyUri | null): this;
+  setNodeUri(nodeUri: UriLike | null): this;
 
   /** @protected */
   initLaneUri(): Uri | null;
@@ -143,7 +140,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 
   getLaneUri(): Uri | null;
 
-  setLaneUri(laneUri: AnyUri | null): this;
+  setLaneUri(laneUri: UriLike | null): this;
 
   /** @protected */
   initPrio(): number | undefined;
@@ -170,17 +167,11 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 
   getBody(): Value | null;
 
-  setBody(body: AnyValue | null): this;
-
-  /** @internal */
-  initRelinks(relinks: boolean): void;
+  setBody(body: ValueLike | null): this;
 
   get relinks(): boolean;
 
   relink(relinks?: boolean): this;
-
-  /** @internal */
-  initSyncs(syncs: boolean): void;
 
   get syncs(): boolean;
 
@@ -202,7 +193,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 
   get session(): Value;
 
-  command(body: AnyValue): void;
+  command(body: ValueLike): void;
 
   /** @protected */
   onEvent(body: Value): void;
@@ -300,7 +291,7 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
   /** @protected */
   didUnobserve(observer: Observes<this>): void;
 
-  callObservers<O, K extends keyof ObserverMethods<O>>(this: {readonly observerType?: Class<O>}, key: K, ...args: ObserverParameters<O, K>): void;
+  callObservers<R, K extends keyof ObserverMethods<R>>(this: {readonly observerType?: Class<R>}, key: K, ...args: ObserverParameters<R, K>): void;
 
   /** @internal */
   readonly consumers: ReadonlySet<Consumer> | null;
@@ -374,172 +365,152 @@ export interface WarpDownlink<O = unknown> extends Fastener<O>, Observable, Cons
 }
 
 /** @public */
-export const WarpDownlink = (function (_super: typeof Fastener) {
-  const WarpDownlink = _super.extend("WarpDownlink", {}) as WarpDownlinkClass;
+export const WarpDownlink = (<R, F extends WarpDownlink<any>>() => Fastener.extend<WarpDownlink<R>, WarpDownlinkClass<F>>("WarpDownlink", {
+  get fastenerType(): Proto<WarpDownlink<any>> {
+    return WarpDownlink;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "fastenerType", {
-    value: WarpDownlink,
-    enumerable: true,
-    configurable: true,
-  });
-
-  WarpDownlink.prototype.onDerive = function (this: WarpDownlink, inlet: WarpDownlink): void {
-    // hook
-  };
-
-  WarpDownlink.prototype.initHostUri = function (this: WarpDownlink): Uri | null {
-    let hostUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink).hostUri;
+  initHostUri(): Uri | null {
+    let hostUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink<any>).hostUri;
     if (hostUri === void 0) {
       hostUri = null;
     }
     return hostUri;
-  };
+  },
 
-  WarpDownlink.prototype.getHostUri = function (this: WarpDownlink): Uri | null {
+  getHostUri(): Uri | null {
     let hostUri = this.hostUri;
     if (hostUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "hostUri")) {
       hostUri = this.owner.hostUri();
     }
     return hostUri;
-  };
+  },
 
-  WarpDownlink.prototype.setHostUri = function (this: WarpDownlink, hostUri: AnyUri | null): WarpDownlink {
+  setHostUri(hostUri: UriLike | null): WarpDownlink<any> {
     if (hostUri !== null) {
-      hostUri = Uri.fromAny(hostUri);
+      hostUri = Uri.fromLike(hostUri);
     }
     if (!Equals(this.hostUri, hostUri)) {
       (this as Mutable<typeof this>).hostUri = hostUri;
       this.reopen();
     }
     return this;
-  };
+  },
 
-  WarpDownlink.prototype.initNodeUri = function (this: WarpDownlink): Uri | null {
-    let nodeUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink).nodeUri;
+  initNodeUri(): Uri | null {
+    let nodeUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink<any>).nodeUri;
     if (nodeUri === void 0) {
       nodeUri = null;
     }
     return nodeUri;
-  };
+  },
 
-  WarpDownlink.prototype.getNodeUri = function (this: WarpDownlink): Uri | null {
+  getNodeUri(): Uri | null {
     let nodeUri = this.nodeUri;
     if (nodeUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "nodeUri")) {
       nodeUri = this.owner.nodeUri();
     }
     return nodeUri;
-  };
+  },
 
-  WarpDownlink.prototype.setNodeUri = function (this: WarpDownlink, nodeUri: AnyUri | null): WarpDownlink {
+  setNodeUri(nodeUri: UriLike | null): WarpDownlink<any> {
     if (nodeUri !== null) {
-      nodeUri = Uri.fromAny(nodeUri);
+      nodeUri = Uri.fromLike(nodeUri);
     }
     if (!Equals(this.nodeUri, nodeUri)) {
       (this as Mutable<typeof this>).nodeUri = nodeUri;
       this.reopen();
     }
     return this;
-  };
+  },
 
-  WarpDownlink.prototype.initLaneUri = function (this: WarpDownlink): Uri | null {
-    let laneUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink).laneUri;
+  initLaneUri(): Uri | null {
+    let laneUri: Uri | null | undefined = (Object.getPrototypeOf(this) as WarpDownlink<any>).laneUri;
     if (laneUri === void 0) {
       laneUri = null;
     }
     return laneUri;
-  };
+  },
 
-  WarpDownlink.prototype.getLaneUri = function (this: WarpDownlink): Uri | null {
+  getLaneUri(): Uri | null {
     let laneUri = this.laneUri;
     if (laneUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "laneUri")) {
       laneUri = this.owner.laneUri();
     }
     return laneUri;
-  };
+  },
 
-  WarpDownlink.prototype.setLaneUri = function (this: WarpDownlink, laneUri: AnyUri | null): WarpDownlink {
+  setLaneUri(laneUri: UriLike | null): WarpDownlink<any> {
     if (laneUri !== null) {
-      laneUri = Uri.fromAny(laneUri);
+      laneUri = Uri.fromLike(laneUri);
     }
     if (!Equals(this.laneUri, laneUri)) {
       (this as Mutable<typeof this>).laneUri = laneUri;
       this.reopen();
     }
     return this;
-  };
+  },
 
-  WarpDownlink.prototype.initPrio = function (this: WarpDownlink): number | undefined {
+  initPrio(): number | undefined {
     return (Object.getPrototypeOf(this) as WarpDownlink).prio;
-  };
+  },
 
-  WarpDownlink.prototype.getPrio = function (this: WarpDownlink): number | undefined {
+  getPrio(): number | undefined {
     return this.prio;
-  };
+  },
 
-  WarpDownlink.prototype.setPrio = function (this: WarpDownlink, prio: number | undefined): WarpDownlink {
+  setPrio(prio: number | undefined): WarpDownlink<any> {
     if (this.prio !== prio) {
       (this as Mutable<typeof this>).prio = prio;
       this.reopen();
     }
     return this;
-  };
+  },
 
-  WarpDownlink.prototype.initRate = function (this: WarpDownlink): number | undefined {
+  initRate(): number | undefined {
     return (Object.getPrototypeOf(this) as WarpDownlink).rate;
-  };
+  },
 
-  WarpDownlink.prototype.getRate = function (this: WarpDownlink): number | undefined {
+  getRate(): number | undefined {
     return this.rate;
-  };
+  },
 
-  WarpDownlink.prototype.setRate = function (this: WarpDownlink, rate: number | undefined): WarpDownlink {
+  setRate(rate: number | undefined): WarpDownlink<any> {
     if (this.rate !== rate) {
       (this as Mutable<typeof this>).rate = rate;
       this.reopen();
     }
     return this;
-  };
+  },
 
-  WarpDownlink.prototype.initBody = function (this: WarpDownlink): Value | null {
-    let body = (Object.getPrototypeOf(this) as WarpDownlink).body as Value | null | undefined;
+  initBody(): Value | null {
+    let body = (Object.getPrototypeOf(this) as WarpDownlink<any>).body as Value | null | undefined;
     if (body === void 0) {
       body = null;
     }
     return body;
-  };
+  },
 
-  WarpDownlink.prototype.getBody = function (this: WarpDownlink): Value | null {
+  getBody(): Value | null {
     return this.body;
-  };
+  },
 
-  WarpDownlink.prototype.setBody = function (this: WarpDownlink, body: AnyValue | null): WarpDownlink {
+  setBody(body: ValueLike | null): WarpDownlink<any> {
     if (body !== null) {
-      body = Value.fromAny(body);
+      body = Value.fromLike(body);
     }
     if (!Equals(this.body, body)) {
       (this as Mutable<typeof this>).body = body;
       this.reopen();
     }
     return this;
-  };
+  },
 
-  WarpDownlink.prototype.initRelinks = function (this: WarpDownlink, relinks: boolean): void {
-    if (relinks) {
-      (this as Mutable<typeof this>).flags = this.flags | WarpDownlink.RelinksFlag;
-    } else {
-      (this as Mutable<typeof this>).flags = this.flags & ~WarpDownlink.RelinksFlag;
-    }
-  };
+  get relinks(): boolean {
+    return (this.flags & WarpDownlink.RelinksFlag) !== 0;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "relinks", {
-    get(this: WarpDownlink): boolean {
-      return (this.flags & WarpDownlink.RelinksFlag) !== 0;
-    },
-    enumerable: true,
-    configurable: true,
-  });
-
-  WarpDownlink.prototype.relink = function (this: WarpDownlink, relinks?: boolean): typeof this {
+  relink(relinks?: boolean): typeof this {
     if (relinks === void 0) {
       relinks = true;
     }
@@ -550,25 +521,13 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       this.setFlags(flags & ~WarpDownlink.RelinksFlag);
     }
     return this;
-  };
+  },
 
-  WarpDownlink.prototype.initSyncs = function (this: WarpDownlink, syncs: boolean): void {
-    if (syncs) {
-      (this as Mutable<typeof this>).flags = this.flags | WarpDownlink.SyncsFlag;
-    } else {
-      (this as Mutable<typeof this>).flags = this.flags & ~WarpDownlink.SyncsFlag;
-    }
-  };
+  get syncs(): boolean {
+    return (this.flags & WarpDownlink.SyncsFlag) !== 0;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "syncs", {
-    get(this: WarpDownlink): boolean {
-      return (this.flags & WarpDownlink.SyncsFlag) !== 0;
-    },
-    enumerable: true,
-    configurable: true,
-  });
-
-  WarpDownlink.prototype.sync = function (this: WarpDownlink, syncs?: boolean): typeof this {
+  sync(syncs?: boolean): typeof this {
     if (syncs === void 0) {
       syncs = true;
     }
@@ -579,191 +538,159 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
       this.setFlags(flags & ~WarpDownlink.SyncsFlag);
     }
     return this;
-  };
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "opened", {
-    get(this: WarpDownlink): boolean {
-      return this.model !== null;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get opened(): boolean {
+    return this.model !== null;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "online", {
-    get(this: WarpDownlink): boolean {
-      const model = this.model;
-      return model !== null && model.online.value;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get online(): boolean {
+    const model = this.model;
+    return model !== null && model.online.value;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "connected", {
-    get(this: WarpDownlink): boolean {
-      const model = this.model;
-      return model !== null && model.connected;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get connected(): boolean {
+    const model = this.model;
+    return model !== null && model.connected;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "authenticated", {
-    get(this: WarpDownlink): boolean {
-      const model = this.model;
-      return model !== null && model.authenticated;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get authenticated(): boolean {
+    const model = this.model;
+    return model !== null && model.authenticated;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "deauthenticated", {
-    get(this: WarpDownlink): boolean {
-      const model = this.model;
-      return model !== null && model.deauthenticated;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get deauthenticated(): boolean {
+    const model = this.model;
+    return model !== null && model.deauthenticated;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "linked", {
-    get(this: WarpDownlink): boolean {
-      const model = this.model;
-      return model !== null && model.linked;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get linked(): boolean {
+    const model = this.model;
+    return model !== null && model.linked;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "synced", {
-    get(this: WarpDownlink): boolean {
-      const model = this.model;
-      return model !== null && model.synced;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get synced(): boolean {
+    const model = this.model;
+    return model !== null && model.synced;
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "session", {
-    get(this: WarpDownlink): Value {
-      const model = this.model;
-      return model !== null ? model.session.value : Value.absent();
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get session(): Value {
+    const model = this.model;
+    return model !== null ? model.session.value : Value.absent();
+  },
 
-  WarpDownlink.prototype.command = function (this: WarpDownlink, body: AnyValue): void {
+  command(body: ValueLike): void {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.command(body);
-  };
+  },
 
-  WarpDownlink.prototype.onEvent = function (this: WarpDownlink, body: Value): void {
+  onEvent(body: Value): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.onCommand = function (this: WarpDownlink, body: Value): void {
+  onCommand(body: Value): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.willLink = function (this: WarpDownlink): void {
+  willLink(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didLink = function (this: WarpDownlink): void {
+  didLink(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.willSync = function (this: WarpDownlink): void {
+  willSync(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didSync = function (this: WarpDownlink): void {
+  didSync(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.willUnlink = function (this: WarpDownlink): void {
+  willUnlink(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didUnlink = function (this: WarpDownlink): void {
+  didUnlink(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didConnect = function (this: WarpDownlink): void {
+  didConnect(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didDisconnect = function (this: WarpDownlink): void {
+  didDisconnect(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didClose = function (this: WarpDownlink): void {
+  didClose(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didFail = function (this: WarpDownlink, error: unknown): void {
+  didFail(error: unknown): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.onEventMessage = function (this: WarpDownlink, message: EventMessage): void {
+  onEventMessage(message: EventMessage): void {
     this.onEvent(message.body);
     this.callObservers("onEvent", message.body, this);
-  };
+  },
 
-  WarpDownlink.prototype.onCommandMessage = function (this: WarpDownlink, body: Value): void {
+  onCommandMessage(body: Value): void {
     this.onCommand(body);
     this.callObservers("onCommand", body, this);
-  };
+  },
 
-  WarpDownlink.prototype.onLinkRequest = function (this: WarpDownlink, request?: LinkRequest): void {
+  onLinkRequest(request?: LinkRequest): void {
     this.willLink();
     this.callObservers("willLink", this);
-  };
+  },
 
-  WarpDownlink.prototype.onLinkedResponse = function (this: WarpDownlink, response?: LinkedResponse): void {
+  onLinkedResponse(response?: LinkedResponse): void {
     this.didLink();
     this.callObservers("didLink", this);
-  };
+  },
 
-  WarpDownlink.prototype.onSyncRequest = function (this: WarpDownlink, request?: SyncRequest): void {
+  onSyncRequest(request?: SyncRequest): void {
     this.willSync();
     this.callObservers("willSync", this);
-  };
+  },
 
-  WarpDownlink.prototype.onSyncedResponse = function (this: WarpDownlink, response?: SyncedResponse): void {
+  onSyncedResponse(response?: SyncedResponse): void {
     this.didSync();
     this.callObservers("didSync", this);
-  };
+  },
 
-  WarpDownlink.prototype.onUnlinkRequest = function (this: WarpDownlink, request?: UnlinkRequest): void {
+  onUnlinkRequest(request?: UnlinkRequest): void {
     this.willUnlink();
     this.callObservers("willUnlink", this);
-  };
+  },
 
-  WarpDownlink.prototype.onUnlinkedResponse = function (this: WarpDownlink, response?: UnlinkedResponse): void {
+  onUnlinkedResponse(response?: UnlinkedResponse): void {
     this.didUnlink();
     this.callObservers("didUnlink", this);
-  };
+  },
 
-  WarpDownlink.prototype.hostDidConnect = function (this: WarpDownlink): void {
+  hostDidConnect(): void {
     this.didConnect();
     this.callObservers("didConnect", this);
-  };
+  },
 
-  WarpDownlink.prototype.hostDidDisconnect = function (this: WarpDownlink): void {
+  hostDidDisconnect(): void {
     this.didDisconnect();
     this.callObservers("didDisconnect", this);
-  };
+  },
 
-  WarpDownlink.prototype.hostDidFail = function (this: WarpDownlink, error: unknown): void {
+  hostDidFail(error: unknown): void {
     this.didFail(error);
     this.callObservers("didFail", error, this);
-  };
+  },
 
-  WarpDownlink.prototype.observe = function (this: WarpDownlink, observer: Observes<typeof this>): void {
+  observe(observer: Observes<typeof this>): void {
     let observers = this.observers as Set<Observes<typeof this>> | null;
     if (observers === null) {
       observers = new Set<Observes<typeof this>>();
@@ -775,21 +702,21 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     observers.add(observer);
     this.onObserve(observer);
     this.didObserve(observer);
-  };
+  },
 
-  WarpDownlink.prototype.willObserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
+  willObserve(observer: Observes<typeof this>): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.onObserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
+  onObserve(observer: Observes<typeof this>): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didObserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
+  didObserve(observer: Observes<typeof this>): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.unobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
+  unobserve(observer: Observes<typeof this>): void {
     const observers = this.observers as Set<Observes<typeof this>> | null;
     if (observers === null || !observers.has(observer)) {
       return;
@@ -798,22 +725,22 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     observers.delete(observer);
     this.onUnobserve(observer);
     this.didUnobserve(observer);
-  };
+  },
 
-  WarpDownlink.prototype.willUnobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
+  willUnobserve(observer: Observes<typeof this>): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.onUnobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
+  onUnobserve(observer: Observes<typeof this>): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didUnobserve = function (this: WarpDownlink, observer: Observes<typeof this>): void {
+  didUnobserve(observer: Observes<typeof this>): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.callObservers = function <O, K extends keyof ObserverMethods<O>>(this: {readonly observerType?: Class<O>}, key: K, ...args: ObserverParameters<O, K>): void {
-    const observers = (this as WarpDownlink).observers as ReadonlySet<ObserverMethods<O>> | null;
+  callObservers: function <R, K extends keyof ObserverMethods<R>>(this: {readonly observerType?: Class<R>}, key: K, ...args: ObserverParameters<R, K>): void {
+    const observers = (this as WarpDownlink<any>).observers as ReadonlySet<ObserverMethods<R>> | null;
     if (observers === null) {
       return;
     }
@@ -823,9 +750,9 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
         method.call(observer, ...args);
       }
     }
-  } as any;
+  } as any,
 
-  WarpDownlink.prototype.consume = function (this: WarpDownlink, consumer: Consumer): void {
+  consume(consumer: Consumer): void {
     let consumers = this.consumers as Set<Consumer> | null;
     if (consumers === null) {
       consumers = new Set<Consumer>();
@@ -840,21 +767,21 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     if (consumers.size === 1 && this.mounted) {
       this.startConsuming();
     }
-  };
+  },
 
-  WarpDownlink.prototype.willConsume = function (this: WarpDownlink, consumer: Consumer): void {
+  willConsume(consumer: Consumer): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.onConsume = function (this: WarpDownlink, consumer: Consumer): void {
+  onConsume(consumer: Consumer): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didConsume = function (this: WarpDownlink, consumer: Consumer): void {
+  didConsume(consumer: Consumer): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.unconsume = function (this: WarpDownlink, consumer: Consumer): void {
+  unconsume(consumer: Consumer): void {
     const consumers = this.consumers as Set<Consumer> | null;
     if (consumers === null || !consumers.has(consumer)) {
       return;
@@ -866,29 +793,25 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     if (consumers.size === 0) {
       this.stopConsuming();
     }
-  };
+  },
 
-  WarpDownlink.prototype.willUnconsume = function (this: WarpDownlink, consumer: Consumer): void {
+  willUnconsume(consumer: Consumer): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.onUnconsume = function (this: WarpDownlink, consumer: Consumer): void {
+  onUnconsume(consumer: Consumer): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.didUnconsume = function (this: WarpDownlink, consumer: Consumer): void {
+  didUnconsume(consumer: Consumer): void {
     // hook
-  };
+  },
 
-  Object.defineProperty(WarpDownlink.prototype, "consuming", {
-    get(this: WarpDownlink): boolean {
-      return (this.flags & WarpDownlink.ConsumingFlag) !== 0;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get consuming(): boolean {
+    return (this.flags & WarpDownlink.ConsumingFlag) !== 0;
+  },
 
-  WarpDownlink.prototype.startConsuming = function (this: WarpDownlink): void {
+  startConsuming(): void {
     if ((this.flags & WarpDownlink.ConsumingFlag) !== 0) {
       return;
     }
@@ -896,22 +819,22 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     this.setFlags(this.flags | WarpDownlink.ConsumingFlag);
     this.onStartConsuming();
     this.didStartConsuming();
-  };
+  },
 
-  WarpDownlink.prototype.willStartConsuming = function (this: WarpDownlink): void {
+  willStartConsuming(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.onStartConsuming = function (this: WarpDownlink): void {
+  onStartConsuming(): void {
     this.setCoherent(false);
-    this.decohere();
-  };
+    this.requireRecohere();
+  },
 
-  WarpDownlink.prototype.didStartConsuming = function (this: WarpDownlink): void {
+  didStartConsuming(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.stopConsuming = function (this: WarpDownlink): void {
+  stopConsuming(): void {
     if ((this.flags & WarpDownlink.ConsumingFlag) === 0) {
       return;
     }
@@ -919,25 +842,25 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     this.setFlags(this.flags & ~WarpDownlink.ConsumingFlag);
     this.onStopConsuming();
     this.didStopConsuming();
-  };
+  },
 
-  WarpDownlink.prototype.willStopConsuming = function (this: WarpDownlink): void {
+  willStopConsuming(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.onStopConsuming = function (this: WarpDownlink): void {
+  onStopConsuming(): void {
     this.close();
-  };
+  },
 
-  WarpDownlink.prototype.didStopConsuming = function (this: WarpDownlink): void {
+  didStopConsuming(): void {
     // hook
-  };
+  },
 
-  WarpDownlink.prototype.open = function (this: WarpDownlink): WarpDownlink {
+  open(): typeof this {
     throw new Error("abstract");
-  };
+  },
 
-  WarpDownlink.prototype.close = function (this: WarpDownlink): void {
+  close(): void {
     const model = this.model;
     if (model === null) {
       return;
@@ -947,42 +870,39 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
 
     this.didClose();
     this.callObservers("didClose", this);
-  };
+  },
 
-  WarpDownlink.prototype.reopen = function (this: WarpDownlink): void {
+  reopen(): void {
     this.close();
     if ((this.flags & WarpDownlink.ConsumingFlag) !== 0) {
       this.setCoherent(false);
-      this.decohere();
+      this.requireRecohere();
     }
-  };
+  },
 
-  WarpDownlink.prototype.recohere = function (this: WarpDownlink, t: number): void {
+  recohere(t: number): void {
+    this.setCoherentTime(t);
     this.setCoherent(true);
     if ((this.flags & WarpDownlink.ConsumingFlag) !== 0) {
       this.open();
     }
-  };
+  },
 
-  WarpDownlink.prototype.onMount = function (this: WarpDownlink): void {
-    _super.prototype.onMount.call(this);
+  onMount(): void {
+    super.onMount();
     if (this.consumers !== null && this.consumers.size !== 0) {
       this.startConsuming();
     }
-  };
+  },
 
-  WarpDownlink.prototype.onUnmount = function (this: WarpDownlink): void {
-    _super.prototype.onUnmount.call(this);
+  onUnmount(): void {
+    super.onUnmount();
     this.stopConsuming();
-  };
-
-  WarpDownlink.construct = function <F extends WarpDownlink<any>>(downlink: F | null, owner: F extends WarpDownlink<infer O> ? O : never): F {
-    downlink = _super.construct.call(this, downlink, owner) as F;
-    const flagsInit = downlink.flagsInit;
-    if (flagsInit !== void 0) {
-      downlink.initRelinks((flagsInit & WarpDownlink.RelinksFlag) !== 0);
-      downlink.initSyncs((flagsInit & WarpDownlink.SyncsFlag) !== 0);
-    }
+  },
+},
+{
+  construct(downlink: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
+    downlink = super.construct(downlink, owner) as F;
     (downlink as Mutable<typeof downlink>).observers = null;
     (downlink as Mutable<typeof downlink>).consumers = null;
     (downlink as Mutable<typeof downlink>).hostUri = downlink.initHostUri();
@@ -993,84 +913,64 @@ export const WarpDownlink = (function (_super: typeof Fastener) {
     (downlink as Mutable<typeof downlink>).body = downlink.initBody();
     (downlink as Mutable<typeof downlink>).model = null;
     return downlink;
-  };
+  },
 
-  WarpDownlink.refine = function (downlinkClass: WarpDownlinkClass<any>): void {
-    _super.refine.call(this, downlinkClass);
+  refine(downlinkClass: FastenerClass<WarpDownlink<any>>): void {
+    super.refine(downlinkClass);
     const downlinkPrototype = downlinkClass.prototype;
-    let flagsInit = downlinkPrototype.flagsInit;
 
+    let flagsInit = downlinkPrototype.flagsInit;
     if (Object.prototype.hasOwnProperty.call(downlinkPrototype, "relinks")) {
-      if (flagsInit === void 0) {
-        flagsInit = 0;
-      }
       if (downlinkPrototype.relinks) {
         flagsInit |= WarpDownlink.RelinksFlag;
       } else {
         flagsInit &= ~WarpDownlink.RelinksFlag;
       }
-      delete (downlinkPrototype as WarpDownlinkDescriptor).relinks;
+      delete (downlinkPrototype as WarpDownlinkDescriptor<any>).relinks;
     }
-
     if (Object.prototype.hasOwnProperty.call(downlinkPrototype, "syncs")) {
-      if (flagsInit === void 0) {
-        flagsInit = 0;
-      }
       if (downlinkPrototype.syncs) {
         flagsInit |= WarpDownlink.SyncsFlag;
       } else {
         flagsInit &= ~WarpDownlink.SyncsFlag;
       }
-      delete (downlinkPrototype as WarpDownlinkDescriptor).syncs;
+      delete (downlinkPrototype as WarpDownlinkDescriptor<any>).syncs;
+    }
+    Object.defineProperty(downlinkPrototype, "flagsInit", {
+      value: flagsInit,
+      enumerable: true,
+      configurable: true,
+    });
+
+    const hostUriDescriptor = Object.getOwnPropertyDescriptor(downlinkPrototype, "hostUri");
+    if (hostUriDescriptor !== void 0 && "value" in hostUriDescriptor) {
+      hostUriDescriptor.value = Uri.fromLike(hostUriDescriptor.value);
+      Object.defineProperty(downlinkPrototype, "hostUri", hostUriDescriptor);
     }
 
-    if (flagsInit !== void 0) {
-      Object.defineProperty(downlinkPrototype, "flagsInit", {
-        value: flagsInit,
-        enumerable: true,
-        configurable: true,
-      });
+    const nodeUriDescriptor = Object.getOwnPropertyDescriptor(downlinkPrototype, "nodeUri");
+    if (nodeUriDescriptor !== void 0 && "value" in nodeUriDescriptor) {
+      nodeUriDescriptor.value = Uri.fromLike(nodeUriDescriptor.value);
+      Object.defineProperty(downlinkPrototype, "nodeUri", nodeUriDescriptor);
     }
 
-    if (Object.prototype.hasOwnProperty.call(downlinkPrototype, "hostUri")) {
-      Object.defineProperty(downlinkPrototype, "hostUri", {
-        value: Uri.fromAny(downlinkPrototype.hostUri),
-        enumerable: true,
-        configurable: true,
-      });
+    const laneUriDescriptor = Object.getOwnPropertyDescriptor(downlinkPrototype, "laneUri");
+    if (laneUriDescriptor !== void 0 && "value" in laneUriDescriptor) {
+      laneUriDescriptor.value = Uri.fromLike(laneUriDescriptor.value);
+      Object.defineProperty(downlinkPrototype, "laneUri", laneUriDescriptor);
     }
 
-    if (Object.prototype.hasOwnProperty.call(downlinkPrototype, "nodeUri")) {
-      Object.defineProperty(downlinkPrototype, "nodeUri", {
-        value: Uri.fromAny(downlinkPrototype.nodeUri),
-        enumerable: true,
-        configurable: true,
-      });
+    const bodyDescriptor = Object.getOwnPropertyDescriptor(downlinkPrototype, "body");
+    if (bodyDescriptor !== void 0 && "value" in bodyDescriptor) {
+      bodyDescriptor.value = Value.fromLike(bodyDescriptor.value);
+      Object.defineProperty(downlinkPrototype, "body", bodyDescriptor);
     }
+  },
 
-    if (Object.prototype.hasOwnProperty.call(downlinkPrototype, "laneUri")) {
-      Object.defineProperty(downlinkPrototype, "laneUri", {
-        value: Uri.fromAny(downlinkPrototype.laneUri),
-        enumerable: true,
-        configurable: true,
-      });
-    }
+  RelinksFlag: 1 << (Fastener.FlagShift + 0),
+  SyncsFlag: 1 << (Fastener.FlagShift + 1),
+  ConsumingFlag: 1 << (Fastener.FlagShift + 2),
 
-    if (Object.prototype.hasOwnProperty.call(downlinkPrototype, "body")) {
-      Object.defineProperty(downlinkPrototype, "body", {
-        value: Value.fromAny(downlinkPrototype.body),
-        enumerable: true,
-        configurable: true,
-      });
-    }
-  };
-
-  (WarpDownlink as Mutable<typeof WarpDownlink>).RelinksFlag = 1 << (_super.FlagShift + 0);
-  (WarpDownlink as Mutable<typeof WarpDownlink>).SyncsFlag = 1 << (_super.FlagShift + 1);
-  (WarpDownlink as Mutable<typeof WarpDownlink>).ConsumingFlag = 1 << (_super.FlagShift + 2);
-
-  (WarpDownlink as Mutable<typeof WarpDownlink>).FlagShift = _super.FlagShift + 3;
-  (WarpDownlink as Mutable<typeof WarpDownlink>).FlagMask = (1 << WarpDownlink.FlagShift) - 1;
-
-  return WarpDownlink;
-})(Fastener);
+  FlagShift: Fastener.FlagShift + 3,
+  FlagMask: (1 << (Fastener.FlagShift + 3)) - 1,
+}))();

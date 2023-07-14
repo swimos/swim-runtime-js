@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AnyOutputSettings} from "../output/OutputSettings";
+import type {OutputSettingsLike} from "../output/OutputSettings";
 import {OutputSettings} from "../output/OutputSettings";
 import type {Output} from "../output/Output";
 import type {OutputBuffer} from "../output/OutputBuffer";
@@ -37,7 +37,7 @@ export const Binary = (function () {
      * permanently in the _cont_ state, and can [[Output.bind bind]] a
      * `Uint8Array` with the current output state at any time.
      */
-    output(initialCapacity?: number, settings?: AnyOutputSettings): Output<Uint8Array>;
+    output(initialCapacity?: number, settings?: OutputSettingsLike): Output<Uint8Array>;
 
     /**
      * Returns a new `Output` that appends bytes to a growable array, using the
@@ -45,13 +45,13 @@ export const Binary = (function () {
      * bytes, remaining permanently in the _cont_ state, and can [[Output.bind
      * bind]] a `Uint8Array` array with the current output state at any time.
      */
-    output(settings: AnyOutputSettings): Output<Uint8Array>;
+    output(settings: OutputSettingsLike): Output<Uint8Array>;
 
     outputBuffer(array: Uint8Array, offset?: number, length?: number): OutputBuffer<Uint8Array>;
   };
 
-  Binary.output = function (initialCapacity?: number | AnyOutputSettings,
-                            settings?: AnyOutputSettings): Output<Uint8Array> {
+  Binary.output = function (initialCapacity?: number | OutputSettingsLike,
+                            settings?: OutputSettingsLike): Output<Uint8Array> {
     if (settings === void 0 && typeof initialCapacity !== "number") {
       settings = initialCapacity;
       initialCapacity = void 0;
@@ -64,7 +64,7 @@ export const Binary = (function () {
     } else {
       array = null;
     }
-    settings = OutputSettings.fromAny(settings);
+    settings = OutputSettings.fromLike(settings);
     return new ByteOutputUint8Array(array, 0, settings);
   };
 

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import type {AnyItem} from "../Item";
+import type {ItemLike} from "../Item";
 import {Item} from "../Item";
-import type {AnyValue} from "../Value";
+import type {ValueLike} from "../Value";
 import {Value} from "../Value";
 import {TagForm} from "../"; // forward import
 import {UnitForm} from "../"; // forward import
@@ -96,17 +96,17 @@ export abstract class Form<T, U = T> {
   }
 
   @Lazy
-  static forAny(): Form<AnyItem> {
+  static forAny(): Form<ItemLike> {
     return new AnyForm(void 0);
   }
 
   @Lazy
-  static forItem(): Form<Item, AnyItem> {
+  static forItem(): Form<Item, ItemLike> {
     return new ItemForm(Item.absent());
   }
 
   @Lazy
-  static forValue(): Form<Value, AnyValue> {
+  static forValue(): Form<Value, ValueLike> {
     return new ValueForm(Value.absent());
   }
 }

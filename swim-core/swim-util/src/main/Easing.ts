@@ -14,10 +14,11 @@
 
 import type {Uninitable} from "./types";
 import type {Mutable} from "./types";
+import type {Proto} from "./types";
 import {Timing} from "./Timing";
 
 /** @public */
-export type AnyEasing = Easing | EasingType;
+export type EasingLike = Easing | EasingType;
 
 /** @public */
 export type EasingType = "linear" | "quad-in" | "quad-out" | "quad-in-out"
@@ -31,6 +32,9 @@ export type EasingType = "linear" | "quad-in" | "quad-out" | "quad-in-out"
 
 /** @public */
 export interface Easing extends Timing {
+  /** @override */
+  readonly likeType?: Proto<EasingType>;
+
   readonly type: string;
 
   /** @override */
@@ -118,7 +122,7 @@ export const Easing = (function (_super: typeof Timing) {
     readonly bounceOut: Easing;
     readonly bounceInOut: Easing;
 
-    fromAny<T extends AnyEasing | null | undefined>(value: T): Easing | Uninitable<T>;
+    fromLike<T extends EasingLike | null | undefined>(value: T): Easing | Uninitable<T>;
   };
 
   Easing.prototype = Object.create(_super.prototype);
@@ -154,7 +158,7 @@ export const Easing = (function (_super: typeof Timing) {
     return "Easing(\"" + this.type + "\")";
   };
 
-  Easing.fromAny = function <T extends AnyEasing | null | undefined>(value: T): Easing | Uninitable<T> {
+  Easing.fromLike = function <T extends EasingLike | null | undefined>(value: T): Easing | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Easing) {
       return value as Easing | Uninitable<T>;
     } else if (typeof value === "string") {
@@ -250,7 +254,7 @@ export const Easing = (function (_super: typeof Timing) {
     if (u === 0) {
       return 0;
     }
-    return Math.pow(2, 10 * (u - 1) );
+    return Math.pow(2, 10 * (u - 1));
   } as Easing;
   Object.setPrototypeOf(Easing.expoIn, Easing.prototype);
   (Easing.expoIn as Mutable<Easing>).type = "expo-in";
@@ -303,7 +307,7 @@ export const Easing = (function (_super: typeof Timing) {
 
   (Easing as Mutable<typeof Easing>).backIn = function (u: number): number {
     const m = 1.70158; // m - Magnitude
-    return u * u * (( m + 1) * u - m);
+    return u * u * ((m + 1) * u - m);
   } as Easing;
   Object.setPrototypeOf(Easing.backIn, Easing.prototype);
   (Easing.backIn as Mutable<Easing>).type = "back-in";

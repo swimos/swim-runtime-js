@@ -20,7 +20,7 @@ import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Operator} from "./Operator";
 import {ConditionalOperatorInterpolator} from "../"; // forward import
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -47,8 +47,8 @@ export class ConditionalOperator extends Operator {
     return 2;
   }
 
-  override evaluate(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override evaluate(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     interpreter.willOperate(this);
     let result;
     const ifTerm = this.ifTerm.evaluate(interpreter);
@@ -63,8 +63,8 @@ export class ConditionalOperator extends Operator {
     return result;
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const ifTerm = this.ifTerm.substitute(interpreter);
     const thenTerm = this.thenTerm.substitute(interpreter);
     const elseTerm = this.elseTerm.substitute(interpreter);

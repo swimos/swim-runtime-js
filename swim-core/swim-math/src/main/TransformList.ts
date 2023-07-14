@@ -25,18 +25,18 @@ import type {Item} from "@swim/structure";
 import type {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
 import {R2Point} from "./R2Point";
-import type {AnyTransform} from "./Transform";
+import type {TransformLike} from "./Transform";
 import {Transform} from "./Transform";
 import {TransformParser} from "./Transform";
 import {AffineTransform} from "./AffineTransform";
 import {IdentityTransform} from "./IdentityTransform";
 
 /** @public */
-export type AnyTransformList = TransformList | string;
+export type TransformListLike = TransformList | string;
 
 /** @public */
-export const AnyTransformList = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyTransformList {
+export const TransformListLike = {
+  [Symbol.hasInstance](instance: unknown): instance is TransformListLike {
     return instance instanceof TransformList
         || typeof instance === "string";
   },
@@ -44,13 +44,13 @@ export const AnyTransformList = {
 
 /** @public */
 export class TransformList extends Transform {
-  constructor(transforms: ReadonlyArray<Transform>) {
+  constructor(transforms: readonly Transform[]) {
     super();
     this.transforms = transforms;
     this.stringValue = void 0;
   }
 
-  readonly transforms: ReadonlyArray<Transform>;
+  readonly transforms: readonly Transform[];
 
   override transform(that: Transform): Transform;
   override transform(x: number, y: number): R2Point;
@@ -268,9 +268,9 @@ export class TransformList extends Transform {
     return s;
   }
 
-  static override fromAny<T extends AnyTransformList | null | undefined>(value: T): TransformList | Uninitable<T>;
-  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyTransformList | null | undefined>(value: T): TransformList | Uninitable<T> {
+  static override fromLike<T extends TransformListLike | null | undefined>(value: T): TransformList | Uninitable<T>;
+  static override fromLike<T extends TransformLike | null | undefined>(value: T): never;
+  static override fromLike<T extends TransformListLike | null | undefined>(value: T): TransformList | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof TransformList) {
       return value as TransformList | Uninitable<T>;
     } else if (typeof value === "string") {
@@ -305,7 +305,7 @@ export class TransformList extends Transform {
 /** @internal */
 export interface TransformListInterpolator extends Interpolator<TransformList> {
   /** @internal */
-  readonly interpolators: ReadonlyArray<Interpolator<Transform>>;
+  readonly interpolators: readonly Interpolator<Transform>[];
 
   readonly 0: TransformList;
 

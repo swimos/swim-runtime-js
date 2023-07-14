@@ -15,9 +15,10 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
+import type {LikeType} from "@swim/util";
 import type {Cursor} from "@swim/util";
+import type {Fastener} from "@swim/component";
 import type {STree} from "@swim/collections";
-import type {AnyValue} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Form} from "@swim/structure";
 import {ValueCursor} from "@swim/structure";
@@ -30,19 +31,19 @@ import {WarpDownlink} from "./WarpDownlink";
 import {ListDownlinkModel} from "./ListDownlinkModel";
 
 /** @public */
-export interface ListDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlinkDescriptor {
-  extends?: Proto<ListDownlink<any, any, any>> | boolean | null;
-  valueForm?: Form<V, VU>;
+export interface ListDownlinkDescriptor<R, V> extends WarpDownlinkDescriptor<R> {
+  extends?: Proto<ListDownlink<any, any>> | boolean | null;
+  valueForm?: Form<V, LikeType<V>>;
   /** @internal */
   stateInit?: STree<Value, Value> | null;
 }
 
 /** @public */
-export interface ListDownlinkClass<F extends ListDownlink<any, any, any> = ListDownlink<any, any, any>> extends WarpDownlinkClass<F> {
+export interface ListDownlinkClass<F extends ListDownlink<any, any> = ListDownlink<any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
-export interface ListDownlinkObserver<V = unknown, F extends ListDownlink<any, V, any> = ListDownlink<unknown, V>> extends WarpDownlinkObserver<F> {
+export interface ListDownlinkObserver<V = any, F extends ListDownlink<any, V> = ListDownlink<any, V>> extends WarpDownlinkObserver<F> {
   willUpdate?(index: number, newValue: V, downlink: F): V | void;
 
   didUpdate?(index: number, newValue: V, oldValue: V, downlink: F): void;
@@ -69,12 +70,9 @@ export interface ListDownlinkObserver<V = unknown, F extends ListDownlink<any, V
 }
 
 /** @public */
-export interface ListDownlink<O = unknown, V = Value, VU = V extends Value ? AnyValue & V : V> extends WarpDownlink<O> {
-  (index: number): V | undefined;
-  (index: number, newObject: V | VU): O;
-
+export interface ListDownlink<R = any, V = Value> extends WarpDownlink<R> {
   /** @override */
-  get descriptorType(): Proto<ListDownlinkDescriptor<V, VU>>;
+  get descriptorType(): Proto<ListDownlinkDescriptor<R, V>>;
 
   /** @override */
   readonly observerType?: Class<ListDownlinkObserver<V>>;
@@ -83,11 +81,11 @@ export interface ListDownlink<O = unknown, V = Value, VU = V extends Value ? Any
   readonly model: ListDownlinkModel | null;
 
   /** @protected */
-  initValueForm(): Form<V, VU>;
+  initValueForm(): Form<V, LikeType<V>>;
 
-  readonly valueForm: Form<V, VU>;
+  readonly valueForm: Form<V, LikeType<V>>;
 
-  setValueForm(valueForm: Form<V, VU>): this;
+  setValueForm(valueForm: Form<V, LikeType<V>>): this;
 
   /** @internal */
   readonly stateInit?: STree<Value, Value> | null; // optional prototype property
@@ -106,27 +104,27 @@ export interface ListDownlink<O = unknown, V = Value, VU = V extends Value ? Any
 
   getEntry(index: number, id?: Value): [V, Value] | undefined;
 
-  set(index: number, newObject: V | VU, id?: Value): this;
+  set(index: number, newObject: V | LikeType<V>, id?: Value): this;
 
-  insert(index: number, newObject: V | VU, id?: Value): this;
+  insert(index: number, newObject: V | LikeType<V>, id?: Value): this;
 
   remove(index: number, id?: Value): this;
 
-  push(...newObjects: (V | VU)[]): number;
+  push(...newObjects: (V | LikeType<V>)[]): number;
 
   pop(): V;
 
-  unshift(...newObjects: (V | VU)[]): number;
+  unshift(...newObjects: (V | LikeType<V>)[]): number;
 
   shift(): V;
 
   move(fromIndex: number, toIndex: number, id?: Value): this;
 
-  splice(start: number, deleteCount?: number, ...newObjects: (V | VU)[]): V[];
+  splice(start: number, deleteCount?: number, ...newObjects: (V | LikeType<V>)[]): V[];
 
   clear(): void;
 
-  forEach<T, S>(callback: (value: V, index: number, id: Value) => T | void): T | undefined;
+  forEach<T>(callback: (value: V, index: number, id: Value) => T | void): T | undefined;
   forEach<T, S>(callback: (this: S, value: V, index: number, id: Value) => T | void, thisArg: S): T | undefined;
 
   values(): Cursor<V>;
@@ -217,70 +215,65 @@ export interface ListDownlink<O = unknown, V = Value, VU = V extends Value ? Any
 }
 
 /** @public */
-export const ListDownlink = (function (_super: typeof WarpDownlink) {
-  const ListDownlink = _super.extend("ListDownlink", {
-    relinks: true,
-    syncs: true,
-  }) as ListDownlinkClass;
+export const ListDownlink = (<R, V, F extends ListDownlink<any, any>>() => WarpDownlink.extend<ListDownlink<R, V>, ListDownlinkClass<F>>("ListDownlink", {
+  relinks: true,
+  syncs: true,
 
-  ListDownlink.prototype.initValueForm = function <V, VU>(this: ListDownlink<unknown, V, VU>): Form<V, VU> {
-    let valueForm = (Object.getPrototypeOf(this) as ListDownlink<unknown, V, VU>).valueForm as Form<V, VU> | undefined;
+  initValueForm(): Form<V, LikeType<V>> {
+    let valueForm = (Object.getPrototypeOf(this) as ListDownlink<unknown, V>).valueForm as Form<V, LikeType<V>> | undefined;
     if (valueForm === void 0) {
-      valueForm = Form.forValue() as unknown as Form<V, VU>;
+      valueForm = Form.forValue() as unknown as Form<V, LikeType<V>>;
     }
     return valueForm;
-  };
+  },
 
-  ListDownlink.prototype.setValueForm = function <V, VU>(this: ListDownlink<unknown, V, VU>, valueForm: Form<V, VU>): ListDownlink<unknown, V, VU> {
+  setValueForm(valueForm: Form<V, LikeType<V>>): typeof this {
     if (this.valueForm !== valueForm) {
       (this as Mutable<typeof this>).valueForm = valueForm;
       this.relink();
     }
     return this;
-  };
+  },
 
-  ListDownlink.prototype.initState = function (this: ListDownlink): STree<Value, Value> | null {
+  initState(): STree<Value, Value> | null {
     let state = this.stateInit;
     if (state === void 0) {
       state = null;
     }
     return state;
-  };
+  },
 
-  ListDownlink.prototype.setState = function (this: ListDownlink, state: STree<Value, Value>): void {
+  setState(state: STree<Value, Value>): void {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.setState(state);
-  };
+  },
 
-  Object.defineProperty(ListDownlink.prototype, "size", {
-    get(this: ListDownlink): number {
-      const model = this.model;
-      return model !== null ? model.size : 0;
-    },
-    configurable: true,
-  });
+  get size(): number {
+    const model = this.model;
+    return model !== null ? model.size : 0;
+  },
 
-  ListDownlink.prototype.isEmpty = function (this: ListDownlink): boolean {
+  isEmpty(): boolean {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     return model.isEmpty();
-  };
+  },
 
-  ListDownlink.prototype.get = function <V>(this: ListDownlink<unknown, V>, index: number, id?: Value): V {
+  get(index: number, id?: Value): V {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     const value = model.get(index, id);
     return value.coerce(this.valueForm);
-  };
+  },
 
-  ListDownlink.prototype.getEntry = function <V>(this: ListDownlink<unknown, V>, index: number, id?: Value): [V, Value] | undefined {
+  getEntry(index: number, id?: Value): [V, Value] | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -290,9 +283,9 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return [entry[0].coerce(this.valueForm), entry[1]];
-  };
+  },
 
-  ListDownlink.prototype.set = function <V, VU>(this: ListDownlink<unknown, V, VU>, index: number, newObject: V | VU, id?: Value): ListDownlink<unknown, V, VU> {
+  set(index: number, newObject: V | LikeType<V>, id?: Value): typeof this {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -300,9 +293,9 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     const newValue = this.valueForm.mold(newObject);
     model.set(index, newValue, id);
     return this;
-  };
+  },
 
-  ListDownlink.prototype.insert = function <V, VU>(this: ListDownlink<unknown, V, VU>, index: number, newObject: V | VU, id?: Value): ListDownlink<unknown, V, VU> {
+  insert(index: number, newObject: V | LikeType<V>, id?: Value): typeof this {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -310,18 +303,18 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     const newValue = this.valueForm.mold(newObject);
     model.insert(index, newValue, id);
     return this;
-  };
+  },
 
-  ListDownlink.prototype.remove = function <V>(this: ListDownlink<unknown, V>, index: number, id?: Value): ListDownlink<unknown, V> {
+  remove(index: number, id?: Value): typeof this {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.remove(index, id);
     return this;
-  };
+  },
 
-  ListDownlink.prototype.push = function <V, VU>(this: ListDownlink<unknown, V, VU>, ...newObjects: (V | VU)[]): number {
+  push(...newObjects: (V | LikeType<V>)[]): number {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -332,18 +325,18 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
       newValues[i] = valueForm.mold(newObjects[i]!);
     }
     return model.push(...newValues);
-  };
+  },
 
-  ListDownlink.prototype.pop = function <V>(this: ListDownlink<unknown, V>): V {
+  pop(): V {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     const value = model.pop();
     return value.coerce(this.valueForm);
-  };
+  },
 
-  ListDownlink.prototype.unshift = function <V, VU>(this: ListDownlink<unknown, V, VU>, ...newObjects: (V | VU)[]): number {
+  unshift(...newObjects: (V | LikeType<V>)[]): number {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -354,27 +347,27 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
       newValues[i] = valueForm.mold(newObjects[i]!);
     }
     return model.unshift(...newValues);
-  };
+  },
 
-  ListDownlink.prototype.shift = function <V>(this: ListDownlink<unknown, V>): V {
+  shift(): V {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     const value = model.shift();
     return value.coerce(this.valueForm);
-  };
+  },
 
-  ListDownlink.prototype.move = function <V>(this: ListDownlink<unknown, V>, fromIndex: number, toIndex: number, id?: Value): ListDownlink<unknown, V> {
+  move(fromIndex: number, toIndex: number, id?: Value): typeof this {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.move(fromIndex, toIndex, id);
     return this;
-  };
+  },
 
-  ListDownlink.prototype.splice = function <V, VU>(this: ListDownlink<unknown, V, VU>, start: number, deleteCount?: number, ...newObjects: (V | VU)[]): V[] {
+  splice(start: number, deleteCount?: number, ...newObjects: (V | LikeType<V>)[]): V[] {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -390,19 +383,17 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
       oldObjects[i] = oldValues[i]!.coerce(valueForm);
     }
     return oldObjects;
-  };
+  },
 
-  ListDownlink.prototype.clear = function (this: ListDownlink): void {
+  clear(): void {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.clear();
-  };
+  },
 
-  ListDownlink.prototype.forEach = function <V, T, S>(this: ListDownlink<unknown, V>,
-                                                      callback: (this: S | undefined, value: V, index: number, id: Value) => T | void,
-                                                      thisArg?: S): T | undefined {
+  forEach<T, S>(callback: (this: S | undefined, value: V, index: number, id: Value) => T | void, thisArg?: S): T | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -415,9 +406,9 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
       const object = value.coerce(valueForm);
       return callback.call(thisArg, object, index, id);
     }, this);
-  };
+  },
 
-  ListDownlink.prototype.values = function <V>(this: ListDownlink<unknown, V>): Cursor<V> {
+  values(): Cursor<V> {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -428,17 +419,17 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
       return cursor as unknown as Cursor<V>;
     }
     return new ValueCursor(cursor, valueForm);
-  };
+  },
 
-  ListDownlink.prototype.keys = function <V>(this: ListDownlink<unknown, V>): Cursor<Value> {
+  keys(): Cursor<Value> {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     return model.keys();
-  };
+  },
 
-  ListDownlink.prototype.entries = function <V>(this: ListDownlink<unknown, V>): Cursor<[Value, V]> {
+  entries(): Cursor<[Value, V]> {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -448,17 +439,17 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
       return cursor as unknown as Cursor<[Value, V]>;
     }
     return new ValueEntryCursor(cursor, Form.forValue(), this.valueForm);
-  };
+  },
 
-  ListDownlink.prototype.snapshot = function <V>(this: ListDownlink<unknown, V>): STree<Value, Value> {
+  snapshot(): STree<Value, Value> {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     return model.snapshot();
-  };
+  },
 
-  ListDownlink.prototype.listWillUpdate = function <V>(this: ListDownlink<unknown, V>, index: number, newValue: Value): Value {
+  listWillUpdate(index: number, newValue: Value): Value {
     let newObject: V | undefined;
     const valueForm = this.valueForm;
 
@@ -489,9 +480,9 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     return newValue;
-  };
+  },
 
-  ListDownlink.prototype.listDidUpdate = function <V>(this: ListDownlink<unknown, V>, index: number, newValue: Value, oldValue: Value): void {
+  listDidUpdate(index: number, newValue: Value, oldValue: Value): void {
     let newObject: V | undefined;
     let oldObject: V | undefined;
     const valueForm = this.valueForm;
@@ -517,9 +508,9 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
         observer.didUpdate(index, newObject, oldObject, this);
       }
     }
-  };
+  },
 
-  ListDownlink.prototype.listWillMove = function <V>(this: ListDownlink<unknown, V>, fromIndex: number, toIndex: number, value: Value): void {
+  listWillMove(fromIndex: number, toIndex: number, value: Value): void {
     let object: V | undefined;
     const valueForm = this.valueForm;
 
@@ -540,9 +531,9 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
         observer.willMove(fromIndex, toIndex, object, this);
       }
     }
-  };
+  },
 
-  ListDownlink.prototype.listDidMove = function <V>(this: ListDownlink<unknown, V>, fromIndex: number, toIndex: number, value: Value): void {
+  listDidMove(fromIndex: number, toIndex: number, value: Value): void {
     let object: V | undefined;
     const valueForm = this.valueForm;
 
@@ -563,16 +554,16 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
         observer.didMove(fromIndex, toIndex, object, this);
       }
     }
-  };
+  },
 
-  ListDownlink.prototype.listWillRemove = function <V>(this: ListDownlink<unknown, V>, index: number): void {
+  listWillRemove(index: number): void {
     if (this.willRemove !== void 0) {
       this.willRemove(index);
     }
     this.callObservers("willRemove", index, this);
-  };
+  },
 
-  ListDownlink.prototype.listDidRemove = function <V>(this: ListDownlink<unknown, V>, index: number, oldValue: Value): void {
+  listDidRemove(index: number, oldValue: Value): void {
     let oldObject: V | undefined;
     const valueForm = this.valueForm;
 
@@ -593,51 +584,51 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
         observer.didRemove(index, oldObject, this);
       }
     }
-  };
+  },
 
-  ListDownlink.prototype.listWillDrop = function (this: ListDownlink, lower: number): void {
+  listWillDrop(lower: number): void {
     if (this.willDrop !== void 0) {
       this.willDrop(lower);
     }
     this.callObservers("willDrop", lower, this);
-  };
+  },
 
-  ListDownlink.prototype.listDidDrop = function (this: ListDownlink, lower: number): void {
+  listDidDrop(lower: number): void {
     if (this.didDrop !== void 0) {
       this.didDrop(lower);
     }
     this.callObservers("didDrop", lower, this);
-  };
+  },
 
-  ListDownlink.prototype.listWillTake = function (this: ListDownlink, upper: number): void {
+  listWillTake(upper: number): void {
     if (this.willTake !== void 0) {
       this.willTake(upper);
     }
     this.callObservers("willTake", upper, this);
-  };
+  },
 
-  ListDownlink.prototype.listDidTake = function (this: ListDownlink, upper: number): void {
+  listDidTake(upper: number): void {
     if (this.didTake !== void 0) {
       this.didTake(upper);
     }
     this.callObservers("didTake", upper, this);
-  };
+  },
 
-  ListDownlink.prototype.listWillClear = function (this: ListDownlink): void {
+  listWillClear(): void {
     if (this.willClear !== void 0) {
       this.willClear();
     }
     this.callObservers("willClear", this);
-  };
+  },
 
-  ListDownlink.prototype.listDidClear = function (this: ListDownlink): void {
+  listDidClear(): void {
     if (this.didClear !== void 0) {
       this.didClear();
     }
     this.callObservers("didClear", this);
-  };
+  },
 
-  ListDownlink.prototype.didAliasModel = function (this: ListDownlink): void {
+  didAliasModel(): void {
     const model = this.model;
     if (model === null || !model.linked) {
       return;
@@ -649,9 +640,9 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
     if (model.synced) {
       this.onSyncedResponse();
     }
-  };
+  },
 
-  ListDownlink.prototype.open = function (this: ListDownlink): ListDownlink {
+  open(): typeof this {
     if (this.model !== null) {
       return this;
     }
@@ -700,29 +691,12 @@ export const ListDownlink = (function (_super: typeof WarpDownlink) {
       (this as Mutable<typeof this>).model = model as ListDownlinkModel;
     }
     return this;
-  };
-
-  ListDownlink.construct = function <F extends ListDownlink<any, any, any>>(downlink: F | null, owner: F extends ListDownlink<infer O, any, any> ? O : never): F {
-    if (downlink === null) {
-      downlink = function (index: number, value?: F extends ListDownlink<any, infer V, infer U> ? V | U : never): F extends ListDownlink<infer O, infer V, any> ? V | O | undefined : never {
-        if (arguments.length === 0) {
-          return downlink!.get(index);
-        } else {
-          downlink!.set(index, value!);
-          return downlink!.owner;
-        }
-      } as F;
-      Object.defineProperty(downlink, "name", {
-        value: this.prototype.name,
-        enumerable: true,
-        configurable: true,
-      });
-      Object.setPrototypeOf(downlink, this.prototype);
-    }
-    downlink = _super.construct.call(this, downlink, owner) as F;
+  },
+},
+{
+  construct(downlink: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
+    downlink = super.construct(downlink, owner) as F;
     (downlink as Mutable<typeof downlink>).valueForm = downlink.initValueForm();
     return downlink;
-  };
-
-  return ListDownlink;
-})(WarpDownlink);
+  },
+}))();

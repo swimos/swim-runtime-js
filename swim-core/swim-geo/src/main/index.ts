@@ -14,10 +14,10 @@
 
 export {GeoProjection} from "./GeoProjection";
 
-export {AnyGeoShape} from "./GeoShape";
+export {GeoShapeLike} from "./GeoShape";
 export {GeoShape} from "./GeoShape";
 
-export {AnyGeoPoint} from "./GeoPoint";
+export {GeoPointLike} from "./GeoPoint";
 export {GeoPointInit} from "./GeoPoint";
 export {GeoPointTuple} from "./GeoPoint";
 export {GeoPoint} from "./GeoPoint";
@@ -26,29 +26,29 @@ export {GeoPointInterpolator} from "./GeoPoint";
 export type {GeoCurveContext} from "./GeoCurve";
 export {GeoCurve} from "./GeoCurve";
 
-export {AnyGeoSegment} from "./GeoSegment";
+export {GeoSegmentLike} from "./GeoSegment";
 export {GeoSegmentInit} from "./GeoSegment";
 export {GeoSegment} from "./GeoSegment";
 export {GeoSegmentInterpolator} from "./GeoSegment";
 
 export type {GeoSplineContext} from "./GeoSpline";
-export {AnyGeoSpline} from "./GeoSpline";
+export {GeoSplineLike} from "./GeoSpline";
 export {GeoSplinePoints} from "./GeoSpline";
 export {GeoSpline} from "./GeoSpline";
 export {GeoSplineBuilder} from "./GeoSpline";
 
 export type {GeoPathContext} from "./GeoPath";
-export {AnyGeoPath} from "./GeoPath";
+export {GeoPathLike} from "./GeoPath";
 export {GeoPathSplines} from "./GeoPath";
 export {GeoPath} from "./GeoPath";
 export {GeoPathBuilder} from "./GeoPath";
 
-export {AnyGeoTile} from "./GeoTile";
+export {GeoTileLike} from "./GeoTile";
 export {GeoTileInit} from "./GeoTile";
 export {GeoTileTuple} from "./GeoTile";
 export {GeoTile} from "./GeoTile";
 
-export {AnyGeoBox} from "./GeoBox";
+export {GeoBoxLike} from "./GeoBox";
 export {GeoBoxInit} from "./GeoBox";
 export {GeoBox} from "./GeoBox";
 export {GeoBoxInterpolator} from "./GeoBox";

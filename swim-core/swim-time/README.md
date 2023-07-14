@@ -33,19 +33,19 @@ DateTime.fromInit({year: 2019, month: 8, day: 12, hour: 5, minute: 16, second: 1
 // "2019-09-11T15:16:10.000Z"
 ```
 
-The `DateTime.fromAny` static method coerces common JavaScript date
+The `DateTime.fromLike` static method coerces common JavaScript date
 representations, including ECMAScript `Date` objects, numbers representing
 milliseconds since the Unix epoch, and ISO 8601-formatted date-time strings,
 to `DateTime` instances.
 
 ```typescript
-DateTime.fromAny(Date.now());
+DateTime.fromLike(Date.now());
 // "2019-08-12T22:54:39.648Z"
 
-DateTime.fromAny(1565650479648);
+DateTime.fromLike(1565650479648);
 // "2019-08-12T22:54:39.648Z"
 
-DateTime.fromAny("2019-08-12T22:54:39.648Z");
+DateTime.fromLike("2019-08-12T22:54:39.648Z");
 // "2019-08-12T22:54:39.648Z"
 ```
 

@@ -214,7 +214,7 @@ export const MathModule = (function () {
 
   class MaxFunc extends BridgeFunc {
     override invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
-      interpreter = Interpreter.fromAny(interpreter);
+      interpreter = Interpreter.fromLike(interpreter);
       let x: Item;
       let y: Item | undefined;
       if (args.length >= 2) {
@@ -245,7 +245,7 @@ export const MathModule = (function () {
 
   class MinFunc extends BridgeFunc {
     override invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
-      interpreter = Interpreter.fromAny(interpreter);
+      interpreter = Interpreter.fromLike(interpreter);
       let x: Item;
       let y: Item | undefined;
       if (args.length >= 2) {
@@ -326,7 +326,7 @@ export const MathModule = (function () {
 
   class PowFunc extends BridgeFunc {
     override invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
-      interpreter = Interpreter.fromAny(interpreter);
+      interpreter = Interpreter.fromLike(interpreter);
       const x = args.getItem(0).evaluate(interpreter);
       const y = args.getItem(1).evaluate(interpreter);
       if (x instanceof Num && y instanceof Num) {
@@ -338,7 +338,7 @@ export const MathModule = (function () {
 
   class RateFunc extends BridgeFunc {
     override invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
-      interpreter = Interpreter.fromAny(interpreter);
+      interpreter = Interpreter.fromLike(interpreter);
       let value: number;
       let period: number;
       if (args.length >= 2) {

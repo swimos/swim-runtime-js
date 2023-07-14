@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import type {Equals} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {R2Function} from "./R2Function";
@@ -28,17 +29,17 @@ import {R2CircleInit} from "./"; // forward import
 import {R2Circle} from "./"; // forward import
 
 /** @public */
-export type AnyR2Shape = R2Shape
-                       | R2PointInit
-                       | R2PointTuple
-                       | R2SegmentInit
-                       | R2BoxInit
-                       | R2CircleInit
-                       | string;
+export type R2ShapeLike = R2Shape
+                        | R2PointInit
+                        | R2PointTuple
+                        | R2SegmentInit
+                        | R2BoxInit
+                        | R2CircleInit
+                        | string;
 
 /** @public */
-export const AnyR2Shape = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyR2Shape {
+export const R2ShapeLike = {
+  [Symbol.hasInstance](instance: unknown): instance is R2ShapeLike {
     return instance instanceof R2Shape
         || R2PointInit[Symbol.hasInstance](instance)
         || R2PointTuple[Symbol.hasInstance](instance)
@@ -52,7 +53,14 @@ export const AnyR2Shape = {
 /** @public */
 export abstract class R2Shape implements Equals, Equivalent {
   /** @internal */
-  declare typeid?: string;
+  declare readonly typeid?: string;
+
+  declare readonly likeType?: Proto<R2PointInit
+                                  | R2PointTuple
+                                  | R2SegmentInit
+                                  | R2BoxInit
+                                  | R2CircleInit
+                                  | string>;
 
   abstract isDefined(): boolean;
 
@@ -64,14 +72,14 @@ export abstract class R2Shape implements Equals, Equivalent {
 
   abstract readonly yMax: number;
 
-  abstract contains(that: AnyR2Shape): boolean;
+  abstract contains(that: R2ShapeLike): boolean;
 
   abstract contains(x: number, y: number): boolean;
 
-  abstract intersects(that: AnyR2Shape): boolean;
+  abstract intersects(that: R2ShapeLike): boolean;
 
-  union(that: AnyR2Shape): R2Shape {
-    that = R2Shape.fromAny(that);
+  union(that: R2ShapeLike): R2Shape {
+    that = R2Shape.fromLike(that);
     return new R2Box(Math.min(this.xMin, that.xMin),
                      Math.min(this.yMin, that.yMin),
                      Math.max(this.xMax, that.xMax),
@@ -90,7 +98,7 @@ export abstract class R2Shape implements Equals, Equivalent {
   /** @override */
   abstract equals(that: unknown): boolean;
 
-  static fromAny<T extends AnyR2Shape | null | undefined>(value: T): R2Shape | Uninitable<T> {
+  static fromLike<T extends R2ShapeLike | null | undefined>(value: T): R2Shape | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Shape) {
       return value as R2Shape | Uninitable<T>;
     } else if (R2PointInit[Symbol.hasInstance](value)) {

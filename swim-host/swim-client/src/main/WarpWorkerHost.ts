@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
 import type {Uri} from "@swim/uri";
 import {Message} from "@swim/warp";
@@ -40,7 +40,7 @@ export class WarpWorkerHost extends WarpHost {
     this.onWorkerReceive = this.onWorkerReceive.bind(this);
     this.onPortReceive = this.onPortReceive.bind(this);
     this.worker.addEventListener("message", this.onWorkerReceive);
-    this.worker.postMessage(OpenSignal.create(this.hostUri).toAny());
+    this.worker.postMessage(OpenSignal.create(this.hostUri).toLike());
   }
 
   /** @internal */
@@ -52,7 +52,7 @@ export class WarpWorkerHost extends WarpHost {
   override push(envelope: Envelope): void {
     if (this.connected) {
       this.idleTimer.cancel();
-      this.port!.postMessage(envelope.toAny());
+      this.port!.postMessage(envelope.toLike());
       this.idleTimer.watch();
     } else if (envelope instanceof CommandMessage) {
       if (this.sendBuffer.length >= this.sendBufferSize.value) {
@@ -69,28 +69,28 @@ export class WarpWorkerHost extends WarpHost {
     this.reconnectTimer.cancel();
     const port = this.port;
     if (port !== null) {
-      port.postMessage(ConnectSignal.create(this.hostUri).toAny());
+      port.postMessage(ConnectSignal.create(this.hostUri).toLike());
     }
   }
 
   override disconnect(): void {
     const port = this.port;
     if (port !== null) {
-      port.postMessage(DisconnectSignal.create(this.hostUri).toAny());
+      port.postMessage(DisconnectSignal.create(this.hostUri).toLike());
     }
     this.setConnected(false);
   }
 
-  protected onWorkerReceive(event: MessageEvent<AnyValue>): void {
-    const value = Value.fromAny(event.data);
+  protected onWorkerReceive(event: MessageEvent<ValueLike>): void {
+    const value = Value.fromLike(event.data);
     const signal = Signal.fromValue(value);
     if (signal !== null && signal.host.equals(this.hostUri)) {
       this.onSignal(signal, event);
     }
   }
 
-  protected onPortReceive(event: MessageEvent<AnyValue>): void {
-    const value = Value.fromAny(event.data);
+  protected onPortReceive(event: MessageEvent<ValueLike>): void {
+    const value = Value.fromLike(event.data);
     const message = Message.fromValue(value);
     if (message !== null) {
       this.onMessage(message, event);

@@ -43,7 +43,7 @@ export class MapDownlinkSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node, Uri.parse("dictionary/english"));
+          exam.equal(envelope.node, Uri.parse("/dictionary/english"));
           exam.equal(envelope.lane, Uri.parse("definitions"));
           const header = Record.of(Slot.of("key", "the"));
           exam.equal(envelope.body, Attr.of("update", header).concat("definite article"));
@@ -106,7 +106,7 @@ export class MapDownlinkSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node, Uri.parse("dictionary/english"));
+          exam.equal(envelope.node, Uri.parse("/dictionary/english"));
           exam.equal(envelope.lane, Uri.parse("definitions"));
           const header = Record.of(Slot.of("key", "the"));
           exam.equal(envelope.body, Record.of(Attr.of("remove", header)));
@@ -168,7 +168,7 @@ export class MapDownlinkSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node, Uri.parse("dictionary/english"));
+          exam.equal(envelope.node, Uri.parse("/dictionary/english"));
           exam.equal(envelope.lane, Uri.parse("definitions"));
           exam.equal(envelope.body, Record.of(Attr.of("clear")));
           resolve();
@@ -204,7 +204,7 @@ export class MapDownlinkSpec extends Suite {
       };
       client.downlinkMap({
         hostUri: server.hostUri,
-        nodeUri: "dictionary/english",
+        nodeUri: "/dictionary/english",
         laneUri: "definitions",
         relinks: false,
         stateInit: new BTree<Value, Value>().set(Text.from("a"), Text.from("indefinite article"))

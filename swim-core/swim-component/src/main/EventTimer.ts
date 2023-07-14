@@ -20,9 +20,8 @@ import type {EventHandlerClass} from "./EventHandler";
 import {EventHandler} from "./EventHandler";
 
 /** @public */
-export interface EventTimerDescriptor<T extends EventTarget = EventTarget> extends EventHandlerDescriptor<T> {
+export interface EventTimerDescriptor<R, T> extends EventHandlerDescriptor<R, T> {
   extends?: Proto<EventTimer<any, any>> | boolean | null;
-  delay?: number;
 }
 
 /** @public */
@@ -30,13 +29,13 @@ export interface EventTimerClass<F extends EventTimer<any, any> = EventTimer<any
 }
 
 /** @public */
-export interface EventTimer<O = unknown, T extends EventTarget = EventTarget> extends EventHandler<O, T> {
+export interface EventTimer<R = any, T = EventTarget> extends EventHandler<R, T> {
   /** @override */
   (event: Event): void;
   (): void;
 
   /** @override */
-  get descriptorType(): Proto<EventTimerDescriptor<T>>;
+  get descriptorType(): Proto<EventTimerDescriptor<R, T>>;
 
   /** @protected */
   readonly event: Event | null;
@@ -99,10 +98,10 @@ export interface EventTimer<O = unknown, T extends EventTarget = EventTarget> ex
   /** @internal */
   readonly timeout: unknown | undefined;
 
-  /** @internal @protected */
+  /** @protected */
   setTimeout(callback: () => void, delay: number): unknown;
 
-  /** @internal @protected */
+  /** @protected */
   clearTimeout(timeoutId: unknown): void;
 
   /** @override @protected */
@@ -110,16 +109,15 @@ export interface EventTimer<O = unknown, T extends EventTarget = EventTarget> ex
 }
 
 /** @public */
-export const EventTimer = (<O, T extends EventTarget, F extends EventTimer>() => EventHandler.extend<EventTimer<O, T>, EventTimerClass<F>>("EventTimer", {
+export const EventTimer = (<R, T, F extends EventTimer<any, any>>() => EventHandler.extend<EventTimer<R, T>, EventTimerClass<F>>("EventTimer", {
   defer(event: Event): void {
     this.throttle(event);
   },
 
- initDelay(): number {
-    let delay = (Object.getPrototypeOf(this) as EventTimer).delay as number | undefined;
-    if (delay === void 0) {
-      delay = 0;
-    }
+  delay: 0,
+
+  initDelay(): number {
+    const delay = (Object.getPrototypeOf(this) as EventTimer<any, any>).delay;
     return Math.max(0, delay);
   },
 
@@ -243,7 +241,7 @@ export const EventTimer = (<O, T extends EventTarget, F extends EventTimer>() =>
     // hook
   },
 
-  expire(this: EventTimer): void {
+  expire(): void {
     const event = this.event;
     (this as Mutable<typeof this>).event = null;
     (this as Mutable<typeof this>).timeout = void 0;
@@ -276,13 +274,13 @@ export const EventTimer = (<O, T extends EventTarget, F extends EventTimer>() =>
     clearTimeout(timeout as any);
   },
 
-  onUnmount(this: EventTimer): void {
+  onUnmount(): void {
     super.onUnmount();
     this.cancel();
   },
 },
 {
-  construct(fastener: F | null, owner: F extends Fastener<infer O> ? O : never): F {
+  construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
     if (fastener === null) {
       fastener = function (event?: Event): void {
         if (event !== void 0) { // event listener

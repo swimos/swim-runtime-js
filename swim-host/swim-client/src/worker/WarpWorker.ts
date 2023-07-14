@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import {Message} from "@swim/warp";
 import {Signal} from "@swim/warp";
@@ -53,15 +53,15 @@ export class WarpWorker {
   readonly hosts: {readonly [hostUri: string]: WarpSocketHostWorker | undefined};
 
   /** @internal */
-  getHost(hostUri: AnyUri): WarpSocketHostWorker | null {
-    hostUri = Uri.fromAny(hostUri);
+  getHost(hostUri: UriLike): WarpSocketHostWorker | null {
+    hostUri = Uri.fromLike(hostUri);
     const host = this.hosts[hostUri.toString()];
     return host !== void 0 ? host : null;
   }
 
   /** @internal */
-  openHost(hostUri: AnyUri, options: WarpWorkerOptions): WarpSocketHostWorker {
-    hostUri = Uri.fromAny(hostUri);
+  openHost(hostUri: UriLike, options: WarpWorkerOptions): WarpSocketHostWorker {
+    hostUri = Uri.fromLike(hostUri);
     const hosts = this.hosts as {[hostUri: string]: WarpSocketHostWorker | undefined};
     let host = hosts[hostUri.toString()];
     if (host === void 0) {
@@ -80,8 +80,8 @@ export class WarpWorker {
     }
   }
 
-  protected onWorkerReceive(event: MessageEvent<AnyValue>): void {
-    const value = Value.fromAny(event.data);
+  protected onWorkerReceive(event: MessageEvent<ValueLike>): void {
+    const value = Value.fromLike(event.data);
     const message = Message.fromValue(value);
     if (message !== null) {
       this.onMessage(message);
@@ -114,7 +114,7 @@ export class WarpWorker {
     const hostUri = request.host;
     const host = this.openHost(hostUri, {});
     if (host instanceof WarpSocketHostWorker) {
-      this.scope.postMessage(OpenedSignal.create(hostUri).toAny(), [host.channel.port2]);
+      this.scope.postMessage(OpenedSignal.create(hostUri).toLike(), [host.channel.port2]);
       host.connect();
     }
   }
@@ -124,7 +124,7 @@ export class WarpWorker {
     const host = this.getHost(hostUri);
     if (host instanceof WarpSocketHostWorker) {
       this.closeHost(host);
-      this.scope.postMessage(ClosedSignal.create(hostUri).toAny());
+      this.scope.postMessage(ClosedSignal.create(hostUri).toLike());
     }
   }
 

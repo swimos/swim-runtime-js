@@ -15,7 +15,7 @@
 import {Lazy} from "@swim/util";
 import {Mark} from "../source/Mark";
 import {InputException} from "./InputException";
-import type {AnyInputSettings} from "./InputSettings";
+import type {InputSettingsLike} from "./InputSettings";
 import {InputSettings} from "./InputSettings";
 import {InputEmpty} from "../"; // forward import
 import {InputDone} from "../"; // forward import
@@ -199,7 +199,7 @@ export abstract class Input {
    *
    * @throws `Error` if this `Input` reader cannot be cloned.
    */
-  abstract withSettings(settings: AnyInputSettings): Input;
+  abstract withSettings(settings: InputSettingsLike): Input;
 
   /**
    * Returns an independently positioned view into the token stream,

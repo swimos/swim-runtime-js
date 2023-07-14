@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -26,17 +27,17 @@ import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import type {AnyR2Vector} from "./R2Vector";
+import type {R2VectorLike} from "./R2Vector";
 import {R2Vector} from "./R2Vector";
-import type {AnyR2Shape} from "./R2Shape";
+import type {R2ShapeLike} from "./R2Shape";
 import {R2Shape} from "./R2Shape";
 
 /** @public */
-export type AnyR2Point = R2Point | R2PointInit | R2PointTuple;
+export type R2PointLike = R2Point | R2PointInit | R2PointTuple;
 
 /** @public */
-export const AnyR2Point = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyR2Point {
+export const R2PointLike = {
+  [Symbol.hasInstance](instance: unknown): instance is R2PointLike {
     return instance instanceof R2Point
         || R2PointInit[Symbol.hasInstance](instance)
         || R2PointTuple[Symbol.hasInstance](instance);
@@ -46,7 +47,7 @@ export const AnyR2Point = {
 /** @public */
 export interface R2PointInit {
   /** @internal */
-  typeid?: "R2PointInit";
+  readonly typeid?: "R2PointInit";
   x: number;
   y: number;
 }
@@ -79,7 +80,10 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
   }
 
   /** @internal */
-  declare typeid?: "R2Point";
+  declare readonly typeid?: "R2Point";
+
+  /** @override */
+  declare readonly likeType?: Proto<R2PointInit | R2PointTuple>;
 
   override isDefined(): boolean {
     return isFinite(this.x) && isFinite(this.y);
@@ -105,7 +109,7 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return this.y;
   }
 
-  plus(vector: AnyR2Vector): R2Point {
+  plus(vector: R2VectorLike): R2Point {
     return new R2Point(this.x + vector.x, this.y + vector.y);
   }
 
@@ -118,13 +122,13 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return new R2Vector(this.x - that.x, this.y - that.y);
   }
 
-  override contains(that: AnyR2Shape): boolean;
+  override contains(that: R2ShapeLike): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyR2Shape | number, y?: number): boolean {
+  override contains(that: R2ShapeLike | number, y?: number): boolean {
     if (typeof that === "number") {
       return this.x === that && this.y === y!;
     }
-    that = R2Shape.fromAny(that);
+    that = R2Shape.fromLike(that);
     if (that instanceof R2Point) {
       return this.x === that.x && this.y === that.y;
     } else if (that instanceof R2Shape) {
@@ -134,8 +138,8 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return false;
   }
 
-  override intersects(that: AnyR2Shape): boolean {
-    that = R2Shape.fromAny(that);
+  override intersects(that: R2ShapeLike): boolean {
+    that = R2Shape.fromLike(that);
     return that.intersects(this);
   }
 
@@ -143,7 +147,7 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return new R2Point(f.transformX(this.x, this.y), f.transformY(this.x, this.y));
   }
 
-  toAny(): R2PointInit {
+  toLike(): R2PointInit {
     return {
       x: this.x,
       y: this.y,
@@ -210,9 +214,9 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
     return new R2Point(x, y);
   }
 
-  static override fromAny<T extends AnyR2Point | null | undefined>(value: T): R2Point | Uninitable<T>;
-  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyR2Point | null | undefined>(value: T): R2Point | Uninitable<T> {
+  static override fromLike<T extends R2PointLike | null | undefined>(value: T): R2Point | Uninitable<T>;
+  static override fromLike<T extends R2ShapeLike | null | undefined>(value: T): never;
+  static override fromLike<T extends R2PointLike | null | undefined>(value: T): R2Point | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Point) {
       return value as R2Point | Uninitable<T>;
     } else if (R2PointInit[Symbol.hasInstance](value)) {

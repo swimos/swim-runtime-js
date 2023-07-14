@@ -18,7 +18,7 @@ import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {UnaryOperator} from "./UnaryOperator";
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../interpreter/Interpreter";
 
 /** @public */
@@ -35,14 +35,14 @@ export class NegativeOperator extends UnaryOperator {
     return 10;
   }
 
-  override evaluate(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override evaluate(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const argument = this.operand.evaluate(interpreter);
     return argument.negative();
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const argument = this.operand.substitute(interpreter);
     return argument.negative();
   }

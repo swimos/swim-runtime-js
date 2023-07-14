@@ -18,7 +18,7 @@ import type {Output} from "@swim/codec";
 import {Parser} from "@swim/codec";
 import {Unicode} from "@swim/codec";
 import {Base10} from "@swim/codec";
-import type {AnyDateTime} from "./DateTime";
+import type {DateTimeLike} from "./DateTime";
 import type {DateTimeInit} from "./DateTime";
 import {DateTime} from "./DateTime";
 import {DateTimeParser} from "./DateTime";
@@ -43,8 +43,8 @@ export abstract class DateTimeFormat {
     return this;
   }
 
-  format(date: AnyDateTime): string {
-    date = DateTime.fromAny(date);
+  format(date: DateTimeLike): string {
+    date = DateTime.fromLike(date);
     let output = Unicode.stringOutput();
     output = this.writeDate(output, date);
     return output.bind();
@@ -75,7 +75,7 @@ export abstract class DateTimeFormat {
   parseDate(input: Input, date: DateTimeInit): Parser<DateTime> {
     const dateParser = this.parseDateTime(input, date);
     if (dateParser.isDone()) {
-      return Parser.done(DateTime.fromAny(dateParser.bind()));
+      return Parser.done(DateTime.fromLike(dateParser.bind()));
     } else if (dateParser.isError()) {
       return dateParser.asError();
     }

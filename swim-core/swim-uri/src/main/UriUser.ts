@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Strings} from "@swim/util";
@@ -30,11 +31,11 @@ import {Utf8} from "@swim/codec";
 import {Uri} from "./Uri";
 
 /** @public */
-export type AnyUriUser = UriUser | UriUserInit | string;
+export type UriUserLike = UriUser | UriUserInit | string;
 
 /** @public */
-export const AnyUriUser = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUriUser {
+export const UriUserLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriUserLike {
     return instance instanceof UriUser
         || UriUserInit[Symbol.hasInstance](instance)
         || typeof instance === "string";
@@ -44,7 +45,7 @@ export const AnyUriUser = {
 /** @public */
 export interface UriUserInit {
   /** @internal */
-  typeid?: "UriUserInit" | "UriAuthorityInit" | "UriInit";
+  readonly typeid?: "UriUserInit" | "UriAuthorityInit" | "UriInit";
   username?: string;
   password?: string;
 }
@@ -65,7 +66,9 @@ export class UriUser implements HashCode, Debug, Display {
   }
 
   /** @internal */
-  declare typeid?: "UriUser";
+  declare readonly typeid?: "UriUser";
+
+  declare readonly likeType?: Proto<UriUserInit | string>;
 
   isDefined(): boolean {
     return this.username !== void 0;
@@ -93,7 +96,7 @@ export class UriUser implements HashCode, Debug, Display {
     return UriUser.create(username, password);
   }
 
-  toAny(user?: {username?: string, password?: string}): {username?: string, password?: string} | undefined {
+  toLike(user?: {username?: string, password?: string}): {username?: string, password?: string} | undefined {
     if (this.username !== void 0) {
       if (user === void 0) {
         user = {};
@@ -166,7 +169,7 @@ export class UriUser implements HashCode, Debug, Display {
     return UriUser.create(init.username, init.password);
   }
 
-  static fromAny<T extends AnyUriUser | null | undefined>(value: T): UriUser | Uninitable<T> {
+  static fromLike<T extends UriUserLike | null | undefined>(value: T): UriUser | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriUser) {
       return value as UriUser | Uninitable<T>;
     } else if (typeof value === "object") {

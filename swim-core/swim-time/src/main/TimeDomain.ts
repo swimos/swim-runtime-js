@@ -16,7 +16,7 @@ import type {Mutable} from "@swim/util";
 import {Domain} from "@swim/util";
 import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
-import type {AnyDateTime} from "./DateTime";
+import type {DateTimeLike} from "./DateTime";
 import {DateTime} from "./DateTime";
 import {TimeRange} from "./"; // forward import
 
@@ -31,7 +31,7 @@ export interface TimeDomain extends Domain<DateTime>, Interpolate<TimeDomain> {
   readonly inverse: TimeRange;
 
   /** @override */
-  contains(t: AnyDateTime): boolean;
+  contains(t: DateTimeLike): boolean;
 
   /** @override */
   union(that: Domain<DateTime>): TimeDomain;
@@ -80,7 +80,7 @@ export const TimeDomain = (function (_super: typeof Domain) {
     configurable: true,
   });
 
-  TimeDomain.prototype.contains = function (t: AnyDateTime): boolean {
+  TimeDomain.prototype.contains = function (t: DateTimeLike): boolean {
     t = DateTime.time(t);
     return this[0].time <= t && t <= this[1].time;
   };

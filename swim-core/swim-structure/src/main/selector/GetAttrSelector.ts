@@ -22,7 +22,7 @@ import {Attr} from "../Attr";
 import {Record} from "../Record";
 import type {Text} from "../Text";
 import {Selector} from "./Selector";
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -133,8 +133,8 @@ export class GetAttrSelector extends Selector {
     return result;
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const key = this.item;
     const value = GetAttrSelector.substitute(key, this.then, interpreter);
     if (value !== void 0) {

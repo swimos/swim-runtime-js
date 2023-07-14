@@ -29,17 +29,17 @@ import {Angle} from "./Angle";
 import {DegAngle} from "./Angle";
 import {AngleParser} from "./Angle";
 import {R2Point} from "./R2Point";
-import type {AnyTransform} from "./Transform";
+import type {TransformLike} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransform} from "./"; // forward import
 
 /** @public */
-export type AnySkewTransform = SkewTransform | string;
+export type SkewTransformLike = SkewTransform | string;
 
 /** @public */
-export const AnySkewTransform = {
-  [Symbol.hasInstance](instance: unknown): instance is AnySkewTransform {
+export const SkewTransformLike = {
+  [Symbol.hasInstance](instance: unknown): instance is SkewTransformLike {
     return instance instanceof SkewTransform
         || typeof instance === "string";
   },
@@ -187,9 +187,9 @@ export class SkewTransform extends Transform {
     return new SkewTransform(x, y);
   }
 
-  static override fromAny<T extends AnySkewTransform | null | undefined>(value: T): SkewTransform | Uninitable<T>;
-  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
-  static override fromAny<T extends AnySkewTransform | null | undefined>(value: T): SkewTransform | Uninitable<T> {
+  static override fromLike<T extends SkewTransformLike | null | undefined>(value: T): SkewTransform | Uninitable<T>;
+  static override fromLike<T extends TransformLike | null | undefined>(value: T): never;
+  static override fromLike<T extends SkewTransformLike | null | undefined>(value: T): SkewTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof SkewTransform) {
       return value as SkewTransform | Uninitable<T>;
     } else if (typeof value === "string") {

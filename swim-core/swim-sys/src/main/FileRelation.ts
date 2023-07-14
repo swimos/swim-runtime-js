@@ -23,7 +23,7 @@ import type {FastenerClass} from "@swim/component";
 import {Fastener} from "@swim/component";
 
 /** @public */
-export interface FileRelationDescriptor<T = unknown> extends FastenerDescriptor {
+export interface FileRelationDescriptor<R, T> extends FastenerDescriptor<R> {
   extends?: Proto<FileRelation<any, any>> | boolean | null;
   baseDir?: string;
   resolves?: boolean;
@@ -41,9 +41,9 @@ export interface FileRelationClass<F extends FileRelation<any, any> = FileRelati
 }
 
 /** @public */
-export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
+export interface FileRelation<R = any, T = any> extends Fastener<R> {
   /** @override */
-  get descriptorType(): Proto<FileRelationDescriptor<T>>;
+  get descriptorType(): Proto<FileRelationDescriptor<R, T>>;
 
   /** @override */
   get fastenerType(): Proto<FileRelation<any, any>>;
@@ -68,9 +68,6 @@ export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
   get resolves(): boolean;
 
   setResolves(resolves: boolean): void;
-
-  /** @internal */
-  initResolves(resolves: boolean): void;
 
   /** @internal */
   resolveFile(baseDir: string | undefined, fileName: string | undefined): Promise<string | undefined>;
@@ -98,28 +95,26 @@ export interface FileRelation<O = unknown, T = unknown> extends Fastener<O> {
 }
 
 /** @public */
-export const FileRelation = (function (_super: typeof Fastener) {
-  const FileRelation = _super.extend("FileRelation", {}) as FileRelationClass;
+export const FileRelation = (<R, T, F extends FileRelation<any, any>>() => Fastener.extend<FileRelation<R, T>, FileRelationClass<F>>("FileRelation", {
+  get fastenerType(): Proto<FileRelation<any, any>> {
+    return FileRelation;
+  },
 
-  Object.defineProperty(FileRelation.prototype, "fastenerType", {
-    value: FileRelation,
-    enumerable: true,
-    configurable: true,
-  });
+  baseDir: void 0,
 
-  FileRelation.prototype.initBaseDir = function (this: FileRelation): string | undefined {
-    return (Object.getPrototypeOf(this) as FileRelation).baseDir;
-  };
+  initBaseDir(): string | undefined {
+    return (Object.getPrototypeOf(this) as FileRelation<any, any>).baseDir;
+  },
 
-  FileRelation.prototype.getBaseDir = function (this: FileRelation): string | undefined {
+  getBaseDir(): string | undefined {
     let baseDir = this.baseDir;
     if (baseDir === void 0) {
       baseDir = process.cwd();
     }
     return baseDir;
-  };
+  },
 
-  FileRelation.prototype.setBaseDir = function (this: FileRelation, newBaseDir: string | undefined): void {
+  setBaseDir(newBaseDir: string | undefined): void {
     const oldBaseDir = this.baseDir;
     if (newBaseDir === oldBaseDir) {
       return;
@@ -128,45 +123,33 @@ export const FileRelation = (function (_super: typeof Fastener) {
     (this as Mutable<typeof this>).baseDir = newBaseDir;
     this.onSetBaseDir(newBaseDir, oldBaseDir);
     this.didSetBaseDir(newBaseDir, oldBaseDir);
-  };
+  },
 
-  FileRelation.prototype.willSetBaseDir = function (this: FileRelation, newBaseDir: string | undefined, oldBaseDir: string | undefined): void {
+  willSetBaseDir(newBaseDir: string | undefined, oldBaseDir: string | undefined): void {
     // hook
-  };
+  },
 
-  FileRelation.prototype.onSetBaseDir = function (this: FileRelation, newBaseDir: string | undefined, oldBaseDir: string | undefined): void {
+  onSetBaseDir(newBaseDir: string | undefined, oldBaseDir: string | undefined): void {
     // hook
-  };
+  },
 
-  FileRelation.prototype.didSetBaseDir = function (this: FileRelation, newBaseDir: string | undefined, oldBaseDir: string | undefined): void {
+  didSetBaseDir(newBaseDir: string | undefined, oldBaseDir: string | undefined): void {
     // hook
-  };
+  },
 
-  Object.defineProperty(FileRelation.prototype, "resolves", {
-    get: function (this: FileRelation): boolean {
-      return (this.flags & FileRelation.ResolvesFlag) !== 0;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get resolves(): boolean {
+    return (this.flags & FileRelation.ResolvesFlag) !== 0;
+  },
 
-  FileRelation.prototype.setResolves = function (this: FileRelation, resolves: boolean): void {
+  setResolves(resolves: boolean): void {
     if (resolves) {
       (this as Mutable<typeof this>).flags |= FileRelation.ResolvesFlag;
     } else {
       (this as Mutable<typeof this>).flags &= ~FileRelation.ResolvesFlag;
     }
-  };
+  },
 
-  FileRelation.prototype.initResolves = function (this: FileRelation, resolves: boolean): void {
-    if (resolves) {
-      (this as Mutable<typeof this>).flags |= FileRelation.ResolvesFlag;
-    } else {
-      (this as Mutable<typeof this>).flags &= ~FileRelation.ResolvesFlag;
-    }
-  };
-
-  FileRelation.prototype.resolveFile = async function (this: FileRelation, baseDir: string | undefined, fileName: string | undefined): Promise<string | undefined> {
+  async resolveFile(baseDir: string | undefined, fileName: string | undefined): Promise<string | undefined> {
     if (fileName === void 0) {
       return;
     } else if (baseDir === void 0) {
@@ -186,78 +169,67 @@ export const FileRelation = (function (_super: typeof Fastener) {
       }
       return void 0;
     } while (true);
-  };
+  },
 
-  FileRelation.prototype.exists = function (this: FileRelation, path: string): boolean {
+  exists(path: string): boolean {
     return FS.existsSync(path);
-  };
+  },
 
-  FileRelation.prototype.readFile = async function <T>(this: FileRelation<unknown, T>, path: string): Promise<T> {
+  async readFile(path: string): Promise<T> {
     const buffer = await FS.promises.readFile(path, "utf8");
     return JSON.parse(buffer);
-  };
+  },
 
-  FileRelation.prototype.writeFile = async function <T>(this: FileRelation<unknown, T>, path: string, value: T): Promise<void> {
+  async writeFile(path: string, value: T): Promise<void> {
     const buffer = JSON.stringify(value, void 0, 2) + "\n";
     await FS.promises.writeFile(path, buffer, "utf8");
-  };
+  },
 
-  FileRelation.prototype.willSetValue = function <T>(this: FileRelation<unknown, T>, path: string, newValue: T, oldValue: T): void {
+  willSetValue(path: string, newValue: T, oldValue: T): void {
     // hook
-  };
+  },
 
-  FileRelation.prototype.onSetValue = function <T>(this: FileRelation<unknown, T>, path: string, newValue: T, oldValue: T): void {
+  onSetValue(path: string, newValue: T, oldValue: T): void {
     // hook
-  };
+  },
 
-  FileRelation.prototype.didSetValue = function <T>(this: FileRelation<unknown, T>, path: string, newValue: T, oldValue: T): void {
+  didSetValue(path: string, newValue: T, oldValue: T): void {
     // hook
-  };
+  },
 
-  FileRelation.prototype.equalValues = function <T>(this: FileRelation<unknown, T>, newValue: T, oldValue: T): boolean {
+  equalValues(newValue: T, oldValue: T): boolean {
     return Equals(newValue, oldValue);
-  };
-
-  FileRelation.construct = function <F extends FileRelation<any, any>>(fastener: F | null, owner: F extends FileRelation<infer O, any> ? F : never): F {
-    fastener = _super.construct.call(this, fastener, owner) as F;
-    const flagsInit = fastener.flagsInit;
-    if (flagsInit !== void 0) {
-      fastener.initResolves((flagsInit & FileRelation.ResolvesFlag) !== 0);
-    }
+  },
+},
+{
+  construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
+    fastener = super.construct(fastener, owner) as F;
     (fastener as Mutable<typeof fastener>).baseDir = fastener.initBaseDir();
     return fastener;
-  };
+  },
 
-  FileRelation.refine = function (fastenerClass: FileRelationClass<any>): void {
-    _super.refine.call(this, fastenerClass);
+  refine(fastenerClass: FastenerClass<FileRelation<any, any>>): void {
+    super.refine(fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
-    let flagsInit = fastenerPrototype.flagsInit;
 
+    let flagsInit = fastenerPrototype.flagsInit;
     if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "resolves")) {
-      if (flagsInit === void 0) {
-        flagsInit = 0;
-      }
       if (fastenerPrototype.resolves) {
         flagsInit |= FileRelation.ResolvesFlag;
       } else {
         flagsInit &= ~FileRelation.ResolvesFlag;
       }
-      delete (fastenerPrototype as FileRelationDescriptor).resolves;
+      delete (fastenerPrototype as FileRelationDescriptor<any, any>).resolves;
     }
+    Object.defineProperty(fastenerPrototype, "flagsInit", {
+      value: flagsInit,
+      enumerable: true,
+      configurable: true,
+    });
+  },
 
-    if (flagsInit !== void 0) {
-      Object.defineProperty(fastenerPrototype, "flagsInit", {
-        value: flagsInit,
-        enumerable: true,
-        configurable: true,
-      });
-    }
-  };
+  ResolvesFlag: 1 << (Fastener.FlagShift + 0),
 
-  (FileRelation as Mutable<typeof FileRelation>).ResolvesFlag = 1 << (_super.FlagShift + 0);
-
-  (FileRelation as Mutable<typeof FileRelation>).FlagShift = _super.FlagShift + 1;
-  (FileRelation as Mutable<typeof FileRelation>).FlagMask = (1 << FileRelation.FlagShift) - 1;
-
-  return FileRelation;
-})(Fastener);
+  FlagShift: Fastener.FlagShift + 1,
+  FlagMask: (1 << (Fastener.FlagShift + 1)) - 1,
+}))();

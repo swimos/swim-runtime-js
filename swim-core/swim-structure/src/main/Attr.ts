@@ -18,14 +18,14 @@ import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
-import type {AnyField} from "./Field";
+import type {FieldLike} from "./Field";
 import {Field} from "./Field";
 import {Slot} from "./"; // forward import
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./"; // forward import
-import type {AnyText} from "./Text";
+import type {TextLike} from "./Text";
 import {Text} from "./"; // forward import
 import {Extant} from "./"; // forward import
 import {Expression} from "./"; // forward import
@@ -37,7 +37,7 @@ import {MinusOperator} from "./"; // forward import
 import {TimesOperator} from "./"; // forward import
 import {DivideOperator} from "./"; // forward import
 import {ModuloOperator} from "./"; // forward import
-import type {AnyInterpreter} from "./interpreter/Interpreter";
+import type {InterpreterLike} from "./interpreter/Interpreter";
 import {Interpreter} from "./"; // forward import
 
 /** @public */
@@ -77,8 +77,8 @@ export class Attr extends Field {
     return new Attr(this.key, value);
   }
 
-  override bitwiseOr(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseOr(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new BitwiseOrOperator(this, that);
     }
@@ -96,8 +96,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override bitwiseXor(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseXor(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new BitwiseXorOperator(this, that);
     }
@@ -115,8 +115,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override bitwiseAnd(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseAnd(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new BitwiseAndOperator(this, that);
     }
@@ -134,8 +134,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override plus(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override plus(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new PlusOperator(this, that);
     }
@@ -153,8 +153,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override minus(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override minus(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new MinusOperator(this, that);
     }
@@ -172,8 +172,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override times(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override times(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new TimesOperator(this, that);
     }
@@ -191,8 +191,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override divide(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override divide(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new DivideOperator(this, that);
     }
@@ -210,8 +210,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override modulo(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override modulo(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new ModuloOperator(this, that);
     }
@@ -269,8 +269,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override evaluate(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override evaluate(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const key = this.key.evaluate(interpreter).toValue();
     const value = this.value.evaluate(interpreter).toValue();
     if (key === this.key && value === this.value) {
@@ -285,8 +285,8 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const key = this.key.substitute(interpreter).toValue();
     const value = this.value.substitute(interpreter).toValue();
     if (key === this.key && value === this.value) {
@@ -301,9 +301,9 @@ export class Attr extends Field {
     return Item.absent();
   }
 
-  override toAny(): AnyField {
-    const field = {} as {[key: string]: AnyValue};
-    field["@" + this.key.value] = this.value.toAny();
+  override toLike(): FieldLike {
+    const field = {} as {[key: string]: ValueLike};
+    field["@" + this.key.value] = this.value.toLike();
     return field;
   }
 
@@ -405,12 +405,12 @@ export class Attr extends Field {
     return output;
   }
 
-  static override of(key: AnyText, value?: AnyValue): Attr {
-    key = Text.fromAny(key);
+  static override of(key: TextLike, value?: ValueLike): Attr {
+    key = Text.fromLike(key);
     if (arguments.length === 1) {
       value = Value.extant();
     } else {
-      value = Value.fromAny(value);
+      value = Value.fromLike(value);
     }
     return new Attr(key, value);
   }

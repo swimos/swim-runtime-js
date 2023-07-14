@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -28,11 +29,11 @@ import {Base10} from "@swim/codec";
 import {Unicode} from "@swim/codec";
 
 /** @public */
-export type AnyUriPort = UriPort | number | string;
+export type UriPortLike = UriPort | number | string;
 
 /** @public */
-export const AnyUriPort = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUriPort {
+export const UriPortLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriPortLike {
     return instance instanceof UriPort
         || typeof instance === "number"
         || typeof instance === "string";
@@ -46,6 +47,8 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     this.number = portNumber;
   }
 
+  declare readonly likeType?: Proto<number | string>;
+
   isDefined(): boolean {
     return this.number !== 0;
   }
@@ -56,7 +59,7 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return this.number;
   }
 
-  toAny(): number {
+  toLike(): number {
     return this.number;
   }
 
@@ -121,7 +124,7 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     return new UriPort(number);
   }
 
-  static fromAny<T extends AnyUriPort | null | undefined>(value: T): UriPort | Uninitable<T> {
+  static fromLike<T extends UriPortLike | null | undefined>(value: T): UriPort | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriPort) {
       return value as UriPort | Uninitable<T>;
     } else if (typeof value === "number") {

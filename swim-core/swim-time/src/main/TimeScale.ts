@@ -19,7 +19,7 @@ import type {Interpolate} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {LinearRange} from "@swim/util";
 import {ContinuousScale} from "@swim/util";
-import type {AnyDateTime} from "./DateTime";
+import type {DateTimeLike} from "./DateTime";
 import {DateTime} from "./DateTime";
 import {TimeDomain} from "./TimeDomain";
 
@@ -36,7 +36,7 @@ export interface TimeScale extends ContinuousScale<DateTime, number>, Interpolat
 
   /** @override */
   withDomain(domain: TimeDomain): TimeScale;
-  withDomain(x0: AnyDateTime, x1: AnyDateTime): TimeScale;
+  withDomain(x0: DateTimeLike, x1: DateTimeLike): TimeScale;
 
   /** @override */
   overRange(range: LinearRange): TimeScale;
@@ -92,13 +92,13 @@ export const TimeScale = (function (_super: typeof ContinuousScale) {
     configurable: true,
   });
 
-  TimeScale.prototype.withDomain = function (x0: TimeDomain | AnyDateTime, x1?: AnyDateTime): TimeScale {
+  TimeScale.prototype.withDomain = function (x0: TimeDomain | DateTimeLike, x1?: DateTimeLike): TimeScale {
     let domain: TimeDomain;
     if (arguments.length === 1) {
       domain = x0 as TimeDomain;
     } else {
-      x0 = DateTime.fromAny(x0 as AnyDateTime);
-      x1 = DateTime.fromAny(x1!);
+      x0 = DateTime.fromLike(x0 as DateTimeLike);
+      x1 = DateTime.fromLike(x1!);
       domain = TimeDomain(x0, x1);
     }
     return TimeScale(domain, this.range);

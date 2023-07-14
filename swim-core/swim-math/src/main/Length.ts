@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -47,11 +48,11 @@ export interface LengthBasis {
 }
 
 /** @public */
-export type AnyLength = Length | number | string;
+export type LengthLike = Length | number | string;
 
 /** @public */
-export const AnyLength = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyLength {
+export const LengthLike = {
+  [Symbol.hasInstance](instance: unknown): instance is LengthLike {
     return instance instanceof Length
         || typeof instance === "number"
         || typeof instance === "string";
@@ -64,12 +65,14 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     return isFinite(this.value);
   }
 
+  declare readonly likeType?: Proto<number | string>;
+
   abstract readonly value: number;
 
   abstract readonly units: LengthUnits;
 
-  plus(that: AnyLength, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
-    that = Length.fromAny(that);
+  plus(that: LengthLike, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
+    that = Length.fromLike(that);
     return Length.of(this.toValue(units, basis) + that.toValue(units, basis), units);
   }
 
@@ -77,8 +80,8 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     return Length.of(-this.toValue(units, basis), units);
   }
 
-  minus(that: AnyLength, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
-    that = Length.fromAny(that);
+  minus(that: LengthLike, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
+    that = Length.fromLike(that);
     return Length.of(this.toValue(units, basis) - that.toValue(units, basis), units);
   }
 
@@ -90,8 +93,8 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     return Length.of(this.toValue(units, basis) / scalar, units);
   }
 
-  combine(that: AnyLength, scalar: number = 1, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
-    that = Length.fromAny(that);
+  combine(that: LengthLike, scalar: number = 1, units: LengthUnits = this.units, basis?: LengthBasis | number): Length {
+    that = Length.fromLike(that);
     return Length.of(this.toValue(units, basis) + that.toValue(units, basis) * scalar, units);
   }
 
@@ -231,7 +234,7 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     throw new TypeError("" + value);
   }
 
-  static fromAny<T extends AnyLength | null | undefined>(value: T, defaultUnits?: LengthUnits): Length | Uninitable<T> {
+  static fromLike<T extends LengthLike | null | undefined>(value: T, defaultUnits?: LengthUnits): Length | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Length) {
       return value as Length | Uninitable<T>;
     } else if (typeof value === "number") {
@@ -278,7 +281,7 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
   }
 
   @Lazy
-  static form(): Form<Length, AnyLength> {
+  static form(): Form<Length, LengthLike> {
     return new LengthForm(void 0, Length.zero());
   }
 
@@ -760,29 +763,30 @@ export const LengthInterpolator = (function (_super: typeof Interpolator) {
 })(Interpolator);
 
 /** @internal */
-export class LengthForm extends Form<Length, AnyLength> {
+export class LengthForm extends Form<Length, LengthLike> {
   constructor(defaultUnits: LengthUnits | undefined, unit: Length | undefined) {
     super();
     this.defaultUnits = defaultUnits;
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
   readonly defaultUnits: LengthUnits | undefined;
 
-  override readonly unit!: Length | undefined;
+  override readonly unit: Length | undefined;
 
-  override withUnit(unit: Length | undefined): Form<Length, AnyLength> {
+  override withUnit(unit: Length | undefined): Form<Length, LengthLike> {
     if (unit === this.unit) {
       return this;
     }
     return new LengthForm(this.defaultUnits, unit);
   }
 
-  override mold(length: AnyLength): Item {
-    length = Length.fromAny(length, this.defaultUnits);
+  override mold(length: LengthLike): Item {
+    length = Length.fromLike(length, this.defaultUnits);
     return Text.from(length.toString());
   }
 

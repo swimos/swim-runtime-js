@@ -17,13 +17,13 @@ import {Opt} from "@swim/args";
 import {Cmd} from "@swim/args";
 import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import type {WarpDownlink} from "@swim/client";
 import {WarpClient} from "@swim/client";
 
-function link(hostUri: AnyUri | undefined, nodeUri: AnyUri | undefined,
-              laneUri: AnyUri | undefined, format?: string): WarpDownlink {
+function link(hostUri: UriLike | undefined, nodeUri: UriLike | undefined,
+              laneUri: UriLike | undefined, format?: string): WarpDownlink {
   return WarpClient.global().downlink({
     hostUri: hostUri,
     nodeUri: nodeUri,
@@ -31,7 +31,7 @@ function link(hostUri: AnyUri | undefined, nodeUri: AnyUri | undefined,
     syncs: true,
     onEvent(body: Value): void {
       if (format === "json") {
-        console.log(JSON.stringify(body.toAny()));
+        console.log(JSON.stringify(body.toLike()));
       } else {
         console.log(Recon.toString(body));
       }
@@ -79,7 +79,7 @@ const getCmd = Cmd.create("get")
       syncs: true,
       onEvent(body: Value): void {
         if (args.format === "json") {
-          console.log(JSON.stringify(body.toAny()));
+          console.log(JSON.stringify(body.toLike()));
         } else {
           console.log(Recon.toString(body));
         }

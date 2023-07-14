@@ -67,7 +67,7 @@ export class BlockWriter<I, V> extends Writer {
     let next: I | undefined;
     while (next !== void 0 || items.hasNext()) {
       let item: I | undefined;
-      if (next === void 0 ) {
+      if (next === void 0) {
         item = items.next().value as I;
       } else {
         item = next;

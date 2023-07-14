@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./Value";
 
 /** @public */
-export type AnyBool = Bool | boolean;
+export type BoolLike = Bool | boolean;
 
 /** @public */
 export class Bool extends Value {
@@ -36,6 +37,9 @@ export class Bool extends Value {
       value: Strings.hash(value ? "true" : "false"),
     });
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<boolean>;
 
   override isDefinite(): boolean {
     return this.value;
@@ -59,7 +63,7 @@ export class Bool extends Value {
     return this.value;
   }
 
-  override toAny(): AnyBool {
+  override toLike(): BoolLike {
     return this.value;
   }
 
@@ -67,22 +71,22 @@ export class Bool extends Value {
     return this.value;
   }
 
-  override conditional(thenTerm: AnyValue, elseTerm: AnyValue): Value;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item {
-    return this.value ? Item.fromAny(thenTerm) : Item.fromAny(elseTerm);
+  override conditional(thenTerm: ValueLike, elseTerm: ValueLike): Value;
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item;
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item {
+    return this.value ? Item.fromLike(thenTerm) : Item.fromLike(elseTerm);
   }
 
-  override or(that: AnyValue): Value;
-  override or(that: AnyItem): Item;
-  override or(that: AnyItem): Item {
-    return this.value ? this : Item.fromAny(that);
+  override or(that: ValueLike): Value;
+  override or(that: ItemLike): Item;
+  override or(that: ItemLike): Item {
+    return this.value ? this : Item.fromLike(that);
   }
 
-  override and(that: AnyValue): Value;
-  override and(that: AnyItem): Item;
-  override and(that: AnyItem): Item {
-    return this.value ? Item.fromAny(that) : this;
+  override and(that: ValueLike): Value;
+  override and(that: ItemLike): Item;
+  override and(that: ItemLike): Item {
+    return this.value ? Item.fromLike(that) : this;
   }
 
   override not(): Value {
@@ -153,7 +157,7 @@ export class Bool extends Value {
     return value ? Bool.true() : Bool.false();
   }
 
-  static override fromAny(value: AnyBool): Bool {
+  static override fromLike(value: BoolLike): Bool {
     if (value instanceof Bool) {
       return value;
     } else if (typeof value === "boolean") {

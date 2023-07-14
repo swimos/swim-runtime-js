@@ -14,9 +14,7 @@
 
 export {InterpreterException} from "./InterpreterException";
 
-export type {AnyInterpreterSettings} from "./InterpreterSettings";
-export type {InterpreterSettingsInit} from "./InterpreterSettings";
 export {InterpreterSettings} from "./InterpreterSettings";
 
-export type {AnyInterpreter} from "./Interpreter";
+export type {InterpreterLike} from "./Interpreter";
 export {Interpreter} from "./Interpreter";

@@ -16,7 +16,8 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Equals} from "@swim/util";
 import {Objects} from "@swim/util";
-import {FromAny} from "@swim/util";
+import type {LikeType} from "@swim/util";
+import {FromLike} from "@swim/util";
 import {Affinity} from "./Affinity";
 import {FastenerContext} from "./FastenerContext";
 import type {FastenerDescriptor} from "./Fastener";
@@ -24,103 +25,57 @@ import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 
 /** @public */
-export interface PropertyDescriptor<T, U> extends FastenerDescriptor {
-  extends?: Proto<Property> | boolean | null;
+export interface PropertyDescriptor<R, T> extends FastenerDescriptor<R> {
+  extends?: Proto<Property<any, any, any>> | boolean | null;
   valueType?: unknown;
-  value?: T | U;
+  value?: T | LikeType<T>;
   updateFlags?: number;
 }
 
 /** @public */
-export interface PropertyClass<P extends Property = Property> extends FastenerClass<P> {
-  tryValue<O, K extends keyof O, F extends O[K] = O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any, any> ? T : undefined;
+export interface PropertyClass<P extends Property<any, any, any> = Property<any, any, any>> extends FastenerClass<P> {
+  tryValue<R, K extends keyof R, F extends R[K] = R[K]>(owner: R, fastenerName: K): F extends {readonly value: infer T} ? T : undefined;
 
-  tryValueOr<O, K extends keyof O, E, F extends O[K] = O[K]>(owner: O, fastenerName: K, elseValue: E): F extends Property<any, infer T, any, any> ? NonNullable<T> | E : E;
+  tryValueOr<R, K extends keyof R, E, F extends R[K] = R[K]>(owner: R, fastenerName: K, elseValue: E): F extends {readonly value: infer T} ? NonNullable<T> | E : E;
 }
 
 /** @public */
-export interface Property<O = any, T = any, U = T, I = T> extends Fastener<O> {
+export interface Property<R = any, T = any, I extends any[] = [T]> extends Fastener<R, T, I> {
   (): T;
-  (value: T | U, affinity?: Affinity): O;
+  (value: T | LikeType<T>, affinity?: Affinity): R;
 
   /** @override */
-  get descriptorType(): Proto<PropertyDescriptor<T, U>>;
+  get descriptorType(): Proto<PropertyDescriptor<R, T>>;
 
   /** @override */
-  get fastenerType(): Proto<Property>;
-
-  /** @internal @override */
-  setDerived(derived: boolean, inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  willDerive(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  onDerive(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  didDerive(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  willUnderive(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  onUnderive(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  didUnderive(inlet: Property<any, I, any, any>): void;
+  get fastenerType(): Proto<Property<any, any, any>>;
 
   /** @override */
-  get parent(): Property<any, I, any, any> | null;
+  get parent(): Property<any, I[0], any> | null;
 
-  /** @override */
-  readonly inlet: Property<any, I, any, any> | null;
+  get inletValue(): I[0] | undefined;
 
-  /** @override */
-  bindInlet<I2 extends I>(inlet: Property<any, I2, any, any>): void;
+  getInletValue(): NonNullable<I[0]>;
 
-  /** @protected @override */
-  willBindInlet(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  onBindInlet(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  didBindInlet(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  willUnbindInlet(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  onUnbindInlet(inlet: Property<any, I, any, any>): void;
-
-  /** @protected @override */
-  didUnbindInlet(inlet: Property<any, I, any, any>): void;
-
-  get inletValue(): I | undefined;
-
-  getInletValue(): NonNullable<I>;
-
-  getInletValueOr<E>(elseValue: E): NonNullable<I> | E;
-
-  transformInletValue(inletValue: I): T;
+  getInletValueOr<E>(elseValue: E): NonNullable<I[0]> | E;
 
   /** @internal */
-  readonly outlets: ReadonlySet<Property<any, any, any, T>> | null;
+  readonly outlets: ReadonlySet<Fastener<any, any, any>> | null;
 
   /** @internal @override */
-  attachOutlet(outlet: Property<any, any, any, T>): void;
+  attachOutlet(outlet: Fastener<any, any, any>): void;
 
   /** @internal @override */
-  detachOutlet(outlet: Property<any, any, any, T>): void;
+  detachOutlet(outlet: Fastener<any, any, any>): void;
 
-  getOutletValue(outlet: Property<any, any, any, T>): T;
+  /** @internal @protected */
+  decohereOutlets(): void;
 
-  /** @internal */
-  readonly valueType?: unknown; // optional prototype property
+  getOutletValue(outlet: Fastener<any, any, any>): T;
 
-  /** @internal */
-  readonly valueInit?: U; // for type destructuring
+  deriveValue(...inletValues: I): T;
+
+  get valueType(): unknown | undefined;
 
   initValue(): T;
 
@@ -132,7 +87,7 @@ export interface Property<O = any, T = any, U = T, I = T> extends Fastener<O> {
 
   transformValue(value: T): T;
 
-  setValue(newValue: T | U, affinity?: Affinity): void;
+  setValue(newValue: T | LikeType<T>, affinity?: Affinity): void;
 
   /** @protected */
   willSetValue(newValue: T, oldValue: T): void;
@@ -143,45 +98,30 @@ export interface Property<O = any, T = any, U = T, I = T> extends Fastener<O> {
   /** @protected */
   didSetValue(newValue: T, oldValue: T): void;
 
-  /** @internal */
-  readonly updateFlags?: number; // optional prototype property
-
-  /** @internal @protected */
-  decohereOutlets(): void;
-
-  /** @internal @protected */
-  decohereOutlet(outlet: Property<any, T, any, any>): void;
+  get updateFlags(): number | undefined;
 
   /** @override */
   recohere(t: number): void;
 
-  /** @internal */
   definedValue(value: T): boolean;
 
-  /** @internal */
   equalValues(newValue: T, oldValue: T | undefined): boolean;
 
-  /** @internal */
-  fromAny(value: T | U): T;
+  fromLike(value: T | LikeType<T>): T;
 }
 
 /** @public */
-export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<Property<O, T, U, I>, PropertyClass<P>>("Property", {
-  get fastenerType(): Proto<Property> {
+export const Property = (<R, T, I extends any[], P extends Property<any, any, any>>() => Fastener.extend<Property<R, T, I>, PropertyClass<P>>("Property", {
+  get fastenerType(): Proto<Property<any, any, any>> {
     return Property;
   },
 
-  onDerive(inlet: Property<any, I, any, any>): void {
-    const inletValue = this.transformInletValue(inlet.getOutletValue(this));
-    this.setValue(inletValue, Affinity.Reflexive);
-  },
-
-  get inletValue(): I | undefined {
+  get inletValue(): I[0] | undefined {
     const inlet = this.inlet;
-    return inlet !== null ? inlet.getOutletValue(this) : void 0;
+    return inlet instanceof Property ? inlet.getOutletValue(this) : void 0;
   },
 
-  getInletValue(): NonNullable<I> {
+  getInletValue(): NonNullable<I[0]> {
     const inletValue = this.inletValue;
     if (inletValue === void 0 || inletValue === null) {
       let message = inletValue + " ";
@@ -195,41 +135,51 @@ export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<P
     return inletValue;
   },
 
-  getInletValueOr<E>(elseValue: E): NonNullable<I> | E {
-    let inletValue: I | E | undefined = this.inletValue;
+  getInletValueOr<E>(elseValue: E): NonNullable<I[0]> | E {
+    const inletValue: I[0] | E | undefined = this.inletValue;
     if (inletValue === void 0 || inletValue === null) {
-      inletValue = elseValue;
+      return elseValue;
     }
-    return inletValue as NonNullable<I> | E;
+    return inletValue;
   },
 
-  transformInletValue(inletValue: I): T {
-    return inletValue as unknown as T;
-  },
-
-  attachOutlet(outlet: Property<any, any, any, T>): void {
-    let outlets = this.outlets as Set<Property<any, any, any, T>> | null;
+  attachOutlet(outlet: Property<any, any, any>): void {
+    let outlets = this.outlets as Set<Property<any, any, any>> | null;
     if (outlets === null) {
-      outlets = new Set<Property<any, any, any, T>>();
+      outlets = new Set<Property<any, any, any>>();
       (this as Mutable<typeof this>).outlets = outlets;
     }
     outlets.add(outlet);
   },
 
-  detachOutlet(outlet: Property<any, any, any, T>): void {
-    const outlets = this.outlets as Set<Property<any, any, any, T>> | null;
-    if (outlets === null) {
-      return;
+  detachOutlet(outlet: Property<any, any, any>): void {
+    const outlets = this.outlets as Set<Property<any, any, any>> | null;
+    if (outlets !== null) {
+      outlets.delete(outlet);
     }
-    outlets.delete(outlet);
   },
 
-  getOutletValue(outlet: Property<any, any, any, T>): T {
+  decohereOutlets(): void {
+    const outlets = this.outlets;
+    if (outlets !== null) {
+      for (const outlet of outlets) {
+        outlet.decohere(this);
+      }
+    }
+  },
+
+  getOutletValue(outlet: Property<any, any, any>): T {
     return this.value;
   },
 
+  deriveValue(...inletValues: any[]): T {
+    return inletValues[0] as T;
+  },
+
+  valueType: void 0,
+
   initValue(): T {
-    return (Object.getPrototypeOf(this) as Property<unknown, T>).value;
+    return (Object.getPrototypeOf(this) as Property<any, T, any>).value;
   },
 
   getValue(): NonNullable<T> {
@@ -247,25 +197,25 @@ export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<P
   },
 
   getValueOr<E>(elseValue: E): NonNullable<T> | E {
-    let value: T | E = this.value;
+    const value: T | E = this.value;
     if (value === void 0 || value === null) {
-      value = elseValue;
+      return elseValue;
     }
-    return value as NonNullable<T> | E;
+    return value;
   },
 
   transformValue(value: T): T {
     return value;
   },
 
-  setValue(newValue: T | U, affinity?: Affinity): void {
+  setValue(newValue: T | LikeType<T>, affinity?: Affinity): void {
     if (affinity === void 0) {
       affinity = Affinity.Extrinsic;
     }
     if (!this.minAffinity(affinity)) {
       return;
     }
-    newValue = this.fromAny(newValue);
+    newValue = this.fromLike(newValue);
     newValue = this.transformValue(newValue);
     const oldValue = this.value;
     if (this.equalValues(newValue, oldValue)) {
@@ -286,9 +236,8 @@ export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<P
 
   onSetValue(newValue: T, oldValue: T): void {
     const updateFlags = this.updateFlags;
-    const owner = this.owner;
-    if (updateFlags !== void 0 && Objects.hasAllKeys<FastenerContext>(owner, "requireUpdate")) {
-      owner.requireUpdate!(updateFlags);
+    if (updateFlags !== void 0 && Objects.hasAllKeys<FastenerContext>(this.owner, "requireUpdate")) {
+      this.owner.requireUpdate!(updateFlags);
     }
   },
 
@@ -296,32 +245,34 @@ export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<P
     // hook
   },
 
-  decohereOutlets(): void {
-    const outlets = this.outlets;
-    if (outlets === null) {
-      return;
-    }
-    for (const outlet of outlets) {
-      this.decohereOutlet(outlet);
-    }
-  },
-
-  decohereOutlet(outlet: Property<any, T, any, any>): void {
-    if ((outlet.flags & Fastener.DerivedFlag) === 0 && Math.min(this.flags & Affinity.Mask, Affinity.Intrinsic) >= (outlet.flags & Affinity.Mask)) {
-      outlet.setDerived(true, this);
-    } else if ((outlet.flags & Fastener.DerivedFlag) !== 0 && (outlet.flags & Fastener.DecoherentFlag) === 0) {
-      outlet.setCoherent(false);
-      outlet.decohere();
-    }
-  },
+  updateFlags: void 0,
 
   recohere(t: number): void {
-    let inlet: Property<any, I, any, any> | null;
-    if ((this.flags & Fastener.DerivedFlag) === 0 || (inlet = this.inlet) === null) {
-      return;
+    this.setCoherentTime(t);
+    const inlets = this.inlet;
+    if (inlets instanceof Property) {
+      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlets.flags & Affinity.Mask, Affinity.Intrinsic));
+      if ((this.flags & Fastener.DerivedFlag) !== 0) {
+        const derivedValue = (this as unknown as Property<R, T, [unknown]>).deriveValue(inlets.getOutletValue(this));
+        this.setValue(derivedValue, Affinity.Reflexive);
+      }
+    } else if (Array.isArray(inlets)) {
+      this.setDerived(true);
+      const inletValues = new Array<unknown>(inlets.length);
+      for (let i = 0; i < inlets.length; i += 1) {
+        const inlet = inlets[i] as Fastener;
+        if (inlet instanceof Property) {
+          inletValues[i] = inlet.getOutletValue(this);
+        } else {
+          this.setDerived(false);
+          return;
+        }
+      }
+      const derivedValue = this.deriveValue(...(inletValues as I));
+      this.setValue(derivedValue, Affinity.Reflexive);
+    } else {
+      this.setDerived(false);
     }
-    const inletValue = this.transformInletValue(inlet.getOutletValue(this));
-    this.setValue(inletValue, Affinity.Reflexive);
   },
 
   definedValue(value: T): boolean {
@@ -332,13 +283,13 @@ export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<P
     return Equals(newValue, oldValue);
   },
 
-  fromAny(value: T | U): T {
-    return FromAny<T, U>(this.valueType, value);
+  fromLike(value: T | LikeType<T>): T {
+    return FromLike(this.valueType, value);
   },
 },
 {
-  tryValue<O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends Property<any, infer T, any, any> ? T : undefined {
-    const property = FastenerContext.tryFastener(owner, fastenerName) as Property | null;
+  tryValue<R, K extends keyof R, F extends R[K]>(owner: R, fastenerName: K): F extends {readonly value: infer T} ? T : undefined {
+    const property = FastenerContext.tryFastener(owner, fastenerName) as Property<any, any, any> | null;
     if (property !== null) {
       return property.value as any;
     }
@@ -349,17 +300,17 @@ export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<P
     return void 0 as any;
   },
 
-  tryValueOr<O, K extends keyof O, E, F extends O[K] = O[K]>(owner: O, fastenerName: K, elseValue: E): F extends Property<any, infer T, any, any> ? NonNullable<T> | E : E {
-    let value: (F extends Property<any, infer T, any, any> ? T : undefined) | E = this.tryValue(owner, fastenerName);
+  tryValueOr<R, K extends keyof R, E, F extends R[K] = R[K]>(owner: R, fastenerName: K, elseValue: E): F extends {readonly value: infer T} ? NonNullable<T> | E : E {
+    let value: (F extends {readonly value: infer T} ? T : undefined) | E = this.tryValue(owner, fastenerName);
     if (value === void 0 || value === null) {
       value = elseValue;
     }
-    return value as F extends Property<any, infer T, any, any> ? NonNullable<T> | E : E;
+    return value as F extends {readonly value: infer T} ? NonNullable<T> | E : E;
   },
 
-  construct(property: P | null, owner: P extends Fastener<infer O> ? O : never): P {
+  construct(property: P | null, owner: P extends Fastener<infer R, any, any> ? R : never): P {
     if (property === null) {
-      property = function (value?: P extends Property<any, infer T, infer U, any> ? T | U : never, affinity?: Affinity): P extends Property<infer O, infer T, any> ? T | O : never {
+      property = function (value?: P extends Property<any, infer T, any> ? T | LikeType<T> : never, affinity?: Affinity): P extends Property<infer R, infer T, any> ? T | R : never {
         if (arguments.length === 0) {
           return property!.value;
         } else {
@@ -380,16 +331,14 @@ export const Property = (<O, T, U, I, P extends Property>() => Fastener.extend<P
     return property;
   },
 
-  refine(propertyClass: FastenerClass<any>): void {
+  refine(propertyClass: FastenerClass<Property<any, any, any>>): void {
     super.refine(propertyClass);
-    const propertyProtortype = propertyClass.prototype;
+    const propertyPrototype = propertyClass.prototype;
 
-    if (Object.prototype.hasOwnProperty.call(propertyProtortype, "value")) {
-      Object.defineProperty(propertyProtortype, "value", {
-        value: propertyProtortype.fromAny(propertyProtortype.value),
-        enumerable: true,
-        configurable: true,
-      });
+    const valueDescriptor = Object.getOwnPropertyDescriptor(propertyPrototype, "value");
+    if (valueDescriptor !== void 0 && "value" in valueDescriptor) {
+      valueDescriptor.value = propertyPrototype.fromLike(valueDescriptor.value);
+      Object.defineProperty(propertyPrototype, "value", valueDescriptor);
     }
   },
 }))();

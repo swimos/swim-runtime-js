@@ -21,7 +21,7 @@ import type {LinearDomain} from "./LinearDomain";
 import {LinearRange} from "./"; // forward import
 
 /** @public */
-export type AnyRange<Y> = Range<Y> | readonly [Y, Y];
+export type RangeLike<Y> = Range<Y> | readonly [Y, Y];
 
 /** @public */
 export interface Range<Y> extends Mapping<number, Y> {

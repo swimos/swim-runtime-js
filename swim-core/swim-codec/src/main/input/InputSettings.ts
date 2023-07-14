@@ -26,7 +26,7 @@ import {Format} from "../format/Format";
  * initializer.
  * @public
  */
-export type AnyInputSettings = InputSettings | InputSettingsInit;
+export type InputSettingsLike = InputSettings | InputSettingsInit;
 
 /**
  * [[InputSettings]] object initializer.
@@ -136,7 +136,7 @@ export class InputSettings implements HashCode, Debug {
   /**
    * Converts the loosely typed `settings` to an instance of `InputSettings`.
    */
-  static fromAny(settings: AnyInputSettings | undefined): InputSettings {
+  static fromLike(settings: InputSettingsLike | undefined): InputSettings {
     if (settings instanceof InputSettings) {
       return settings;
     } else if (typeof settings === "object" && settings !== null) {

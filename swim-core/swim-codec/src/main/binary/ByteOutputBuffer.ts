@@ -14,7 +14,7 @@
 
 import type {Mutable} from "@swim/util";
 import {OutputException} from "../output/OutputException";
-import type {AnyOutputSettings} from "../output/OutputSettings";
+import type {OutputSettingsLike} from "../output/OutputSettings";
 import {OutputSettings} from "../output/OutputSettings";
 import {OutputBuffer} from "../output/OutputBuffer";
 import {OutputBufferError} from "../output/OutputBufferError";
@@ -147,8 +147,8 @@ export class ByteOutputBuffer extends OutputBuffer<Uint8Array> {
 
   override readonly settings: OutputSettings;
 
-  override withSettings(settings: AnyOutputSettings): OutputBuffer<Uint8Array> {
-    settings = OutputSettings.fromAny(settings);
+  override withSettings(settings: OutputSettingsLike): OutputBuffer<Uint8Array> {
+    settings = OutputSettings.fromLike(settings);
     (this as Mutable<this>).settings = settings;
     return this;
   }

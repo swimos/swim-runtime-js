@@ -19,7 +19,7 @@ import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Record} from "../Record";
 import {Selector} from "./Selector";
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -121,8 +121,8 @@ export class DescendantsSelector extends Selector {
     return result;
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     let then = this.then.substitute(interpreter);
     if (!(then instanceof Selector)) {
       then = this.then;

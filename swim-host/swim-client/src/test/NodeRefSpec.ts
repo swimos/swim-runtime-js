@@ -41,7 +41,7 @@ export class NodeRefSpec extends Suite {
       exam.equal(node1.nodeUri(), Uri.parse("house/kitchen"));
       const node2 = client.nodeRef(server.resolve("house/kitchen"));
       exam.equal(node2.hostUri(), server.hostUri);
-      exam.equal(node2.nodeUri(), Uri.parse("house/kitchen"));
+      exam.equal(node2.nodeUri(), Uri.parse("/house/kitchen"));
       resolve();
     });
   }
@@ -90,7 +90,7 @@ export class NodeRefSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.instanceOf(envelope, CommandMessage);
-        exam.equal(envelope.node, Uri.parse("house/kitchen"));
+        exam.equal(envelope.node, Uri.parse("/house/kitchen"));
         exam.equal(envelope.lane, Uri.parse("light"));
         exam.equal(envelope.body, Text.from("on"));
         resolve();

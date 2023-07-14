@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {OutputException} from "./OutputException";
-import type {AnyOutputSettings} from "./OutputSettings";
+import type {OutputSettingsLike} from "./OutputSettings";
 import {OutputSettings} from "./OutputSettings";
 import {OutputBuffer} from "./OutputBuffer";
 
@@ -130,8 +130,8 @@ export class OutputBufferError extends OutputBuffer<never> {
 
   override readonly settings!: OutputSettings;
 
-  override withSettings(settings: AnyOutputSettings): OutputBuffer<never> {
-    settings = OutputSettings.fromAny(settings);
+  override withSettings(settings: OutputSettingsLike): OutputBuffer<never> {
+    settings = OutputSettings.fromLike(settings);
     return new OutputBufferError(this.error, settings);
   }
 

@@ -18,7 +18,7 @@ import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {BinaryOperator} from "./BinaryOperator";
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../interpreter/Interpreter";
 
 /** @public */
@@ -35,8 +35,8 @@ export class OrOperator extends BinaryOperator {
     return 3;
   }
 
-  override evaluate(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override evaluate(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     interpreter.willOperate(this);
     let result: Item;
     const argument1 = this.operand1.evaluate(interpreter);
@@ -50,8 +50,8 @@ export class OrOperator extends BinaryOperator {
     return result;
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const argument1 = this.operand1.substitute(interpreter);
     const argument2 = this.operand2.substitute(interpreter);
     return argument1.or(argument2);

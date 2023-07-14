@@ -68,7 +68,8 @@ export const Identity = {
     };
   })(),
 
-  fromAny<T>(value: T): T {
+  fromLike<T>(value: T): T {
     return value;
   },
+
 };

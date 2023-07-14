@@ -113,7 +113,7 @@ export const Strings = {
     throw new TypeError("" + x);
   },
 
-  fromAny<T extends string | number | boolean | null | undefined>(value: T): string | Uninitable<T> {
+  fromLike<T extends string | number | boolean | null | undefined>(value: T): string | Uninitable<T> {
     if (value === void 0 || value === null) {
       return value as string | Uninitable<T>;
     }

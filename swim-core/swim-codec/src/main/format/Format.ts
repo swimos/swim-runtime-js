@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import * as os from "os";
-import type {AnyOutputSettings} from "../output/OutputSettings";
+import type {OutputSettingsLike} from "../output/OutputSettings";
 import type {Output} from "../output/Output";
 import type {Display} from "./Display";
 import type {Debug} from "./Debug";
@@ -36,7 +36,7 @@ export const Format = (function () {
      * if `object` implements `Display`; otherwise returns the result of
      * `Object.toString`.
      */
-    display(object: unknown, settings?: AnyOutputSettings): string;
+    display(object: unknown, settings?: OutputSettingsLike): string;
 
     /**
      * Returns the developer-readable [[Debug]] string for the given `object`,
@@ -45,7 +45,7 @@ export const Format = (function () {
      * `object` is a `string`, and returns a JavaScript number literal, if
      * `object` is a `number`; otherwise returns the result of `Object.toString`.
      */
-    debug(object: unknown, settings?: AnyOutputSettings): string;
+    debug(object: unknown, settings?: OutputSettingsLike): string;
 
     /**
      * Writes the code points of the human-readable [[Display]] string for the
@@ -133,7 +133,7 @@ export const Format = (function () {
     configurable: true,
   });
 
-  Format.display = function (object: unknown, settings?: AnyOutputSettings): string {
+  Format.display = function (object: unknown, settings?: OutputSettingsLike): string {
     if (object === void 0) {
       return "undefined";
     } else if (object === null) {
@@ -151,7 +151,7 @@ export const Format = (function () {
     }
   };
 
-  Format.debug = function (object: unknown, settings?: AnyOutputSettings): string {
+  Format.debug = function (object: unknown, settings?: OutputSettingsLike): string {
     if (object === void 0) {
       return "undefined";
     } else if (object === null) {
@@ -302,7 +302,7 @@ export const Format = (function () {
   };
 
   Format.prefix = (function () {
-    const prefixes: ReadonlyArray<string> = ["y", "z", "a", "f", "p", "n", String.fromCharCode(0x03BC/*'µ'*/), "m", "", "k", "M", "G", "T", "P", "E"," Z", "Y"];
+    const prefixes: readonly string[] = ["y", "z", "a", "f", "p", "n", String.fromCharCode(0x03BC/*'µ'*/), "m", "", "k", "M", "G", "T", "P", "E"," Z", "Y"];
     return function (value: number, precision: number = 1): string {
       if (isFinite(value)) {
         const exponential = Math.abs(value).toExponential();

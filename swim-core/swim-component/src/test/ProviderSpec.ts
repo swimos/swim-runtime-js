@@ -31,7 +31,7 @@ export class ProviderSpec extends Suite {
     const provider = testProvider.create(null);
     exam.equal(provider.name, "foo");
     exam.identical(provider.service, service);
-    exam.equal(provider(), service, "accessor");
+    exam.equal(provider.service, service, "accessor");
   }
 
   @Test
@@ -50,7 +50,7 @@ export class ProviderSpec extends Suite {
 
     exam.equal(component.foo.name, "foo");
     exam.identical(component.foo.service, service);
-    exam.equal(component.foo(), service, "accessor");
+    exam.equal(component.foo.service, service, "accessor");
   }
 
   @Test

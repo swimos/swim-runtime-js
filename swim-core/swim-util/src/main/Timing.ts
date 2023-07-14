@@ -14,21 +14,23 @@
 
 import type {Uninitable} from "./types";
 import type {Mutable} from "./types";
+import type {Proto} from "./types";
 import {Values} from "./Values";
 import {Domain} from "./Domain";
 import {Interpolator} from "./Interpolator";
-import type {AnyEasing} from "./Easing";
+import type {EasingLike} from "./Easing";
+import type {EasingType} from "./Easing";
 import {Easing} from "./"; // forward import
 import {Tweening} from "./"; // forward import
 
 /** @public */
-export type AnyTiming = Timing | TimingInit;
+export type TimingLike = Timing | TimingInit;
 
 /** @public */
 export interface TimingInit {
   /** @internal */
-  typeid?: "TimingInit";
-  easing?: AnyEasing;
+  readonly typeid?: "TimingInit";
+  easing?: EasingLike;
   t0?: number;
   t1?: number;
   dt?: number;
@@ -37,7 +39,9 @@ export interface TimingInit {
 /** @public */
 export interface Timing extends Domain<number> {
   /** @internal */
-  typeid?: "Timing";
+  readonly typeid?: "Timing";
+
+  readonly likeType?: Proto<TimingInit | EasingType>;
 
   /** @override */
   readonly 0: number;
@@ -94,7 +98,7 @@ export const Timing = (function (_super: typeof Domain) {
     /** @internal */
     prototype: Timing;
 
-    fromAny<T extends AnyTiming | boolean | null | undefined>(value: T): Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T>;
+    fromLike<T extends TimingLike | boolean | null | undefined>(value: T): Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T>;
 
     fromInit(init: TimingInit): Timing;
   };
@@ -167,7 +171,7 @@ export const Timing = (function (_super: typeof Domain) {
     return "Timing(" + this.easing + ", " + this[0] + ", " + this[1] + ")";
   };
 
-  Timing.fromAny = function <T extends AnyTiming | boolean | null | undefined>(value: T): Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T> {
+  Timing.fromLike = function <T extends TimingLike | boolean | null | undefined>(value: T): Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T> {
     if (value === void 0 || value === null || typeof value === "boolean" || value instanceof Timing) {
       return value as Timing | (T extends true ? true : never) | (T extends false ? false : never) | Uninitable<T>;
     } else if (typeof value === "object") {

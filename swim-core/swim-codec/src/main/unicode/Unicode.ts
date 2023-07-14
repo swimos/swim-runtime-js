@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Input} from "../input/Input";
-import type {AnyOutputSettings} from "../output/OutputSettings";
+import type {OutputSettingsLike} from "../output/OutputSettings";
 import {OutputSettings} from "../output/OutputSettings";
 import type {Output} from "../output/Output";
 import type {Writer} from "../writer/Writer";
@@ -43,7 +43,7 @@ export const Unicode = (function () {
      * _cont_ state, and [[Output.bind binds]] a `string` containing the given
      * `string`, and all appended code points.
      */
-    stringOutput(string?: string, settings?: AnyOutputSettings): Output<string>;
+    stringOutput(string?: string, settings?: OutputSettingsLike): Output<string>;
 
     /**
      * Returns a new `Output` that buffers Unicode code points, using the given
@@ -51,7 +51,7 @@ export const Unicode = (function () {
      * code points, remaining permanently in the _cont_ state, and [[Output.bind
      * binds]] a `string` containing all written code points.
      */
-    stringOutput(settings?: AnyOutputSettings): Output<string>;
+    stringOutput(settings?: OutputSettingsLike): Output<string>;
 
     stringWriter<I>(): Writer<I, unknown>;
 
@@ -79,14 +79,14 @@ export const Unicode = (function () {
     return StringInput.create(string);
   };
 
-  Unicode.stringOutput = function (string?: string | AnyOutputSettings, settings?: AnyOutputSettings): Output<string> {
+  Unicode.stringOutput = function (string?: string | OutputSettingsLike, settings?: OutputSettingsLike): Output<string> {
     if (settings === void 0 && typeof string !== "string") {
       settings = string;
       string = "";
     } else if (typeof string !== "string") {
       string = "";
     }
-    settings = OutputSettings.fromAny(settings);
+    settings = OutputSettings.fromLike(settings);
     return new StringOutput(string, settings);
   };
 

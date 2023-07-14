@@ -21,7 +21,7 @@ import {LinearDomain} from "./"; // forward import
 import type {LinearRange} from "./LinearRange";
 
 /** @public */
-export type AnyDomain<X> = Domain<X> | readonly [X, X];
+export type DomainLike<X> = Domain<X> | readonly [X, X];
 
 /** @public */
 export interface Domain<X> extends Mapping<X, number> {

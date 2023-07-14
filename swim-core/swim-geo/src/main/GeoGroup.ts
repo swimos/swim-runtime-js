@@ -21,7 +21,7 @@ import {Format} from "@swim/codec";
 import type {R2Shape} from "@swim/math";
 import {R2Group} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import type {AnyGeoShape} from "./GeoShape";
+import type {GeoShapeLike} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
 import {GeoBox} from "./GeoBox";
 
@@ -34,7 +34,7 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
   }
 
   /** @internal */
-  declare typeid?: "GeoGroup";
+  declare readonly typeid?: "GeoGroup";
 
   isDefined(): boolean {
     return this.shapes.length !== 0;
@@ -58,13 +58,13 @@ export class GeoGroup<S extends GeoShape = GeoShape> extends GeoShape implements
     return this.bounds.latMax;
   }
 
-  override contains(that: AnyGeoShape): boolean;
+  override contains(that: GeoShapeLike): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyGeoShape | number, y?: number): boolean {
+  override contains(that: GeoShapeLike | number, y?: number): boolean {
     return false; // TODO
   }
 
-  override intersects(that: AnyGeoShape): boolean {
+  override intersects(that: GeoShapeLike): boolean {
     return false; // TODO
   }
 

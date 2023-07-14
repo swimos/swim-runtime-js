@@ -53,7 +53,7 @@ export const Booleans = {
     throw new TypeError("" + x);
   },
 
-  fromAny<T extends boolean | string | number | null | undefined>(value: T): boolean | Uninitable<T> {
+  fromLike<T extends boolean | string | number | null | undefined>(value: T): boolean | Uninitable<T> {
     if (value === void 0 || value === null) {
       return value as boolean | Uninitable<T>;
     }

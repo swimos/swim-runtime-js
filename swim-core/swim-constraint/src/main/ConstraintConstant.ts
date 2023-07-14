@@ -15,7 +15,7 @@
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import type {AnyConstraintExpression} from "./ConstraintExpression";
+import type {ConstraintExpressionLike} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
 import type {ConstraintVariable} from "./ConstraintVariable";
@@ -44,8 +44,8 @@ export class ConstraintConstant implements ConstraintTerm, Debug {
 
   readonly constant: number;
 
-  plus(that: AnyConstraintExpression): ConstraintExpression {
-    that = ConstraintExpression.fromAny(that);
+  plus(that: ConstraintExpressionLike): ConstraintExpression {
+    that = ConstraintExpression.fromLike(that);
     if (that instanceof ConstraintConstant) {
       return ConstraintExpression.constant(this.constant + that.constant);
     }
@@ -56,8 +56,8 @@ export class ConstraintConstant implements ConstraintTerm, Debug {
     return ConstraintExpression.constant(-this.constant);
   }
 
-  minus(that: AnyConstraintExpression): ConstraintExpression {
-    that = ConstraintExpression.fromAny(that);
+  minus(that: ConstraintExpressionLike): ConstraintExpression {
+    that = ConstraintExpression.fromLike(that);
     if (that instanceof ConstraintConstant) {
       return ConstraintExpression.constant(this.constant - that.constant);
     }

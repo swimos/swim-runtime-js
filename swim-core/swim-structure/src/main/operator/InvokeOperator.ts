@@ -23,7 +23,7 @@ import type {Value} from "../Value";
 import {Operator} from "./Operator";
 import {InvokeOperatorInterpolator} from "../"; // forward import
 import {Func} from "../"; // forward import
-import type {AnyInterpreter} from "../interpreter/Interpreter"; // forward import
+import type {InterpreterLike} from "../interpreter/Interpreter"; // forward import
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -53,8 +53,8 @@ export class InvokeOperator extends Operator {
     return 11;
   }
 
-  override evaluate(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override evaluate(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const func = this.func.evaluate(interpreter);
     if (func instanceof Func) {
       return func.invoke(this.args, interpreter, this);
@@ -62,8 +62,8 @@ export class InvokeOperator extends Operator {
     return Item.absent();
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const func = this.func.evaluate(interpreter);
     if (func instanceof Func) {
       const result = func.expand(this.args, interpreter, this);

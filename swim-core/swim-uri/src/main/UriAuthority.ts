@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -27,23 +28,23 @@ import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import {Format} from "@swim/codec";
 import {Unicode} from "@swim/codec";
-import type {AnyUriUser} from "./UriUser";
+import type {UriUserLike} from "./UriUser";
 import type {UriUserInit} from "./UriUser";
 import {UriUser} from "./"; // forward import
-import type {AnyUriHost} from "./UriHost";
+import type {UriHostLike} from "./UriHost";
 import {UriHost} from "./"; // forward import
-import type {AnyUriPort} from "./UriPort";
+import type {UriPortLike} from "./UriPort";
 import {UriPort} from "./"; // forward import
 import {UriUserParser} from "./"; // forward import
 import {UriHostParser} from "./"; // forward import
 import {UriPortParser} from "./"; // forward import
 
 /** @public */
-export type AnyUriAuthority = UriAuthority | UriAuthorityInit | string;
+export type UriAuthorityLike = UriAuthority | UriAuthorityInit | string;
 
 /** @public */
-export const AnyUriAuthority = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUriAuthority {
+export const UriAuthorityLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriAuthorityLike {
     return instance instanceof UriAuthority
         || UriAuthorityInit[Symbol.hasInstance](instance)
         || typeof instance === "string";
@@ -53,10 +54,10 @@ export const AnyUriAuthority = {
 /** @public */
 export interface UriAuthorityInit extends UriUserInit {
   /** @internal */
-  typeid?: "UriAuthorityInit" | "UriInit";
-  user?: AnyUriUser;
-  host?: AnyUriHost;
-  port?: AnyUriPort;
+  readonly typeid?: "UriAuthorityInit" | "UriInit";
+  user?: UriUserLike;
+  host?: UriHostLike;
+  port?: UriPortLike;
 }
 
 /** @public */
@@ -78,7 +79,9 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
   }
 
   /** @internal */
-  declare typeid?: "UriAuthority";
+  declare readonly typeid?: "UriAuthority";
+
+  declare readonly likeType?: Proto<UriAuthorityInit | string>;
 
   isDefined(): boolean {
     return this.user.isDefined() || this.host.isDefined() || this.port.isDefined();
@@ -86,8 +89,8 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
 
   readonly user: UriUser;
 
-  withUser(user: AnyUriUser): UriAuthority {
-    user = UriUser.fromAny(user);
+  withUser(user: UriUserLike): UriAuthority {
+    user = UriUser.fromLike(user);
     if (user === this.user) {
       return this;
     }
@@ -125,8 +128,8 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
 
   readonly host: UriHost;
 
-  withHost(host: AnyUriHost): UriAuthority {
-    host = UriHost.fromAny(host);
+  withHost(host: UriHostLike): UriAuthority {
+    host = UriHost.fromLike(host);
     if (host === this.host) {
       return this;
     }
@@ -171,8 +174,8 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
 
   readonly port: UriPort;
 
-  withPort(port: AnyUriPort): UriAuthority {
-    port = UriPort.fromAny(port);
+  withPort(port: UriPortLike): UriAuthority {
+    port = UriPort.fromLike(port);
     if (port === this.port) {
       return this;
     }
@@ -199,18 +202,18 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return UriAuthority.create(user, host, port);
   }
 
-  toAny(authority?: {username?: string, password?: string, host?: string, port?: number}):
+  toLike(authority?: {username?: string, password?: string, host?: string, port?: number}):
       {username?: string, password?: string, host?: string, port?: number} | undefined {
     if (this.isDefined()) {
       if (authority === void 0) {
         authority = {};
       }
-      this.user.toAny(authority);
+      this.user.toLike(authority);
       if (this.host.isDefined()) {
-        authority.host = this.host.toAny();
+        authority.host = this.host.toLike();
       }
       if (this.port.isDefined()) {
-        authority.port = this.port.toAny();
+        authority.port = this.port.toLike();
       }
     }
     return authority;
@@ -305,7 +308,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return new UriAuthority(user, host, port);
   }
 
-  static fromAny<T extends AnyUriAuthority | null | undefined>(value: T): UriAuthority | Uninitable<T> {
+  static fromLike<T extends UriAuthorityLike | null | undefined>(value: T): UriAuthority | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriAuthority) {
       return value as UriAuthority | Uninitable<T>;
     } else if (typeof value === "object") {
@@ -317,14 +320,14 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
   }
 
   static fromInit(init: UriAuthorityInit): UriAuthority {
-    const user = UriUser.fromAny(init.user);
-    const host = UriHost.fromAny(init.host);
-    const port = UriPort.fromAny(init.port);
+    const user = UriUser.fromLike(init.user);
+    const host = UriHost.fromLike(init.host);
+    const port = UriPort.fromLike(init.port);
     return this.create(user, host, port);
   }
 
-  static user(user: AnyUriUser): UriAuthority {
-    user = UriUser.fromAny(user);
+  static user(user: UriUserLike): UriAuthority {
+    user = UriUser.fromLike(user);
     return this.create(user, void 0, void 0);
   }
 
@@ -343,8 +346,8 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return this.create(user, void 0, void 0);
   }
 
-  static host(host: AnyUriHost): UriAuthority {
-    host = UriHost.fromAny(host);
+  static host(host: UriHostLike): UriAuthority {
+    host = UriHost.fromLike(host);
     return this.create(void 0, host, void 0);
   }
 
@@ -368,8 +371,8 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
     return this.create(void 0, host, void 0);
   }
 
-  static port(port: AnyUriPort): UriAuthority {
-    port = UriPort.fromAny(port);
+  static port(port: UriPortLike): UriAuthority {
+    port = UriPort.fromLike(port);
     return this.create(void 0, void 0, port);
   }
 

@@ -51,13 +51,13 @@ uri.toString();
 // "http://www.example.com/test?foo&bar=baz#qux"
 ```
 
-Use the `Uri.fromAny` static method to coerce a plain old JavaScript object,
+Use the `Uri.fromLike` static method to coerce a plain old JavaScript object,
 of type `UriInit`, or an encoded URI string, to a structured `Uri` instance.
-Use the `Uri.toAny` instance method to convert a `Uri` instance into a plain
+Use the `Uri.toLike` instance method to convert a `Uri` instance into a plain
 old JavaScript object.
 
 ```typescript
-Uri.fromAny({
+Uri.fromLike({
   scheme: "http",
   host: "example.com",
   path: ["/", "index.html"],
@@ -66,7 +66,7 @@ Uri.fromAny({
 });
 // Uri.parse("http://example.com/index.html?token=1234#toc")
 
-Uri.parse("http://user:pass@127.0.0.1:8080/foo?a=1&b=2#bar").toAny();
+Uri.parse("http://user:pass@127.0.0.1:8080/foo?a=1&b=2#bar").toLike();
 // {
 //   scheme: "http",
 //   username: "user",
@@ -312,7 +312,7 @@ is valid.
 The `UriScheme.isDefined` instance method returns `false` if the `UriScheme`
 instance represents an undefined URI scheme component. The `UriScheme.name`
 instance method returns the underlying scheme name, or the empty string if the
-scheme is not defined. The `UriScheme.toAny` method returns the underlying
+scheme is not defined. The `UriScheme.toLike` method returns the underlying
 scheme name, or `undefined` if the scheme is not defined.
 
 ```typescript
@@ -331,7 +331,7 @@ UriScheme.create("https").name;
 UriScheme.undefined().name;
 // ""
 
-UriScheme.undefined().toAny()
+UriScheme.undefined().toLike()
 // undefined
 ```
 
@@ -351,13 +351,13 @@ authority.toString();
 // "user:pass@example.com:80"
 ```
 
-Use the `UriAuthority.fromAny` static method to coerce a plain old JavaScript
+Use the `UriAuthority.fromLike` static method to coerce a plain old JavaScript
 object, of type `UriAuthorityInit`, or a URI-encoded authority string, to a
-structured `UriAuthority` instance. Use the `UriAuthority.toAny` instance
+structured `UriAuthority` instance. Use the `UriAuthority.toLike` instance
 method to convert a `UriAuthority` instance into a plain old JavaScript object.
 
 ```typescript
-UriAuthority.fromAny({
+UriAuthority.fromLike({
   username: "user",
   password: "pass",
   host: "example.com",
@@ -365,7 +365,7 @@ UriAuthority.fromAny({
 });
 // UriAuthority.parse("user:pass@example.com:80")
 
-UriAuthority.parse("user:pass@example.com:80").toAny();
+UriAuthority.parse("user:pass@example.com:80").toLike();
 // {
 //   username: "user",
 //   password: "pass",
@@ -456,14 +456,14 @@ The `UriUser` class wraps a username and optional password string. The
 `UriUser.undefined` static method returns a singleton `UriUser` with an
 undefined username and password. The `UriUser.create` static method constructs
 a new `UriUser` from a username and optional password string. The
-`UriUser.fromAny` static method coerces a plain old JavaScript object, of type
+`UriUser.fromLike` static method coerces a plain old JavaScript object, of type
 `UriUserInit`, or a URI-encoded user string, to a structured `UriUser` instance.
 
 ```typescript
-UriUser.fromAny({username: "user", password: "pass"});
+UriUser.fromLike({username: "user", password: "pass"});
 // UriUser.parse("user:pass")
 
-UriUser.parse("user:pass").toAny();
+UriUser.parse("user:pass").toLike();
 // {username: "user", password: "pass"}
 ```
 
@@ -578,16 +578,16 @@ UriPath.of("/", "foo/bar");
 // UriPath.parse("/foo%2fbar")
 ```
 
-Use the `UriPath.fromAny` static method to construct a `UriPath` from an array
+Use the `UriPath.fromLike` static method to construct a `UriPath` from an array
 of unencoded string components, or from a URI-encoded path string. Use the
-`UriPath.toAny` instance method to convert a `UriPath` list to an array of
+`UriPath.toLike` instance method to convert a `UriPath` list to an array of
 unencoded string components.
 
 ```typescript
-UriPath.fromAny(["/", "foo", "/", "bar"]);
+UriPath.fromLike(["/", "foo", "/", "bar"]);
 // UriPath.parse("/foo/bar")
 
-UriPath.parse("/foo/bar%2fbaz").toAny();
+UriPath.parse("/foo/bar%2fbaz").toLike();
 // ["/", "foo", "/", "bar/baz"]
 ```
 
@@ -747,17 +747,17 @@ query.toString();
 // "foo&bar=baz"
 ```
 
-Use the `UriQuery.fromAny` static method to construct a `UriQuery` from a plain
+Use the `UriQuery.fromLike` static method to construct a `UriQuery` from a plain
 old JavaScript object containing key-value query parameters, or from a
-URI-encoded query string. Use the `UriQuery.toAny` instance method to convert
+URI-encoded query string. Use the `UriQuery.toLike` instance method to convert
 a `UriQuery` instance to a plain old JavaScript object containing key-value
 query parameters.
 
 ```typescript
-UriQuery.fromAny({a: "1", b: "2"});
+UriQuery.fromLike({a: "1", b: "2"});
 // UriQuery.parse("a=1&b=2")
 
-UriQuery.parse("a=alpha&b=beta").toAny();
+UriQuery.parse("a=alpha&b=beta").toLike();
 // {a: "alpha", b: "beta"}
 ```
 

@@ -15,10 +15,11 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
+import type {LikeType} from "@swim/util";
 import type {Cursor} from "@swim/util";
 import type {OrderedMap} from "@swim/util";
+import type {Fastener} from "@swim/component";
 import type {BTree} from "@swim/collections";
-import type {AnyValue} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Form} from "@swim/structure";
 import {ValueCursor} from "@swim/structure";
@@ -31,20 +32,20 @@ import {WarpDownlink} from "./WarpDownlink";
 import {MapDownlinkModel} from "./MapDownlinkModel";
 
 /** @public */
-export interface MapDownlinkDescriptor<K = unknown, V = unknown, KU = K, VU = V> extends WarpDownlinkDescriptor {
-  extends?: Proto<MapDownlink<any, any, any, any, any>> | boolean | null;
-  keyForm?: Form<K, KU>;
-  valueForm?: Form<V, VU>;
+export interface MapDownlinkDescriptor<R, K, V> extends WarpDownlinkDescriptor<R> {
+  extends?: Proto<MapDownlink<any, any, any>> | boolean | null;
+  keyForm?: Form<K, LikeType<K>>;
+  valueForm?: Form<V, LikeType<V>>;
   /** @internal */
   stateInit?: BTree<Value, Value> | null;
 }
 
 /** @public */
-export interface MapDownlinkClass<F extends MapDownlink<any, any, any, any, any> = MapDownlink<any, any, any, any, any>> extends WarpDownlinkClass<F> {
+export interface MapDownlinkClass<F extends MapDownlink<any, any, any> = MapDownlink<any, any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
-export interface MapDownlinkObserver<K = unknown, V = unknown, F extends MapDownlink<any, K, V, any, any> = MapDownlink<unknown, K, V, any, any>> extends WarpDownlinkObserver<F> {
+export interface MapDownlinkObserver<K = any, V = any, F extends MapDownlink<any, K, V> = MapDownlink<any, K, V>> extends WarpDownlinkObserver<F> {
   willUpdate?(key: K, newValue: V, downlink: F): V | void;
 
   didUpdate?(key: K, newValue: V, oldValue: V, downlink: F): void;
@@ -67,12 +68,9 @@ export interface MapDownlinkObserver<K = unknown, V = unknown, F extends MapDown
 }
 
 /** @public */
-export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends Value ? AnyValue & K : K, VU = V extends Value ? AnyValue & V : V> extends WarpDownlink<O>, OrderedMap<K, V> {
-  (key: K | KU): V | undefined;
-  (key: K | KU, value: V | VU): O;
-
+export interface MapDownlink<R = any, K = Value, V = Value> extends WarpDownlink<R>, OrderedMap<K, V> {
   /** @override */
-  get descriptorType(): Proto<MapDownlinkDescriptor<K, V, KU, VU>>;
+  get descriptorType(): Proto<MapDownlinkDescriptor<R, K, V>>;
 
   /** @override */
   readonly observerType?: Class<MapDownlinkObserver<K, V>>;
@@ -81,18 +79,18 @@ export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends V
   readonly model: MapDownlinkModel | null;
 
   /** @protected */
-  initKeyForm(): Form<K, KU>;
+  initKeyForm(): Form<K, LikeType<K>>;
 
-  keyForm: Form<K, KU>;
+  keyForm: Form<K, LikeType<K>>;
 
-  setKeyForm(keyForm: Form<K, KU>): this;
+  setKeyForm(keyForm: Form<K, LikeType<K>>): this;
 
   /** @protected */
-  initValueForm(): Form<V, VU>;
+  initValueForm(): Form<V, LikeType<V>>;
 
-  readonly valueForm: Form<V, VU>;
+  readonly valueForm: Form<V, LikeType<V>>;
 
-  setValueForm(valueForm: Form<V, VU>): this;
+  setValueForm(valueForm: Form<V, LikeType<V>>): this;
 
   /** @internal */
   readonly stateInit?: BTree<Value, Value> | null; // optional prototype property
@@ -107,9 +105,9 @@ export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends V
 
   isEmpty(): boolean;
 
-  has(key: K | KU): boolean;
+  has(key: K | LikeType<K>): boolean;
 
-  get(key: K | KU): V;
+  get(key: K | LikeType<K>): V;
 
   getEntry(index: number): [K, V] | undefined;
 
@@ -137,9 +135,9 @@ export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends V
 
   previousEntry(keyObject: K): [K, V] | undefined;
 
-  set(key: K | KU, newValue: V | VU): this;
+  set(key: K | LikeType<K>, newValue: V | LikeType<V>): this;
 
-  delete(key: K | KU): boolean;
+  delete(key: K | LikeType<K>): boolean;
 
   drop(lower: number): this;
 
@@ -147,8 +145,8 @@ export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends V
 
   clear(): void;
 
-  forEach<T>(callback: (value: V, key: K, map: MapDownlink<unknown, K, V, KU, VU>) => T | void): T | undefined;
-  forEach<T, S>(callback: (this: S, value: V, key: K, map: MapDownlink<unknown, K, V, KU, VU>) => T | void, thisArg: S): T | undefined;
+  forEach<T>(callback: (value: V, key: K, map: MapDownlink<any, K, V>) => T | void): T | undefined;
+  forEach<T, S>(callback: (this: S, value: V, key: K, map: MapDownlink<any, K, V>) => T | void, thisArg: S): T | undefined;
 
   keys(): Cursor<K>;
 
@@ -226,83 +224,78 @@ export interface MapDownlink<O = unknown, K = Value, V = Value, KU = K extends V
 }
 
 /** @public */
-export const MapDownlink = (function (_super: typeof WarpDownlink) {
-  const MapDownlink = _super.extend("MapDownlink", {
-    relinks: true,
-    syncs: true,
-  }) as MapDownlinkClass;
+export const MapDownlink = (<R, K, V, F extends MapDownlink<any, any, any>>() => WarpDownlink.extend<MapDownlink<R, K, V>, MapDownlinkClass<F>>("MapDownlink", {
+  relinks: true,
+  syncs: true,
 
-  MapDownlink.prototype.initKeyForm = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>): Form<K, KU> {
-    let keyForm = (Object.getPrototypeOf(this) as MapDownlink<unknown, K,V, KU, VU>).keyForm as Form<K, KU> | undefined;
+  initKeyForm(): Form<K, LikeType<K>> {
+    let keyForm = (Object.getPrototypeOf(this) as MapDownlink<unknown, K, V>).keyForm as Form<K, LikeType<K>> | undefined;
     if (keyForm === void 0) {
-      keyForm = Form.forValue() as unknown as Form<K, KU>;
+      keyForm = Form.forValue() as unknown as Form<K, LikeType<K>>;
     }
     return keyForm;
-  };
+  },
 
-  MapDownlink.prototype.setKeyForm = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, keyForm: Form<K, KU>): MapDownlink<unknown, K, V, KU, VU> {
+  setKeyForm(keyForm: Form<K, LikeType<K>>): typeof this {
     if (this.keyForm !== keyForm) {
       (this as Mutable<typeof this>).keyForm = keyForm;
       this.relink();
     }
     return this;
-  };
+  },
 
-  MapDownlink.prototype.initValueForm = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>): Form<V, VU> {
-    let valueForm = (Object.getPrototypeOf(this) as MapDownlink<unknown, K,V, KU, VU>).valueForm as Form<V, VU> | undefined;
+  initValueForm(): Form<V, LikeType<V>> {
+    let valueForm = (Object.getPrototypeOf(this) as MapDownlink<unknown, K, V>).valueForm as Form<V, LikeType<V>> | undefined;
     if (valueForm === void 0) {
-      valueForm = Form.forValue() as unknown as Form<V, VU>;
+      valueForm = Form.forValue() as unknown as Form<V, LikeType<V>>;
     }
     return valueForm;
-  };
+  },
 
-  MapDownlink.prototype.setValueForm = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, valueForm: Form<V, VU>): MapDownlink<unknown, K, V, KU, VU> {
+  setValueForm(valueForm: Form<V, LikeType<V>>): typeof this {
     if (this.valueForm !== valueForm) {
       (this as Mutable<typeof this>).valueForm = valueForm;
       this.relink();
     }
     return this;
-  };
+  },
 
-  MapDownlink.prototype.initState = function (this: MapDownlink): BTree<Value, Value> | null {
+  initState(): BTree<Value, Value> | null {
     let state = this.stateInit;
     if (state === void 0) {
       state = null;
     }
     return state;
-  };
+  },
 
-  MapDownlink.prototype.setState = function (this: MapDownlink, state: BTree<Value, Value>): void {
+  setState(state: BTree<Value, Value>): void {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.setState(state);
-  };
+  },
 
-  Object.defineProperty(MapDownlink.prototype, "size", {
-    get(this: MapDownlink): number {
-      const model = this.model;
-      return model !== null ? model.size : 0;
-    },
-    configurable: true,
-  });
+  get size(): number {
+    const model = this.model;
+    return model !== null ? model.size : 0;
+  },
 
-  MapDownlink.prototype.isEmpty = function (this: MapDownlink): boolean {
+  isEmpty(): boolean {
     const model = this.model;
     return model === null || model.isEmpty();
-  };
+  },
 
-  MapDownlink.prototype.has = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, key: K | KU): boolean {
+  has(key: K | LikeType<K>): boolean {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     const keyObject = this.keyForm.mold(key);
     return model.has(keyObject);
-  };
+  },
 
-  MapDownlink.prototype.get = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, key: K | KU): V {
+  get(key: K | LikeType<K>): V {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -310,9 +303,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     const keyObject = this.keyForm.mold(key);
     const value = model.get(keyObject);
     return value.coerce(this.valueForm);
-  };
+  },
 
-  MapDownlink.prototype.getEntry = function <K, V>(this: MapDownlink<unknown, K, V>, index: number): [K, V] | undefined {
+  getEntry(index: number): [K, V] | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -322,9 +315,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
-  };
+  },
 
-  MapDownlink.prototype.firstKey = function <K, V>(this: MapDownlink<unknown, K, V>): K | undefined {
+  firstKey(): K | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -334,9 +327,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return key.coerce(this.keyForm);
-  };
+  },
 
-  MapDownlink.prototype.firstValue = function <K, V>(this: MapDownlink<unknown, K, V>): V | undefined {
+  firstValue(): V | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -346,9 +339,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return value.coerce(this.valueForm);
-  };
+  },
 
-  MapDownlink.prototype.firstEntry = function <K, V>(this: MapDownlink<unknown, K, V>): [K, V] | undefined {
+  firstEntry(): [K, V] | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -358,9 +351,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
-  };
+  },
 
-  MapDownlink.prototype.lastKey = function <K, V>(this: MapDownlink<unknown, K, V>): K | undefined {
+  lastKey(): K | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -370,9 +363,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return key.coerce(this.keyForm);
-  };
+  },
 
-  MapDownlink.prototype.lastValue = function <K, V>(this: MapDownlink<unknown, K, V>): V | undefined {
+  lastValue(): V | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -382,9 +375,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return value.coerce(this.valueForm);
-  };
+  },
 
-  MapDownlink.prototype.lastEntry = function <K, V>(this: MapDownlink<unknown, K, V>): [K, V] | undefined {
+  lastEntry(): [K, V] | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -394,9 +387,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return [entry[0].coerce(this.keyForm), entry[1].coerce(this.valueForm)];
-  };
+  },
 
-  MapDownlink.prototype.nextKey = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): K | undefined {
+  nextKey(keyObject: K): K | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -407,9 +400,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return nextKey.coerce(this.keyForm);
-  };
+  },
 
-  MapDownlink.prototype.nextValue = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): V | undefined {
+  nextValue(keyObject: K): V | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -420,9 +413,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return nextValue.coerce(this.valueForm);
-  };
+  },
 
-  MapDownlink.prototype.nextEntry = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): [K, V] | undefined {
+  nextEntry(keyObject: K): [K, V] | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -433,9 +426,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return [nextEntry[0].coerce(this.keyForm), nextEntry[1].coerce(this.valueForm)];
-  };
+  },
 
-  MapDownlink.prototype.previousKey = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): K | undefined {
+  previousKey(keyObject: K): K | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -446,9 +439,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return previousKey.coerce(this.keyForm);
-  };
+  },
 
-  MapDownlink.prototype.previousValue = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): V | undefined {
+  previousValue(keyObject: K): V | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -459,9 +452,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return previousValue.coerce(this.valueForm);
-  };
+  },
 
-  MapDownlink.prototype.previousEntry = function <K, V>(this: MapDownlink<unknown, K, V>, keyObject: K): [K, V] | undefined {
+  previousEntry(keyObject: K): [K, V] | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -472,9 +465,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return void 0;
     }
     return [previousEntry[0].coerce(this.keyForm), previousEntry[1].coerce(this.valueForm)];
-  };
+  },
 
-  MapDownlink.prototype.set = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, key: K | KU, newValue: V | VU): MapDownlink<unknown, K, V, KU, VU> {
+  set(key: K | LikeType<K>, newValue: V | LikeType<V>): typeof this {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -483,46 +476,44 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     const newObject = this.valueForm.mold(newValue);
     model.set(keyObject, newObject);
     return this;
-  };
+  },
 
-  MapDownlink.prototype.delete = function <K, V, KU, VU>(this: MapDownlink<unknown, K, V, KU, VU>, key: K | KU): boolean {
+  delete(key: K | LikeType<K>): boolean {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     const keyObject = this.keyForm.mold(key);
     return model.delete(keyObject);
-  };
+  },
 
-  MapDownlink.prototype.drop = function <K, V>(this: MapDownlink<unknown, K, V>, lower: number): MapDownlink<unknown, K, V> {
+  drop(lower: number): typeof this {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.drop(lower);
     return this;
-  };
+  },
 
-  MapDownlink.prototype.take = function <K, V>(this: MapDownlink<unknown, K, V>, upper: number): MapDownlink<unknown, K, V> {
+  take(upper: number): typeof this {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.take(upper);
     return this;
-  };
+  },
 
-  MapDownlink.prototype.clear = function <K, V>(this: MapDownlink<unknown, K, V>): void {
+  clear(): void {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.clear();
-  };
+  },
 
-  MapDownlink.prototype.forEach = function<K, V, T, S>(this: MapDownlink<unknown, K, V>,
-                                                       callback: (this: S | undefined, value: V, key: K, map: MapDownlink<unknown, K, V>) => T | void,
-                                                       thisArg?: S): T | undefined {
+  forEach<T, S>(callback: (this: S | undefined, value: V, key: K, map: MapDownlink<unknown, K, V>) => T | void, thisArg?: S): T | undefined {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -539,9 +530,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       const keyObject = key.coerce(keyForm);
       return callback.call(thisArg, object, keyObject, this);
     }, this);
-  };
+  },
 
-  MapDownlink.prototype.keys = function <K, V>(this: MapDownlink<unknown, K, V>): Cursor<K> {
+  keys(): Cursor<K> {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -551,9 +542,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return cursor as unknown as Cursor<K>;
     }
     return new ValueCursor(cursor, this.keyForm);
-  };
+  },
 
-  MapDownlink.prototype.values = function <K, V>(this: MapDownlink<unknown, K, V>): Cursor<V> {
+  values(): Cursor<V> {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -563,9 +554,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return cursor as unknown as Cursor<V>;
     }
     return new ValueCursor(cursor, this.valueForm);
-  };
+  },
 
-  MapDownlink.prototype.entries = function <K, V>(this: MapDownlink<unknown, K, V>): Cursor<[K, V]> {
+  entries(): Cursor<[K, V]> {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
@@ -575,17 +566,17 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       return cursor as unknown as Cursor<[K, V]>;
     }
     return new ValueEntryCursor(cursor, this.keyForm, this.valueForm);
-  };
+  },
 
-  MapDownlink.prototype.snapshot = function <K, V>(this: MapDownlink<unknown, K, V>): BTree<Value, Value> {
+  snapshot(): BTree<Value, Value> {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     return model.snapshot();
-  };
+  },
 
-  MapDownlink.prototype.mapWillUpdate = function <K, V>(this: MapDownlink<unknown, K, V>, key: Value, newValue: Value): Value {
+  mapWillUpdate(key: Value, newValue: Value): Value {
     let keyObject: K | undefined;
     let newObject: V | undefined;
     const keyForm = this.keyForm;
@@ -622,9 +613,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     return newValue;
-  };
+  },
 
-  MapDownlink.prototype.mapDidUpdate = function <K, V>(this: MapDownlink<unknown, K, V>, key: Value, newValue: Value, oldValue: Value): void {
+  mapDidUpdate(key: Value, newValue: Value, oldValue: Value): void {
     let keyObject: K | undefined;
     let newObject: V | undefined;
     let oldObject: V | undefined;
@@ -656,9 +647,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
         observer.didUpdate(keyObject, newObject, oldObject, this);
       }
     }
-  };
+  },
 
-  MapDownlink.prototype.mapWillRemove = function <K, V>(this: MapDownlink<unknown, K, V>, key: Value): void {
+  mapWillRemove(key: Value): void {
     let keyObject: K | undefined;
     const keyForm = this.keyForm;
 
@@ -679,9 +670,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
         observer.willRemove(keyObject, this);
       }
     }
-  };
+  },
 
-  MapDownlink.prototype.mapDidRemove = function <K, V>(this: MapDownlink<unknown, K, V>, key: Value, oldValue: Value): void {
+  mapDidRemove(key: Value, oldValue: Value): void {
     let keyObject: K | undefined;
     let oldObject: V | undefined;
     const keyForm = this.keyForm;
@@ -708,51 +699,51 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
         observer.didRemove(keyObject, oldObject, this);
       }
     }
-  };
+  },
 
-  MapDownlink.prototype.mapWillDrop = function <K, V>(this: MapDownlink<unknown, K, V>, lower: number): void {
+  mapWillDrop(lower: number): void {
     if (this.willDrop !== void 0) {
       this.willDrop(lower);
     }
     this.callObservers("willDrop", lower, this);
-  };
+  },
 
-  MapDownlink.prototype.mapDidDrop = function <K, V>(this: MapDownlink<unknown, K, V>, lower: number): void {
+  mapDidDrop(lower: number): void {
     if (this.didDrop !== void 0) {
       this.didDrop(lower);
     }
     this.callObservers("didDrop", lower, this);
-  };
+  },
 
-  MapDownlink.prototype.mapWillTake = function <K, V>(this: MapDownlink<unknown, K, V>, upper: number): void {
+  mapWillTake(upper: number): void {
     if (this.willTake !== void 0) {
       this.willTake(upper);
     }
     this.callObservers("willTake", upper, this);
-  };
+  },
 
-  MapDownlink.prototype.mapDidTake = function <K, V>(this: MapDownlink<unknown, K, V>, upper: number): void {
+  mapDidTake(upper: number): void {
     if (this.didTake !== void 0) {
       this.didTake(upper);
     }
     this.callObservers("didTake", upper, this);
-  };
+  },
 
-  MapDownlink.prototype.mapWillClear = function <K, V>(this: MapDownlink<unknown, K, V>): void {
+  mapWillClear(): void {
     if (this.willClear !== void 0) {
       this.willClear();
     }
     this.callObservers("willClear", this);
-  };
+  },
 
-  MapDownlink.prototype.mapDidClear = function <K, V>(this: MapDownlink<unknown, K, V>): void {
+  mapDidClear(): void {
     if (this.didClear !== void 0) {
       this.didClear();
     }
     this.callObservers("didClear", this);
-  };
+  },
 
-  MapDownlink.prototype.didAliasModel = function (this: MapDownlink): void {
+  didAliasModel(): void {
     const model = this.model;
     if (model === null || !model.linked) {
       return;
@@ -764,9 +755,9 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
     if (model.synced) {
       this.onSyncedResponse();
     }
-  };
+  },
 
-  MapDownlink.prototype.open = function (this: MapDownlink): MapDownlink {
+  open(): typeof this {
     if (this.model !== null) {
       return this;
     }
@@ -815,30 +806,13 @@ export const MapDownlink = (function (_super: typeof WarpDownlink) {
       (this as Mutable<typeof this>).model = model as MapDownlinkModel;
     }
     return this;
-  };
-
-  MapDownlink.construct = function <F extends MapDownlink<any, any, any, any, any>>(downlink: F | null, owner: F extends MapDownlink<infer O, any, any, any, any> ? O : never): F {
-    if (downlink === null) {
-      downlink = function (key: F extends MapDownlink<any, infer K, any, infer KU, any> ? K | KU : never, value?: F extends MapDownlink<any, any, infer V, any, infer VU> ? V | VU : never): F extends MapDownlink<infer O, any, infer V, any, any> ? V | O | undefined : never {
-        if (arguments.length === 1) {
-          return downlink!.get(key);
-        } else {
-          downlink!.set(key, value!);
-          return downlink!.owner;
-        }
-      } as F;
-      Object.defineProperty(downlink, "name", {
-        value: this.prototype.name,
-        enumerable: true,
-        configurable: true,
-      });
-      Object.setPrototypeOf(downlink, this.prototype);
-    }
-    downlink = _super.construct.call(this, downlink, owner) as F;
+  },
+},
+{
+  construct(downlink: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
+    downlink = super.construct(downlink, owner) as F;
     (downlink as Mutable<typeof downlink>).keyForm = downlink.initKeyForm();
     (downlink as Mutable<typeof downlink>).valueForm = downlink.initValueForm();
     return downlink;
-  };
-
-  return MapDownlink;
-})(WarpDownlink);
+  },
+}))();

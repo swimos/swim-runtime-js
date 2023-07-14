@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import type {Equals} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {R2Shape} from "@swim/math";
@@ -24,6 +25,8 @@ import {GeoSegmentInit} from "./"; // forward import
 import {GeoSegment} from "./"; // forward import
 import {GeoSplinePoints} from "./"; // forward import
 import {GeoSpline} from "./"; // forward import
+import {GeoPathSplines} from "./"; // forward import
+import {GeoPath} from "./"; // forward import
 import {GeoBoxInit} from "./"; // forward import
 import {GeoBox} from "./"; // forward import
 import {GeoTileInit} from "./"; // forward import
@@ -31,23 +34,24 @@ import {GeoTileTuple} from "./"; // forward import
 import {GeoTile} from "./"; // forward import
 
 /** @public */
-export type AnyGeoShape = GeoShape
-                        | GeoPointInit
-                        | GeoPointTuple
-                        | GeoSegmentInit
-                        | GeoSplinePoints
-                        | GeoTileInit
-                        | GeoTileTuple
-                        | GeoBoxInit;
+export type GeoShapeLike = GeoShape
+                         | GeoPointInit
+                         | GeoPointTuple
+                         | GeoSegmentInit
+                         | GeoSplinePoints
+                         | GeoTileInit
+                         | GeoTileTuple
+                         | GeoBoxInit;
 
 /** @public */
-export const AnyGeoShape = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyGeoShape {
+export const GeoShapeLike = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoShapeLike {
     return instance instanceof GeoShape
         || GeoPointInit[Symbol.hasInstance](instance)
         || GeoPointTuple[Symbol.hasInstance](instance)
         || GeoSegmentInit[Symbol.hasInstance](instance)
         || GeoSplinePoints[Symbol.hasInstance](instance)
+        || GeoPathSplines[Symbol.hasInstance](instance)
         || GeoTileInit[Symbol.hasInstance](instance)
         || GeoTileTuple[Symbol.hasInstance](instance)
         || GeoBoxInit[Symbol.hasInstance](instance);
@@ -57,7 +61,16 @@ export const AnyGeoShape = {
 /** @public */
 export abstract class GeoShape implements Equals, Equivalent {
   /** @internal */
-  declare typeid?: string;
+  declare readonly typeid?: string;
+
+  declare readonly likeType?: Proto<GeoPointInit
+                            | GeoPointTuple
+                            | GeoSegmentInit
+                            | GeoSplinePoints
+                            | GeoPathSplines
+                            | GeoTileInit
+                            | GeoTileTuple
+                            | GeoBoxInit>;
 
   abstract isDefined(): boolean;
 
@@ -69,14 +82,14 @@ export abstract class GeoShape implements Equals, Equivalent {
 
   abstract readonly latMax: number;
 
-  abstract contains(that: AnyGeoShape): boolean;
+  abstract contains(that: GeoShapeLike): boolean;
 
   abstract contains(lng: number, lat: number): boolean;
 
-  abstract intersects(that: AnyGeoShape): boolean;
+  abstract intersects(that: GeoShapeLike): boolean;
 
-  union(that: AnyGeoShape): GeoShape {
-    that = GeoShape.fromAny(that);
+  union(that: GeoShapeLike): GeoShape {
+    that = GeoShape.fromLike(that);
     return new GeoBox(Math.min(this.lngMin, that.lngMin),
                       Math.min(this.latMin, that.latMin),
                       Math.max(this.lngMax, that.lngMax),
@@ -95,7 +108,7 @@ export abstract class GeoShape implements Equals, Equivalent {
   /** @override */
   abstract equals(that: unknown): boolean;
 
-  static fromAny<T extends AnyGeoShape | null | undefined>(value: T): GeoShape | Uninitable<T> {
+  static fromLike<T extends GeoShapeLike | null | undefined>(value: T): GeoShape | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoShape) {
       return value as GeoShape | Uninitable<T>;
     } else if (GeoPointInit[Symbol.hasInstance](value)) {
@@ -106,6 +119,8 @@ export abstract class GeoShape implements Equals, Equivalent {
       return GeoSegment.fromInit(value);
     } else if (GeoSplinePoints[Symbol.hasInstance](value)) {
       return GeoSpline.fromPoints(value);
+    } else if (GeoPathSplines[Symbol.hasInstance](value)) {
+      return GeoPath.fromSplines(value);
     } else if (GeoTileInit[Symbol.hasInstance](value)) {
       return GeoTile.fromInit(value);
     } else if (GeoTileTuple[Symbol.hasInstance](value)) {

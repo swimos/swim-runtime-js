@@ -35,7 +35,7 @@ export class ListDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  declare readonly views: ReadonlySet<ListDownlink<unknown, unknown, unknown>> | null;
+  declare readonly views: ReadonlySet<ListDownlink<any, any>> | null;
 
   /** @internal */
   readonly state: STree<Value, Value>;

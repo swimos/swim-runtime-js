@@ -23,6 +23,7 @@ export class UnitForm<T, U = T> extends Form<T, U> {
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
@@ -38,32 +39,29 @@ export class UnitForm<T, U = T> extends Form<T, U> {
     return new UnitForm(this.form.withTag(tag), this.unit);
   }
 
-  override readonly unit!: T | undefined;
+  override readonly unit: T | undefined;
 
   override withUnit(unit: T | undefined): Form<T, U> {
     if (unit !== this.unit) {
       return new UnitForm(this.form, unit);
     } else if (unit === this.form.unit) {
       return this.form;
-    } else {
-      return this;
     }
+    return this;
   }
 
   override mold(object: T | U, item?: Item): Item {
     if (arguments.length === 1) {
       return this.form.mold(object);
-    } else {
-      return this.form.mold(object, item);
     }
+    return this.form.mold(object, item);
   }
 
   override cast(item: Item, object?: T): T | undefined {
     if (arguments.length === 1) {
       return this.form.cast(item);
-    } else {
-      return this.form.cast(item, object);
     }
+    return this.form.cast(item, object);
   }
 }
 Object.defineProperty(UnitForm.prototype, "tag", {

@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {AnyUri} from "./Uri";
+export {UriLike} from "./Uri";
 export {UriInit} from "./Uri";
 export {Uri} from "./Uri";
 export {UriForm} from "./Uri";
 export {UriParser} from "./Uri";
 
-export {AnyUriScheme} from "./UriScheme";
+export {UriSchemeLike} from "./UriScheme";
 export {UriScheme} from "./UriScheme";
 export {UriSchemeParser} from "./UriScheme";
 
-export {AnyUriAuthority} from "./UriAuthority";
+export {UriAuthorityLike} from "./UriAuthority";
 export {UriAuthorityInit} from "./UriAuthority";
 export {UriAuthority} from "./UriAuthority";
 export {UriAuthorityParser} from "./UriAuthority";
 
-export {AnyUriUser} from "./UriUser";
+export {UriUserLike} from "./UriUser";
 export {UriUserInit} from "./UriUser";
 export {UriUser} from "./UriUser";
 export {UriUserParser} from "./UriUser";
 
-export {AnyUriHost} from "./UriHost";
+export {UriHostLike} from "./UriHost";
 export {UriHost} from "./UriHost";
 export {UriHostUndefined} from "./UriHost";
 export {UriHostName} from "./UriHost";
@@ -42,11 +42,11 @@ export {UriHostParser} from "./UriHost";
 export {UriHostAddressParser} from "./UriHost";
 export {UriHostLiteralParser} from "./UriHost";
 
-export {AnyUriPort} from "./UriPort";
+export {UriPortLike} from "./UriPort";
 export {UriPort} from "./UriPort";
 export {UriPortParser} from "./UriPort";
 
-export {AnyUriPath} from "./UriPath";
+export {UriPathLike} from "./UriPath";
 export {UriPath} from "./UriPath";
 export {UriPathEmpty} from "./UriPath";
 export {UriPathSlash} from "./UriPath";
@@ -55,14 +55,14 @@ export {UriPathBuilder} from "./UriPath";
 export {UriPathForm} from "./UriPath";
 export {UriPathParser} from "./UriPath";
 
-export {AnyUriQuery} from "./UriQuery";
+export {UriQueryLike} from "./UriQuery";
 export {UriQuery} from "./UriQuery";
 export {UriQueryUndefined} from "./UriQuery";
 export {UriQueryParam} from "./UriQuery";
 export {UriQueryBuilder} from "./UriQuery";
 export {UriQueryParser} from "./UriQuery";
 
-export {AnyUriFragment} from "./UriFragment";
+export {UriFragmentLike} from "./UriFragment";
 export {UriFragment} from "./UriFragment";
 export {UriFragmentParser} from "./UriFragment";
 

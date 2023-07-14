@@ -15,7 +15,7 @@
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import type {AnyConstraintExpression} from "./ConstraintExpression";
+import type {ConstraintExpressionLike} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintVariable} from "./ConstraintVariable";
 
@@ -34,7 +34,7 @@ export class ConstraintSum implements ConstraintExpression, Debug {
 
   readonly constant: number;
 
-  plus(that: AnyConstraintExpression): ConstraintExpression {
+  plus(that: ConstraintExpressionLike): ConstraintExpression {
     return ConstraintExpression.sum(this, that);
   }
 
@@ -46,8 +46,8 @@ export class ConstraintSum implements ConstraintExpression, Debug {
     return new ConstraintSum(terms, -this.constant);
   }
 
-  minus(that: AnyConstraintExpression): ConstraintExpression {
-    that = ConstraintExpression.fromAny(that).negative();
+  minus(that: ConstraintExpressionLike): ConstraintExpression {
+    that = ConstraintExpression.fromLike(that).negative();
     return ConstraintExpression.sum(this, that);
   }
 

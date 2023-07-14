@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {AnyConstraintExpression} from "./ConstraintExpression";
+import type {ConstraintExpressionLike} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintRelation} from "./Constraint";
-import type {AnyConstraintStrength} from "./Constraint";
+import type {ConstraintStrengthLike} from "./Constraint";
 import {ConstraintStrength} from "./Constraint";
 import {Constraint} from "./Constraint";
 import type {ConstraintScope} from "./ConstraintScope";
@@ -31,22 +31,22 @@ export class ConstraintGroup {
 
   readonly scope: ConstraintScope;
 
-  constraint(lhs: AnyConstraintExpression, relation: ConstraintRelation,
-             rhs?: AnyConstraintExpression, strength?: AnyConstraintStrength): Constraint {
-    lhs = ConstraintExpression.fromAny(lhs);
-    rhs = ConstraintExpression.fromAny(rhs);
+  constraint(lhs: ConstraintExpressionLike, relation: ConstraintRelation,
+             rhs?: ConstraintExpressionLike, strength?: ConstraintStrengthLike): Constraint {
+    lhs = ConstraintExpression.fromLike(lhs);
+    rhs = ConstraintExpression.fromLike(rhs);
     const expression = rhs !== void 0 ? lhs.minus(rhs) : lhs;
     if (strength === void 0) {
       strength = ConstraintStrength.Required;
     } else {
-      strength = ConstraintStrength.fromAny(strength);
+      strength = ConstraintStrength.fromLike(strength);
     }
     const constraint = new Constraint(this.scope, expression, relation, strength);
     this.addConstraint(constraint);
     return constraint;
   }
 
-  readonly constraints: ReadonlyArray<Constraint>;
+  readonly constraints: readonly Constraint[];
 
   hasConstraint(constraint: Constraint): boolean {
     const constraints = this.constraints;

@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
-import {Murmur3} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
@@ -30,18 +31,18 @@ import {Parser} from "@swim/codec";
 import {Unicode} from "@swim/codec";
 import {Base10} from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import type {AnyR2Shape} from "./R2Shape";
+import type {R2ShapeLike} from "./R2Shape";
 import {R2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";
 import type {R2CurveContext} from "./R2Curve";
 import {R2BezierCurve} from "./R2Curve";
 
 /** @public */
-export type AnyR2Segment = R2Segment | R2SegmentInit;
+export type R2SegmentLike = R2Segment | R2SegmentInit;
 
 /** @public */
-export const AnyR2Segment = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyR2Segment {
+export const R2SegmentLike = {
+  [Symbol.hasInstance](instance: unknown): instance is R2SegmentLike {
     return instance instanceof R2Segment
         || R2SegmentInit[Symbol.hasInstance](instance);
   },
@@ -50,7 +51,7 @@ export const AnyR2Segment = {
 /** @public */
 export interface R2SegmentInit {
   /** @internal */
-  typeid?: "R2SegmentInit";
+  readonly typeid?: "R2SegmentInit";
   x0: number;
   y0: number;
   x1: number;
@@ -75,7 +76,10 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
   }
 
   /** @internal */
-  declare typeid?: "R2Segment";
+  declare readonly typeid?: "R2Segment";
+
+  /** @override */
+  declare readonly likeType?: Proto<R2SegmentInit>;
 
   isDefined(): boolean {
     return isFinite(this.x0) && isFinite(this.y0)
@@ -121,13 +125,13 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
     return new R2Point(x01, y01);
   }
 
-  override contains(that: AnyR2Shape): boolean;
+  override contains(that: R2ShapeLike): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyR2Shape | number, y?: number): boolean {
+  override contains(that: R2ShapeLike | number, y?: number): boolean {
     if (typeof that === "number") {
       return R2Segment.contains(this.x0, this.y0, this.x1, this.y1, that, y!);
     }
-    that = R2Shape.fromAny(that);
+    that = R2Shape.fromLike(that);
     if (that instanceof R2Point) {
       return this.containsPoint(that);
     } else if (that instanceof R2Segment) {
@@ -154,8 +158,8 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
         && (bx - ax) * (cy - ay) === (cx - ax) * (by - ay);
   }
 
-  override intersects(that: AnyR2Shape): boolean {
-    that = R2Shape.fromAny(that);
+  override intersects(that: R2ShapeLike): boolean {
+    that = R2Shape.fromLike(that);
     if (that instanceof R2Point) {
       return this.intersectsPoint(that);
     } else if (that instanceof R2Segment) {
@@ -211,7 +215,7 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
                          f.transformX(this.x1, this.y1), f.transformY(this.x1, this.y1));
   }
 
-  toAny(): R2SegmentInit {
+  toLike(): R2SegmentInit {
     return {
       x0: this.x0,
       y0: this.y0,
@@ -307,9 +311,9 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
     return new R2Segment(x0, y0, x1, y1);
   }
 
-  static override fromAny<T extends AnyR2Segment | null | undefined>(value: T): R2Segment | Uninitable<T>;
-  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyR2Segment | null | undefined>(value: T): R2Segment | Uninitable<T> {
+  static override fromLike<T extends R2SegmentLike | null | undefined>(value: T): R2Segment | Uninitable<T>;
+  static override fromLike<T extends R2ShapeLike | null | undefined>(value: T): never;
+  static override fromLike<T extends R2SegmentLike | null | undefined>(value: T): R2Segment | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Segment) {
       return value as R2Segment | Uninitable<T>;
     } else if (R2SegmentInit[Symbol.hasInstance](value)) {

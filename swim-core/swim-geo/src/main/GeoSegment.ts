@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
@@ -26,17 +27,17 @@ import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 import {R2Segment} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import type {AnyGeoShape} from "./GeoShape";
+import type {GeoShapeLike} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
 import {GeoPoint} from "./GeoPoint";
 import {GeoCurve} from "./GeoCurve";
 
 /** @public */
-export type AnyGeoSegment = GeoSegment | GeoSegmentInit;
+export type GeoSegmentLike = GeoSegment | GeoSegmentInit;
 
 /** @public */
-export const AnyGeoSegment = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyGeoSegment {
+export const GeoSegmentLike = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoSegmentLike {
     return instance instanceof GeoSegment
         || GeoSegmentInit[Symbol.hasInstance](instance);
   },
@@ -45,7 +46,7 @@ export const AnyGeoSegment = {
 /** @public */
 export interface GeoSegmentInit {
   /** @internal */
-  typeid?: "GeoSegmentInit";
+  readonly typeid?: "GeoSegmentInit";
   lng0: number;
   lat0: number;
   lng1: number;
@@ -70,7 +71,10 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   }
 
   /** @internal */
-  declare typeid?: "GeoSegment";
+  declare readonly typeid?: "GeoSegment";
+
+  /** @override */
+  declare readonly likeType?: Proto<GeoSegmentInit>;
 
   override isDefined(): boolean {
     return isFinite(this.lng0) && isFinite(this.lat0)
@@ -116,13 +120,13 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     return new GeoPoint(lng01, lat01);
   }
 
-  override contains(that: AnyGeoShape): boolean;
+  override contains(that: GeoShapeLike): boolean;
   override contains(lng: number, lat: number): boolean;
-  override contains(that: AnyGeoShape | number, lat?: number): boolean {
+  override contains(that: GeoShapeLike | number, lat?: number): boolean {
     if (typeof that === "number") {
       return R2Segment.contains(this.lng0, this.lat0, this.lng1, this.lat1, that, lat!);
     }
-    that = GeoShape.fromAny(that);
+    that = GeoShape.fromLike(that);
     if (that instanceof GeoPoint) {
       return this.containsPoint(that);
     } else if (that instanceof GeoSegment) {
@@ -142,8 +146,8 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
         && R2Segment.contains(this.lng0, this.lat0, this.lng1, this.lat1, that.lng1, that.lat1);
   }
 
-  override intersects(that: AnyGeoShape): boolean {
-    that = GeoShape.fromAny(that);
+  override intersects(that: GeoShapeLike): boolean {
+    that = GeoShape.fromLike(that);
     if (that instanceof GeoPoint) {
       return this.intersectsPoint(that);
     } else if (that instanceof GeoSegment) {
@@ -205,7 +209,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     return void 0;
   }
 
-  toAny(): GeoSegmentInit {
+  toLike(): GeoSegmentInit {
     return {
       lng0: this.lng0,
       lat0: this.lat0,
@@ -269,9 +273,9 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
     return new GeoSegment(lng0, lat0, lng1, lat1);
   }
 
-  static override fromAny<T extends AnyGeoSegment | null | undefined>(value: T): GeoSegment | Uninitable<T>;
-  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyGeoSegment | null | undefined>(value: T): GeoSegment | Uninitable<T> {
+  static override fromLike<T extends GeoSegmentLike | null | undefined>(value: T): GeoSegment | Uninitable<T>;
+  static override fromLike<T extends GeoShapeLike | null | undefined>(value: T): never;
+  static override fromLike<T extends GeoSegmentLike | null | undefined>(value: T): GeoSegment | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoSegment) {
       return value as GeoSegment | Uninitable<T>;
     } else if (GeoSegmentInit[Symbol.hasInstance](value)) {

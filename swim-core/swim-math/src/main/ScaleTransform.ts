@@ -28,17 +28,17 @@ import type {Item} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
 import {R2Point} from "./R2Point";
-import type {AnyTransform} from "./Transform";
+import type {TransformLike} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransform} from "./"; // forward import
 
 /** @public */
-export type AnyScaleTransform = ScaleTransform | string;
+export type ScaleTransformLike = ScaleTransform | string;
 
 /** @public */
-export const AnyScaleTransform = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyScaleTransform {
+export const ScaleTransformLike = {
+  [Symbol.hasInstance](instance: unknown): instance is ScaleTransformLike {
     return instance instanceof ScaleTransform
         || typeof instance === "string";
   },
@@ -174,9 +174,9 @@ export class ScaleTransform extends Transform {
     return new ScaleTransform(x, y);
   }
 
-  static override fromAny<T extends AnyScaleTransform | null | undefined>(value: T): ScaleTransform | Uninitable<T>;
-  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyScaleTransform | null | undefined>(value: T): ScaleTransform | Uninitable<T> {
+  static override fromLike<T extends ScaleTransformLike | null | undefined>(value: T): ScaleTransform | Uninitable<T>;
+  static override fromLike<T extends TransformLike | null | undefined>(value: T): never;
+  static override fromLike<T extends ScaleTransformLike | null | undefined>(value: T): ScaleTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof ScaleTransform) {
       return value as ScaleTransform | Uninitable<T>;
     } else if (typeof value === "string") {

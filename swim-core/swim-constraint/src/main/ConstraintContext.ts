@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Objects} from "@swim/util";
 import type {ConstraintVariable} from "./ConstraintVariable";
 import type {Constraint} from "./Constraint";
 
-/** @beta */
+/** @public */
 export interface ConstraintContext {
   activateConstraint(constraint: Constraint): void;
 
@@ -27,3 +28,10 @@ export interface ConstraintContext {
 
   setConstraintVariable(variable: ConstraintVariable, state: number): void;
 }
+
+/** @public */
+export const ConstraintContext = {
+  [Symbol.hasInstance](instance: unknown): instance is ConstraintContext {
+    return Objects.hasAllKeys<ConstraintContext>(instance, "activateConstraint", "deactivateConstraint", "activateConstraintVariable", "deactivateConstraintVariable", "setConstraintVariable");
+  },
+};

@@ -22,7 +22,7 @@ import {Parser} from "@swim/codec";
 import {Unicode} from "@swim/codec";
 import {Base10} from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import type {AnyR2Shape} from "./R2Shape";
+import type {R2ShapeLike} from "./R2Shape";
 import {R2Point} from "./R2Point";
 import type {R2CurveContext} from "./R2Curve";
 import {R2BezierCurve} from "./R2Curve";
@@ -98,13 +98,13 @@ export class R2QuadraticCurve extends R2BezierCurve implements Debug {
     return new R2Point(x02, y02);
   }
 
-  override contains(that: AnyR2Shape): boolean;
+  override contains(that: R2ShapeLike): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyR2Shape | number, y?: number): boolean {
+  override contains(that: R2ShapeLike | number, y?: number): boolean {
     return false; // TODO
   }
 
-  override intersects(that: AnyR2Shape): boolean {
+  override intersects(that: R2ShapeLike): boolean {
     return false; // TODO
   }
 

@@ -14,7 +14,7 @@
 
 import type {Mark} from "../source/Mark";
 import {InputException} from "./InputException";
-import type {AnyInputSettings} from "./InputSettings";
+import type {InputSettingsLike} from "./InputSettings";
 import {InputSettings} from "./InputSettings";
 import {Input} from "./Input";
 import {InputDone} from "../"; // forward import
@@ -102,8 +102,8 @@ export class InputEmpty extends Input {
 
   override readonly settings!: InputSettings;
 
-  override withSettings(settings: AnyInputSettings): Input {
-    settings = InputSettings.fromAny(settings);
+  override withSettings(settings: InputSettingsLike): Input {
+    settings = InputSettings.fromLike(settings);
     return new InputEmpty(this.id, this.mark, settings);
   }
 

@@ -16,7 +16,7 @@ import type {Mutable} from "@swim/util";
 import {Strings} from "@swim/util";
 import {Mark} from "../source/Mark";
 import {InputException} from "../input/InputException";
-import type {AnyInputSettings} from "../input/InputSettings";
+import type {InputSettingsLike} from "../input/InputSettings";
 import {InputSettings} from "../input/InputSettings";
 import {Input} from "../input/Input";
 import {InputError} from "../input/InputError";
@@ -153,8 +153,8 @@ export class StringInput extends Input {
 
   override readonly settings: InputSettings;
 
-  override withSettings(settings: AnyInputSettings): Input {
-    settings = InputSettings.fromAny(settings);
+  override withSettings(settings: InputSettingsLike): Input {
+    settings = InputSettings.fromLike(settings);
     (this as Mutable<this>).settings = settings;
     return this;
   }

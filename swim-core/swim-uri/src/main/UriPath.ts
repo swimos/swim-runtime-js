@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -35,11 +36,11 @@ import {Form} from "@swim/structure";
 import {Uri} from "./Uri";
 
 /** @public */
-export type AnyUriPath = UriPath | string[] | string;
+export type UriPathLike = UriPath | string[] | string;
 
 /** @public */
-export const AnyUriPath = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUriPath {
+export const UriPathLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriPathLike {
     return instance instanceof UriPath
         || Array.isArray(instance)
         || typeof instance === "string";
@@ -52,6 +53,8 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   protected constructor() {
     // sealed
   }
+
+  declare readonly likeType?: Proto<string[] | string>;
 
   abstract isDefined(): boolean;
 
@@ -154,8 +157,8 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     } while (true);
   }
 
-  isSubpathOf(b: AnyUriPath): boolean {
-    b = UriPath.fromAny(b);
+  isSubpathOf(b: UriPathLike): boolean {
+    b = UriPath.fromLike(b);
     let a: UriPath = this;
     while (!a.isEmpty() && !b.isEmpty()) {
       if (a.isRelative() != b.isRelative() || a.head() !== b.head()) {
@@ -167,7 +170,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return b.isEmpty();
   }
 
-  appended(...components: AnyUriPath[]): UriPath {
+  appended(...components: UriPathLike[]): UriPath {
     if (arguments.length === 0) {
       return this;
     }
@@ -191,7 +194,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return builder.build();
   }
 
-  prepended(...components: AnyUriPath[]): UriPath {
+  prepended(...components: UriPathLike[]): UriPath {
     if (arguments.length === 0) {
       return this;
     }
@@ -290,15 +293,18 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return builder.build();
   }
 
-  unmerge(relative: UriPath, root: UriPath = relative): UriPath {
+  unmerge(that: UriPath): UriPath {
     let base: UriPath = this;
+    let relative = that;
+    if (base.isEmpty()) {
+      return relative;
+    }
     do {
       if (base.isEmpty()) {
-        if (!relative.isEmpty() && !relative.tail().isEmpty()) {
-          return relative.tail();
-        } else {
+        if (relative.isEmpty() || relative.tail().isEmpty()) {
           return relative;
         }
+        return relative.tail();
       } else if (base.isRelative()) {
         return relative;
       } else if (relative.isRelative()) {
@@ -316,7 +322,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
       a = a.tail();
       b = b.tail();
       if (!a.isEmpty() && b.isEmpty()) {
-        return root;
+        return that;
       }
       base = a;
       relative = b;
@@ -357,7 +363,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return builder.build();
   }
 
-  toAny(): string[] {
+  toLike(): string[] {
     const components = [];
     let path: UriPath = this;
     while (!path.isEmpty()) {
@@ -435,13 +441,13 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     return new UriPathSegment(segment, tail);
   }
 
-  static of(...components: AnyUriPath[]): UriPath {
+  static of(...components: UriPathLike[]): UriPath {
     const builder = new UriPathBuilder();
     builder.push(...components);
     return builder.build();
   }
 
-  static fromAny<T extends AnyUriPath | null | undefined>(value: T): UriPath | Uninitable<T> {
+  static fromLike<T extends UriPathLike | null | undefined>(value: T): UriPath | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriPath) {
       return value as UriPath | Uninitable<T>;
     } else if (Array.isArray(value)) {
@@ -464,7 +470,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
   }
 
   @Lazy
-  static pathForm(): Form<UriPath, AnyUriPath> {
+  static pathForm(): Form<UriPath, UriPathLike> {
     return new UriPathForm(UriPath.empty());
   }
 }
@@ -522,7 +528,7 @@ export class UriPathEmpty extends UriPath {
     return this;
   }
 
-  override appended(...components: AnyUriPath[]): UriPath {
+  override appended(...components: UriPathLike[]): UriPath {
     return UriPath.of(...components);
   }
 
@@ -534,7 +540,7 @@ export class UriPathEmpty extends UriPath {
     return UriPath.segment(segment);
   }
 
-  override prepended(...components: AnyUriPath[]): UriPath {
+  override prepended(...components: UriPathLike[]): UriPath {
     return UriPath.of(...components);
   }
 
@@ -806,7 +812,7 @@ export class UriPathBuilder implements Builder<string, UriPath> {
     return this.size === 0;
   }
 
-  push(...components: AnyUriPath[]): void {
+  push(...components: UriPathLike[]): void {
     for (let i = 0; i < components.length; i += 1) {
       const component = components[i]!;
       if (component instanceof UriPath) {
@@ -961,27 +967,27 @@ export class UriPathBuilder implements Builder<string, UriPath> {
 }
 
 /** @internal */
-export class UriPathForm extends Form<UriPath, AnyUriPath> {
+export class UriPathForm extends Form<UriPath, UriPathLike> {
   constructor(unit: UriPath | undefined) {
     super();
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
-  override readonly unit!: UriPath | undefined;
+  override readonly unit: UriPath | undefined;
 
-  override withUnit(unit: UriPath | undefined): Form<UriPath, AnyUriPath> {
+  override withUnit(unit: UriPath | undefined): Form<UriPath, UriPathLike> {
     if (unit === this.unit) {
       return this;
-    } else {
-      return new UriPathForm(unit);
     }
+    return new UriPathForm(unit);
   }
 
-  override mold(object: AnyUriPath, item?: Item): Item {
-    object = UriPath.fromAny(object);
+  override mold(object: UriPathLike, item?: Item): Item {
+    object = UriPath.fromLike(object);
     if (item === void 0) {
       return Text.from(object.toString());
     } else {

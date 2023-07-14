@@ -29,17 +29,17 @@ import {Length} from "./Length";
 import {PxLength} from "./Length";
 import {LengthParser} from "./Length";
 import {R2Point} from "./R2Point";
-import type {AnyTransform} from "./Transform";
+import type {TransformLike} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 import {AffineTransform} from "./"; // forward import
 
 /** @public */
-export type AnyTranslateTransform = TranslateTransform | string;
+export type TranslateTransformLike = TranslateTransform | string;
 
 /** @public */
-export const AnyTranslateTransform = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyTranslateTransform {
+export const TranslateTransformLike = {
+  [Symbol.hasInstance](instance: unknown): instance is TranslateTransformLike {
     return instance instanceof TranslateTransform
         || typeof instance === "string";
   },
@@ -186,9 +186,9 @@ export class TranslateTransform extends Transform {
     return new TranslateTransform(x, y);
   }
 
-  static override fromAny<T extends AnyTranslateTransform | null | undefined>(value: T): TranslateTransform | Uninitable<T>;
-  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyTranslateTransform | null | undefined>(value: T): TranslateTransform | Uninitable<T> {
+  static override fromLike<T extends TranslateTransformLike | null | undefined>(value: T): TranslateTransform | Uninitable<T>;
+  static override fromLike<T extends TransformLike | null | undefined>(value: T): never;
+  static override fromLike<T extends TranslateTransformLike | null | undefined>(value: T): TranslateTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof TranslateTransform) {
       return value as TranslateTransform | Uninitable<T>;
     } else if (typeof value === "string") {

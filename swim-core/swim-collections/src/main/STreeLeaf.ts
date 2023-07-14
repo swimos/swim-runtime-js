@@ -20,13 +20,13 @@ import {STreeNode} from "./"; // forward import
 
 /** @internal */
 export class STreeLeaf<V, I> extends STreePage<V, I> {
-  constructor(slots: ReadonlyArray<[I, V]>) {
+  constructor(slots: readonly [I, V][]) {
     super();
     this.slots = slots;
   }
 
   /** @internal */
-  readonly slots: ReadonlyArray<[I, V]>;
+  readonly slots: readonly [I, V][];
 
   override get arity(): number {
     return this.slots.length;

@@ -29,16 +29,16 @@ import type {Item} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
 import {R2Point} from "./R2Point";
-import type {AnyTransform} from "./Transform";
+import type {TransformLike} from "./Transform";
 import {Transform} from "./Transform";
 import {IdentityTransform} from "./IdentityTransform";
 
 /** @public */
-export type AnyAffineTransform = AffineTransform | string;
+export type AffineTransformLike = AffineTransform | string;
 
 /** @public */
-export const AnyAffineTransform = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyAffineTransform {
+export const AffineTransformLike = {
+  [Symbol.hasInstance](instance: unknown): instance is AffineTransformLike {
     return instance instanceof AffineTransform
         || typeof instance === "string";
   },
@@ -210,9 +210,9 @@ export class AffineTransform extends Transform {
     return new AffineTransform(1, 0, 0, 1, 0, 0);
   }
 
-  static override fromAny<T extends AnyAffineTransform | null | undefined>(value: T): AffineTransform | Uninitable<T>;
-  static override fromAny<T extends AnyTransform | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyAffineTransform | null | undefined>(value: T): AffineTransform | Uninitable<T> {
+  static override fromLike<T extends AffineTransformLike | null | undefined>(value: T): AffineTransform | Uninitable<T>;
+  static override fromLike<T extends TransformLike | null | undefined>(value: T): never;
+  static override fromLike<T extends AffineTransformLike | null | undefined>(value: T): AffineTransform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof AffineTransform) {
       return value as AffineTransform | Uninitable<T>;
     } else if (typeof value === "string") {

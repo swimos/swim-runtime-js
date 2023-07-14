@@ -16,10 +16,10 @@ import {Murmur3} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AnyItem} from "../Item";
+import type {ItemLike} from "../Item";
 import {Item} from "../Item";
 import {Selector} from "./Selector";
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -80,8 +80,8 @@ export class FilterSelector extends Selector {
     return result;
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     let predicate = this.predicate.substitute(interpreter);
     if (!(predicate instanceof Selector)) {
       predicate = this.predicate;
@@ -105,11 +105,11 @@ export class FilterSelector extends Selector {
     return new FilterSelector(this.predicate, this.then.andThen(then));
   }
 
-  override filter(predicate?: AnyItem): Selector {
+  override filter(predicate?: ItemLike): Selector {
     if (arguments.length === 0) {
       return this;
     } else {
-      predicate = Item.fromAny(predicate);
+      predicate = Item.fromLike(predicate);
       return this.andThen(predicate.filter());
     }
   }

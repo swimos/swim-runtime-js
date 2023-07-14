@@ -84,7 +84,7 @@ export const Numbers = {
     };
   })(),
 
-  fromAny<T extends number | string | boolean | null | undefined>(value: T): number | Uninitable<T> {
+  fromLike<T extends number | string | boolean | null | undefined>(value: T): number | Uninitable<T> {
     if (value === void 0 || value === null) {
       return value as number | Uninitable<T>;
     }

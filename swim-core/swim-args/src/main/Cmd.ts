@@ -20,27 +20,27 @@ import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 import {Unicode} from "@swim/codec";
-import type {AnyOpt} from "./Opt";
+import type {OptLike} from "./Opt";
 import {Opt} from "./Opt";
-import type {AnyArg} from "./Arg";
+import type {ArgLike} from "./Arg";
 import {Arg} from "./Arg";
 
 /** @public */
 export type ExecCmd = (this: Cmd, opts: {[name: string]: string | undefined}, args: string[]) => void;
 
 /** @public */
-export type AnyCmd = Cmd | CmdInit | string;
+export type CmdLike = Cmd | CmdInit | string;
 
 /** @public */
 export interface CmdInit {
   /** @internal */
-  typeid?: "CmdInit";
+  readonly typeid?: "CmdInit";
   id?: string;
   name: string;
   desc?: string;
-  opts?: AnyOpt[];
-  args?: AnyArg[];
-  cmds?: AnyCmd[];
+  opts?: OptLike[];
+  args?: ArgLike[];
+  cmds?: CmdLike[];
   exec?: ExecCmd | null;
 }
 
@@ -59,7 +59,7 @@ export class Cmd implements Equals, Debug {
   }
 
   /** @internal */
-  declare typeid?: "Cmd";
+  declare readonly typeid?: "Cmd";
 
   readonly id: string;
 
@@ -74,24 +74,24 @@ export class Cmd implements Equals, Debug {
 
   readonly opts: readonly Opt[];
 
-  withOpt(opt: AnyOpt): this {
-    opt = Opt.fromAny(opt);
+  withOpt(opt: OptLike): this {
+    opt = Opt.fromLike(opt);
     (this.opts as Opt[]).push(opt);
     return this;
   }
 
   readonly args: readonly Arg[];
 
-  withArg(arg: AnyArg): this {
-    arg = Arg.fromAny(arg);
+  withArg(arg: ArgLike): this {
+    arg = Arg.fromLike(arg);
     (this.args as Arg[]).push(arg);
     return this;
   }
 
   readonly cmds: readonly Cmd[];
 
-  withCmd(cmd: AnyCmd): this {
-    cmd = Cmd.fromAny(cmd);
+  withCmd(cmd: CmdLike): this {
+    cmd = Cmd.fromLike(cmd);
     (this.cmds as Cmd[]).push(cmd);
     return this;
   }
@@ -371,45 +371,27 @@ export class Cmd implements Equals, Debug {
     return new Cmd(this.id, this.name, this.desc, opts, args, cmds, this.exec, this.base);
   }
 
-  static create(id: string, name?: string, desc?: string, anyOpts?: AnyOpt[],
-                anyArgs?: AnyArg[], anyCmds?: AnyCmd[], exec: ExecCmd | null = null): Cmd {
+  static create(id: string, name?: string, desc?: string, anyOpts?: OptLike[],
+                anyArgs?: ArgLike[], anyCmds?: CmdLike[], exec: ExecCmd | null = null): Cmd {
     if (name === void 0) {
       name = id;
     }
     const opts = new Array<Opt>(anyOpts !== void 0 ? anyOpts.length : 0);
     for (let optIndex = 0; optIndex < opts.length; optIndex += 1) {
-      opts[optIndex] = Opt.fromAny(anyOpts![optIndex]!);
+      opts[optIndex] = Opt.fromLike(anyOpts![optIndex]!);
     }
     const args = new Array<Arg>(anyArgs !== void 0 ? anyArgs.length : 0);
     for (let argIndex = 0; argIndex < args.length; argIndex += 1) {
-      args[argIndex] = Arg.fromAny(anyArgs![argIndex]!);
+      args[argIndex] = Arg.fromLike(anyArgs![argIndex]!);
     }
     const cmds = new Array<Cmd>(anyCmds !== void 0 ? anyCmds.length : 0);
     for (let cmdIndex = 0; cmdIndex < cmds.length; cmdIndex += 1) {
-      cmds[cmdIndex] = Cmd.fromAny(anyCmds![cmdIndex]!);
+      cmds[cmdIndex] = Cmd.fromLike(anyCmds![cmdIndex]!);
     }
     return new Cmd(id, name, desc, opts, args, cmds, exec, null);
   }
 
-  static fromInit(init: CmdInit): Cmd {
-    const id = init.id !== void 0 ? init.id : init.name;
-    const opts = new Array<Opt>(init.opts !== void 0 ? init.opts.length : 0);
-    for (let optIndex = 0; optIndex < opts.length; optIndex += 1) {
-      opts[optIndex] = Opt.fromAny(init.opts![optIndex]!);
-    }
-    const args = new Array<Arg>(init.args !== void 0 ? init.args.length : 0);
-    for (let argIndex = 0; argIndex < args.length; argIndex += 1) {
-      args[argIndex] = Arg.fromAny(init.args![argIndex]!);
-    }
-    const cmds = new Array<Cmd>(init.cmds !== void 0 ? init.cmds.length : 0);
-    for (let initIndex = 0; initIndex < cmds.length; initIndex += 1) {
-      cmds[initIndex] = Cmd.fromAny(init.cmds![initIndex]!);
-    }
-    const exec = init.exec !== void 0 ? init.exec : null;
-    return new Cmd(id, init.name, init.desc, opts, args, cmds, exec, null);
-  }
-
-  static fromAny<T extends AnyCmd | null | undefined>(value: T): Cmd | Uninitable<T> {
+  static fromLike<T extends CmdLike | null | undefined>(value: T): Cmd | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Cmd) {
       return value as Cmd | Uninitable<T>;
     } else if (typeof value === "string") {
@@ -418,6 +400,24 @@ export class Cmd implements Equals, Debug {
       return Cmd.fromInit(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static fromInit(init: CmdInit): Cmd {
+    const id = init.id !== void 0 ? init.id : init.name;
+    const opts = new Array<Opt>(init.opts !== void 0 ? init.opts.length : 0);
+    for (let optIndex = 0; optIndex < opts.length; optIndex += 1) {
+      opts[optIndex] = Opt.fromLike(init.opts![optIndex]!);
+    }
+    const args = new Array<Arg>(init.args !== void 0 ? init.args.length : 0);
+    for (let argIndex = 0; argIndex < args.length; argIndex += 1) {
+      args[argIndex] = Arg.fromLike(init.args![argIndex]!);
+    }
+    const cmds = new Array<Cmd>(init.cmds !== void 0 ? init.cmds.length : 0);
+    for (let initIndex = 0; initIndex < cmds.length; initIndex += 1) {
+      cmds[initIndex] = Cmd.fromLike(init.cmds![initIndex]!);
+    }
+    const exec = init.exec !== void 0 ? init.exec : null;
+    return new Cmd(id, init.name, init.desc, opts, args, cmds, exec, null);
   }
 
   static help(): Cmd {

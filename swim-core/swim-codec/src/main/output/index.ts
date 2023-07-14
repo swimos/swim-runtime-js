@@ -14,7 +14,7 @@
 
 export {OutputException} from "./OutputException";
 
-export type {AnyOutputSettings} from "./OutputSettings";
+export type {OutputSettingsLike} from "./OutputSettings";
 export type {OutputSettingsInit} from "./OutputSettings";
 export {OutputSettings} from "./OutputSettings";
 

@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {FastenerTemplate} from "@swim/component";
 import {Property} from "@swim/component";
 import {Component} from "@swim/component";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import type {WarpDownlinkModel} from "./WarpDownlinkModel";
-import type {EventDownlinkDescriptor} from "./EventDownlink";
 import {EventDownlink} from "./EventDownlink";
-import type {ValueDownlinkDescriptor} from "./ValueDownlink";
 import {ValueDownlink} from "./ValueDownlink";
-import type {ListDownlinkDescriptor} from "./ListDownlink";
 import {ListDownlink} from "./ListDownlink";
-import type {MapDownlinkDescriptor} from "./MapDownlink";
 import {MapDownlink} from "./MapDownlink";
 import {WarpRef} from "./WarpRef";
 import {WarpClient} from "./"; // forward import
@@ -34,18 +31,18 @@ import {WarpClient} from "./"; // forward import
 export class WarpScope extends Component implements WarpRef {
   /** @override */
   @Property({valueType: Uri, value: null, inherits: true})
-  readonly hostUri!: Property<this, Uri | null, AnyUri | null>;
+  readonly hostUri!: Property<this, Uri | null>;
 
   /** @override */
   @Property({valueType: Uri, value: null, inherits: true})
-  readonly nodeUri!: Property<this, Uri | null, AnyUri | null>;
+  readonly nodeUri!: Property<this, Uri | null>;
 
   /** @override */
   @Property({valueType: Uri, value: null, inherits: true})
-  readonly laneUri!: Property<this, Uri | null,AnyUri | null>;
+  readonly laneUri!: Property<this, Uri | null>;
 
   /** @override */
-  downlink(template?: ThisType<EventDownlink<this>> & EventDownlinkDescriptor & Partial<Omit<EventDownlink<this>, keyof EventDownlinkDescriptor>>): EventDownlink<this> {
+  downlink(template?: FastenerTemplate<EventDownlink<WarpRef>>): EventDownlink<WarpRef> {
     let downlinkClass = EventDownlink;
     if (template !== void 0) {
       downlinkClass = downlinkClass.define("downlink", template) as typeof EventDownlink;
@@ -54,7 +51,7 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ValueDownlink<this, V, VU>> & ValueDownlinkDescriptor<V, VU> & Partial<Omit<ValueDownlink<this, V, VU>, keyof ValueDownlinkDescriptor<V, VU>>>): ValueDownlink<this, V, VU> {
+  downlinkValue<V = Value>(template?: FastenerTemplate<ValueDownlink<WarpRef, V>>): ValueDownlink<WarpRef, V> {
     let downlinkClass = ValueDownlink;
     if (template !== void 0) {
       downlinkClass = downlinkClass.define("downlinkValue", template) as typeof ValueDownlink;
@@ -63,7 +60,7 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ListDownlink<this, V, VU>> & ListDownlinkDescriptor<V, VU> & Partial<Omit<ListDownlink<this, V, VU>, keyof ListDownlinkDescriptor<V, VU>>>): ListDownlink<this, V, VU> {
+  downlinkList<V = Value>(template?: FastenerTemplate<ListDownlink<WarpRef, V>>): ListDownlink<WarpRef, V> {
     let downlinkClass = ListDownlink;
     if (template !== void 0) {
       downlinkClass = downlinkClass.define("downlinkList", template) as typeof ListDownlink;
@@ -72,7 +69,7 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: ThisType<MapDownlink<this, K, V, KU, VU>> & MapDownlinkDescriptor<K, V, KU, VU> & Partial<Omit<MapDownlink<this, K, V, KU, VU>, keyof MapDownlinkDescriptor<K, V, KU, VU>>>): MapDownlink<this, K, V, KU, VU> {
+  downlinkMap<K = Value, V = Value>(template?: FastenerTemplate<MapDownlink<WarpRef, K, V>>): MapDownlink<WarpRef, K, V> {
     let downlinkClass = MapDownlink;
     if (template !== void 0) {
       downlinkClass = downlinkClass.define("downlinkMap", template) as typeof MapDownlink;
@@ -81,34 +78,34 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  command(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
+  command(hostUri: UriLike, nodeUri: UriLike, laneUri: UriLike, body: ValueLike): void;
   /** @override */
-  command(nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
+  command(nodeUri: UriLike, laneUri: UriLike, body: ValueLike): void;
   /** @override */
-  command(laneUri: AnyUri, body: AnyValue): void;
+  command(laneUri: UriLike, body: ValueLike): void;
   /** @override */
-  command(body: AnyValue): void;
-  command(hostUri: AnyUri | AnyValue, nodeUri?: AnyUri | AnyValue, laneUri?: AnyUri | AnyValue, body?: AnyValue): void {
+  command(body: ValueLike): void;
+  command(hostUri: UriLike | ValueLike, nodeUri?: UriLike | ValueLike, laneUri?: UriLike | ValueLike, body?: ValueLike): void {
     if (nodeUri === void 0) {
-      body = Value.fromAny(hostUri as AnyValue);
+      body = Value.fromLike(hostUri as ValueLike);
       laneUri = this.laneUri.getValue();
       nodeUri = this.nodeUri.getValue();
       hostUri = this.hostUri.value;
     } else if (laneUri === void 0) {
-      body = Value.fromAny(nodeUri as AnyValue);
-      laneUri = Uri.fromAny(hostUri as AnyUri);
+      body = Value.fromLike(nodeUri as ValueLike);
+      laneUri = Uri.fromLike(hostUri as UriLike);
       nodeUri = this.nodeUri.getValue();
       hostUri = this.hostUri.value;
     } else if (body === void 0) {
-      body = Value.fromAny(laneUri as AnyValue);
-      laneUri = Uri.fromAny(nodeUri as AnyUri);
-      nodeUri = Uri.fromAny(hostUri as AnyUri);
+      body = Value.fromLike(laneUri as ValueLike);
+      laneUri = Uri.fromLike(nodeUri as UriLike);
+      nodeUri = Uri.fromLike(hostUri as UriLike);
       hostUri = this.hostUri.value;
     } else {
-      body = Value.fromAny(body);
-      laneUri = Uri.fromAny(laneUri as AnyUri);
-      nodeUri = Uri.fromAny(nodeUri as AnyUri);
-      hostUri = Uri.fromAny(hostUri as AnyUri);
+      body = Value.fromLike(body);
+      laneUri = Uri.fromLike(laneUri as UriLike);
+      nodeUri = Uri.fromLike(nodeUri as UriLike);
+      hostUri = Uri.fromLike(hostUri as UriLike);
     }
     if (hostUri === null) {
       hostUri = nodeUri.endpoint();
@@ -119,24 +116,24 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  authenticate(hostUri: AnyUri, credentials: AnyValue): void;
+  authenticate(hostUri: UriLike, credentials: ValueLike): void;
   /** @override */
-  authenticate(credentials: AnyValue): void;
-  authenticate(hostUri: AnyUri | AnyValue, credentials?: AnyValue): void {
+  authenticate(credentials: ValueLike): void;
+  authenticate(hostUri: UriLike | ValueLike, credentials?: ValueLike): void {
     if (credentials === void 0) {
-      credentials = Value.fromAny(hostUri as AnyValue);
+      credentials = Value.fromLike(hostUri as ValueLike);
       hostUri = this.hostUri.getValue();
     } else {
-      credentials = Value.fromAny(credentials);
-      hostUri = Uri.fromAny(hostUri as AnyUri);
+      credentials = Value.fromLike(credentials);
+      hostUri = Uri.fromLike(hostUri as UriLike);
     }
     const warpRef = this.warpRef.value;
     warpRef.authenticate(hostUri, credentials);
   }
 
   /** @override */
-  hostRef(hostUri: AnyUri): WarpRef {
-    hostUri = Uri.fromAny(hostUri);
+  hostRef(hostUri: UriLike): WarpRef {
+    hostUri = Uri.fromLike(hostUri);
     const childRef = new WarpScope();
     childRef.hostUri.setValue(hostUri);
     this.appendChild(childRef);
@@ -144,12 +141,12 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  nodeRef(hostUri: AnyUri, nodeUri: AnyUri): WarpRef;
+  nodeRef(hostUri: UriLike, nodeUri: UriLike): WarpRef;
   /** @override */
-  nodeRef(nodeUri: AnyUri): WarpRef;
-  nodeRef(hostUri: AnyUri | undefined, nodeUri?: AnyUri): WarpRef {
+  nodeRef(nodeUri: UriLike): WarpRef;
+  nodeRef(hostUri: UriLike | undefined, nodeUri?: UriLike): WarpRef {
     if (nodeUri === void 0) {
-      nodeUri = Uri.fromAny(hostUri as AnyUri);
+      nodeUri = Uri.fromLike(hostUri as UriLike);
       hostUri = nodeUri.endpoint();
       if (hostUri.isDefined()) {
         nodeUri = hostUri.unresolve(nodeUri);
@@ -157,8 +154,8 @@ export class WarpScope extends Component implements WarpRef {
         hostUri = void 0;
       }
     } else {
-      nodeUri = Uri.fromAny(nodeUri);
-      hostUri = Uri.fromAny(hostUri as AnyUri);
+      nodeUri = Uri.fromLike(nodeUri);
+      hostUri = Uri.fromLike(hostUri as UriLike);
     }
     const childRef = new WarpScope();
     if (hostUri !== void 0) {
@@ -172,19 +169,19 @@ export class WarpScope extends Component implements WarpRef {
   }
 
   /** @override */
-  laneRef(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri): WarpRef;
+  laneRef(hostUri: UriLike, nodeUri: UriLike, laneUri: UriLike): WarpRef;
   /** @override */
-  laneRef(nodeUri: AnyUri, laneUri: AnyUri): WarpRef;
+  laneRef(nodeUri: UriLike, laneUri: UriLike): WarpRef;
   /** @override */
-  laneRef(laneUri: AnyUri): WarpRef;
-  laneRef(hostUri: AnyUri | undefined, nodeUri?: AnyUri, laneUri?: AnyUri): WarpRef {
+  laneRef(laneUri: UriLike): WarpRef;
+  laneRef(hostUri: UriLike | undefined, nodeUri?: UriLike, laneUri?: UriLike): WarpRef {
     if (nodeUri === void 0) {
-      laneUri = Uri.fromAny(hostUri as AnyUri);
+      laneUri = Uri.fromLike(hostUri as UriLike);
       nodeUri = void 0;
       hostUri = void 0;
     } else if (laneUri === void 0) {
-      laneUri = Uri.fromAny(nodeUri);
-      nodeUri = Uri.fromAny(hostUri as AnyUri);
+      laneUri = Uri.fromLike(nodeUri);
+      nodeUri = Uri.fromLike(hostUri as UriLike);
       hostUri = nodeUri.endpoint();
       if (hostUri.isDefined()) {
         nodeUri = hostUri.unresolve(nodeUri);
@@ -192,9 +189,9 @@ export class WarpScope extends Component implements WarpRef {
         hostUri = void 0;
       }
     } else {
-      laneUri = Uri.fromAny(laneUri);
-      nodeUri = Uri.fromAny(nodeUri);
-      hostUri = Uri.fromAny(hostUri as AnyUri);
+      laneUri = Uri.fromLike(laneUri);
+      nodeUri = Uri.fromLike(nodeUri);
+      hostUri = Uri.fromLike(hostUri as UriLike);
     }
     const childRef = new WarpScope();
     if (hostUri !== void 0) {

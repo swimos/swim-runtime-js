@@ -14,6 +14,7 @@
 
 import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -25,30 +26,30 @@ import type {Debug} from "@swim/codec";
 import type {Display} from "@swim/codec";
 import {Format} from "@swim/codec";
 import type {Field} from "./Field";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./"; // forward import
 import {Record} from "./"; // forward import
-import type {AnyText} from "./Text";
-import type {AnyNum} from "./Num";
+import type {TextLike} from "./Text";
+import type {NumLike} from "./Num";
 import {Bool} from "./"; // forward import
 import {Extant} from "./"; // forward import
 import {Absent} from "./"; // forward import
 import {Selector} from "./"; // forward import
 import {MathModule} from "./"; // forward import
-import type {AnyInterpreter} from "./interpreter/Interpreter";
+import type {InterpreterLike} from "./interpreter/Interpreter";
 import type {Form} from "./form/Form";
 
 /** @public */
-export type AnyItem = Item
-                    | {readonly $key: AnyValue, readonly $value: AnyValue}
-                    | {readonly [key: string]: AnyValue}
-                    | ReadonlyArray<AnyItem>
-                    | Uint8Array
-                    | string
-                    | number
-                    | boolean
-                    | null
-                    | undefined;
+export type ItemLike = Item
+                     | {readonly $key: ValueLike, readonly $value: ValueLike}
+                     | {readonly [key: string]: ValueLike}
+                     | readonly ItemLike[]
+                     | Uint8Array
+                     | string
+                     | number
+                     | boolean
+                     | null
+                     | undefined;
 
 /** @public */
 export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, Compare, Debug, Display {
@@ -56,6 +57,16 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
   constructor() {
     // nop
   }
+
+  declare readonly likeType?: Proto<{readonly $key: ValueLike, readonly $value: ValueLike}
+                                  | {readonly [key: string]: ValueLike}
+                                  | readonly ItemLike[]
+                                  | Uint8Array
+                                  | string
+                                  | number
+                                  | boolean
+                                  | null
+                                  | undefined>;
 
   /**
    * Returns `true` if this `Item` is not [[Absent]].
@@ -196,7 +207,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
    * this `Item` is not a `Record`, or if this `Item` is a `Record`, but has no
    * `Field` member with a key equal to the given `key`.
    */
-  abstract has(key: AnyValue): boolean;
+  abstract has(key: ValueLike): boolean;
 
   /**
    * Returns the value of the last [[Field]] member of this `Item` whose key
@@ -204,7 +215,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
    * [[Record]], or if this `Item` is a `Record`, but has no `Field` member
    * with a key equal to the given `key`.
    */
-  abstract get(key: AnyValue): Value;
+  abstract get(key: ValueLike): Value;
 
   /**
    * Returns the value of the last [[Attr]] member of this `Item` whose key
@@ -212,7 +223,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
    * [[Record]], or if this `Item` is a `Record`, but has no `Attr` member
    * with a key equal to the given `key`.
    */
-  abstract getAttr(key: AnyText): Value;
+  abstract getAttr(key: TextLike): Value;
 
   /**
    * Returns the value of the last [[Slot]] member of this `Item` whose key
@@ -220,7 +231,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
    * [[Record]], or if this `Item` is a `Record`, but has no `Slot` member
    * with a key equal to the given `key`.
    */
-  abstract getSlot(key: AnyValue): Value;
+  abstract getSlot(key: ValueLike): Value;
 
   /**
    * Returns the last [[Field]] member of this `Item` whose key is equal to the
@@ -228,7 +239,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
    * this `Item` is a `Record`, but has no `Field` member with a `key` equal to
    * the given `key`.
    */
-  abstract getField(key: AnyValue): Field | undefined;
+  abstract getField(key: ValueLike): Field | undefined;
 
   /**
    * Returns the member of this `Item` at the given `index`, if this `Item` is
@@ -237,50 +248,50 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
    * [[Absent]] if this `Item` is not a `Record`, or if this `Item` is a
    * `Record`, but the `index` is out of bounds.
    */
-  abstract getItem(index: AnyNum): Item;
+  abstract getItem(index: NumLike): Item;
 
-  updated(key: AnyValue, value: AnyValue): Record {
+  updated(key: ValueLike, value: ValueLike): Record {
     const record = Record.create(2);
     record.push(this);
     record.set(key, value);
     return record;
   }
 
-  updatedAttr(key: AnyText, value: AnyValue): Record {
+  updatedAttr(key: TextLike, value: ValueLike): Record {
     const record = Record.create(2);
     record.push(this);
     record.setAttr(key, value);
     return record;
   }
 
-  updatedSlot(key: AnyValue, value: AnyValue): Record {
+  updatedSlot(key: ValueLike, value: ValueLike): Record {
     const record = Record.create(2);
     record.push(this);
     record.setSlot(key, value);
     return record;
   }
 
-  appended(...items: AnyItem[]): Record {
+  appended(...items: ItemLike[]): Record {
     const record = Record.create(1 + arguments.length);
     record.push(this);
     record.push(...items);
     return record;
   }
 
-  prepended(...items: AnyItem[]): Record {
+  prepended(...items: ItemLike[]): Record {
     const record = Record.create(arguments.length + 1);
     record.push(...items);
     record.push(this);
     return record;
   }
 
-  abstract deleted(key: AnyValue): Item;
+  abstract deleted(key: ValueLike): Item;
 
-  concat(...items: AnyItem[]): Record {
+  concat(...items: ItemLike[]): Record {
     const record = Record.create();
     record.push(this);
     for (let i = 0, n = items.length; i < n; i += 1) {
-      Item.fromAny(items[i]).forEach(function (item: Item): void {
+      Item.fromLike(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });
     }
@@ -293,51 +304,51 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
 
   abstract and(that: Item): Item;
 
-  abstract bitwiseOr(that: AnyItem): Item;
+  abstract bitwiseOr(that: ItemLike): Item;
 
-  abstract bitwiseXor(that: AnyItem): Item;
+  abstract bitwiseXor(that: ItemLike): Item;
 
-  abstract bitwiseAnd(that: AnyItem): Item;
+  abstract bitwiseAnd(that: ItemLike): Item;
 
-  lt(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  lt(that: ItemLike): Item {
+    that = Item.fromLike(that);
     return this.compareTo(that) < 0 ? Bool.from(true) : Item.absent();
   }
 
-  le(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  le(that: ItemLike): Item {
+    that = Item.fromLike(that);
     return this.compareTo(that) <= 0 ? Bool.from(true) : Item.absent();
   }
 
-  eq(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  eq(that: ItemLike): Item {
+    that = Item.fromLike(that);
     return this.equals(that) ? Bool.from(true) : Item.absent();
   }
 
-  ne(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  ne(that: ItemLike): Item {
+    that = Item.fromLike(that);
     return !this.equals(that) ? Bool.from(true) : Item.absent();
   }
 
-  ge(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  ge(that: ItemLike): Item {
+    that = Item.fromLike(that);
     return this.compareTo(that) >= 0 ? Bool.from(true) : Item.absent();
   }
 
-  gt(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  gt(that: ItemLike): Item {
+    that = Item.fromLike(that);
     return this.compareTo(that) > 0 ? Bool.from(true) : Item.absent();
   }
 
-  abstract plus(that: AnyItem): Item;
+  abstract plus(that: ItemLike): Item;
 
-  abstract minus(that: AnyItem): Item;
+  abstract minus(that: ItemLike): Item;
 
-  abstract times(that: AnyItem): Item;
+  abstract times(that: ItemLike): Item;
 
-  abstract divide(that: AnyItem): Item;
+  abstract divide(that: ItemLike): Item;
 
-  abstract modulo(that: AnyItem): Item;
+  abstract modulo(that: ItemLike): Item;
 
   abstract not(): Item;
 
@@ -355,7 +366,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
 
   abstract lambda(template: Value): Value;
 
-  filter(predicate?: AnyItem): Selector {
+  filter(predicate?: ItemLike): Selector {
     const selector = Selector.literal(this);
     if (arguments.length === 0) {
       return selector.filter();
@@ -372,11 +383,11 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
     return this.compareTo(that) <= 0 ? this : that;
   }
 
-  evaluate(interpreter: AnyInterpreter): Item {
+  evaluate(interpreter: InterpreterLike): Item {
     return this;
   }
 
-  substitute(interpreter: AnyInterpreter): Item {
+  substitute(interpreter: InterpreterLike): Item {
     return this;
   }
 
@@ -443,7 +454,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
     return object!;
   }
 
-  abstract toAny(): AnyItem;
+  abstract toLike(): ItemLike;
 
   abstract isAliased(): boolean;
 
@@ -532,11 +543,11 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
     return Absent.absent();
   }
 
-  static fromAny(item: AnyItem): Item {
+  static fromLike(item: ItemLike): Item {
     if (item instanceof Item) {
       return item;
     }
-    return Value.fromAny(item);
+    return Value.fromLike(item);
   }
 
   @Lazy

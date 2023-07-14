@@ -18,12 +18,12 @@ import {ConstraintSymbol} from "./ConstraintSymbol";
 import {ConstraintSlack} from "./ConstraintSymbol";
 import {ConstraintError} from "./ConstraintSymbol";
 import {ConstraintDummy} from "./ConstraintSymbol";
-import type {AnyConstraintExpression} from "./ConstraintExpression";
+import type {ConstraintExpressionLike} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintVariable} from "./ConstraintVariable";
 import {ConstraintProperty} from "./ConstraintProperty";
 import type {ConstraintRelation} from "./Constraint";
-import type {AnyConstraintStrength} from "./Constraint";
+import type {ConstraintStrengthLike} from "./Constraint";
 import {ConstraintStrength} from "./Constraint";
 import {Constraint} from "./Constraint";
 import type {ConstraintScope} from "./ConstraintScope";
@@ -75,15 +75,15 @@ export class ConstraintSolver implements ConstraintScope {
   /** @internal */
   readonly invalidated: Map<ConstraintSymbol, ConstraintRow | null>;
 
-  constraint(lhs: AnyConstraintExpression, relation: ConstraintRelation,
-             rhs?: AnyConstraintExpression, strength?: AnyConstraintStrength): Constraint {
-    lhs = ConstraintExpression.fromAny(lhs);
-    rhs = ConstraintExpression.fromAny(rhs);
+  constraint(lhs: ConstraintExpressionLike, relation: ConstraintRelation,
+             rhs?: ConstraintExpressionLike, strength?: ConstraintStrengthLike): Constraint {
+    lhs = ConstraintExpression.fromLike(lhs);
+    rhs = ConstraintExpression.fromLike(rhs);
     const expression = rhs !== void 0 ? lhs.minus(rhs) : lhs;
     if (strength === void 0) {
       strength = ConstraintStrength.Required;
     } else {
-      strength = ConstraintStrength.fromAny(strength);
+      strength = ConstraintStrength.fromLike(strength);
     }
     const constraint = new Constraint(this, expression, relation, strength);
     this.addConstraint(constraint);
@@ -221,12 +221,12 @@ export class ConstraintSolver implements ConstraintScope {
     // hook
   }
 
-  constraintVariable(name: string, value?: number, strength?: AnyConstraintStrength): ConstraintProperty<unknown, number> {
+  constraintVariable(name: string, value?: number, strength?: ConstraintStrengthLike): ConstraintProperty<unknown, number> {
     if (value === void 0) {
       value = 0;
     }
     if (strength !== void 0) {
-      strength = ConstraintStrength.fromAny(strength);
+      strength = ConstraintStrength.fromLike(strength);
     } else {
       strength = ConstraintStrength.Strong;
     }

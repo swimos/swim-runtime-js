@@ -20,10 +20,10 @@ import {Property} from "@swim/component";
 import {Timer} from "@swim/component";
 import type {ComponentFlags} from "@swim/component";
 import {Component} from "@swim/component";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import {UriCache} from "@swim/uri";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
 import type {Envelope} from "@swim/warp";
 import {EventMessage} from "@swim/warp";
@@ -58,7 +58,7 @@ export abstract class WarpHost extends Component {
   constructor(hostUri: Uri) {
     super();
     this.hostUri = hostUri;
-    this.uriCache = new UriCache(hostUri);
+    this.uriCache = new UriCache(hostUri.endpoint());
     this.downlinks = {};
     this.downlinkCount = 0;
     this.sendBuffer = [];
@@ -71,11 +71,11 @@ export abstract class WarpHost extends Component {
   /** @internal */
   readonly uriCache: UriCache;
 
-  resolve(relative: AnyUri): Uri {
+  resolve(relative: UriLike): Uri {
     return this.uriCache.resolve(relative);
   }
 
-  unresolve(absolute: AnyUri): Uri {
+  unresolve(absolute: UriLike): Uri {
     return this.uriCache.unresolve(absolute);
   }
 
@@ -272,7 +272,7 @@ export abstract class WarpHost extends Component {
       }
     },
   })
-  readonly credentials!: Property<this, Value, AnyValue>;
+  readonly credentials!: Property<this, Value>;
 
   get authenticated(): boolean {
     return (this.flags & WarpHost.AuthenticatedFlag) !== 0;
@@ -352,12 +352,12 @@ export abstract class WarpHost extends Component {
     }
   }
 
-  authenticate(credentials: AnyValue): void {
+  authenticate(credentials: ValueLike): void {
     this.credentials.setValue(credentials);
   }
 
   @Property({valueType: Value, value: Value.absent()})
-  readonly session!: Property<this, Value, AnyValue>;
+  readonly session!: Property<this, Value>;
 
   /** @internal */
   readonly downlinks: {
@@ -514,11 +514,11 @@ export abstract class WarpHost extends Component {
   /** @internal */
   abstract push(envelope: Envelope): void;
 
-  command(nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void {
-    nodeUri = Uri.fromAny(nodeUri);
+  command(nodeUri: UriLike, laneUri: UriLike, body: ValueLike): void {
+    nodeUri = Uri.fromLike(nodeUri);
     nodeUri = this.resolve(nodeUri);
-    laneUri = Uri.fromAny(laneUri);
-    body = Value.fromAny(body);
+    laneUri = Uri.fromLike(laneUri);
+    body = Value.fromLike(body);
     const message = new CommandMessage(this.unresolve(nodeUri), laneUri, body);
     this.push(message);
   }

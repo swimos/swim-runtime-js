@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Lazy} from "@swim/util";
@@ -28,11 +29,11 @@ import {Num} from "@swim/structure";
 import {Form} from "@swim/structure";
 
 /** @public */
-export type AnyTimeZone = TimeZone | string | number;
+export type TimeZoneLike = TimeZone | string | number;
 
 /** @public */
-export const AnyTimeZone = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyTimeZone {
+export const TimeZoneLike = {
+  [Symbol.hasInstance](instance: unknown): instance is TimeZoneLike {
     return instance instanceof TimeZone
         || typeof instance === "string"
         || typeof instance === "number";
@@ -46,6 +47,8 @@ export class TimeZone implements HashCode, Debug {
     this.name = name;
     this.offset = offset;
   }
+
+  declare readonly likeType?: Proto<string | number>;
 
   readonly name: string | undefined;
 
@@ -125,7 +128,7 @@ export class TimeZone implements HashCode, Debug {
     }
   }
 
-  static fromAny<T extends AnyTimeZone | null | undefined>(value: T): TimeZone | Uninitable<T> {
+  static fromLike<T extends TimeZoneLike | null | undefined>(value: T): TimeZone | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof TimeZone) {
       return value as TimeZone | Uninitable<T>;
     } else if (typeof value === "string") {
@@ -152,32 +155,33 @@ export class TimeZone implements HashCode, Debug {
   }
 
   @Lazy
-  static form(): Form<TimeZone, AnyTimeZone> {
+  static form(): Form<TimeZone, TimeZoneLike> {
     return new TimeZoneForm(TimeZone.utc());
   }
 }
 
 /** @internal */
-export class TimeZoneForm extends Form<TimeZone, AnyTimeZone> {
+export class TimeZoneForm extends Form<TimeZone, TimeZoneLike> {
   constructor(unit: TimeZone | undefined) {
     super();
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
-  override readonly unit!: TimeZone | undefined;
+  override readonly unit: TimeZone | undefined;
 
-  override withUnit(unit: TimeZone | undefined): Form<TimeZone, AnyTimeZone> {
+  override withUnit(unit: TimeZone | undefined): Form<TimeZone, TimeZoneLike> {
     if (unit === this.unit) {
       return this;
     }
     return new TimeZoneForm(unit);
   }
 
-  override mold(zone: AnyTimeZone): Item {
-    zone = TimeZone.fromAny(zone);
+  override mold(zone: TimeZoneLike): Item {
+    zone = TimeZone.fromLike(zone);
     const name = zone.name;
     if (name !== void 0) {
       return Text.from(name);

@@ -14,7 +14,7 @@
 
 import * as ws from "ws";
 import type {Mutable} from "@swim/util";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
 import type {Uri} from "@swim/uri";
 import {Message} from "@swim/warp";
@@ -57,8 +57,8 @@ export class WarpSocketHostWorker {
   /** @internal */
   readonly sendBuffer: Envelope[];
 
-  protected onPortReceive(event: MessageEvent<AnyValue>): void {
-    const value = Value.fromAny(event.data);
+  protected onPortReceive(event: MessageEvent<ValueLike>): void {
+    const value = Value.fromLike(event.data);
     const message = Message.fromValue(value);
     if (message !== null) {
       this.onReceiveMessage(message);
@@ -170,19 +170,19 @@ export class WarpSocketHostWorker {
   }
 
   protected onConnect(): void {
-    this.channel.port1.postMessage(ConnectedSignal.create(this.hostUri).toAny());
+    this.channel.port1.postMessage(ConnectedSignal.create(this.hostUri).toLike());
   }
 
   protected onDisconnect(): void {
-    this.channel.port1.postMessage(DisconnectedSignal.create(this.hostUri).toAny());
+    this.channel.port1.postMessage(DisconnectedSignal.create(this.hostUri).toLike());
   }
 
   protected onError(error?: unknown): void {
-    this.channel.port1.postMessage(ErrorSignal.create(this.hostUri).toAny());
+    this.channel.port1.postMessage(ErrorSignal.create(this.hostUri).toLike());
   }
 
   protected onEnvelope(envelope: Envelope): void {
-    this.channel.port1.postMessage(envelope.toAny());
+    this.channel.port1.postMessage(envelope.toLike());
   }
 
   push(envelope: Envelope): void {

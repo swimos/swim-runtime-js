@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -32,11 +33,11 @@ import {Utf8} from "@swim/codec";
 import {Uri} from "./Uri";
 
 /** @public */
-export type AnyUriQuery = UriQuery | {[key: string]: string} | string;
+export type UriQueryLike = UriQuery | {[key: string]: string} | string;
 
 /** @public */
-export const AnyUriQuery = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUriQuery {
+export const UriQueryLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriQueryLike {
     return instance instanceof UriQuery
         || typeof instance === "object" && instance !== null
         || typeof instance === "string";
@@ -45,6 +46,8 @@ export const AnyUriQuery = {
 
 /** @public */
 export abstract class UriQuery implements HashCode, Compare, Debug, Display {
+  declare readonly likeType?: Proto<{[key: string]: string} | string>;
+
   abstract isDefined(): boolean;
 
   abstract isEmpty(): boolean;
@@ -133,8 +136,8 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
   }
 
   appended(key: string | undefined, value: string): UriQuery;
-  appended(params: AnyUriQuery): UriQuery;
-  appended(key: AnyUriQuery | undefined, value?: string): UriQuery {
+  appended(params: UriQueryLike): UriQuery;
+  appended(key: UriQueryLike | undefined, value?: string): UriQuery {
     const builder = new UriQueryBuilder();
     builder.addQuery(this);
     builder.add(key as any, value as any);
@@ -142,15 +145,15 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
   }
 
   prepended(key: string | undefined, value: string): UriQuery;
-  prepended(params: AnyUriQuery): UriQuery;
-  prepended(key: AnyUriQuery | undefined, value?: string): UriQuery {
+  prepended(params: UriQueryLike): UriQuery;
+  prepended(key: UriQueryLike | undefined, value?: string): UriQuery {
     const builder = new UriQueryBuilder();
     builder.add(key as any, value as any);
     builder.addQuery(this);
     return builder.build();
   }
 
-  toAny(params?: {[key: string]: string}): {[key: string]: string} | undefined {
+  toLike(params?: {[key: string]: string}): {[key: string]: string} | undefined {
     if (this.isDefined()) {
       params = params || {};
       let query: UriQuery = this;
@@ -242,7 +245,7 @@ export abstract class UriQuery implements HashCode, Compare, Debug, Display {
     return new UriQueryParam(key, value as string, tail);
   }
 
-  static fromAny<T extends AnyUriQuery | null | undefined>(value: T): UriQuery | Uninitable<T> {
+  static fromLike<T extends UriQueryLike | null | undefined>(value: T): UriQuery | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriQuery) {
       return value as UriQuery | Uninitable<T>;
     } else if (typeof value === "object") {
@@ -312,16 +315,16 @@ export class UriQueryUndefined extends UriQuery {
   }
 
   override appended(key: string | undefined, value: string): UriQuery;
-  override appended(params: AnyUriQuery): UriQuery;
-  override appended(key: AnyUriQuery | undefined, value?: string): UriQuery {
+  override appended(params: UriQueryLike): UriQuery;
+  override appended(key: UriQueryLike | undefined, value?: string): UriQuery {
     const builder = new UriQueryBuilder();
     builder.add(key as any, value as any);
     return builder.build();
   }
 
   override prepended(key: string | undefined, value: string): UriQuery;
-  override prepended(params: AnyUriQuery): UriQuery;
-  override prepended(key: AnyUriQuery | undefined, value?: string): UriQuery {
+  override prepended(params: UriQueryLike): UriQuery;
+  override prepended(key: UriQueryLike | undefined, value?: string): UriQuery {
     const builder = new UriQueryBuilder();
     builder.add(key as any, value as any);
     return builder.build();
@@ -437,8 +440,8 @@ export class UriQueryBuilder implements PairBuilder<string | undefined, string, 
   }
 
   add(key: string | undefined, value: string): void;
-  add(params: AnyUriQuery): void;
-  add(key: AnyUriQuery | undefined, value?: string): void {
+  add(params: UriQueryLike): void;
+  add(key: UriQueryLike | undefined, value?: string): void {
     if (value !== void 0) {
       this.addParam(key as string | undefined, value);
     } else if (typeof key === "string") {

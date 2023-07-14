@@ -13,45 +13,42 @@
 // limitations under the License.
 
 import {Objects} from "@swim/util";
-import type {AnyValue} from "@swim/structure";
+import type {FastenerTemplate} from "@swim/component";
+import type {ValueLike} from "@swim/structure";
 import type {Value} from "@swim/structure";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import type {WarpDownlinkContext} from "./WarpDownlinkContext";
-import type {EventDownlinkDescriptor} from "./EventDownlink";
 import type {EventDownlink} from "./EventDownlink";
-import type {ValueDownlinkDescriptor} from "./ValueDownlink";
 import type {ValueDownlink} from "./ValueDownlink";
-import type {ListDownlinkDescriptor} from "./ListDownlink";
 import type {ListDownlink} from "./ListDownlink";
-import type {MapDownlinkDescriptor} from "./MapDownlink";
 import type {MapDownlink} from "./MapDownlink";
 
 /** @public */
 export interface WarpRef extends WarpDownlinkContext {
-  downlink(template?: ThisType<EventDownlink<this>> & EventDownlinkDescriptor & Partial<Omit<EventDownlink<this>, keyof EventDownlinkDescriptor>>): EventDownlink<this>;
+  downlink(template?: FastenerTemplate<EventDownlink<WarpRef>>): EventDownlink<WarpRef>;
 
-  downlinkValue<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ValueDownlink<this, V, VU>> & ValueDownlinkDescriptor<V, VU> & Partial<Omit<ValueDownlink<this, V, VU>, keyof ValueDownlinkDescriptor<V, VU>>>): ValueDownlink<this, V, VU>;
+  downlinkValue<V = Value>(template?: FastenerTemplate<ValueDownlink<WarpRef, V>>): ValueDownlink<WarpRef, V>;
 
-  downlinkList<V = Value, VU = V extends Value ? AnyValue : V>(template?: ThisType<ListDownlink<this, V, VU>> & ListDownlinkDescriptor<V, VU> & Partial<Omit<ListDownlink<this, V, VU>, keyof ListDownlinkDescriptor<V, VU>>>): ListDownlink<this, V, VU>;
+  downlinkList<V = Value>(template?: FastenerTemplate<ListDownlink<WarpRef, V>>): ListDownlink<WarpRef, V>;
 
-  downlinkMap<K = Value, V = Value, KU = K extends Value ? AnyValue : K, VU = V extends Value ? AnyValue : V>(template?: ThisType<MapDownlink<this, K, V, KU, VU>> & MapDownlinkDescriptor<K, V, KU, VU> & Partial<Omit<MapDownlink<this, K, V, KU, VU>, keyof MapDownlinkDescriptor<K, V, KU, VU>>>): MapDownlink<this, K, V, KU, VU>;
+  downlinkMap<K = Value, V = Value>(template?: FastenerTemplate<MapDownlink<WarpRef, K, V>>): MapDownlink<WarpRef, K, V>;
 
-  command(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
-  command(nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
-  command(laneUri: AnyUri, body: AnyValue): void;
-  command(body: AnyValue): void;
+  command(hostUri: UriLike, nodeUri: UriLike, laneUri: UriLike, body: ValueLike): void;
+  command(nodeUri: UriLike, laneUri: UriLike, body: ValueLike): void;
+  command(laneUri: UriLike, body: ValueLike): void;
+  command(body: ValueLike): void;
 
-  authenticate(hostUri: AnyUri, credentials: AnyValue): void;
-  authenticate(credentials: AnyValue): void;
+  authenticate(hostUri: UriLike, credentials: ValueLike): void;
+  authenticate(credentials: ValueLike): void;
 
-  hostRef(hostUri: AnyUri): WarpRef;
+  hostRef(hostUri: UriLike): WarpRef;
 
-  nodeRef(hostUri: AnyUri, nodeUri: AnyUri): WarpRef;
-  nodeRef(nodeUri: AnyUri): WarpRef;
+  nodeRef(hostUri: UriLike, nodeUri: UriLike): WarpRef;
+  nodeRef(nodeUri: UriLike): WarpRef;
 
-  laneRef(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri): WarpRef;
-  laneRef(nodeUri: AnyUri, laneUri: AnyUri): WarpRef;
-  laneRef(laneUri: AnyUri): WarpRef;
+  laneRef(hostUri: UriLike, nodeUri: UriLike, laneUri: UriLike): WarpRef;
+  laneRef(nodeUri: UriLike, laneUri: UriLike): WarpRef;
+  laneRef(laneUri: UriLike): WarpRef;
 }
 
 /** @public */

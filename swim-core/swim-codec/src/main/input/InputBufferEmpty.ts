@@ -14,7 +14,7 @@
 
 import type {Mark} from "../source/Mark";
 import {InputException} from "./InputException";
-import type {AnyInputSettings} from "./InputSettings";
+import type {InputSettingsLike} from "./InputSettings";
 import {InputSettings} from "./InputSettings";
 import {InputBuffer} from "./InputBuffer";
 import {InputBufferDone} from "../"; // forward import
@@ -148,8 +148,8 @@ export class InputBufferEmpty extends InputBuffer {
 
   override readonly settings!: InputSettings;
 
-  override withSettings(settings: AnyInputSettings): InputBuffer {
-    settings = InputSettings.fromAny(settings);
+  override withSettings(settings: InputSettingsLike): InputBuffer {
+    settings = InputSettings.fromLike(settings);
     return new InputBufferEmpty(this.id, this.mark, settings);
   }
 

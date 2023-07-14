@@ -15,6 +15,7 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
+import type {Fastener} from "@swim/component";
 import {Value} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
 import type {WarpDownlinkDescriptor} from "./WarpDownlink";
@@ -24,7 +25,7 @@ import {WarpDownlink} from "./WarpDownlink";
 import {EventDownlinkModel} from "./EventDownlinkModel";
 
 /** @public */
-export interface EventDownlinkDescriptor extends WarpDownlinkDescriptor {
+export interface EventDownlinkDescriptor<R> extends WarpDownlinkDescriptor<R> {
   extends?: Proto<EventDownlink<any>> | boolean | null;
 }
 
@@ -33,13 +34,13 @@ export interface EventDownlinkClass<F extends EventDownlink<any> = EventDownlink
 }
 
 /** @public */
-export interface EventDownlinkObserver<F extends EventDownlink<any> = EventDownlink> extends WarpDownlinkObserver<F> {
+export interface EventDownlinkObserver<F extends EventDownlink<any> = EventDownlink<any>> extends WarpDownlinkObserver<F> {
 }
 
 /** @public */
-export interface EventDownlink<O = unknown> extends WarpDownlink<O> {
+export interface EventDownlink<R = any> extends WarpDownlink<R> {
   /** @override */
-  get descriptorType(): Proto<EventDownlinkDescriptor>;
+  get descriptorType(): Proto<EventDownlinkDescriptor<R>>;
 
   /** @override */
   readonly observerType?: Class<EventDownlinkObserver>;
@@ -52,12 +53,10 @@ export interface EventDownlink<O = unknown> extends WarpDownlink<O> {
 }
 
 /** @public */
-export const EventDownlink = (function (_super: typeof WarpDownlink) {
-  const EventDownlink = _super.extend("EventDownlink", {
-    relinks: true,
-  }) as EventDownlinkClass;
+export const EventDownlink = (<R, F extends EventDownlink<any>>() => WarpDownlink.extend<EventDownlink<R>, EventDownlinkClass<F>>("EventDownlink", {
+  relinks: true,
 
-  EventDownlink.prototype.open = function (this: EventDownlink): EventDownlink {
+  open(): typeof this {
     if (this.model !== null) {
       return this;
     }
@@ -103,7 +102,11 @@ export const EventDownlink = (function (_super: typeof WarpDownlink) {
     }
     (this as Mutable<typeof this>).model = model as EventDownlinkModel;
     return this;
-  };
-
-  return EventDownlink;
-})(WarpDownlink);
+  },
+},
+{
+  construct(downlink: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
+    downlink = super.construct(downlink, owner) as F;
+    return downlink;
+  },
+}))();

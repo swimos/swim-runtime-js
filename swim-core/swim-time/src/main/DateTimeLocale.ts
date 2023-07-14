@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Lazy} from "@swim/util";
+
 /** @public */
 export class DateTimeLocale {
-  readonly periods: ReadonlyArray<string>;
-  readonly weekdays: ReadonlyArray<string>;
-  readonly shortWeekdays: ReadonlyArray<string>;
-  readonly months: ReadonlyArray<string>;
-  readonly shortMonths: ReadonlyArray<string>;
+  readonly periods: readonly string[];
+  readonly weekdays: readonly string[];
+  readonly shortWeekdays: readonly string[];
+  readonly months: readonly string[];
+  readonly shortMonths: readonly string[];
 
-  constructor(periods: ReadonlyArray<string> = DateTimeLocale.Periods,
-              weekdays: ReadonlyArray<string> = DateTimeLocale.Weekdays,
-              shortWeekdays: ReadonlyArray<string> = DateTimeLocale.ShortWeekdays,
-              months: ReadonlyArray<string> = DateTimeLocale.Months,
-              shortMonths: ReadonlyArray<string> = DateTimeLocale.ShortMonths) {
+  constructor(periods: readonly string[] = DateTimeLocale.Periods,
+              weekdays: readonly string[] = DateTimeLocale.Weekdays,
+              shortWeekdays: readonly string[] = DateTimeLocale.ShortWeekdays,
+              months: readonly string[] = DateTimeLocale.Months,
+              shortMonths: readonly string[] = DateTimeLocale.ShortMonths) {
     this.periods = periods;
     this.weekdays = weekdays;
     this.shortWeekdays = shortWeekdays;
@@ -33,13 +35,13 @@ export class DateTimeLocale {
   }
 
   /** @internal */
-  static readonly Periods: ReadonlyArray<string> = [
+  static readonly Periods: readonly string[] = [
     "AM",
     "PM",
   ];
 
   /** @internal */
-  static readonly Weekdays: ReadonlyArray<string> = [
+  static readonly Weekdays: readonly string[] = [
     "Sunday",
     "Monday",
     "Tuesday",
@@ -50,7 +52,7 @@ export class DateTimeLocale {
   ];
 
   /** @internal */
-  static readonly ShortWeekdays: ReadonlyArray<string> = [
+  static readonly ShortWeekdays: readonly string[] = [
     "Sun",
     "Mon",
     "Tue",
@@ -61,7 +63,7 @@ export class DateTimeLocale {
   ];
 
   /** @internal */
-  static readonly Months: ReadonlyArray<string> = [
+  static readonly Months: readonly string[] = [
     "January",
     "February",
     "March",
@@ -77,7 +79,7 @@ export class DateTimeLocale {
   ];
 
   /** @internal */
-  static readonly ShortMonths: ReadonlyArray<string> = [
+  static readonly ShortMonths: readonly string[] = [
     "Jan",
     "Feb",
     "Mar",
@@ -92,10 +94,8 @@ export class DateTimeLocale {
     "Dec",
   ];
 
-  /** @internal */
-  static readonly Standard: DateTimeLocale = new DateTimeLocale();
-
+  @Lazy
   static standard(): DateTimeLocale {
-    return this.Standard;
+    return new DateTimeLocale();
   }
 }

@@ -16,7 +16,7 @@ import type {HashCode} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
 import {OpenSignal} from "./"; // forward import
@@ -49,12 +49,12 @@ export abstract class Message<M extends Message<M> = Message<any>> implements Ha
 
   abstract readonly body: Value;
 
-  abstract withBody(body: AnyValue): M;
+  abstract withBody(body: ValueLike): M;
 
   abstract toValue(): Value;
 
-  toAny(): AnyValue {
-    return this.toValue().toAny();
+  toLike(): ValueLike {
+    return this.toValue().toLike();
   }
 
   toRecon(): string {

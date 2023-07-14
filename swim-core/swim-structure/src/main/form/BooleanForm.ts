@@ -23,10 +23,11 @@ export class BooleanForm extends Form<boolean> {
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
-  override readonly unit!: boolean | undefined;
+  override readonly unit: boolean | undefined;
 
   override withUnit(unit: boolean | undefined): Form<boolean> {
     if (unit === this.unit) {

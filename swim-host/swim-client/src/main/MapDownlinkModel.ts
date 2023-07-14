@@ -35,7 +35,7 @@ export class MapDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  declare readonly views: ReadonlySet<MapDownlink<unknown, unknown, unknown, unknown, unknown>> | null;
+  declare readonly views: ReadonlySet<MapDownlink<any, any, any>> | null;
 
   /** @internal */
   readonly state: BTree<Value, Value>;

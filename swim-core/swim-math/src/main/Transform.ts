@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
@@ -28,10 +29,10 @@ import type {Item} from "@swim/structure";
 import type {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
 import {Form} from "@swim/structure";
-import type {AnyLength} from "./Length";
+import type {LengthLike} from "./Length";
 import {Length} from "./Length";
 import {PxLength} from "./Length";
-import type {AnyAngle} from "./Angle";
+import type {AngleLike} from "./Angle";
 import {Angle} from "./Angle";
 import {DegAngle} from "./Angle";
 import type {R2Operator} from "./R2Function";
@@ -52,11 +53,11 @@ import {TransformList} from "./"; // forward import
 import {TransformListParser} from "./"; // forward import
 
 /** @public */
-export type AnyTransform = Transform | string;
+export type TransformLike = Transform | string;
 
 /** @public */
-export const AnyTransform = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyTransform {
+export const TransformLike = {
+  [Symbol.hasInstance](instance: unknown): instance is TransformLike {
     return instance instanceof Transform
         || typeof instance === "string";
   },
@@ -64,6 +65,8 @@ export const AnyTransform = {
 
 /** @public */
 export abstract class Transform implements R2Operator, Interpolate<Transform>, HashCode, Equivalent, Debug {
+  declare readonly likeType?: Proto<string>;
+
   abstract transform(that: Transform): Transform;
   abstract transform(x: number, y: number): R2Point;
 
@@ -73,15 +76,15 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
 
   abstract inverse(): Transform;
 
-  translate(x: AnyLength, y: AnyLength): Transform {
+  translate(x: LengthLike, y: LengthLike): Transform {
     return this.transform(Transform.translate(x, y));
   }
 
-  translateX(x: AnyLength): Transform {
+  translateX(x: LengthLike): Transform {
     return this.transform(Transform.translateX(x));
   }
 
-  translateY(y: AnyLength): Transform {
+  translateY(y: LengthLike): Transform {
     return this.transform(Transform.translateY(y));
   }
 
@@ -97,19 +100,19 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
     return this.transform(Transform.scaleY(y));
   }
 
-  rotate(a: AnyAngle): Transform {
+  rotate(a: AngleLike): Transform {
     return this.transform(Transform.rotate(a));
   }
 
-  skew(x: AnyAngle, y: AnyAngle): Transform {
+  skew(x: AngleLike, y: AngleLike): Transform {
     return this.transform(Transform.skew(x, y));
   }
 
-  skewX(x: AnyAngle): Transform {
+  skewX(x: AngleLike): Transform {
     return this.transform(Transform.skewX(x));
   }
 
-  skewY(y: AnyAngle): Transform {
+  skewY(y: AngleLike): Transform {
     return this.transform(Transform.skewY(y));
   }
 
@@ -172,19 +175,19 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
     return new IdentityTransform();
   }
 
-  static translate(x: AnyLength, y: AnyLength): TranslateTransform {
-    x = Length.fromAny(x);
-    y = Length.fromAny(y);
+  static translate(x: LengthLike, y: LengthLike): TranslateTransform {
+    x = Length.fromLike(x);
+    y = Length.fromLike(y);
     return new TranslateTransform(x, y);
   }
 
-  static translateX(x: AnyLength): TranslateTransform {
-    x = Length.fromAny(x);
+  static translateX(x: LengthLike): TranslateTransform {
+    x = Length.fromLike(x);
     return new TranslateTransform(x, PxLength.zero());
   }
 
-  static translateY(y: AnyLength): TranslateTransform {
-    y = Length.fromAny(y);
+  static translateY(y: LengthLike): TranslateTransform {
+    y = Length.fromLike(y);
     return new TranslateTransform(PxLength.zero(), y);
   }
 
@@ -200,24 +203,24 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
     return new ScaleTransform(1, y);
   }
 
-  static rotate(a: AnyAngle): RotateTransform {
-    a = Angle.fromAny(a, "deg");
+  static rotate(a: AngleLike): RotateTransform {
+    a = Angle.fromLike(a, "deg");
     return new RotateTransform(a);
   }
 
-  static skew(x: AnyAngle, y: AnyAngle): SkewTransform {
-    x = Angle.fromAny(x, "deg");
-    y = Angle.fromAny(y, "deg");
+  static skew(x: AngleLike, y: AngleLike): SkewTransform {
+    x = Angle.fromLike(x, "deg");
+    y = Angle.fromLike(y, "deg");
     return new SkewTransform(x, y);
   }
 
-  static skewX(x: AnyAngle): SkewTransform {
-    x = Angle.fromAny(x, "deg");
+  static skewX(x: AngleLike): SkewTransform {
+    x = Angle.fromLike(x, "deg");
     return new SkewTransform(x, DegAngle.zero());
   }
 
-  static skewY(y: AnyAngle): SkewTransform {
-    y = Angle.fromAny(y, "deg");
+  static skewY(y: AngleLike): SkewTransform {
+    y = Angle.fromLike(y, "deg");
     return new SkewTransform(DegAngle.zero(), y);
   }
 
@@ -227,10 +230,10 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
     return new AffineTransform(x0, y0, x1, y1, tx, ty);
   }
 
-  static list(...transforms: AnyTransform[]): TransformList {
+  static list(...transforms: TransformLike[]): TransformList {
     const list: Transform[] = [];
     for (let i = 0; i < transforms.length; i += 1) {
-      const transform = Transform.fromAny(transforms[i]!);
+      const transform = Transform.fromLike(transforms[i]!);
       if (transform instanceof TransformList) {
         list.push(...transform.transforms);
       } else if (!(transform instanceof IdentityTransform)) {
@@ -275,7 +278,7 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
     throw new TypeError("" + component);
   }
 
-  static fromAny<T extends AnyTransform | null | undefined>(value: T): Transform | Uninitable<T> {
+  static fromLike<T extends TransformLike | null | undefined>(value: T): Transform | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Transform) {
       return value as Transform | Uninitable<T>;
     } else if (typeof value === "string") {
@@ -315,32 +318,33 @@ export abstract class Transform implements R2Operator, Interpolate<Transform>, H
   }
 
   @Lazy
-  static form(): Form<Transform, AnyTransform> {
+  static form(): Form<Transform, TransformLike> {
     return new TransformForm(Transform.identity());
   }
 }
 
 /** @internal */
-export class TransformForm extends Form<Transform, AnyTransform> {
+export class TransformForm extends Form<Transform, TransformLike> {
   constructor(unit: Transform | undefined) {
     super();
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
-  override readonly unit!: Transform | undefined;
+  override readonly unit: Transform | undefined;
 
-  override withUnit(unit: Transform | undefined): Form<Transform, AnyTransform> {
+  override withUnit(unit: Transform | undefined): Form<Transform, TransformLike> {
     if (unit === this.unit) {
       return this;
     }
     return new TransformForm(unit);
   }
 
-  override mold(transform: AnyTransform): Item {
-    transform = Transform.fromAny(transform);
+  override mold(transform: TransformLike): Item {
+    transform = Transform.fromLike(transform);
     return transform.toValue();
   }
 

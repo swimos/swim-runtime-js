@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
@@ -22,7 +23,7 @@ import {Value} from "./Value";
 import {Record} from "./Record";
 
 /** @public */
-export type AnyExtant = Extant | null;
+export type ExtantLike = Extant | null;
 
 /** @public */
 export class Extant extends Value {
@@ -30,6 +31,9 @@ export class Extant extends Value {
   private constructor() {
     super();
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<null>;
 
   /**
    * Always returns `true` because `Extant` is a defined value.
@@ -95,7 +99,7 @@ export class Extant extends Value {
     return true;
   }
 
-  override toAny(): AnyExtant {
+  override toLike(): ExtantLike {
     return null;
   }
 
@@ -144,7 +148,7 @@ export class Extant extends Value {
     return new Extant();
   }
 
-  static override fromAny(value: AnyExtant): Extant {
+  static override fromLike(value: ExtantLike): Extant {
     if (value instanceof Extant) {
       return value;
     } else if (value === null) {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AnyUri} from "./Uri";
+import type {UriLike} from "./Uri";
 import {Uri} from "./Uri";
 
 /** @public */
@@ -34,9 +34,9 @@ export class UriCache {
   /** @internal */
   readonly unresolveCache: Map<string, Uri>;
 
-  resolve(relative: AnyUri): Uri {
+  resolve(relative: UriLike): Uri {
     if (typeof relative !== "string") {
-      relative = Uri.fromAny(relative).toString();
+      relative = Uri.fromLike(relative).toString();
     }
 
     const resolveCache = this.resolveCache;
@@ -62,9 +62,9 @@ export class UriCache {
     return absolute;
   }
 
-  unresolve(absolute: AnyUri): Uri {
+  unresolve(absolute: UriLike): Uri {
     if (typeof absolute !== "string") {
-      absolute = Uri.fromAny(absolute).toString();
+      absolute = Uri.fromLike(absolute).toString();
     }
 
     const unresolveCache = this.unresolveCache;

@@ -15,20 +15,20 @@
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AnyItem} from "../Item";
+import type {ItemLike} from "../Item";
 import {Item} from "../Item";
-import type {AnyValue} from "../Value";
+import type {ValueLike} from "../Value";
 import {Value} from "../Value";
-import type {AnyText} from "../Text";
+import type {TextLike} from "../Text";
 import {Text} from "../Text";
-import type {AnyNum} from "../Num";
+import type {NumLike} from "../Num";
 import {Num} from "../Num";
 import {Selector} from "./Selector";
 import {GetSelector} from "../"; // forward import
 import {GetAttrSelector} from "../"; // forward import
 import {GetItemSelector} from "../"; // forward import
 import {FilterSelector} from "../"; // forward import
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -74,23 +74,23 @@ export class IdentitySelector extends Selector {
     return transform.call(thisArg, interpreter);
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     return interpreter.peekScope().substitute(interpreter);
   }
 
-  override get(key: AnyValue): Selector {
-    key = Value.fromAny(key);
+  override get(key: ValueLike): Selector {
+    key = Value.fromLike(key);
     return new GetSelector(key, this);
   }
 
-  override getAttr(key: AnyText): Selector {
-    key = Text.fromAny(key);
+  override getAttr(key: TextLike): Selector {
+    key = Text.fromLike(key);
     return new GetAttrSelector(key, this);
   }
 
-  override getItem(index: AnyNum): Selector {
-    index = Num.fromAny(index);
+  override getItem(index: NumLike): Selector {
+    index = Num.fromLike(index);
     return new GetItemSelector(index, this);
   }
 
@@ -114,11 +114,11 @@ export class IdentitySelector extends Selector {
     return Selector.descendants();
   }
 
-  override filter(predicate?: AnyItem): Selector {
+  override filter(predicate?: ItemLike): Selector {
     if (arguments.length === 0) {
       return new FilterSelector(this, this);
     } else {
-      predicate = Item.fromAny(predicate);
+      predicate = Item.fromLike(predicate);
       return predicate.filter();
     }
   }

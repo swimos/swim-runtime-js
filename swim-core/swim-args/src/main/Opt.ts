@@ -19,20 +19,20 @@ import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import type {AnyArg} from "./Arg";
+import type {ArgLike} from "./Arg";
 import {Arg} from "./Arg";
 
 /** @public */
-export type AnyOpt = Opt | OptInit | string;
+export type OptLike = Opt | OptInit | string;
 
 /** @public */
 export interface OptInit {
   /** @internal */
-  typeid?: "OptInit";
+  readonly typeid?: "OptInit";
   name: string;
   flag?: string;
   desc?: string;
-  args?: AnyArg[];
+  args?: ArgLike[];
 }
 
 /** @public */
@@ -47,7 +47,7 @@ export class Opt implements Equals, Debug {
   }
 
   /** @internal */
-  declare typeid?: "Opt";
+  declare readonly typeid?: "Opt";
 
   readonly name: string;
 
@@ -68,8 +68,8 @@ export class Opt implements Equals, Debug {
   readonly args: readonly Arg[];
 
   /** @internal */
-  withArg(arg: AnyArg): this {
-    arg = Arg.fromAny(arg);
+  withArg(arg: ArgLike): this {
+    arg = Arg.fromLike(arg);
     (this.args as Arg[]).push(arg);
     return this;
   }
@@ -152,25 +152,16 @@ export class Opt implements Equals, Debug {
     return new Opt(this.name, this.flag, this.desc, newArgs, this.defs);
   }
 
-  static create(name: string, flag?: string, desc?: string, anyArgs?: AnyArg[]): Opt {
+  static create(name: string, flag?: string, desc?: string, anyArgs?: ArgLike[]): Opt {
     const argCount = anyArgs !== void 0 ? anyArgs.length : 0;
     const args = new Array<Arg>(argCount);
     for (let argIndex = 0; argIndex < argCount; argIndex += 1) {
-      args[argIndex] = Arg.fromAny(anyArgs![argIndex]!);
+      args[argIndex] = Arg.fromLike(anyArgs![argIndex]!);
     }
     return new Opt(name, flag, desc, args, 0);
   }
 
-  static fromInit(init: OptInit): Opt {
-    const argCount = init.args !== void 0 ? init.args.length : 0;
-    const args = new Array<Arg>(argCount);
-    for (let argIndex = 0; argIndex < argCount; argIndex += 1) {
-      args[argIndex] = Arg.fromAny(init.args![argIndex]!);
-    }
-    return new Opt(init.name, init.flag, init.desc, args, 0);
-  }
-
-  static fromAny<T extends AnyOpt | null | undefined>(value: T): Opt | Uninitable<T> {
+  static fromLike<T extends OptLike | null | undefined>(value: T): Opt | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Opt) {
       return value as Opt | Uninitable<T>;
     } else if (typeof value === "string") {
@@ -179,5 +170,14 @@ export class Opt implements Equals, Debug {
       return Opt.fromInit(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static fromInit(init: OptInit): Opt {
+    const argCount = init.args !== void 0 ? init.args.length : 0;
+    const args = new Array<Arg>(argCount);
+    for (let argIndex = 0; argIndex < argCount; argIndex += 1) {
+      args[argIndex] = Arg.fromLike(init.args![argIndex]!);
+    }
+    return new Opt(init.name, init.flag, init.desc, args, 0);
   }
 }

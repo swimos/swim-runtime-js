@@ -15,6 +15,7 @@
 import type {Proto} from "@swim/util";
 import {Objects} from "@swim/util";
 import type {FastenerDecorator} from "./Fastener";
+import type {FastenerTemplate} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import type {Fastener} from "./Fastener";
 
@@ -32,109 +33,109 @@ export interface FastenerContextClass {
 
 /** @public */
 export interface FastenerContext {
-  getParentFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null;
+  getFastener<F extends Fastener<any, any, any>>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null;
 
-  attachFastener?(fastener: Fastener): void;
+  getParentFastener<F extends Fastener<any, any, any>>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null;
 
-  decohereFastener?(fastener: Fastener): void;
+  attachFastener?(fastener: Fastener<any, any, any>): void;
+
+  decohereFastener?(fastener: Fastener<any, any, any>): void;
 
   requireUpdate?(updateFlags: number): void;
 }
 
 /** @public */
-export const FastenerContext = (function () {
-  const FastenerContext = {} as {
-    tryFastener<O, K extends keyof O, F extends O[K] = O[K]>(owner: O, fastenerName: K): F extends Fastener ? F | null : null;
+export const FastenerContext: {
+  tryFastener<R, K extends keyof R, F extends R[K] = R[K]>(owner: R, fastenerName: K): F extends Fastener<any, any, any> ? F | null : null;
 
-    getFastenerClass<O, K extends keyof O>(owner: O, fastenerName: K): O[K] extends Fastener ? FastenerClass<O[K]> | null : null;
+  getFastenerClass<R, K extends keyof R>(owner: R, fastenerName: K): R[K] extends Fastener<any, any, any> ? FastenerClass<R[K]> | null : null;
 
-    getFastenerSlot<O>(owner: O, fastenerName: keyof O): keyof O | undefined;
+  getFastenerSlot<R>(owner: R, fastenerName: keyof R): keyof R | undefined;
 
-    getFastenerSlots<O>(owner: O): readonly (keyof O)[];
+  getFastenerSlots<R>(owner: R): readonly (keyof R)[];
 
-    fastenerDecorator<F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never): FastenerDecorator<F>;
+  fastenerDecorator<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>): FastenerDecorator<F>;
 
-    /** @internal */
-    decorateFastener<F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, target: undefined, context: ClassFieldDecoratorContext<F extends Fastener<infer O> ? O : never, F>): (this: F extends Fastener<infer O> ? O : never, value?: F) => F;
-    /** @internal */
-    decorateFastener<F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, target: (this: F extends Fastener<infer O> ? O : never) => F, context: ClassGetterDecoratorContext<F extends Fastener<infer O> ? O : never, F>): (this: F extends Fastener<infer O> ? O : never) => F;
+  /** @internal */
+  decorateFastener<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>, target: undefined, context: ClassFieldDecoratorContext<F extends Fastener<infer R, any, any> ? R : never, F>): (this: F extends Fastener<infer R, any, any> ? R : never, value?: F) => F;
+  /** @internal */
+  decorateFastener<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>, target: (this: F extends Fastener<infer R, any, any> ? R : never) => F, context: ClassGetterDecoratorContext<F extends Fastener<infer R, any, any> ? R : never, F>): (this: F extends Fastener<infer R, any, any> ? R : never) => F;
 
-    /** @internal */
-    decorateFastenerField<F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, target: undefined, context: ClassFieldDecoratorContext<F extends Fastener<infer O> ? O : never, F>): (this: F extends Fastener<infer O> ? O : never, value?: F) => F;
+  /** @internal */
+  decorateFastenerField<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>, target: undefined, context: ClassFieldDecoratorContext<F extends Fastener<infer R, any, any> ? R : never, F>): (this: F extends Fastener<infer R, any, any> ? R : never, value?: F) => F;
 
-    /** @internal */
-    decorateFastenerGetter<F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, target: (this: F extends Fastener<infer O> ? O : never) => F, context: ClassGetterDecoratorContext<F extends Fastener<infer O> ? O : never, F>): (this: F extends Fastener<infer O> ? O : never) => F;
+  /** @internal */
+  decorateFastenerGetter<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>, target: (this: F extends Fastener<infer R, any, any> ? R : never) => F, context: ClassGetterDecoratorContext<F extends Fastener<infer R, any, any> ? R : never, F>): (this: F extends Fastener<infer R, any, any> ? R : never) => F;
 
-    /** @internal */
-    initOwner(owner: unknown): FastenerContextClass;
+  /** @internal */
+  initOwner(owner: unknown): FastenerContextClass;
 
-    /** @internal */
-    initFastenerField<O>(owner: O, fastenerName: PropertyKey): keyof O;
+  /** @internal */
+  initFastenerField<R>(owner: R, fastenerName: PropertyKey): keyof R;
 
-    /** @internal */
-    initFastenerGetter<O>(owner: O, fastenerName: PropertyKey): keyof O;
+  /** @internal */
+  initFastenerGetter<R>(owner: R, fastenerName: PropertyKey): keyof R;
 
-    /** @internal */
-    initFastenerClass<F extends Fastener>(owner: F extends Fastener<infer O> ? O : never, baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, fastenerName: PropertyKey, fastenerSlot: PropertyKey, fastenerClass: FastenerClass<F> | null): FastenerClass<F>;
+  /** @internal */
+  initFastenerClass<F extends Fastener<any, any, any>>(owner: F extends Fastener<infer R, any, any> ? R : never, baseClass: FastenerClass, template: FastenerTemplate<F>, fastenerName: PropertyKey, fastenerSlot: PropertyKey, fastenerClass: FastenerClass<F> | null): FastenerClass<F>;
 
-    [Symbol.hasInstance](instance: unknown): instance is FastenerContext;
+  [Symbol.hasInstance](instance: unknown): instance is FastenerContext;
 
-    readonly FastenerClassMap: unique symbol;
+  readonly FastenerClassMap: unique symbol;
 
-    readonly FastenerSlotMap: unique symbol;
+  readonly FastenerSlotMap: unique symbol;
 
-    readonly FastenerSlots: unique symbol;
-  };
-
-  FastenerContext.tryFastener = function <O, K extends keyof O, F extends O[K]>(owner: O, fastenerName: K): F extends Fastener ? F | null : null {
+  readonly FastenerSlots: unique symbol;
+} = {
+  tryFastener<R, K extends keyof R, F extends R[K]>(owner: R, fastenerName: K): F extends Fastener<any, any, any> ? F | null : null {
     const fastenerSlot = FastenerContext.getFastenerSlot(owner, fastenerName);
     const fastener = fastenerSlot !== void 0 ? owner[fastenerSlot] : void 0;
-    return (fastener !== void 0 ? fastener : null) as F extends Fastener ? F | null : null;
-  };
+    return (fastener !== void 0 ? fastener : null) as F extends Fastener<any, any, any> ? F | null : null;
+  },
 
-  FastenerContext.getFastenerClass = function <O, K extends keyof O>(owner: O, fastenerName: K): O[K] extends Fastener ? FastenerClass<O[K]> | null : null {
+  getFastenerClass<R, K extends keyof R>(owner: R, fastenerName: K): R[K] extends Fastener<any, any, any> ? FastenerClass<R[K]> | null : null {
     const contextClass = (owner as object).constructor as Partial<FastenerContextClass>;
     const fastenerClassMap = contextClass[FastenerContext.FastenerClassMap];
     const fastenerClass = fastenerClassMap !== void 0 ? fastenerClassMap[fastenerName] : void 0;
-    return fastenerClass !== void 0 ? fastenerClass as O[K] extends Fastener ? FastenerClass<O[K]> : never : null;
-  };
+    return fastenerClass !== void 0 ? fastenerClass as R[K] extends Fastener<any, any, any> ? FastenerClass<R[K]> : never : null;
+  },
 
-  FastenerContext.getFastenerSlot = function <O>(owner: O, fastenerName: PropertyKey): keyof O | undefined {
+  getFastenerSlot<R>(owner: R, fastenerName: PropertyKey): keyof R | undefined {
     const contextClass = (owner as object).constructor as Partial<FastenerContextClass>;
     const fastenerSlotMap = contextClass[FastenerContext.FastenerSlotMap];
-    return fastenerSlotMap !== void 0 ? fastenerSlotMap[fastenerName] as keyof O : void 0;
-  };
+    return fastenerSlotMap !== void 0 ? fastenerSlotMap[fastenerName] as keyof R : void 0;
+  },
 
-  FastenerContext.getFastenerSlots = function <O>(owner: O): readonly (keyof O)[] {
+  getFastenerSlots<R>(owner: R): readonly (keyof R)[] {
     const contextClass = (owner as object).constructor as Partial<FastenerContextClass>;
-    let fastenerSlots = contextClass[FastenerContext.FastenerSlots] as (keyof O)[] | undefined;
+    let fastenerSlots = contextClass[FastenerContext.FastenerSlots] as (keyof R)[] | undefined;
     if (fastenerSlots === void 0) {
       fastenerSlots = [];
     }
     return fastenerSlots;
-  };
+  },
 
-  FastenerContext.fastenerDecorator = function <F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never): FastenerDecorator<F> {
-    return FastenerContext.decorateFastener.bind(FastenerContext, baseClass, template) as unknown as FastenerDecorator<F>;
-  };
+  fastenerDecorator<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>): FastenerDecorator<F> {
+    return (FastenerContext.decorateFastener as any).bind(FastenerContext, baseClass, template);
+  },
 
-  FastenerContext.decorateFastener = function <F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, target: ((this: F extends Fastener<infer O> ? O : never) => F) | undefined, context: ClassFieldDecoratorContext<F extends Fastener<infer O> ? O : never, F> | ClassGetterDecoratorContext<F extends Fastener<infer O> ? O : never, F>): (this: F extends Fastener<infer O> ? O : never, value?: F) => F {
+  decorateFastener<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>, target: ((this: F extends Fastener<infer R, any, any> ? R : never) => F) | undefined, context: ClassFieldDecoratorContext<F extends Fastener<infer R, any, any> ? R : never, F> | ClassGetterDecoratorContext<F extends Fastener<infer R, any, any> ? R : never, F>): (this: F extends Fastener<infer R, any, any> ? R : never, value?: F) => F {
     if (context.kind === "field") {
       return FastenerContext.decorateFastenerField(baseClass, template, target as undefined, context);
     } else if (context.kind === "getter") {
       return FastenerContext.decorateFastenerGetter(baseClass, template, target!, context);
     }
     throw new Error("unsupported " + (context as ClassMemberDecoratorContext).kind + " decorator");
-  };
+  },
 
-  FastenerContext.decorateFastenerField = function <F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, target: undefined, context: ClassFieldDecoratorContext<F extends Fastener<infer O> ? O : never, F>): (this: F extends Fastener<infer O> ? O : never, value?: F) => F {
+  decorateFastenerField<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>, target: undefined, context: ClassFieldDecoratorContext<F extends Fastener<infer R, any, any> ? R : never, F>): (this: F extends Fastener<infer R, any, any> ? R : never, value?: F) => F {
     const fastenerName = context.name;
     let fastenerClass: FastenerClass<F> | null = null;
-    context.addInitializer(function (this: F extends Fastener<infer O> ? O : never): void {
+    context.addInitializer(function (this: F extends Fastener<infer R, any, any> ? R : never): void {
       FastenerContext.initFastenerField(this, fastenerName);
       fastenerClass = FastenerContext.initFastenerClass(this, baseClass, template, fastenerName, fastenerName, fastenerClass) as FastenerClass<F>;
     });
-    return function (this: F extends Fastener<infer O> ? O : never, value?: F): F {
+    return function (this: F extends Fastener<infer R, any, any> ? R : never, value?: F): F {
       if (value === void 0) {
         value = context.access.get(this);
       }
@@ -143,17 +144,17 @@ export const FastenerContext = (function () {
       }
       return value;
     };
-  };
+  },
 
-  FastenerContext.decorateFastenerGetter = function <F extends Fastener>(baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, target: F extends Fastener<infer O> ? (this: O) => F : never, context: ClassGetterDecoratorContext<F extends Fastener<infer O> ? O : never, F>): (this: F extends Fastener<infer O> ? O : never) => F {
+  decorateFastenerGetter<F extends Fastener<any, any, any>>(baseClass: FastenerClass, template: FastenerTemplate<F>, target: F extends Fastener<infer R, any, any> ? (this: R) => F : never, context: ClassGetterDecoratorContext<F extends Fastener<infer R, any, any> ? R : never, F>): (this: F extends Fastener<infer R, any, any> ? R : never) => F {
     const fastenerName = context.name;
     let fastenerClass: FastenerClass<F> | null = null;
-    context.addInitializer(function (this: F extends Fastener<infer O> ? O : never): void {
+    context.addInitializer(function (this: F extends Fastener<infer R, any, any> ? R : never): void {
       const fastenerSlot = FastenerContext.initFastenerGetter(this, fastenerName);
       fastenerClass = FastenerContext.initFastenerClass(this, baseClass, template, fastenerName, fastenerSlot, fastenerClass) as FastenerClass<F>;
       this[fastenerSlot] = void 0;
     });
-    return function (this: F extends Fastener<infer O> ? O : never): F {
+    return function (this: F extends Fastener<infer R, any, any> ? R : never): F {
       const fastenerSlot = FastenerContext.getFastenerSlot(this, fastenerName)!;
       let fastener = this[fastenerSlot] as F | undefined;
       if (fastener === void 0) {
@@ -165,10 +166,10 @@ export const FastenerContext = (function () {
       }
       return fastener;
     };
-  };
+  },
 
-  FastenerContext.initOwner = function (owner: unknown): FastenerContextClass {
-    const contextClass = (owner as any).constructor as Partial<FastenerContextClass>;
+  initOwner(owner: unknown): FastenerContextClass {
+    const contextClass = (owner as any).constructor as FastenerContextClass;
     if (!Object.prototype.hasOwnProperty.call(contextClass, FastenerContext.FastenerClassMap)) {
       Object.defineProperty(contextClass, FastenerContext.FastenerClassMap, {
         value: Object.create(null),
@@ -187,17 +188,17 @@ export const FastenerContext = (function () {
         configurable: true,
       });
     }
-    return contextClass as FastenerContextClass;
-  };
+    return contextClass;
+  },
 
-  FastenerContext.initFastenerField = function <O>(owner: O, fastenerName: PropertyKey): keyof O {
+  initFastenerField<R>(owner: R, fastenerName: PropertyKey): keyof R {
     const contextClass = FastenerContext.initOwner(owner);
     const fastenerSlotMap = contextClass[FastenerContext.FastenerSlotMap];
     fastenerSlotMap[fastenerName] = fastenerName;
-    return fastenerName as keyof O;
-  };
+    return fastenerName as keyof R;
+  },
 
-  FastenerContext.initFastenerGetter = function <O>(owner: O, fastenerName: PropertyKey): keyof O {
+  initFastenerGetter<R>(owner: R, fastenerName: PropertyKey): keyof R {
     const contextClass = FastenerContext.initOwner(owner);
     const fastenerSlotMap = contextClass[FastenerContext.FastenerSlotMap];
     let fastenerSlot = fastenerSlotMap[fastenerName];
@@ -205,10 +206,10 @@ export const FastenerContext = (function () {
       fastenerSlot = Symbol(fastenerName.toString());
       fastenerSlotMap[fastenerName] = fastenerSlot;
     }
-    return fastenerSlot as keyof O;
-  };
+    return fastenerSlot as keyof R;
+  },
 
-  FastenerContext.initFastenerClass = function <F extends Fastener>(owner: F extends Fastener<infer O> ? O : never, baseClass: FastenerClass, template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never, fastenerName: PropertyKey, fastenerSlot: PropertyKey, fastenerClass: FastenerClass<F> | null): FastenerClass<F> {
+  initFastenerClass<F extends Fastener<any, any, any>>(owner: F extends Fastener<infer R, any, any> ? R : never, baseClass: FastenerClass, template: FastenerTemplate<F>, fastenerName: PropertyKey, fastenerSlot: PropertyKey, fastenerClass: FastenerClass<F> | null): FastenerClass<F> {
     const contextClass = FastenerContext.initOwner(owner);
     const fastenerClassMap = contextClass[FastenerContext.FastenerClassMap];
     const superFastenerClass = fastenerClassMap[fastenerName];
@@ -222,21 +223,15 @@ export const FastenerContext = (function () {
       }
     }
     return fastenerClass;
-  };
+  },
 
-  Object.defineProperty(FastenerContext, Symbol.hasInstance, {
-    value: function (instance: unknown): instance is FastenerContext {
-      return Objects.hasAnyKey<FastenerContext>(instance, "getParentFastener");
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  [Symbol.hasInstance](instance: unknown): instance is FastenerContext {
+    return Objects.hasAnyKey<FastenerContext>(instance, "getParentFastener");
+  },
 
-  (FastenerContext as any).FastenerClassMap = Symbol("FastenerClassMap");
+  FastenerClassMap: Symbol("FastenerClassMap") as any,
 
-  (FastenerContext as any).FastenerSlotMap = Symbol("FastenerSlotMap");
+  FastenerSlotMap: Symbol("FastenerSlotMap") as any,
 
-  (FastenerContext as any).FastenerSlots = Symbol("FastenerSlots");
-
-  return FastenerContext;
-})();
+  FastenerSlots: Symbol("FastenerSlots") as any,
+};

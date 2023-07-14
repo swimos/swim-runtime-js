@@ -22,11 +22,11 @@ import {ConstraintProduct} from "./"; // forward import
 import {ConstraintConstant} from "./"; // forward import
 
 /** @public */
-export type AnyConstraintExpression = ConstraintExpression | number;
+export type ConstraintExpressionLike = ConstraintExpression | number;
 
 /** @public */
-export const AnyConstraintExpression = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyConstraintExpression {
+export const ConstraintExpressionLike = {
+  [Symbol.hasInstance](instance: unknown): instance is ConstraintExpressionLike {
     return ConstraintExpression[Symbol.hasInstance](instance)
         || typeof instance === "number";
   },
@@ -40,11 +40,11 @@ export interface ConstraintExpression {
 
   isConstant(): boolean;
 
-  plus(that: AnyConstraintExpression): ConstraintExpression;
+  plus(that: ConstraintExpressionLike): ConstraintExpression;
 
   negative(): ConstraintExpression;
 
-  minus(that: AnyConstraintExpression): ConstraintExpression;
+  minus(that: ConstraintExpressionLike): ConstraintExpression;
 
   times(scalar: number): ConstraintExpression;
 
@@ -64,7 +64,7 @@ export const ConstraintExpression = {
     return new ConstraintConstant(value);
   },
 
-  sum(...expressions: AnyConstraintExpression[]): ConstraintSum {
+  sum(...expressions: ConstraintExpressionLike[]): ConstraintSum {
     const terms = new Map<ConstraintVariable, number>();
     let constant = 0;
     for (let i = 0; i < expressions.length; i += 1) {
@@ -100,7 +100,7 @@ export const ConstraintExpression = {
     return new ConstraintProduct(coefficient, variable);
   },
 
-  fromAny<T extends AnyConstraintExpression | null | undefined>(value: T): ConstraintExpression | Uninitable<T> {
+  fromLike<T extends ConstraintExpressionLike | null | undefined>(value: T): ConstraintExpression | Uninitable<T> {
     if (value == void 0 || value === null || ConstraintExpression[Symbol.hasInstance](value)) {
       return value as ConstraintExpression | Uninitable<T>;
     } else if (typeof value === "number") {

@@ -13,22 +13,23 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Interpolator} from "@swim/util";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
 import {Attr} from "./"; // forward import
 import {Slot} from "./"; // forward import
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./"; // forward import
 import {Record} from "./"; // forward import
-import type {AnyText} from "./Text";
+import type {TextLike} from "./Text";
 import {Text} from "./"; // forward import
-import type {AnyNum} from "./Num";
+import type {NumLike} from "./Num";
 
 /** @public */
-export type AnyField = Field
-                     | {readonly $key: AnyValue, readonly $value: AnyValue}
-                     | {[key: string]: AnyValue};
+export type FieldLike = Field
+                      | {readonly $key: ValueLike, readonly $value: ValueLike}
+                      | {[key: string]: ValueLike};
 
 /** @public */
 export abstract class Field extends Item {
@@ -36,6 +37,10 @@ export abstract class Field extends Item {
   constructor() {
     super();
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<{readonly $key: ValueLike, readonly $value: ValueLike}
+                                  | {[key: string]: ValueLike}>;
 
   /**
    * Always returns `true` because a `Field` can never be [[Absent]].
@@ -75,12 +80,12 @@ export abstract class Field extends Item {
    *
    * @throws `Error` if this `Field` is immutable.
    */
-  abstract setValue(value: AnyValue): Value;
+  abstract setValue(value: ValueLike): Value;
 
   /**
    * Returns a copy of this `Field` with the updated `value`.
    */
-  abstract updatedValue(value: AnyValue): Field;
+  abstract updatedValue(value: ValueLike): Field;
 
   /**
    * Returns the value component of this `Field`.
@@ -174,7 +179,7 @@ export abstract class Field extends Item {
    * Always returns `false` because a `Field` can't be a `Record`, so it can't
    * have a `Field` member whose key is equal to the given `key`.
    */
-  override has(key: AnyValue): boolean {
+  override has(key: ValueLike): boolean {
     return false;
   }
 
@@ -182,7 +187,7 @@ export abstract class Field extends Item {
    * Always returns [[Absent]] because a `Field` can't be a `Record`, so it
    * can't have a `Field` member whose key is equal to the given `key`.
    */
-  override get(key: AnyValue): Value {
+  override get(key: ValueLike): Value {
     return Value.absent();
   }
 
@@ -190,7 +195,7 @@ export abstract class Field extends Item {
    * Always returns [[Absent]] because a `Field` can't be a `Record`, so it
    * can't have an `Attr` member whose key is equal to the given `key`.
    */
-  override getAttr(key: AnyText): Value {
+  override getAttr(key: TextLike): Value {
     return Value.absent();
   }
 
@@ -198,7 +203,7 @@ export abstract class Field extends Item {
    * Always returns [[Absent]] because a `Field` can't be a `Record`, so it
    * can't have a `Slot` member whose key is equal to the given `key`.
    */
-  override getSlot(key: AnyValue): Value {
+  override getSlot(key: ValueLike): Value {
     return Value.absent();
   }
 
@@ -206,7 +211,7 @@ export abstract class Field extends Item {
    * Always returns `undefined` because a `Field` can't be a `Record`, so it
    * can't have a `Field` member whose key is equal to the given `key`.
    */
-  override getField(key: AnyValue): Field | undefined {
+  override getField(key: ValueLike): Field | undefined {
     return void 0;
   }
 
@@ -214,31 +219,31 @@ export abstract class Field extends Item {
    * Always returns [[Absent]] because a `Field` can't be a `Record`, so it
    * can't have a member at the given `index`.
    */
-  override getItem(index: AnyNum): Item {
+  override getItem(index: NumLike): Item {
     return Item.absent();
   }
 
-  override deleted(key: AnyValue): Field {
+  override deleted(key: ValueLike): Field {
     return this;
   }
 
   override conditional(thenTerm: Field, elseTerm: Field): Field;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item {
-    thenTerm = Item.fromAny(thenTerm);
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item;
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item {
+    thenTerm = Item.fromLike(thenTerm);
     return thenTerm;
   }
 
   override or(that: Field): Field;
-  override or(that: AnyItem): Item;
-  override or(that: AnyItem): Item {
+  override or(that: ItemLike): Item;
+  override or(that: ItemLike): Item {
     return this;
   }
 
   override and(that: Field): Field;
-  override and(that: AnyItem): Item;
-  override and(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override and(that: ItemLike): Item;
+  override and(that: ItemLike): Item {
+    that = Item.fromLike(that);
     return that;
   }
 
@@ -297,7 +302,7 @@ export abstract class Field extends Item {
     return this.value.booleanValue(orElse);
   }
 
-  abstract override toAny(): AnyField;
+  abstract override toLike(): FieldLike;
 
   abstract override branch(): Field;
 
@@ -318,7 +323,7 @@ export abstract class Field extends Item {
   /** @internal */
   static readonly ImmutableFlag: number = 1 << 0;
 
-  static of(key: AnyValue, value?: AnyValue): Field {
+  static of(key: ValueLike, value?: ValueLike): Field {
     let name: string | undefined;
     if (typeof key === "string") {
       name = key;
@@ -339,7 +344,7 @@ export abstract class Field extends Item {
     }
   }
 
-  static override fromAny(field: AnyField): Field {
+  static override fromLike(field: FieldLike): Field {
     if (field instanceof Field) {
       return field;
     } else if (typeof field === "object" && field !== null) {

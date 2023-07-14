@@ -15,7 +15,7 @@
 import * as http from "http";
 import * as ws from "ws";
 import type {Mutable} from "@swim/util";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import {Envelope} from "@swim/warp";
 import {WarpClient} from "@swim/client";
@@ -48,8 +48,8 @@ export class MockServer {
   /** @internal */
   readonly socket: ws.WebSocket | null;
 
-  resolve(relative: AnyUri): Uri {
-    relative = Uri.fromAny(relative);
+  resolve(relative: UriLike): Uri {
+    relative = Uri.fromLike(relative);
     return this.hostUri.resolve(relative);
   }
 
@@ -160,11 +160,11 @@ export class MockServer {
     // hook
   }
 
-  static create(hostUri?: AnyUri, client?: WarpClient): MockServer {
+  static create(hostUri?: UriLike, client?: WarpClient): MockServer {
     if (hostUri === void 0) {
       hostUri = "ws://localhost:5619";
     }
-    hostUri = Uri.fromAny(hostUri);
+    hostUri = Uri.fromLike(hostUri);
     if (client === void 0) {
       client = new WarpClient();
     }

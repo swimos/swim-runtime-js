@@ -13,22 +13,23 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
 import type {Interpolator} from "@swim/util";
-import type {AnyOutputSettings} from "@swim/codec";
+import type {OutputSettingsLike} from "@swim/codec";
 import {OutputSettings} from "@swim/codec";
 import {Output} from "@swim/codec";
 import {Format} from "@swim/codec";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./Value";
 import {Num} from "./"; // forward import
 
 /** @public */
-export type AnyText = Text | string;
+export type TextLike = Text | string;
 
 /** @public */
 export class Text extends Value {
@@ -37,6 +38,9 @@ export class Text extends Value {
     this.value = value;
     this.hashValue = void 0;
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<string>;
 
   override isConstant(): boolean {
     return true;
@@ -76,7 +80,7 @@ export class Text extends Value {
     }
   }
 
-  override toAny(): AnyText {
+  override toLike(): TextLike {
     return this.value;
   }
 
@@ -84,10 +88,10 @@ export class Text extends Value {
     return this.value;
   }
 
-  override plus(that: AnyValue): Value;
-  override plus(that: AnyItem): Item;
-  override plus(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override plus(that: ValueLike): Value;
+  override plus(that: ItemLike): Item;
+  override plus(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Text) {
       return Text.from(this.value + that.value);
     }
@@ -182,7 +186,7 @@ export class Text extends Value {
     return new Text(value);
   }
 
-  static override fromAny(value: AnyText): Text {
+  static override fromLike(value: TextLike): Text {
     if (value instanceof Text) {
       return value;
     } else if (typeof value === "string") {
@@ -252,8 +256,8 @@ export class TextOutput extends Output<Text> {
 
   override readonly settings!: OutputSettings;
 
-  override withSettings(settings: AnyOutputSettings): Output<Text> {
-    settings = OutputSettings.fromAny(settings);
+  override withSettings(settings: OutputSettingsLike): Output<Text> {
+    settings = OutputSettings.fromLike(settings);
     (this as Mutable<this>).settings = settings;
     return this;
   }

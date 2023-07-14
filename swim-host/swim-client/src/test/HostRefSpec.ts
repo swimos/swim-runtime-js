@@ -76,7 +76,7 @@ export class HostRefSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.instanceOf(envelope, CommandMessage);
-        exam.equal(envelope.node, Uri.parse("house/kitchen"));
+        exam.equal(envelope.node, Uri.parse("/house/kitchen"));
         exam.equal(envelope.lane, Uri.parse("light"));
         exam.equal(envelope.body, Text.from("on"));
         resolve();

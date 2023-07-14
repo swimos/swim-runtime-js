@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./Value";
 import {Num} from "./Num";
 import type {Operator} from "./operator/Operator";
@@ -48,90 +48,90 @@ export abstract class Expression extends Value {
   }
 
   override conditional(thenTerm: Value, elseTerm: Value): Value;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item {
-    thenTerm = Item.fromAny(thenTerm);
-    elseTerm = Item.fromAny(elseTerm);
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item;
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item {
+    thenTerm = Item.fromLike(thenTerm);
+    elseTerm = Item.fromLike(elseTerm);
     return new ConditionalOperator(this, thenTerm, elseTerm);
   }
 
-  override or(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override or(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new OrOperator(this, that);
   }
 
-  override and(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override and(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new AndOperator(this, that);
   }
 
-  override bitwiseOr(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override bitwiseOr(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new BitwiseOrOperator(this, that);
   }
 
-  override bitwiseXor(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override bitwiseXor(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new BitwiseXorOperator(this, that);
   }
 
-  override bitwiseAnd(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override bitwiseAnd(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new BitwiseAndOperator(this, that);
   }
 
-  override lt(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override lt(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new LtOperator(this, that);
   }
 
-  override le(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override le(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new LeOperator(this, that);
   }
 
-  override eq(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override eq(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new EqOperator(this, that);
   }
 
-  override ne(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override ne(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new NeOperator(this, that);
   }
 
-  override ge(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override ge(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new GeOperator(this, that);
   }
 
-  override gt(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override gt(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new GtOperator(this, that);
   }
 
-  override plus(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override plus(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new PlusOperator(this, that);
   }
 
-  override minus(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override minus(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new MinusOperator(this, that);
   }
 
-  override times(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override times(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new TimesOperator(this, that);
   }
 
-  override divide(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override divide(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new DivideOperator(this, that);
   }
 
-  override modulo(that: AnyItem): Operator {
-    that = Item.fromAny(that);
+  override modulo(that: ItemLike): Operator {
+    that = Item.fromLike(that);
     return new ModuloOperator(this, that);
   }
 
@@ -155,7 +155,7 @@ export abstract class Expression extends Value {
     return new DivideOperator(Num.one(), this);
   }
 
-  override toAny(): AnyValue {
+  override toLike(): ValueLike {
     return this;
   }
 }

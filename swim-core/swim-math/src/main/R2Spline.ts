@@ -16,7 +16,7 @@ import type {Mutable} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
-import type {AnyOutputSettings} from "@swim/codec";
+import type {OutputSettingsLike} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
 import {Parser} from "@swim/codec";
@@ -25,7 +25,7 @@ import {Format} from "@swim/codec";
 import {Base10} from "@swim/codec";
 import {Unicode} from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import type {AnyR2Shape} from "./R2Shape";
+import type {R2ShapeLike} from "./R2Shape";
 import {R2Point} from "./R2Point";
 import type {R2CurveContext} from "./R2Curve";
 import {R2Curve} from "./R2Curve";
@@ -48,7 +48,7 @@ export interface R2SplineContext extends R2CurveContext {
 
 /** @public */
 export class R2Spline extends R2Curve implements Debug {
-  constructor(curves: ReadonlyArray<R2Curve>, closed: boolean) {
+  constructor(curves: readonly R2Curve[], closed: boolean) {
     super();
     this.curves = curves;
     this.closed = closed;
@@ -56,7 +56,7 @@ export class R2Spline extends R2Curve implements Debug {
     this.pathString = void 0;
   }
 
-  readonly curves: ReadonlyArray<R2Curve>;
+  readonly curves: readonly R2Curve[];
 
   /** @internal */
   readonly closed: boolean;
@@ -121,13 +121,13 @@ export class R2Spline extends R2Curve implements Debug {
     return curves[k]!.interpolate(v);
   }
 
-  override contains(that: AnyR2Shape): boolean;
+  override contains(that: R2ShapeLike): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyR2Shape | number, y?: number): boolean {
+  override contains(that: R2ShapeLike | number, y?: number): boolean {
     return false; // TODO
   }
 
-  override intersects(that: AnyR2Shape): boolean {
+  override intersects(that: R2ShapeLike): boolean {
     return false; // TODO
   }
 
@@ -275,7 +275,7 @@ export class R2Spline extends R2Curve implements Debug {
   /** @internal */
   readonly pathString: string | undefined;
 
-  override toPathString(outputSettings?: AnyOutputSettings): string {
+  override toPathString(outputSettings?: OutputSettingsLike): string {
     let pathString: string | undefined;
     if (outputSettings !== void 0 || (pathString = this.pathString, pathString === void 0)) {
       const output = Unicode.stringOutput(outputSettings);

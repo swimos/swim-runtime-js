@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -40,11 +41,11 @@ import {Form} from "@swim/structure";
 export type AngleUnits = "deg" | "rad" | "grad" | "turn";
 
 /** @public */
-export type AnyAngle = Angle | string | number;
+export type AngleLike = Angle | string | number;
 
 /** @public */
-export const AnyAngle = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyAngle {
+export const AngleLike = {
+  [Symbol.hasInstance](instance: unknown): instance is AngleLike {
     return instance instanceof Angle
         || typeof instance === "number"
         || typeof instance === "string";
@@ -57,12 +58,14 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     return isFinite(this.value);
   }
 
+  declare readonly likeType?: Proto<string | number>;
+
   abstract readonly value: number;
 
   abstract readonly units: AngleUnits;
 
-  plus(that: AnyAngle, units: AngleUnits = this.units): Angle {
-    that = Angle.fromAny(that);
+  plus(that: AngleLike, units: AngleUnits = this.units): Angle {
+    that = Angle.fromLike(that);
     return Angle.of(this.toValue(units) + that.toValue(units), units);
   }
 
@@ -70,8 +73,8 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     return Angle.of(-this.toValue(units), units);
   }
 
-  minus(that: AnyAngle, units: AngleUnits = this.units): Angle {
-    that = Angle.fromAny(that);
+  minus(that: AngleLike, units: AngleUnits = this.units): Angle {
+    that = Angle.fromLike(that);
     return Angle.of(this.toValue(units) - that.toValue(units), units);
   }
 
@@ -83,13 +86,13 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     return Angle.of(this.toValue(units) / scalar, units);
   }
 
-  combine(that: AnyAngle, scalar: number = 1, units: AngleUnits = this.units): Angle {
-    that = Angle.fromAny(that);
+  combine(that: AngleLike, scalar: number = 1, units: AngleUnits = this.units): Angle {
+    that = Angle.fromLike(that);
     return Angle.of(this.toValue(units) + that.toValue(units) * scalar, units);
   }
 
-  norm(total: AnyAngle, units: AngleUnits = this.units): Angle {
-    total = Angle.fromAny(total);
+  norm(total: AngleLike, units: AngleUnits = this.units): Angle {
+    total = Angle.fromLike(total);
     return Angle.of(this.toValue(units) / total.toValue(units), units);
   }
 
@@ -217,7 +220,7 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     throw new TypeError("" + value);
   }
 
-  static fromAny<T extends AnyAngle | null | undefined>(value: T, defaultUnits?: AngleUnits): Angle | Uninitable<T> {
+  static fromLike<T extends AngleLike | null | undefined>(value: T, defaultUnits?: AngleUnits): Angle | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Angle) {
       return value as Angle | Uninitable<T>;
     } else if (typeof value === "number") {
@@ -264,7 +267,7 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
   }
 
   @Lazy
-  static form(): Form<Angle, AnyAngle> {
+  static form(): Form<Angle, AngleLike> {
     return new AngleForm(void 0, Angle.zero());
   }
 }
@@ -655,29 +658,30 @@ export const AngleInterpolator = (function (_super: typeof Interpolator) {
 })(Interpolator);
 
 /** @internal */
-export class AngleForm extends Form<Angle, AnyAngle> {
+export class AngleForm extends Form<Angle, AngleLike> {
   constructor(defaultUnits: AngleUnits | undefined, unit: Angle | undefined) {
     super();
     this.defaultUnits = defaultUnits;
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
   readonly defaultUnits: AngleUnits | undefined;
 
-  override readonly unit!: Angle | undefined;
+  override readonly unit: Angle | undefined;
 
-  override withUnit(unit: Angle | undefined): Form<Angle, AnyAngle> {
+  override withUnit(unit: Angle | undefined): Form<Angle, AngleLike> {
     if (unit === this.unit) {
       return this;
     }
     return new AngleForm(this.defaultUnits, unit);
   }
 
-  override mold(angle: AnyAngle): Item {
-    angle = Angle.fromAny(angle, this.defaultUnits);
+  override mold(angle: AngleLike): Item {
+    angle = Angle.fromLike(angle, this.defaultUnits);
     return Text.from(angle.toString());
   }
 

@@ -19,9 +19,9 @@ import type {Observer} from "@swim/util";
 import {Affinity} from "@swim/component";
 import {Property} from "@swim/component";
 import type {Component} from "@swim/component";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import webworker from "@swim/client/webworker";
 import type {WarpDownlinkModel} from "./WarpDownlinkModel";
@@ -57,31 +57,31 @@ export class WarpClient extends WarpScope {
 
   declare readonly observerType?: Class<WarpClientObserver>;
 
-  override command(hostUri: AnyUri, nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
-  override command(nodeUri: AnyUri, laneUri: AnyUri, body: AnyValue): void;
-  override command(laneUri: AnyUri, body: AnyValue): void;
-  override command(body: AnyValue): void;
-  override command(hostUri: AnyUri | AnyValue, nodeUri?: AnyUri | AnyValue, laneUri?: AnyUri | AnyValue, body?: AnyValue): void {
+  override command(hostUri: UriLike, nodeUri: UriLike, laneUri: UriLike, body: ValueLike): void;
+  override command(nodeUri: UriLike, laneUri: UriLike, body: ValueLike): void;
+  override command(laneUri: UriLike, body: ValueLike): void;
+  override command(body: ValueLike): void;
+  override command(hostUri: UriLike | ValueLike, nodeUri?: UriLike | ValueLike, laneUri?: UriLike | ValueLike, body?: ValueLike): void {
     if (nodeUri === void 0) {
-      body = Value.fromAny(hostUri as AnyValue);
+      body = Value.fromLike(hostUri as ValueLike);
       laneUri = this.laneUri.getValue();
       nodeUri = this.nodeUri.getValue();
       hostUri = this.hostUri.value;
     } else if (laneUri === void 0) {
-      body = Value.fromAny(nodeUri as AnyValue);
-      laneUri = Uri.fromAny(hostUri as AnyUri);
+      body = Value.fromLike(nodeUri as ValueLike);
+      laneUri = Uri.fromLike(hostUri as UriLike);
       nodeUri = this.nodeUri.getValue();
       hostUri = this.hostUri.value;
     } else if (body === void 0) {
-      body = Value.fromAny(laneUri as AnyValue);
-      laneUri = Uri.fromAny(nodeUri as AnyUri);
-      nodeUri = Uri.fromAny(hostUri as AnyUri);
+      body = Value.fromLike(laneUri as ValueLike);
+      laneUri = Uri.fromLike(nodeUri as UriLike);
+      nodeUri = Uri.fromLike(hostUri as UriLike);
       hostUri = this.hostUri.value;
     } else {
-      body = Value.fromAny(body);
-      laneUri = Uri.fromAny(laneUri as AnyUri);
-      nodeUri = Uri.fromAny(nodeUri as AnyUri);
-      hostUri = Uri.fromAny(hostUri as AnyUri);
+      body = Value.fromLike(body);
+      laneUri = Uri.fromLike(laneUri as UriLike);
+      nodeUri = Uri.fromLike(nodeUri as UriLike);
+      hostUri = Uri.fromLike(hostUri as UriLike);
     }
     if (hostUri === null) {
       hostUri = nodeUri.endpoint();
@@ -91,15 +91,15 @@ export class WarpClient extends WarpScope {
     host.command(nodeUri, laneUri, body);
   }
 
-  override authenticate(hostUri: AnyUri, credentials: AnyValue): void;
-  override authenticate(credentials: AnyValue): void;
-  override authenticate(hostUri: AnyUri | AnyValue, credentials?: AnyValue): void {
+  override authenticate(hostUri: UriLike, credentials: ValueLike): void;
+  override authenticate(credentials: ValueLike): void;
+  override authenticate(hostUri: UriLike | ValueLike, credentials?: ValueLike): void {
     if (credentials === void 0) {
-      credentials = Value.fromAny(hostUri as AnyValue);
+      credentials = Value.fromLike(hostUri as ValueLike);
       hostUri = this.hostUri.getValue();
     } else {
-      credentials = Value.fromAny(credentials);
-      hostUri = Uri.fromAny(hostUri as AnyUri);
+      credentials = Value.fromLike(credentials);
+      hostUri = Uri.fromLike(hostUri as UriLike);
     }
     const host = this.openHost(hostUri);
     host.authenticate(credentials);
@@ -120,13 +120,13 @@ export class WarpClient extends WarpScope {
     host.openDownlink(downlink);
   }
 
-  getHost(hostUri: AnyUri): WarpHost | null {
-    hostUri = Uri.fromAny(hostUri);
+  getHost(hostUri: UriLike): WarpHost | null {
+    hostUri = Uri.fromLike(hostUri);
     return this.getChild(hostUri.toString(), WarpHost);
   }
 
-  openHost(hostUri: AnyUri): WarpHost {
-    hostUri = Uri.fromAny(hostUri);
+  openHost(hostUri: UriLike): WarpHost {
+    hostUri = Uri.fromLike(hostUri);
     let host = this.getChild(hostUri.toString(), WarpHost);
     if (host === null) {
       host = this.createHost(hostUri);
@@ -156,8 +156,8 @@ export class WarpClient extends WarpScope {
     return host;
   }
 
-  closeHost(hostUri: AnyUri): WarpHost | null {
-    hostUri = Uri.fromAny(hostUri);
+  closeHost(hostUri: UriLike): WarpHost | null {
+    hostUri = Uri.fromLike(hostUri);
     const host = this.getChild(hostUri.toString(), WarpHost);
     if (host !== null) {
       this.removeChild(host);

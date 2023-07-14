@@ -28,7 +28,7 @@ import {Format} from "../format/Format";
  * initializer.
  * @public
  */
-export type AnyOutputSettings = OutputSettings | OutputSettingsInit;
+export type OutputSettingsLike = OutputSettings | OutputSettingsInit;
 
 /**
  * [[OutputSettings]] object initializer.
@@ -266,7 +266,7 @@ export class OutputSettings implements Debug, HashCode {
   /**
    * Converts a loosely typed settings `value` to an instance of `OutputSettings`.
    */
-  static fromAny(value: AnyOutputSettings | undefined): OutputSettings {
+  static fromLike(value: OutputSettingsLike | undefined): OutputSettings {
     if (value instanceof OutputSettings) {
       return value;
     } else if (typeof value === "object" && value !== null) {

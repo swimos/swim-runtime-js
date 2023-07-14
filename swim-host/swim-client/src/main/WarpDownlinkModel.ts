@@ -17,7 +17,7 @@ import {Property} from "@swim/component";
 import type {ComponentFlags} from "@swim/component";
 import {Component} from "@swim/component";
 import type {Uri} from "@swim/uri";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
 import type {EventMessage} from "@swim/warp";
 import {LinkRequest} from "@swim/warp";
@@ -214,7 +214,7 @@ export class WarpDownlinkModel extends Component {
   }
 
   @Property({valueType: Value, value: Value.absent(), inherits: true})
-  readonly session!: Property<this, Value, AnyValue>;
+  readonly session!: Property<this, Value>;
 
   addDownlink(view: WarpDownlink): void {
     let views = this.views as Set<WarpDownlink> | null;
@@ -284,12 +284,12 @@ export class WarpDownlinkModel extends Component {
   @Property({valueType: Number, value: 0, inherits: true})
   readonly unlinkDelay!: Property<this, number>;
 
-  command(body: AnyValue): void {
+  command(body: ValueLike): void {
     const host = this.getAncestor(WarpHost);
     if (host === null) {
       return;
     }
-    body = Value.fromAny(body);
+    body = Value.fromLike(body);
     this.onCommandMessage(body);
     host.command(this.nodeUri, this.laneUri, body);
   }

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export type {AnyItem} from "./Item";
+export type {ItemLike} from "./Item";
 export {Item} from "./Item";
 export {ItemInterpolator} from "./Item";
 
-export type {AnyField} from "./Field";
+export type {FieldLike} from "./Field";
 export {Field} from "./Field";
 export {FieldInterpolator} from "./Field";
 
@@ -26,36 +26,36 @@ export {AttrInterpolator} from "./Attr";
 export {Slot} from "./Slot";
 export {SlotInterpolator} from "./Slot";
 
-export type {AnyValue} from "./Value";
+export type {ValueLike} from "./Value";
 export {Value} from "./Value";
 export {ValueBuilder} from "./Value";
 
-export type {AnyRecord} from "./Record";
+export type {RecordLike} from "./Record";
 export {Record} from "./Record";
 export {RecordInterpolator} from "./Record";
 export {RecordCursor} from "./Record";
 export {RecordMap} from "./RecordMap";
 export {RecordMapView} from "./RecordMapView";
 
-export type {AnyData} from "./Data";
+export type {DataLike} from "./Data";
 export {Data} from "./Data";
 export {DataOutput} from "./Data";
 
-export type {AnyText} from "./Text";
+export type {TextLike} from "./Text";
 export {Text} from "./Text";
 export {TextOutput} from "./Text";
 
-export type {AnyNum} from "./Num";
+export type {NumLike} from "./Num";
 export {Num} from "./Num";
 export {NumInterpolator} from "./Num";
 
-export type {AnyBool} from "./Bool";
+export type {BoolLike} from "./Bool";
 export {Bool} from "./Bool";
 
-export type {AnyExtant} from "./Extant";
+export type {ExtantLike} from "./Extant";
 export {Extant} from "./Extant";
 
-export type {AnyAbsent} from "./Absent";
+export type {AbsentLike} from "./Absent";
 export {Absent} from "./Absent";
 
 export {Expression} from "./Expression";

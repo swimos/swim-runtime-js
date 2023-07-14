@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {AnyOutputSettings} from "../output/OutputSettings";
+import type {OutputSettingsLike} from "../output/OutputSettings";
 import {OutputSettings} from "../output/OutputSettings";
 import {Output} from "../output/Output";
 
@@ -78,8 +78,8 @@ export class StringOutput extends Output<string> {
 
   override readonly settings: OutputSettings;
 
-  override withSettings(settings: AnyOutputSettings): Output<string> {
-    settings = OutputSettings.fromAny(settings);
+  override withSettings(settings: OutputSettingsLike): Output<string> {
+    settings = OutputSettings.fromLike(settings);
     (this as Mutable<this>).settings = settings;
     return this;
   }

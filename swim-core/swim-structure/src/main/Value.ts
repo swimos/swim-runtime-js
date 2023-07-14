@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Proto} from "@swim/util";
 import type {Interpolator} from "@swim/util";
 import type {Builder} from "@swim/util";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
 import {Field} from "./"; // forward import
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
 import {Record} from "./"; // forward import
 import {Data} from "./"; // forward import
-import type {AnyText} from "./Text";
+import type {TextLike} from "./Text";
 import {Text} from "./"; // forward import
-import type {AnyNum} from "./Num";
+import type {NumLike} from "./Num";
 import {Num} from "./"; // forward import
 import {Bool} from "./"; // forward import
 import {Extant} from "./"; // forward import
@@ -46,15 +47,15 @@ import {ModuloOperator} from "./"; // forward import
 import {LambdaFunc} from "./"; // forward import
 
 /** @public */
-export type AnyValue = Value
-                     | {readonly [key: string]: AnyValue}
-                     | ReadonlyArray<AnyItem>
-                     | Uint8Array
-                     | string
-                     | number
-                     | boolean
-                     | null
-                     | undefined;
+export type ValueLike = Value
+                      | {readonly [key: string]: ValueLike}
+                      | readonly ItemLike[]
+                      | Uint8Array
+                      | string
+                      | number
+                      | boolean
+                      | null
+                      | undefined;
 
 /** @public */
 export abstract class Value extends Item {
@@ -62,6 +63,16 @@ export abstract class Value extends Item {
   constructor() {
     super();
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<{readonly [key: string]: ValueLike}
+                                  | readonly ItemLike[]
+                                  | Uint8Array
+                                  | string
+                                  | number
+                                  | boolean
+                                  | null
+                                  | undefined>;
 
   /**
    * Returns `true` if this `Value` is not [[Absent]].
@@ -225,7 +236,7 @@ export abstract class Value extends Item {
    * this `Value` is not a `Record`, or if this `Value` is a `Record`, but has
    * no `Field` member with a key equal to the given `key`.
    */
-  override has(key: AnyValue): boolean {
+  override has(key: ValueLike): boolean {
     return false;
   }
 
@@ -235,7 +246,7 @@ export abstract class Value extends Item {
    * [[Record]], or if this `Value` is a `Record`, but has no `Field` member
    * with a key equal to the given `key`.
    */
-  override get(key: AnyValue): Value {
+  override get(key: ValueLike): Value {
     return Value.absent();
   }
 
@@ -245,7 +256,7 @@ export abstract class Value extends Item {
    * [[Record]], or if this `Value` is a `Record`, but has no `Attr` member
    * with a key equal to the given `key`.
    */
-  override getAttr(key: AnyText): Value {
+  override getAttr(key: TextLike): Value {
     return Value.absent();
   }
 
@@ -255,7 +266,7 @@ export abstract class Value extends Item {
    * [[Record]], or if this `Value` is a `Record`, but has no `Slot` member
    * with a key equal to the given `key`.
    */
-  override getSlot(key: AnyValue): Value {
+  override getSlot(key: ValueLike): Value {
     return Value.absent();
   }
 
@@ -265,7 +276,7 @@ export abstract class Value extends Item {
    * or if this `Value` is a `Record`, but has no `Field` member with a `key`
    * equal to the given `key`.
    */
-  override getField(key: AnyValue): Field | undefined {
+  override getField(key: ValueLike): Field | undefined {
     return void 0;
   }
 
@@ -276,38 +287,38 @@ export abstract class Value extends Item {
    * [[Absent]] if this `Value` is not a `Record`, or if this `Value` is a
    * `Record`, but the `index` is out of bounds.
    */
-  override getItem(index: AnyNum): Item {
+  override getItem(index: NumLike): Item {
     return Item.absent();
   }
 
-  override deleted(key: AnyValue): Value {
+  override deleted(key: ValueLike): Value {
     return this;
   }
 
-  override conditional(thenTerm: AnyValue, elseTerm: AnyValue): Value;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item {
-    thenTerm = Item.fromAny(thenTerm);
+  override conditional(thenTerm: ValueLike, elseTerm: ValueLike): Value;
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item;
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item {
+    thenTerm = Item.fromLike(thenTerm);
     return thenTerm;
   }
 
-  override or(that: AnyValue): Value;
-  override or(that: AnyItem): Item;
-  override or(that: AnyItem): Item {
+  override or(that: ValueLike): Value;
+  override or(that: ItemLike): Item;
+  override or(that: ItemLike): Item {
     return this;
   }
 
-  override and(that: AnyValue): Value;
-  override and(that: AnyItem): Item;
-  override and(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override and(that: ValueLike): Value;
+  override and(that: ItemLike): Item;
+  override and(that: ItemLike): Item {
+    that = Item.fromLike(that);
     return that;
   }
 
-  override bitwiseOr(that: AnyValue): Value;
-  override bitwiseOr(that: AnyItem): Item;
-  override bitwiseOr(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseOr(that: ValueLike): Value;
+  override bitwiseOr(that: ItemLike): Item;
+  override bitwiseOr(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new BitwiseOrOperator(this, that);
     } else if (that instanceof Attr) {
@@ -324,10 +335,10 @@ export abstract class Value extends Item {
     return Item.absent();
   }
 
-  override bitwiseXor(that: AnyValue): Value;
-  override bitwiseXor(that: AnyItem): Item;
-  override bitwiseXor(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseXor(that: ValueLike): Value;
+  override bitwiseXor(that: ItemLike): Item;
+  override bitwiseXor(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new BitwiseXorOperator(this, that);
     } else if (that instanceof Attr) {
@@ -344,10 +355,10 @@ export abstract class Value extends Item {
     return Item.absent();
   }
 
-  override bitwiseAnd(that: AnyValue): Value;
-  override bitwiseAnd(that: AnyItem): Item;
-  override bitwiseAnd(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseAnd(that: ValueLike): Value;
+  override bitwiseAnd(that: ItemLike): Item;
+  override bitwiseAnd(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new BitwiseAndOperator(this, that);
     } else if (that instanceof Attr) {
@@ -364,70 +375,70 @@ export abstract class Value extends Item {
     return Item.absent();
   }
 
-  override lt(that: AnyValue): Value;
-  override lt(that: AnyItem): Item;
-  override lt(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override lt(that: ValueLike): Value;
+  override lt(that: ItemLike): Item;
+  override lt(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new LtOperator(this, that);
     }
     return super.lt(that);
   }
 
-  override le(that: AnyValue): Value;
-  override le(that: AnyItem): Item;
-  override le(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override le(that: ValueLike): Value;
+  override le(that: ItemLike): Item;
+  override le(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new LeOperator(this, that);
     }
     return super.le(that);
   }
 
-  override eq(that: AnyValue): Value;
-  override eq(that: AnyItem): Item;
-  override eq(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override eq(that: ValueLike): Value;
+  override eq(that: ItemLike): Item;
+  override eq(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new EqOperator(this, that);
     }
     return super.eq(that);
   }
 
-  override ne(that: AnyValue): Value;
-  override ne(that: AnyItem): Item;
-  override ne(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override ne(that: ValueLike): Value;
+  override ne(that: ItemLike): Item;
+  override ne(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new NeOperator(this, that);
     }
     return super.ne(that);
   }
 
-  override ge(that: AnyValue): Value;
-  override ge(that: AnyItem): Item;
-  override ge(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override ge(that: ValueLike): Value;
+  override ge(that: ItemLike): Item;
+  override ge(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new GeOperator(this, that);
     }
     return super.ge(that);
   }
 
-  override gt(that: AnyValue): Value;
-  override gt(that: AnyItem): Item;
-  override gt(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override gt(that: ValueLike): Value;
+  override gt(that: ItemLike): Item;
+  override gt(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new GtOperator(this, that);
     }
     return super.gt(that);
   }
 
-  override plus(that: AnyValue): Value;
-  override plus(that: AnyItem): Item;
-  override plus(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override plus(that: ValueLike): Value;
+  override plus(that: ItemLike): Item;
+  override plus(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new PlusOperator(this, that);
     } else if (that instanceof Attr) {
@@ -444,10 +455,10 @@ export abstract class Value extends Item {
     return Item.absent();
   }
 
-  override minus(that: AnyValue): Value;
-  override minus(that: AnyItem): Item;
-  override minus(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override minus(that: ValueLike): Value;
+  override minus(that: ItemLike): Item;
+  override minus(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new MinusOperator(this, that);
     } else if (that instanceof Attr) {
@@ -464,10 +475,10 @@ export abstract class Value extends Item {
     return Item.absent();
   }
 
-  override times(that: AnyValue): Value;
-  override times(that: AnyItem): Item;
-  override times(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override times(that: ValueLike): Value;
+  override times(that: ItemLike): Item;
+  override times(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new TimesOperator(this, that);
     } else if (that instanceof Attr) {
@@ -484,10 +495,10 @@ export abstract class Value extends Item {
     return Item.absent();
   }
 
-  override divide(that: AnyValue): Value;
-  override divide(that: AnyItem): Item;
-  override divide(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override divide(that: ValueLike): Value;
+  override divide(that: ItemLike): Item;
+  override divide(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new DivideOperator(this, that);
     } else if (that instanceof Attr) {
@@ -504,10 +515,10 @@ export abstract class Value extends Item {
     return Item.absent();
   }
 
-  override modulo(that: AnyValue): Value;
-  override modulo(that: AnyItem): Item;
-  override modulo(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override modulo(that: ValueLike): Value;
+  override modulo(that: ItemLike): Item;
+  override modulo(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Expression) {
       return new ModuloOperator(this, that);
     } else if (that instanceof Attr) {
@@ -591,7 +602,7 @@ export abstract class Value extends Item {
     return orElse;
   }
 
-  abstract override toAny(): AnyValue;
+  abstract override toLike(): ValueLike;
 
   override isAliased(): boolean {
     return false;
@@ -644,7 +655,7 @@ export abstract class Value extends Item {
     return Absent.absent();
   }
 
-  static override fromAny(value: AnyValue): Value {
+  static override fromLike(value: ValueLike): Value {
     if (value instanceof Value) {
       return value;
     } else if (value instanceof Item) {
@@ -664,7 +675,7 @@ export abstract class Value extends Item {
     } else if (Array.isArray(value)) {
       return Record.fromArray(value);
     } else if (typeof value === "object") {
-      return Record.fromObject(value as {[key: string]: AnyValue});
+      return Record.fromObject(value as {[key: string]: ValueLike});
     }
     throw new TypeError("" + value);
   }

@@ -13,15 +13,15 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
 import {Field} from "./Field";
 import {Attr} from "./Attr";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./Value";
 import {Record} from "./Record";
 import {RecordMap} from "./RecordMap";
-import type {AnyNum} from "./Num";
+import type {NumLike} from "./Num";
 import {Num} from "./"; // forward import
 
 /** @internal */
@@ -163,8 +163,8 @@ export class RecordMapView extends Record {
     return new RecordMapView(this.record, this.lower + 1, this.upper).branch();
   }
 
-  override indexOf(item: AnyItem, index: number = 0): number {
-    item = Item.fromAny(item);
+  override indexOf(item: ItemLike, index: number = 0): number {
+    item = Item.fromLike(item);
     const array = this.record.array;
     const n = this.length;
     if (index < 0) {
@@ -180,8 +180,8 @@ export class RecordMapView extends Record {
     return -1;
   }
 
-  override lastIndexOf(item: AnyItem, index?: number): number {
-    item = Item.fromAny(item);
+  override lastIndexOf(item: ItemLike, index?: number): number {
+    item = Item.fromLike(item);
     const array = this.record.array;
     const n = this.length;
     if (index === void 0) {
@@ -199,7 +199,7 @@ export class RecordMapView extends Record {
     return -1;
   }
 
-  override getItem(index: AnyNum): Item {
+  override getItem(index: NumLike): Item {
     if (index instanceof Num) {
       index = index.value;
     }
@@ -213,11 +213,11 @@ export class RecordMapView extends Record {
     return this.record.array![this.lower + index]!;
   }
 
-  override setItem(index: number, newItem: AnyItem): this {
+  override setItem(index: number, newItem: ItemLike): this {
     if ((this.record.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    newItem = Item.fromAny(newItem);
+    newItem = Item.fromLike(newItem);
     const n = this.length;
     if (index < 0) {
       index = n + index;
@@ -273,7 +273,7 @@ export class RecordMapView extends Record {
     }
   }
 
-  override push(...newItems: AnyItem[]): number {
+  override push(...newItems: ItemLike[]): number {
     if ((this.record.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
@@ -286,7 +286,7 @@ export class RecordMapView extends Record {
   }
 
   /** @internal */
-  pushAliased(...newItems: AnyItem[]): void {
+  pushAliased(...newItems: ItemLike[]): void {
     const record = this.record;
     const k = newItems.length;
     let m = record.length;
@@ -302,7 +302,7 @@ export class RecordMapView extends Record {
       }
     }
     for (let i = 0; i < k; i += 1) {
-      const newItem = Item.fromAny(newItems[i]);
+      const newItem = Item.fromLike(newItems[i]);
       newArray[i + this.upper] = newItem;
       m += 1;
       if (newItem instanceof Field) {
@@ -318,7 +318,7 @@ export class RecordMapView extends Record {
   }
 
   /** @internal */
-  pushMutable(...newItems: AnyItem[]): void {
+  pushMutable(...newItems: ItemLike[]): void {
     const record = this.record;
     const k = newItems.length;
     let m = record.length;
@@ -339,7 +339,7 @@ export class RecordMapView extends Record {
       newArray[i + k] = oldArray[i];
     }
     for (let i = 0; i < k; i += 1) {
-      const newItem = Item.fromAny(newItems[i]);
+      const newItem = Item.fromLike(newItems[i]);
       newArray[i + this.upper] = newItem;
       m += 1;
       if (newItem instanceof Field) {
@@ -353,7 +353,7 @@ export class RecordMapView extends Record {
     (this as Mutable<this>).upper += k;
   }
 
-  override splice(start: number, deleteCount: number = 0, ...newItems: AnyItem[]): Item[] {
+  override splice(start: number, deleteCount: number = 0, ...newItems: ItemLike[]): Item[] {
     if ((this.record.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
@@ -373,11 +373,11 @@ export class RecordMapView extends Record {
     return deleted;
   }
 
-  override delete(key: AnyValue): Item {
+  override delete(key: ValueLike): Item {
     if ((this.record.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    key = Value.fromAny(key);
+    key = Value.fromLike(key);
     if ((this.record.flags & Record.AliasedFlag) !== 0) {
       return this.deleteAliased(key);
     } else {

@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -31,24 +32,24 @@ import {Unicode} from "@swim/codec";
 import type {Item} from "@swim/structure";
 import {Text} from "@swim/structure";
 import {Form} from "@swim/structure";
-import type {AnyUriScheme} from "./UriScheme";
+import type {UriSchemeLike} from "./UriScheme";
 import {UriScheme} from "./"; // forward import
-import type {AnyUriAuthority} from "./UriAuthority";
+import type {UriAuthorityLike} from "./UriAuthority";
 import type {UriAuthorityInit} from "./UriAuthority";
 import {UriAuthority} from "./"; // forward import
-import type {AnyUriUser} from "./UriUser";
+import type {UriUserLike} from "./UriUser";
 import type {UriUser} from "./UriUser";
-import type {AnyUriHost} from "./UriHost";
+import type {UriHostLike} from "./UriHost";
 import type {UriHost} from "./UriHost";
-import type {AnyUriPort} from "./UriPort";
+import type {UriPortLike} from "./UriPort";
 import type {UriPort} from "./UriPort";
-import type {AnyUriPath} from "./UriPath";
+import type {UriPathLike} from "./UriPath";
 import {UriPath} from "./"; // forward import
 import {UriPathBuilder} from "./"; // forward import
-import type {AnyUriQuery} from "./UriQuery";
+import type {UriQueryLike} from "./UriQuery";
 import {UriQuery} from "./"; // forward import
 import {UriQueryBuilder} from "./"; // forward import
-import type {AnyUriFragment} from "./UriFragment";
+import type {UriFragmentLike} from "./UriFragment";
 import {UriFragment} from "./"; // forward import
 import {UriSchemeParser} from "./"; // forward import
 import {UriAuthorityParser} from "./"; // forward import
@@ -57,11 +58,11 @@ import {UriQueryParser} from "./"; // forward import
 import {UriFragmentParser} from "./"; // forward import
 
 /** @public */
-export type AnyUri = Uri | UriInit | string;
+export type UriLike = Uri | UriInit | string;
 
 /** @public */
-export const AnyUri = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUri {
+export const UriLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriLike {
     return instance instanceof Uri
         || UriInit[Symbol.hasInstance](instance)
         || typeof instance === "string";
@@ -71,12 +72,12 @@ export const AnyUri = {
 /** @public */
 export interface UriInit extends UriAuthorityInit {
   /** @internal */
-  typeid?: "UriInit";
-  scheme?: AnyUriScheme;
-  authority?: AnyUriAuthority;
-  path?: AnyUriPath;
-  query?: AnyUriQuery;
-  fragment?: AnyUriFragment;
+  readonly typeid?: "UriInit";
+  scheme?: UriSchemeLike;
+  authority?: UriAuthorityLike;
+  path?: UriPathLike;
+  query?: UriQueryLike;
+  fragment?: UriFragmentLike;
 }
 
 /** @public */
@@ -101,7 +102,9 @@ export class Uri implements HashCode, Compare, Debug, Display {
   }
 
   /** @internal */
-  declare typeid?: "Uri";
+  declare readonly typeid?: "Uri";
+
+  declare readonly likeType?: Proto<UriInit | string>;
 
   isDefined(): boolean {
     return this.scheme.isDefined() || this.authority.isDefined() || this.path.isDefined()
@@ -115,8 +118,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   readonly scheme: UriScheme;
 
-  withScheme(scheme: AnyUriScheme): Uri {
-    scheme = UriScheme.fromAny(scheme);
+  withScheme(scheme: UriSchemeLike): Uri {
+    scheme = UriScheme.fromLike(scheme);
     if (scheme === this.scheme) {
       return this;
     }
@@ -141,8 +144,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   readonly authority: UriAuthority;
 
-  withAuthority(authority: AnyUriAuthority): Uri {
-    authority = UriAuthority.fromAny(authority);
+  withAuthority(authority: UriAuthorityLike): Uri {
+    authority = UriAuthority.fromLike(authority);
     if (authority === this.authority) {
       return this;
     }
@@ -161,7 +164,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return this.authority.user;
   }
 
-  withUser(user: AnyUriUser): Uri {
+  withUser(user: UriUserLike): Uri {
     return this.withAuthority(this.authority.withUser(user));
   }
 
@@ -198,7 +201,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return this.authority.host;
   }
 
-  withHost(host: AnyUriHost): Uri {
+  withHost(host: UriHostLike): Uri {
     return this.withAuthority(this.authority.withHost(host));
   }
 
@@ -242,7 +245,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return this.authority.port;
   }
 
-  withPort(port: AnyUriPort): Uri {
+  withPort(port: UriPortLike): Uri {
     return this.withAuthority(this.authority.withPort(port));
   }
 
@@ -264,7 +267,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   readonly path: UriPath;
 
-  withPath(...components: AnyUriPath[]): Uri {
+  withPath(...components: UriPathLike[]): Uri {
     const path = UriPath.of(...components);
     if (path === this.path) {
       return this;
@@ -304,7 +307,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(this.scheme, this.authority, this.path.base());
   }
 
-  appendedPath(...components: AnyUriPath[]): Uri {
+  appendedPath(...components: UriPathLike[]): Uri {
     return this.withPath(this.path.appended(...components));
   }
 
@@ -316,7 +319,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return this.withPath(this.path.appendedSegment(segment));
   }
 
-  prependedPath(...components: AnyUriPath[]): Uri {
+  prependedPath(...components: UriPathLike[]): Uri {
     return this.withPath(this.path.prepended(...components));
   }
 
@@ -330,8 +333,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
 
   readonly query: UriQuery;
 
-  withQuery(query: AnyUriQuery): Uri {
-    query = UriQuery.fromAny(query);
+  withQuery(query: UriQueryLike): Uri {
+    query = UriQuery.fromLike(query);
     if (query === this.query) {
       return this;
     }
@@ -355,21 +358,21 @@ export class Uri implements HashCode, Compare, Debug, Display {
   }
 
   appendedQuery(key: string | undefined, value: string): Uri;
-  appendedQuery(params: AnyUriQuery): Uri;
-  appendedQuery(key: AnyUriQuery | undefined, value?: string): Uri {
+  appendedQuery(params: UriQueryLike): Uri;
+  appendedQuery(key: UriQueryLike | undefined, value?: string): Uri {
     return this.withQuery(this.query.appended(key as any, value as any));
   }
 
   prependedQuery(key: string | undefined, value: string): Uri;
-  prependedQuery(params: AnyUriQuery): Uri;
-  prependedQuery(key: AnyUriQuery | undefined, value?: string): Uri {
+  prependedQuery(params: UriQueryLike): Uri;
+  prependedQuery(key: UriQueryLike | undefined, value?: string): Uri {
     return this.withQuery(this.query.prepended(key as any, value as any));
   }
 
   readonly fragment: UriFragment;
 
-  withFragment(fragment: AnyUriFragment): Uri {
-    fragment = UriFragment.fromAny(fragment);
+  withFragment(fragment: UriFragmentLike): Uri {
+    fragment = UriFragment.fromLike(fragment);
     if (fragment === this.fragment) {
       return this;
     }
@@ -399,8 +402,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(this.scheme, this.authority);
   }
 
-  resolve(relative: AnyUri): Uri {
-    const that = Uri.fromAny(relative);
+  resolve(relative: UriLike): Uri {
+    const that = Uri.fromLike(relative);
     if (that.scheme.isDefined()) {
       return this.copy(that.scheme,
                        that.authority,
@@ -443,8 +446,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return this.path.merge(relative);
   }
 
-  unresolve(absolute: AnyUri): Uri {
-    const that = Uri.fromAny(absolute);
+  unresolve(absolute: UriLike): Uri {
+    const that = Uri.fromLike(absolute);
     if (!this.scheme.equals(that.scheme) || !this.authority.equals(that.authority)) {
       return that;
     }
@@ -460,17 +463,17 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(scheme, authority, path, query, fragment);
   }
 
-  toAny(): {scheme?: string, username?: string, password?: string, host?: string,
-            port?: number, path: string[], query?: {[key: string]: string},
-            fragment?: string} {
+  toLike(): {scheme?: string, username?: string, password?: string, host?: string,
+             port?: number, path: string[], query?: {[key: string]: string},
+             fragment?: string} {
     const uri = {} as {scheme?: string, username?: string, password?: string, host?: string,
                        port?: number, path: string[], query?: {[key: string]: string},
                        fragment?: string};
-    uri.scheme = this.scheme.toAny();
-    this.authority.toAny(uri);
-    uri.path = this.path.toAny();
-    uri.query = this.query.toAny();
-    uri.fragment = this.fragment.toAny();
+    uri.scheme = this.scheme.toLike();
+    this.authority.toLike(uri);
+    uri.path = this.path.toLike();
+    uri.query = this.query.toLike();
+    uri.fragment = this.fragment.toLike();
     return uri;
   }
 
@@ -570,7 +573,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return new Uri(scheme, authority, path, query, fragment);
   }
 
-  static fromAny<T extends AnyUri | null | undefined>(value: T): Uri | Uninitable<T> {
+  static fromLike<T extends UriLike | null | undefined>(value: T): Uri | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Uri) {
       return value as Uri | Uninitable<T>;
     } else if (typeof value === "object") {
@@ -582,16 +585,16 @@ export class Uri implements HashCode, Compare, Debug, Display {
   }
 
   static fromInit(init: UriInit): Uri {
-    const scheme = UriScheme.fromAny(init.scheme);
-    const authority = UriAuthority.fromAny(init.authority);
-    const path = UriPath.fromAny(init.path);
-    const query = UriQuery.fromAny(init.query);
-    const fragment = UriFragment.fromAny(init.fragment);
+    const scheme = UriScheme.fromLike(init.scheme);
+    const authority = UriAuthority.fromLike(init.authority);
+    const path = UriPath.fromLike(init.path);
+    const query = UriQuery.fromLike(init.query);
+    const fragment = UriFragment.fromLike(init.fragment);
     return this.create(scheme, authority, path, query, fragment);
   }
 
-  static scheme(scheme: AnyUriScheme): Uri {
-    scheme = UriScheme.fromAny(scheme);
+  static scheme(scheme: UriSchemeLike): Uri {
+    scheme = UriScheme.fromLike(scheme);
     return Uri.create(scheme, void 0, void 0, void 0, void 0);
   }
 
@@ -605,8 +608,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(scheme, void 0, void 0, void 0, void 0);
   }
 
-  static authority(authority: AnyUriAuthority): Uri {
-    authority = UriAuthority.fromAny(authority);
+  static authority(authority: UriAuthorityLike): Uri {
+    authority = UriAuthority.fromLike(authority);
     return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
 
@@ -615,7 +618,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
 
-  static user(user: AnyUriUser): Uri {
+  static user(user: UriUserLike): Uri {
     const authority = UriAuthority.user(user);
     return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
@@ -635,7 +638,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
 
-  static host(host: AnyUriHost): Uri {
+  static host(host: UriHostLike): Uri {
     const authority = UriAuthority.host(host);
     return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
@@ -660,7 +663,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
 
-  static port(port: AnyUriPort): Uri {
+  static port(port: UriPortLike): Uri {
     const authority = UriAuthority.port(port);
     return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
@@ -675,7 +678,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(void 0, authority, void 0, void 0, void 0);
   }
 
-  static path(...components: AnyUriPath[]): Uri {
+  static path(...components: UriPathLike[]): Uri {
     const path = UriPath.of(...components);
     return Uri.create(void 0, void 0, path, void 0, void 0);
   }
@@ -685,8 +688,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(void 0, void 0, path, void 0, void 0);
   }
 
-  static query(query: AnyUriQuery): Uri {
-    query = UriQuery.fromAny(query);
+  static query(query: UriQueryLike): Uri {
+    query = UriQuery.fromLike(query);
     return Uri.create(void 0, void 0, void 0, query, void 0);
   }
 
@@ -695,8 +698,8 @@ export class Uri implements HashCode, Compare, Debug, Display {
     return Uri.create(void 0, void 0, void 0, query, void 0);
   }
 
-  static fragment(fragment: AnyUriFragment): Uri {
-    fragment = UriFragment.fromAny(fragment);
+  static fragment(fragment: UriFragmentLike): Uri {
+    fragment = UriFragment.fromLike(fragment);
     return Uri.create(void 0, void 0, void 0, void 0, fragment);
   }
 
@@ -769,7 +772,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
   }
 
   @Lazy
-  static form(): Form<Uri, AnyUri> {
+  static form(): Form<Uri, UriLike> {
     return new UriForm(Uri.empty());
   }
 
@@ -1026,26 +1029,27 @@ export class Uri implements HashCode, Compare, Debug, Display {
 }
 
 /** @internal */
-export class UriForm extends Form<Uri, AnyUri> {
+export class UriForm extends Form<Uri, UriLike> {
   constructor(unit: Uri | undefined) {
     super();
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
-  override readonly unit!: Uri | undefined;
+  override readonly unit: Uri | undefined;
 
-  override withUnit(unit: Uri | undefined): Form<Uri, AnyUri> {
+  override withUnit(unit: Uri | undefined): Form<Uri, UriLike> {
     if (unit === this.unit) {
       return this;
     }
     return new UriForm(unit);
   }
 
-  override mold(object: AnyUri, item?: Item): Item {
-    object = Uri.fromAny(object);
+  override mold(object: UriLike, item?: Item): Item {
+    object = Uri.fromLike(object);
     if (item === void 0) {
       return Text.from(object.toString());
     } else {

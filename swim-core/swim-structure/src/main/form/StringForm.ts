@@ -23,10 +23,11 @@ export class StringForm extends Form<string> {
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
-  override readonly unit!: string | undefined;
+  override readonly unit: string | undefined;
 
   override withUnit(unit: string | undefined): Form<string> {
     if (unit === this.unit) {

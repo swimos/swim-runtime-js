@@ -18,7 +18,7 @@ export {ConstraintDummy} from "./ConstraintSymbol";
 export {ConstraintError} from "./ConstraintSymbol";
 export {ConstraintInvalid} from "./ConstraintSymbol";
 
-export {AnyConstraintExpression} from "./ConstraintExpression";
+export {ConstraintExpressionLike} from "./ConstraintExpression";
 export {ConstraintExpression} from "./ConstraintExpression";
 
 export {ConstraintSum} from "./ConstraintSum";
@@ -37,7 +37,7 @@ export type {ConstraintAnimatorClass} from "./ConstraintAnimator";
 export {ConstraintAnimator} from "./ConstraintAnimator";
 
 export type {ConstraintRelation} from "./Constraint";
-export type {AnyConstraintStrength} from "./Constraint";
+export type {ConstraintStrengthLike} from "./Constraint";
 export type {ConstraintStrengthInit} from "./Constraint";
 export {ConstraintStrength} from "./Constraint";
 export {Constraint} from "./Constraint";
@@ -46,7 +46,7 @@ export {ConstraintGroup} from "./ConstraintGroup";
 
 export {ConstraintScope} from "./ConstraintScope";
 
-export type {ConstraintContext} from "./ConstraintContext";
+export {ConstraintContext} from "./ConstraintContext";
 
 export {ConstraintRow} from "./ConstraintRow";
 

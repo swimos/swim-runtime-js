@@ -31,7 +31,7 @@ export class ValueDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  declare readonly views: ReadonlySet<ValueDownlink<unknown, unknown, unknown>> | null;
+  declare readonly views: ReadonlySet<ValueDownlink<any, any>> | null;
 
   /** @internal */
   readonly state: Value;

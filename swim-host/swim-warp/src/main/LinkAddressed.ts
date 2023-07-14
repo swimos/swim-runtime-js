@@ -19,10 +19,10 @@ import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Item} from "@swim/structure";
 import {Attr} from "@swim/structure";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import {Envelope} from "./Envelope";
 
@@ -56,15 +56,15 @@ export abstract class LinkAddressed<E extends LinkAddressed<E> = LinkAddressed<a
 
   override readonly node: Uri;
 
-  override withNode(node: AnyUri): E {
-    node = Uri.fromAny(node);
+  override withNode(node: UriLike): E {
+    node = Uri.fromLike(node);
     return this.copy(node, this.lane, this.prio, this.rate, this.body);
   }
 
   override readonly lane: Uri;
 
-  override withLane(lane: AnyUri): E {
-    lane = Uri.fromAny(lane);
+  override withLane(lane: UriLike): E {
+    lane = Uri.fromLike(lane);
     return this.copy(this.node, lane, this.prio, this.rate, this.body);
   }
 
@@ -82,8 +82,8 @@ export abstract class LinkAddressed<E extends LinkAddressed<E> = LinkAddressed<a
 
   override readonly body: Value;
 
-  override withBody(body: AnyValue): E {
-    body = Value.fromAny(body);
+  override withBody(body: ValueLike): E {
+    body = Value.fromLike(body);
     return this.copy(this.node, this.lane, this.prio, this.rate, body);
   }
 
@@ -169,9 +169,9 @@ export abstract class LinkAddressed<E extends LinkAddressed<E> = LinkAddressed<a
     return null;
   }
 
-  static create<S extends LinkAddressedConstructor<Instance<S, LinkAddressed<any>>>>(this: S, node: AnyUri, lane: AnyUri, prio?: number, rate?: number, body?: AnyValue): InstanceType<S> {
-    node = Uri.fromAny(node);
-    lane = Uri.fromAny(lane);
+  static create<S extends LinkAddressedConstructor<Instance<S, LinkAddressed<any>>>>(this: S, node: UriLike, lane: UriLike, prio?: number, rate?: number, body?: ValueLike): InstanceType<S> {
+    node = Uri.fromLike(node);
+    lane = Uri.fromLike(lane);
     if (prio === void 0) {
       prio = 0;
     }
@@ -181,7 +181,7 @@ export abstract class LinkAddressed<E extends LinkAddressed<E> = LinkAddressed<a
     if (body === void 0) {
       body = Value.absent();
     } else {
-      body = Value.fromAny(body);
+      body = Value.fromLike(body);
     }
     return new this(node, lane, prio, rate, body);
   }

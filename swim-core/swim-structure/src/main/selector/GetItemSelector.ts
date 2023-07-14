@@ -20,7 +20,7 @@ import {Item} from "../Item";
 import {Record} from "../Record";
 import type {Num} from "../Num";
 import {Selector} from "./Selector";
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -103,8 +103,8 @@ export class GetItemSelector extends Selector {
     return result;
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const index = this.item.numberValue();
     if (interpreter.scopeDepth !== 0) {
       // Pop the current selection off of the stack to take it out of scope.

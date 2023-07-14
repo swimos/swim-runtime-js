@@ -350,17 +350,17 @@ Record.of("Hello, ", Record.of(Attr.of("em"), "world"), "!").toRecon();
 // "[Hello, @em[world]!]"
 ```
 
-Invoke `Item.toAny` to convert parsed Recon structures to plain old JavaScript
+Invoke `Item.toLike` to convert parsed Recon structures to plain old JavaScript
 objects:
 
 ```typescript
-Value.parseRecon("1, 2, 3").toAny();
+Value.parseRecon("1, 2, 3").toLike();
 // [1, 2, 3]
 
-Value.parseRecon("a: 1, b: 2, c: 3").toAny();
+Value.parseRecon("a: 1, b: 2, c: 3").toLike();
 // {"a": 1, "b": 2, "c": 3}
 
-Value.parseRecon("[Hello, @em[world]!]").toAny();
+Value.parseRecon("[Hello, @em[world]!]").toLike();
 // ["Hello, ",{"@em":null,"$1":"world"},"!"]
 ```
 

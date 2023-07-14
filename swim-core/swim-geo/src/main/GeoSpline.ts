@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -23,8 +24,8 @@ import type {R2Curve} from "@swim/math";
 import {R2Segment} from "@swim/math";
 import {R2Spline} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import type {AnyGeoShape} from "./GeoShape";
-import {AnyGeoPoint} from "./GeoPoint";
+import type {GeoShapeLike} from "./GeoShape";
+import {GeoPointLike} from "./GeoPoint";
 import {GeoPoint} from "./GeoPoint";
 import type {GeoCurveContext} from "./GeoCurve";
 import {GeoCurve} from "./GeoCurve";
@@ -37,37 +38,40 @@ export interface GeoSplineContext extends GeoCurveContext {
 }
 
 /** @public */
-export type AnyGeoSpline = GeoSpline | GeoSplinePoints;
+export type GeoSplineLike = GeoSpline | GeoSplinePoints;
 
 /** @public */
-export const AnyGeoSpline = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyGeoSpline {
+export const GeoSplineLike = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoSplineLike {
     return instance instanceof GeoSpline
         || GeoSplinePoints[Symbol.hasInstance](instance);
   },
 };
 
 /** @public */
-export type GeoSplinePoints = readonly AnyGeoPoint[];
+export type GeoSplinePoints = readonly GeoPointLike[];
 
 /** @public */
 export const GeoSplinePoints = {
   [Symbol.hasInstance](instance: unknown): instance is GeoSplinePoints {
     return Array.isArray(instance) && instance.length >= 2
-        && AnyGeoPoint[Symbol.hasInstance](instance[0]!);
+        && GeoPointLike[Symbol.hasInstance](instance[0]!);
   },
 };
 
 /** @public */
 export class GeoSpline extends GeoCurve implements Debug {
-  constructor(curves: ReadonlyArray<GeoCurve>, closed: boolean) {
+  constructor(curves: readonly GeoCurve[], closed: boolean) {
     super();
     this.curves = curves;
     this.closed = closed;
     this.boundingBox = null;
   }
 
-  readonly curves: ReadonlyArray<GeoCurve>;
+  /** @override */
+  declare readonly likeType?: Proto<GeoSplinePoints>;
+
+  readonly curves: readonly GeoCurve[];
 
   /** @internal */
   readonly closed: boolean;
@@ -132,13 +136,13 @@ export class GeoSpline extends GeoCurve implements Debug {
     return curves[k]!.interpolate(v);
   }
 
-  override contains(that: AnyGeoShape): boolean;
+  override contains(that: GeoShapeLike): boolean;
   override contains(lng: number, lat: number): boolean;
-  override contains(that: AnyGeoShape | number, lat?: number): boolean {
+  override contains(that: GeoShapeLike | number, lat?: number): boolean {
     return false; // TODO
   }
 
-  override intersects(that: AnyGeoShape): boolean {
+  override intersects(that: GeoShapeLike): boolean {
     return false; // TODO
   }
 
@@ -345,9 +349,9 @@ export class GeoSpline extends GeoCurve implements Debug {
     return new GeoSpline(curves, true);
   }
 
-  static override fromAny<T extends AnyGeoSpline | null | undefined>(value: T): GeoSpline | Uninitable<T>;
-  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyGeoSpline | null | undefined>(value: T): GeoSpline | Uninitable<T> {
+  static override fromLike<T extends GeoSplineLike | null | undefined>(value: T): GeoSpline | Uninitable<T>;
+  static override fromLike<T extends GeoShapeLike | null | undefined>(value: T): never;
+  static override fromLike<T extends GeoSplineLike | null | undefined>(value: T): GeoSpline | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoSpline) {
       return value as GeoSpline | Uninitable<T>;
     } else if (GeoSplinePoints[Symbol.hasInstance](value)) {
@@ -362,10 +366,10 @@ export class GeoSpline extends GeoCurve implements Debug {
       return GeoSpline.empty();
     }
     const curves = new Array<GeoCurve>(n - 1);
-    const p0 = GeoPoint.fromAny(points[0]!);
+    const p0 = GeoPoint.fromLike(points[0]!);
     let p1 = p0;
     for (let i = 1; i < n; i += 1) {
-      const p2 = GeoPoint.fromAny(points[i]!);
+      const p2 = GeoPoint.fromLike(points[i]!);
       curves[i - 1] = new GeoSegment(p1.lng, p1.lat, p2.lng, p2.lat);
       p1 = p2;
     }

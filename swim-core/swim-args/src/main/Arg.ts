@@ -24,12 +24,12 @@ import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 
 /** @public */
-export type AnyArg = Arg | ArgInit | string;
+export type ArgLike = Arg | ArgInit | string;
 
 /** @public */
 export interface ArgInit {
   /** @internal */
-  typeid?: "ArgInit";
+  readonly typeid?: "ArgInit";
   readonly name: string;
   readonly value?: string;
   readonly optional?: boolean;
@@ -44,7 +44,7 @@ export class Arg implements HashCode, Debug {
   }
 
   /** @internal */
-  declare typeid?: "Arg";
+  declare readonly typeid?: "Arg";
 
   readonly name: string;
 
@@ -101,11 +101,7 @@ export class Arg implements HashCode, Debug {
     return new Arg(name, value, optional);
   }
 
-  static fromInit(init: ArgInit): Arg {
-    return new Arg(init.name, init.value, init.optional !== void 0 ? init.optional : false);
-  }
-
-  static fromAny<T extends AnyArg | null | undefined>(value: T): Arg | Uninitable<T> {
+  static fromLike<T extends ArgLike | null | undefined>(value: T): Arg | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof Arg) {
       return value as Arg | Uninitable<T>;
     } else if (typeof value === "string") {
@@ -114,5 +110,9 @@ export class Arg implements HashCode, Debug {
       return Arg.fromInit(value);
     }
     throw new TypeError("" + value);
+  }
+
+  static fromInit(init: ArgInit): Arg {
+    return new Arg(init.name, init.value, init.optional !== void 0 ? init.optional : false);
   }
 }

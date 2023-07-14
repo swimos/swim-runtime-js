@@ -14,14 +14,15 @@
 
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
+import {Affinity} from "@swim/component";
 import type {FastenerFlags} from "@swim/component";
-import type {Fastener} from "@swim/component";
+import {Fastener} from "@swim/component";
 import type {FileRelationDescriptor} from "./FileRelation";
 import type {FileRelationClass} from "./FileRelation";
 import {FileRelation} from "./FileRelation";
 
 /** @public */
-export interface FileRefDescriptor<T = unknown> extends FileRelationDescriptor {
+export interface FileRefDescriptor<R, T> extends FileRelationDescriptor<R, T> {
   extends?: Proto<FileRef<any, any>> | boolean | null;
   fileName?: string;
   value?: T;
@@ -41,18 +42,15 @@ export interface FileRefClass<F extends FileRef<any, any> = FileRef<any, any>> e
 }
 
 /** @public */
-export interface FileRef<O = unknown, T = unknown> extends FileRelation<O, T> {
+export interface FileRef<R = any, T = any> extends FileRelation<R, T> {
   (): T | null;
-  (fileName: string | undefined): O;
+  (fileName: string | undefined): R;
 
   /** @override */
-  get descriptorType(): Proto<FileRefDescriptor<T>>;
+  get descriptorType(): Proto<FileRefDescriptor<R, T>>;
 
   /** @override */
   get fastenerType(): Proto<FileRef<any, any>>;
-
-  /** @protected @override */
-  onDerive(inlet: Fastener): void;
 
   initFileName(): string | undefined;
 
@@ -96,32 +94,28 @@ export interface FileRef<O = unknown, T = unknown> extends FileRelation<O, T> {
 
   getOrLoadIfExists(): Promise<T | undefined>;
   getOrLoadIfExists<E>(elseValue: E): Promise<T | E>;
+
+  /** @override */
+  recohere(t: number): void;
 }
 
 /** @public */
-export const FileRef = (function (_super: typeof FileRelation) {
-  const FileRef = _super.extend("FileRef", {}) as FileRefClass;
+export const FileRef = (<R, T, F extends FileRef<any, any>>() => FileRelation.extend<FileRef<R, T>, FileRefClass<F>>("FileRef", {
+  get fastenerType(): Proto<FileRef<any, any>> {
+    return FileRef;
+  },
 
-  Object.defineProperty(FileRef.prototype, "fastenerType", {
-    value: FileRef,
-    enumerable: true,
-    configurable: true,
-  });
+  fileName: void 0,
 
-  FileRef.prototype.onDerive = function (this: FileRef, inlet: FileRef): void {
-    this.setBaseDir(inlet.baseDir);
-    this.setFileName(inlet.fileName);
-  };
+  initFileName(): string | undefined {
+    return (Object.getPrototypeOf(this) as FileRef<any, any>).fileName;
+  },
 
-  FileRef.prototype.initFileName = function (this: FileRef): string | undefined {
-    return (Object.getPrototypeOf(this) as FileRef).fileName;
-  };
-
-  FileRef.prototype.getFileName = function (this: FileRef): string | undefined {
+  getFileName(): string | undefined {
     return this.fileName;
-  };
+  },
 
-  FileRef.prototype.setFileName = function (this: FileRef, newFileName: string | undefined): void {
+  setFileName(newFileName: string | undefined): void {
     const oldFileName = this.fileName;
     if (newFileName === oldFileName) {
       return;
@@ -130,35 +124,31 @@ export const FileRef = (function (_super: typeof FileRelation) {
     (this as Mutable<typeof this>).fileName = newFileName;
     this.onSetFileName(newFileName, oldFileName);
     this.didSetFileName(newFileName, oldFileName);
-  };
+  },
 
-  FileRef.prototype.willSetFileName = function (this: FileRef, newFileName: string | undefined, oldFileName: string | undefined): void {
+  willSetFileName(newFileName: string | undefined, oldFileName: string | undefined): void {
     // hook
-  };
+  },
 
-  FileRef.prototype.onSetFileName = function (this: FileRef, newFileName: string | undefined, oldFileName: string | undefined): void {
+  onSetFileName(newFileName: string | undefined, oldFileName: string | undefined): void {
     // hook
-  };
+  },
 
-  FileRef.prototype.didSetFileName = function (this: FileRef, newFileName: string | undefined, oldFileName: string | undefined): void {
+  didSetFileName(newFileName: string | undefined, oldFileName: string | undefined): void {
     // hook
-  };
+  },
 
-  FileRef.prototype.resolve = function (this: FileRef): Promise<string | undefined> {
+  resolve(): Promise<string | undefined> {
     const baseDir = this.getBaseDir();
     const fileName = this.getFileName();
     return this.resolveFile(baseDir, fileName);
-  };
+  },
 
-  Object.defineProperty(FileRef.prototype, "loaded", {
-    get: function (this: FileRef): boolean {
-      return (this.flags & FileRef.LoadedFlag) !== 0;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get loaded(): boolean {
+    return (this.flags & FileRef.LoadedFlag) !== 0;
+  },
 
-  FileRef.prototype.load = async function <T>(this: FileRef<unknown, T>, path?: string): Promise<T> {
+  async load(path?: string): Promise<T> {
     if (path === void 0) {
       const baseDir = this.getBaseDir();
       const fileName = this.getFileName();
@@ -177,9 +167,9 @@ export const FileRef = (function (_super: typeof FileRelation) {
     this.setValue(path, value);
 
     return value;
-  };
+  },
 
-  FileRef.prototype.loadIfExists = async function <T, E>(this: FileRef<unknown, T>, path?: string, elseValue?: E): Promise<T | E> {
+  async loadIfExists<E>(path?: string, elseValue?: E): Promise<T | E> {
     if (path === void 0) {
       const baseDir = this.getBaseDir();
       const fileName = this.getFileName();
@@ -194,17 +184,13 @@ export const FileRef = (function (_super: typeof FileRelation) {
     } else {
       return elseValue as E;
     }
-  };
+  },
 
-  Object.defineProperty(FileRef.prototype, "modified", {
-    get: function (this: FileRef): boolean {
-      return (this.flags & FileRef.ModifiedFlag) !== 0;
-    },
-    enumerable: true,
-    configurable: true,
-  });
+  get modified(): boolean {
+    return (this.flags & FileRef.ModifiedFlag) !== 0;
+  },
 
-  FileRef.prototype.store = async function <T>(this: FileRef<unknown, T>, path?: string, value?: T): Promise<void> {
+  async store(path?: string, value?: T): Promise<void> {
     if (path === void 0) {
       path = this.path;
       if (path === void 0) {
@@ -230,44 +216,60 @@ export const FileRef = (function (_super: typeof FileRelation) {
 
     await this.writeFile(path, value);
     this.setFlags(this.flags & ~FileRef.ModifiedFlag);
-  };
+  },
 
-  FileRef.prototype.getOrLoad = async function <T>(this: FileRef<unknown, T>): Promise<T> {
+  async getOrLoad(): Promise<T> {
     if (this.loaded) {
       return this.value;
-    } else {
-      return this.load();
     }
-  };
+    return this.load();
+  },
 
-  FileRef.prototype.getOrLoadIfExists = async function <T, E>(this: FileRef<unknown, T>, elseValue?: E): Promise<T | E> {
+  async getOrLoadIfExists<E>(elseValue?: E): Promise<T | E> {
     if (this.loaded) {
       return this.value;
-    } else {
-      return this.loadIfExists(void 0, elseValue as E);
     }
-  };
+    return this.loadIfExists(void 0, elseValue as E);
+  },
 
-  FileRef.prototype.initValue = function <T>(this: FileRef<unknown, T>): T {
+  value: void 0,
+
+  initValue(): T {
     return (Object.getPrototypeOf(this) as FileRef<unknown, T>).value;
-  };
+  },
 
-  FileRef.prototype.setValue = function <T>(this: FileRef<unknown, T>, path: string, newValue: T): void {
+  setValue(path: string, newValue: T): T {
     (this as Mutable<typeof this>).path = path;
     const oldValue = this.value;
     if (this.equalValues(newValue, oldValue)) {
-      return;
+      return oldValue;
     }
     this.willSetValue(path, newValue, oldValue);
     (this as Mutable<typeof this>).value = newValue;
     this.setFlags(this.flags | FileRef.ModifiedFlag);
     this.onSetValue(path, newValue, oldValue);
     this.didSetValue(path, newValue, oldValue);
-  };
+    return oldValue;
+  },
 
-  FileRef.construct = function <F extends FileRef<any, any>>(fastener: F | null, owner: F extends FileRelation<infer O, any> ? F : never): F {
+  recohere(t: number): void {
+    this.setCoherentTime(t);
+    const inlets = this.inlet;
+    if (inlets instanceof FileRef) {
+      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlets.flags & Affinity.Mask, Affinity.Intrinsic));
+      if ((this.flags & Fastener.DerivedFlag) !== 0) {
+        this.setBaseDir(inlets.baseDir);
+        this.setFileName(inlets.fileName);
+      }
+    } else {
+      this.setDerived(false);
+    }
+  },
+},
+{
+  construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
     if (fastener === null) {
-      fastener = function (fileName?: string | undefined): F extends FileRelation<infer O, infer T> ? T | O : never {
+      fastener = function (fileName?: string | undefined): F extends FileRef<infer R, infer T> ? T | R : never {
         if (arguments.length === 0) {
           return fastener!.value;
         } else {
@@ -282,18 +284,16 @@ export const FileRef = (function (_super: typeof FileRelation) {
       });
       Object.setPrototypeOf(fastener, this.prototype);
     }
-    fastener = _super.construct.call(this, fastener, owner) as F;
+    fastener = super.construct(fastener, owner) as F;
     (fastener as Mutable<typeof fastener>).fileName = fastener.initFileName();
     (fastener as Mutable<typeof fastener>).path = void 0;
     (fastener as Mutable<typeof fastener>).value = fastener.initValue();
     return fastener;
-  };
+  },
 
-  (FileRef as Mutable<typeof FileRef>).LoadedFlag = 1 << (_super.FlagShift + 0);
-  (FileRef as Mutable<typeof FileRef>).ModifiedFlag = 1 << (_super.FlagShift + 1);
+  LoadedFlag: 1 << (FileRelation.FlagShift + 0),
+  ModifiedFlag: 1 << (FileRelation.FlagShift + 1),
 
-  (FileRef as Mutable<typeof FileRef>).FlagShift = _super.FlagShift + 2;
-  (FileRef as Mutable<typeof FileRef>).FlagMask = (1 << FileRef.FlagShift) - 1;
-
-  return FileRef;
-})(FileRelation);
+  FlagShift: FileRelation.FlagShift + 2,
+  FlagMask: (1 << (FileRelation.FlagShift + 2)) - 1,
+}))();

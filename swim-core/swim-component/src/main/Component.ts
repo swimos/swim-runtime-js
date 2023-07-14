@@ -19,10 +19,11 @@ import type {Instance} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Comparator} from "@swim/util";
+import type {LikeType} from "@swim/util";
+import type {FromLike} from "@swim/util";
 import type {Dictionary} from "@swim/util";
 import type {MutableDictionary} from "@swim/util";
-import type {FromAny} from "@swim/util";
-import type {AnyTiming} from "@swim/util";
+import type {TimingLike} from "@swim/util";
 import {Creatable} from "@swim/util";
 import type {Observes} from "@swim/util";
 import type {Observable} from "@swim/util";
@@ -41,24 +42,21 @@ import {ComponentRelation} from "./"; // forward import
 export type ComponentFlags = number;
 
 /** @public */
-export type AnyComponent<C extends Component<any> = Component> = C | ComponentFactory<C>;
-
-/** @public */
-export interface ComponentFactory<C extends Component<any> = Component, U = AnyComponent<C>> extends Creatable<C>, FromAny<C, U> {
+export interface ComponentFactory<C extends Component<any> = Component> extends Creatable<C>, FromLike<C> {
 }
 
 /** @public */
-export interface ComponentClass<C extends Component<any> = Component, U = AnyComponent<C>> extends Function, ComponentFactory<C, U> {
+export interface ComponentClass<C extends Component<any> = Component> extends Function, ComponentFactory<C> {
   readonly prototype: C;
 }
 
 /** @public */
-export interface ComponentConstructor<C extends Component<any> = Component, U = AnyComponent<C>> extends ComponentClass<C, U> {
+export interface ComponentConstructor<C extends Component<any> = Component> extends ComponentClass<C> {
   new(): C;
 }
 
 /** @public */
-export interface ComponentObserver<C extends Component = Component> extends Observer<C> {
+export interface ComponentObserver<C extends Component<any> = Component> extends Observer<C> {
 }
 
 /** @public */
@@ -73,16 +71,20 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     this.firstChild = null;
     this.lastChild = null;
     this.childMap = null;
+    this.coherentTime = 0;
     this.decoherent = null;
+    this.recohering = null;
     this.observers = null;
   }
+
+  declare readonly likeType?: Proto<{create?(): C}>;
+
+  /** @override */
+  declare readonly observerType?: Class<ComponentObserver>;
 
   get componentType(): Class<Component> {
     return Component;
   }
-
-  /** @override */
-  declare readonly observerType?: Class<ComponentObserver>;
 
   /** @internal */
   readonly uid: string;
@@ -369,8 +371,13 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return child;
   }
 
-  setChild(key: string, newChild: C | null): C | null;
-  setChild(this: C, key: string, newChild: C | null): C | null {
+  setChild<F extends Class<Instance<F, C>> & Creatable<Instance<F, C>>>(key: string, newChildFactory: F): C | null;
+  setChild(key: string, newChild: C | LikeType<C> | null): C | null;
+  setChild(this: C, key: string, newChild: C | LikeType<C> | null): C | null {
+    if (newChild !== null) {
+      newChild = (this.componentType as unknown as FromLike<C>).fromLike(newChild);
+    }
+
     const oldChild = this.getChild(key);
     let target: C | null;
 
@@ -433,9 +440,12 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return oldChild;
   }
 
-  appendChild<Child extends C>(child: Child, key?: string): Child;
-  appendChild(child: C, key?: string): C;
-  appendChild(this: C, child: C, key?: string): C {
+  appendChild<F extends Class<Instance<F, C>> & Creatable<Instance<F, C>>>(childFactory: F, key?: string): InstanceType<F>;
+  appendChild<Child extends C>(child: Child | LikeType<Child>, key?: string): Child;
+  appendChild(child: C | LikeType<C>, key?: string): C;
+  appendChild(this: C, child: C | LikeType<C>, key?: string): C {
+    child = (this.componentType as unknown as FromLike<C>).fromLike(child);
+
     child.remove();
     if (key !== void 0) {
       this.removeChild(key);
@@ -454,9 +464,12 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return child;
   }
 
-  prependChild<Child extends C>(child: Child, key?: string): Child;
-  prependChild(child: C, key?: string): C;
-  prependChild(this: C, child: C, key?: string): C {
+  prependChild<F extends Class<Instance<F, C>> & Creatable<Instance<F, C>>>(childFactory: F, key?: string): InstanceType<F>;
+  prependChild<Child extends C>(child: Child | LikeType<Child>, key?: string): Child;
+  prependChild(child: C | LikeType<C>, key?: string): C;
+  prependChild(this: C, child: C | LikeType<C>, key?: string): C {
+    child = (this.componentType as unknown as FromLike<C>).fromLike(child);
+
     child.remove();
     if (key !== void 0) {
       this.removeChild(key);
@@ -476,9 +489,12 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return child;
   }
 
-  insertChild<Child extends C>(child: Child, target: C | null, key?: string): Child;
-  insertChild(child: C, target: C | null, key?: string): C;
-  insertChild(this: C, child: C, target: C | null, key?: string): C {
+  insertChild<F extends Class<Instance<F, C>> & Creatable<Instance<F, C>>>(childFactory: F, target: C | null, key?: string): InstanceType<F>;
+  insertChild<Child extends C>(child: Child | LikeType<Child>, target: C | null, key?: string): Child;
+  insertChild(child: C | LikeType<C>, target: C | null, key?: string): C;
+  insertChild(this: C, child: C | LikeType<C>, target: C | null, key?: string): C {
+    child = (this.componentType as unknown as FromLike<C>).fromLike(child);
+
     if (target !== null && target.parent !== this) {
       target = null;
     }
@@ -501,12 +517,17 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return child;
   }
 
-  replaceChild<Child extends C>(newChild: C, oldChild: Child): Child;
-  replaceChild(newChild: C, oldChild: C): C;
-  replaceChild(this: C, newChild: C, oldChild: C): C {
+  replaceChild<F extends Class<Instance<F, C>> & Creatable<Instance<F, C>>>(newChildFactory: F, oldChild: C): C;
+  replaceChild<Child extends C>(newChild: C | LikeType<C>, oldChild: Child): Child;
+  replaceChild(newChild: C | LikeType<C>, oldChild: C): C;
+  replaceChild(this: C, newChild: C | LikeType<C>, oldChild: C): C {
     if (oldChild.parent !== this) {
       throw new Error("replacement target is not a child");
-    } else if (newChild === oldChild) {
+    }
+
+    newChild = (this.componentType as unknown as FromLike<C>).fromLike(newChild);
+
+    if (newChild === oldChild) {
       return oldChild;
     }
 
@@ -878,7 +899,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return FastenerContext.tryFastener(this, fastenerName);
   }
 
-  getFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
+  getFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null {
     if (contextType !== void 0 && contextType !== null && !(this instanceof contextType)) {
       return null;
     }
@@ -890,7 +911,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @override */
-  getParentFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType: Proto<F>, contextType?: Proto<unknown> | null): F | null {
+  getParentFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null {
     let parent = this.parent;
     while (parent !== null) {
       const fastener = parent.getFastener(fastenerName, fastenerType, contextType);
@@ -981,9 +1002,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
-  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timingOrAffinity: Affinity | AnyTiming | boolean | null | undefined): void;
-  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timing?: AnyTiming | boolean | null, affinity?: Affinity): void;
-  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}, K extends keyof P>(key: K, value: P[K], timing?: Affinity | AnyTiming | boolean | null, affinity?: Affinity): void {
+  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}, K extends keyof P>(key: K, value: P[K], timingOrAffinity: Affinity | TimingLike | boolean | null | undefined): void;
+  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}, K extends keyof P>(key: K, value: P[K], timing?: TimingLike | boolean | null, affinity?: Affinity): void;
+  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}, K extends keyof P>(key: K, value: P[K], timing?: Affinity | TimingLike | boolean | null, affinity?: Affinity): void {
     if (typeof timing === "number") {
       affinity = timing;
       timing = void 0;
@@ -996,9 +1017,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
-  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timingOrAffinity: Affinity | AnyTiming | boolean | null | undefined): void;
-  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timing?: AnyTiming | boolean | null, affinity?: Affinity): void;
-  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, infer U> ? T | U : never}>(properties: P, timing?: Affinity | AnyTiming | boolean | null, affinity?: Affinity): void {
+  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}>(properties: P, timingOrAffinity: Affinity | TimingLike | boolean | null | undefined): void;
+  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}>(properties: P, timing?: TimingLike | boolean | null, affinity?: Affinity): void;
+  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}>(properties: P, timing?: Affinity | TimingLike | boolean | null, affinity?: Affinity): void {
     if (typeof timing === "number") {
       affinity = timing;
       timing = void 0;
@@ -1010,10 +1031,25 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @internal */
-  readonly decoherent: ReadonlyArray<Fastener> | null;
+  readonly coherentTime: number;
+
+  /** @internal */
+  readonly decoherent: readonly Fastener[] | null;
+
+  /** @internal */
+  readonly recohering: readonly Fastener[] | null;
 
   /** @override */
   decohereFastener(fastener: Fastener): void {
+    const recohering = this.recohering as Fastener[] | null;
+    if (recohering !== null && fastener.coherentTime !== this.coherentTime) {
+      recohering.push(fastener);
+      return;
+    }
+    this.enqueueFastener(fastener);
+  }
+
+  protected enqueueFastener(fastener: Fastener): void {
     let decoherent = this.decoherent as Fastener[] | null;
     if (decoherent === null) {
       decoherent = [];
@@ -1024,19 +1060,21 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   recohereFasteners(t?: number): void {
     const decoherent = this.decoherent;
-    if (decoherent === null) {
-      return;
-    }
-    const decoherentCount = decoherent.length;
-    if (decoherentCount === 0) {
+    if (decoherent === null || decoherent.length === 0) {
       return;
     } else if (t === void 0) {
       t = performance.now();
     }
+    (this as Mutable<this>).coherentTime = t;
     (this as Mutable<this>).decoherent = null;
-    for (let i = 0; i < decoherentCount; i += 1) {
-      const fastener = decoherent[i]!;
-      fastener.recohere(t);
+    (this as Mutable<this>).recohering = decoherent;
+    try {
+      for (let i = 0; i < decoherent.length; i += 1) {
+        const fastener = decoherent[i]!;
+        fastener.recohere(t);
+      }
+    } finally {
+      (this as Mutable<this>).recohering = null;
     }
   }
 
@@ -1121,11 +1159,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     return new this();
   }
 
-  static fromAny<S extends Class<Instance<S, Component>>>(this: S, value: AnyComponent<InstanceType<S>>): InstanceType<S> {
+  static fromLike<S extends Class<Instance<S, Component>>>(this: S, value: InstanceType<S> | LikeType<InstanceType<S>>): InstanceType<S> {
     if (value === void 0 || value === null) {
-      return value;
+      return value as InstanceType<S>;
     } else if (value instanceof Component) {
-      if (!((value as Component) instanceof this)) {
+      if (!(value instanceof this)) {
         throw new TypeError(value + " not an instance of " + this);
       }
       return value;

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -24,21 +25,21 @@ import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 import {R2Box} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import type {AnyGeoShape} from "./GeoShape";
+import type {GeoShapeLike} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
-import {AnyGeoPoint} from "./GeoPoint";
+import {GeoPointLike} from "./GeoPoint";
 import {GeoPoint} from "./GeoPoint";
-import {AnyGeoSegment} from "./GeoSegment";
+import {GeoSegmentLike} from "./GeoSegment";
 import {GeoSegment} from "./GeoSegment";
-import {AnyGeoBox} from "./"; // forward import
+import {GeoBoxLike} from "./"; // forward import
 import {GeoBox} from "./"; // forward import
 
 /** @public */
-export type AnyGeoTile = GeoTile | GeoTileInit | GeoTileTuple;
+export type GeoTileLike = GeoTile | GeoTileInit | GeoTileTuple;
 
 /** @public */
-export const AnyGeoTile = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyGeoTile {
+export const GeoTileLike = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoTileLike {
     return instance instanceof GeoTile
         || GeoTileInit[Symbol.hasInstance](instance)
         || GeoTileTuple[Symbol.hasInstance](instance);
@@ -48,7 +49,7 @@ export const AnyGeoTile = {
 /** @public */
 export interface GeoTileInit {
   /** @internal */
-  typeid?: "GeoTileInit";
+  readonly typeid?: "GeoTileInit";
   x: number;
   y: number;
   z: number;
@@ -81,7 +82,10 @@ export class GeoTile extends GeoShape implements HashCode, Debug {
   }
 
   /** @internal */
-  declare typeid?: "GeoTile";
+  declare readonly typeid?: "GeoTile";
+
+  /** @override */
+  declare readonly likeType?: Proto<GeoTileInit | GeoTileTuple>;
 
   override isDefined(): boolean {
     return true;
@@ -166,20 +170,20 @@ export class GeoTile extends GeoShape implements HashCode, Debug {
     return new GeoTile(this.x >> 1, this.y >> 1, this.z - 1);
   }
 
-  override contains(that: AnyGeoShape): boolean;
+  override contains(that: GeoShapeLike): boolean;
   override contains(lng: number, lat: number): boolean;
-  override contains(that: AnyGeoShape | number, lat?: number): boolean {
+  override contains(that: GeoShapeLike | number, lat?: number): boolean {
     if (typeof that === "number") {
       return this.lngMin <= that && that <= this.lngMax
           && this.latMin <= lat! && lat! <= this.latMax;
-    } else if (AnyGeoPoint[Symbol.hasInstance](that)) {
-      return this.containsPoint(GeoPoint.fromAny(that));
-    } else if (AnyGeoSegment[Symbol.hasInstance](that)) {
-      return this.containsSegment(GeoSegment.fromAny(that));
-    } else if (AnyGeoTile[Symbol.hasInstance](that)) {
-      return this.containsTile(GeoTile.fromAny(that));
-    } else if (AnyGeoBox[Symbol.hasInstance](that)) {
-      return this.containsBox(GeoBox.fromAny(that));
+    } else if (GeoPointLike[Symbol.hasInstance](that)) {
+      return this.containsPoint(GeoPoint.fromLike(that));
+    } else if (GeoSegmentLike[Symbol.hasInstance](that)) {
+      return this.containsSegment(GeoSegment.fromLike(that));
+    } else if (GeoTileLike[Symbol.hasInstance](that)) {
+      return this.containsTile(GeoTile.fromLike(that));
+    } else if (GeoBoxLike[Symbol.hasInstance](that)) {
+      return this.containsBox(GeoBox.fromLike(that));
     }
     throw new TypeError("" + that);
   }
@@ -210,15 +214,15 @@ export class GeoTile extends GeoShape implements HashCode, Debug {
         && this.latMin <= that.latMin && that.latMax <= this.latMax;
   }
 
-  override intersects(that: AnyGeoShape): boolean {
-    if (AnyGeoPoint[Symbol.hasInstance](that)) {
-      return this.intersectsPoint(GeoPoint.fromAny(that));
-    } else if (AnyGeoSegment[Symbol.hasInstance](that)) {
-      return this.intersectsSegment(GeoSegment.fromAny(that));
-    } else if (AnyGeoTile[Symbol.hasInstance](that)) {
-      return this.intersectsTile(GeoTile.fromAny(that));
-    } else if (AnyGeoBox[Symbol.hasInstance](that)) {
-      return this.intersectsBox(GeoBox.fromAny(that));
+  override intersects(that: GeoShapeLike): boolean {
+    if (GeoPointLike[Symbol.hasInstance](that)) {
+      return this.intersectsPoint(GeoPoint.fromLike(that));
+    } else if (GeoSegmentLike[Symbol.hasInstance](that)) {
+      return this.intersectsSegment(GeoSegment.fromLike(that));
+    } else if (GeoTileLike[Symbol.hasInstance](that)) {
+      return this.intersectsTile(GeoTile.fromLike(that));
+    } else if (GeoBoxLike[Symbol.hasInstance](that)) {
+      return this.intersectsBox(GeoBox.fromLike(that));
     }
     throw new TypeError("" + that);
   }
@@ -297,7 +301,7 @@ export class GeoTile extends GeoShape implements HashCode, Debug {
     return new R2Box(xMin, yMin, xMax, yMax);
   }
 
-  toAny(): GeoTileInit {
+  toLike(): GeoTileInit {
     return {
       x: this.x,
       y: this.y,
@@ -352,9 +356,9 @@ export class GeoTile extends GeoShape implements HashCode, Debug {
     return new GeoTile(x, y, z);
   }
 
-  static override fromAny<T extends AnyGeoTile | null | undefined>(value: T): GeoTile | Uninitable<T>;
-  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyGeoTile | null | undefined>(value: T): GeoTile | Uninitable<T> {
+  static override fromLike<T extends GeoTileLike | null | undefined>(value: T): GeoTile | Uninitable<T>;
+  static override fromLike<T extends GeoShapeLike | null | undefined>(value: T): never;
+  static override fromLike<T extends GeoTileLike | null | undefined>(value: T): GeoTile | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoTile) {
       return value as GeoTile | Uninitable<T>;
     } else if (GeoTileInit[Symbol.hasInstance](value)) {

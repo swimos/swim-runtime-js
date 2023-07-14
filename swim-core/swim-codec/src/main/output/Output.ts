@@ -14,7 +14,7 @@
 
 import {Lazy} from "@swim/util";
 import {OutputException} from "./OutputException";
-import type {AnyOutputSettings} from "./OutputSettings";
+import type {OutputSettingsLike} from "./OutputSettings";
 import {OutputSettings} from "./OutputSettings";
 import {OutputFull} from "../"; // forward import
 import {OutputDone} from "../"; // forward import
@@ -196,7 +196,7 @@ export abstract class Output<T = unknown> {
    *
    * @returns `this`
    */
-  abstract withSettings(settings: AnyOutputSettings): Output<T>;
+  abstract withSettings(settings: OutputSettingsLike): Output<T>;
 
   /**
    * Returns the implementation-defined result of writing the output.

@@ -23,50 +23,56 @@ import {FastenerContext} from "./FastenerContext";
 export type FastenerFlags = number;
 
 /** @public */
-export interface FastenerDescriptor {
+export interface FastenerDescriptor<R> {
   name?: PropertyKey;
-  extends?: Proto<Fastener> | boolean | null;
-  /** @internal */
-  flagsInit?: number;
+  extends?: Proto<Fastener<any, any, any>> | boolean | null;
   affinity?: Affinity;
   inherits?: PropertyKey | boolean;
-  parentType?: Proto<any> | null | undefined;
-  binds?: boolean;
 }
 
 /** @public */
-export interface FastenerDecorator<F extends Fastener> {
+export interface FastenerDecorator<F extends Fastener<any, any, any>> {
   <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value?: F) => F;
   <T>(target: (this: T) => F, context: ClassGetterDecoratorContext<T, F>): (this: T) => F;
 }
 
 /** @public */
-export interface FastenerClass<F extends Fastener = Fastener> {
+export type FastenerTemplate<F extends Fastener<any, any, any>> =
+  F extends {readonly descriptorType?: Proto<infer D>}
+          ? ThisType<F> & D & Partial<Omit<F, keyof D>> & (F extends Fastener<infer R, any, any> ? {readonly inletKeys?: readonly (keyof R)[]} : {})
+          : never;
+
+/** @public */
+export type FastenerClassTemplate<C extends FastenerClass<any>> =
+  ThisType<C> & Partial<C>;
+
+/** @public */
+export interface FastenerClass<F extends Fastener<any, any, any> = Fastener<any, any, any>> {
   /** @internal */
   prototype: F;
 
-  create(owner: F extends Fastener<infer O> ? O : never): F;
+  create(owner: F extends Fastener<infer R, any, any> ? R : never): F;
 
   /** @protected */
-  construct(fastener: F | null, owner: F extends Fastener<infer O> ? O : never): F;
+  construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F;
 
   /** @internal */
   declare<F2 extends F, C extends FastenerClass<any> = FastenerClass<F2>>(className: PropertyKey): C;
 
   /** @internal */
-  implement<F2 extends F, C extends FastenerClass<any> = FastenerClass<F2>>(fastenerClass: C, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F2> & D & Partial<Omit<F2, keyof D>> : never, classTemplate?: ThisType<C> & Partial<C>): void;
+  implement<F2 extends F, C extends FastenerClass<any> = FastenerClass<F2>>(fastenerClass: C, template: FastenerTemplate<F2>, classTemplate?: FastenerClassTemplate<C>): void;
 
   specialize(template: F extends {readonly descriptorType?: Proto<infer D>} ? D : never): FastenerClass<F>;
 
-  refine(fastenerClass: FastenerClass<any>): void;
+  refine(fastenerClass: FastenerClass<Fastener<any, any, any>>): void;
 
-  extend<F2 extends F, C extends FastenerClass<any> = FastenerClass<F2>>(className: PropertyKey, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F2> & D & Partial<Omit<F2, keyof D>> : never, classTemplate?: ThisType<C> & Partial<C>): C;
+  extend<F2 extends F, C extends FastenerClass<any> = FastenerClass<F2>>(className: PropertyKey, template: FastenerTemplate<F2>, classTemplate?: FastenerClassTemplate<C>): C;
 
-  define<F2 extends F>(className: PropertyKey, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F2> & D & Partial<Omit<F2, keyof D>> : never, extendsClass?: FastenerClass<F>): FastenerClass<F2>;
+  define<F2 extends F>(className: PropertyKey, template: FastenerTemplate<F2>, extendsClass?: FastenerClass<F>): FastenerClass<F2>;
 
   dummy<F2 extends F>(): F2;
 
-  <F2 extends F>(template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F2> & D & Partial<Omit<F2, keyof D>> : never): FastenerDecorator<F2>;
+  <F2 extends F>(template: FastenerTemplate<F2>): FastenerDecorator<F2>;
 
   /** @internal */
   readonly MountedFlag: FastenerFlags;
@@ -84,29 +90,89 @@ export interface FastenerClass<F extends Fastener = Fastener> {
 }
 
 /** @public */
-export interface Fastener<O = any> {
-  get descriptorType(): Proto<FastenerDescriptor>;
+export interface Fastener<R = any, O = any, I extends any[] = any> {
+  get descriptorType(): Proto<FastenerDescriptor<R>>;
 
-  get fastenerType(): Proto<Fastener>;
+  get fastenerType(): Proto<Fastener<any, any, any>>;
 
-  readonly owner: O;
+  readonly owner: R;
 
   readonly name: PropertyKey;
 
-  /** @internal */
-  readonly binds?: boolean; // optional prototype property
+  get binds(): boolean;
 
   /** @protected */
   init(): void;
 
   /** @internal */
-  readonly flagsInit?: FastenerFlags; // optional prototype property
+  get flagsInit(): FastenerFlags;
 
   /** @internal */
   readonly flags: FastenerFlags;
 
   /** @internal */
   setFlags(flags: FastenerFlags): void;
+
+  get parentType(): Proto<any> | null | undefined;
+
+  get parent(): Fastener<any, any, any> | null;
+
+  readonly inlet: readonly Fastener<any, any, any>[] | Fastener<any, any, any> | null;
+
+  /** @internal */
+  inheritInlet(): void;
+
+  bindInlet<K extends keyof I, IK extends I[K]>(inlet: Fastener<any, IK, any>, key: IK): void;
+  bindInlet<I0 extends I[0]>(inlet: Fastener<any, I0, any>): void;
+
+  /** @protected */
+  willBindInlet(inlet: Fastener<any, any, any>): void;
+
+  /** @protected */
+  onBindInlet(inlet: Fastener<any, any, any>): void;
+
+  /** @protected */
+  didBindInlet(inlet: Fastener<any, any, any>): void;
+
+  /** @internal */
+  uninheritInlet(): void;
+
+  unbindInlet(inlet?: Fastener<any, any, any>): void;
+
+  /** @protected */
+  willUnbindInlet(inlet: Fastener<any, any, any>): void;
+
+  /** @protected */
+  onUnbindInlet(inlet: Fastener<any, any, any>): void;
+
+  /** @protected */
+  didUnbindInlet(inlet: Fastener<any, any, any>): void;
+
+  /** @internal */
+  attachOutlet(outlet: Fastener<any, any, any>): void;
+
+  /** @internal */
+  detachOutlet(outlet: Fastener<any, any, any>): void;
+
+  get inheritName(): PropertyKey | undefined;
+
+  get inherits(): boolean;
+
+  setInherits(inherits: PropertyKey | boolean): void;
+
+  /** @protected */
+  willSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void;
+
+  /** @protected */
+  onSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void;
+
+  /** @protected */
+  didSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void;
+
+  get derived(): boolean;
+
+  /** @internal */
+  setDerived(derived: boolean): void;
 
   get affinity(): Affinity;
 
@@ -129,97 +195,32 @@ export interface Fastener<O = any> {
   /** @protected */
   didSetAffinity(newAffinity: Affinity, oldAffinity: Affinity): void;
 
-  get parentType(): Proto<unknown> | null | undefined;
-
-  get inheritName(): PropertyKey | undefined;
-
-  get inherits(): boolean;
-
-  /** @internal */
-  initInherits(inherits: PropertyKey | boolean): void;
-
-  setInherits(inherits: PropertyKey | boolean): void;
-
-  /** @protected */
-  willSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void;
-
-  /** @protected */
-  onSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void;
-
-  /** @protected */
-  didSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void;
-
-  get derived(): boolean;
-
-  /** @internal */
-  setDerived(derived: boolean, inlet: Fastener): void;
-
-  /** @protected */
-  willDerive(inlet: Fastener): void;
-
-  /** @protected */
-  onDerive(inlet: Fastener): void;
-
-  /** @protected */
-  didDerive(inlet: Fastener): void;
-
-  /** @protected */
-  willUnderive(inlet: Fastener): void;
-
-  /** @protected */
-  onUnderive(inlet: Fastener): void;
-
-  /** @protected */
-  didUnderive(inlet: Fastener): void;
-
-  get parent(): Fastener | null;
-
-  readonly inlet: Fastener | null;
-
-  /** @internal */
-  inheritInlet(): void;
-
-  bindInlet(inlet: Fastener): void;
-
-  /** @protected */
-  willBindInlet(inlet: Fastener): void;
-
-  /** @protected */
-  onBindInlet(inlet: Fastener): void;
-
-  /** @protected */
-  didBindInlet(inlet: Fastener): void;
-
-  /** @internal */
-  uninheritInlet(): void;
-
-  unbindInlet(inlet?: Fastener): void;
-
-  /** @protected */
-  willUnbindInlet(inlet: Fastener): void;
-
-  /** @protected */
-  onUnbindInlet(inlet: Fastener): void;
-
-  /** @protected */
-  didUnbindInlet(inlet: Fastener): void;
-
-  /** @internal */
-  attachOutlet(outlet: Fastener): void;
-
-  /** @internal */
-  detachOutlet(outlet: Fastener): void;
-
   get coherent(): boolean;
 
-  /** @internal */
+  /** @protected */
   setCoherent(coherent: boolean): void;
 
-  /** @internal */
-  decohere(): void;
+  readonly coherentTime: number;
 
-  /** @internal */
+  /** @protected */
+  setCoherentTime(coherentTime: number): void;
+
+  decohere(inlet?: Fastener<any, any, any>): void;
+
+  requireRecohere(): void;
+
   recohere(t: number): void;
+
+  /** @protected */
+  get inletKeys(): readonly PropertyKey[] | undefined;
+
+  resolveInlets(): readonly Fastener<any, any, any>[] | null;
+
+  /** @protected */
+  attachInlets(): void;
+
+  /** @protected */
+  detachInlets(): void;
 
   get mounted(): boolean;
 
@@ -252,8 +253,8 @@ export interface Fastener<O = any> {
 }
 
 /** @public */
-export const Fastener = (<O, F extends Fastener>() => (function (template: ThisType<Fastener<O>> & FastenerDescriptor & Partial<Omit<Fastener, keyof FastenerDescriptor>>, classTemplate: ThisType<FastenerClass<F>> & Partial<FastenerClass<F>>): FastenerClass<F> {
-  const Fastener = function (template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never): FastenerDecorator<F> {
+export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, any>>() => (function (template: FastenerTemplate<Fastener<R, O, I>>, classTemplate: FastenerClassTemplate<FastenerClass<F>>): FastenerClass<F> {
+  const Fastener = function (template: FastenerTemplate<F>): FastenerDecorator<F> {
     return FastenerContext.fastenerDecorator(Fastener, template);
   } as FastenerClass<F>;
   Object.setPrototypeOf(template, Object.prototype);
@@ -263,7 +264,7 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
   Object.setPrototypeOf(Fastener, classTemplate);
   return Fastener;
 })({
-  get fastenerType(): Proto<Fastener> {
+  get fastenerType(): Proto<Fastener<any, any, any>> {
     return Fastener;
   },
 
@@ -275,8 +276,170 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
     // hook
   },
 
+  binds: false,
+
+  flagsInit: 0,
+
   setFlags(flags: FastenerFlags): void {
     (this as Mutable<typeof this>).flags = flags;
+  },
+
+  get parentType(): Proto<any> | null | undefined {
+    return void 0;
+  },
+
+  get parent(): Fastener<any, any, any> | null {
+    const inheritName = this.inheritName;
+    if (inheritName === void 0 || !FastenerContext[Symbol.hasInstance](this.owner)) {
+      return null;
+    }
+    return this.owner.getParentFastener(inheritName, this.fastenerType, this.parentType);
+  },
+
+  inheritInlet(): void {
+    let inlet: Fastener | null;
+    if ((this.flags & Fastener.InheritsFlag) === 0 || (inlet = this.parent) === null) {
+      return;
+    }
+    this.willBindInlet(inlet);
+    inlet.attachOutlet(this);
+    (this as Mutable<typeof this>).inlet = inlet;
+    this.onBindInlet(inlet);
+    this.didBindInlet(inlet);
+  },
+
+  bindInlet<K extends keyof I, IK extends I[K]>(inlet: Fastener<any, IK, any>, key?: IK): void {
+    this.setInherits(false);
+    this.willBindInlet(inlet);
+    inlet.attachOutlet(this);
+    (this as Mutable<typeof this>).inlet = inlet;
+    this.onBindInlet(inlet);
+    this.didBindInlet(inlet);
+  },
+
+  willBindInlet(inlet: Fastener<any, any, any>): void {
+    // hook
+  },
+
+  onBindInlet(inlet: Fastener<any, any, any>): void {
+    this.recohere(performance.now());
+  },
+
+  didBindInlet(inlet: Fastener<any, any, any>): void {
+    // hook
+  },
+
+  uninheritInlet(): void {
+    if ((this.flags & Fastener.InheritsFlag) === 0) {
+      return;
+    }
+    const inlet = this.inlet;
+    if (!(inlet instanceof Fastener)) {
+      return;
+    }
+    this.willUnbindInlet(inlet);
+    inlet.detachOutlet(this);
+    (this as Mutable<typeof this>).inlet = null;
+    this.onUnbindInlet(inlet);
+    this.didUnbindInlet(inlet);
+  },
+
+  unbindInlet(inlet?: Fastener<any, any, any>): void {
+    if (inlet === void 0 && this.inlet instanceof Fastener) {
+      inlet = this.inlet;
+    }
+    if (inlet instanceof Fastener && inlet === this.inlet) {
+      this.willUnbindInlet(inlet);
+      inlet.detachOutlet(this);
+      (this as Mutable<typeof this>).inlet = null;
+      this.onUnbindInlet(inlet);
+      this.didUnbindInlet(inlet);
+    } else if (inlet === void 0) {
+      (this as Mutable<typeof this>).inlet = null;
+    }
+  },
+
+  willUnbindInlet(inlet: Fastener<any, any, any>): void {
+    // hook
+  },
+
+  onUnbindInlet(inlet: Fastener<any, any, any>): void {
+    this.setDerived(false);
+  },
+
+  didUnbindInlet(inlet: Fastener<any, any, any>): void {
+    // hook
+  },
+
+  attachOutlet(outlet: Fastener<any, any, any>): void {
+    // hook
+  },
+
+  detachOutlet(outlet: Fastener<any, any, any>): void {
+    // hook
+  },
+
+  get inheritName(): PropertyKey | undefined {
+    return (this.flags & Fastener.InheritsFlag) !== 0 ? this.name : void 0;
+  },
+
+  get inherits(): boolean {
+    return (this.flags & Fastener.InheritsFlag) !== 0;
+  },
+
+  setInherits(inherits: PropertyKey | boolean): void {
+    let inheritName: PropertyKey | undefined;
+    if (typeof inherits === "string" || typeof inherits === "number" || typeof inherits === "symbol") {
+      if (inherits !== this.name) {
+        inheritName = inherits;
+      }
+      inherits = true;
+    }
+    if (inherits && ((this.flags & Fastener.InheritsFlag) === 0 || (inheritName !== void 0 && inheritName !== this.name))) {
+      this.unbindInlet();
+      this.willSetInherits(true, inheritName);
+      if (inheritName !== void 0) {
+        Object.defineProperty(this, "name", {
+          value: inheritName,
+          enumerable: true,
+          configurable: true,
+        });
+      }
+      this.setFlags(this.flags | Fastener.InheritsFlag);
+      this.onSetInherits(true, inheritName);
+      this.didSetInherits(true, inheritName);
+      this.inheritInlet();
+    } else if (!inherits && (this.flags & Fastener.InheritsFlag) !== 0) {
+      this.unbindInlet();
+      this.willSetInherits(false, inheritName);
+      this.setFlags(this.flags & ~Fastener.InheritsFlag);
+      this.onSetInherits(false, inheritName);
+      this.didSetInherits(false, inheritName);
+    }
+  },
+
+  willSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void {
+    // hook
+  },
+
+  onSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void {
+    // hook
+  },
+
+  didSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void {
+    // hook
+  },
+
+  get derived(): boolean {
+    return (this.flags & Fastener.DerivedFlag) !== 0;
+  },
+
+  setDerived(derived: boolean): void {
+    if (derived) {
+      this.setFlags(this.flags | Fastener.DerivedFlag);
+    } else {
+      this.setFlags(this.flags & ~Fastener.DerivedFlag);
+    }
   },
 
   get affinity(): Affinity {
@@ -328,231 +491,18 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
   onSetAffinity(newAffinity: Affinity, oldAffinity: Affinity): void {
     if (newAffinity > oldAffinity && (this.flags & Fastener.DerivedFlag) !== 0) {
       const inlet = this.inlet;
-      if (inlet !== null && Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic) < newAffinity) {
-        this.setDerived(false, inlet);
+      if (inlet instanceof Fastener && Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic) < newAffinity) {
+        this.setDerived(false);
       }
     } else if (newAffinity < oldAffinity && (this.flags & Fastener.InheritsFlag) !== 0) {
       const inlet = this.inlet;
-      if (inlet !== null && Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic) >= newAffinity) {
-        this.setDerived(true, inlet);
+      if (inlet instanceof Fastener && Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic) >= newAffinity) {
+        this.decohere(inlet);
       }
     }
   },
 
   didSetAffinity(newAffinity: Affinity, oldAffinity: Affinity): void {
-    // hook
-  },
-
-  get parentType(): Proto<unknown> | null | undefined {
-    return void 0;
-  },
-
-  get inheritName(): PropertyKey | undefined {
-    return (this.flags & Fastener.InheritsFlag) !== 0 ? this.name : void 0;
-  },
-
-  get inherits(): boolean {
-    return (this.flags & Fastener.InheritsFlag) !== 0;
-  },
-
-  initInherits(inherits: PropertyKey | boolean): void {
-    let inheritName: PropertyKey | undefined;
-    if (typeof inherits === "string" || typeof inherits === "number" || typeof inherits === "symbol") {
-      inheritName = inherits;
-      inherits = true;
-    }
-    if (inherits) {
-      if (inheritName !== void 0) {
-        Object.defineProperty(this, "name", {
-          value: inheritName,
-          enumerable: true,
-          configurable: true,
-        });
-      }
-      (this as Mutable<typeof this>).flags = this.flags | Fastener.InheritsFlag;
-    } else {
-      (this as Mutable<typeof this>).flags = this.flags & ~Fastener.InheritsFlag;
-    }
-  },
-
-  setInherits(inherits: PropertyKey | boolean): void {
-    let inheritName: PropertyKey | undefined;
-    if (typeof inherits === "string" || typeof inherits === "number" || typeof inherits === "symbol") {
-      if (inherits !== this.name) {
-        inheritName = inherits;
-      }
-      inherits = true;
-    }
-    if (inherits && ((this.flags & Fastener.InheritsFlag) === 0 || (inheritName !== void 0 && inheritName !== this.name))) {
-      this.unbindInlet();
-      this.willSetInherits(true, inheritName);
-      if (inheritName !== void 0) {
-        Object.defineProperty(this, "name", {
-          value: inheritName,
-          enumerable: true,
-          configurable: true,
-        });
-      }
-      this.setFlags(this.flags | Fastener.InheritsFlag);
-      this.onSetInherits(true, inheritName);
-      this.didSetInherits(true, inheritName);
-      this.inheritInlet();
-    } else if (!inherits && (this.flags & Fastener.InheritsFlag) !== 0) {
-      this.unbindInlet();
-      this.willSetInherits(false, inheritName);
-      this.setFlags(this.flags & ~Fastener.InheritsFlag);
-      this.onSetInherits(false, inheritName);
-      this.didSetInherits(false, inheritName);
-    }
-  },
-
-  willSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void {
-    // hook
-  },
-
-  onSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void {
-    // hook
-  },
-
-  didSetInherits(inherits: boolean, inheritName: PropertyKey | undefined): void {
-    // hook
-  },
-
-  get derived(): boolean {
-    return (this.flags & Fastener.DerivedFlag) !== 0;
-  },
-
-  setDerived(derived: boolean, inlet: Fastener): void {
-    if (derived && (this.flags & Fastener.DerivedFlag) === 0) {
-      this.willDerive(inlet);
-      this.setFlags(this.flags | Fastener.DerivedFlag);
-      this.onDerive(inlet);
-      this.didDerive(inlet);
-    } else if (!derived && (this.flags & Fastener.DerivedFlag) !== 0) {
-      this.willUnderive(inlet);
-      this.setFlags(this.flags & ~Fastener.DerivedFlag);
-      this.onUnderive(inlet);
-      this.didUnderive(inlet);
-    }
-  },
-
-  willDerive(inlet: Fastener): void {
-    // hook
-  },
-
-  onDerive(inlet: Fastener): void {
-    // hook
-  },
-
-  didDerive(inlet: Fastener): void {
-    // hook
-  },
-
-  willUnderive(inlet: Fastener): void {
-    // hook
-  },
-
-  onUnderive(inlet: Fastener): void {
-    // hook
-  },
-
-  didUnderive(inlet: Fastener): void {
-    // hook
-  },
-
-  get parent(): Fastener | null {
-    const inheritName = this.inheritName;
-    if (inheritName === void 0 || !FastenerContext[Symbol.hasInstance](this.owner)) {
-      return null;
-    }
-    return this.owner.getParentFastener(inheritName, this.fastenerType, this.parentType);
-  },
-
-  inheritInlet(): void {
-    if ((this.flags & Fastener.InheritsFlag) === 0) {
-      return;
-    }
-    const inlet = this.parent;
-    if (inlet === null) {
-      return;
-    }
-    this.willBindInlet(inlet);
-    inlet.attachOutlet(this);
-    (this as Mutable<typeof this>).inlet = inlet;
-    this.onBindInlet(inlet);
-    this.didBindInlet(inlet);
-  },
-
-  bindInlet(inlet: Fastener): void {
-    this.setInherits(false);
-    this.willBindInlet(inlet);
-    inlet.attachOutlet(this);
-    (this as Mutable<typeof this>).inlet = inlet;
-    this.onBindInlet(inlet);
-    this.didBindInlet(inlet);
-  },
-
-  willBindInlet(inlet: Fastener): void {
-    // hook
-  },
-
-  onBindInlet(inlet: Fastener): void {
-    if ((inlet.flags & Affinity.Mask) >= (this.flags & Affinity.Mask)) {
-      this.setDerived(true, inlet);
-    }
-  },
-
-  didBindInlet(inlet: Fastener): void {
-    // hook
-  },
-
-  uninheritInlet(): void {
-    if ((this.flags & Fastener.InheritsFlag) === 0) {
-      return;
-    }
-    const inlet = this.inlet;
-    if (inlet === null) {
-      return;
-    }
-    this.willUnbindInlet(inlet);
-    inlet.detachOutlet(this);
-    (this as Mutable<typeof this>).inlet = null;
-    this.onUnbindInlet(inlet);
-    this.didUnbindInlet(inlet);
-  },
-
-  unbindInlet(inlet?: Fastener | null): void {
-    if (inlet !== void 0 && inlet !== null && inlet !== this.inlet) {
-      return;
-    }
-    inlet = this.inlet;
-    if (inlet === null) {
-      return;
-    }
-    this.willUnbindInlet(inlet);
-    inlet.detachOutlet(this);
-    (this as Mutable<typeof this>).inlet = null;
-    this.onUnbindInlet(inlet);
-    this.didUnbindInlet(inlet);
-  },
-
-  willUnbindInlet(inlet: Fastener): void {
-    // hook
-  },
-
-  onUnbindInlet(inlet: Fastener): void {
-    this.setDerived(false, inlet);
-  },
-
-  didUnbindInlet(inlet: Fastener): void {
-    // hook
-  },
-
-  attachOutlet(outlet: Fastener): void {
-    // hook
-  },
-
-  detachOutlet(outlet: Fastener): void {
     // hook
   },
 
@@ -568,15 +518,85 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
     }
   },
 
-  decohere(): void {
-    const owner = this.owner;
-    if (Objects.hasAllKeys<FastenerContext>(owner, "decohereFastener")) {
-      owner.decohereFastener!(this);
+  setCoherentTime(coherentTime: number): void {
+    (this as Mutable<typeof this>).coherentTime = coherentTime;
+  },
+
+  decohere(inlet?: Fastener<any, any, any>): void {
+    if (inlet === void 0 || inlet !== this.inlet || (this.flags & Fastener.DerivedFlag) !== 0) {
+      if ((this.flags & Fastener.DecoherentFlag) === 0) {
+        this.requireRecohere();
+      }
+    } else {
+      this.recohere(performance.now());
+    }
+  },
+
+  requireRecohere(): void {
+    this.setCoherent(false);
+    if (Objects.hasAllKeys<FastenerContext>(this.owner, "decohereFastener")) {
+      this.owner.decohereFastener!(this);
     }
   },
 
   recohere(t: number): void {
-    // hook
+    this.setCoherentTime(t);
+    const inlets = this.inlet;
+    if (inlets instanceof Fastener) {
+      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlets.flags & Affinity.Mask, Affinity.Intrinsic));
+    } else if (Array.isArray(inlets)) {
+      this.setDerived(true);
+    } else {
+      this.setDerived(false);
+    }
+  },
+
+  inletKeys: void 0,
+
+  resolveInlets(): readonly Fastener<any, any, any>[] | null {
+    const inletKeys = this.inletKeys;
+    if (inletKeys === void 0 || !Objects.hasAllKeys<FastenerContext>(this.owner, "getFastener")) {
+      return null;
+    }
+    const inlets = new Array<Fastener<any, any, any>>(inletKeys.length);
+    for (let i = 0; i < inletKeys.length; i += 1) {
+      const inletKey = inletKeys[i]!;
+      const inlet = this.owner.getFastener(inletKey);
+      if (inlet === null) {
+        return null;
+      }
+      inlets[i] = inlet;
+    }
+    return inlets;
+  },
+
+  attachInlets(): void {
+    const inlets = this.resolveInlets();
+    if (inlets !== null) {
+      this.setInherits(false);
+      this.setFlags(this.flags | Fastener.DerivedFlag);
+      (this as Mutable<typeof this>).inlet = inlets;
+      for (let i = 0; i < inlets.length; i += 1) {
+        const inlet = inlets[i]!;
+        inlet.attachOutlet(this);
+      }
+    } else {
+      this.inheritInlet();
+    }
+  },
+
+  detachInlets(): void {
+    const inlets = this.inlet;
+    if (Array.isArray(inlets)) {
+      for (let i = 0; i < inlets.length; i += 1) {
+        const inlet = inlets[i]!;
+        inlet.detachOutlet(this);
+      }
+      (this as Mutable<typeof this>).inlet = null;
+      this.setFlags(this.flags & ~Fastener.DerivedFlag);
+    } else {
+      this.uninheritInlet();
+    }
   },
 
   get mounted(): boolean {
@@ -598,7 +618,7 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
   },
 
   onMount(): void {
-    this.inheritInlet();
+    this.attachInlets();
   },
 
   didMount(): void {
@@ -620,7 +640,7 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
   },
 
   onUnmount(): void {
-    this.uninheritInlet();
+    this.detachInlets();
   },
 
   didUnmount(): void {
@@ -632,24 +652,20 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
   },
 },
 {
-  create(owner: F extends Fastener<infer O> ? O : never): F {
+  create(owner: F extends Fastener<infer R, any, any> ? R : never): F {
     const fastener = this.construct(null, owner);
     fastener.init();
     return fastener;
   },
 
-  construct(fastener: F | null, owner: F extends Fastener<infer O> ? O : never): F {
+  construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
     if (fastener === null) {
       fastener = Object.create(this.prototype) as F;
     }
-    (fastener as Mutable<typeof fastener>).flags = 0;
     (fastener as Mutable<typeof fastener>).owner = owner;
+    (fastener as Mutable<typeof fastener>).flags = fastener.flagsInit;
+    (fastener as Mutable<typeof fastener>).coherentTime = 0;
     (fastener as Mutable<typeof fastener>).inlet = null;
-    const flagsInit = fastener.flagsInit;
-    if (flagsInit !== void 0) {
-      fastener.initAffinity((flagsInit & Affinity.Mask) as Affinity);
-      fastener.initInherits((flagsInit & Fastener.InheritsFlag) !== 0);
-    }
     return fastener;
   },
 
@@ -660,7 +676,7 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
       )(FastenerContext) as C;
     }
 
-    const fastenerClass = function <F extends Fastener>(template: F extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F> & D & Partial<Omit<F, keyof D>> : never): FastenerDecorator<F> {
+    const fastenerClass = function <F extends Fastener<any, any, any>>(template: FastenerTemplate<F>): FastenerDecorator<F> {
       return FastenerContext.fastenerDecorator(fastenerClass, template);
     } as C;
     Object.defineProperty(fastenerClass, "name", {
@@ -671,7 +687,7 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
     return fastenerClass;
   },
 
-  implement<F2 extends F, C extends FastenerClass<any>>(fastenerClass: C, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F2> & D & Partial<Omit<F2, keyof D>> : never, classTemplate?: ThisType<C> & Partial<C>): void {
+  implement<F2 extends F, C extends FastenerClass<any>>(fastenerClass: C, template: FastenerTemplate<F2>, classTemplate?: FastenerClassTemplate<C>): void {
     Object.defineProperty(template, "name", {
       value: fastenerClass.name,
       enumerable: true,
@@ -701,22 +717,15 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
     return baseClass;
   },
 
-  refine(fastenerClass: FastenerClass<any>): void {
+  refine(fastenerClass: FastenerClass<Fastener<any, any, any>>): void {
     const fastenerPrototype = fastenerClass.prototype;
+
     let flagsInit = fastenerPrototype.flagsInit;
-
     if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "affinity")) {
-      if (flagsInit === void 0) {
-        flagsInit = 0;
-      }
       flagsInit = flagsInit & ~Affinity.Mask | fastenerPrototype.affinity & Affinity.Mask;
-      delete (fastenerPrototype as FastenerDescriptor).affinity;
+      delete (fastenerPrototype as FastenerDescriptor<any>).affinity;
     }
-
     if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "inherits")) {
-      if (flagsInit === void 0) {
-        flagsInit = 0;
-      }
       let inherits = fastenerPrototype.inherits as PropertyKey | boolean;
       if (typeof inherits === "string" || typeof inherits === "number" || typeof inherits === "symbol") {
         Object.defineProperty(fastenerPrototype, "name", {
@@ -726,24 +735,21 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
         });
         inherits = true;
       }
-      if (fastenerPrototype.inherits) {
+      if (inherits) {
         flagsInit |= Fastener.InheritsFlag;
       } else {
         flagsInit &= ~Fastener.InheritsFlag;
       }
-      delete (fastenerPrototype as FastenerDescriptor).inherits;
+      delete (fastenerPrototype as FastenerDescriptor<any>).inherits;
     }
-
-    if (flagsInit !== void 0) {
-      Object.defineProperty(fastenerPrototype, "flagsInit", {
-        value: flagsInit,
-        enumerable: true,
-        configurable: true,
-      });
-    }
+    Object.defineProperty(fastenerPrototype, "flagsInit", {
+      value: flagsInit,
+      enumerable: true,
+      configurable: true,
+    });
   },
 
-  extend<F2 extends F, C extends FastenerClass<any>>(className: PropertyKey, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F2> & D & Partial<Omit<F2, keyof D>> : never, classTemplate?: ThisType<C> & Partial<C>): any {
+  extend<F2 extends F, C extends FastenerClass<any>>(className: PropertyKey, template: FastenerTemplate<F2>, classTemplate?: FastenerClassTemplate<C>): any {
     if (template.name !== void 0) {
       className = template.name;
     }
@@ -753,21 +759,18 @@ export const Fastener = (<O, F extends Fastener>() => (function (template: ThisT
     return fastenerClass;
   },
 
-  define<F2 extends F>(className: PropertyKey, template: F2 extends {readonly descriptorType?: Proto<infer D>} ? ThisType<F2> & D & Partial<Omit<F2, keyof D>> : never, extendsClass?: FastenerClass<F>): FastenerClass<F2> {
+  define<F2 extends F>(className: PropertyKey, template: FastenerTemplate<F2>, extendsClass?: FastenerClass<F>): FastenerClass<F2> {
     if (typeof template.extends === "boolean") {
-      const extendsDescriptor = Object.getOwnPropertyDescriptor(template, "extends")!;
       if (template.extends === true) {
         Object.defineProperty(template, "extends", {
           value: extendsClass,
-          writable: extendsDescriptor.writable,
-          enumerable: extendsDescriptor.enumerable,
+          enumerable: true,
           configurable: true,
         });
       } else if (template.extends === false) {
         Object.defineProperty(template, "extends", {
           value: null,
-          writable: extendsDescriptor.writable,
-          enumerable: extendsDescriptor.enumerable,
+          enumerable: true,
           configurable: true,
         });
       }

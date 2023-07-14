@@ -12,23 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Cursor} from "@swim/util";
 import type {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./Value";
 import {Record} from "./Record";
-import type {AnyText} from "./Text";
+import type {TextLike} from "./Text";
 
 /** @public */
-export type AnyAbsent = Absent | undefined;
+export type AbsentLike = Absent | undefined;
 
 /** @public */
 export class Absent extends Value {
@@ -36,6 +37,9 @@ export class Absent extends Value {
   private constructor() {
     super();
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<undefined>;
 
   /**
    * Always returns `false` because `Absent` represents an undefined value.
@@ -69,51 +73,51 @@ export class Absent extends Value {
     return Record.empty();
   }
 
-  override updated(key: AnyValue, value: AnyValue): Record {
+  override updated(key: ValueLike, value: ValueLike): Record {
     return Record.of(Slot.of(key, value));
   }
 
-  override updatedAttr(key: AnyText, value: AnyValue): Record {
+  override updatedAttr(key: TextLike, value: ValueLike): Record {
     return Record.of(Attr.of(key, value));
   }
 
-  override updatedSlot(key: AnyValue, value: AnyValue): Record {
+  override updatedSlot(key: ValueLike, value: ValueLike): Record {
     return Record.of(Slot.of(key, value));
   }
 
-  override appended(...items: AnyItem[]): Record {
+  override appended(...items: ItemLike[]): Record {
     return Record.of(items);
   }
 
-  override prepended(...items: AnyItem[]): Record {
+  override prepended(...items: ItemLike[]): Record {
     return Record.of(items);
   }
 
-  override concat(...items: AnyItem[]): Record {
+  override concat(...items: ItemLike[]): Record {
     const record = Record.create();
     for (let i = 0, n = items.length; i < n; i += 1) {
-      Item.fromAny(items[i]).forEach(function (item: Item): void {
+      Item.fromLike(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });
     }
     return record;
   }
 
-  override conditional(thenTerm: AnyValue, elseTerm: AnyValue): Value;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item;
-  override conditional(thenTerm: AnyItem, elseTerm: AnyItem): Item {
-    return Item.fromAny(elseTerm);
+  override conditional(thenTerm: ValueLike, elseTerm: ValueLike): Value;
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item;
+  override conditional(thenTerm: ItemLike, elseTerm: ItemLike): Item {
+    return Item.fromLike(elseTerm);
   }
 
-  override or(that: AnyValue): Value;
-  override or(that: AnyItem): Item;
-  override or(that: AnyItem): Item {
-    return Item.fromAny(that);
+  override or(that: ValueLike): Value;
+  override or(that: ItemLike): Item;
+  override or(that: ItemLike): Item {
+    return Item.fromLike(that);
   }
 
-  override and(that: AnyValue): Value;
-  override and(that: AnyItem): Item;
-  override and(that: AnyItem): Item {
+  override and(that: ValueLike): Value;
+  override and(that: ItemLike): Item;
+  override and(that: ItemLike): Item {
     return this;
   }
 
@@ -133,7 +137,7 @@ export class Absent extends Value {
     return false;
   }
 
-  override toAny(): AnyAbsent {
+  override toLike(): AbsentLike {
     return void 0;
   }
 
@@ -192,7 +196,7 @@ export class Absent extends Value {
     return new Absent();
   }
 
-  static override fromAny(value: AnyAbsent): Absent {
+  static override fromLike(value: AbsentLike): Absent {
     if (value instanceof Absent) {
       return value;
     } else if (value === void 0) {

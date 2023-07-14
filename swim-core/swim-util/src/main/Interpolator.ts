@@ -328,15 +328,15 @@ export const NumberInterpolator = (function (_super: typeof Interpolator) {
 })(Interpolator);
 
 /** @internal */
-export interface ArrayInterpolator<Y> extends Interpolator<ReadonlyArray<Y>> {
+export interface ArrayInterpolator<Y> extends Interpolator<readonly Y[]> {
   /** @internal */
-  readonly interpolators: ReadonlyArray<Interpolator<Y>>;
+  readonly interpolators: readonly Interpolator<Y>[];
 
   /** @override */
-  readonly 0: ReadonlyArray<Y>;
+  readonly 0: readonly Y[];
 
   /** @override */
-  readonly 1: ReadonlyArray<Y>;
+  readonly 1: readonly Y[];
 
   /** @override */
   equals(that: unknown): boolean;
@@ -344,8 +344,8 @@ export interface ArrayInterpolator<Y> extends Interpolator<ReadonlyArray<Y>> {
 
 /** @internal */
 export const ArrayInterpolator = (function (_super: typeof Interpolator) {
-  const ArrayInterpolator = function <Y>(y0: ReadonlyArray<Y>, y1: ReadonlyArray<Y>): ArrayInterpolator<Y> {
-    const interpolator = function (u: number): ReadonlyArray<Y> {
+  const ArrayInterpolator = function <Y>(y0: readonly Y[], y1: readonly Y[]): ArrayInterpolator<Y> {
+    const interpolator = function (u: number): readonly Y[] {
       const interpolators = interpolator.interpolators;
       const interpolatorCount = interpolators.length;
       const array = new Array<Y>(interpolatorCount);
@@ -363,7 +363,7 @@ export const ArrayInterpolator = (function (_super: typeof Interpolator) {
     (interpolator as Mutable<typeof interpolator>).interpolators = interpolators;
     return interpolator;
   } as {
-    <Y>(y0: ReadonlyArray<Y>, y1: ReadonlyArray<Y>): ArrayInterpolator<Y>;
+    <Y>(y0: readonly Y[], y1: readonly Y[]): ArrayInterpolator<Y>;
 
     /** @internal */
     prototype: ArrayInterpolator<any>;
@@ -373,7 +373,7 @@ export const ArrayInterpolator = (function (_super: typeof Interpolator) {
   ArrayInterpolator.prototype.constructor = ArrayInterpolator;
 
   Object.defineProperty(ArrayInterpolator.prototype, 0, {
-    get<Y>(this: ArrayInterpolator<Y>): ReadonlyArray<Y> {
+    get<Y>(this: ArrayInterpolator<Y>): readonly Y[] {
       const interpolators = this.interpolators;
       const interpolatorCount = interpolators.length;
       const array = new Array<Y>(interpolatorCount);
@@ -386,7 +386,7 @@ export const ArrayInterpolator = (function (_super: typeof Interpolator) {
   });
 
   Object.defineProperty(ArrayInterpolator.prototype, 1, {
-    get<Y>(this: ArrayInterpolator<Y>): ReadonlyArray<Y> {
+    get<Y>(this: ArrayInterpolator<Y>): readonly Y[] {
       const interpolators = this.interpolators;
       const interpolatorCount = interpolators.length;
       const array = new Array<Y>(interpolatorCount);

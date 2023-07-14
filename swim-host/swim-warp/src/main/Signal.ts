@@ -14,7 +14,7 @@
 
 import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import type {Uri} from "@swim/uri";
 import {Message} from "./Message";
 import {OpenSignal} from "./"; // forward import
@@ -31,7 +31,7 @@ import {ErrorSignal} from "./"; // forward import
 export abstract class Signal<S extends Signal<S> = Signal<any>> extends Message<S> {
   abstract readonly host: Uri;
 
-  abstract withHost(host: AnyUri): S;
+  abstract withHost(host: UriLike): S;
 
   static override fromValue(value: Value): Signal | null {
     switch (value.tag) {

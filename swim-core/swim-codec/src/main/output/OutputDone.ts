@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {OutputException} from "./OutputException";
-import type {AnyOutputSettings} from "./OutputSettings";
+import type {OutputSettingsLike} from "./OutputSettings";
 import {OutputSettings} from "./OutputSettings";
 import {Output} from "./Output";
 import {OutputFull} from "../"; // forward import
@@ -69,8 +69,8 @@ export class OutputDone extends Output<never> {
 
   override readonly settings!: OutputSettings;
 
-  override withSettings(settings: AnyOutputSettings): Output<never> {
-    settings = OutputSettings.fromAny(settings);
+  override withSettings(settings: OutputSettingsLike): Output<never> {
+    settings = OutputSettings.fromLike(settings);
     return new OutputDone(settings);
   }
 

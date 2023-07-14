@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -30,11 +31,11 @@ import {Utf8} from "@swim/codec";
 import {Uri} from "./Uri";
 
 /** @public */
-export type AnyUriHost = UriHost | string;
+export type UriHostLike = UriHost | string;
 
 /** @public */
-export const AnyUriHost = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUriHost {
+export const UriHostLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriHostLike {
     return instance instanceof UriHost
         || typeof instance === "string";
   },
@@ -45,6 +46,8 @@ export abstract class UriHost implements HashCode, Compare, Debug, Display {
   protected constructor() {
     // nop
   }
+
+  declare readonly likeType?: Proto<string>;
 
   isDefined(): boolean {
     return true;
@@ -64,7 +67,7 @@ export abstract class UriHost implements HashCode, Compare, Debug, Display {
     return void 0;
   }
 
-  toAny(): string {
+  toLike(): string {
     return this.toString();
   }
 
@@ -117,7 +120,7 @@ export abstract class UriHost implements HashCode, Compare, Debug, Display {
     return new UriHostIPv6(ipv6);
   }
 
-  static fromAny<T extends AnyUriHost | null | undefined>(value: T): UriHost | Uninitable<T> {
+  static fromLike<T extends UriHostLike | null | undefined>(value: T): UriHost | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriHost) {
       return value as UriHost | Uninitable<T>;
     } else if (typeof value === "string") {

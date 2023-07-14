@@ -42,7 +42,7 @@ export class LambdaFunc extends Func {
   }
 
   override invoke(args: Value, interpreter?: Interpreter, operator?: InvokeOperator): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+    interpreter = Interpreter.fromLike(interpreter);
     const bindings = this.bindings;
     const arity = Math.max(1, bindings.length);
     const params = Record.create(arity);

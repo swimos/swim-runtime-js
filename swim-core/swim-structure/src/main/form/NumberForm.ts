@@ -23,10 +23,11 @@ export class NumberForm extends Form<number> {
     Object.defineProperty(this, "unit", {
       value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
-  override readonly unit!: number | undefined;
+  override readonly unit: number | undefined;
 
   override withUnit(unit: number | undefined): Form<number> {
     if (unit === this.unit) {

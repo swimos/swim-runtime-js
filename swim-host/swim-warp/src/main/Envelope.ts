@@ -14,7 +14,7 @@
 
 import type {Value} from "@swim/structure";
 import {Recon} from "@swim/recon";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import type {Uri} from "@swim/uri";
 import {Message} from "./Message";
 import {EventMessage} from "./"; // forward import
@@ -34,11 +34,11 @@ import {DeauthedResponse} from "./"; // forward import
 export abstract class Envelope<E extends Envelope<E> = Envelope<any>> extends Message<E> {
   abstract readonly node: Uri;
 
-  abstract withNode(node: AnyUri): E;
+  abstract withNode(node: UriLike): E;
 
   abstract readonly lane: Uri;
 
-  abstract withLane(lane: AnyUri): E;
+  abstract withLane(lane: UriLike): E;
 
   declare readonly prio: number; // getter defined below to work around useDefineForClassFields lunacy
 

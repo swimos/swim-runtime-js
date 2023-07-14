@@ -12,32 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Murmur3} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
+import {Murmur3} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Cursor} from "@swim/util";
 import type {Builder} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
 import {Field} from "./Field";
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./Value";
 import {RecordMap} from "./"; // forward import
-import type {AnyText} from "./Text";
+import type {TextLike} from "./Text";
 import {Text} from "./"; // forward import
-import type {AnyNum} from "./Num";
-import type {AnyInterpreter} from "./interpreter/Interpreter";
+import type {NumLike} from "./Num";
+import type {InterpreterLike} from "./interpreter/Interpreter";
 import {Interpreter} from "./"; // forward import
 
 /** @public */
-export type AnyRecord = Record
-                      | {readonly [key: string]: AnyValue}
-                      | ReadonlyArray<AnyItem>;
+export type RecordLike = Record
+                       | {readonly [key: string]: ValueLike}
+                       | readonly ItemLike[];
 
 /** @public */
 export abstract class Record extends Value implements Builder<Item, Record> {
@@ -45,6 +46,10 @@ export abstract class Record extends Value implements Builder<Item, Record> {
   constructor() {
     super();
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<{readonly [key: string]: ValueLike}
+                                  | readonly ItemLike[]>;
 
   override isDefinite(): boolean {
     return !this.isEmpty();
@@ -266,15 +271,15 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * equal to the given `key`; otherwise returns `false` if this `Record` has
    * no `Field` member with a key equal to the given `key`.
    */
-  override has(key: AnyValue): boolean {
-    key = Value.fromAny(key);
+  override has(key: ValueLike): boolean {
+    key = Value.fromLike(key);
     return this.forEach(function (item: Item): boolean | undefined {
       return item instanceof Field && item.key.equals(key) ? true : void 0;
     }, this) || false;
   }
 
-  indexOf(item: AnyItem, index: number = 0): number {
-    item = Item.fromAny(item);
+  indexOf(item: ItemLike, index: number = 0): number {
+    item = Item.fromLike(item);
     if (index < 0) {
       index = Math.max(0, this.length + index);
     }
@@ -284,8 +289,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return i !== void 0 ? i : -1;
   }
 
-  lastIndexOf(item: AnyItem, index?: number): number {
-    item = Item.fromAny(item);
+  lastIndexOf(item: ItemLike, index?: number): number {
+    item = Item.fromLike(item);
     const n = this.length;
     if (index === void 0) {
       index = n - 1;
@@ -307,8 +312,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * is equal to the given `key`; returns [[Absent]] if this `Record` has no
    * `Field` member with a key equal to the given `key`.
    */
-  override get(key: AnyValue): Value {
-    key = Value.fromAny(key);
+  override get(key: ValueLike): Value {
+    key = Value.fromLike(key);
     return this.forEach(function (item: Item): Value | undefined {
       return item instanceof Field && item.key.equals(key) ? item.value : void 0;
     }, this) || Value.absent();
@@ -319,8 +324,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * is equal to the given `key`; returns [[Absent]] if this `Record` has no
    * `Attr` member with a key equal to the given `key`.
    */
-  override getAttr(key: AnyText): Value {
-    key = Text.fromAny(key);
+  override getAttr(key: TextLike): Value {
+    key = Text.fromLike(key);
     return this.forEach(function (item: Item): Value | undefined {
       return item instanceof Attr && item.key.equals(key) ? item.value : void 0;
     }, this) || Value.absent();
@@ -331,8 +336,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * is equal to the given `key`; returns [[Absent]] if this `Record` has no
    * `Slot` member with a key equal to the given `key`.
    */
-  override getSlot(key: AnyValue): Value {
-    key = Value.fromAny(key);
+  override getSlot(key: ValueLike): Value {
+    key = Value.fromLike(key);
     return this.forEach(function (item: Item): Value | undefined {
       return item instanceof Slot && item.key.equals(key) ? item.value : void 0;
     }, this) || Value.absent();
@@ -343,8 +348,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * the given `key`; returns `undefined` if this `Record` has no `Field` member
    * with a `key` equal to the given `key`.
    */
-  override getField(key: AnyValue): Field | undefined {
-    key = Value.fromAny(key);
+  override getField(key: ValueLike): Field | undefined {
+    key = Value.fromLike(key);
     return this.forEach(function (item: Item): Field | undefined {
       return item instanceof Field && item.key.equals(key) ? item : void 0;
     }, this);
@@ -356,11 +361,11 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * length]] of this `Record`; otherwise returns [[Absent]] if the `index` is
    * out of bounds.
    */
-  abstract override getItem(index: AnyNum): Item;
+  abstract override getItem(index: NumLike): Item;
 
-  set(key: AnyValue, newValue: AnyValue): this {
-    key = Value.fromAny(key);
-    newValue = Value.fromAny(newValue);
+  set(key: ValueLike, newValue: ValueLike): this {
+    key = Value.fromLike(key);
+    newValue = Value.fromLike(newValue);
     const items = this.iterator();
     while (!items.isEmpty()) {
       const item = items.head();
@@ -378,9 +383,9 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return this;
   }
 
-  setAttr(key: AnyText, newValue: AnyValue): this {
-    key = Text.fromAny(key);
-    newValue = Value.fromAny(newValue);
+  setAttr(key: TextLike, newValue: ValueLike): this {
+    key = Text.fromLike(key);
+    newValue = Value.fromLike(newValue);
     const items = this.iterator();
     while (!items.isEmpty()) {
       const item = items.head();
@@ -398,9 +403,9 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return this;
   }
 
-  setSlot(key: AnyValue, newValue: AnyValue): this {
-    key = Value.fromAny(key);
-    newValue = Value.fromAny(newValue);
+  setSlot(key: ValueLike, newValue: ValueLike): this {
+    key = Value.fromLike(key);
+    newValue = Value.fromLike(newValue);
     const items = this.iterator();
     while (!items.isEmpty()) {
       const item = items.head();
@@ -426,11 +431,11 @@ export abstract class Record extends Value implements Builder<Item, Record> {
    * @throws `Error` if this is an immutable `Record`.
    * @throws `RangeError` if the `index` is out of bounds.
    */
-  abstract setItem(index: number, item: AnyItem): this;
+  abstract setItem(index: number, item: ItemLike): this;
 
-  override updated(key: AnyValue, value: AnyValue): Record {
-    key = Value.fromAny(key);
-    value = Value.fromAny(value);
+  override updated(key: ValueLike, value: ValueLike): Record {
+    key = Value.fromLike(key);
+    value = Value.fromLike(value);
     const record = this.isMutable() ? this : this.branch();
     const items = record.iterator();
     while (!items.isEmpty()) {
@@ -449,9 +454,9 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return record;
   }
 
-  override updatedAttr(key: AnyText, value: AnyValue): Record {
-    key = Text.fromAny(key);
-    value = Value.fromAny(value);
+  override updatedAttr(key: TextLike, value: ValueLike): Record {
+    key = Text.fromLike(key);
+    value = Value.fromLike(value);
     const record = this.isMutable() ? this : this.branch();
     const items = record.iterator();
     while (!items.isEmpty()) {
@@ -470,9 +475,9 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return record;
   }
 
-  override updatedSlot(key: AnyValue, value: AnyValue): Record {
-    key = Value.fromAny(key);
-    value = Value.fromAny(value);
+  override updatedSlot(key: ValueLike, value: ValueLike): Record {
+    key = Value.fromLike(key);
+    value = Value.fromLike(value);
     const record = this.isMutable() ? this : this.branch();
     const items = record.iterator();
     while (!items.isEmpty()) {
@@ -491,36 +496,36 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return record;
   }
 
-  abstract push(...items: AnyItem[]): number;
+  abstract push(...items: ItemLike[]): number;
 
-  abstract splice(start: number, deleteCount?: number, ...newItems: AnyItem[]): Item[];
+  abstract splice(start: number, deleteCount?: number, ...newItems: ItemLike[]): Item[];
 
-  abstract delete(key: AnyValue): Item;
+  abstract delete(key: ValueLike): Item;
 
   abstract clear(): void;
 
-  override appended(...items: AnyItem[]): Record {
+  override appended(...items: ItemLike[]): Record {
     const record = this.isMutable() ? this : this.branch();
     record.push(...items);
     return record;
   }
 
-  override prepended(...items: AnyItem[]): Record {
+  override prepended(...items: ItemLike[]): Record {
     const record = this.isMutable() ? this : this.branch();
     record.splice(0, 0, ...items);
     return record;
   }
 
-  override deleted(key: AnyValue): Record {
+  override deleted(key: ValueLike): Record {
     const record = this.isMutable() ? this : this.branch();
     record.delete(key);
     return record;
   }
 
-  override concat(...items: AnyItem[]): Record {
+  override concat(...items: ItemLike[]): Record {
     const record = this.isMutable() ? this : this.branch();
     for (let i = 0, n = items.length; i < n; i += 1) {
-      Item.fromAny(items[i]).forEach(function (item: Item): void {
+      Item.fromLike(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });
     }
@@ -531,7 +536,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return this.subRecord(lower, upper).branch();
   }
 
-  attr(key: AnyText, value?: AnyValue): this {
+  attr(key: TextLike, value?: ValueLike): this {
     let field: Field;
     if (arguments.length === 1) {
       field = Attr.of(key);
@@ -542,7 +547,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return this;
   }
 
-  slot(key: AnyValue, value?: AnyValue): this {
+  slot(key: ValueLike, value?: ValueLike): this {
     let field: Field;
     if (arguments.length === 1) {
       field = Slot.of(key);
@@ -553,18 +558,18 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return this;
   }
 
-  item(item: AnyItem): this {
+  item(item: ItemLike): this {
     this.push(item);
     return this;
   }
 
-  items(...items: AnyItem[]): this {
+  items(...items: ItemLike[]): this {
     this.push(this, ...items);
     return this;
   }
 
-  override evaluate(interpreter: AnyInterpreter): Record {
-    interpreter = Interpreter.fromAny(interpreter);
+  override evaluate(interpreter: InterpreterLike): Record {
+    interpreter = Interpreter.fromLike(interpreter);
     const scope = Record.create();
     interpreter.pushScope(scope);
     let changed = false;
@@ -581,8 +586,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return changed ? scope : this;
   }
 
-  override substitute(interpreter: AnyInterpreter): Record {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Record {
+    interpreter = Interpreter.fromLike(interpreter);
     const scope = Record.create();
     interpreter.pushScope(scope);
     let changed = false;
@@ -616,44 +621,44 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return defined ? recordString : void 0;
   }
 
-  override toAny(): AnyValue {
+  override toLike(): ValueLike {
     if (!this.isEmpty() && this.isArray()) {
       return this.toArray();
     }
     return this.toObject();
   }
 
-  toArray(): AnyItem[] {
-    const array = new Array<AnyItem>(this.length);
+  toArray(): ItemLike[] {
+    const array = new Array<ItemLike>(this.length);
     this.forEach(function (item: Item, index: number): void {
       if (item instanceof Value) {
-        array[index] = item.toAny();
+        array[index] = item.toLike();
       } else if (item instanceof Field) {
         array[index] = {
-          $key: item.key.toAny(),
-          $value: item.value.toAny(),
+          $key: item.key.toLike(),
+          $value: item.value.toLike(),
         };
       }
     }, this);
     return array;
   }
 
-  toObject(): {[key: string]: AnyValue} {
-    const object = {} as {[key: string]: AnyValue};
+  toObject(): {[key: string]: ValueLike} {
+    const object = {} as {[key: string]: ValueLike};
     this.forEach(function (item: Item, index: number): void {
       if (item instanceof Attr) {
-        object["@" + item.key.value] = item.value.toAny();
+        object["@" + item.key.value] = item.value.toLike();
       } else if (item instanceof Slot) {
         if (item.key instanceof Text) {
-          object[item.key.value] = item.value.toAny();
+          object[item.key.value] = item.value.toLike();
         } else {
           object["$" + index] = {
-            $key: item.key.toAny(),
-            $value: item.value.toAny(),
+            $key: item.key.toLike(),
+            $value: item.value.toLike(),
           };
         }
       } else if (item instanceof Value) {
-        object["$" + index] = item.toAny();
+        object["$" + index] = item.toLike();
       }
     }, this);
     return object;
@@ -846,37 +851,37 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     return RecordMap.create(initialCapacity);
   }
 
-  static of(...items: AnyItem[]): Record {
+  static of(...items: ItemLike[]): Record {
     return RecordMap.of(...items);
   }
 
-  static override fromAny(value: AnyRecord): Record {
+  static override fromLike(value: RecordLike): Record {
     if (value instanceof Record) {
       return value;
     } else if (Array.isArray(value)) {
       return Record.fromArray(value);
     } else if (typeof value === "object" && value !== null) {
-      return Record.fromObject(value as {[key: string]: AnyValue});
+      return Record.fromObject(value as {[key: string]: ValueLike});
     }
     throw new TypeError("" + value);
   }
 
-  static fromArray(array: {[index: number]: AnyItem, length?: number}): Record {
+  static fromArray(array: {[index: number]: ItemLike, length?: number}): Record {
     const n = array.length || 0;
     const record = Record.create(n);
     for (let i = 0; i < n; i += 1) {
-      record.push(Item.fromAny(array[i]));
+      record.push(Item.fromLike(array[i]));
     }
     return record;
   }
 
-  static fromObject(object: {[key: string]: AnyValue}): Record {
+  static fromObject(object: {[key: string]: ValueLike}): Record {
     const record = Record.create();
     for (const key in object) {
       const value = object[key];
       if (key.charCodeAt(0) === 36/*'$'*/) {
         if (!value || typeof value !== "object" || !Object.prototype.hasOwnProperty.call(value, "$key")) {
-          record.push(Value.fromAny(value));
+          record.push(Value.fromLike(value));
         } else {
           record.push(Field.of((value as any).$key, (value as any).$value));
         }
@@ -910,7 +915,7 @@ Object.defineProperty(Record.prototype, "fieldCount", {
 /** @internal */
 export interface RecordInterpolator extends Interpolator<Record> {
   /** @internal */
-  readonly interpolators: ReadonlyArray<Interpolator<Item>>;
+  readonly interpolators: readonly Interpolator<Item>[];
 
   readonly 0: Record;
 

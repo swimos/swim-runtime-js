@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AnyItem} from "../Item";
+import type {ItemLike} from "../Item";
 import {Item} from "../Item";
 import {Form} from "./Form";
 
 /** @internal */
-export class ItemForm extends Form<Item, AnyItem> {
+export class ItemForm extends Form<Item, ItemLike> {
   constructor(unit?: Item) {
     super();
     Object.defineProperty(this, "unit", {
-      value: unit !== void 0 ? unit.commit() : void 0,
+      value: unit,
       enumerable: true,
+      configurable: true,
     });
   }
 
-  override readonly unit!: Item | undefined;
+  override readonly unit: Item | undefined;
 
   override withUnit(unit: Item | undefined): Form<Item> {
     if (unit === this.unit) {
@@ -35,8 +36,8 @@ export class ItemForm extends Form<Item, AnyItem> {
     return new ItemForm(unit);
   }
 
-  override mold(object: AnyItem, item?: Item): Item {
-    object = Item.fromAny(object);
+  override mold(object: ItemLike, item?: Item): Item {
+    object = Item.fromLike(object);
     if (item !== void 0) {
       object = item.concat(object);
     }

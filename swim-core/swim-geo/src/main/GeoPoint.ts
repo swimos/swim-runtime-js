@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -28,15 +29,15 @@ import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 import type {R2Point} from "@swim/math";
 import type {GeoProjection} from "./GeoProjection";
-import type {AnyGeoShape} from "./GeoShape";
+import type {GeoShapeLike} from "./GeoShape";
 import {GeoShape} from "./GeoShape";
 
 /** @public */
-export type AnyGeoPoint = GeoPoint | GeoPointInit | GeoPointTuple;
+export type GeoPointLike = GeoPoint | GeoPointInit | GeoPointTuple;
 
 /** @public */
-export const AnyGeoPoint = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyGeoPoint {
+export const GeoPointLike = {
+  [Symbol.hasInstance](instance: unknown): instance is GeoPointLike {
     return instance instanceof GeoPoint
         || GeoPointInit[Symbol.hasInstance](instance)
         || GeoPointTuple[Symbol.hasInstance](instance);
@@ -46,7 +47,7 @@ export const AnyGeoPoint = {
 /** @public */
 export interface GeoPointInit {
   /** @internal */
-  typeid?: "GeoPointInit";
+  readonly typeid?: "GeoPointInit";
   lng: number;
   lat: number;
 }
@@ -82,7 +83,10 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
   }
 
   /** @internal */
-  declare typeid?: "GeoPoint";
+  declare readonly typeid?: "GeoPoint";
+
+  /** @override */
+  declare readonly likeType?: Proto<GeoPointInit | GeoPointTuple>;
 
   override isDefined(): boolean {
     return isFinite(this.lng) && isFinite(this.lat);
@@ -108,13 +112,13 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return this.lat;
   }
 
-  override contains(that: AnyGeoShape): boolean;
+  override contains(that: GeoShapeLike): boolean;
   override contains(lng: number, lat: number): boolean;
-  override contains(that: AnyGeoShape | number, lat?: number): boolean {
+  override contains(that: GeoShapeLike | number, lat?: number): boolean {
     if (typeof that === "number") {
       return this.lng === that && this.lat === lat!;
     }
-    that = GeoShape.fromAny(that);
+    that = GeoShape.fromLike(that);
     if (that instanceof GeoPoint) {
       return this.lng === that.lng && this.lat === that.lat;
     } else if (that instanceof GeoShape) {
@@ -124,8 +128,8 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return false;
   }
 
-  override intersects(that: AnyGeoShape): boolean {
-    that = GeoShape.fromAny(that);
+  override intersects(that: GeoShapeLike): boolean {
+    that = GeoShape.fromLike(that);
     return that.intersects(this);
   }
 
@@ -144,7 +148,7 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return new GeoPoint(newLng, newLat);
   }
 
-  toAny(): GeoPointInit {
+  toLike(): GeoPointInit {
     return {
       lng: this.lng,
       lat: this.lat,
@@ -211,9 +215,9 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
     return new GeoPoint(lng, lat);
   }
 
-  static override fromAny<T extends AnyGeoPoint | null | undefined>(value: T): GeoPoint | Uninitable<T>;
-  static override fromAny<T extends AnyGeoShape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyGeoPoint | null | undefined>(value: T): GeoPoint | Uninitable<T> {
+  static override fromLike<T extends GeoPointLike | null | undefined>(value: T): GeoPoint | Uninitable<T>;
+  static override fromLike<T extends GeoShapeLike | null | undefined>(value: T): never;
+  static override fromLike<T extends GeoPointLike | null | undefined>(value: T): GeoPoint | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof GeoPoint) {
       return value as GeoPoint | Uninitable<T>;
     } else if (GeoPointInit[Symbol.hasInstance](value)) {

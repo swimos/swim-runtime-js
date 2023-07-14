@@ -18,7 +18,7 @@ import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Item} from "../Item";
 import {Selector} from "./Selector";
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -86,8 +86,8 @@ export class LiteralSelector extends Selector {
     return result;
   }
 
-  override substitute(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     const item = this.item.substitute(interpreter);
     let then = this.then.substitute(interpreter);
     if (!(then instanceof Selector)) {

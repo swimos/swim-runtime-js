@@ -16,23 +16,25 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Affinity} from "@swim/component";
 import type {FastenerFlags} from "@swim/component";
+import type {FastenerClass} from "@swim/component";
+import type {Fastener} from "@swim/component";
 import type {PropertyDescriptor} from "@swim/component";
 import type {PropertyClass} from "@swim/component";
 import {Property} from "@swim/component";
-import type {AnyConstraintExpression} from "./ConstraintExpression";
+import type {ConstraintExpressionLike} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
 import type {ConstraintVariable} from "./ConstraintVariable";
-import type {AnyConstraintStrength} from "./"; // forward import
+import type {ConstraintStrengthLike} from "./Constraint";
 import {ConstraintStrength} from "./"; // forward import
 import type {Constraint} from "./Constraint";
 import {ConstraintScope} from "./"; // forward import
 import type {ConstraintSolver} from "./ConstraintSolver";
 
 /** @public */
-export interface ConstraintPropertyDescriptor<T = unknown, U = T> extends PropertyDescriptor<T, U> {
+export interface ConstraintPropertyDescriptor<R, T> extends PropertyDescriptor<R, T> {
   extends?: Proto<ConstraintProperty<any, any, any>> | boolean | null;
-  strength?: AnyConstraintStrength;
+  strength?: ConstraintStrengthLike;
   constrained?: boolean;
 }
 
@@ -50,7 +52,10 @@ export interface ConstraintPropertyClass<P extends ConstraintProperty<any, any, 
 }
 
 /** @public */
-export interface ConstraintProperty<O = unknown, T = unknown, U = T, I = T> extends Property<O, T, U, I>, ConstraintVariable {
+export interface ConstraintProperty<R = any, T = any, I extends any[] = [T]> extends Property<R, T, I>, ConstraintVariable {
+  /** @override */
+  get descriptorType(): Proto<ConstraintPropertyDescriptor<R, T>>;
+
   /** @internal @override */
   isExternal(): boolean;
 
@@ -75,7 +80,7 @@ export interface ConstraintProperty<O = unknown, T = unknown, U = T, I = T> exte
   /** @override */
   readonly strength: ConstraintStrength;
 
-  setStrength(strength: AnyConstraintStrength): void;
+  setStrength(strength: ConstraintStrengthLike): void;
 
   /** @override */
   get coefficient(): number;
@@ -90,13 +95,13 @@ export interface ConstraintProperty<O = unknown, T = unknown, U = T, I = T> exte
   get constant(): number;
 
   /** @override */
-  plus(that: AnyConstraintExpression): ConstraintExpression;
+  plus(that: ConstraintExpressionLike): ConstraintExpression;
 
   /** @override */
   negative(): ConstraintTerm;
 
   /** @override */
-  minus(that: AnyConstraintExpression): ConstraintExpression;
+  minus(that: ConstraintExpressionLike): ConstraintExpression;
 
   /** @override */
   times(scalar: number): ConstraintExpression;
@@ -161,109 +166,96 @@ export interface ConstraintProperty<O = unknown, T = unknown, U = T, I = T> exte
 }
 
 /** @public */
-export const ConstraintProperty = (function (_super: typeof Property) {
-  const ConstraintProperty = _super.extend("ConstraintProperty", {}) as ConstraintPropertyClass;
-
-  ConstraintProperty.prototype.isExternal = function (this: ConstraintProperty): boolean {
+export const ConstraintProperty = (<R, T, I extends any[], P extends ConstraintProperty<any, any, any>>() => Property.extend<ConstraintProperty<R, T, I>, ConstraintPropertyClass<P>>("ConstraintProperty", {
+  isExternal(): boolean {
     return true;
-  };
+  },
 
-  ConstraintProperty.prototype.isDummy = function (this: ConstraintProperty): boolean {
+  isDummy(): boolean {
     return false;
-  };
+  },
 
-  ConstraintProperty.prototype.isInvalid = function (this: ConstraintProperty): boolean {
+  isInvalid(): boolean {
     return false;
-  };
+  },
 
-  ConstraintProperty.prototype.isConstant = function (this: ConstraintProperty): boolean {
+  isConstant(): boolean {
     return false;
-  };
+  },
 
-  ConstraintProperty.prototype.evaluateConstraintVariable = function <T>(this: ConstraintProperty<unknown, T>): void {
+  evaluateConstraintVariable(): void {
     // hook
-  };
+  },
 
-  ConstraintProperty.prototype.updateConstraintSolution = function <T>(this: ConstraintProperty<unknown, T>, value: number): void {
+  updateConstraintSolution(value: number): void {
     if (this.constrained && this.toNumber(this.value) !== value) {
       this.setValue(value as unknown as T, Affinity.Reflexive);
     }
-  };
+  },
 
-  ConstraintProperty.prototype.initStrength = function (this: ConstraintProperty): ConstraintStrength {
-    let strength = (Object.getPrototypeOf(this) as ConstraintProperty).strength as ConstraintStrength | undefined;
+  initStrength(): ConstraintStrength {
+    let strength = (Object.getPrototypeOf(this) as ConstraintProperty<any, any, any>).strength as ConstraintStrength | undefined;
     if (strength === void 0) {
       strength = ConstraintStrength.Strong;
     }
     return strength;
-  };
+  },
 
-  ConstraintProperty.prototype.setStrength = function (this: ConstraintProperty, strength: AnyConstraintStrength): void {
-    (this as Mutable<typeof this>).strength = ConstraintStrength.fromAny(strength);
-  };
+  setStrength(strength: ConstraintStrengthLike): void {
+    (this as Mutable<typeof this>).strength = ConstraintStrength.fromLike(strength);
+  },
 
-  Object.defineProperty(ConstraintProperty.prototype, "coefficient", {
-    value: 1,
-    configurable: true,
-  });
+  get coefficient(): number {
+    return 1;
+  },
 
-  Object.defineProperty(ConstraintProperty.prototype, "variable", {
-    get(this: ConstraintProperty): ConstraintVariable {
-      return this;
-    },
-    configurable: true,
-  });
+  get variable(): ConstraintVariable {
+    return this;
+  },
 
-  Object.defineProperty(ConstraintProperty.prototype, "terms", {
-    get(this: ConstraintProperty): ReadonlyMap<ConstraintVariable, number> {
-      const terms = new Map<ConstraintVariable, number>();
-      terms.set(this, 1);
-      return terms;
-    },
-    configurable: true,
-  });
+  get terms(): ReadonlyMap<ConstraintVariable, number> {
+    const terms = new Map<ConstraintVariable, number>();
+    terms.set(this, 1);
+    return terms;
+  },
 
-  Object.defineProperty(ConstraintProperty.prototype, "constant", {
-    value: 0,
-    configurable: true,
-  });
+  get constant(): number {
+    return 0;
+  },
 
-  ConstraintProperty.prototype.plus = function (this: ConstraintProperty, that: AnyConstraintExpression): ConstraintExpression {
-    that = ConstraintExpression.fromAny(that);
+  plus(that: ConstraintExpressionLike): ConstraintExpression {
+    that = ConstraintExpression.fromLike(that);
     if (this === that) {
       return ConstraintExpression.product(2, this);
     }
     return ConstraintExpression.sum(this, that);
-  };
+  },
 
-  ConstraintProperty.prototype.negative = function (this: ConstraintProperty): ConstraintTerm {
+  negative(): ConstraintTerm {
     return ConstraintExpression.product(-1, this);
-  };
+  },
 
-  ConstraintProperty.prototype.minus = function (this: ConstraintProperty, that: AnyConstraintExpression): ConstraintExpression {
-    that = ConstraintExpression.fromAny(that);
+  minus(that: ConstraintExpressionLike): ConstraintExpression {
+    that = ConstraintExpression.fromLike(that);
     if (this === that) {
       return ConstraintExpression.zero();
     }
     return ConstraintExpression.sum(this, that.negative());
-  };
+  },
 
-  ConstraintProperty.prototype.times = function (this: ConstraintProperty, scalar: number): ConstraintExpression {
+  times(scalar: number): ConstraintExpression {
     return ConstraintExpression.product(scalar, this);
-  };
+  },
 
-  ConstraintProperty.prototype.divide = function (this: ConstraintProperty, scalar: number): ConstraintExpression {
+  divide(scalar: number): ConstraintExpression {
     return ConstraintExpression.product(1 / scalar, this);
-  };
+  },
 
-  Object.defineProperty(ConstraintProperty.prototype, "constrained", {
-    get(this: ConstraintProperty): boolean {
-      return (this.flags & ConstraintProperty.ConstrainedFlag) !== 0;
-    },
-    configurable: true,
-  });
+  get constrained(): boolean {
+    return (this.flags & ConstraintProperty.ConstrainedFlag) !== 0;
+  },
 
-  ConstraintProperty.prototype.constrain = function (this: ConstraintProperty<unknown, unknown, unknown>, constrained?: boolean): typeof this {
+  constrain(constrained?: boolean): typeof this {
     if (constrained === void 0) {
       constrained = true;
     }
@@ -281,31 +273,28 @@ export const ConstraintProperty = (function (_super: typeof Property) {
       }
     }
     return this;
-  };
+  },
 
-  ConstraintProperty.prototype.addConstraintCondition = function (this: ConstraintProperty, constraint: Constraint, solver: ConstraintSolver): void {
+  addConstraintCondition(constraint: Constraint, solver: ConstraintSolver): void {
     (this as Mutable<typeof this>).conditionCount += 1;
     if (!this.constrained && this.conditionCount === 1 && this.mounted) {
       this.startConstraining();
       this.updateConstraintVariable();
     }
-  };
+  },
 
-  ConstraintProperty.prototype.removeConstraintCondition = function (this: ConstraintProperty, constraint: Constraint, solver: ConstraintSolver): void {
+  removeConstraintCondition(constraint: Constraint, solver: ConstraintSolver): void {
     (this as Mutable<typeof this>).conditionCount -= 1;
     if (!this.constrained && this.conditionCount === 0 && this.mounted) {
       this.stopConstraining();
     }
-  };
+  },
 
-  Object.defineProperty(ConstraintProperty.prototype, "constraining", {
-    get(this: ConstraintProperty): boolean {
-      return (this.flags & ConstraintProperty.ConstrainingFlag) !== 0;
-    },
-    configurable: true,
-  });
+  get constraining(): boolean {
+    return (this.flags & ConstraintProperty.ConstrainingFlag) !== 0;
+  },
 
-  ConstraintProperty.prototype.startConstraining = function (this: ConstraintProperty): void {
+  startConstraining(): void {
     if ((this.flags & ConstraintProperty.ConstrainingFlag) !== 0) {
       return;
     }
@@ -313,24 +302,24 @@ export const ConstraintProperty = (function (_super: typeof Property) {
     this.setFlags(this.flags | ConstraintProperty.ConstrainingFlag);
     this.onStartConstraining();
     this.didStartConstraining();
-  };
+  },
 
-  ConstraintProperty.prototype.willStartConstraining = function (this: ConstraintProperty): void {
+  willStartConstraining(): void {
     // hook
-  };
+  },
 
-  ConstraintProperty.prototype.onStartConstraining = function (this: ConstraintProperty): void {
+  onStartConstraining(): void {
     const constraintScope = this.owner;
     if (ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.addConstraintVariable(this);
     }
-  };
+  },
 
-  ConstraintProperty.prototype.didStartConstraining = function (this: ConstraintProperty): void {
+  didStartConstraining(): void {
     // hook
-  };
+  },
 
-  ConstraintProperty.prototype.stopConstraining = function (this: ConstraintProperty): void {
+  stopConstraining(): void {
     if ((this.flags & ConstraintProperty.ConstrainingFlag) === 0) {
       return;
     }
@@ -338,106 +327,94 @@ export const ConstraintProperty = (function (_super: typeof Property) {
     this.setFlags(this.flags & ~ConstraintProperty.ConstrainingFlag);
     this.onStopConstraining();
     this.didStopConstraining();
-  };
+  },
 
-  ConstraintProperty.prototype.willStopConstraining = function (this: ConstraintProperty): void {
+  willStopConstraining(): void {
     // hook
-  };
+  },
 
-  ConstraintProperty.prototype.onStopConstraining = function (this: ConstraintProperty): void {
+  onStopConstraining(): void {
     const constraintScope = this.owner;
     if (ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.removeConstraintVariable(this);
     }
-  };
+  },
 
-  ConstraintProperty.prototype.didStopConstraining = function (this: ConstraintProperty): void {
+  didStopConstraining(): void {
     // hook
-  };
+  },
 
-  ConstraintProperty.prototype.updateConstraintVariable = function (this: ConstraintProperty): void {
+  updateConstraintVariable(): void {
     const constraintScope = this.owner;
     const value = this.value;
     if (value !== void 0 && ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.setConstraintVariable(this, this.toNumber(value));
     }
-  };
+  },
 
-  ConstraintProperty.prototype.onSetValue = function <T>(this: ConstraintProperty<unknown, T>, newValue: T, oldValue: T): void {
-    _super.prototype.onSetValue.call(this, newValue, oldValue);
+  onSetValue(newValue: T, oldValue: T): void {
+    super.onSetValue(newValue, oldValue);
     const constraintScope = this.owner;
     if (this.constraining && ConstraintScope[Symbol.hasInstance](constraintScope)) {
       constraintScope.setConstraintVariable(this, newValue !== void 0 && newValue !== null ? this.toNumber(newValue) : 0);
     }
-  };
+  },
 
-  ConstraintProperty.prototype.onMount = function <T>(this: ConstraintProperty<unknown, T>): void {
-    _super.prototype.onMount.call(this);
+  onMount(): void {
+    super.onMount();
     if (!this.constrained && this.conditionCount !== 0) {
       this.startConstraining();
     }
-  };
+  },
 
-  ConstraintProperty.prototype.onUnmount = function <T>(this: ConstraintProperty<unknown, T>): void {
+  onUnmount(): void {
     if (!this.constrained && this.conditionCount !== 0) {
       this.stopConstraining();
     }
-    _super.prototype.onUnmount.call(this);
-  };
+    super.onUnmount();
+  },
 
-  ConstraintProperty.prototype.toNumber = function <T>(this: ConstraintProperty<unknown, T>, value: T): number {
+  toNumber(value: T): number {
     return value !== void 0 && value !== null ? +value : 0;
-  };
-
-  ConstraintProperty.construct = function <P extends ConstraintProperty<any, any, any>>(property: P | null, owner: P extends ConstraintProperty<infer O, any, any> ? O : never): P {
-    property = _super.construct.call(this, property, owner) as P;
+  },
+},
+{
+  construct(property: P | null, owner: P extends Fastener<infer R, any, any> ? R : never): P {
+    property = super.construct(property, owner) as P;
     (property as Mutable<typeof property>).strength = property.initStrength();
     (property as Mutable<typeof property>).conditionCount = 0;
-    const flagsInit = property.flagsInit;
-    if (flagsInit !== void 0) {
-      property.constrain((flagsInit & ConstraintProperty.ConstrainedFlag) !== 0);
-    }
     return property;
-  };
+  },
 
-  ConstraintProperty.refine = function (propertyClass: ConstraintPropertyClass): void {
-    _super.refine.call(this, propertyClass);
+  refine(propertyClass: FastenerClass<ConstraintProperty<any, any, any>>): void {
+    super.refine(propertyClass);
     const propertyPrototype = propertyClass.prototype;
-    let flagsInit = propertyPrototype.flagsInit;
 
+    let flagsInit = propertyPrototype.flagsInit;
     if (Object.prototype.hasOwnProperty.call(propertyPrototype, "constrained")) {
-      if (flagsInit === void 0) {
-        flagsInit = 0;
-      }
       if (propertyPrototype.constrained) {
         flagsInit |= ConstraintProperty.ConstrainedFlag;
       } else {
         flagsInit &= ~ConstraintProperty.ConstrainedFlag;
       }
-      delete (propertyPrototype as ConstraintPropertyDescriptor).constrained;
+      delete (propertyPrototype as ConstraintPropertyDescriptor<any, any>).constrained;
     }
+    Object.defineProperty(propertyPrototype, "flagsInit", {
+      value: flagsInit,
+      enumerable: true,
+      configurable: true,
+    });
 
-    if (flagsInit !== void 0) {
-      Object.defineProperty(propertyPrototype, "flagsInit", {
-        value: flagsInit,
-        configurable: true,
-      });
+    const strengthDescriptor = Object.getOwnPropertyDescriptor(propertyPrototype, "strength");
+    if (strengthDescriptor !== void 0 && "value" in strengthDescriptor) {
+      strengthDescriptor.value = ConstraintStrength.fromLike(strengthDescriptor.value);
+      Object.defineProperty(propertyPrototype, "strength", strengthDescriptor);
     }
+  },
 
-    if (Object.prototype.hasOwnProperty.call(propertyPrototype, "strength")) {
-      Object.defineProperty(propertyPrototype, "strength", {
-        value: propertyPrototype.fromAny(propertyPrototype.strength),
-        enumerable: true,
-        configurable: true,
-      });
-    }
-  };
+  ConstrainedFlag: 1 << (Property.FlagShift + 0),
+  ConstrainingFlag: 1 << (Property.FlagShift + 1),
 
-  (ConstraintProperty as Mutable<typeof ConstraintProperty>).ConstrainedFlag = 1 << (_super.FlagShift + 0);
-  (ConstraintProperty as Mutable<typeof ConstraintProperty>).ConstrainingFlag = 1 << (_super.FlagShift + 1);
-
-  (ConstraintProperty as Mutable<typeof ConstraintProperty>).FlagShift = _super.FlagShift + 2;
-  (ConstraintProperty as Mutable<typeof ConstraintProperty>).FlagMask = (1 << ConstraintProperty.FlagShift) - 1;
-
-  return ConstraintProperty;
-})(Property);
+  FlagShift: Property.FlagShift + 2,
+  FlagMask: (1 << (Property.FlagShift + 2)) - 1,
+}))();

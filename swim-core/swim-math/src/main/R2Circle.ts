@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
@@ -26,18 +27,18 @@ import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import type {AnyR2Shape} from "./R2Shape";
+import type {R2ShapeLike} from "./R2Shape";
 import {R2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";
 import {R2Segment} from "./R2Segment";
 import {R2Box} from "./R2Box";
 
 /** @public */
-export type AnyR2Circle = R2Circle | R2CircleInit;
+export type R2CircleLike = R2Circle | R2CircleInit;
 
 /** @public */
-export const AnyR2Circle = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyR2Circle {
+export const R2CircleLike = {
+  [Symbol.hasInstance](instance: unknown): instance is R2CircleLike {
     return instance instanceof R2Circle
         || R2CircleInit[Symbol.hasInstance](instance);
   },
@@ -46,7 +47,7 @@ export const AnyR2Circle = {
 /** @public */
 export interface R2CircleInit {
   /** @internal */
-  typeid?: "R2CircleInit";
+  readonly typeid?: "R2CircleInit";
   cx: number;
   cy: number;
   r: number;
@@ -69,7 +70,10 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
   }
 
   /** @internal */
-  declare typeid?: "R2Circle";
+  declare readonly typeid?: "R2Circle";
+
+  /** @override */
+  declare readonly likeType?: Proto<R2CircleInit>;
 
   override isDefined(): boolean {
     return isFinite(this.cx) && isFinite(this.cy) && isFinite(this.r);
@@ -97,15 +101,15 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     return this.cy + this.r;
   }
 
-  override contains(that: AnyR2Shape): boolean;
+  override contains(that: R2ShapeLike): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyR2Shape | number, y?: number): boolean {
+  override contains(that: R2ShapeLike | number, y?: number): boolean {
     if (typeof that === "number") {
       const dx = that - this.cx;
       const dy = y! - this.cy;
       return dx * dx + dy * dy <= this.r * this.r;
     }
-    that = R2Shape.fromAny(that);
+    that = R2Shape.fromLike(that);
     if (that instanceof R2Point) {
       return this.containsPoint(that);
     } else if (that instanceof R2Segment) {
@@ -156,8 +160,8 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     return dx * dx + dy * dy + that.r * that.r <= this.r * this.r;
   }
 
-  override intersects(that: AnyR2Shape): boolean {
-    that = R2Shape.fromAny(that);
+  override intersects(that: R2ShapeLike): boolean {
+    that = R2Shape.fromLike(that);
     if (that instanceof R2Point) {
       return this.intersectsPoint(that);
     } else if (that instanceof R2Segment) {
@@ -235,7 +239,7 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     return new R2Circle(cx, cy, r);
   }
 
-  toAny(): R2CircleInit {
+  toLike(): R2CircleInit {
     return {
       cx: this.cx,
       cy: this.cy,
@@ -295,9 +299,9 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
     return new R2Circle(cx, cy, r);
   }
 
-  static override fromAny<T extends AnyR2Circle | null | undefined>(value: T): R2Circle | Uninitable<T>;
-  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyR2Circle | null | undefined>(value: T): R2Circle | Uninitable<T> {
+  static override fromLike<T extends R2CircleLike | null | undefined>(value: T): R2Circle | Uninitable<T>;
+  static override fromLike<T extends R2ShapeLike | null | undefined>(value: T): never;
+  static override fromLike<T extends R2CircleLike | null | undefined>(value: T): R2Circle | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Circle) {
       return value as R2Circle | Uninitable<T>;
     } else if (R2CircleInit[Symbol.hasInstance](value)) {

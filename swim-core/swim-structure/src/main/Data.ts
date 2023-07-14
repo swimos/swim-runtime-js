@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import type {Proto} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Random} from "@swim/util";
@@ -20,7 +21,7 @@ import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Interpolator} from "@swim/util";
 import type {Input} from "@swim/codec";
-import type {AnyOutputSettings} from "@swim/codec";
+import type {OutputSettingsLike} from "@swim/codec";
 import {OutputSettings} from "@swim/codec";
 import {Output} from "@swim/codec";
 import {Writer} from "@swim/codec";
@@ -31,7 +32,7 @@ import {Item} from "./Item";
 import {Value} from "./Value";
 
 /** @public */
-export type AnyData = Data | Uint8Array;
+export type DataLike = Data | Uint8Array;
 
 /** @public */
 export class Data extends Value {
@@ -41,6 +42,9 @@ export class Data extends Value {
     this.size = size;
     this.flags = flags;
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<Uint8Array>;
 
   /** @internal */
   readonly array: Uint8Array | null;
@@ -238,7 +242,7 @@ export class Data extends Value {
     return array;
   }
 
-  override toAny(): AnyData {
+  override toLike(): DataLike {
     return this.toUint8Array();
   }
 
@@ -421,7 +425,7 @@ export class Data extends Value {
     return base64.parse(input, Data.output()).bind();
   }
 
-  static override fromAny(value: AnyData): Data {
+  static override fromLike(value: DataLike): Data {
     if (value instanceof Data) {
       return value;
     } else if (value instanceof Uint8Array) {
@@ -503,8 +507,8 @@ export class DataOutput extends Output<Data> {
 
   override readonly settings: OutputSettings;
 
-  override withSettings(settings: AnyOutputSettings): Output<Data> {
-    settings = OutputSettings.fromAny(settings);
+  override withSettings(settings: OutputSettingsLike): Output<Data> {
+    settings = OutputSettings.fromLike(settings);
     (this as Mutable<this>).settings = settings;
     return this;
   }

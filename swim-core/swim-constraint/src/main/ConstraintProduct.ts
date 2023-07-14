@@ -15,7 +15,7 @@
 import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
-import type {AnyConstraintExpression} from "./ConstraintExpression";
+import type {ConstraintExpressionLike} from "./ConstraintExpression";
 import {ConstraintExpression} from "./ConstraintExpression";
 import type {ConstraintTerm} from "./ConstraintTerm";
 import type {ConstraintVariable} from "./ConstraintVariable";
@@ -45,8 +45,8 @@ export class ConstraintProduct implements ConstraintTerm, Debug {
     return 0;
   }
 
-  plus(that: AnyConstraintExpression): ConstraintExpression {
-    that = ConstraintExpression.fromAny(that);
+  plus(that: ConstraintExpressionLike): ConstraintExpression {
+    that = ConstraintExpression.fromLike(that);
     if (that instanceof ConstraintProduct && this.variable === that.variable) {
       return ConstraintExpression.product(this.coefficient + that.coefficient, this.variable);
     } else if (this.variable === that) {
@@ -59,8 +59,8 @@ export class ConstraintProduct implements ConstraintTerm, Debug {
     return ConstraintExpression.product(-this.coefficient, this.variable);
   }
 
-  minus(that: AnyConstraintExpression): ConstraintExpression {
-    that = ConstraintExpression.fromAny(that);
+  minus(that: ConstraintExpressionLike): ConstraintExpression {
+    that = ConstraintExpression.fromLike(that);
     if (that instanceof ConstraintProduct && this.variable === that.variable) {
       return ConstraintExpression.product(this.coefficient - that.coefficient, this.variable);
     } else if (this.variable === that) {

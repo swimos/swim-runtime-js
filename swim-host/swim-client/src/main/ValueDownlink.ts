@@ -15,7 +15,8 @@
 import type {Mutable} from "@swim/util";
 import type {Class} from "@swim/util";
 import type {Proto} from "@swim/util";
-import type {AnyValue} from "@swim/structure";
+import type {LikeType} from "@swim/util";
+import type {Fastener} from "@swim/component";
 import {Value} from "@swim/structure";
 import {Form} from "@swim/structure";
 import {WarpDownlinkContext} from "./WarpDownlinkContext";
@@ -26,31 +27,28 @@ import {WarpDownlink} from "./WarpDownlink";
 import {ValueDownlinkModel} from "./ValueDownlinkModel";
 
 /** @public */
-export interface ValueDownlinkDescriptor<V = unknown, VU = V> extends WarpDownlinkDescriptor {
-  extends?: Proto<ValueDownlink<any, any, any>> | boolean | null;
-  valueForm?: Form<V, VU>;
+export interface ValueDownlinkDescriptor<R, V> extends WarpDownlinkDescriptor<R> {
+  extends?: Proto<ValueDownlink<any, any>> | boolean | null;
+  valueForm?: Form<V, LikeType<V>>;
   /** @internal */
   stateInit?: Value | null;
 }
 
 /** @public */
-export interface ValueDownlinkClass<F extends ValueDownlink<any, any, any> = ValueDownlink<any, any, any>> extends WarpDownlinkClass<F> {
+export interface ValueDownlinkClass<F extends ValueDownlink<any, any> = ValueDownlink<any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
-export interface ValueDownlinkObserver<V = unknown, F extends ValueDownlink<any, V, any> = ValueDownlink<unknown, V>> extends WarpDownlinkObserver<F> {
+export interface ValueDownlinkObserver<V = any, F extends ValueDownlink<any, V> = ValueDownlink<any, V>> extends WarpDownlinkObserver<F> {
   willSet?(newValue: V, downlink: F): V | void;
 
   didSet?(newValue: V, oldValue: V, downlink: F): void;
 }
 
 /** @public */
-export interface ValueDownlink<O = unknown, V = Value, VU = V extends Value ? AnyValue & V : V> extends WarpDownlink<O> {
-  (): V;
-  (value: V | VU): O;
-
+export interface ValueDownlink<R = any, V = Value> extends WarpDownlink<R> {
   /** @override */
-  get descriptorType(): Proto<ValueDownlinkDescriptor<V, VU>>;
+  get descriptorType(): Proto<ValueDownlinkDescriptor<R, V>>;
 
   /** @override */
   readonly observerType?: Class<ValueDownlinkObserver<V>>;
@@ -59,11 +57,11 @@ export interface ValueDownlink<O = unknown, V = Value, VU = V extends Value ? An
   readonly model: ValueDownlinkModel | null;
 
   /** @protected */
-  initValueForm(): Form<V, VU>;
+  initValueForm(): Form<V, LikeType<V>>;
 
-  readonly valueForm: Form<V, VU>;
+  readonly valueForm: Form<V, LikeType<V>>;
 
-  setValueForm(valueForm: Form<V, VU>): this;
+  setValueForm(valueForm: Form<V, LikeType<V>>): this;
 
   /** @internal */
   readonly stateInit?: Value | null; // optional prototype property
@@ -76,7 +74,7 @@ export interface ValueDownlink<O = unknown, V = Value, VU = V extends Value ? An
 
   get(): V;
 
-  set(value: V | VU): void;
+  set(value: V | LikeType<V>): void;
 
   /** @protected */
   willSet?(newValue: V): V | void;
@@ -98,63 +96,61 @@ export interface ValueDownlink<O = unknown, V = Value, VU = V extends Value ? An
 }
 
 /** @public */
-export const ValueDownlink = (function (_super: typeof WarpDownlink) {
-  const ValueDownlink = _super.extend("ValueDownlink", {
-    relinks: true,
-    syncs: true,
-  }) as ValueDownlinkClass;
+export const ValueDownlink = (<R, V, F extends ValueDownlink<any, any>>() => WarpDownlink.extend<ValueDownlink<R, V>, ValueDownlinkClass<F>>("ValueDownlink", {
+  relinks: true,
+  syncs: true,
 
-  ValueDownlink.prototype.initValueForm = function <V, VU>(this: ValueDownlink<unknown, V, VU>): Form<V, VU> {
-    let valueForm = (Object.getPrototypeOf(this) as ValueDownlink<unknown, V, VU>).valueForm as Form<V, VU> | undefined;
+  initValueForm(): Form<V, LikeType<V>> {
+    const valueForm = (Object.getPrototypeOf(this) as ValueDownlink<unknown, V>).valueForm as Form<V, LikeType<V>> | undefined;
     if (valueForm === void 0) {
-      valueForm = Form.forValue() as unknown as Form<V, VU>;
+      return Form.forValue() as unknown as Form<V, LikeType<V>>;
     }
     return valueForm;
-  };
+  },
 
-  ValueDownlink.prototype.setValueForm = function <V, VU>(this: ValueDownlink<unknown, V, VU>, valueForm: Form<V, VU>): ValueDownlink<unknown, V, VU> {
+  setValueForm(valueForm: Form<V, LikeType<V>>): typeof this {
     if (this.valueForm !== valueForm) {
       (this as Mutable<typeof this>).valueForm = valueForm;
       this.relink();
     }
     return this;
-  };
+  },
 
-  ValueDownlink.prototype.initState = function (this: ValueDownlink): Value | null {
+  initState(): Value | null {
     let stateInit = this.stateInit;
     if (stateInit === void 0) {
       stateInit = null;
     }
     return stateInit;
-  };
+  },
 
-  ValueDownlink.prototype.setState = function (this: ValueDownlink, state: Value): void {
+  setState(state: Value): void {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     model.setState(state);
-  };
+  },
 
-  ValueDownlink.prototype.get = function <V>(this: ValueDownlink<unknown, V>): V {
+  get(): V {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     const value = model.get();
     return value.coerce(this.valueForm);
-  };
+  },
 
-  ValueDownlink.prototype.set = function <V, VU>(this: ValueDownlink<unknown, V, VU>, object: V | VU): void {
+  set(object: V | LikeType<V>): void {
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
     const value = this.valueForm.mold(object);
     model.set(value);
-  };
+  },
 
-  ValueDownlink.prototype.valueWillSet = function <V>(this: ValueDownlink<unknown, V>, newValue: Value): Value {
+  valueWillSet(newValue: Value): Value {
     let newObject: V | undefined;
     const valueForm = this.valueForm;
 
@@ -185,9 +181,9 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
     }
 
     return newValue;
-  };
+  },
 
-  ValueDownlink.prototype.valueDidSet = function <V>(this: ValueDownlink<unknown, V>, newValue: Value, oldValue: Value): void {
+  valueDidSet(newValue: Value, oldValue: Value): void {
     let newObject: V | undefined;
     let oldObject: V | undefined;
     const valueForm = this.valueForm;
@@ -213,9 +209,9 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
         observer.didSet(newObject, oldObject, this);
       }
     }
-  };
+  },
 
-  ValueDownlink.prototype.didAliasModel = function <V>(this: ValueDownlink<unknown, V>): void {
+  didAliasModel(): void {
     const model = this.model;
     if (model === null || !model.linked) {
       return;
@@ -225,9 +221,9 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
     if (model.synced) {
       this.onSyncedResponse();
     }
-  };
+  },
 
-  ValueDownlink.prototype.open = function (this: ValueDownlink): ValueDownlink {
+  open(): typeof this {
     if (this.model !== null) {
       return this;
     }
@@ -276,29 +272,12 @@ export const ValueDownlink = (function (_super: typeof WarpDownlink) {
       (this as Mutable<typeof this>).model = model as ValueDownlinkModel;
     }
     return this;
-  };
-
-  ValueDownlink.construct = function <F extends ValueDownlink<any, any, any>>(downlink: F | null, owner: F extends ValueDownlink<infer O, any, any> ? O : never): F {
-    if (downlink === null) {
-      downlink = function (value?: F extends ValueDownlink<any, infer T, infer U> ? T | U : never): F extends ValueDownlink<infer O, infer V, any> ? V | O : never {
-        if (arguments.length === 0) {
-          return downlink!.get();
-        } else {
-          downlink!.set(value!);
-          return downlink!.owner;
-        }
-      } as F;
-      Object.defineProperty(downlink, "name", {
-        value: this.prototype.name,
-        enumerable: true,
-        configurable: true,
-      });
-      Object.setPrototypeOf(downlink, this.prototype);
-    }
-    downlink = _super.construct.call(this, downlink, owner) as F;
+  },
+},
+{
+  construct(downlink: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
+    downlink = super.construct(downlink, owner) as F;
     (downlink as Mutable<typeof downlink>).valueForm = downlink.initValueForm();
     return downlink;
-  };
-
-  return ValueDownlink;
-})(WarpDownlink);
+  },
+}))();

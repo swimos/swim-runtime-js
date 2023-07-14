@@ -13,15 +13,16 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {InterpreterException} from "./InterpreterException";
 import {InterpreterSettings} from "./InterpreterSettings";
-import type {AnyItem} from "../Item";
+import type {ItemLike} from "../Item";
 import {Item} from "../Item";
 import type {Operator} from "../operator/Operator";
 import type {Selector} from "../selector/Selector";
 
 /** @public */
-export type AnyInterpreter = Interpreter | AnyItem;
+export type InterpreterLike = Interpreter | ItemLike;
 
 /** @public */
 export class Interpreter {
@@ -30,6 +31,8 @@ export class Interpreter {
     this.scopeStack = scopeStack !== void 0 ? scopeStack : null;
     this.scopeDepth = scopeDepth !== void 0 ? scopeDepth : 0;
   }
+
+  declare readonly likeType?: Proto<ItemLike>;
 
   readonly settings: InterpreterSettings;
 
@@ -127,17 +130,17 @@ export class Interpreter {
     // hook
   }
 
-  static of(...objects: AnyItem[]): Interpreter {
+  static of(...objects: ItemLike[]): Interpreter {
     const n = objects.length;
     const scopes = new Array(Interpreter.expand(n));
     for (let i = 0; i < n; i += 1) {
-      const scope = Item.fromAny(objects[i]);
+      const scope = Item.fromLike(objects[i]);
       scopes[i] = scope;
     }
     return new Interpreter(InterpreterSettings.standard(), scopes, n);
   }
 
-  static fromAny(interpreter: AnyInterpreter, globalScope: Item = Item.globalScope()): Interpreter {
+  static fromLike(interpreter: InterpreterLike, globalScope: Item = Item.globalScope()): Interpreter {
     if (!(interpreter instanceof Interpreter)) {
       const scope = interpreter;
       interpreter = new Interpreter();
@@ -145,7 +148,7 @@ export class Interpreter {
         interpreter.pushScope(globalScope);
       }
       if (scope !== void 0) {
-        interpreter.pushScope(Item.fromAny(scope));
+        interpreter.pushScope(Item.fromLike(scope));
       }
     }
     return interpreter;

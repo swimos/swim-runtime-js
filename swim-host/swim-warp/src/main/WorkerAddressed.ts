@@ -18,10 +18,10 @@ import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
 import type {Item} from "@swim/structure";
 import {Attr} from "@swim/structure";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Record} from "@swim/structure";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import {Signal} from "./Signal";
 
@@ -42,15 +42,15 @@ export abstract class WorkerAddressed<S extends WorkerAddressed<S> = WorkerAddre
 
   override readonly host: Uri;
 
-  override withHost(host: AnyUri): S {
-    host = Uri.fromAny(host);
+  override withHost(host: UriLike): S {
+    host = Uri.fromLike(host);
     return this.copy(host, this.body);
   }
 
   override readonly body: Value;
 
-  override withBody(body: AnyValue): S {
-    body = Value.fromAny(body);
+  override withBody(body: ValueLike): S {
+    body = Value.fromLike(body);
     return this.copy(this.host, body);
   }
 
@@ -112,12 +112,12 @@ export abstract class WorkerAddressed<S extends WorkerAddressed<S> = WorkerAddre
     return null;
   }
 
-  static create<S extends WorkerAddressedConstructor<Instance<S, WorkerAddressed<any>>>>(this: S, host: AnyUri, body?: AnyValue): InstanceType<S> {
-    host = Uri.fromAny(host);
+  static create<S extends WorkerAddressedConstructor<Instance<S, WorkerAddressed<any>>>>(this: S, host: UriLike, body?: ValueLike): InstanceType<S> {
+    host = Uri.fromLike(host);
     if (body === void 0) {
       body = Value.absent();
     } else {
-      body = Value.fromAny(body);
+      body = Value.fromLike(body);
     }
     return new this(host, body);
   }

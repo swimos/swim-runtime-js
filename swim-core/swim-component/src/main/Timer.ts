@@ -19,24 +19,23 @@ import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 
 /** @public */
-export interface TimerDescriptor extends FastenerDescriptor {
-  extends?: Proto<Timer> | boolean | null;
-  delay?: number;
+export interface TimerDescriptor<R> extends FastenerDescriptor<R> {
+  extends?: Proto<Timer<any>> | boolean | null;
 }
 
 /** @public */
-export interface TimerClass<F extends Timer = Timer> extends FastenerClass<F> {
+export interface TimerClass<F extends Timer<any> = Timer<any>> extends FastenerClass<F> {
 }
 
 /** @public */
-export interface Timer<O = any> extends Fastener<O> {
+export interface Timer<R = any> extends Fastener<R> {
   (): void;
 
   /** @override */
-  get descriptorType(): Proto<TimerDescriptor>;
+  get descriptorType(): Proto<TimerDescriptor<R>>;
 
   /** @override */
-  get fastenerType(): Proto<Timer>;
+  get fastenerType(): Proto<Timer<any>>;
 
   /** @protected */
   fire(): void;
@@ -96,10 +95,10 @@ export interface Timer<O = any> extends Fastener<O> {
   /** @internal */
   readonly timeout: unknown | undefined;
 
-  /** @internal @protected */
+  /** @protected */
   setTimeout(callback: () => void, delay: number): unknown;
 
-  /** @internal @protected */
+  /** @protected */
   clearTimeout(timeoutId: unknown): void;
 
   /** @override @protected */
@@ -107,8 +106,8 @@ export interface Timer<O = any> extends Fastener<O> {
 }
 
 /** @public */
-export const Timer = (<O, F extends Timer>() => Fastener.extend<Timer<O>, TimerClass<F>>("Timer", {
-  get fastenerType(): Proto<Timer> {
+export const Timer = (<R, F extends Timer<any>>() => Fastener.extend<Timer<R>, TimerClass<F>>("Timer", {
+  get fastenerType(): Proto<Timer<any>> {
     return Timer;
   },
 
@@ -116,11 +115,10 @@ export const Timer = (<O, F extends Timer>() => Fastener.extend<Timer<O>, TimerC
     // hook
   },
 
+  delay: 0,
+
   initDelay(): number {
-    let delay = (Object.getPrototypeOf(this) as Timer).delay as number | undefined;
-    if (delay === void 0) {
-      delay = 0;
-    }
+    const delay = (Object.getPrototypeOf(this) as Timer<any>).delay;
     return Math.max(0, delay);
   },
 
@@ -272,7 +270,7 @@ export const Timer = (<O, F extends Timer>() => Fastener.extend<Timer<O>, TimerC
   },
 },
 {
-  construct(fastener: F | null, owner: F extends Fastener<infer O> ? O : never): F {
+  construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
     if (fastener === null) {
       fastener = function (): void {
         fastener!.expire();
@@ -284,7 +282,7 @@ export const Timer = (<O, F extends Timer>() => Fastener.extend<Timer<O>, TimerC
       });
       Object.setPrototypeOf(fastener, this.prototype);
     }
-    fastener = super.construct.call(this, fastener, owner) as F;
+    fastener = super.construct(fastener, owner) as F;
     (fastener as Mutable<typeof fastener>).delay = fastener.initDelay();
     (fastener as Mutable<typeof fastener>).deadline = 0;
     (fastener as Mutable<typeof fastener>).timeout = void 0;

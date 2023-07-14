@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -26,18 +27,18 @@ import type {Output} from "@swim/codec";
 import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import type {AnyR2Shape} from "./R2Shape";
+import type {R2ShapeLike} from "./R2Shape";
 import {R2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";
 import {R2Segment} from "./R2Segment";
 import {R2Circle} from "./R2Circle";
 
 /** @public */
-export type AnyR2Box = R2Box | R2BoxInit;
+export type R2BoxLike = R2Box | R2BoxInit;
 
 /** @public */
-export const AnyR2Box = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyR2Box {
+export const R2BoxLike = {
+  [Symbol.hasInstance](instance: unknown): instance is R2BoxLike {
     return instance instanceof R2Box
         || R2BoxInit[Symbol.hasInstance](instance);
   },
@@ -46,7 +47,7 @@ export const AnyR2Box = {
 /** @public */
 export interface R2BoxInit {
   /** @internal */
-  typeid?: "R2BoxInit";
+  readonly typeid?: "R2BoxInit";
   xMin: number;
   yMin: number;
   xMax: number;
@@ -71,7 +72,10 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debu
   }
 
   /** @internal */
-  declare typeid?: "R2Box";
+  declare readonly typeid?: "R2Box";
+
+  /** @override */
+  declare readonly likeType?: Proto<R2BoxInit>;
 
   override isDefined(): boolean {
     return isFinite(this.xMin) && isFinite(this.yMin)
@@ -122,14 +126,14 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debu
     return new R2Point((this.xMin + this.xMax) / 2, (this.yMin + this.yMax) / 2);
   }
 
-  override contains(that: AnyR2Shape): boolean;
+  override contains(that: R2ShapeLike): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyR2Shape | number, y?: number): boolean {
+  override contains(that: R2ShapeLike | number, y?: number): boolean {
     if (typeof that === "number") {
       return this.xMin <= that && that <= this.xMax
           && this.yMin <= y! && y! <= this.yMax;
     }
-    that = R2Shape.fromAny(that);
+    that = R2Shape.fromLike(that);
     if (that instanceof R2Point) {
       return this.containsPoint(that);
     } else if (that instanceof R2Segment) {
@@ -171,8 +175,8 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debu
         && this.yMin <= that.cy - that.r && that.cy + that.r <= this.yMax;
   }
 
-  override intersects(that: AnyR2Shape): boolean {
-    that = R2Shape.fromAny(that);
+  override intersects(that: R2ShapeLike): boolean {
+    that = R2Shape.fromLike(that);
     if (that instanceof R2Point) {
       return this.intersectsPoint(that);
     } else if (that instanceof R2Segment) {
@@ -242,7 +246,7 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debu
     return dx * dx + dy * dy <= that.r * that.r;
   }
 
-  override union(that: AnyR2Shape): R2Box {
+  override union(that: R2ShapeLike): R2Box {
     return super.union(that) as R2Box;
   }
 
@@ -255,7 +259,7 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debu
     return this;
   }
 
-  toAny(): R2BoxInit {
+  toLike(): R2BoxInit {
     return {
       xMin: this.xMin,
       yMin: this.yMin,
@@ -330,9 +334,9 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debu
     return new R2Box(xMin, yMin, xMax, yMax);
   }
 
-  static override fromAny<T extends AnyR2Box | null | undefined>(value: T): R2Box | Uninitable<T>;
-  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): never;
-  static override fromAny<T extends AnyR2Box | null | undefined>(value: T): R2Box | Uninitable<T> {
+  static override fromLike<T extends R2BoxLike | null | undefined>(value: T): R2Box | Uninitable<T>;
+  static override fromLike<T extends R2ShapeLike | null | undefined>(value: T): never;
+  static override fromLike<T extends R2BoxLike | null | undefined>(value: T): R2Box | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Box) {
       return value as R2Box | Uninitable<T>;
     } else if (R2BoxInit[Symbol.hasInstance](value)) {

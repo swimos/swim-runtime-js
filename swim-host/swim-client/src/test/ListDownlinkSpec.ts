@@ -44,7 +44,7 @@ export class ListDownlinkSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.node, Uri.parse("/todo"));
           exam.equal(envelope.lane, Uri.parse("list"));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
           exam.equal(envelope.body, Attr.of("update", header).concat("test"));
@@ -112,7 +112,7 @@ export class ListDownlinkSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.node, Uri.parse("/todo"));
           exam.equal(envelope.lane, Uri.parse("list"));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
           exam.equal(envelope.body, Attr.of("update", header).concat("retest"));
@@ -184,7 +184,7 @@ export class ListDownlinkSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.node, Uri.parse("/todo"));
           exam.equal(envelope.lane, Uri.parse("list"));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("index", 0));
           exam.equal(envelope.body, Record.of(Attr.of("remove", header)));
@@ -252,7 +252,7 @@ export class ListDownlinkSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.node, Uri.parse("/todo"));
           exam.equal(envelope.lane, Uri.parse("list"));
           const header = Record.of(Slot.of("key", Data.fromBase64("Az+0")), Slot.of("from", 0), Slot.of("to", 2));
           exam.equal(envelope.body, Record.of(Attr.of("move", header)));
@@ -338,7 +338,7 @@ export class ListDownlinkSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof CommandMessage) {
-          exam.equal(envelope.node, Uri.parse("todo"));
+          exam.equal(envelope.node, Uri.parse("/todo"));
           exam.equal(envelope.lane, Uri.parse("list"));
           exam.equal(envelope.body, Record.of(Attr.of("clear")));
           resolve();

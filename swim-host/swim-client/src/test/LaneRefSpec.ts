@@ -42,7 +42,7 @@ export class LaneRefSpec extends Suite {
       exam.equal(laneRef1.laneUri(), Uri.parse("light"));
       const laneRef2 = client.laneRef(server.resolve("house/kitchen"), "light");
       exam.equal(laneRef2.hostUri(), server.hostUri);
-      exam.equal(laneRef2.nodeUri(), Uri.parse("house/kitchen"));
+      exam.equal(laneRef2.nodeUri(), Uri.parse("/house/kitchen"));
       exam.equal(laneRef2.laneUri(), Uri.parse("light"));
       resolve();
     });
@@ -104,7 +104,7 @@ export class LaneRefSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         exam.instanceOf(envelope, CommandMessage);
-        exam.equal(envelope.node, Uri.parse("house/kitchen"));
+        exam.equal(envelope.node, Uri.parse("/house/kitchen"));
         exam.equal(envelope.lane, Uri.parse("light"));
         exam.equal(envelope.body, Text.from("on"));
         resolve();

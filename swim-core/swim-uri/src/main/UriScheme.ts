@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -28,11 +29,11 @@ import {Utf8} from "@swim/codec";
 import {Uri} from "./Uri";
 
 /** @public */
-export type AnyUriScheme = UriScheme | string;
+export type UriSchemeLike = UriScheme | string;
 
 /** @public */
-export const AnyUriScheme = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUriScheme {
+export const UriSchemeLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriSchemeLike {
     return instance instanceof UriScheme
         || typeof instance === "string";
   },
@@ -45,13 +46,15 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     this.name = name;
   }
 
+  declare readonly likeType?: Proto<string>;
+
   isDefined(): boolean {
     return this.name.length !== 0;
   }
 
   readonly name: string;
 
-  toAny(): string | undefined {
+  toLike(): string | undefined {
     return this.name.length !== 0 ? this.name : void 0;
   }
 
@@ -110,7 +113,7 @@ export class UriScheme implements HashCode, Compare, Debug, Display {
     return new UriScheme(schemeName);
   }
 
-  static fromAny<T extends AnyUriScheme | null | undefined>(value: T): UriScheme | Uninitable<T> {
+  static fromLike<T extends UriSchemeLike | null | undefined>(value: T): UriScheme | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriScheme) {
       return value as UriScheme | Uninitable<T>;
     } else if (typeof value === "string") {

@@ -369,7 +369,7 @@ export class TimeIntervalSpec extends Suite {
 
   @Test
   testRoundMinuteDown(exam: Exam): void {
-    exam.equal( TimeInterval.minute.round(DateTime.fromInit({year: 2018, month: 4, day: 25, hour: 7, minute: 29, second: 28, millisecond: 400})).toString(), "2018-05-25T07:29:00.000Z");
+    exam.equal(TimeInterval.minute.round(DateTime.fromInit({year: 2018, month: 4, day: 25, hour: 7, minute: 29, second: 28, millisecond: 400})).toString(), "2018-05-25T07:29:00.000Z");
   }
 
   @Test

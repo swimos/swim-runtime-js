@@ -14,7 +14,7 @@
 
 import {Lazy} from "@swim/util";
 import {Mark} from "../source/Mark";
-import type {AnyInputSettings} from "./InputSettings";
+import type {InputSettingsLike} from "./InputSettings";
 import {InputSettings} from "./InputSettings";
 import {Input} from "./Input";
 import {InputBufferEmpty} from "../"; // forward import
@@ -54,7 +54,7 @@ export abstract class InputBuffer extends Input {
 
   abstract override withMark(mark: Mark): InputBuffer;
 
-  abstract override withSettings(settings: AnyInputSettings): InputBuffer;
+  abstract override withSettings(settings: InputSettingsLike): InputBuffer;
 
   abstract override clone(): InputBuffer;
 

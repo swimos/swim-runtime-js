@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -31,11 +32,11 @@ import {Uri} from "./Uri";
 import {Utf8} from "@swim/codec";
 
 /** @public */
-export type AnyUriFragment = UriFragment | string;
+export type UriFragmentLike = UriFragment | string;
 
 /** @public */
-export const AnyUriFragment = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyUriFragment {
+export const UriFragmentLike = {
+  [Symbol.hasInstance](instance: unknown): instance is UriFragmentLike {
     return instance instanceof UriFragment
         || typeof instance === "string";
   },
@@ -49,13 +50,15 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     this.stringValue = void 0;
   }
 
+  declare readonly likeType?: Proto<string>;
+
   isDefined(): boolean {
     return this.identifier !== void 0;
   }
 
   readonly identifier: string | undefined;
 
-  toAny(): string | undefined {
+  toLike(): string | undefined {
     return this.identifier;
   }
 
@@ -130,7 +133,7 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     return new UriFragment(identifier);
   }
 
-  static fromAny<T extends AnyUriFragment | null | undefined>(value: T): UriFragment | Uninitable<T> {
+  static fromLike<T extends UriFragmentLike | null | undefined>(value: T): UriFragment | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof UriFragment) {
       return value as UriFragment | Uninitable<T>;
     } else if (typeof value === "string") {

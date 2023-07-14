@@ -14,7 +14,7 @@
 
 import {Diagnostic} from "@swim/codec";
 import type {Input} from "@swim/codec";
-import type {AnyOutputSettings} from "@swim/codec";
+import type {OutputSettingsLike} from "@swim/codec";
 import type {Output} from "@swim/codec";
 import {Parser} from "@swim/codec";
 import {Base10} from "@swim/codec";
@@ -88,7 +88,7 @@ export abstract class R2Curve extends R2Shape {
     return output;
   }
 
-  toPathString(outputSettings?: AnyOutputSettings): string {
+  toPathString(outputSettings?: OutputSettingsLike): string {
     let output = Unicode.stringOutput(outputSettings);
     output = this.writePath(output);
     return output.toString();

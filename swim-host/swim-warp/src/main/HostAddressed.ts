@@ -16,10 +16,10 @@ import type {Instance} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Constructors} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AnyValue} from "@swim/structure";
+import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
 import {Attr} from "@swim/structure";
-import type {AnyUri} from "@swim/uri";
+import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
 import {Envelope} from "./Envelope";
 
@@ -41,8 +41,8 @@ export abstract class HostAddressed<E extends HostAddressed<E> = HostAddressed<a
     return Uri.empty();
   }
 
-  override withNode(node: AnyUri): E
-  override withNode(this: E, node: AnyUri): E {
+  override withNode(node: UriLike): E
+  override withNode(this: E, node: UriLike): E {
     return this;
   }
 
@@ -50,15 +50,15 @@ export abstract class HostAddressed<E extends HostAddressed<E> = HostAddressed<a
     return Uri.empty();
   }
 
-  override withLane(lane: AnyUri): E
-  override withLane(this: E, lane: AnyUri): E {
+  override withLane(lane: UriLike): E
+  override withLane(this: E, lane: UriLike): E {
     return this;
   }
 
   override readonly body: Value;
 
-  override withBody(body: AnyValue): E {
-    body = Value.fromAny(body);
+  override withBody(body: ValueLike): E {
+    body = Value.fromLike(body);
     return this.copy(body);
   }
 
@@ -104,11 +104,11 @@ export abstract class HostAddressed<E extends HostAddressed<E> = HostAddressed<a
     return new this(body);
   }
 
-  static create<S extends HostAddressedConstructor<Instance<S, HostAddressed<any>>>>(this: S, body?: AnyValue): InstanceType<S> {
+  static create<S extends HostAddressedConstructor<Instance<S, HostAddressed<any>>>>(this: S, body?: ValueLike): InstanceType<S> {
     if (body === void 0) {
       body = Value.absent();
     } else {
-      body = Value.fromAny(body);
+      body = Value.fromLike(body);
     }
     return new this(body);
   }

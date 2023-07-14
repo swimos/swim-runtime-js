@@ -23,7 +23,7 @@ import type {ConstraintScope} from "./ConstraintScope";
 export type ConstraintRelation = "le" | "eq" | "ge";
 
 /** @public */
-export type AnyConstraintStrength = ConstraintStrength | ConstraintStrengthInit;
+export type ConstraintStrengthLike = ConstraintStrength | ConstraintStrengthInit;
 
 /** @public */
 export type ConstraintStrengthInit = "required" | "strong" | "medium" | "weak";
@@ -41,7 +41,7 @@ export const ConstraintStrength: {
 
   clip(strength: ConstraintStrength): ConstraintStrength;
 
-  fromAny<T extends AnyConstraintStrength | null | undefined>(strength: T): ConstraintStrength | Uninitable<T>;
+  fromLike<T extends ConstraintStrengthLike | null | undefined>(strength: T): ConstraintStrength | Uninitable<T>;
 } = {
   Required: 1001001000,
   Strong: 1000000,
@@ -53,7 +53,7 @@ export const ConstraintStrength: {
     return Math.min(Math.max(0, strength), ConstraintStrength.Required);
   },
 
-  fromAny<T extends AnyConstraintStrength | null | undefined>(strength: T): ConstraintStrength | Uninitable<T> {
+  fromLike<T extends ConstraintStrengthLike | null | undefined>(strength: T): ConstraintStrength | Uninitable<T> {
     if (strength === void 0 || strength === null) {
       return strength as ConstraintStrength | Uninitable<T>;
     } else if (typeof strength === "number") {

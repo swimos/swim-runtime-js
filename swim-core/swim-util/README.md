@@ -9,7 +9,7 @@ key-value maps, caches, and assertions.
 ### Ordering, equality, and hashing
 
 Swim Util exports `Comparable`, `Equals`, and `HashCode` interfaces that can
-be implemented by ordered, equatable, and hashable classes, respectively.
+be implemented by ordered, equatable, and hash-able classes, respectively.
 
 ```typescript
 export interface Comparable<T> {
@@ -55,40 +55,6 @@ If `x` is an object, each entry has its key and value hashed using
 The exported `Murmur3` object implements the 32-bit
 [MurmurHash](https://en.wikipedia.org/wiki/MurmurHash) algorithm, version 3.
 
-### Type conversions
-
-Swim Util provides two generic interfaces for converting between loosely
-JavaScript values, and strongly typed TypeScript values, called `FromAny` and
-`ToAny`.
-
-```typescript
-export interface FromAny<T, U = T> {
-  fromAny(value: T | U): T;
-}
-export interface ToAny<T> {
-  toAny(): T;
-}
-```
-
-`FromAny` is implicitly implemented by classes that have a static `fromAny`
-method that converts a loosely typed JavaScript value into a strongly typed
-TypeScript value.
-
-`ToAny` is implemented by classes that have a `tonAny` method that returns a
-loosely typed JavaScript value. `ToAny` is used to abstract over the
-conversion of strongly typed values to loosely typed values.
-
-### Iterator interfaces
-
-Swim Util exports an ES6-compatible `Iterator` interface, as well as a
-`Cursor` base class for positioned iterators.
-
-```typescript
-export interface Iterator<T> {
-  next(): {value?: T, done: boolean};
-}
-```
-
 ### Builder interfaces
 
 The exported `Builder` interface abstracts over construction of collections.
@@ -98,11 +64,11 @@ and other pair-containing collections.
 ```typescript
 export interface Builder<I, O> {
   push(...inputs: I[]): void;
-  bind(): O;
+  build(): O;
 }
 export interface PairBuilder<K, V, O> {
   add(key: K, value: V): void;
-  bind(): O;
+  build(): O;
 }
 ```
 

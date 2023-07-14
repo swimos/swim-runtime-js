@@ -14,20 +14,20 @@
 
 import type {Mutable} from "@swim/util";
 import {Lazy} from "@swim/util";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
 import {Field} from "./Field";
 import {Attr} from "./Attr";
 import {Slot} from "./Slot";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./Value";
 import {Record} from "./Record";
 import {RecordMapView} from "./"; // forward import
-import type {AnyText} from "./Text";
+import type {TextLike} from "./Text";
 import {Text} from "./"; // forward import
-import type {AnyNum} from "./Num";
+import type {NumLike} from "./Num";
 import {Num} from "./"; // forward import
-import type {AnyInterpreter} from "./interpreter/Interpreter"; // forward import
+import type {InterpreterLike} from "./interpreter/Interpreter"; // forward import
 import {Interpreter} from "./"; // forward import
 
 /** @internal */
@@ -154,11 +154,11 @@ export class RecordMap extends Record {
     return new RecordMapView(this, 1, n).branch();
   }
 
-  override has(key: AnyValue): boolean {
+  override has(key: ValueLike): boolean {
     if (this.fieldCount === 0) {
       return false;
     }
-    key = Value.fromAny(key);
+    key = Value.fromLike(key);
     const table = this.hashTable()!;
     const n = table.length;
     //assert(n > 0);
@@ -176,8 +176,8 @@ export class RecordMap extends Record {
     return false;
   }
 
-  override indexOf(item: AnyItem, index: number = 0): number {
-    item = Item.fromAny(item);
+  override indexOf(item: ItemLike, index: number = 0): number {
+    item = Item.fromLike(item);
     const array = this.array!;
     const n = this.length;
     if (index < 0) {
@@ -192,8 +192,8 @@ export class RecordMap extends Record {
     return -1;
   }
 
-  override lastIndexOf(item: AnyItem, index?: number): number {
-    item = Item.fromAny(item);
+  override lastIndexOf(item: ItemLike, index?: number): number {
+    item = Item.fromLike(item);
     const array = this.array!;
     const n = this.length;
     if (index === void 0) {
@@ -211,11 +211,11 @@ export class RecordMap extends Record {
     return -1;
   }
 
-  override get(key: AnyValue): Value {
+  override get(key: ValueLike): Value {
     if (this.fieldCount === 0) {
       return Value.absent();
     }
-    key = Value.fromAny(key);
+    key = Value.fromLike(key);
     const table = this.hashTable()!;
     const n = table.length;
     //assert(n > 0);
@@ -233,11 +233,11 @@ export class RecordMap extends Record {
     return Value.absent();
   }
 
-  override getAttr(key: AnyText): Value {
+  override getAttr(key: TextLike): Value {
     if (this.fieldCount === 0) {
       return Value.absent();
     }
-    key = Text.fromAny(key);
+    key = Text.fromLike(key);
     const table = this.hashTable()!;
     const n = table.length;
     //assert(n > 0);
@@ -255,11 +255,11 @@ export class RecordMap extends Record {
     return Value.absent();
   }
 
-  override getSlot(key: AnyValue): Value {
+  override getSlot(key: ValueLike): Value {
     if (this.fieldCount === 0) {
       return Value.absent();
     }
-    key = Value.fromAny(key);
+    key = Value.fromLike(key);
     const table = this.hashTable()!;
     const n = table.length;
     //assert(n > 0);
@@ -277,11 +277,11 @@ export class RecordMap extends Record {
     return Value.absent();
   }
 
-  override getField(key: AnyValue): Field | undefined {
+  override getField(key: ValueLike): Field | undefined {
     if (this.fieldCount === 0) {
       return void 0;
     }
-    key = Value.fromAny(key);
+    key = Value.fromLike(key);
     const table = this.hashTable()!;
     const n = table.length;
     //assert(n > 0);
@@ -299,7 +299,7 @@ export class RecordMap extends Record {
     return void 0;
   }
 
-  override getItem(index: AnyNum): Item {
+  override getItem(index: NumLike): Item {
     if (index instanceof Num) {
       index = index.value;
     }
@@ -313,12 +313,12 @@ export class RecordMap extends Record {
     return this.array![index]!;
   }
 
-  override set(key: AnyValue, newValue: Value): this {
+  override set(key: ValueLike, newValue: Value): this {
     if ((this.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    key = Value.fromAny(key);
-    newValue = Value.fromAny(newValue);
+    key = Value.fromLike(key);
+    newValue = Value.fromLike(newValue);
     if ((this.flags & Record.AliasedFlag) !== 0) {
       if (this.fieldCount > 0) {
         this.setAliased(key, newValue);
@@ -408,12 +408,12 @@ export class RecordMap extends Record {
     RecordMap.put(this.table, field);
   }
 
-  override setAttr(key: AnyText, newValue: Value): this {
+  override setAttr(key: TextLike, newValue: Value): this {
     if ((this.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    key = Text.fromAny(key);
-    newValue = Value.fromAny(newValue);
+    key = Text.fromLike(key);
+    newValue = Value.fromLike(newValue);
     if ((this.flags & Record.AliasedFlag) !== 0) {
       if (this.fieldCount > 0) {
         this.setAttrAliased(key, newValue);
@@ -503,12 +503,12 @@ export class RecordMap extends Record {
     RecordMap.put(this.table, field);
   }
 
-  override setSlot(key: AnyValue, newValue: Value): this {
+  override setSlot(key: ValueLike, newValue: Value): this {
     if ((this.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    key = Value.fromAny(key);
-    newValue = Value.fromAny(newValue);
+    key = Value.fromLike(key);
+    newValue = Value.fromLike(newValue);
     if ((this.flags & Record.AliasedFlag) !== 0) {
       if (this.fieldCount > 0) {
         this.setSlotAliased(key, newValue);
@@ -598,11 +598,11 @@ export class RecordMap extends Record {
     RecordMap.put(this.table, field);
   }
 
-  override setItem(index: number, newItem: AnyItem): this {
+  override setItem(index: number, newItem: ItemLike): this {
     if ((this.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    newItem = Item.fromAny(newItem);
+    newItem = Item.fromLike(newItem);
     const n = this.length;
     if (index < 0) {
       index = n + index;
@@ -656,9 +656,9 @@ export class RecordMap extends Record {
     }
   }
 
-  override updated(key: AnyValue, newValue: AnyValue): Record {
-    key = Value.fromAny(key);
-    newValue = Value.fromAny(newValue);
+  override updated(key: ValueLike, newValue: ValueLike): Record {
+    key = Value.fromLike(key);
+    newValue = Value.fromLike(newValue);
     const record = (this.flags & Record.ImmutableFlag) === 0 ? this : this.branch();
     if ((record.flags & Record.AliasedFlag) !== 0) {
       if (record.fieldCount > 0) {
@@ -678,9 +678,9 @@ export class RecordMap extends Record {
     return record;
   }
 
-  override updatedAttr(key: AnyText, newValue: AnyValue): Record {
-    key = Text.fromAny(key);
-    newValue = Value.fromAny(newValue);
+  override updatedAttr(key: TextLike, newValue: ValueLike): Record {
+    key = Text.fromLike(key);
+    newValue = Value.fromLike(newValue);
     const record = (this.flags & Record.ImmutableFlag) === 0 ? this : this.branch();
     if ((record.flags & Record.AliasedFlag) !== 0) {
       if (record.fieldCount > 0) {
@@ -700,9 +700,9 @@ export class RecordMap extends Record {
     return record;
   }
 
-  override updatedSlot(key: AnyValue, newValue: AnyValue): Record {
-    key = Value.fromAny(key);
-    newValue = Value.fromAny(newValue);
+  override updatedSlot(key: ValueLike, newValue: ValueLike): Record {
+    key = Value.fromLike(key);
+    newValue = Value.fromLike(newValue);
     const record = (this.flags & Record.ImmutableFlag) === 0 ? this : this.branch();
     if ((record.flags & Record.AliasedFlag) !== 0) {
       if (record.fieldCount > 0) {
@@ -722,7 +722,7 @@ export class RecordMap extends Record {
     return record;
   }
 
-  override push(...newItems: AnyItem[]): number {
+  override push(...newItems: ItemLike[]): number {
     if ((this.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
@@ -735,7 +735,7 @@ export class RecordMap extends Record {
   }
 
   /** @internal */
-  pushAliased(...newItems: AnyItem[]): void {
+  pushAliased(...newItems: ItemLike[]): void {
     const k = newItems.length;
     let m = this.length;
     let n = this.fieldCount;
@@ -747,7 +747,7 @@ export class RecordMap extends Record {
       }
     }
     for (let i = 0; i < k; i += 1) {
-      const newItem = Item.fromAny(newItems[i]);
+      const newItem = Item.fromLike(newItems[i]);
       newArray[m] = newItem;
       m += 1;
       if (newItem instanceof Field) {
@@ -762,7 +762,7 @@ export class RecordMap extends Record {
   }
 
   /** @internal */
-  pushMutable(...newItems: AnyItem[]): void {
+  pushMutable(...newItems: ItemLike[]): void {
     const k = newItems.length;
     let m = this.length;
     let n = this.fieldCount;
@@ -779,7 +779,7 @@ export class RecordMap extends Record {
       newArray = oldArray;
     }
     for (let i = 0; i < k; i += 1) {
-      const newItem = Item.fromAny(newItems[i]);
+      const newItem = Item.fromLike(newItems[i]);
       newArray[m] = newItem;
       m += 1;
       if (newItem instanceof Field) {
@@ -792,7 +792,7 @@ export class RecordMap extends Record {
     (this as Mutable<this>).fieldCount = n;
   }
 
-  splice(start: number, deleteCount: number = 0, ...newItems: AnyItem[]): Item[] {
+  splice(start: number, deleteCount: number = 0, ...newItems: ItemLike[]): Item[] {
     if ((this.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
@@ -810,7 +810,7 @@ export class RecordMap extends Record {
   }
 
   /** @internal */
-  spliceAliased(start: number, deleteCount: number, ...newItems: AnyItem[]): Item[] {
+  spliceAliased(start: number, deleteCount: number, ...newItems: ItemLike[]): Item[] {
     const k = newItems.length;
     let m = this.length;
     let n = this.fieldCount;
@@ -832,7 +832,7 @@ export class RecordMap extends Record {
       newArray[i + k] = oldArray[i + deleteCount];
     }
     for (let i = 0; i < k; i += 1) {
-      const newItem = Item.fromAny(newItems[i]);
+      const newItem = Item.fromLike(newItems[i]);
       newArray[i + start] = newItem;
       m += 1;
       if (newItem instanceof Field) {
@@ -848,7 +848,7 @@ export class RecordMap extends Record {
   }
 
   /** @internal */
-  spliceMutable(start: number, deleteCount: number, ...newItems: AnyItem[]): Item[] {
+  spliceMutable(start: number, deleteCount: number, ...newItems: ItemLike[]): Item[] {
     const k = newItems.length;
     let m = this.length;
     let n = this.fieldCount;
@@ -883,7 +883,7 @@ export class RecordMap extends Record {
       }
     }
     for (let i = 0; i < k; i += 1) {
-      const newItem = Item.fromAny(newItems[i]);
+      const newItem = Item.fromLike(newItems[i]);
       newArray[i + start] = newItem;
       m += 1;
       if (newItem instanceof Field) {
@@ -896,11 +896,11 @@ export class RecordMap extends Record {
     return oldItems;
   }
 
-  override delete(key: AnyValue): Item {
+  override delete(key: ValueLike): Item {
     if ((this.flags & Record.ImmutableFlag) !== 0) {
       throw new Error("immutable");
     }
-    key = Value.fromAny(key);
+    key = Value.fromLike(key);
     if ((this.flags & Record.AliasedFlag) !== 0) {
       return this.deleteAliased(key);
     } else {
@@ -1043,8 +1043,8 @@ export class RecordMap extends Record {
     throw new Error();
   }
 
-  override evaluate(interpreter: AnyInterpreter): Record {
-    interpreter = Interpreter.fromAny(interpreter);
+  override evaluate(interpreter: InterpreterLike): Record {
+    interpreter = Interpreter.fromLike(interpreter);
     const array = this.array!;
     const n = this.length;
     const scope = Record.create(n);
@@ -1064,8 +1064,8 @@ export class RecordMap extends Record {
     return changed ? scope : this;
   }
 
-  override substitute(interpreter: AnyInterpreter): Record {
-    interpreter = Interpreter.fromAny(interpreter);
+  override substitute(interpreter: InterpreterLike): Record {
+    interpreter = Interpreter.fromLike(interpreter);
     const array = this.array!;
     const n = this.length;
     const scope = Record.create(n);
@@ -1128,7 +1128,7 @@ export class RecordMap extends Record {
     return new RecordMap(new Array(initialCapacity), null, 0, 0, 0);
   }
 
-  static override of(...items: AnyItem[]): RecordMap {
+  static override of(...items: ItemLike[]): RecordMap {
     const n = items.length;
     if (n === 0) {
       return new RecordMap(null, null, 0, 0, Record.AliasedFlag);
@@ -1137,7 +1137,7 @@ export class RecordMap extends Record {
     let itemCount = 0;
     let fieldCount = 0;
     for (let i = 0; i < n; i += 1) {
-      const item = Item.fromAny(items[i]);
+      const item = Item.fromLike(items[i]);
       array[i] = item;
       itemCount += 1;
       if (item instanceof Field) {

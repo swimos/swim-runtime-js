@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Lazy} from "@swim/util";
-import type {AnyOutputSettings} from "./OutputSettings";
+import type {OutputSettingsLike} from "./OutputSettings";
 import {OutputSettings} from "./OutputSettings";
 import {Output} from "./Output";
 import {OutputBufferFull} from "../"; // forward import
@@ -61,7 +61,7 @@ export abstract class OutputBuffer<T = unknown> extends Output<T> {
     return this;
   }
 
-  abstract override withSettings(settings: AnyOutputSettings): Output<T>;
+  abstract override withSettings(settings: OutputSettingsLike): Output<T>;
 
   override clone(): OutputBuffer<T> {
     throw new Error();

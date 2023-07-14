@@ -59,11 +59,12 @@ export {Objects} from "./Objects";
 
 export {Values} from "./Values";
 
-// Convertible
+// Like
 
-export {FromAny} from "./FromAny";
-
-export {ToAny} from "./ToAny";
+export type {Like} from "./Like";
+export type {LikeType} from "./Like";
+export {FromLike} from "./Like";
+export {ToLike} from "./Like";
 
 // Creatable
 
@@ -109,10 +110,10 @@ export type {PairBuilder} from "./Builder";
 export {Mapping} from "./Mapping";
 export {Piecewise} from "./Mapping";
 
-export type {AnyDomain} from "./Domain";
+export type {DomainLike} from "./Domain";
 export {Domain} from "./Domain";
 
-export type {AnyRange} from "./Range";
+export type {RangeLike} from "./Range";
 export {Range} from "./Range";
 export {Constant} from "./Range";
 
@@ -130,11 +131,11 @@ export {InterpolatorInterpolator} from "./Interpolator";
 
 // Transition
 
-export type {AnyTiming} from "./Timing";
+export type {TimingLike} from "./Timing";
 export type {TimingInit} from "./Timing";
 export {Timing} from "./Timing";
 
-export type {AnyEasing} from "./Easing";
+export type {EasingLike} from "./Easing";
 export type {EasingType} from "./Easing";
 export {Easing} from "./Easing";
 

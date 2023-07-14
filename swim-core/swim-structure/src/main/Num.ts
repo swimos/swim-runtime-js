@@ -13,27 +13,31 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Equivalent} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {Output} from "@swim/codec";
 import {Format} from "@swim/codec";
-import type {AnyItem} from "./Item";
+import type {ItemLike} from "./Item";
 import {Item} from "./Item";
-import type {AnyValue} from "./Value";
+import type {ValueLike} from "./Value";
 import {Value} from "./Value";
 
 /** @public */
-export type AnyNum = Num | number;
+export type NumLike = Num | number;
 
 /** @public */
 export class Num extends Value {
-  private constructor(value: number, flags?: number ) {
+  private constructor(value: number, flags?: number) {
     super();
     this.value = value;
     this.flags = flags !== void 0 ? flags : 0;
   }
+
+  /** @override */
+  declare readonly likeType?: Proto<number>;
 
   override isConstant(): boolean {
     return true;
@@ -78,7 +82,7 @@ export class Num extends Value {
     return !!this.value;
   }
 
-  override toAny(): AnyNum {
+  override toLike(): NumLike {
     return this.value;
   }
 
@@ -86,80 +90,80 @@ export class Num extends Value {
     return this.value;
   }
 
-  override bitwiseOr(that: AnyValue): Value;
-  override bitwiseOr(that: AnyItem): Item;
-  override bitwiseOr(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseOr(that: ValueLike): Value;
+  override bitwiseOr(that: ItemLike): Item;
+  override bitwiseOr(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Num) {
       return Num.from((this.value | that.value) >>> 0);
     }
     return super.bitwiseOr(that);
   }
 
-  override bitwiseXor(that: AnyValue): Value;
-  override bitwiseXor(that: AnyItem): Item;
-  override bitwiseXor(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseXor(that: ValueLike): Value;
+  override bitwiseXor(that: ItemLike): Item;
+  override bitwiseXor(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Num) {
       return Num.from((this.value ^ that.value) >>> 0);
     }
     return super.bitwiseXor(that);
   }
 
-  override bitwiseAnd(that: AnyValue): Value;
-  override bitwiseAnd(that: AnyItem): Item;
-  override bitwiseAnd(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override bitwiseAnd(that: ValueLike): Value;
+  override bitwiseAnd(that: ItemLike): Item;
+  override bitwiseAnd(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Num) {
       return Num.from((this.value & that.value) >>> 0);
     }
     return super.bitwiseAnd(that);
   }
 
-  override plus(that: AnyValue): Value;
-  override plus(that: AnyItem): Item;
-  override plus(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override plus(that: ValueLike): Value;
+  override plus(that: ItemLike): Item;
+  override plus(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Num) {
       return Num.from(this.value + that.value);
     }
     return super.plus(that);
   }
 
-  override minus(that: AnyValue): Value;
-  override minus(that: AnyItem): Item;
-  override minus(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override minus(that: ValueLike): Value;
+  override minus(that: ItemLike): Item;
+  override minus(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Num) {
       return Num.from(this.value - that.value);
     }
     return super.minus(that);
   }
 
-  override times(that: AnyValue): Value;
-  override times(that: AnyItem): Item;
-  override times(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override times(that: ValueLike): Value;
+  override times(that: ItemLike): Item;
+  override times(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Num) {
       return Num.from(this.value * that.value);
     }
     return super.times(that);
   }
 
-  override divide(that: AnyValue): Value;
-  override divide(that: AnyItem): Item;
-  override divide(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override divide(that: ValueLike): Value;
+  override divide(that: ItemLike): Item;
+  override divide(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Num) {
       return Num.from(this.value / that.value);
     }
     return super.divide(that);
   }
 
-  override modulo(that: AnyValue): Value;
-  override modulo(that: AnyItem): Item;
-  override modulo(that: AnyItem): Item {
-    that = Item.fromAny(that);
+  override modulo(that: ValueLike): Value;
+  override modulo(that: ItemLike): Item;
+  override modulo(that: ItemLike): Item {
+    that = Item.fromLike(that);
     if (that instanceof Num) {
       return Num.from(this.value % that.value);
     }
@@ -202,8 +206,8 @@ export class Num extends Value {
     return Num.from(Math.sqrt(this.value));
   }
 
-  pow(that: AnyNum): Num {
-    that = Num.fromAny(that);
+  pow(that: NumLike): Num {
+    that = Num.fromLike(that);
     return Num.from(Math.pow(this.value, that.value));
   }
 
@@ -337,7 +341,7 @@ export class Num extends Value {
     return new Num(value);
   }
 
-  static override fromAny(value: AnyNum): Num {
+  static override fromLike(value: NumLike): Num {
     if (value instanceof Num) {
       return value;
     } else if (typeof value === "number") {

@@ -22,6 +22,8 @@ export {FastenerContext} from "./FastenerContext";
 export type {FastenerFlags} from "./Fastener";
 export type {FastenerDescriptor} from "./Fastener";
 export type {FastenerDecorator} from "./Fastener";
+export type {FastenerTemplate} from "./Fastener";
+export type {FastenerClassTemplate} from "./Fastener";
 export type {FastenerClass} from "./Fastener";
 export {Fastener} from "./Fastener";
 
@@ -62,7 +64,6 @@ export {Provider} from "./Provider";
 // Component
 
 export type {ComponentFlags} from "./Component";
-export type {AnyComponent} from "./Component";
 export type {ComponentFactory} from "./Component";
 export type {ComponentClass} from "./Component";
 export type {ComponentConstructor} from "./Component";

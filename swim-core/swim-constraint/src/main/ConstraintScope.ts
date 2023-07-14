@@ -13,17 +13,17 @@
 // limitations under the License.
 
 import {Objects} from "@swim/util";
-import type {AnyConstraintExpression} from "./ConstraintExpression";
+import type {ConstraintExpressionLike} from "./ConstraintExpression";
 import type {ConstraintVariable} from "./ConstraintVariable";
 import type {ConstraintProperty} from "./ConstraintProperty";
 import type {ConstraintRelation} from "./Constraint";
-import type {AnyConstraintStrength} from "./Constraint";
+import type {ConstraintStrengthLike} from "./Constraint";
 import type {Constraint} from "./Constraint";
 
 /** @public */
 export interface ConstraintScope {
-  constraint(lhs: AnyConstraintExpression, relation: ConstraintRelation,
-             rhs?: AnyConstraintExpression, strength?: AnyConstraintStrength): Constraint;
+  constraint(lhs: ConstraintExpressionLike, relation: ConstraintRelation,
+             rhs?: ConstraintExpressionLike, strength?: ConstraintStrengthLike): Constraint;
 
   hasConstraint(constraint: Constraint): boolean;
 
@@ -31,7 +31,7 @@ export interface ConstraintScope {
 
   removeConstraint(constraint: Constraint): void;
 
-  constraintVariable(name: string, value?: number, strength?: AnyConstraintStrength): ConstraintProperty<unknown, number>;
+  constraintVariable(name: string, value?: number, strength?: ConstraintStrengthLike): ConstraintProperty<unknown, number>;
 
   hasConstraintVariable(variable: ConstraintVariable): boolean;
 

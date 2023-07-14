@@ -14,7 +14,7 @@
 
 import type {Mutable} from "@swim/util";
 import {OutputException} from "../output/OutputException";
-import type {AnyOutputSettings} from "../output/OutputSettings";
+import type {OutputSettingsLike} from "../output/OutputSettings";
 import type {OutputSettings} from "../output/OutputSettings";
 import {Output} from "../output/Output";
 import {Unicode} from "./Unicode";
@@ -232,7 +232,7 @@ export class Utf8DecodedOutput<T> extends Output<T> {
     return this.output.settings;
   }
 
-  override withSettings(settings: AnyOutputSettings): Output<T> {
+  override withSettings(settings: OutputSettingsLike): Output<T> {
     (this as Mutable<this>).output = this.output.withSettings(settings);
     return this;
   }

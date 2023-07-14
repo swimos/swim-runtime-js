@@ -20,7 +20,7 @@ import {STreePage} from "./STreePage";
 
 /** @internal */
 export class STreeNode<V, I> extends STreePage<V, I> {
-  constructor(pages: ReadonlyArray<STreePage<V, I>>, knots: ReadonlyArray<number>, size: number) {
+  constructor(pages: readonly STreePage<V, I>[], knots: readonly number[], size: number) {
     super();
     this.pages = pages;
     this.knots = knots;
@@ -28,10 +28,10 @@ export class STreeNode<V, I> extends STreePage<V, I> {
   }
 
   /** @internal */
-  readonly pages: ReadonlyArray<STreePage<V, I>>;
+  readonly pages: readonly STreePage<V, I>[];
 
   /** @internal */
-  readonly knots: ReadonlyArray<number>;
+  readonly knots: readonly number[];
 
   override get arity(): number {
     return this.pages.length;
@@ -417,7 +417,7 @@ export class STreeNode<V, I> extends STreePage<V, I> {
     return -(lo + 1);
   }
 
-  static create<V, I>(pages: ReadonlyArray<STreePage<V, I>>): STreeNode<V, I> {
+  static create<V, I>(pages: readonly STreePage<V, I>[]): STreeNode<V, I> {
     const knots = new Array<number>(pages.length - 1);
     let size = 0;
     for (let i = 0, n  = knots.length; i < n; i += 1) {

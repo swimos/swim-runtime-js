@@ -14,14 +14,14 @@
 
 import {Lazy} from "@swim/util";
 import type {Output} from "@swim/codec";
-import type {AnyItem} from "../Item";
+import type {ItemLike} from "../Item";
 import {Item} from "../Item";
-import type {AnyValue} from "../Value";
+import type {ValueLike} from "../Value";
 import {Value} from "../Value";
 import {Record} from "../Record";
-import type {AnyText} from "../Text";
+import type {TextLike} from "../Text";
 import {Text} from "../Text";
-import type {AnyNum} from "../Num";
+import type {NumLike} from "../Num";
 import {Num} from "../Num";
 import {Expression} from "../Expression";
 import type {Operator} from "../operator/Operator";
@@ -36,7 +36,7 @@ import {ChildrenSelector} from "../"; // forward import
 import {DescendantsSelector} from "../"; // forward import
 import {FilterSelector} from "../"; // forward import
 import {LiteralSelector} from "../"; // forward import
-import type {AnyInterpreter} from "../interpreter/Interpreter";
+import type {InterpreterLike} from "../interpreter/Interpreter";
 import {Interpreter} from "../"; // forward import
 
 /** @public */
@@ -67,8 +67,8 @@ export abstract class Selector extends Expression {
                           transform: (this: S, interpreter: Interpreter) => Item,
                           thisArg: S): Item;
 
-  override evaluate(interpreter: AnyInterpreter): Item {
-    interpreter = Interpreter.fromAny(interpreter);
+  override evaluate(interpreter: InterpreterLike): Item {
+    interpreter = Interpreter.fromLike(interpreter);
     let selected = Item.absent();
     let count = 0;
     this.forSelected(interpreter, function (interpreter: Interpreter): void {
@@ -90,22 +90,22 @@ export abstract class Selector extends Expression {
     return selected;
   }
 
-  abstract override substitute(interpreter: AnyInterpreter): Item;
+  abstract override substitute(interpreter: InterpreterLike): Item;
 
   abstract andThen(then: Selector): Selector;
 
-  override get(key: AnyValue): Selector {
-    key = Value.fromAny(key);
+  override get(key: ValueLike): Selector {
+    key = Value.fromLike(key);
     return this.andThen(new GetSelector(key, Selector.identity()));
   }
 
-  override getAttr(key: AnyText): Selector {
-    key = Text.fromAny(key);
+  override getAttr(key: TextLike): Selector {
+    key = Text.fromLike(key);
     return this.andThen(new GetAttrSelector(key, Selector.identity()));
   }
 
-  override getItem(index: AnyNum): Selector {
-    index = Num.fromAny(index);
+  override getItem(index: NumLike): Selector {
+    index = Num.fromLike(index);
     return this.andThen(new GetItemSelector(index, Selector.identity()));
   }
 
@@ -125,11 +125,11 @@ export abstract class Selector extends Expression {
     return this.andThen(Selector.descendants());
   }
 
-  override filter(predicate?: AnyItem): Selector {
+  override filter(predicate?: ItemLike): Selector {
     if (arguments.length === 0) {
       return new FilterSelector(this, Selector.identity());
     } else {
-      predicate = Item.fromAny(predicate);
+      predicate = Item.fromLike(predicate);
       return this.andThen(predicate.filter());
     }
   }
@@ -157,18 +157,18 @@ export abstract class Selector extends Expression {
     return new IdentitySelector();
   }
 
-  static get(key: AnyValue): Selector {
-    key = Value.fromAny(key);
+  static get(key: ValueLike): Selector {
+    key = Value.fromLike(key);
     return new GetSelector(key, Selector.identity());
   }
 
-  static getAttr(key: AnyText): Selector {
-    key = Text.fromAny(key);
+  static getAttr(key: TextLike): Selector {
+    key = Text.fromLike(key);
     return new GetAttrSelector(key, Selector.identity());
   }
 
-  static getItem(index: AnyNum): Selector {
-    index = Num.fromAny(index);
+  static getItem(index: NumLike): Selector {
+    index = Num.fromLike(index);
     return new GetItemSelector(index, Selector.identity());
   }
 
@@ -192,8 +192,8 @@ export abstract class Selector extends Expression {
     return new DescendantsSelector(Selector.identity());
   }
 
-  static literal(item: AnyItem): Selector {
-    item = Item.fromAny(item);
+  static literal(item: ItemLike): Selector {
+    item = Item.fromLike(item);
     if (!(item instanceof Selector)) {
       item = new LiteralSelector(item, Selector.identity());
     }

@@ -14,10 +14,11 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
-import type {AnyOutputSettings} from "@swim/codec";
+import type {OutputSettingsLike} from "@swim/codec";
 import {OutputSettings} from "@swim/codec";
 import type {Input} from "@swim/codec";
 import type {Output} from "@swim/codec";
@@ -26,7 +27,7 @@ import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 import {Unicode} from "@swim/codec";
 import type {R2Function} from "./R2Function";
-import type {AnyR2Shape} from "./R2Shape";
+import type {R2ShapeLike} from "./R2Shape";
 import {R2Shape} from "./R2Shape";
 import {R2Point} from "./R2Point";
 import type {R2Curve} from "./R2Curve";
@@ -41,11 +42,11 @@ export interface R2PathContext extends R2SplineContext {
 }
 
 /** @public */
-export type AnyR2Path = R2Path | string;
+export type R2PathLike = R2Path | string;
 
 /** @public */
-export const AnyR2Path = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyR2Path {
+export const R2PathLike = {
+  [Symbol.hasInstance](instance: unknown): instance is R2PathLike {
     return instance instanceof R2Path
         || typeof instance === "string";
   },
@@ -53,14 +54,17 @@ export const AnyR2Path = {
 
 /** @public */
 export class R2Path extends R2Shape implements Debug {
-  constructor(splines: ReadonlyArray<R2Spline>) {
+  constructor(splines: readonly R2Spline[]) {
     super();
     this.splines = splines;
     this.boundingBox = null;
     this.pathString = void 0;
   }
 
-  readonly splines: ReadonlyArray<R2Spline>;
+  /** @override */
+  declare readonly likeType?: Proto<string>;
+
+  readonly splines: readonly R2Spline[];
 
   override isDefined(): boolean {
     return this.splines.length !== 0;
@@ -118,13 +122,13 @@ export class R2Path extends R2Shape implements Debug {
     return splines[k]!.interpolate(v);
   }
 
-  override contains(that: AnyR2Shape): boolean;
+  override contains(that: R2ShapeLike): boolean;
   override contains(x: number, y: number): boolean;
-  override contains(that: AnyR2Shape | number, y?: number): boolean {
+  override contains(that: R2ShapeLike | number, y?: number): boolean {
     return false; // TODO
   }
 
-  override intersects(that: AnyR2Shape): boolean {
+  override intersects(that: R2ShapeLike): boolean {
     return false; // TODO
   }
 
@@ -240,7 +244,7 @@ export class R2Path extends R2Shape implements Debug {
   /** @internal */
   readonly pathString: string | undefined;
 
-  toPathString(outputSettings?: AnyOutputSettings): string {
+  toPathString(outputSettings?: OutputSettingsLike): string {
     let pathString: string | undefined;
     if (outputSettings !== void 0 || (pathString = this.pathString, pathString === void 0)) {
       const output = Unicode.stringOutput(outputSettings);
@@ -329,9 +333,9 @@ export class R2Path extends R2Shape implements Debug {
     return new R2Path([new R2Spline(curves, true)]);
   }
 
-  static override fromAny<T extends AnyR2Path | null | undefined>(value: T): R2Path | Uninitable<T>;
-  static override fromAny<T extends AnyR2Shape | null | undefined>(value: T): R2Path | never;
-  static override fromAny<T extends AnyR2Path | null | undefined>(value: T): R2Path | Uninitable<T> {
+  static override fromLike<T extends R2PathLike | null | undefined>(value: T): R2Path | Uninitable<T>;
+  static override fromLike<T extends R2ShapeLike | null | undefined>(value: T): R2Path | never;
+  static override fromLike<T extends R2PathLike | null | undefined>(value: T): R2Path | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Path) {
       return value as R2Path | Uninitable<T>;
     } else if (typeof value === "string") {

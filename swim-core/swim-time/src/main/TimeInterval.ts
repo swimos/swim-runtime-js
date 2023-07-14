@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {AnyDateTime} from "./DateTime";
+import type {DateTimeLike} from "./DateTime";
 import {DateTime} from "./DateTime";
 
 /** @public */
 export abstract class TimeInterval {
-  abstract offset(d: AnyDateTime, k?: number): DateTime;
+  abstract offset(d: DateTimeLike, k?: number): DateTime;
 
-  next(d: AnyDateTime, k?: number): DateTime {
+  next(d: DateTimeLike, k?: number): DateTime {
     return this.floor(this.offset(d, k));
   }
 
-  abstract floor(d: AnyDateTime): DateTime;
+  abstract floor(d: DateTimeLike): DateTime;
 
-  ceil(d: AnyDateTime): DateTime {
+  ceil(d: DateTimeLike): DateTime {
     if (d instanceof DateTime) {
       d = new DateTime(d.time - 1, d.zone);
     } else {
@@ -34,14 +34,14 @@ export abstract class TimeInterval {
     return this.next(this.floor(d), 1);
   }
 
-  round(t: AnyDateTime): DateTime {
-    const d = DateTime.fromAny(t);
+  round(t: DateTimeLike): DateTime {
+    const d = DateTime.fromLike(t);
     const d0 = this.floor(d);
     const d1 = this.ceil(d);
     return d.time - d0.time < d1.time - d.time ? d0 : d1;
   }
 
-  range(t0: AnyDateTime, t1: AnyDateTime, step?: number): DateTime[] {
+  range(t0: DateTimeLike, t1: DateTimeLike, step?: number): DateTime[] {
     let d0 = this.ceil(t0);
     const d1 = DateTime.time(t1);
     const ds: DateTime[] = [];
@@ -131,35 +131,35 @@ export abstract class TimeInterval {
     return this.Millisecond;
   }
 
-  static years(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
+  static years(d0: DateTimeLike, d1: DateTimeLike, step?: number): DateTime[] {
     return TimeInterval.year.range(d0, d1, step);
   }
 
-  static months(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
+  static months(d0: DateTimeLike, d1: DateTimeLike, step?: number): DateTime[] {
     return TimeInterval.month.range(d0, d1, step);
   }
 
-  static weeks(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
+  static weeks(d0: DateTimeLike, d1: DateTimeLike, step?: number): DateTime[] {
     return TimeInterval.week.range(d0, d1, step);
   }
 
-  static days(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
+  static days(d0: DateTimeLike, d1: DateTimeLike, step?: number): DateTime[] {
     return TimeInterval.day.range(d0, d1, step);
   }
 
-  static hours(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
+  static hours(d0: DateTimeLike, d1: DateTimeLike, step?: number): DateTime[] {
     return TimeInterval.hour.range(d0, d1, step);
   }
 
-  static minutes(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
+  static minutes(d0: DateTimeLike, d1: DateTimeLike, step?: number): DateTime[] {
     return TimeInterval.minute.range(d0, d1, step);
   }
 
-  static seconds(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
+  static seconds(d0: DateTimeLike, d1: DateTimeLike, step?: number): DateTime[] {
     return TimeInterval.second.range(d0, d1, step);
   }
 
-  static milliseconds(d0: AnyDateTime, d1: AnyDateTime, step?: number): DateTime[] {
+  static milliseconds(d0: DateTimeLike, d1: DateTimeLike, step?: number): DateTime[] {
     return TimeInterval.millisecond.range(d0, d1, step);
   }
 
@@ -189,8 +189,8 @@ export class FilterTimeInterval extends TimeInterval {
   /** @internal */
   readonly predicate: (d: DateTime) => boolean;
 
-  override offset(t: AnyDateTime, k?: number): DateTime {
-    let d = DateTime.fromAny(t);
+  override offset(t: DateTimeLike, k?: number): DateTime {
+    let d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     while (k < 0) {
       do {
@@ -207,8 +207,8 @@ export class FilterTimeInterval extends TimeInterval {
     return d;
   }
 
-  override floor(t: AnyDateTime): DateTime {
-    let d = DateTime.fromAny(t);
+  override floor(t: DateTimeLike): DateTime {
+    let d = DateTime.fromLike(t);
     while (d = this.unit.floor(d), d.isDefined() && !this.predicate(d)) {
       d = new DateTime(d.time - 1, d.zone);
     }
@@ -218,26 +218,26 @@ export class FilterTimeInterval extends TimeInterval {
 
 /** @internal */
 export class YearInterval extends UnitTimeInterval {
-  override offset(t: AnyDateTime, k?: number): DateTime {
-    let d = DateTime.fromAny(t);
+  override offset(t: DateTimeLike, k?: number): DateTime {
+    let d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     d = d.withYear(d.year + k);
     return d;
   }
 
-  override next(t: AnyDateTime, k?: number): DateTime {
-    const d = DateTime.fromAny(t);
+  override next(t: DateTimeLike, k?: number): DateTime {
+    const d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     return d.withYear(d.year + k).withMonth(0, 1).withHour(0, 0, 0, 0);
   }
 
-  override floor(t: AnyDateTime): DateTime {
-    const d = DateTime.fromAny(t);
+  override floor(t: DateTimeLike): DateTime {
+    const d = DateTime.fromLike(t);
     return d.withMonth(0, 1).withHour(0, 0, 0, 0);
   }
 
-  override ceil(t: AnyDateTime): DateTime {
-    let d = DateTime.fromAny(t);
+  override ceil(t: DateTimeLike): DateTime {
+    let d = DateTime.fromLike(t);
     d = new DateTime(d.time - 1, d.zone);
     d = d.withMonth(0, 1).withHour(0, 0, 0, 0);
     d = d.withYear(d.year + 1);
@@ -263,27 +263,27 @@ export class YearsInterval extends TimeInterval {
     this.stride = stride;
   }
 
-  override offset(t: AnyDateTime, k?: number): DateTime {
-    const d = DateTime.fromAny(t);
+  override offset(t: DateTimeLike, k?: number): DateTime {
+    const d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     return d.withYear(d.year + k * this.stride);
   }
 
-  override next(t: AnyDateTime, k?: number): DateTime {
-    let d = DateTime.fromAny(t);
+  override next(t: DateTimeLike, k?: number): DateTime {
+    let d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     d = d.withYear(Math.floor((d.year + k * this.stride) / this.stride) * this.stride);
     return d.withMonth(0, 1).withHour(0, 0, 0, 0);
   }
 
-  override floor(t: AnyDateTime): DateTime {
-    let d = DateTime.fromAny(t);
+  override floor(t: DateTimeLike): DateTime {
+    let d = DateTime.fromLike(t);
     d = d.withYear(Math.floor(d.year / this.stride) * this.stride);
     return d.withMonth(0, 1).withHour(0, 0, 0, 0);
   }
 
-  override ceil(t: AnyDateTime): DateTime {
-    let d = DateTime.fromAny(t);
+  override ceil(t: DateTimeLike): DateTime {
+    let d = DateTime.fromLike(t);
     d = new DateTime(d.time - 1, d.zone);
     d = d.withYear(Math.floor(d.year / this.stride) * this.stride);
     d = d.withMonth(0, 1).withHour(0, 0, 0, 0);
@@ -294,26 +294,26 @@ export class YearsInterval extends TimeInterval {
 
 /** @internal */
 export class MonthInterval extends UnitTimeInterval {
-  override offset(t: AnyDateTime, k?: number): DateTime {
-    const d = DateTime.fromAny(t);
+  override offset(t: DateTimeLike, k?: number): DateTime {
+    const d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     return d.withMonth(d.month + k);
   }
 
-  override next(t: AnyDateTime, k?: number): DateTime {
-    let d = DateTime.fromAny(t);
+  override next(t: DateTimeLike, k?: number): DateTime {
+    let d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     d = d.withMonth(d.month + k);
     return d.withDay(1).withHour(0, 0, 0, 0);
   }
 
-  override floor(t: AnyDateTime): DateTime {
-    const d = DateTime.fromAny(t);
+  override floor(t: DateTimeLike): DateTime {
+    const d = DateTime.fromLike(t);
     return d.withDay(1).withHour(0, 0, 0, 0);
   }
 
-  override ceil(t: AnyDateTime): DateTime {
-    let d = DateTime.fromAny(t);
+  override ceil(t: DateTimeLike): DateTime {
+    let d = DateTime.fromLike(t);
     d = new DateTime(d.time - 1, d.zone);
     d = d.withDay(1).withHour(0, 0, 0, 0);
     d = d.withMonth(d.month + 1);
@@ -345,28 +345,28 @@ export class WeekInterval extends TimeInterval {
     this.day = day;
   }
 
-  override offset(t: AnyDateTime, k?: number): DateTime {
-    const d = DateTime.fromAny(t);
+  override offset(t: DateTimeLike, k?: number): DateTime {
+    const d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     return d.withDay(d.day + 7 * k);
   }
 
-  override next(t: AnyDateTime, k?: number): DateTime {
-    let d = DateTime.fromAny(t);
+  override next(t: DateTimeLike, k?: number): DateTime {
+    let d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     d = d.withDay(d.day + 7 * k);
     d = d.withDay(d.day - (d.weekday + 7 - this.day) % 7);
     return d.withHour(0, 0, 0, 0);
   }
 
-  override floor(t: AnyDateTime): DateTime {
-    let d = DateTime.fromAny(t);
+  override floor(t: DateTimeLike): DateTime {
+    let d = DateTime.fromLike(t);
     d = d.withDay(d.day - (d.weekday + 7 - this.day) % 7);
     return d.withHour(0, 0, 0, 0);
   }
 
-  override ceil(t: AnyDateTime): DateTime {
-    let d = DateTime.fromAny(t);
+  override ceil(t: DateTimeLike): DateTime {
+    let d = DateTime.fromLike(t);
     d = new DateTime(d.time - 1, d.zone);
     d = d.withDay(d.day - (d.weekday + 7 - this.day) % 7);
     d = d.withHour(0, 0, 0, 0);
@@ -377,26 +377,26 @@ export class WeekInterval extends TimeInterval {
 
 /** @internal */
 export class DayInterval extends UnitTimeInterval {
-  override offset(t: AnyDateTime, k?: number): DateTime {
-    const d = DateTime.fromAny(t);
+  override offset(t: DateTimeLike, k?: number): DateTime {
+    const d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     return d.withDay(d.day + k);
   }
 
-  override next(t: AnyDateTime, k?: number): DateTime {
-    let d = DateTime.fromAny(t);
+  override next(t: DateTimeLike, k?: number): DateTime {
+    let d = DateTime.fromLike(t);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
     d = d.withDay(d.day + k);
     return d.withHour(0, 0, 0, 0);
   }
 
-  override floor(t: AnyDateTime): DateTime {
-    const d = DateTime.fromAny(t);
+  override floor(t: DateTimeLike): DateTime {
+    const d = DateTime.fromLike(t);
     return d.withHour(0, 0, 0, 0);
   }
 
-  override ceil(t: AnyDateTime): DateTime {
-    let d = DateTime.fromAny(t);
+  override ceil(t: DateTimeLike): DateTime {
+    let d = DateTime.fromLike(t);
     d = new DateTime(d.time - 1, d.zone);
     d = d.withHour(0, 0, 0, 0);
     d = d.withDay(d.day + 1);
@@ -421,7 +421,7 @@ export class DayInterval extends UnitTimeInterval {
 
 /** @internal */
 export class HourInterval extends UnitTimeInterval {
-  override offset(d: AnyDateTime, k?: number): DateTime {
+  override offset(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -429,7 +429,7 @@ export class HourInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override next(d: AnyDateTime, k?: number): DateTime {
+  override next(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -442,7 +442,7 @@ export class HourInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override floor(d: AnyDateTime): DateTime {
+  override floor(d: DateTimeLike): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     let dtz = z.offset * TimeInterval.MillisPerMinute % TimeInterval.MillisPerHour;
@@ -453,7 +453,7 @@ export class HourInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override ceil(d: AnyDateTime): DateTime {
+  override ceil(d: DateTimeLike): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     d -= 1;
@@ -484,7 +484,7 @@ export class HourInterval extends UnitTimeInterval {
 
 /** @internal */
 export class MinuteInterval extends UnitTimeInterval {
-  override offset(d: AnyDateTime, k?: number): DateTime {
+  override offset(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -492,7 +492,7 @@ export class MinuteInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override next(d: AnyDateTime, k?: number): DateTime {
+  override next(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -500,14 +500,14 @@ export class MinuteInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override floor(d: AnyDateTime): DateTime {
+  override floor(d: DateTimeLike): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     d = Math.floor(d / TimeInterval.MillisPerMinute) * TimeInterval.MillisPerMinute;
     return new DateTime(d, z);
   }
 
-  override ceil(d: AnyDateTime): DateTime {
+  override ceil(d: DateTimeLike): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     d = Math.floor(((Math.floor((d - 1) / TimeInterval.MillisPerMinute) * TimeInterval.MillisPerMinute) + TimeInterval.MillisPerMinute) / TimeInterval.MillisPerMinute) * TimeInterval.MillisPerMinute;
@@ -532,7 +532,7 @@ export class MinuteInterval extends UnitTimeInterval {
 
 /** @internal */
 export class SecondInterval extends UnitTimeInterval {
-  override offset(d: AnyDateTime, k?: number): DateTime {
+  override offset(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -540,7 +540,7 @@ export class SecondInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override next(d: AnyDateTime, k?: number): DateTime {
+  override next(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -549,14 +549,14 @@ export class SecondInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override floor(d: AnyDateTime): DateTime {
+  override floor(d: DateTimeLike): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     d = Math.floor(d / TimeInterval.MillisPerSecond) * TimeInterval.MillisPerSecond;
     return new DateTime(d, z);
   }
 
-  override ceil(d: AnyDateTime): DateTime {
+  override ceil(d: DateTimeLike): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     d = Math.floor(((Math.floor((d - 1) / TimeInterval.MillisPerSecond) * TimeInterval.MillisPerSecond) + TimeInterval.MillisPerSecond) / TimeInterval.MillisPerSecond) * TimeInterval.MillisPerSecond;
@@ -581,7 +581,7 @@ export class SecondInterval extends UnitTimeInterval {
 
 /** @internal */
 export class MillisecondInterval extends UnitTimeInterval {
-  override offset(d: AnyDateTime, k?: number): DateTime {
+  override offset(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -589,7 +589,7 @@ export class MillisecondInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override next(d: AnyDateTime, k?: number): DateTime {
+  override next(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -597,12 +597,12 @@ export class MillisecondInterval extends UnitTimeInterval {
     return new DateTime(d, z);
   }
 
-  override floor(d: AnyDateTime): DateTime {
-    return DateTime.fromAny(d);
+  override floor(d: DateTimeLike): DateTime {
+    return DateTime.fromLike(d);
   }
 
-  override ceil(d: AnyDateTime): DateTime {
-    return DateTime.fromAny(d);
+  override ceil(d: DateTimeLike): DateTime {
+    return DateTime.fromLike(d);
   }
 
   override every(k: number): TimeInterval {
@@ -627,7 +627,7 @@ export class MillisecondsInterval extends TimeInterval {
     this.stride = stride;
   }
 
-  override offset(d: AnyDateTime, k?: number): DateTime {
+  override offset(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -635,7 +635,7 @@ export class MillisecondsInterval extends TimeInterval {
     return new DateTime(d, z);
   }
 
-  override next(d: AnyDateTime, k?: number): DateTime {
+  override next(d: DateTimeLike, k?: number): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     k = Math.max(1, typeof k === "number" ? Math.floor(k) : 1);
@@ -644,7 +644,7 @@ export class MillisecondsInterval extends TimeInterval {
     return new DateTime(d, z);
   }
 
-  override floor(d: AnyDateTime): DateTime {
+  override floor(d: DateTimeLike): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     const stride = this.stride;
@@ -652,7 +652,7 @@ export class MillisecondsInterval extends TimeInterval {
     return new DateTime(d, z);
   }
 
-  override ceil(d: AnyDateTime): DateTime {
+  override ceil(d: DateTimeLike): DateTime {
     const z = DateTime.zone(d);
     d = DateTime.time(d);
     const stride = this.stride;

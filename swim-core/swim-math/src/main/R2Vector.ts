@@ -14,6 +14,7 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
+import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {Equivalent} from "@swim/util";
@@ -28,11 +29,11 @@ import type {Debug} from "@swim/codec";
 import {Format} from "@swim/codec";
 
 /** @public */
-export type AnyR2Vector = R2Vector | R2VectorInit;
+export type R2VectorLike = R2Vector | R2VectorInit;
 
 /** @public */
-export const AnyR2Vector = {
-  [Symbol.hasInstance](instance: unknown): instance is AnyR2Vector {
+export const R2VectorLike = {
+  [Symbol.hasInstance](instance: unknown): instance is R2VectorLike {
     return instance instanceof R2Vector
         || R2VectorInit[Symbol.hasInstance](instance);
   },
@@ -41,7 +42,7 @@ export const AnyR2Vector = {
 /** @public */
 export interface R2VectorInit {
   /** @internal */
-  typeid?: "R2VectorInit";
+  readonly typeid?: "R2VectorInit";
   x: number;
   y: number;
 }
@@ -61,7 +62,9 @@ export class R2Vector implements Interpolate<R2Vector>, Equivalent, HashCode, De
   }
 
   /** @internal */
-  declare typeid?: "R2Vector";
+  declare readonly typeid?: "R2Vector";
+
+  declare readonly likeType?: Proto<R2VectorInit>;
 
   isDefined(): boolean {
     return isFinite(this.x) && isFinite(this.y);
@@ -71,7 +74,7 @@ export class R2Vector implements Interpolate<R2Vector>, Equivalent, HashCode, De
 
   readonly y: number;
 
-  plus(that: AnyR2Vector): R2Vector {
+  plus(that: R2VectorLike): R2Vector {
     return new R2Vector(this.x + that.x, this.y + that.y);
   }
 
@@ -79,7 +82,7 @@ export class R2Vector implements Interpolate<R2Vector>, Equivalent, HashCode, De
     return new R2Vector(-this.x, -this.y);
   }
 
-  minus(that: AnyR2Vector): R2Vector {
+  minus(that: R2VectorLike): R2Vector {
     return new R2Vector(this.x - that.x, this.y - that.y);
   }
 
@@ -87,7 +90,7 @@ export class R2Vector implements Interpolate<R2Vector>, Equivalent, HashCode, De
     return new R2Vector(this.x * scalar, this.y * scalar);
   }
 
-  toAny(): R2VectorInit {
+  toLike(): R2VectorInit {
     return {
       x: this.x,
       y: this.y,
@@ -152,7 +155,7 @@ export class R2Vector implements Interpolate<R2Vector>, Equivalent, HashCode, De
     return new R2Vector(x, y);
   }
 
-  static fromAny<T extends AnyR2Vector | null | undefined>(value: T): R2Vector | Uninitable<T> {
+  static fromLike<T extends R2VectorLike | null | undefined>(value: T): R2Vector | Uninitable<T> {
     if (value === void 0 || value === null || value instanceof R2Vector) {
       return value as R2Vector | Uninitable<T>;
     } else if (R2VectorInit[Symbol.hasInstance](value)) {

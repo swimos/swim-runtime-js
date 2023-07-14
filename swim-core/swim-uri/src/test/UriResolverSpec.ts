@@ -77,7 +77,7 @@ export class UriResolverSpec extends Suite {
   unresolveRelatedURIs(exam: Exam): void {
     exam.equal(Uri.parse("http://a").unresolve(Uri.parse("http://a")), Uri.parse(""));
     exam.equal(Uri.parse("http://a").unresolve(Uri.parse("http://a/")), Uri.parse("/"));
-    exam.equal(Uri.parse("http://a").unresolve(Uri.parse("http://a/c")), Uri.parse("c"));
+    exam.equal(Uri.parse("http://a").unresolve(Uri.parse("http://a/c")), Uri.parse("/c"));
     exam.equal(Uri.parse("http://a").unresolve(Uri.parse("http://a?y")), Uri.parse("?y"));
     exam.equal(Uri.parse("http://a").unresolve(Uri.parse("http://a#s")), Uri.parse("#s"));
 

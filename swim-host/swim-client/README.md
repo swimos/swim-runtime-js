@@ -85,7 +85,7 @@ swim.downlink()
     .hostUri("warp://traffic.swim.services")
     .nodeUri("swim:meta:mesh")
     .laneUri("linkStats")
-    .onEvent((value) => console.log(value.toAny()))
+    .onEvent((value) => console.log(value.toLike()))
     .open();
 ```
 
@@ -103,8 +103,8 @@ invoked when the client encounters an unexpected error.
 ```typescript
 swim.didConnect((host) => console.log("connected to", host));
 swim.didDisconnect((host) => console.log("disconnected from", host));
-swim.didAuthenticate((session, host) => console.log("authenticated to", host, "with session", session.toAny()));
-swim.didDeauthenticate((reason, host) => console.log("deauthenticated from", host, "because", reason.toAny()));
+swim.didAuthenticate((session, host) => console.log("authenticated to", host, "with session", session.toLike()));
+swim.didDeauthenticate((reason, host) => console.log("deauthenticated from", host, "because", reason.toLike()));
 swim.didFail((error, host) => console.log("host", host, "failed because", error));
 ```
 
@@ -185,7 +185,7 @@ const hostRef = swim.hostRef("warp://traffic.swim.services");
 hostRef.downlink()
        .nodeUri("swim:meta:mesh")
        .laneUri("linkStats")
-       .onEvent((value) => console.log(value.toAny())})
+       .onEvent((value) => console.log(value.toLike())})
        .open();
 // ...
 hostRef.close();
@@ -211,7 +211,7 @@ it automatically closes all of its open downlink views.
 const nodeRef = swim.nodeRef("warp://traffic.swim.services", "swim:meta:mesh");
 nodeRef.downlink()
        .laneUri("linkStats")
-       .onEvent((value) => console.log(value.toAny())})
+       .onEvent((value) => console.log(value.toLike())})
        .open();
 // ...
 nodeRef.close();
@@ -235,7 +235,7 @@ it automatically closes all of its open downlink views.
 ```typescript
 const laneRef = swim.laneRef("warp://traffic.swim.services", "swim:meta:mesh", "linkStats");
 laneRef.downlink()
-       .onEvent((value) => console.log(value.toAny())})
+       .onEvent((value) => console.log(value.toLike())})
        .open();
 // ...
 laneRef.close();
