@@ -172,6 +172,8 @@ export class WarpClientSpec extends Suite {
 
   @Test
   clientConcurrentlyRelink(exam: ClientExam): Promise<void> {
+    const client = new WarpClient();
+    client.unlinkDelay.setValue(-1);
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof LinkRequest) {
@@ -220,7 +222,7 @@ export class WarpClientSpec extends Suite {
         },
       });
       downlinkA.open();
-    }, void 0, new WarpClient().unlinkDelay(-1));
+    });
   }
 
   @Test

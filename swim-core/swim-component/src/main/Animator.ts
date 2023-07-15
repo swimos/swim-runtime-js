@@ -14,12 +14,14 @@
 
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
+import {Objects} from "@swim/util";
 import type {LikeType} from "@swim/util";
 import type {TimingLike} from "@swim/util";
 import {Timing} from "@swim/util";
 import {Easing} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import {Affinity} from "./Affinity";
+import type {FastenerContext} from "./FastenerContext";
 import type {FastenerFlags} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
@@ -30,7 +32,7 @@ import {Property} from "./Property";
 /** @public */
 export interface AnimatorDescriptor<R, T> extends PropertyDescriptor<R, T> {
   extends?: Proto<Animator<any, any, any>> | boolean | null;
-  transition?: TimingLike | null;
+  transition?: TimingLike | boolean | null;
 }
 
 /** @public */
@@ -50,10 +52,6 @@ export interface AnimatorClass<A extends Animator<any, any, any> = Animator<any,
 
 /** @public */
 export interface Animator<R = any, T = any, I extends any[] = [T]> extends Property<R, T, I> {
-  (): T;
-  (newState: T | LikeType<T>, timingOrAffinity: Affinity | TimingLike | boolean | null | undefined): R;
-  (newState: T | LikeType<T>, timing?: TimingLike | boolean | null, affinity?: Affinity): R;
-
   /** @override */
   get descriptorType(): Proto<AnimatorDescriptor<R, T>>;
 
@@ -80,15 +78,13 @@ export interface Animator<R = any, T = any, I extends any[] = [T]> extends Prope
   setState(newState: T | LikeType<T>, timing?: TimingLike | boolean | null, affinity?: Affinity): void;
 
   /** @protected */
-  willSetState(newstate: T, oldState: T): void;
+  willSetState(newState: T, oldState: T): void;
 
   /** @protected */
-  onSetState(newstate: T, oldState: T): void;
+  onSetState(newState: T, oldState: T): void;
 
   /** @protected */
-  didSetState(newstate: T, oldState: T): void;
-
-  get transition(): Timing | null;
+  didSetState(newState: T, oldState: T): void;
 
   readonly timing: Timing | null;
 
@@ -97,7 +93,7 @@ export interface Animator<R = any, T = any, I extends any[] = [T]> extends Prope
   setInterpolatedValue(newValue: T, newState?: T): void;
 
   /** @override */
-  decohere(inlet?: Fastener): void;
+  decohere(inlet?: Fastener<any, any, any>): void;
 
   /** @override */
   recohere(t: number): void;
@@ -193,10 +189,11 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
     if (this.equalValues(newValue, oldValue)) {
       return;
     }
-    this.willSetValue(newValue, oldValue!);
+    this.willSetValue(newValue, oldValue);
+    this.incrementVersion();
     (this as Mutable<typeof this>).value = newValue;
-    this.onSetValue(newValue, oldValue!);
-    this.didSetValue(newValue, oldValue!);
+    this.onSetValue(newValue, oldValue);
+    this.didSetValue(newValue, oldValue);
     this.decohereOutlets();
   },
 
@@ -241,29 +238,33 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
     newState = this.fromLike(newState);
     newState = this.transformState(newState);
     const oldState = this.state;
-    if (this.equalValues(newState, oldState) && timing === void 0) {
+    if (timing === void 0 && this.equalValues(newState, oldState)) {
       return;
     }
 
-    if (timing === void 0 || timing === null || timing === false) {
-      timing = false;
-    } else if (timing === true) {
+    if (timing === void 0) {
       timing = this.transition;
-      if (timing === null) {
-        timing = false;
-      }
     } else {
       timing = Timing.fromLike(timing);
     }
+    if (timing === true) {
+      if (Objects.hasAllKeys<FastenerContext>(this.owner, "getTransition")) {
+        timing = this.owner.getTransition!(this);
+      } else {
+        timing = this.timing;
+      }
+    } else if (timing === false) {
+      timing = null;
+    }
 
-    const animated = timing !== false && this.definedValue(oldState);
+    const tweened = timing !== null && this.definedValue(oldState);
 
     this.willSetState(newState, oldState);
 
     (this as Mutable<typeof this>).state = newState;
 
-    if (animated) {
-      (this as Mutable<typeof this>).timing = timing as Timing;
+    if (tweened) {
+      (this as Mutable<typeof this>).timing = timing;
       (this as Mutable<typeof this>).interpolator = Interpolator(this.value, newState);
       if ((this.flags & Animator.TweeningFlag) !== 0) {
         this.setFlags(this.flags | (Animator.DivergedFlag | Animator.InterruptFlag));
@@ -277,13 +278,13 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
 
     this.onSetState(newState, oldState);
 
-    if (!animated) {
+    if (!tweened) {
       this.setValue(newState, Affinity.Reflexive);
     }
 
     this.didSetState(newState, oldState);
 
-    if (animated) {
+    if (tweened) {
       this.startTweening();
     } else if ((this.flags & Animator.TweeningFlag) !== 0) {
       this.didInterrupt(this.value);
@@ -301,10 +302,6 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
 
   didSetState(newState: T, oldState: T): void {
     // hook
-  },
-
-  get transition(): Timing | null {
-    return this.timing;
   },
 
   setInterpolatedValue(this: Animator<unknown, T>, newValue: T, newState?: T): void {
@@ -329,7 +326,7 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
     }
   },
 
-  decohere(inlet?: Fastener): void {
+  decohere(inlet?: Fastener<any, any, any>): void {
     if (inlet === void 0 || inlet !== this.inlet || (this.flags & Fastener.DerivedFlag) !== 0) {
       if (inlet instanceof Animator && (inlet.flags & Animator.TweeningFlag) !== 0) {
         this.startTweening();
@@ -344,18 +341,59 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
 
   recohere(t: number): void {
     this.setCoherentTime(t);
-    const inlets = this.inlet;
-    if (inlets instanceof Property) {
-      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlets.flags & Affinity.Mask, Affinity.Intrinsic));
+    const inlet = this.inlet;
+    if (inlet instanceof Animator) {
+      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic));
       if ((this.flags & Fastener.DerivedFlag) !== 0) {
         this.tweenInherited(t);
       } else if ((this.flags & Animator.TweeningFlag) !== 0) {
         this.tween(t);
+      } else {
+        this.setCoherent(true);
+      }
+    } else if (inlet instanceof Property) {
+      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic));
+      if ((this.flags & Fastener.DerivedFlag) !== 0 && this.inletVersion !== inlet.version) {
+        (this as Mutable<typeof this>).inletVersion = inlet.version;
+        const derivedValue = (this as unknown as Property<R, T, [unknown]>).deriveValue(inlet.getOutletValue(this));
+        this.setState(derivedValue, Affinity.Reflexive);
+        if ((this.flags & Animator.TweeningFlag) !== 0) {
+          this.tween(t);
+        } else {
+          this.setCoherent(true);
+        }
+      } else if ((this.flags & Animator.TweeningFlag) !== 0) {
+        this.tween(t);
+      } else {
+        this.setCoherent(true);
+      }
+    } else if (Array.isArray(inlet)) {
+      this.setDerived(true);
+      const inletVersions = this.inletVersion as number[];
+      const inletValues = new Array<unknown>(inlet.length);
+      for (let i = 0; i < inlet.length; i += 1) {
+        if (inlet[i] instanceof Property) {
+          inletVersions[i] = (inlet[i] as Property).version;
+          inletValues[i] = (inlet[i] as Property).getOutletValue(this);
+        } else {
+          this.setDerived(false);
+          this.setCoherent(true);
+          return;
+        }
+      }
+      const derivedValue = this.deriveValue(...(inletValues as I));
+      this.setState(derivedValue, Affinity.Reflexive);
+      if ((this.flags & Animator.TweeningFlag) !== 0) {
+        this.tween(t);
+      } else {
+        this.setCoherent(true);
       }
     } else {
       this.setDerived(false);
       if ((this.flags & Animator.TweeningFlag) !== 0) {
         this.tween(t);
+      } else {
+        this.setCoherent(true);
       }
     }
   },
@@ -408,19 +446,13 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
 
   tweenInherited(t: number): void {
     const inlet = this.inlet;
-    if (!(inlet instanceof Property)) {
+    if (!(inlet instanceof Animator)) {
       this.stopTweening();
       return;
     }
-    let newValue: T;
-    let newState: T;
-    if (inlet instanceof Animator) {
-      newValue = (this as unknown as Animator<R, T, [unknown]>).deriveValue(inlet.getOutletValue(this));
-      newState = (this as unknown as Animator<R, T, [unknown]>).deriveValue(inlet.getOutletState(this));
-    } else {
-      newValue = (this as unknown as Property<R, T, [unknown]>).deriveValue(inlet.getOutletValue(this));
-      newState = newValue;
-    }
+    (this as Mutable<typeof this>).inletVersion = inlet.version;
+    const newValue = (this as unknown as Animator<R, T, [unknown]>).deriveValue(inlet.getOutletValue(this));
+    const newState = (this as unknown as Animator<R, T, [unknown]>).deriveValue(inlet.getOutletState(this));
     const oldState = this.state;
     const stateChanged = !this.equalValues(newState, oldState);
     if (stateChanged) {
@@ -440,7 +472,7 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
       }
     }
 
-    if (inlet instanceof Animator && (inlet.flags & Animator.TweeningFlag) !== 0) {
+    if ((inlet.flags & Animator.TweeningFlag) !== 0) {
       this.requireRecohere();
     } else if ((this.flags & Animator.TweeningFlag) !== 0) {
       this.stopTweening();
@@ -512,26 +544,6 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
 },
 {
   construct(animator: A | null, owner: A extends Fastener<infer R, any, any> ? R : never): A {
-    if (animator === null) {
-      animator = function (state?: A extends Animator<any, infer T, any> ? T | LikeType<T> : never, timing?: Affinity | TimingLike | boolean | null, affinity?: Affinity): A extends Animator<infer R, infer T, any> ? T | R : never {
-        if (arguments.length === 0) {
-          return animator!.value;
-        } else {
-          if (arguments.length === 2) {
-            animator!.setState(state!, timing);
-          } else {
-            animator!.setState(state!, timing as TimingLike | boolean | null | undefined, affinity);
-          }
-          return animator!.owner;
-        }
-      } as A;
-      Object.defineProperty(animator, "name", {
-        value: this.prototype.name,
-        enumerable: true,
-        configurable: true,
-      });
-      Object.setPrototypeOf(animator, this.prototype);
-    }
     animator = super.construct(animator, owner) as A;
     (animator as Mutable<typeof animator>).state = animator.value;
     (animator as Mutable<typeof animator>).timing = null;

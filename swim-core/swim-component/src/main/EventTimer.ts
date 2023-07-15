@@ -283,7 +283,7 @@ export const EventTimer = (<R, T, F extends EventTimer<any, any>>() => EventHand
   construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
     if (fastener === null) {
       fastener = function (event?: Event): void {
-        if (event !== void 0) { // event listener
+        if (event !== void 0) { // event callback
           fastener!.defer(event);
         } else { // timer callback
           fastener!.expire();

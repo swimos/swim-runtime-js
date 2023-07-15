@@ -18,11 +18,17 @@ import type {WarpDownlinkModel} from "./WarpDownlinkModel";
 
 /** @public */
 export interface WarpDownlinkContext {
-  hostUri(): Uri | null;
+  hostUri: {
+    readonly value: Uri | null
+  };
 
-  nodeUri(): Uri | null;
+  nodeUri: {
+    readonly value: Uri | null
+  };
 
-  laneUri(): Uri | null;
+  laneUri: {
+    readonly value: Uri | null
+  };
 
   /** @internal */
   getDownlink(hostUri: Uri, nodeUri: Uri, laneUri: Uri): WarpDownlinkModel | null;

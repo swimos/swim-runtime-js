@@ -61,6 +61,8 @@ export class EventDownlinkSpec extends Suite {
 
   @Test
   eventDownlinkOffline(exam: ClientExam): Promise<void> {
+    const client = new WarpClient();
+    client.online.setValue(true);
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof LinkRequest) {
@@ -76,7 +78,7 @@ export class EventDownlinkSpec extends Suite {
           linkCount += 1;
           if (linkCount === 1) {
             exam.comment("online");
-            client.online(false);
+            client.online.setValue(false);
             server.close();
           } else if (linkCount === 2) {
             this.relink(false);
@@ -87,10 +89,10 @@ export class EventDownlinkSpec extends Suite {
         didDisconnect(): void {
           exam.comment("offline");
           exam.equal(linkCount, 1);
-          client.online(true);
+          client.online.setValue(true);
         },
       }).open();
-    }, void 0, new WarpClient().online(true));
+    }, void 0, client);
   }
 
   @Test

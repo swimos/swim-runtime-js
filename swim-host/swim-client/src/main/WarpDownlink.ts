@@ -381,7 +381,7 @@ export const WarpDownlink = (<R, F extends WarpDownlink<any>>() => Fastener.exte
   getHostUri(): Uri | null {
     let hostUri = this.hostUri;
     if (hostUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "hostUri")) {
-      hostUri = this.owner.hostUri();
+      hostUri = this.owner.hostUri.value;
     }
     return hostUri;
   },
@@ -408,7 +408,7 @@ export const WarpDownlink = (<R, F extends WarpDownlink<any>>() => Fastener.exte
   getNodeUri(): Uri | null {
     let nodeUri = this.nodeUri;
     if (nodeUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "nodeUri")) {
-      nodeUri = this.owner.nodeUri();
+      nodeUri = this.owner.nodeUri.value;
     }
     return nodeUri;
   },
@@ -435,7 +435,7 @@ export const WarpDownlink = (<R, F extends WarpDownlink<any>>() => Fastener.exte
   getLaneUri(): Uri | null {
     let laneUri = this.laneUri;
     if (laneUri === null && Objects.hasAllKeys<WarpDownlinkContext>(this.owner, "laneUri")) {
-      laneUri = this.owner.laneUri();
+      laneUri = this.owner.laneUri.value;
     }
     return laneUri;
   },

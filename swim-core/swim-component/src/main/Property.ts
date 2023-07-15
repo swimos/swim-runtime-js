@@ -18,6 +18,7 @@ import {Equals} from "@swim/util";
 import {Objects} from "@swim/util";
 import type {LikeType} from "@swim/util";
 import {FromLike} from "@swim/util";
+import type {Timing} from "@swim/util";
 import {Affinity} from "./Affinity";
 import {FastenerContext} from "./FastenerContext";
 import type {FastenerDescriptor} from "./Fastener";
@@ -41,9 +42,6 @@ export interface PropertyClass<P extends Property<any, any, any> = Property<any,
 
 /** @public */
 export interface Property<R = any, T = any, I extends any[] = [T]> extends Fastener<R, T, I> {
-  (): T;
-  (value: T | LikeType<T>, affinity?: Affinity): R;
-
   /** @override */
   get descriptorType(): Proto<PropertyDescriptor<R, T>>;
 
@@ -97,6 +95,8 @@ export interface Property<R = any, T = any, I extends any[] = [T]> extends Faste
 
   /** @protected */
   didSetValue(newValue: T, oldValue: T): void;
+
+  get transition(): Timing | boolean | null;
 
   get updateFlags(): number | undefined;
 
@@ -223,6 +223,7 @@ export const Property = (<R, T, I extends any[], P extends Property<any, any, an
       return;
     }
     this.willSetValue(newValue, oldValue);
+    this.incrementVersion();
     (this as Mutable<typeof this>).value = newValue;
     this.onSetValue(newValue, oldValue);
     this.didSetValue(newValue, oldValue);
@@ -245,26 +246,38 @@ export const Property = (<R, T, I extends any[], P extends Property<any, any, an
     // hook
   },
 
+  get transition(): Timing | boolean | null {
+    if (this.derived && this.inlet instanceof Property) {
+      return this.inlet.transition;
+    }
+    return null;
+  },
+
   updateFlags: void 0,
 
   recohere(t: number): void {
     this.setCoherentTime(t);
-    const inlets = this.inlet;
-    if (inlets instanceof Property) {
-      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlets.flags & Affinity.Mask, Affinity.Intrinsic));
+    const inlet = this.inlet;
+    if (inlet instanceof Property) {
+      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic));
       if ((this.flags & Fastener.DerivedFlag) !== 0) {
-        const derivedValue = (this as unknown as Property<R, T, [unknown]>).deriveValue(inlets.getOutletValue(this));
+        (this as Mutable<typeof this>).inletVersion = inlet.version;
+        const derivedValue = (this as unknown as Property<R, T, [unknown]>).deriveValue(inlet.getOutletValue(this));
         this.setValue(derivedValue, Affinity.Reflexive);
+      } else {
+        this.setCoherent(true);
       }
-    } else if (Array.isArray(inlets)) {
+    } else if (Array.isArray(inlet)) {
       this.setDerived(true);
-      const inletValues = new Array<unknown>(inlets.length);
-      for (let i = 0; i < inlets.length; i += 1) {
-        const inlet = inlets[i] as Fastener;
-        if (inlet instanceof Property) {
-          inletValues[i] = inlet.getOutletValue(this);
+      const inletVersions = this.inletVersion as number[];
+      const inletValues = new Array<unknown>(inlet.length);
+      for (let i = 0; i < inlet.length; i += 1) {
+        if (inlet[i] instanceof Property) {
+          inletVersions[i] = (inlet[i] as Property).version;
+          inletValues[i] = (inlet[i] as Property).getOutletValue(this);
         } else {
           this.setDerived(false);
+          this.setCoherent(true);
           return;
         }
       }
@@ -272,6 +285,7 @@ export const Property = (<R, T, I extends any[], P extends Property<any, any, an
       this.setValue(derivedValue, Affinity.Reflexive);
     } else {
       this.setDerived(false);
+      this.setCoherent(true);
     }
   },
 
@@ -309,22 +323,6 @@ export const Property = (<R, T, I extends any[], P extends Property<any, any, an
   },
 
   construct(property: P | null, owner: P extends Fastener<infer R, any, any> ? R : never): P {
-    if (property === null) {
-      property = function (value?: P extends Property<any, infer T, any> ? T | LikeType<T> : never, affinity?: Affinity): P extends Property<infer R, infer T, any> ? T | R : never {
-        if (arguments.length === 0) {
-          return property!.value;
-        } else {
-          property!.setValue(value!, affinity);
-          return property!.owner;
-        }
-      } as P;
-      Object.defineProperty(property, "name", {
-        value: this.prototype.name,
-        enumerable: true,
-        configurable: true,
-      });
-      Object.setPrototypeOf(property, this.prototype);
-    }
     property = super.construct(property, owner) as P;
     (property as Mutable<typeof property>).outlets = null;
     (property as Mutable<typeof property>).value = property.initValue();

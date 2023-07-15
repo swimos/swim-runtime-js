@@ -37,7 +37,7 @@ export class HostRefSpec extends Suite {
   clientHostRef(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       const hostRef = client.hostRef(server.hostUri);
-      exam.equal(hostRef.hostUri(), server.hostUri);
+      exam.equal(hostRef.hostUri.value, server.hostUri);
       resolve();
     });
   }

@@ -113,9 +113,21 @@ export interface Fastener<R = any, O = any, I extends any[] = any> {
   /** @internal */
   setFlags(flags: FastenerFlags): void;
 
+  readonly coherentTime: number;
+
+  /** @protected */
+  setCoherentTime(coherentTime: number): void;
+
+  readonly version: number;
+
+  /** @protected */
+  incrementVersion(): void;
+
   get parentType(): Proto<any> | null | undefined;
 
   get parent(): Fastener<any, any, any> | null;
+
+  readonly inletVersion: readonly number[] | number;
 
   readonly inlet: readonly Fastener<any, any, any>[] | Fastener<any, any, any> | null;
 
@@ -200,11 +212,6 @@ export interface Fastener<R = any, O = any, I extends any[] = any> {
   /** @protected */
   setCoherent(coherent: boolean): void;
 
-  readonly coherentTime: number;
-
-  /** @protected */
-  setCoherentTime(coherentTime: number): void;
-
   decohere(inlet?: Fastener<any, any, any>): void;
 
   requireRecohere(): void;
@@ -284,6 +291,14 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     (this as Mutable<typeof this>).flags = flags;
   },
 
+  incrementVersion(): void {
+    (this as Mutable<typeof this>).version += 1;
+  },
+
+  setCoherentTime(coherentTime: number): void {
+    (this as Mutable<typeof this>).coherentTime = coherentTime;
+  },
+
   get parentType(): Proto<any> | null | undefined {
     return void 0;
   },
@@ -303,6 +318,7 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     }
     this.willBindInlet(inlet);
     inlet.attachOutlet(this);
+    (this as Mutable<typeof this>).inletVersion = -1;
     (this as Mutable<typeof this>).inlet = inlet;
     this.onBindInlet(inlet);
     this.didBindInlet(inlet);
@@ -312,6 +328,7 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     this.setInherits(false);
     this.willBindInlet(inlet);
     inlet.attachOutlet(this);
+    (this as Mutable<typeof this>).inletVersion = -1;
     (this as Mutable<typeof this>).inlet = inlet;
     this.onBindInlet(inlet);
     this.didBindInlet(inlet);
@@ -339,6 +356,7 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     }
     this.willUnbindInlet(inlet);
     inlet.detachOutlet(this);
+    (this as Mutable<typeof this>).inletVersion = -1;
     (this as Mutable<typeof this>).inlet = null;
     this.onUnbindInlet(inlet);
     this.didUnbindInlet(inlet);
@@ -351,10 +369,12 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     if (inlet instanceof Fastener && inlet === this.inlet) {
       this.willUnbindInlet(inlet);
       inlet.detachOutlet(this);
+      (this as Mutable<typeof this>).inletVersion = -1;
       (this as Mutable<typeof this>).inlet = null;
       this.onUnbindInlet(inlet);
       this.didUnbindInlet(inlet);
     } else if (inlet === void 0) {
+      (this as Mutable<typeof this>).inletVersion = -1;
       (this as Mutable<typeof this>).inlet = null;
     }
   },
@@ -518,10 +538,6 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     }
   },
 
-  setCoherentTime(coherentTime: number): void {
-    (this as Mutable<typeof this>).coherentTime = coherentTime;
-  },
-
   decohere(inlet?: Fastener<any, any, any>): void {
     if (inlet === void 0 || inlet !== this.inlet || (this.flags & Fastener.DerivedFlag) !== 0) {
       if ((this.flags & Fastener.DecoherentFlag) === 0) {
@@ -541,14 +557,15 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
 
   recohere(t: number): void {
     this.setCoherentTime(t);
-    const inlets = this.inlet;
-    if (inlets instanceof Fastener) {
-      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlets.flags & Affinity.Mask, Affinity.Intrinsic));
-    } else if (Array.isArray(inlets)) {
+    const inlet = this.inlet;
+    if (inlet instanceof Fastener) {
+      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic));
+    } else if (Array.isArray(inlet)) {
       this.setDerived(true);
     } else {
       this.setDerived(false);
     }
+    this.setCoherent(true);
   },
 
   inletKeys: void 0,
@@ -575,10 +592,14 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     if (inlets !== null) {
       this.setInherits(false);
       this.setFlags(this.flags | Fastener.DerivedFlag);
+      const inletVersions = new Array<number>(inlets.length);
+      for (let i = 0; i < inlets.length; i += 1) {
+        inletVersions[i] = -1;
+      }
+      (this as Mutable<typeof this>).inletVersion = inletVersions;
       (this as Mutable<typeof this>).inlet = inlets;
       for (let i = 0; i < inlets.length; i += 1) {
-        const inlet = inlets[i]!;
-        inlet.attachOutlet(this);
+        inlets[i]!.attachOutlet(this);
       }
     } else {
       this.inheritInlet();
@@ -586,12 +607,12 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
   },
 
   detachInlets(): void {
-    const inlets = this.inlet;
-    if (Array.isArray(inlets)) {
-      for (let i = 0; i < inlets.length; i += 1) {
-        const inlet = inlets[i]!;
-        inlet.detachOutlet(this);
+    const inlet = this.inlet;
+    if (Array.isArray(inlet)) {
+      for (let i = 0; i < inlet.length; i += 1) {
+        (inlet[i] as Fastener).detachOutlet(this);
       }
+      (this as Mutable<typeof this>).inletVersion = -1;
       (this as Mutable<typeof this>).inlet = null;
       this.setFlags(this.flags & ~Fastener.DerivedFlag);
     } else {
@@ -665,6 +686,8 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     (fastener as Mutable<typeof fastener>).owner = owner;
     (fastener as Mutable<typeof fastener>).flags = fastener.flagsInit;
     (fastener as Mutable<typeof fastener>).coherentTime = 0;
+    (fastener as Mutable<typeof fastener>).version = 0;
+    (fastener as Mutable<typeof fastener>).inletVersion = -1;
     (fastener as Mutable<typeof fastener>).inlet = null;
     return fastener;
   },

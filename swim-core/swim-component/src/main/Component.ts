@@ -895,11 +895,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     // hook
   }
 
-  tryFastener<K extends keyof this, F extends this[K] = this[K]>(fastenerName: K): F extends Fastener ? F | null : null {
+  tryFastener<K extends keyof this, F extends this[K] = this[K]>(fastenerName: K): F extends Fastener<any, any, any> ? F | null : null {
     return FastenerContext.tryFastener(this, fastenerName);
   }
 
-  getFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null {
+  getFastener<F extends Fastener<any, any, any>>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null {
     if (contextType !== void 0 && contextType !== null && !(this instanceof contextType)) {
       return null;
     }
@@ -911,7 +911,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @override */
-  getParentFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null {
+  getParentFastener<F extends Fastener<any, any, any>>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null {
     let parent = this.parent;
     while (parent !== null) {
       const fastener = parent.getFastener(fastenerName, fastenerType, contextType);
@@ -924,7 +924,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @override */
-  attachFastener(fastener: Fastener): void {
+  attachFastener(fastener: Fastener<any, any, any>): void {
     if (this.mounted) {
       fastener.mount();
     }
@@ -953,8 +953,8 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
-  protected bindFastener(fastener: Fastener): void;
-  protected bindFastener(this: C, fastener: Fastener): void {
+  protected bindFastener(fastener: Fastener<any, any, any>): void;
+  protected bindFastener(this: C, fastener: Fastener<any, any, any>): void {
     if (!fastener.binds) {
       return;
     }
@@ -978,7 +978,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @internal */
-  protected bindChildFastener(fastener: Fastener, child: C, target: C | null): void {
+  protected bindChildFastener(fastener: Fastener<any, any, any>, child: C, target: C | null): void {
     if (fastener instanceof ComponentRelation || fastener instanceof EventHandler) {
       fastener.bindComponent(child, target);
     }
@@ -996,7 +996,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   }
 
   /** @internal */
-  protected unbindChildFastener(fastener: Fastener, child: C): void {
+  protected unbindChildFastener(fastener: Fastener<any, any, any>, child: C): void {
     if (fastener instanceof ComponentRelation || fastener instanceof EventHandler) {
       fastener.unbindComponent(child);
     }
@@ -1034,14 +1034,14 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
   readonly coherentTime: number;
 
   /** @internal */
-  readonly decoherent: readonly Fastener[] | null;
+  readonly decoherent: readonly Fastener<any, any, any>[] | null;
 
   /** @internal */
-  readonly recohering: readonly Fastener[] | null;
+  readonly recohering: readonly Fastener<any, any, any>[] | null;
 
   /** @override */
-  decohereFastener(fastener: Fastener): void {
-    const recohering = this.recohering as Fastener[] | null;
+  decohereFastener(fastener: Fastener<any, any, any>): void {
+    const recohering = this.recohering as Fastener<any, any, any>[] | null;
     if (recohering !== null && fastener.coherentTime !== this.coherentTime) {
       recohering.push(fastener);
       return;
@@ -1049,8 +1049,8 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     this.enqueueFastener(fastener);
   }
 
-  protected enqueueFastener(fastener: Fastener): void {
-    let decoherent = this.decoherent as Fastener[] | null;
+  protected enqueueFastener(fastener: Fastener<any, any, any>): void {
+    let decoherent = this.decoherent as Fastener<any, any, any>[] | null;
     if (decoherent === null) {
       decoherent = [];
       (this as Mutable<this>).decoherent = decoherent;

@@ -43,9 +43,6 @@ export interface FileRefClass<F extends FileRef<any, any> = FileRef<any, any>> e
 
 /** @public */
 export interface FileRef<R = any, T = any> extends FileRelation<R, T> {
-  (): T | null;
-  (fileName: string | undefined): R;
-
   /** @override */
   get descriptorType(): Proto<FileRefDescriptor<R, T>>;
 
@@ -254,12 +251,12 @@ export const FileRef = (<R, T, F extends FileRef<any, any>>() => FileRelation.ex
 
   recohere(t: number): void {
     this.setCoherentTime(t);
-    const inlets = this.inlet;
-    if (inlets instanceof FileRef) {
-      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlets.flags & Affinity.Mask, Affinity.Intrinsic));
+    const inlet = this.inlet;
+    if (inlet instanceof FileRef) {
+      this.setDerived((this.flags & Affinity.Mask) <= Math.min(inlet.flags & Affinity.Mask, Affinity.Intrinsic));
       if ((this.flags & Fastener.DerivedFlag) !== 0) {
-        this.setBaseDir(inlets.baseDir);
-        this.setFileName(inlets.fileName);
+        this.setBaseDir(inlet.baseDir);
+        this.setFileName(inlet.fileName);
       }
     } else {
       this.setDerived(false);
@@ -268,22 +265,6 @@ export const FileRef = (<R, T, F extends FileRef<any, any>>() => FileRelation.ex
 },
 {
   construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {
-    if (fastener === null) {
-      fastener = function (fileName?: string | undefined): F extends FileRef<infer R, infer T> ? T | R : never {
-        if (arguments.length === 0) {
-          return fastener!.value;
-        } else {
-          fastener!.setFileName(fileName);
-          return fastener!.owner;
-        }
-      } as F;
-      Object.defineProperty(fastener, "name", {
-        value: this.prototype.name,
-        enumerable: true,
-        configurable: true,
-      });
-      Object.setPrototypeOf(fastener, this.prototype);
-    }
     fastener = super.construct(fastener, owner) as F;
     (fastener as Mutable<typeof fastener>).fileName = fastener.initFileName();
     (fastener as Mutable<typeof fastener>).path = void 0;

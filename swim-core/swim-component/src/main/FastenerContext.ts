@@ -14,6 +14,7 @@
 
 import type {Proto} from "@swim/util";
 import {Objects} from "@swim/util";
+import type {Timing} from "@swim/util";
 import type {FastenerDecorator} from "./Fastener";
 import type {FastenerTemplate} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
@@ -42,6 +43,8 @@ export interface FastenerContext {
   decohereFastener?(fastener: Fastener<any, any, any>): void;
 
   requireUpdate?(updateFlags: number): void;
+
+  getTransition?(fastener: Fastener<any, any, any>): Timing | null;
 }
 
 /** @public */

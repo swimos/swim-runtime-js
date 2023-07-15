@@ -28,9 +28,6 @@ export class PropertySpec extends Suite {
 
     property.setValue("bar");
     exam.equal(property.value, "bar");
-
-    exam.identical(property("baz"), null, "accessor set");
-    exam.equal(property(), "baz", "accessor get");
   }
 
   @Test
@@ -42,9 +39,6 @@ export class PropertySpec extends Suite {
 
     property.setValue("baz");
     exam.equal(property.value, "baz");
-
-    exam.identical(property("qux"), null, "accessor set");
-    exam.equal(property(), "qux", "accessor get");
   }
 
   @Test
@@ -61,9 +55,6 @@ export class PropertySpec extends Suite {
 
     component.foo.setValue("baz");
     exam.equal(component.foo.value, "baz");
-
-    exam.identical(component.foo("qux"), component, "accessor set");
-    exam.equal(component.foo(), "qux", "accessor get");
   }
 
   @Test

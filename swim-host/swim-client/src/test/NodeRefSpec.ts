@@ -37,11 +37,11 @@ export class NodeRefSpec extends Suite {
   clientNodeRef(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       const node1 = client.nodeRef(server.hostUri, "house/kitchen");
-      exam.equal(node1.hostUri(), server.hostUri);
-      exam.equal(node1.nodeUri(), Uri.parse("house/kitchen"));
+      exam.equal(node1.hostUri.value, server.hostUri);
+      exam.equal(node1.nodeUri.value, Uri.parse("house/kitchen"));
       const node2 = client.nodeRef(server.resolve("house/kitchen"));
-      exam.equal(node2.hostUri(), server.hostUri);
-      exam.equal(node2.nodeUri(), Uri.parse("/house/kitchen"));
+      exam.equal(node2.hostUri.value, server.hostUri);
+      exam.equal(node2.nodeUri.value, Uri.parse("/house/kitchen"));
       resolve();
     });
   }
@@ -51,8 +51,8 @@ export class NodeRefSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       const hostRef = client.hostRef(server.hostUri);
       const nodeRef = hostRef.nodeRef("house/kitchen");
-      exam.equal(nodeRef.hostUri(), server.hostUri);
-      exam.equal(nodeRef.nodeUri(), Uri.parse("house/kitchen"));
+      exam.equal(nodeRef.hostUri.value, server.hostUri);
+      exam.equal(nodeRef.nodeUri.value, Uri.parse("house/kitchen"));
       resolve();
     });
   }

@@ -37,13 +37,13 @@ export class LaneRefSpec extends Suite {
   clientLaneRef(exam: ClientExam): Promise<void> {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       const laneRef1 = client.laneRef(server.hostUri, "house/kitchen", "light");
-      exam.equal(laneRef1.hostUri(), server.hostUri);
-      exam.equal(laneRef1.nodeUri(), Uri.parse("house/kitchen"));
-      exam.equal(laneRef1.laneUri(), Uri.parse("light"));
+      exam.equal(laneRef1.hostUri.value, server.hostUri);
+      exam.equal(laneRef1.nodeUri.value, Uri.parse("house/kitchen"));
+      exam.equal(laneRef1.laneUri.value, Uri.parse("light"));
       const laneRef2 = client.laneRef(server.resolve("house/kitchen"), "light");
-      exam.equal(laneRef2.hostUri(), server.hostUri);
-      exam.equal(laneRef2.nodeUri(), Uri.parse("/house/kitchen"));
-      exam.equal(laneRef2.laneUri(), Uri.parse("light"));
+      exam.equal(laneRef2.hostUri.value, server.hostUri);
+      exam.equal(laneRef2.nodeUri.value, Uri.parse("/house/kitchen"));
+      exam.equal(laneRef2.laneUri.value, Uri.parse("light"));
       resolve();
     });
   }
@@ -53,9 +53,9 @@ export class LaneRefSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       const hostRef = client.hostRef(server.hostUri);
       const laneRef = hostRef.laneRef("house/kitchen", "light");
-      exam.equal(laneRef.hostUri(), server.hostUri);
-      exam.equal(laneRef.nodeUri(), Uri.parse("house/kitchen"));
-      exam.equal(laneRef.laneUri(), Uri.parse("light"));
+      exam.equal(laneRef.hostUri.value, server.hostUri);
+      exam.equal(laneRef.nodeUri.value, Uri.parse("house/kitchen"));
+      exam.equal(laneRef.laneUri.value, Uri.parse("light"));
       resolve();
     });
   }
@@ -65,9 +65,9 @@ export class LaneRefSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       const nodeRef = client.nodeRef(server.hostUri, "house/kitchen");
       const laneRef = nodeRef.laneRef("light");
-      exam.equal(laneRef.hostUri(), server.hostUri);
-      exam.equal(laneRef.nodeUri(), Uri.parse("house/kitchen"));
-      exam.equal(laneRef.laneUri(), Uri.parse("light"));
+      exam.equal(laneRef.hostUri.value, server.hostUri);
+      exam.equal(laneRef.nodeUri.value, Uri.parse("house/kitchen"));
+      exam.equal(laneRef.laneUri.value, Uri.parse("light"));
       resolve();
     });
   }

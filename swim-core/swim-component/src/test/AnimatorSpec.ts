@@ -31,9 +31,6 @@ export class AnimatorSpec extends Suite {
     animator.setState("bar");
     exam.equal(animator.value, "bar");
     exam.equal(animator.state, "bar");
-
-    exam.identical(animator("baz"), null, "accessor set");
-    exam.equal(animator(), "baz", "accessor get");
   }
 
   @Test
@@ -47,9 +44,6 @@ export class AnimatorSpec extends Suite {
     animator.setState(1);
     exam.equal(animator.value, 1);
     exam.equal(animator.state, 1);
-
-    exam.identical(animator(0.5), null, "accessor set");
-    exam.equal(animator(), 0.5, "accessor get");
   }
 
   @Test
@@ -68,9 +62,6 @@ export class AnimatorSpec extends Suite {
     component.foo.setState(1);
     exam.equal(component.foo.value, 1);
     exam.equal(component.foo.state, 1);
-
-    exam.identical(component.foo(0.5), component, "accessor set");
-    exam.equal(component.foo(), 0.5, "accessor get");
   }
 
   @Test
