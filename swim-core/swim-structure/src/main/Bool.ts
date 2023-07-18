@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
@@ -38,8 +37,7 @@ export class Bool extends Value {
     });
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<boolean>;
+  override likeType?(like: boolean): void;
 
   override isDefinite(): boolean {
     return this.value;

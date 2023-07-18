@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -82,8 +81,7 @@ export class R2Point extends R2Shape implements Interpolate<R2Point>, HashCode, 
   /** @internal */
   declare readonly typeid?: "R2Point";
 
-  /** @override */
-  declare readonly likeType?: Proto<R2PointInit | R2PointTuple>;
+  override likeType?(like: R2PointInit | R2PointTuple): void;
 
   override isDefined(): boolean {
     return isFinite(this.x) && isFinite(this.y);

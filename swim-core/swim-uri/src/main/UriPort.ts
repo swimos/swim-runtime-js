@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -47,7 +46,7 @@ export class UriPort implements HashCode, Compare, Debug, Display {
     this.number = portNumber;
   }
 
-  declare readonly likeType?: Proto<number | string>;
+  likeType?(like: number | string): void;
 
   isDefined(): boolean {
     return this.number !== 0;

@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {Equivalent} from "@swim/util";
@@ -64,7 +63,7 @@ export class R2Vector implements Interpolate<R2Vector>, Equivalent, HashCode, De
   /** @internal */
   declare readonly typeid?: "R2Vector";
 
-  declare readonly likeType?: Proto<R2VectorInit>;
+  likeType?(like: R2VectorInit): void;
 
   isDefined(): boolean {
     return isFinite(this.x) && isFinite(this.y);

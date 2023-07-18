@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Lazy} from "@swim/util";
@@ -48,7 +47,7 @@ export class TimeZone implements HashCode, Debug {
     this.offset = offset;
   }
 
-  declare readonly likeType?: Proto<string | number>;
+  likeType?(like: string | number): void;
 
   readonly name: string | undefined;
 

@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -46,7 +45,7 @@ export const UriQueryLike = {
 
 /** @public */
 export abstract class UriQuery implements HashCode, Compare, Debug, Display {
-  declare readonly likeType?: Proto<{[key: string]: string} | string>;
+  likeType?(like: {[key: string]: string} | string): void;
 
   abstract isDefined(): boolean;
 

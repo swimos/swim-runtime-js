@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {InterpreterException} from "./InterpreterException";
 import {InterpreterSettings} from "./InterpreterSettings";
 import type {ItemLike} from "../Item";
@@ -32,7 +31,7 @@ export class Interpreter {
     this.scopeDepth = scopeDepth !== void 0 ? scopeDepth : 0;
   }
 
-  declare readonly likeType?: Proto<ItemLike>;
+  likeType?(like: ItemLike): void;
 
   readonly settings: InterpreterSettings;
 

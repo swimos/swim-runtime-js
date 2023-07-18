@@ -135,7 +135,7 @@ export class WarpScope extends Component implements WarpRef {
   hostRef(hostUri: UriLike): WarpRef {
     hostUri = Uri.fromLike(hostUri);
     const childRef = new WarpScope();
-    childRef.hostUri.setValue(hostUri);
+    childRef.hostUri.set(hostUri);
     this.appendChild(childRef);
     return childRef;
   }
@@ -159,10 +159,10 @@ export class WarpScope extends Component implements WarpRef {
     }
     const childRef = new WarpScope();
     if (hostUri !== void 0) {
-      childRef.hostUri.setValue(hostUri);
+      childRef.hostUri.set(hostUri);
     }
     if (nodeUri !== void 0) {
-      childRef.nodeUri.setValue(nodeUri);
+      childRef.nodeUri.set(nodeUri);
     }
     this.appendChild(childRef);
     return childRef;
@@ -195,13 +195,13 @@ export class WarpScope extends Component implements WarpRef {
     }
     const childRef = new WarpScope();
     if (hostUri !== void 0) {
-      childRef.hostUri.setValue(hostUri);
+      childRef.hostUri.set(hostUri);
     }
     if (nodeUri !== void 0) {
-      childRef.nodeUri.setValue(nodeUri);
+      childRef.nodeUri.set(nodeUri);
     }
     if (laneUri !== void 0) {
-      childRef.laneUri.setValue(laneUri);
+      childRef.laneUri.set(laneUri);
     }
     this.appendChild(childRef);
     return childRef;

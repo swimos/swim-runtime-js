@@ -24,14 +24,13 @@ import type {Component} from "./Component";
 /** @public */
 export interface EventHandlerDescriptor<R, T> extends FastenerDescriptor<R> {
   extends?: Proto<EventHandler<any, any>> | boolean | null;
-  target?: T | null;
-  disabled?: boolean;
+  enabled?: boolean;
 }
 
 /** @public */
 export interface EventHandlerClass<F extends EventHandler<any, any> = EventHandler<any, any>> extends FastenerClass<F> {
   /** @internal */
-  readonly DisabledFlag: FastenerFlags;
+  readonly EnabledFlag: FastenerFlags;
 
   /** @internal @override */
   readonly FlagShift: number;
@@ -99,18 +98,9 @@ export interface EventHandler<R = any, T = EventTarget> extends Fastener<R>, Eve
   /** @protected */
   handle(event: Event): void;
 
-  get disabled(): boolean;
+  get enabled(): boolean;
 
-  disable(disabled?: boolean): this;
-
-  /** @protected */
-  willDisable(): void;
-
-  /** @protected */
-  onDisable(): void;
-
-  /** @protected */
-  didDisable(): void;
+  set enabled(enabled: boolean);
 
   /** @protected */
   willEnable(): void;
@@ -121,13 +111,22 @@ export interface EventHandler<R = any, T = EventTarget> extends Fastener<R>, Eve
   /** @protected */
   didEnable(): void;
 
-  /** @internal */
-  bindComponent(component: Component, target?: Component | null): void;
+  /** @protected */
+  willDisable(): void;
+
+  /** @protected */
+  onDisable(): void;
+
+  /** @protected */
+  didDisable(): void;
 
   /** @internal */
-  unbindComponent(component: Component): void;
+  bindComponent(component: Component<any>, target?: Component<any> | null): void;
 
-  detectComponent(component: Component): T | null;
+  /** @internal */
+  unbindComponent(component: Component<any>): void;
+
+  detectComponent(component: Component<any>): T | null;
 
   /** @protected @override */
   onMount(): void;
@@ -198,7 +197,7 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
   },
 
   onAttachTarget(target: T): void {
-    if ((this.flags & (Fastener.MountedFlag | EventHandler.DisabledFlag)) === Fastener.MountedFlag) {
+    if ((this.flags & (Fastener.MountedFlag | EventHandler.EnabledFlag)) === (Fastener.MountedFlag | EventHandler.EnabledFlag)) {
       this.attachEvents(target);
     }
   },
@@ -212,7 +211,7 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
   },
 
   onDetachTarget(target: T): void {
-    if ((this.flags & (Fastener.MountedFlag | EventHandler.DisabledFlag)) === Fastener.MountedFlag) {
+    if ((this.flags & (Fastener.MountedFlag | EventHandler.EnabledFlag)) === (Fastener.MountedFlag | EventHandler.EnabledFlag)) {
       this.detachEvents(target);
     }
   },
@@ -261,43 +260,24 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
     // hook
   },
 
-  get disabled(): boolean {
-    return (this.flags & EventHandler.DisabledFlag) !== 0;
+  flagsInit: 1 << (Fastener.FlagShift + 0), // EnabledFlag
+
+  get enabled(): boolean {
+    return (this.flags & EventHandler.EnabledFlag) !== 0;
   },
 
-  disable(disabled?: boolean): typeof this {
-    if (disabled === void 0) {
-      disabled = true;
-    }
-    if (disabled === ((this.flags & EventHandler.DisabledFlag) !== 0)) {
-      return this;
-    } else if (disabled) {
-      this.willDisable();
-      this.setFlags(this.flags | EventHandler.DisabledFlag);
-      this.onDisable();
-      this.didDisable();
-    } else {
+  set enabled(enabled: boolean) {
+    if (enabled && ((this.flags & EventHandler.EnabledFlag) === 0)) {
       this.willEnable();
-      this.setFlags(this.flags & ~EventHandler.DisabledFlag);
+      this.setFlags(this.flags | EventHandler.EnabledFlag);
       this.onEnable();
       this.didEnable();
+    } else if (!enabled && ((this.flags & EventHandler.EnabledFlag) !== 0)) {
+      this.willDisable();
+      this.setFlags(this.flags & ~EventHandler.EnabledFlag);
+      this.onDisable();
+      this.didDisable();
     }
-    return this;
-  },
-
-  willDisable(): void {
-    // hook
-  },
-
-  onDisable(): void {
-    const target = this.target;
-    if (target !== null && (this.flags & Fastener.MountedFlag) !== 0) {
-      this.detachEvents(target);
-    }
-  },
-
-  didDisable(): void {
-    // hook
   },
 
   willEnable(): void {
@@ -315,7 +295,22 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
     // hook
   },
 
-  bindComponent(component: Component): void {
+  willDisable(): void {
+    // hook
+  },
+
+  onDisable(): void {
+    const target = this.target;
+    if (target !== null && (this.flags & Fastener.MountedFlag) !== 0) {
+      this.detachEvents(target);
+    }
+  },
+
+  didDisable(): void {
+    // hook
+  },
+
+  bindComponent(component: Component<any>): void {
     if (!this.binds || this.target !== null) {
       return;
     }
@@ -325,7 +320,7 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
     }
   },
 
-  unbindComponent(component: Component): void {
+  unbindComponent(component: Component<any>): void {
     if (!this.binds) {
       return;
     }
@@ -335,14 +330,14 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
     }
   },
 
-  detectComponent(component: Component): T | null {
+  detectComponent(component: Component<any>): T | null {
     return null;
   },
 
   onMount(): void {
     super.onMount();
     const target = this.target;
-    if (target !== null && (this.flags & EventHandler.DisabledFlag) === 0) {
+    if (target !== null && (this.flags & EventHandler.EnabledFlag) !== 0) {
       this.attachEvents(target);
     }
   },
@@ -350,7 +345,7 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
   onUnmount(): void {
     super.onUnmount();
     const target = this.target;
-    if (target !== null && (this.flags & EventHandler.DisabledFlag) === 0) {
+    if (target !== null && (this.flags & EventHandler.EnabledFlag) !== 0) {
       this.detachEvents(target);
     }
   },
@@ -369,16 +364,8 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
       Object.setPrototypeOf(fastener, this.prototype);
     }
     fastener = super.construct(fastener, owner) as F;
-    Object.defineProperty(fastener, "eventType", {
-      value: fastener.initEventType(),
-      enumerable: true,
-      configurable: true,
-    });
-    Object.defineProperty(fastener, "target", {
-      value: fastener.initTarget(),
-      enumerable: true,
-      configurable: true,
-    });
+    (fastener as Mutable<typeof fastener>).eventType = fastener.initEventType();
+    (fastener as Mutable<typeof fastener>).target = fastener.initTarget();
     return fastener;
   },
 
@@ -387,13 +374,13 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
     const fastenerPrototype = fastenerClass.prototype;
 
     let flagsInit = fastenerPrototype.flagsInit;
-    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "disabled")) {
-      if (fastenerPrototype.disabled) {
-        flagsInit |= EventHandler.DisabledFlag;
+    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "enabled")) {
+      if (fastenerPrototype.enabled) {
+        flagsInit |= EventHandler.EnabledFlag;
       } else {
-        flagsInit &= ~EventHandler.DisabledFlag;
+        flagsInit &= ~EventHandler.EnabledFlag;
       }
-      delete (fastenerPrototype as EventHandlerDescriptor<any, any>).disabled;
+      delete (fastenerPrototype as EventHandlerDescriptor<any, any>).enabled;
     }
     Object.defineProperty(fastenerPrototype, "flagsInit", {
       value: flagsInit,
@@ -401,17 +388,16 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
       configurable: true,
     });
 
-    if (Object.prototype.hasOwnProperty.call(fastenerPrototype, "target")) {
-      const target = fastenerPrototype.target;
-      Object.defineProperty(fastenerPrototype, "target", {
-        value: target !== void 0 ? target : null,
-        enumerable: true,
-        configurable: true,
-      });
+    const targetDescriptor = Object.getOwnPropertyDescriptor(fastenerPrototype, "target");
+    if (targetDescriptor !== void 0 && "value" in targetDescriptor) {
+      if (targetDescriptor.value === void 0) {
+        targetDescriptor.value = null;
+      }
+      Object.defineProperty(fastenerPrototype, "target", targetDescriptor);
     }
   },
 
-  DisabledFlag: 1 << (Fastener.FlagShift + 0),
+  EnabledFlag: 1 << (Fastener.FlagShift + 0),
 
   FlagShift: Fastener.FlagShift + 1,
   FlagMask: (1 << (Fastener.FlagShift + 1)) - 1,

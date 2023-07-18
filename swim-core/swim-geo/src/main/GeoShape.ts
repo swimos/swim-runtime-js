@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import type {Equals} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {R2Shape} from "@swim/math";
@@ -63,14 +62,14 @@ export abstract class GeoShape implements Equals, Equivalent {
   /** @internal */
   declare readonly typeid?: string;
 
-  declare readonly likeType?: Proto<GeoPointInit
-                            | GeoPointTuple
-                            | GeoSegmentInit
-                            | GeoSplinePoints
-                            | GeoPathSplines
-                            | GeoTileInit
-                            | GeoTileTuple
-                            | GeoBoxInit>;
+  likeType?(like: GeoPointInit
+                | GeoPointTuple
+                | GeoSegmentInit
+                | GeoSplinePoints
+                | GeoPathSplines
+                | GeoTileInit
+                | GeoTileTuple
+                | GeoBoxInit): void;
 
   abstract isDefined(): boolean;
 

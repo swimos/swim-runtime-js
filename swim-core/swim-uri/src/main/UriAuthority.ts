@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -81,7 +80,7 @@ export class UriAuthority implements HashCode, Compare, Debug, Display {
   /** @internal */
   declare readonly typeid?: "UriAuthority";
 
-  declare readonly likeType?: Proto<UriAuthorityInit | string>;
+  likeType?(like: UriAuthorityInit | string): void;
 
   isDefined(): boolean {
     return this.user.isDefined() || this.host.isDefined() || this.port.isDefined();

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Equivalent} from "@swim/util";
 import {Numbers} from "@swim/util";
@@ -36,8 +35,7 @@ export class Num extends Value {
     this.flags = flags !== void 0 ? flags : 0;
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<number>;
+  override likeType?(like: number): void;
 
   override isConstant(): boolean {
     return true;

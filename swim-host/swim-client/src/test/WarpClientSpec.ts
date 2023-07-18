@@ -79,7 +79,7 @@ export class WarpClientSpec extends Suite {
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       let t0 = 0;
       const idleTimeout = 500;
-      client.idleTimeout.setValue(idleTimeout);
+      client.idleTimeout.set(idleTimeout);
       client.observe({
         clientDidConnect(host: WarpHost): void {
           exam.comment("clientDidConnect");
@@ -173,7 +173,7 @@ export class WarpClientSpec extends Suite {
   @Test
   clientConcurrentlyRelink(exam: ClientExam): Promise<void> {
     const client = new WarpClient();
-    client.unlinkDelay.setValue(-1);
+    client.unlinkDelay.set(-1);
     return exam.mockServer((server: MockServer, client: WarpClient, resolve: () => void): void => {
       server.onEnvelope = function (envelope: Envelope): void {
         if (envelope instanceof LinkRequest) {

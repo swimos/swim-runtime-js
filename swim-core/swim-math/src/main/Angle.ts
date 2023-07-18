@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -58,7 +57,7 @@ export abstract class Angle implements Interpolate<Angle>, HashCode, Equivalent,
     return isFinite(this.value);
   }
 
-  declare readonly likeType?: Proto<string | number>;
+  likeType?(like: string | number): void;
 
   abstract readonly value: number;
 

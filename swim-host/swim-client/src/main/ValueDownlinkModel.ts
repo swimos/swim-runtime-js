@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
+import type {TimingLike} from "@swim/util";
 import {Value} from "@swim/structure";
 import type {Uri} from "@swim/uri";
 import type {EventMessage} from "@swim/warp";
@@ -31,7 +32,7 @@ export class ValueDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  declare readonly views: ReadonlySet<ValueDownlink<any, any>> | null;
+  declare readonly views: ReadonlySet<ValueDownlink<any, any, any>> | null;
 
   /** @internal */
   readonly state: Value;
@@ -40,12 +41,19 @@ export class ValueDownlinkModel extends WarpDownlinkModel {
     return this.state;
   }
 
-  set(newValue: Value): void {
+  override set(newValue: Value): this;
+  override set<S>(this: S, properties: {[K in keyof S as S[K] extends {set(value: any): any} ? K : never]?: S[K] extends {set(value: infer T): any} ? T : never}, timing?: TimingLike | boolean | null): this;
+  override set(newValue: Value | {[K in keyof ValueDownlinkModel as ValueDownlinkModel[K] extends {set(value: any): any} ? K : never]?: ValueDownlinkModel[K] extends {set(value: infer T): any} ? T : never}, timing?: TimingLike | boolean | null): this {
+    if (!(newValue instanceof Value)) {
+      super.set(newValue, timing);
+      return this;
+    }
     newValue = this.valueWillSet(newValue);
     const oldValue = this.state;
     this.setState(newValue);
     this.valueDidSet(newValue, oldValue);
     this.command(newValue);
+    return this;
   }
 
   setState(state: Value): void {

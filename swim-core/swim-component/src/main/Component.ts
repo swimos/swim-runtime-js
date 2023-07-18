@@ -30,10 +30,8 @@ import type {Observable} from "@swim/util";
 import type {ObserverMethods} from "@swim/util";
 import type {ObserverParameters} from "@swim/util";
 import type {Observer} from "@swim/util";
-import type {Affinity} from "./Affinity";
 import {FastenerContext} from "./FastenerContext";
 import {Fastener} from "./Fastener";
-import {Property} from "./Property";
 import {Animator} from "./Animator";
 import {EventHandler} from "./EventHandler";
 import {ComponentRelation} from "./"; // forward import
@@ -77,7 +75,7 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     this.observers = null;
   }
 
-  declare readonly likeType?: Proto<{create?(): C}>;
+  likeType?(like: {create?(): C}): void;
 
   /** @override */
   declare readonly observerType?: Class<ComponentObserver>;
@@ -1002,32 +1000,40 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     }
   }
 
-  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}, K extends keyof P>(key: K, value: P[K], timingOrAffinity: Affinity | TimingLike | boolean | null | undefined): void;
-  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}, K extends keyof P>(key: K, value: P[K], timing?: TimingLike | boolean | null, affinity?: Affinity): void;
-  setProperty<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}, K extends keyof P>(key: K, value: P[K], timing?: Affinity | TimingLike | boolean | null, affinity?: Affinity): void {
-    if (typeof timing === "number") {
-      affinity = timing;
-      timing = void 0;
-    }
-    const property = this[key as keyof this] as Property<this> | undefined;
-    if (property instanceof Animator) {
-      property.setState(value, timing, affinity);
-    } else if (property instanceof Property) {
-      property.setValue(value, affinity);
-    }
-  }
-
-  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}>(properties: P, timingOrAffinity: Affinity | TimingLike | boolean | null | undefined): void;
-  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}>(properties: P, timing?: TimingLike | boolean | null, affinity?: Affinity): void;
-  setProperties<P extends {[K in keyof this as this[K] extends Property ? K : never]?: this[K] extends Property<any, infer T, any> ? T | LikeType<T> : never}>(properties: P, timing?: Affinity | TimingLike | boolean | null, affinity?: Affinity): void {
-    if (typeof timing === "number") {
-      affinity = timing;
-      timing = void 0;
-    }
+  set<S>(this: S, properties: {[K in keyof S as S[K] extends {set(value: any): any} ? K : never]?: S[K] extends {set(value: infer T): any} ? T : never}, timing?: TimingLike | boolean | null): this;
+  set(properties: {[K in keyof this as this[K] extends {set(value: any): any} ? K : never]?: this[K] extends {set(value: infer T): any} ? T : never}, timing?: TimingLike | boolean | null): this {
     for (const key in properties) {
       const value = properties[key];
-      this.setProperty(key as any, value, timing, affinity);
+      const property = (this as any)[key] as {set?(value: any): any} | undefined;
+      if (property === void 0 || property === null) {
+        throw new Error("unknown property " + key);
+      } else if (property.set === void 0) {
+        throw new Error("unsettable property " + key);
+      } else if (property instanceof Animator) {
+        property.set(value, timing);
+      } else {
+        property.set(value);
+      }
     }
+    return this;
+  }
+
+  setIntrinsic<S>(this: S, properties: {[K in keyof S as S[K] extends {setIntrinsic(value: any): any} ? K : never]?: S[K] extends {setIntrinsic(value: infer T): any} ? T : never}, timing?: TimingLike | boolean | null): this;
+  setIntrinsic(properties: {[K in keyof this as this[K] extends {setIntrinsic(value: any): any} ? K : never]?: this[K] extends {setIntrinsic(value: infer T): any} ? T : never}, timing?: TimingLike | boolean | null): this {
+    for (const key in properties) {
+      const value = properties[key];
+      const property = (this as any)[key] as {setIntrinsic?(value: any): any} | undefined;
+      if (property === void 0 || property === null) {
+        throw new Error("unknown property " + key);
+      } else if (property.setIntrinsic === void 0) {
+        throw new Error("unsettable property " + key);
+      } else if (property instanceof Animator) {
+        property.setIntrinsic(value, timing);
+      } else {
+        property.setIntrinsic(value);
+      }
+    }
+    return this;
   }
 
   /** @internal */

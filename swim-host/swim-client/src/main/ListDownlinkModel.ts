@@ -14,6 +14,7 @@
 
 import type {Mutable} from "@swim/util";
 import type {Cursor} from "@swim/util";
+import type {TimingLike} from "@swim/util";
 import {STree} from "@swim/collections";
 import {Attr} from "@swim/structure";
 import {Value} from "@swim/structure";
@@ -35,7 +36,7 @@ export class ListDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  declare readonly views: ReadonlySet<ListDownlink<any, any>> | null;
+  declare readonly views: ReadonlySet<ListDownlink<any, any, any>> | null;
 
   /** @internal */
   readonly state: STree<Value, Value>;
@@ -56,7 +57,13 @@ export class ListDownlinkModel extends WarpDownlinkModel {
     return this.state.getEntry(index, key);
   }
 
-  set(index: number, newValue: Value, key?: Value): this {
+  override set(index: number, newValue: Value, key?: Value): this;
+  override set<S>(this: S, properties: {[K in keyof S as S[K] extends {set(value: any): any} ? K : never]?: S[K] extends {set(value: infer T): any} ? T : never}, timing?: TimingLike | boolean | null): this;
+  override set(index: number | {[K in keyof ListDownlinkModel as ListDownlinkModel[K] extends {set(value: any): any} ? K : never]?: ListDownlinkModel[K] extends {set(value: infer T): any} ? T : never}, newValue?: Value | TimingLike | boolean | null, key?: Value): this {
+    if (typeof index !== "number") {
+      super.set(index, newValue as TimingLike | boolean | null | undefined);
+      return this;
+    }
     if (key !== void 0) {
       index = this.state.lookup(key, index);
       if (index < 0) {
@@ -66,7 +73,7 @@ export class ListDownlinkModel extends WarpDownlinkModel {
     if (index < 0 || index >= this.state.length) {
       throw new RangeError("" + index);
     }
-    newValue = this.listWillUpdate(index, newValue);
+    newValue = this.listWillUpdate(index, newValue as Value);
     const oldEntry = this.state.getEntry(index)!;
     this.state.set(index, newValue);
     this.listDidUpdate(index, newValue, oldEntry[1]);

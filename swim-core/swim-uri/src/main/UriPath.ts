@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -36,7 +35,7 @@ import {Form} from "@swim/structure";
 import {Uri} from "./Uri";
 
 /** @public */
-export type UriPathLike = UriPath | string[] | string;
+export type UriPathLike = UriPath | readonly string[] | string;
 
 /** @public */
 export const UriPathLike = {
@@ -54,7 +53,7 @@ export abstract class UriPath implements HashCode, Compare, Debug, Display {
     // sealed
   }
 
-  declare readonly likeType?: Proto<string[] | string>;
+  likeType?(like: readonly string[] | string): void;
 
   abstract isDefined(): boolean;
 
@@ -822,7 +821,7 @@ export class UriPathBuilder implements Builder<string, UriPath> {
       } else if (component === "/") {
         this.addSlash();
       } else {
-        this.addSegment(component);
+        this.addSegment(component as string);
       }
     }
   }

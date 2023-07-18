@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
@@ -38,8 +37,7 @@ export class Absent extends Value {
     super();
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<undefined>;
+  override likeType?(like: undefined): void;
 
   /**
    * Always returns `false` because `Absent` represents an undefined value.

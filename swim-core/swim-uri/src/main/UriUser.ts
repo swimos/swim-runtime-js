@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Strings} from "@swim/util";
@@ -68,7 +67,7 @@ export class UriUser implements HashCode, Debug, Display {
   /** @internal */
   declare readonly typeid?: "UriUser";
 
-  declare readonly likeType?: Proto<UriUserInit | string>;
+  likeType?(like: UriUserInit | string): void;
 
   isDefined(): boolean {
     return this.username !== void 0;

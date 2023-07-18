@@ -23,28 +23,28 @@ import type {ComponentFactory} from "./Component";
 import {Component} from "./Component";
 
 /** @public */
-export interface ComponentRelationDescriptor<R, C extends Component> extends FastenerDescriptor<R> {
-  extends?: Proto<ComponentRelation<any, any>> | boolean | null;
+export interface ComponentRelationDescriptor<R, C extends Component<any>> extends FastenerDescriptor<R> {
+  extends?: Proto<ComponentRelation<any, any, any>> | boolean | null;
 }
 
 /** @public */
-export interface ComponentRelationClass<F extends ComponentRelation<any, any> = ComponentRelation> extends FastenerClass<F> {
+export interface ComponentRelationClass<F extends ComponentRelation<any, any, any> = ComponentRelation> extends FastenerClass<F> {
 }
 
 /** @public */
-export interface ComponentRelation<R = any, C extends Component = Component> extends Fastener<R> {
+export interface ComponentRelation<R = any, C extends Component<any> = Component, I extends any[] = [C | null]> extends Fastener<R, C | null, I> {
   /** @override */
   get descriptorType(): Proto<ComponentRelationDescriptor<R, C>>;
 
   /** @override */
-  get fastenerType(): Proto<ComponentRelation<any, any>>;
+  get fastenerType(): Proto<ComponentRelation<any, any, any>>;
 
   get componentType(): ComponentFactory<C> | null;
 
   get observes(): boolean;
 
   /** @override */
-  get parent(): ComponentRelation<any, C> | null;
+  get parent(): ComponentRelation<any, C, any> | null;
 
   /** @internal */
   readonly outlets: ReadonlySet<Fastener<any, any, any>> | null;
@@ -62,13 +62,13 @@ export interface ComponentRelation<R = any, C extends Component = Component> ext
   initComponent(component: C): void;
 
   /** @protected */
-  willAttachComponent(component: C, target: Component | null): void;
+  willAttachComponent(component: C, target: Component<any> | null): void;
 
   /** @protected */
-  onAttachComponent(component: C, target: Component | null): void;
+  onAttachComponent(component: C, target: Component<any> | null): void;
 
   /** @protected */
-  didAttachComponent(component: C, target: Component | null): void;
+  didAttachComponent(component: C, target: Component<any> | null): void;
 
   /** @protected */
   deinitComponent(component: C): void;
@@ -83,18 +83,18 @@ export interface ComponentRelation<R = any, C extends Component = Component> ext
   didDetachComponent(component: C): void;
 
   /** @protected */
-  get parentComponent(): Component | null;
+  get parentComponent(): Component<any> | null;
 
   /** @protected */
-  insertChild(parent: Component, child: C, target: Component | null, key: string | undefined): void;
+  insertChild(parent: Component<any>, child: C, target: Component<any> | null, key: string | undefined): void;
 
   /** @internal */
-  bindComponent(component: Component, target: Component | null): void;
+  bindComponent(component: Component<any>, target: Component<any> | null): void;
 
   /** @internal */
-  unbindComponent(component: Component): void;
+  unbindComponent(component: Component<any>): void;
 
-  detectComponent(component: Component): C | null;
+  detectComponent(component: Component<any>): C | null;
 
   createComponent(): C;
 
@@ -102,8 +102,8 @@ export interface ComponentRelation<R = any, C extends Component = Component> ext
 }
 
 /** @public */
-export const ComponentRelation = (<R, C extends Component, F extends ComponentRelation<any, any>>() => Fastener.extend<ComponentRelation<R, C>, ComponentRelationClass<F>>("ComponentRelation", {
-  get fastenerType(): Proto<ComponentRelation<any, any>> {
+export const ComponentRelation = (<R, C extends Component<any>, I extends any[], F extends ComponentRelation<any, any, any>>() => Fastener.extend<ComponentRelation<R, C, I>, ComponentRelationClass<F>>("ComponentRelation", {
+  get fastenerType(): Proto<ComponentRelation<any, any, any>> {
     return ComponentRelation;
   },
 
@@ -140,17 +140,17 @@ export const ComponentRelation = (<R, C extends Component, F extends ComponentRe
     // hook
   },
 
-  willAttachComponent(component: C, target: Component | null): void {
+  willAttachComponent(component: C, target: Component<any> | null): void {
     // hook
   },
 
-  onAttachComponent(component: C, target: Component | null): void {
+  onAttachComponent(component: C, target: Component<any> | null): void {
     if (this.observes) {
       component.observe(this as Observes<C>);
     }
   },
 
-  didAttachComponent(component: C, target: Component | null): void {
+  didAttachComponent(component: C, target: Component<any> | null): void {
     // hook
   },
 
@@ -172,24 +172,24 @@ export const ComponentRelation = (<R, C extends Component, F extends ComponentRe
     // hook
   },
 
-  get parentComponent(): Component | null {
+  get parentComponent(): Component<any> | null {
     const owner = this.owner;
     return owner instanceof Component ? owner : null;
   },
 
-  insertChild(parent: Component, child: C, target: Component | null, key: string | undefined): void {
+  insertChild(parent: Component<any>, child: C, target: Component<any> | null, key: string | undefined): void {
     parent.insertChild(child, target, key);
   },
 
-  bindComponent(component: Component, target: Component | null): void {
+  bindComponent(component: Component<any>, target: Component<any> | null): void {
     // hook
   },
 
-  unbindComponent(component: Component): void {
+  unbindComponent(component: Component<any>): void {
     // hook
   },
 
-  detectComponent(component: Component): C | null {
+  detectComponent(component: Component<any>): C | null {
     return null;
   },
 

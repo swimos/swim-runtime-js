@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "./types";
 import type {Mutable} from "./types";
-import type {Proto} from "./types";
 import {Values} from "./Values";
 import {Domain} from "./Domain";
 import {Interpolator} from "./Interpolator";
@@ -41,7 +40,7 @@ export interface Timing extends Domain<number> {
   /** @internal */
   readonly typeid?: "Timing";
 
-  readonly likeType?: Proto<TimingInit | EasingType>;
+  likeType?(like: TimingInit | EasingType): void;
 
   /** @override */
   readonly 0: number;

@@ -26,19 +26,19 @@ import {EventDownlinkModel} from "./EventDownlinkModel";
 
 /** @public */
 export interface EventDownlinkDescriptor<R> extends WarpDownlinkDescriptor<R> {
-  extends?: Proto<EventDownlink<any>> | boolean | null;
+  extends?: Proto<EventDownlink<any, any, any>> | boolean | null;
 }
 
 /** @public */
-export interface EventDownlinkClass<F extends EventDownlink<any> = EventDownlink<any>> extends WarpDownlinkClass<F> {
+export interface EventDownlinkClass<F extends EventDownlink<any, any, any> = EventDownlink<any, any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
-export interface EventDownlinkObserver<F extends EventDownlink<any> = EventDownlink<any>> extends WarpDownlinkObserver<F> {
+export interface EventDownlinkObserver<F extends EventDownlink<any, any, any> = EventDownlink<any, any, any>> extends WarpDownlinkObserver<F> {
 }
 
 /** @public */
-export interface EventDownlink<R = any> extends WarpDownlink<R> {
+export interface EventDownlink<R = any, O = any, I extends any[] = [O]> extends WarpDownlink<R, O, I> {
   /** @override */
   get descriptorType(): Proto<EventDownlinkDescriptor<R>>;
 
@@ -53,7 +53,7 @@ export interface EventDownlink<R = any> extends WarpDownlink<R> {
 }
 
 /** @public */
-export const EventDownlink = (<R, F extends EventDownlink<any>>() => WarpDownlink.extend<EventDownlink<R>, EventDownlinkClass<F>>("EventDownlink", {
+export const EventDownlink = (<R, F extends EventDownlink<any, any, any>>() => WarpDownlink.extend<EventDownlink<R>, EventDownlinkClass<F>>("EventDownlink", {
   relinks: true,
 
   open(): typeof this {

@@ -14,7 +14,6 @@
 
 import {Lazy} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -58,15 +57,15 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
     // nop
   }
 
-  declare readonly likeType?: Proto<{readonly $key: ValueLike, readonly $value: ValueLike}
-                                  | {readonly [key: string]: ValueLike}
-                                  | readonly ItemLike[]
-                                  | Uint8Array
-                                  | string
-                                  | number
-                                  | boolean
-                                  | null
-                                  | undefined>;
+  likeType?(like: {readonly $key: ValueLike, readonly $value: ValueLike}
+                | {readonly [key: string]: ValueLike}
+                | readonly ItemLike[]
+                | Uint8Array
+                | string
+                | number
+                | boolean
+                | null
+                | undefined): void;
 
   /**
    * Returns `true` if this `Item` is not [[Absent]].

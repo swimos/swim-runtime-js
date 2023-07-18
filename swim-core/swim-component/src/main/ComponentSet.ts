@@ -27,14 +27,14 @@ import type {ComponentRelationClass} from "./ComponentRelation";
 import {ComponentRelation} from "./ComponentRelation";
 
 /** @public */
-export interface ComponentSetDescriptor<R, C extends Component> extends ComponentRelationDescriptor<R, C> {
-  extends?: Proto<ComponentSet<any, any>> | boolean | null;
+export interface ComponentSetDescriptor<R, C extends Component<any>> extends ComponentRelationDescriptor<R, C> {
+  extends?: Proto<ComponentSet<any, any, any>> | boolean | null;
   ordered?: boolean;
   sorted?: boolean;
 }
 
 /** @public */
-export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentSet> extends ComponentRelationClass<F> {
+export interface ComponentSetClass<F extends ComponentSet<any, any, any> = ComponentSet> extends ComponentRelationClass<F> {
   /** @internal */
   readonly OrderedFlag: FastenerFlags;
   /** @internal */
@@ -47,15 +47,15 @@ export interface ComponentSetClass<F extends ComponentSet<any, any> = ComponentS
 }
 
 /** @public */
-export interface ComponentSet<R = any, C extends Component = Component> extends ComponentRelation<R, C> {
+export interface ComponentSet<R = any, C extends Component<any> = Component, I extends any[] = [C | null]> extends ComponentRelation<R, C, I> {
   /** @override */
   get descriptorType(): Proto<ComponentSetDescriptor<R, C>>;
 
   /** @override */
-  get fastenerType(): Proto<ComponentSet<any, any>>;
+  get fastenerType(): Proto<ComponentSet<any, any, any>>;
 
   /** @override */
-  get parent(): ComponentSet<any, C> | null;
+  get parent(): ComponentSet<any, C, any> | null;
 
   /** @protected */
   componentKey(component: C): string | undefined;
@@ -66,30 +66,30 @@ export interface ComponentSet<R = any, C extends Component = Component> extends 
   readonly componentCount: number;
 
   /** @internal */
-  insertComponentMap(newComponent: C, target: Component | null): void;
+  insertComponentMap(newComponent: C, target: Component<any> | null): void;
 
   /** @internal */
   removeComponentMap(oldComponent: C): void;
 
-  hasComponent(component: Component): boolean;
+  hasComponent(component: Component<any>): boolean;
 
-  addComponent(component?: C | LikeType<C>, target?: Component | null, key?: string): C;
+  addComponent(component?: C | LikeType<C>, target?: Component<any> | null, key?: string): C;
 
-  addComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component | null): void;
+  addComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component<any> | null): void;
 
-  setComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component | null): void;
+  setComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component<any> | null): void;
 
-  attachComponent(component?: C | LikeType<C>, target?: Component | null): C;
+  attachComponent(component?: C | LikeType<C> | null, target?: Component<any> | null): C;
 
-  attachComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component | null): void;
+  attachComponents(components: {readonly [componentId: string]: C | undefined}, target?: Component<any> | null): void;
 
   detachComponent(component: C): C | null;
 
   detachComponents(components?: {readonly [componentId: string]: C | undefined}): void;
 
-  insertComponent(parent?: Component | null, component?: C | LikeType<C>, target?: Component | null, key?: string): C;
+  insertComponent(parent?: Component<any> | null, component?: C | LikeType<C>, target?: Component<any> | null, key?: string): C;
 
-  insertComponents(parent: Component | null, components: {readonly [componentId: string]: C | undefined}, target?: Component | null): void;
+  insertComponents(parent: Component<any> | null, components: {readonly [componentId: string]: C | undefined}, target?: Component<any> | null): void;
 
   removeComponent(component: C): C | null;
 
@@ -99,16 +99,16 @@ export interface ComponentSet<R = any, C extends Component = Component> extends 
 
   deleteComponents(components?: {readonly [componentId: string]: C | undefined}): void;
 
-  reinsertComponent(component: C, target?: Component | null): void;
+  reinsertComponent(component: C, target?: Component<any> | null): void;
 
   /** @internal @override */
-  bindComponent(component: Component, target: Component | null): void;
+  bindComponent(component: Component<any>, target: Component<any> | null): void;
 
   /** @internal @override */
-  unbindComponent(component: Component): void;
+  unbindComponent(component: Component<any>): void;
 
   /** @override */
-  detectComponent(component: Component): C | null;
+  detectComponent(component: Component<any>): C | null;
 
   /** @override */
   recohere(t: number): void;
@@ -122,33 +122,33 @@ export interface ComponentSet<R = any, C extends Component = Component> extends 
   sort(sorted?: boolean): this;
 
   /** @protected */
-  willSort(parent: Component | null): void;
+  willSort(parent: Component<any> | null): void;
 
   /** @protected */
-  onSort(parent: Component | null): void;
+  onSort(parent: Component<any> | null): void;
 
   /** @protected */
-  didSort(parent: Component | null): void;
+  didSort(parent: Component<any> | null): void;
 
   /** @internal */
-  sortChildren(parent: Component, comparator?: Comparator<C>): void;
+  sortChildren(parent: Component<any>, comparator?: Comparator<C>): void;
 
   /** @internal */
-  getTargetChild(parent: Component, child: C): Component | null;
+  getTargetChild(parent: Component<any>, child: C): Component<any> | null;
 
   /** @internal */
-  compareChildren(a: Component, b: Component): number;
+  compareChildren(a: Component<any>, b: Component<any>): number;
 
   /** @internal */
-  compareTargetChild(a: Component, b: Component): number;
+  compareTargetChild(a: Component<any>, b: Component<any>): number;
 
   /** @protected */
   compare(a: C, b: C): number;
 }
 
 /** @public */
-export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any, any>>() => ComponentRelation.extend<ComponentSet<R, C>, ComponentSetClass<F>>("ComponentSet", {
-  get fastenerType(): Proto<ComponentSet<any, any>> {
+export const ComponentSet = (<R, C extends Component<any>, I extends any[], F extends ComponentSet<any, any, any>>() => ComponentRelation.extend<ComponentSet<R, C, I>, ComponentSetClass<F>>("ComponentSet", {
+  get fastenerType(): Proto<ComponentSet<any, any, any>> {
     return ComponentSet;
   },
 
@@ -156,7 +156,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     return void 0;
   },
 
-  insertComponentMap(newComponent: C, target: Component | null): void {
+  insertComponentMap(newComponent: C, target: Component<any> | null): void {
     const components = this.components as {[componentId: string]: C | undefined};
     if (target !== null && (this.flags & ComponentSet.OrderedFlag) !== 0) {
       (this as Mutable<typeof this>).components = Objects.inserted(components, newComponent.uid, newComponent, target);
@@ -170,11 +170,11 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     delete components[oldComponent.uid];
   },
 
-  hasComponent(component: Component): boolean {
+  hasComponent(component: Component<any>): boolean {
     return this.components[component.uid] !== void 0;
   },
 
-  addComponent(newComponent?: C | LikeType<C>, target?: Component | null, key?: string): C {
+  addComponent(newComponent?: C | LikeType<C>, target?: Component<any> | null, key?: string): C {
     if (newComponent !== void 0 && newComponent !== null) {
       newComponent = this.fromLike(newComponent);
     } else {
@@ -183,11 +183,11 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     if (target === void 0) {
       target = null;
     }
-    let parent: Component | null;
+    let parent: Component<any> | null;
     if (this.binds && (parent = this.parentComponent, parent !== null)) {
       if (target === null) {
         if (newComponent.parent === parent) {
-          target = newComponent.nextSibling;
+          target = newComponent.nextSibling as Component<any> | null;
         } else {
           target = this.getTargetChild(parent, newComponent);
         }
@@ -213,13 +213,13 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     return newComponent;
   },
 
-  addComponents(newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
+  addComponents(newComponents: {readonly [componentId: string]: C | undefined}, target?: Component<any> | null): void {
     for (const componentId in newComponents) {
       this.addComponent(newComponents[componentId]!, target);
     }
   },
 
-  setComponents(newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
+  setComponents(newComponents: {readonly [componentId: string]: C | undefined}, target?: Component<any> | null): void {
     const binds = this.binds;
     const parent = binds ? this.parentComponent : null;
     const components = this.components;
@@ -252,7 +252,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     }
   },
 
-  attachComponent(newComponent?: C | LikeType<C>, target?: Component | null): C {
+  attachComponent(newComponent?: C | LikeType<C> | null, target?: Component<any> | null): C {
     if (newComponent !== void 0 && newComponent !== null) {
       newComponent = this.fromLike(newComponent);
     } else {
@@ -274,7 +274,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     return newComponent;
   },
 
-  attachComponents(newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
+  attachComponents(newComponents: {readonly [componentId: string]: C | undefined}, target?: Component<any> | null): void {
     for (const componentId in newComponents) {
       this.attachComponent(newComponents[componentId]!, target);
     }
@@ -304,7 +304,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     }
   },
 
-  insertComponent(parent?: Component | null, newComponent?: C | LikeType<C>, target?: Component | null, key?: string): C {
+  insertComponent(parent?: Component<any> | null, newComponent?: C | LikeType<C>, target?: Component<any> | null, key?: string): C {
     if (newComponent !== void 0 && newComponent !== null) {
       newComponent = this.fromLike(newComponent);
     } else {
@@ -345,7 +345,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     return newComponent;
   },
 
-  insertComponents(parent: Component | null, newComponents: {readonly [componentId: string]: C | undefined}, target?: Component | null): void {
+  insertComponents(parent: Component<any> | null, newComponents: {readonly [componentId: string]: C | undefined}, target?: Component<any> | null): void {
     for (const componentId in newComponents) {
       this.insertComponent(parent, newComponents[componentId]!, target);
     }
@@ -386,7 +386,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     }
   },
 
-  reinsertComponent(component: C, target?: Component | null): void {
+  reinsertComponent(component: C, target?: Component<any> | null): void {
     if (this.components[component.uid] === void 0 || (target === void 0 && (this.flags & ComponentSet.SortedFlag) === 0)) {
       return;
     }
@@ -399,7 +399,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     parent.reinsertChild(component, target);
   },
 
-  bindComponent(component: Component, target: Component | null): void {
+  bindComponent(component: Component<any>, target: Component<any> | null): void {
     if (!this.binds) {
       return;
     }
@@ -417,7 +417,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     this.decohereOutlets();
   },
 
-  unbindComponent(component: Component): void {
+  unbindComponent(component: Component<any>): void {
     if (!this.binds) {
       return;
     }
@@ -435,7 +435,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     this.decohereOutlets();
   },
 
-  detectComponent(component: Component): C | null {
+  detectComponent(component: Component<any>): C | null {
     if (typeof this.componentType === "function" && component instanceof this.componentType) {
       return component as C;
     }
@@ -491,32 +491,32 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     return this;
   },
 
-  willSort(parent: Component | null): void {
+  willSort(parent: Component<any> | null): void {
     // hook
   },
 
-  onSort(parent: Component | null): void {
+  onSort(parent: Component<any> | null): void {
     if (parent !== null) {
       this.sortChildren(parent);
     }
   },
 
-  didSort(parent: Component | null): void {
+  didSort(parent: Component<any> | null): void {
     // hook
   },
 
-  sortChildren(parent: Component, comparator?: Comparator<C>): void {
+  sortChildren(parent: Component<any>, comparator?: Comparator<C>): void {
     parent.sortChildren(this.compareChildren.bind(this));
   },
 
-  getTargetChild(parent: Component, child: C): Component | null {
+  getTargetChild(parent: Component<any>, child: C): Component<any> | null {
     if ((this.flags & ComponentSet.SortedFlag) !== 0) {
       return parent.getTargetChild(child, this.compareTargetChild.bind(this));
     }
     return null;
   },
 
-  compareChildren(a: Component, b: Component): number {
+  compareChildren(a: Component<any>, b: Component<any>): number {
     const components = this.components;
     const x = components[a.uid];
     const y = components[b.uid];
@@ -526,7 +526,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     return x !== void 0 ? 1 : y !== void 0 ? -1 : 0;
   },
 
-  compareTargetChild(a: C, b: Component): number {
+  compareTargetChild(a: C, b: Component<any>): number {
     const components = this.components;
     const y = components[b.uid];
     if (y !== void 0) {
@@ -547,7 +547,7 @@ export const ComponentSet = (<R, C extends Component, F extends ComponentSet<any
     return fastener;
   },
 
-  refine(fastenerClass: FastenerClass<ComponentSet<any, any>>): void {
+  refine(fastenerClass: FastenerClass<ComponentSet<any, any, any>>): void {
     super.refine(fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
 

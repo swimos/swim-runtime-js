@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
@@ -65,7 +64,7 @@ export const TransformLike = {
 
 /** @public */
 export abstract class Transform implements R2Operator, Interpolate<Transform>, HashCode, Equivalent, Debug {
-  declare readonly likeType?: Proto<string>;
+  likeType?(like: string): void;
 
   abstract transform(that: Transform): Transform;
   abstract transform(x: number, y: number): R2Point;

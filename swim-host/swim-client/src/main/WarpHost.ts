@@ -148,7 +148,7 @@ export abstract class WarpHost extends Component {
   protected didDisconnect(): void {
     this.setAuthenticated(false);
     this.setDeauthenticated(false);
-    this.session.setValue(Value.absent());
+    this.session.set(Value.absent());
 
     this.idleTimer.cancel();
     if (!this.idle) {
@@ -353,7 +353,7 @@ export abstract class WarpHost extends Component {
   }
 
   authenticate(credentials: ValueLike): void {
-    this.credentials.setValue(credentials);
+    this.credentials.set(credentials);
   }
 
   @Property({valueType: Value, value: Value.absent()})
@@ -634,7 +634,7 @@ export abstract class WarpHost extends Component {
   }
 
   protected onAuthedResponse(response: AuthedResponse): void {
-    this.session.setValue(response.body);
+    this.session.set(response.body);
     this.setDeauthenticated(false);
     this.setAuthenticated(true);
   }
@@ -644,7 +644,7 @@ export abstract class WarpHost extends Component {
   }
 
   protected onDeauthedResponse(response: DeauthedResponse): void {
-    this.session.setValue(response.body);
+    this.session.set(response.body);
     this.setAuthenticated(false);
     this.setDeauthenticated(true);
   }

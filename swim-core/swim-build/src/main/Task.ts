@@ -69,10 +69,10 @@ export abstract class Task extends Scope {
   }
 
   async run(options?: TaskOptionsType<this>): Promise<TaskStatus> {
-    this.status.setValue(TaskStatus.Pending);
+    this.status.set(TaskStatus.Pending);
     this.willRun();
     const status = await this.exec(options);
-    this.status.setValue(status);
+    this.status.set(status);
     this.didRun(status);
     return status;
   }

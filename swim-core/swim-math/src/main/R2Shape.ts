@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import type {Equals} from "@swim/util";
 import type {Equivalent} from "@swim/util";
 import type {R2Function} from "./R2Function";
@@ -55,12 +54,12 @@ export abstract class R2Shape implements Equals, Equivalent {
   /** @internal */
   declare readonly typeid?: string;
 
-  declare readonly likeType?: Proto<R2PointInit
-                                  | R2PointTuple
-                                  | R2SegmentInit
-                                  | R2BoxInit
-                                  | R2CircleInit
-                                  | string>;
+  likeType?(like: R2PointInit
+                | R2PointTuple
+                | R2SegmentInit
+                | R2BoxInit
+                | R2CircleInit
+                | string): void;
 
   abstract isDefined(): boolean;
 

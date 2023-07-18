@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
@@ -78,8 +77,7 @@ export class GeoBox extends GeoShape implements Interpolate<GeoBox>, HashCode, D
   /** @internal */
   declare readonly typeid?: "GeoBox";
 
-  /** @override */
-  declare readonly likeType?: Proto<GeoBoxInit>;
+  override likeType?(like: GeoBoxInit): void;
 
   override isDefined(): boolean {
     return isFinite(this.lngMin) && isFinite(this.latMin)

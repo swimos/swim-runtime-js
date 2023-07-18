@@ -32,14 +32,14 @@ import {ListDownlinkModel} from "./ListDownlinkModel";
 
 /** @public */
 export interface ListDownlinkDescriptor<R, V> extends WarpDownlinkDescriptor<R> {
-  extends?: Proto<ListDownlink<any, any>> | boolean | null;
+  extends?: Proto<ListDownlink<any, any, any>> | boolean | null;
   valueForm?: Form<V, LikeType<V>>;
   /** @internal */
   stateInit?: STree<Value, Value> | null;
 }
 
 /** @public */
-export interface ListDownlinkClass<F extends ListDownlink<any, any> = ListDownlink<any, any>> extends WarpDownlinkClass<F> {
+export interface ListDownlinkClass<F extends ListDownlink<any, any, any> = ListDownlink<any, any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
@@ -70,7 +70,7 @@ export interface ListDownlinkObserver<V = any, F extends ListDownlink<any, V> = 
 }
 
 /** @public */
-export interface ListDownlink<R = any, V = Value> extends WarpDownlink<R> {
+export interface ListDownlink<R = any, V = Value, I extends any[] = [Iterable<V>]> extends WarpDownlink<R, Iterable<V>, I> {
   /** @override */
   get descriptorType(): Proto<ListDownlinkDescriptor<R, V>>;
 
@@ -100,6 +100,7 @@ export interface ListDownlink<R = any, V = Value> extends WarpDownlink<R> {
 
   isEmpty(): boolean;
 
+  get(): Iterable<V>;
   get(index: number, id?: Value): V;
 
   getEntry(index: number, id?: Value): [V, Value] | undefined;
@@ -215,7 +216,7 @@ export interface ListDownlink<R = any, V = Value> extends WarpDownlink<R> {
 }
 
 /** @public */
-export const ListDownlink = (<R, V, F extends ListDownlink<any, any>>() => WarpDownlink.extend<ListDownlink<R, V>, ListDownlinkClass<F>>("ListDownlink", {
+export const ListDownlink = (<R, V, F extends ListDownlink<any, any, any>>() => WarpDownlink.extend<ListDownlink<R, V>, ListDownlinkClass<F>>("ListDownlink", {
   relinks: true,
   syncs: true,
 
@@ -264,12 +265,15 @@ export const ListDownlink = (<R, V, F extends ListDownlink<any, any>>() => WarpD
     return model.isEmpty();
   },
 
-  get(index: number, id?: Value): V {
+  get(index?: number, id?: Value): any/*Iterable<V> | V*/ {
+    if (arguments.length === 0) {
+      return this;
+    }
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
-    const value = model.get(index, id);
+    const value = model.get(index as number, id);
     return value.coerce(this.valueForm);
   },
 

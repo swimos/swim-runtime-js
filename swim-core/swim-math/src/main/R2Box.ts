@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -74,8 +73,7 @@ export class R2Box extends R2Shape implements Interpolate<R2Box>, HashCode, Debu
   /** @internal */
   declare readonly typeid?: "R2Box";
 
-  /** @override */
-  declare readonly likeType?: Proto<R2BoxInit>;
+  override likeType?(like: R2BoxInit): void;
 
   override isDefined(): boolean {
     return isFinite(this.xMin) && isFinite(this.yMin)

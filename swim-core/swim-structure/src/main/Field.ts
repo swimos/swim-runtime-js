@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Interpolator} from "@swim/util";
 import type {ItemLike} from "./Item";
 import {Item} from "./Item";
@@ -38,9 +37,8 @@ export abstract class Field extends Item {
     super();
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<{readonly $key: ValueLike, readonly $value: ValueLike}
-                                  | {[key: string]: ValueLike}>;
+  override likeType?(like: {readonly $key: ValueLike, readonly $value: ValueLike}
+                         | {[key: string]: ValueLike}): void;
 
   /**
    * Always returns `true` because a `Field` can never be [[Absent]].

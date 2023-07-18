@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Equivalent} from "@swim/util";
@@ -72,8 +71,7 @@ export class R2Circle extends R2Shape implements Interpolate<R2Circle>, HashCode
   /** @internal */
   declare readonly typeid?: "R2Circle";
 
-  /** @override */
-  declare readonly likeType?: Proto<R2CircleInit>;
+  override likeType?(like: R2CircleInit): void;
 
   override isDefined(): boolean {
     return isFinite(this.cx) && isFinite(this.cy) && isFinite(this.r);

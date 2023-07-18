@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "./types";
 import type {Mutable} from "./types";
-import type {Proto} from "./types";
 import {Timing} from "./Timing";
 
 /** @public */
@@ -33,7 +32,7 @@ export type EasingType = "linear" | "quad-in" | "quad-out" | "quad-in-out"
 /** @public */
 export interface Easing extends Timing {
   /** @override */
-  readonly likeType?: Proto<EasingType>;
+  likeType?(like: EasingType): void;
 
   readonly type: string;
 

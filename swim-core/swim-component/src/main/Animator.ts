@@ -64,6 +64,12 @@ export interface Animator<R = any, T = any, I extends any[] = [T]> extends Prope
   getOutletState(outlet: Fastener<any, any, any>): T;
 
   /** @override */
+  set(newValue: T | LikeType<T> | Fastener<any, I[0], any>, timing?: TimingLike | boolean | null): R;
+
+  /** @override */
+  setIntrinsic(newValue: T | LikeType<T> | Fastener<any, I[0], any>, timing?: TimingLike | boolean | null): R;
+
+  /** @override */
   setValue(newValue: T | LikeType<T>, affinity?: Affinity): void;
 
   readonly state: T;
@@ -174,6 +180,24 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
 
   getOutletState(outlet: Fastener<any, any, any>): T {
     return this.state;
+  },
+
+  set(newValue: T | LikeType<T> | Fastener<any, I[0], any>, timing?: TimingLike | boolean | null): R {
+    if (newValue instanceof Fastener) {
+      this.bindInlet(newValue);
+    } else {
+      this.setState(newValue, timing, Affinity.Extrinsic);
+    }
+    return this.owner;
+  },
+
+  setIntrinsic(newValue: T | LikeType<T> | Fastener<any, I[0], any>, timing?: TimingLike | boolean | null): R {
+    if (newValue instanceof Fastener) {
+      this.bindInlet(newValue);
+    } else {
+      this.setState(newValue, timing, Affinity.Intrinsic);
+    }
+    return this.owner;
   },
 
   setValue(newValue: T | LikeType<T>, affinity?: Affinity): void {

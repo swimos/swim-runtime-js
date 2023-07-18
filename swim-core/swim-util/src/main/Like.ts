@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto} from "./types";
 import {Identity} from "./Identity";
 import {Strings} from "./Strings";
 import {Numbers} from "./Numbers";
@@ -21,15 +20,16 @@ import {Objects} from "./Objects";
 
 /**
  * Associates a type `T` with a loosely typed representation `L`. Loose type
- * representations are modeled as an optional property named `likeType`.
- * Because the `likeType` property is optional, values of type `T` are
- * assignable to type `Like<T, L>`, and vice versa.
+ * representations are modeled as a phantom method `likeType?(like: L): void`
+ * whose argument type is the loosely typed representation of `T`. Because the
+ * `likeType` method is optional, values of type `T` are assignable to type
+ * `Like<T, L>`, and vice versa.
  *
  * The preferred way to associate loose type representations with a custom
- * class is to declare a `likeType` property on the class itself. The `Like`
- * type is used to inject an optional `likeType` property into an existing type.
- * This enables ad hoc [[FromLike]] conversion to be declared without needing
- * to change the declaration of the desired strict type.
+ * class is to declare a `likeType?(like: L): void` method on the class itself.
+ * The `Like` type is used to inject a phantom `likeType` method into an
+ * existing type. This enables ad hoc loose types to be declared without
+ * needing to change the declaration of the strict type.
  *
  * @example Ad hoc number coercion
  *
@@ -59,7 +59,7 @@ import {Objects} from "./Objects";
  *
  * @public
  */
-export type Like<T, L> = T & {readonly likeType?: Proto<L>};
+export type Like<T, L> = T & {likeType?(like: LikeType<T> | L): void};
 
 /**
  * Extracts the loosely typed representation of a type `T`. `LikeType` is used
@@ -68,7 +68,7 @@ export type Like<T, L> = T & {readonly likeType?: Proto<L>};
  * track both strict and loose types.
  * @public
  */
-export type LikeType<T> = T extends {readonly likeType?: Proto<infer L>} ? L : never;
+export type LikeType<T> = T extends {likeType?(like: infer L): any} ? L : never;
 
 /**
  * Conversion from loosely typed values to a strictly typed instances.

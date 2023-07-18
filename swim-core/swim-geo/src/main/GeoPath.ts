@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -71,8 +70,7 @@ export class GeoPath extends GeoShape implements Debug {
   /** @internal */
   declare readonly typeid?: "GeoPath";
 
-  /** @override */
-  declare readonly likeType?: Proto<GeoPathSplines | GeoSplinePoints>;
+  override likeType?(like: GeoPathSplines | GeoSplinePoints): void;
 
   override isDefined(): boolean {
     return this.splines.length !== 0;

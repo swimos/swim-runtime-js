@@ -71,7 +71,11 @@ export interface Property<R = any, T = any, I extends any[] = [T]> extends Faste
 
   getOutletValue(outlet: Fastener<any, any, any>): T;
 
-  deriveValue(...inletValues: I): T;
+  get(): T;
+
+  set(newValue: T | LikeType<T> | Fastener<any, I[0], any>): R;
+
+  setIntrinsic(newValue: T | LikeType<T> | Fastener<any, I[0], any>): R;
 
   get valueType(): unknown | undefined;
 
@@ -99,6 +103,8 @@ export interface Property<R = any, T = any, I extends any[] = [T]> extends Faste
   get transition(): Timing | boolean | null;
 
   get updateFlags(): number | undefined;
+
+  deriveValue(...inletValues: I): T;
 
   /** @override */
   recohere(t: number): void;
@@ -172,8 +178,26 @@ export const Property = (<R, T, I extends any[], P extends Property<any, any, an
     return this.value;
   },
 
-  deriveValue(...inletValues: any[]): T {
-    return inletValues[0] as T;
+  get(): T {
+    return this.value;
+  },
+
+  set(newValue: T | LikeType<T> | Fastener<any, I[0], any>): R {
+    if (newValue instanceof Fastener) {
+      this.bindInlet(newValue);
+    } else {
+      this.setValue(newValue, Affinity.Extrinsic);
+    }
+    return this.owner;
+  },
+
+  setIntrinsic(newValue: T | LikeType<T> | Fastener<any, I[0], any>): R {
+    if (newValue instanceof Fastener) {
+      this.bindInlet(newValue);
+    } else {
+      this.setValue(newValue, Affinity.Intrinsic);
+    }
+    return this.owner;
   },
 
   valueType: void 0,
@@ -254,6 +278,10 @@ export const Property = (<R, T, I extends any[], P extends Property<any, any, an
   },
 
   updateFlags: void 0,
+
+  deriveValue(...inletValues: any[]): T {
+    return inletValues[0] as T;
+  },
 
   recohere(t: number): void {
     this.setCoherentTime(t);

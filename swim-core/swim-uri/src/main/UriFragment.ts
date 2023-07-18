@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -50,7 +49,7 @@ export class UriFragment implements HashCode, Compare, Debug, Display {
     this.stringValue = void 0;
   }
 
-  declare readonly likeType?: Proto<string>;
+  likeType?(like: string): void;
 
   isDefined(): boolean {
     return this.identifier !== void 0;

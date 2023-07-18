@@ -33,7 +33,7 @@ import {MapDownlinkModel} from "./MapDownlinkModel";
 
 /** @public */
 export interface MapDownlinkDescriptor<R, K, V> extends WarpDownlinkDescriptor<R> {
-  extends?: Proto<MapDownlink<any, any, any>> | boolean | null;
+  extends?: Proto<MapDownlink<any, any, any, any>> | boolean | null;
   keyForm?: Form<K, LikeType<K>>;
   valueForm?: Form<V, LikeType<V>>;
   /** @internal */
@@ -41,7 +41,7 @@ export interface MapDownlinkDescriptor<R, K, V> extends WarpDownlinkDescriptor<R
 }
 
 /** @public */
-export interface MapDownlinkClass<F extends MapDownlink<any, any, any> = MapDownlink<any, any, any>> extends WarpDownlinkClass<F> {
+export interface MapDownlinkClass<F extends MapDownlink<any, any, any, any> = MapDownlink<any, any, any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
@@ -68,7 +68,7 @@ export interface MapDownlinkObserver<K = any, V = any, F extends MapDownlink<any
 }
 
 /** @public */
-export interface MapDownlink<R = any, K = Value, V = Value> extends WarpDownlink<R>, OrderedMap<K, V> {
+export interface MapDownlink<R = any, K = Value, V = Value, I extends any[] = [Iterable<[K, V]>]> extends WarpDownlink<R, Iterable<[K, V]>, I>, OrderedMap<K, V> {
   /** @override */
   get descriptorType(): Proto<MapDownlinkDescriptor<R, K, V>>;
 
@@ -107,6 +107,8 @@ export interface MapDownlink<R = any, K = Value, V = Value> extends WarpDownlink
 
   has(key: K | LikeType<K>): boolean;
 
+  /** @override */
+  get(): Iterable<[K, V]>;
   get(key: K | LikeType<K>): V;
 
   getEntry(index: number): [K, V] | undefined;
@@ -224,7 +226,7 @@ export interface MapDownlink<R = any, K = Value, V = Value> extends WarpDownlink
 }
 
 /** @public */
-export const MapDownlink = (<R, K, V, F extends MapDownlink<any, any, any>>() => WarpDownlink.extend<MapDownlink<R, K, V>, MapDownlinkClass<F>>("MapDownlink", {
+export const MapDownlink = (<R, K, V, F extends MapDownlink<any, any, any, any>>() => WarpDownlink.extend<MapDownlink<R, K, V>, MapDownlinkClass<F>>("MapDownlink", {
   relinks: true,
   syncs: true,
 
@@ -295,12 +297,15 @@ export const MapDownlink = (<R, K, V, F extends MapDownlink<any, any, any>>() =>
     return model.has(keyObject);
   },
 
-  get(key: K | LikeType<K>): V {
+  get(key?: K | LikeType<K>): any/*Iterable<[K, V]> | V*/ {
+    if (arguments.length === 0) {
+      return this;
+    }
     const model = this.model;
     if (model === null) {
       throw new Error("unopened downlink");
     }
-    const keyObject = this.keyForm.mold(key);
+    const keyObject = this.keyForm.mold(key as K | LikeType<K>);
     const value = model.get(keyObject);
     return value.coerce(this.valueForm);
   },

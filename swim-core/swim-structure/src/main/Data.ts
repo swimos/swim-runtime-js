@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto} from "@swim/util";
 import type {Mutable} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Random} from "@swim/util";
@@ -43,8 +42,7 @@ export class Data extends Value {
     this.flags = flags;
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<Uint8Array>;
+  override likeType?(like: Uint8Array): void;
 
   /** @internal */
   readonly array: Uint8Array | null;

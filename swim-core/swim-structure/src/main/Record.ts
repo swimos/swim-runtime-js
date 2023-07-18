@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
@@ -47,9 +46,8 @@ export abstract class Record extends Value implements Builder<Item, Record> {
     super();
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<{readonly [key: string]: ValueLike}
-                                  | readonly ItemLike[]>;
+  override likeType?(like: {readonly [key: string]: ValueLike}
+                         | readonly ItemLike[]): void;
 
   override isDefinite(): boolean {
     return !this.isEmpty();

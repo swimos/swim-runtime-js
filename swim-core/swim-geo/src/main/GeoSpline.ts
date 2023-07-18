@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import type {Output} from "@swim/codec";
@@ -68,8 +67,7 @@ export class GeoSpline extends GeoCurve implements Debug {
     this.boundingBox = null;
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<GeoSplinePoints>;
+  override likeType?(like: GeoSplinePoints): void;
 
   readonly curves: readonly GeoCurve[];
 

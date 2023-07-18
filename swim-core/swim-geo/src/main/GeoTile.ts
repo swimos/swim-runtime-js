@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Uninitable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -84,8 +83,7 @@ export class GeoTile extends GeoShape implements HashCode, Debug {
   /** @internal */
   declare readonly typeid?: "GeoTile";
 
-  /** @override */
-  declare readonly likeType?: Proto<GeoTileInit | GeoTileTuple>;
+  override likeType?(like: GeoTileInit | GeoTileTuple): void;
 
   override isDefined(): boolean {
     return true;

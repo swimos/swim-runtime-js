@@ -25,30 +25,36 @@ import type {ComponentRelationClass} from "./ComponentRelation";
 import {ComponentRelation} from "./ComponentRelation";
 
 /** @public */
-export interface ComponentRefDescriptor<R, C extends Component> extends ComponentRelationDescriptor<R, C> {
-  extends?: Proto<ComponentRef<any, any>> | boolean | null;
+export interface ComponentRefDescriptor<R, C extends Component<any>> extends ComponentRelationDescriptor<R, C> {
+  extends?: Proto<ComponentRef<any, any, any>> | boolean | null;
   componentKey?: string | boolean;
 }
 
 /** @public */
-export interface ComponentRefClass<F extends ComponentRef<any, any> = ComponentRef> extends ComponentRelationClass<F> {
+export interface ComponentRefClass<F extends ComponentRef<any, any, any> = ComponentRef> extends ComponentRelationClass<F> {
   tryComponent<R, K extends keyof R, F extends R[K] = R[K]>(owner: R, fastenerName: K): F extends {readonly component: infer C | null} ? C | null : null;
 }
 
 /** @public */
-export interface ComponentRef<R = any, C extends Component = Component> extends ComponentRelation<R, C> {
+export interface ComponentRef<R = any, C extends Component<any> = Component, I extends any[] = [C | null]> extends ComponentRelation<R, C, I> {
   /** @override */
   get descriptorType(): Proto<ComponentRefDescriptor<R, C>>;
 
   /** @override */
-  get fastenerType(): Proto<ComponentRef<any, any>>;
+  get fastenerType(): Proto<ComponentRef<any, any, any>>;
 
   /** @override */
-  get parent(): ComponentRef<any, C> | null;
+  get parent(): ComponentRef<any, C, any> | null;
 
   get inletComponent(): C | null;
 
   getInletComponent(): C;
+
+  get(): C | null;
+
+  set(component: C | LikeType<C> | Fastener<any, I[0], any> | null): R;
+
+  setIntrinsic(component: C | LikeType<C> | Fastener<any, I[0], any> | null): R;
 
   get componentKey(): string | undefined;
 
@@ -56,34 +62,34 @@ export interface ComponentRef<R = any, C extends Component = Component> extends 
 
   getComponent(): C;
 
-  setComponent(component: C | LikeType<C> | null, target?: Component | null, key?: string): C | null;
+  setComponent(component: C | LikeType<C> | null, target?: Component<any> | null, key?: string): C | null;
 
-  attachComponent(component?: C | LikeType<C>, target?: Component | null): C;
+  attachComponent(component?: C | LikeType<C> | null, target?: Component<any> | null): C;
 
   detachComponent(): C | null;
 
-  insertComponent(parent?: Component | null, component?: C | LikeType<C>, target?: Component | null, key?: string): C;
+  insertComponent(parent?: Component<any> | null, component?: C | LikeType<C>, target?: Component<any> | null, key?: string): C;
 
   removeComponent(): C | null;
 
   deleteComponent(): C | null;
 
   /** @internal @override */
-  bindComponent(component: Component, target: Component | null): void;
+  bindComponent(component: Component<any>, target: Component<any> | null): void;
 
   /** @internal @override */
-  unbindComponent(component: Component): void;
+  unbindComponent(component: Component<any>): void;
 
   /** @override */
-  detectComponent(component: Component): C | null;
+  detectComponent(component: Component<any>): C | null;
 
   /** @override */
   recohere(t: number): void;
 }
 
 /** @public */
-export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any, any>>() => ComponentRelation.extend<ComponentRef<R, C>, ComponentRefClass<F>>("ComponentRef", {
-  get fastenerType(): Proto<ComponentRef<any, any>> {
+export const ComponentRef = (<R, C extends Component<any>, I extends any[], F extends ComponentRef<any, any, any>>() => ComponentRelation.extend<ComponentRef<R, C, I>, ComponentRefClass<F>>("ComponentRef", {
+  get fastenerType(): Proto<ComponentRef<any, any, any>> {
     return ComponentRef;
   },
 
@@ -106,6 +112,28 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     return inletComponent;
   },
 
+  get(): C | null {
+    return this.component;
+  },
+
+  set(component: C | LikeType<C> | Fastener<any, I[0], any> | null): R {
+    if (component instanceof Fastener) {
+      this.bindInlet(component);
+    } else {
+      this.setComponent(component);
+    }
+    return this.owner;
+  },
+
+  setIntrinsic(component: C | LikeType<C> | Fastener<any, I[0], any> | null): R {
+    if (component instanceof Fastener) {
+      this.bindInlet(component);
+    } else {
+      this.setComponent(component);
+    }
+    return this.owner;
+  },
+
   componentKey: void 0,
 
   getComponent(): C {
@@ -122,7 +150,7 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     return component;
   },
 
-  setComponent(newComponent: C  | null, target?: Component | null, key?: string): C | null {
+  setComponent(newComponent: C  | null, target?: Component<any> | null, key?: string): C | null {
     if (newComponent !== null) {
       newComponent = this.fromLike(newComponent);
     }
@@ -133,11 +161,11 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     } else if (target === void 0) {
       target = null;
     }
-    let parent: Component | null;
+    let parent: Component<any> | null;
     if (this.binds && (parent = this.parentComponent, parent !== null)) {
       if (oldComponent !== null && oldComponent.parent === parent) {
         if (target === null) {
-          target = oldComponent.nextSibling;
+          target = oldComponent.nextSibling as Component<any> | null;
         }
         oldComponent.remove();
       }
@@ -171,7 +199,7 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     return oldComponent;
   },
 
-  attachComponent(newComponent?: C | LikeType<C>, target?: Component | null): C {
+  attachComponent(newComponent?: C | LikeType<C>, target?: Component<any> | null): C {
     const oldComponent = this.component;
     if (newComponent !== void 0 && newComponent !== null) {
       newComponent = this.fromLike(newComponent);
@@ -217,7 +245,7 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     return oldComponent;
   },
 
-  insertComponent(parent?: Component | null, newComponent?: C | LikeType<C>, target?: Component | null, key?: string): C {
+  insertComponent(parent?: Component<any> | null, newComponent?: C | LikeType<C>, target?: Component<any> | null, key?: string): C {
     let oldComponent = this.component;
     if (newComponent !== void 0 && newComponent !== null) {
       newComponent = this.fromLike(newComponent);
@@ -285,7 +313,7 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     return component;
   },
 
-  bindComponent(component: Component, target: Component | null): void {
+  bindComponent(component: Component<any>, target: Component<any> | null): void {
     if (!this.binds || this.component !== null) {
       return;
     }
@@ -302,7 +330,7 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     this.decohereOutlets();
   },
 
-  unbindComponent(component: Component): void {
+  unbindComponent(component: Component<any>): void {
     if (!this.binds) {
       return;
     }
@@ -319,7 +347,7 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     this.decohereOutlets();
   },
 
-  detectComponent(component: Component): C | null {
+  detectComponent(component: Component<any>): C | null {
     const key = this.componentKey;
     if (key !== void 0 && key === component.key) {
       return component as C;
@@ -342,7 +370,7 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
 },
 {
   tryComponent<R, K extends keyof R, F extends R[K]>(owner: R, fastenerName: K): F extends {readonly component: infer C | null} ? C | null : null {
-    const componentRef = FastenerContext.tryFastener(owner, fastenerName) as ComponentRef<any, any> | null;
+    const componentRef = FastenerContext.tryFastener(owner, fastenerName) as ComponentRef<any, any, any> | null;
     if (componentRef !== null) {
       return componentRef.component as any;
     }
@@ -355,7 +383,7 @@ export const ComponentRef = (<R, C extends Component, F extends ComponentRef<any
     return fastener;
   },
 
-  refine(fastenerClass: FastenerClass<ComponentRef<any, any>>): void {
+  refine(fastenerClass: FastenerClass<ComponentRef<any, any, any>>): void {
     super.refine(fastenerClass);
     const fastenerPrototype = fastenerClass.prototype;
 

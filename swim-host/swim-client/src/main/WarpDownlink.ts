@@ -99,7 +99,7 @@ export interface WarpDownlinkObserver<F extends WarpDownlink<any> = WarpDownlink
 }
 
 /** @public */
-export interface WarpDownlink<R = any> extends Fastener<R>, Observable, Consumable {
+export interface WarpDownlink<R = any, O = any, I extends any[] = [O]> extends Fastener<R, O, I>, Observable, Consumable {
   /** @override */
   get descriptorType(): Proto<WarpDownlinkDescriptor<R>>;
 

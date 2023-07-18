@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import type {Compare} from "@swim/util";
@@ -104,7 +103,7 @@ export class Uri implements HashCode, Compare, Debug, Display {
   /** @internal */
   declare readonly typeid?: "Uri";
 
-  declare readonly likeType?: Proto<UriInit | string>;
+  likeType?(like: UriInit | string): void;
 
   isDefined(): boolean {
     return this.scheme.isDefined() || this.authority.isDefined() || this.path.isDefined()

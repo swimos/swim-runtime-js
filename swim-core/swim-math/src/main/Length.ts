@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -65,7 +64,7 @@ export abstract class Length implements Interpolate<Length>, HashCode, Equivalen
     return isFinite(this.value);
   }
 
-  declare readonly likeType?: Proto<number | string>;
+  likeType?(like: number | string): void;
 
   abstract readonly value: number;
 

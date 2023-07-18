@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Constructors} from "@swim/util";
@@ -32,8 +31,7 @@ export class Extant extends Value {
     super();
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<null>;
+  override likeType?(like: null): void;
 
   /**
    * Always returns `true` because `Extant` is a defined value.

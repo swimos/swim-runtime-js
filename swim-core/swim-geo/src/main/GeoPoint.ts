@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -85,8 +84,7 @@ export class GeoPoint extends GeoShape implements Interpolate<GeoPoint>, HashCod
   /** @internal */
   declare readonly typeid?: "GeoPoint";
 
-  /** @override */
-  declare readonly likeType?: Proto<GeoPointInit | GeoPointTuple>;
+  override likeType?(like: GeoPointInit | GeoPointTuple): void;
 
   override isDefined(): boolean {
     return isFinite(this.lng) && isFinite(this.lat);

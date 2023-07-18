@@ -28,14 +28,14 @@ import {ValueDownlinkModel} from "./ValueDownlinkModel";
 
 /** @public */
 export interface ValueDownlinkDescriptor<R, V> extends WarpDownlinkDescriptor<R> {
-  extends?: Proto<ValueDownlink<any, any>> | boolean | null;
+  extends?: Proto<ValueDownlink<any, any, any>> | boolean | null;
   valueForm?: Form<V, LikeType<V>>;
   /** @internal */
   stateInit?: Value | null;
 }
 
 /** @public */
-export interface ValueDownlinkClass<F extends ValueDownlink<any, any> = ValueDownlink<any, any>> extends WarpDownlinkClass<F> {
+export interface ValueDownlinkClass<F extends ValueDownlink<any, any, any> = ValueDownlink<any, any, any>> extends WarpDownlinkClass<F> {
 }
 
 /** @public */
@@ -46,7 +46,7 @@ export interface ValueDownlinkObserver<V = any, F extends ValueDownlink<any, V> 
 }
 
 /** @public */
-export interface ValueDownlink<R = any, V = Value> extends WarpDownlink<R> {
+export interface ValueDownlink<R = any, V = Value, I extends any[] = [V]> extends WarpDownlink<R, V, I> {
   /** @override */
   get descriptorType(): Proto<ValueDownlinkDescriptor<R, V>>;
 
@@ -72,6 +72,7 @@ export interface ValueDownlink<R = any, V = Value> extends WarpDownlink<R> {
   /** @internal */
   setState(state: Value): void;
 
+  /** @override */
   get(): V;
 
   set(value: V | LikeType<V>): void;
@@ -96,7 +97,7 @@ export interface ValueDownlink<R = any, V = Value> extends WarpDownlink<R> {
 }
 
 /** @public */
-export const ValueDownlink = (<R, V, F extends ValueDownlink<any, any>>() => WarpDownlink.extend<ValueDownlink<R, V>, ValueDownlinkClass<F>>("ValueDownlink", {
+export const ValueDownlink = (<R, V, F extends ValueDownlink<any, any, any>>() => WarpDownlink.extend<ValueDownlink<R, V>, ValueDownlinkClass<F>>("ValueDownlink", {
   relinks: true,
   syncs: true,
 

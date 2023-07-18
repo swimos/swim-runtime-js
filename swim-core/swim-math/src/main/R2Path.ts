@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Arrays} from "@swim/util";
 import {Diagnostic} from "@swim/codec";
@@ -61,8 +60,7 @@ export class R2Path extends R2Shape implements Debug {
     this.pathString = void 0;
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<string>;
+  override likeType?(like: string): void;
 
   readonly splines: readonly R2Spline[];
 

@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
@@ -78,8 +77,7 @@ export class R2Segment extends R2BezierCurve implements Interpolate<R2Segment>, 
   /** @internal */
   declare readonly typeid?: "R2Segment";
 
-  /** @override */
-  declare readonly likeType?: Proto<R2SegmentInit>;
+  override likeType?(like: R2SegmentInit): void;
 
   isDefined(): boolean {
     return isFinite(this.x0) && isFinite(this.y0)

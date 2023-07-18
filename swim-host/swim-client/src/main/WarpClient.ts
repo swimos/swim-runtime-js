@@ -16,7 +16,6 @@ import * as ws from "ws";
 import type {Class} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {Observer} from "@swim/util";
-import {Affinity} from "@swim/component";
 import {Property} from "@swim/component";
 import type {Component} from "@swim/component";
 import type {ValueLike} from "@swim/structure";
@@ -284,12 +283,12 @@ export class WarpClient extends WarpScope {
 
   /** @internal */
   protected onOnline(event: Event): void {
-    this.online.setValue(true, Affinity.Intrinsic);
+    this.online.setIntrinsic(true);
   }
 
   /** @internal */
   protected onOffline(event: Event): void {
-    this.online.setValue(false, Affinity.Intrinsic);
+    this.online.setIntrinsic(false);
   }
 
   protected override onMount(): void {

@@ -90,7 +90,7 @@ export interface FastenerClass<F extends Fastener<any, any, any> = Fastener<any,
 }
 
 /** @public */
-export interface Fastener<R = any, O = any, I extends any[] = any> {
+export interface Fastener<R = any, O = any, I extends any[] = [O]> {
   get descriptorType(): Proto<FastenerDescriptor<R>>;
 
   get fastenerType(): Proto<Fastener<any, any, any>>;
@@ -206,6 +206,8 @@ export interface Fastener<R = any, O = any, I extends any[] = any> {
 
   /** @protected */
   didSetAffinity(newAffinity: Affinity, oldAffinity: Affinity): void;
+
+  get(): O;
 
   get coherent(): boolean;
 
@@ -524,6 +526,10 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
 
   didSetAffinity(newAffinity: Affinity, oldAffinity: Affinity): void {
     // hook
+  },
+
+  get(): O {
+    return void 0 as O;
   },
 
   get coherent(): boolean {

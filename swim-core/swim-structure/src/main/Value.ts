@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type {Proto} from "@swim/util";
 import type {Interpolator} from "@swim/util";
 import type {Builder} from "@swim/util";
 import type {ItemLike} from "./Item";
@@ -64,15 +63,14 @@ export abstract class Value extends Item {
     super();
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<{readonly [key: string]: ValueLike}
-                                  | readonly ItemLike[]
-                                  | Uint8Array
-                                  | string
-                                  | number
-                                  | boolean
-                                  | null
-                                  | undefined>;
+  override likeType?(like: {readonly [key: string]: ValueLike}
+                         | readonly ItemLike[]
+                         | Uint8Array
+                         | string
+                         | number
+                         | boolean
+                         | null
+                         | undefined): void;
 
   /**
    * Returns `true` if this `Value` is not [[Absent]].

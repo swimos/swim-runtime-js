@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import type {HashCode} from "@swim/util";
 import {Numbers} from "@swim/util";
@@ -73,8 +72,7 @@ export class GeoSegment extends GeoCurve implements Interpolate<GeoSegment>, Has
   /** @internal */
   declare readonly typeid?: "GeoSegment";
 
-  /** @override */
-  declare readonly likeType?: Proto<GeoSegmentInit>;
+  override likeType?(like: GeoSegmentInit): void;
 
   override isDefined(): boolean {
     return isFinite(this.lng0) && isFinite(this.lat0)

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Lazy} from "@swim/util";
 import {Numbers} from "@swim/util";
 import {Strings} from "@swim/util";
@@ -39,8 +38,7 @@ export class Text extends Value {
     this.hashValue = void 0;
   }
 
-  /** @override */
-  declare readonly likeType?: Proto<string>;
+  override likeType?(like: string): void;
 
   override isConstant(): boolean {
     return true;

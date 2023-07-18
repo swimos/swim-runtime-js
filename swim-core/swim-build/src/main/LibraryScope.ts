@@ -58,7 +58,7 @@ export class LibraryScope extends Scope {
   @ComponentRef({
     componentType: CompileTask,
     initComponent(compileTask: CompileTask): void {
-      compileTask.baseDir.setValue(this.owner.baseDir.value);
+      compileTask.baseDir.set(this.owner.baseDir.value);
     },
   })
   readonly compile!: ComponentRef<this, CompileTask>;
@@ -144,7 +144,7 @@ export class LibraryScope extends Scope {
   static override async load(baseDir: string): Promise<LibraryScope | null> {
     const name = Path.basename(baseDir);
     const libraryScope = new LibraryScope(name);
-    libraryScope.baseDir.setValue(baseDir);
+    libraryScope.baseDir.set(baseDir);
     const compileTask = libraryScope.compile.insertComponent();
     const tsconfig = await compileTask.tsconfig.getOrLoadIfExists(null);
     if (tsconfig !== null) {

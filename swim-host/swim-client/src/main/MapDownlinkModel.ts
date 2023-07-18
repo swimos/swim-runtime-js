@@ -14,6 +14,7 @@
 
 import type {Mutable} from "@swim/util";
 import type {Cursor} from "@swim/util";
+import type {TimingLike} from "@swim/util";
 import {BTree} from "@swim/collections";
 import {Attr} from "@swim/structure";
 import {Value} from "@swim/structure";
@@ -35,7 +36,7 @@ export class MapDownlinkModel extends WarpDownlinkModel {
     this.state = state;
   }
 
-  declare readonly views: ReadonlySet<MapDownlink<any, any, any>> | null;
+  declare readonly views: ReadonlySet<MapDownlink<any, any, any, any>> | null;
 
   /** @internal */
   readonly state: BTree<Value, Value>;
@@ -60,8 +61,14 @@ export class MapDownlinkModel extends WarpDownlinkModel {
     return this.state.getEntry(index);
   }
 
-  set(key: Value, newValue: Value): this {
-    newValue = this.mapWillUpdate(key, newValue);
+  override set(key: Value, newValue: Value): this;
+  override set<S>(this: S, properties: {[K in keyof S as S[K] extends {set(value: any): any} ? K : never]?: S[K] extends {set(value: infer T): any} ? T : never}, timing?: TimingLike | boolean | null): this;
+  override set(key: Value | {[K in keyof MapDownlinkModel as MapDownlinkModel[K] extends {set(value: any): any} ? K : never]?: MapDownlinkModel[K] extends {set(value: infer T): any} ? T : never}, newValue?: Value | TimingLike | boolean | null): this {
+    if (!(key instanceof Value)) {
+      super.set(key, newValue as TimingLike | boolean | null | undefined);
+      return this;
+    }
+    newValue = this.mapWillUpdate(key, newValue as Value);
     const oldValue = this.state.get(key) ?? Value.absent();
     this.state.set(key, newValue);
     this.mapDidUpdate(key, newValue, oldValue);

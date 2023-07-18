@@ -540,7 +540,7 @@ export class PackageScope extends Scope {
 
   static override async load(baseDir: string): Promise<PackageScope | null> {
     const packageScope = new PackageScope("");
-    packageScope.baseDir.setValue(baseDir);
+    packageScope.baseDir.set(baseDir);
     const packageConfig = await packageScope.package.loadIfExists(void 0, null);
     if (packageConfig === null) {
       return null;

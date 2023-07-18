@@ -14,7 +14,6 @@
 
 import type {Uninitable} from "@swim/util";
 import type {Mutable} from "@swim/util";
-import type {Proto} from "@swim/util";
 import {Murmur3} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {HashCode} from "@swim/util";
@@ -83,7 +82,7 @@ export class DateTime implements Interpolate<DateTime>, HashCode, Equivalent, Co
   /** @internal */
   declare readonly typeid?: "DateTime";
 
-  declare readonly likeType?: Proto<DateTimeInit | Date | string | number>;
+  likeType?(like: DateTimeInit | Date | string | number): void;
 
   isDefined(): boolean {
     return isFinite(new Date(this.time).getTime());
