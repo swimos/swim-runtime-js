@@ -30,7 +30,8 @@ import type {Observable} from "@swim/util";
 import type {ObserverMethods} from "@swim/util";
 import type {ObserverParameters} from "@swim/util";
 import type {Observer} from "@swim/util";
-import {FastenerContext} from "./FastenerContext";
+import type {FastenerContext} from "./FastenerContext";
+import {FastenerContextMetaclass} from "./FastenerContext";
 import {Fastener} from "./Fastener";
 import {Animator} from "./Animator";
 import {EventHandler} from "./EventHandler";
@@ -893,8 +894,9 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
     // hook
   }
 
-  tryFastener<K extends keyof this, F extends this[K] = this[K]>(fastenerName: K): F extends Fastener<any, any, any> ? F | null : null {
-    return FastenerContext.tryFastener(this, fastenerName);
+  tryFastener<K extends keyof this, F extends this[K] = this[K]>(fastenerName: K): (F extends Fastener<any, any, any> ? F | null : never) | null {
+    const metaclass = FastenerContextMetaclass.get(this);
+    return metaclass !== null ? metaclass.tryFastener(this, fastenerName) : null;
   }
 
   getFastener<F extends Fastener<any, any, any>>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null {
@@ -931,7 +933,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected mountFasteners(): void {
-    const fastenerSlots = FastenerContext.getFastenerSlots(this);
+    const metaclass = FastenerContextMetaclass.get(this);
+    if (metaclass === null) {
+      return;
+    }
+    const fastenerSlots = metaclass.slots;
     for (let i = 0; i < fastenerSlots.length; i += 1) {
       const fastener = this[fastenerSlots[i]!];
       if (fastener instanceof Fastener) {
@@ -942,7 +948,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected unmountFasteners(): void {
-    const fastenerSlots = FastenerContext.getFastenerSlots(this);
+    const metaclass = FastenerContextMetaclass.get(this);
+    if (metaclass === null) {
+      return;
+    }
+    const fastenerSlots = metaclass.slots;
     for (let i = 0; i < fastenerSlots.length; i += 1) {
       const fastener = this[fastenerSlots[i]!];
       if (fastener instanceof Fastener) {
@@ -966,7 +976,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected bindChildFasteners(child: C, target: C | null): void {
-    const fastenerSlots = FastenerContext.getFastenerSlots(this);
+    const metaclass = FastenerContextMetaclass.get(this);
+    if (metaclass === null) {
+      return;
+    }
+    const fastenerSlots = metaclass.slots;
     for (let i = 0; i < fastenerSlots.length; i += 1) {
       const fastener = this[fastenerSlots[i]!];
       if (fastener instanceof Fastener) {
@@ -984,7 +998,11 @@ export class Component<C extends Component<C> = Component<any>> implements HashC
 
   /** @internal */
   protected unbindChildFasteners(child: C): void {
-    const fastenerSlots = FastenerContext.getFastenerSlots(this);
+    const metaclass = FastenerContextMetaclass.get(this);
+    if (metaclass === null) {
+      return;
+    }
+    const fastenerSlots = metaclass.slots;
     for (let i = 0; i < fastenerSlots.length; i += 1) {
       const fastener = this[fastenerSlots[i]!];
       if (fastener instanceof Fastener) {

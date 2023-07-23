@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {__esDecorate} from "tslib";
+import {__runInitializers} from "tslib";
 import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import {Identifiers} from "@swim/util";
 import {Objects} from "@swim/util";
+import type {Timing} from "@swim/util";
 import {Affinity} from "./Affinity";
-import {FastenerContext} from "./FastenerContext";
+import type {FastenerContext} from "./FastenerContext";
+import {FastenerContextMetaclass} from "./FastenerContext";
 
 /** @public */
 export type FastenerFlags = number;
@@ -32,7 +36,7 @@ export interface FastenerDescriptor<R> {
 
 /** @public */
 export interface FastenerDecorator<F extends Fastener<any, any, any>> {
-  <T>(target: unknown, context: ClassFieldDecoratorContext<T, F>): (this: T, value?: F) => F;
+  <T>(target: any, context: ClassFieldDecoratorContext<T, F>): (this: T, value?: F) => F;
   <T>(target: (this: T) => F, context: ClassGetterDecoratorContext<T, F>): (this: T) => F;
 }
 
@@ -50,6 +54,8 @@ export type FastenerClassTemplate<C extends FastenerClass<any>> =
 export interface FastenerClass<F extends Fastener<any, any, any> = Fastener<any, any, any>> {
   /** @internal */
   prototype: F;
+
+  <F2 extends F>(template: FastenerTemplate<F2>): FastenerDecorator<F2>;
 
   create(owner: F extends Fastener<infer R, any, any> ? R : never): F;
 
@@ -72,7 +78,27 @@ export interface FastenerClass<F extends Fastener<any, any, any> = Fastener<any,
 
   dummy<F2 extends F>(): F2;
 
-  <F2 extends F>(template: FastenerTemplate<F2>): FastenerDecorator<F2>;
+  /** @internal */
+  decorate<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: undefined, context: ClassFieldDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never, value?: F2) => F2;
+  /** @internal */
+  decorate<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: (this: F2 extends Fastener<infer R, any, any> ? R : never) => F2, context: ClassGetterDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never) => F2;
+
+  /** @internal */
+  decorateField<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: undefined, context: ClassFieldDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never, value?: F2) => F2;
+
+  /** @internal */
+  decorateGetter<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: (this: F2 extends Fastener<infer R, any, any> ? R : never) => F2, context: ClassGetterDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never) => F2;
+
+  /** @internal */
+  defineField<F2 extends F, K extends keyof F2>(name: K, decorators: F2[K] extends Fastener<any, any, any> ? FastenerDecorator<F2[K]>[] : never): void;
+
+  /** @internal */
+  defineGetter<F2 extends F, K extends keyof F2>(name: K, decorators: F2[K] extends Fastener<any, any, any> ? FastenerDecorator<F2[K]>[] : never): void;
+
+  /** @internal */
+  readonly fieldInitializers?: {[name: PropertyKey]: Function[]};
+  /** @internal */
+  readonly instanceInitializers?: Function[];
 
   /** @internal */
   readonly MountedFlag: FastenerFlags;
@@ -90,7 +116,7 @@ export interface FastenerClass<F extends Fastener<any, any, any> = Fastener<any,
 }
 
 /** @public */
-export interface Fastener<R = any, O = any, I extends any[] = [O]> {
+export interface Fastener<R = any, O = any, I extends any[] = [O]> extends FastenerContext {
   get descriptorType(): Proto<FastenerDescriptor<R>>;
 
   get fastenerType(): Proto<Fastener<any, any, any>>;
@@ -231,6 +257,33 @@ export interface Fastener<R = any, O = any, I extends any[] = [O]> {
   /** @protected */
   detachInlets(): void;
 
+  /** @override */
+  getFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null;
+
+  /** @override */
+  getParentFastener<F extends Fastener>(fastenerName: string, fastenerType?: Proto<F>, contextType?: Proto<any>): F | null;
+
+  /** @override */
+  attachFastener(fastener: Fastener<any, any, any>): void;
+
+  /** @override */
+  decohereFastener(fastener: Fastener<any, any, any>): void;
+
+  /** @override */
+  requireUpdate(updateFlags: number): void;
+
+  /** @override */
+  getTransition?(fastener: Fastener<any, any, any>): Timing | null;
+
+  /** @internal @protected */
+  initFasteners(fastenerClass: FastenerClass<any>): void;
+
+  /** @internal @protected */
+  mountFasteners(): void;
+
+  /** @internal @protected */
+  unmountFasteners(): void;
+
   get mounted(): boolean;
 
   /** @internal */
@@ -264,7 +317,7 @@ export interface Fastener<R = any, O = any, I extends any[] = [O]> {
 /** @public */
 export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, any>>() => (function (template: FastenerTemplate<Fastener<R, O, I>>, classTemplate: FastenerClassTemplate<FastenerClass<F>>): FastenerClass<F> {
   const Fastener = function (template: FastenerTemplate<F>): FastenerDecorator<F> {
-    return FastenerContext.fastenerDecorator(Fastener, template);
+    return Fastener.decorate.bind(Fastener, Fastener, template) as unknown as FastenerDecorator<F>;
   } as FastenerClass<F>;
   Object.setPrototypeOf(template, Object.prototype);
   Fastener.prototype = template as F;
@@ -307,10 +360,10 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
 
   get parent(): Fastener<any, any, any> | null {
     const inheritName = this.inheritName;
-    if (inheritName === void 0 || !FastenerContext[Symbol.hasInstance](this.owner)) {
+    if (inheritName === void 0 || !Objects.hasAllKeys<FastenerContext>(this.owner, "getParentFastener")) {
       return null;
     }
-    return this.owner.getParentFastener(inheritName, this.fastenerType, this.parentType);
+    return this.owner.getParentFastener!(inheritName, this.fastenerType, this.parentType);
   },
 
   inheritInlet(): void {
@@ -584,7 +637,7 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     const inlets = new Array<Fastener<any, any, any>>(inletKeys.length);
     for (let i = 0; i < inletKeys.length; i += 1) {
       const inletKey = inletKeys[i]!;
-      const inlet = this.owner.getFastener(inletKey);
+      const inlet = this.owner.getFastener!(inletKey);
       if (inlet === null) {
         return null;
       }
@@ -626,6 +679,85 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     }
   },
 
+  getFastener<F extends Fastener>(fastenerName: PropertyKey, fastenerType?: Proto<F>, contextType?: Proto<any> | null): F | null {
+    if (contextType !== void 0 && contextType !== null && !(this instanceof contextType)) {
+      return null;
+    }
+    const fastener = (this as any)[fastenerName] as F | null | undefined;
+    if (fastener === void 0 || (fastenerType !== void 0 && fastenerType !== null && !(fastener instanceof fastenerType))) {
+      return null;
+    }
+    return fastener;
+  },
+
+  getParentFastener<F extends Fastener>(fastenerName: string, fastenerType?: Proto<F>, contextType?: Proto<any>): F | null {
+    return null;
+  },
+
+  attachFastener(fastener: Fastener): void {
+    if (this.mounted) {
+      fastener.mount();
+    }
+  },
+
+  decohereFastener(fastener: Fastener<any, any, any>): void {
+    if (Objects.hasAllKeys<FastenerContext>(this.owner, "decohereFastener")) {
+      this.owner.decohereFastener!(fastener);
+    }
+  },
+
+  requireUpdate(updateFlags: number): void {
+    if (Objects.hasAllKeys<FastenerContext>(this.owner, "requireUpdate")) {
+      this.owner.requireUpdate!(updateFlags);
+    }
+  },
+
+  getTransition(fastener: Fastener<any, any, any>): Timing | null {
+    if (Objects.hasAllKeys<FastenerContext>(this.owner, "getTransition")) {
+      return this.owner.getTransition!(fastener);
+    }
+    return null;
+  },
+
+  initFasteners(fastenerClass: FastenerClass<any>): void {
+    if (!Object.hasOwnProperty.call(fastenerClass, "fieldInitializers")
+        || !Object.hasOwnProperty.call(fastenerClass, "instanceInitializers")) {
+      return;
+    }
+    __runInitializers(this, fastenerClass.instanceInitializers!);
+    for (const key in fastenerClass.fieldInitializers!) {
+      (this as any)[key] = __runInitializers(this, fastenerClass.fieldInitializers[key]!, void 0);
+    }
+  },
+
+  mountFasteners(): void {
+    const metaclass = FastenerContextMetaclass.get(this);
+    if (metaclass === null) {
+      return;
+    }
+    const fastenerSlots = metaclass.slots;
+    for (let i = 0; i < fastenerSlots.length; i += 1) {
+      const fastener = this[fastenerSlots[i]!];
+      if (fastener instanceof Fastener) {
+        fastener.mount();
+      }
+    }
+  },
+
+  unmountFasteners(): void {
+    const metaclass = FastenerContextMetaclass.get(this);
+    if (metaclass === null) {
+      return;
+    }
+    const fastenerSlots = metaclass.slots;
+    for (let i = 0; i < fastenerSlots.length; i += 1) {
+      const fastener = this[fastenerSlots[i]!];
+      if (fastener instanceof Fastener) {
+        fastener.unmount();
+      }
+    }
+  },
+
   get mounted(): boolean {
     return (this.flags & Fastener.MountedFlag) !== 0;
   },
@@ -649,7 +781,7 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
   },
 
   didMount(): void {
-    // hook
+    this.mountFasteners();
   },
 
   unmount(): void {
@@ -663,7 +795,7 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
   },
 
   willUnmount(): void {
-    // hook
+    this.unmountFasteners();
   },
 
   onUnmount(): void {
@@ -699,20 +831,21 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
   },
 
   declare<F2 extends F, C extends FastenerClass<any>>(className: PropertyKey): C {
-    if (typeof className === "string" && Identifiers.isValid(className) && className !== "template") {
-      return new Function("FastenerContext",
-        "return function " + className + "(template) { return FastenerContext.fastenerDecorator(" + className + ", template); }"
-      )(FastenerContext) as C;
+    if (typeof className === "string" && Identifiers.isValid(className) && className !== "Fastener" && className !== "template") {
+      return new Function("Fastener",
+        "return function " + className + "(template) { return Fastener.decorate.bind(Fastener, " + className + ", template); }"
+      )(Fastener) as C;
     }
 
     const fastenerClass = function <F extends Fastener<any, any, any>>(template: FastenerTemplate<F>): FastenerDecorator<F> {
-      return FastenerContext.fastenerDecorator(fastenerClass, template);
+      return Fastener.decorate.bind(Fastener, Fastener, template) as unknown as FastenerDecorator<F>;
     } as C;
     Object.defineProperty(fastenerClass, "name", {
       value: className,
       enumerable: true,
       configurable: true,
     });
+    // Ensure each fastener class has its own decorator initializer fields.
     return fastenerClass;
   },
 
@@ -725,6 +858,7 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     if ("extends" in template) {
       delete template.extends;
     }
+
     // Directly insert the template object into the prototype chain
     // to ensure that super works correctly.
     Object.setPrototypeOf(template, this.prototype);
@@ -810,6 +944,139 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
 
   dummy<F2 extends F>(): F2 {
     throw new Error("dummy fastener");
+  },
+
+  decorate<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: ((this: F2 extends Fastener<infer R, any, any> ? R : never) => F2) | undefined, context: ClassFieldDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2> | ClassGetterDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never, value?: F2) => F2 {
+    if (context.kind === "field") {
+      return Fastener.decorateField(baseClass, template, target as undefined, context);
+    } else if (context.kind === "getter") {
+      return Fastener.decorateGetter(baseClass, template, target!, context);
+    }
+    throw new Error("unsupported " + (context as ClassMemberDecoratorContext).kind + " decorator");
+  },
+
+  decorateField<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: undefined, context: ClassFieldDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never, value?: F2) => F2 {
+    const fastenerName = context.name;
+    let fastenerClass: FastenerClass<F2> | null = null;
+    context.addInitializer(function (this: F2 extends Fastener<infer R, any, any> ? R : never): void {
+      const metaclass = FastenerContextMetaclass.getOrCreate(this);
+      metaclass.slotMap[fastenerName] = fastenerName;
+      fastenerClass = metaclass.initFastenerClass(baseClass, template, fastenerName, fastenerName, fastenerClass);
+    });
+    return function (this: F2 extends Fastener<infer R, any, any> ? R : never, value?: F2): F2 {
+      if (value === void 0) {
+        value = context.access.get(this);
+      }
+      if (!(value instanceof fastenerClass!)) {
+        value = fastenerClass!.create(this);
+      }
+      return value;
+    };
+  },
+
+  decorateGetter<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: F2 extends Fastener<infer R, any, any> ? (this: R) => F2 : never, context: ClassGetterDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never) => F2 {
+    const fastenerName = context.name;
+    let fastenerClass: FastenerClass<F2> | null = null;
+    context.addInitializer(function (this: F2 extends Fastener<infer R, any, any> ? R : never): void {
+      const metaclass = FastenerContextMetaclass.getOrCreate(this);
+      let fastenerSlot = metaclass.slotMap[fastenerName];
+      if (fastenerSlot === void 0) {
+        fastenerSlot = Symbol(fastenerName.toString());
+        metaclass.slotMap[fastenerName] = fastenerSlot;
+      }
+      fastenerClass = metaclass.initFastenerClass(baseClass, template, fastenerName, fastenerSlot, fastenerClass);
+      this[fastenerSlot] = void 0;
+    });
+    return function (this: F2 extends Fastener<infer R, any, any> ? R : never): F2 {
+      const metaclass = FastenerContextMetaclass.get(this)!;
+      const fastenerSlot = metaclass.getFastenerSlot(fastenerName)!;
+      let fastener = this[fastenerSlot] as F2 | undefined;
+      if (fastener === void 0) {
+        fastener = fastenerClass!.create(this);
+        this[fastenerSlot] = fastener;
+        if (this.attachFastener !== void 0) {
+          (this as FastenerContext).attachFastener!(fastener);
+        }
+      }
+      return fastener;
+    };
+  },
+
+  defineField<F2 extends F, K extends keyof F2>(name: K, decorators: F2[K] extends Fastener<any, any, any> ? FastenerDecorator<F2[K]>[] : never): void {
+    // Ensure each fastener class has its own decorator initializer fields.
+    if (!Object.hasOwnProperty.call(this, "fieldInitializers")) {
+      Object.defineProperty(this, "fieldInitializers", {
+        value: {},
+        enumerable: true,
+        configurable: true,
+      });
+    }
+    if (!Object.hasOwnProperty.call(this, "instanceInitializers")) {
+      Object.defineProperty(this, "instanceInitializers", {
+        value: [],
+        enumerable: true,
+        configurable: true,
+      });
+    }
+
+    __esDecorate(null, null, decorators as Function[], {
+      kind: "field",
+      name,
+      static: false,
+      private: false,
+      access: {
+        has(obj: F2): boolean {
+          return name in obj;
+        },
+        get(obj: F2): F2[K] {
+          return obj[name];
+        },
+        set(obj: F2, value: F2[K]): void {
+          obj[name] = value;
+        },
+      },
+    }, this.fieldInitializers![name] = [], this.instanceInitializers!);
+  },
+
+  defineGetter<F2 extends F, K extends keyof F2>(name: K, decorators: F2[K] extends Fastener<any, any, any> ? FastenerDecorator<F2[K]>[] : never): void {
+    // Ensure each fastener class has its own decorator initializer fields.
+    if (!Object.hasOwnProperty.call(this, "fieldInitializers")) {
+      Object.defineProperty(this, "fieldInitializers", {
+        value: {},
+        enumerable: true,
+        configurable: true,
+      });
+    }
+    if (!Object.hasOwnProperty.call(this, "instanceInitializers")) {
+      Object.defineProperty(this, "instanceInitializers", {
+        value: [],
+        enumerable: true,
+        configurable: true,
+      });
+    }
+
+    Object.defineProperty(this.prototype, name, {
+      get: Fastener.dummy,
+      enumerable: true,
+      configurable: true,
+    });
+    __esDecorate(this, null, decorators as Function[], {
+      kind: "getter",
+      name,
+      static: false,
+      private: false,
+      access: {
+        has(obj: F2): boolean {
+          return name in obj;
+        },
+        get(obj: F2): F2[K] {
+          return obj[name];
+        },
+        set(obj: F2, value: F2[K]): void {
+          obj[name] = value;
+        },
+      },
+    }, null, this.instanceInitializers!);
   },
 
   MountedFlag: 1 << (Affinity.Shift + 0),

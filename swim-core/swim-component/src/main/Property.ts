@@ -20,7 +20,8 @@ import type {LikeType} from "@swim/util";
 import {FromLike} from "@swim/util";
 import type {Timing} from "@swim/util";
 import {Affinity} from "./Affinity";
-import {FastenerContext} from "./FastenerContext";
+import type {FastenerContext} from "./FastenerContext";
+import {FastenerContextMetaclass} from "./FastenerContext";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
@@ -331,15 +332,19 @@ export const Property = (<R, T, I extends any[], P extends Property<any, any, an
 },
 {
   tryValue<R, K extends keyof R, F extends R[K]>(owner: R, fastenerName: K): F extends {readonly value: infer T} ? T : undefined {
-    const property = FastenerContext.tryFastener(owner, fastenerName) as Property<any, any, any> | null;
-    if (property !== null) {
-      return property.value as any;
+    const metaclass = FastenerContextMetaclass.get(owner);
+    if (metaclass === null) {
+      return void 0 as any;
     }
-    const propertyClass = FastenerContext.getFastenerClass(owner, fastenerName) as PropertyClass | null;
-    if (propertyClass !== null) {
-      return propertyClass.prototype.value as any;
+    const property = metaclass.tryFastener(owner, fastenerName);
+    if (!(property instanceof Property)) {
+      const propertyClass = metaclass.getFastenerClass(fastenerName) as PropertyClass | null;
+      if (propertyClass === null) {
+        return void 0 as any;
+      }
+      return propertyClass.prototype.value;
     }
-    return void 0 as any;
+    return property.value;
   },
 
   tryValueOr<R, K extends keyof R, E, F extends R[K] = R[K]>(owner: R, fastenerName: K, elseValue: E): F extends {readonly value: infer T} ? NonNullable<T> | E : E {

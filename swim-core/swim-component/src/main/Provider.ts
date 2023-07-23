@@ -16,7 +16,7 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {Observes} from "@swim/util";
 import {Affinity} from "./Affinity";
-import {FastenerContext} from "./FastenerContext";
+import {FastenerContextMetaclass} from "./FastenerContext";
 import type {FastenerFlags} from "./Fastener";
 import type {FastenerDescriptor} from "./Fastener";
 import type {FastenerClass} from "./Fastener";
@@ -32,7 +32,7 @@ export interface ProviderDescriptor<R, S extends Service> extends FastenerDescri
 
 /** @public */
 export interface ProviderClass<P extends Provider<any, any> = Provider<any, any>> extends FastenerClass<P> {
-  tryService<R, K extends keyof R, F extends R[K] = R[K]>(owner: R, fastenerName: K): F extends {readonly service: infer S | null} ? S | null : null;
+  tryService<R, K extends keyof R, F extends R[K] = R[K]>(owner: R, fastenerName: K): (F extends {readonly service: infer S | null} ? S | null : never) | null;
 
   /** @internal */
   readonly ManagedFlag: FastenerFlags;
@@ -355,12 +355,10 @@ export const Provider = (<R, S extends Service, P extends Provider<any, any>>() 
   },
 },
 {
-  tryService<R, K extends keyof R, F extends R[K]>(owner: R, fastenerName: K): F extends {readonly service: infer S | null} ? S | null : null {
-    const provider = FastenerContext.tryFastener(owner, fastenerName) as Provider<any, any> | null;
-    if (provider !== null) {
-      return provider.service as any;
-    }
-    return null as any;
+  tryService<R, K extends keyof R, F extends R[K]>(owner: R, fastenerName: K): (F extends {readonly service: infer S | null} ? S | null : never) | null {
+    const metaclass = FastenerContextMetaclass.get(owner);
+    const provider = metaclass !== null ? metaclass.tryFastener(owner, fastenerName) : null;
+    return provider instanceof Provider ? provider.service : null;
   },
 
   create(owner: P extends Fastener<infer R, any, any> ? R : never): P {

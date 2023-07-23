@@ -16,7 +16,7 @@ import type {Mutable} from "@swim/util";
 import type {Proto} from "@swim/util";
 import type {LikeType} from "@swim/util";
 import {Affinity} from "./Affinity";
-import {FastenerContext} from "./FastenerContext";
+import {FastenerContextMetaclass} from "./FastenerContext";
 import type {FastenerClass} from "./Fastener";
 import {Fastener} from "./Fastener";
 import type {Component} from "./Component";
@@ -32,7 +32,7 @@ export interface ComponentRefDescriptor<R, C extends Component<any>> extends Com
 
 /** @public */
 export interface ComponentRefClass<F extends ComponentRef<any, any, any> = ComponentRef> extends ComponentRelationClass<F> {
-  tryComponent<R, K extends keyof R, F extends R[K] = R[K]>(owner: R, fastenerName: K): F extends {readonly component: infer C | null} ? C | null : null;
+  tryComponent<R, K extends keyof R, F extends R[K] = R[K]>(owner: R, fastenerName: K): (F extends {readonly component: infer C | null} ? C | null : never) | null;
 }
 
 /** @public */
@@ -369,12 +369,10 @@ export const ComponentRef = (<R, C extends Component<any>, I extends any[], F ex
   },
 },
 {
-  tryComponent<R, K extends keyof R, F extends R[K]>(owner: R, fastenerName: K): F extends {readonly component: infer C | null} ? C | null : null {
-    const componentRef = FastenerContext.tryFastener(owner, fastenerName) as ComponentRef<any, any, any> | null;
-    if (componentRef !== null) {
-      return componentRef.component as any;
-    }
-    return null as any;
+  tryComponent<R, K extends keyof R, F extends R[K]>(owner: R, fastenerName: K): (F extends {readonly component: infer C | null} ? C | null : never) | null {
+    const metaclass = FastenerContextMetaclass.get(owner);
+    const componentRef = metaclass !== null ? metaclass.tryFastener(owner, fastenerName) : null;
+    return componentRef instanceof ComponentRef ? componentRef.component : null;
   },
 
   construct(fastener: F | null, owner: F extends Fastener<infer R, any, any> ? R : never): F {

@@ -494,12 +494,14 @@ export const Animator = (<R, T, I extends any[], A extends Animator<any, any, an
       if ((this.flags & Animator.TweeningFlag) !== 0) {
         this.didInterrupt(this.value);
       }
+      this.willTransition(this.value);
     }
 
     if ((inlet.flags & Animator.TweeningFlag) !== 0) {
       this.requireRecohere();
     } else if ((this.flags & Animator.TweeningFlag) !== 0) {
       this.stopTweening();
+      this.didTransition(this.value);
     } else {
       this.setCoherent(true);
     }

@@ -16,8 +16,8 @@
 
 export {Affinity} from "./Affinity";
 
-export type {FastenerContextClass} from "./FastenerContext";
-export {FastenerContext} from "./FastenerContext";
+export type {FastenerContext} from "./FastenerContext";
+export {FastenerContextMetaclass} from "./FastenerContext";
 
 export type {FastenerFlags} from "./Fastener";
 export type {FastenerDescriptor} from "./Fastener";
