@@ -960,7 +960,6 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     let fastenerClass: FastenerClass<F2> | null = null;
     context.addInitializer(function (this: F2 extends Fastener<infer R, any, any> ? R : never): void {
       const metaclass = FastenerContextMetaclass.getOrCreate(this);
-      metaclass.slotMap[fastenerName] = fastenerName;
       fastenerClass = metaclass.initFastenerClass(baseClass, template, fastenerName, fastenerName, fastenerClass);
     });
     return function (this: F2 extends Fastener<infer R, any, any> ? R : never, value?: F2): F2 {
@@ -976,24 +975,24 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
 
   decorateGetter<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: F2 extends Fastener<infer R, any, any> ? (this: R) => F2 : never, context: ClassGetterDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never) => F2 {
     const fastenerName = context.name;
+    let fastenerSlot: PropertyKey | undefined;
     let fastenerClass: FastenerClass<F2> | null = null;
     context.addInitializer(function (this: F2 extends Fastener<infer R, any, any> ? R : never): void {
       const metaclass = FastenerContextMetaclass.getOrCreate(this);
-      let fastenerSlot = metaclass.slotMap[fastenerName];
+      if (fastenerSlot === void 0) {
+        fastenerSlot = metaclass.slotMap[fastenerName];
+      }
       if (fastenerSlot === void 0) {
         fastenerSlot = Symbol(fastenerName.toString());
-        metaclass.slotMap[fastenerName] = fastenerSlot;
       }
       fastenerClass = metaclass.initFastenerClass(baseClass, template, fastenerName, fastenerSlot, fastenerClass);
       this[fastenerSlot] = void 0;
     });
     return function (this: F2 extends Fastener<infer R, any, any> ? R : never): F2 {
-      const metaclass = FastenerContextMetaclass.get(this)!;
-      const fastenerSlot = metaclass.getFastenerSlot(fastenerName)!;
-      let fastener = this[fastenerSlot] as F2 | undefined;
+      let fastener = this[fastenerSlot!] as F2 | undefined;
       if (fastener === void 0) {
         fastener = fastenerClass!.create(this);
-        this[fastenerSlot] = fastener;
+        this[fastenerSlot!] = fastener;
         if (this.attachFastener !== void 0) {
           (this as FastenerContext).attachFastener!(fastener);
         }

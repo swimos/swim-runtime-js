@@ -60,6 +60,7 @@ export class FastenerContextMetaclass<R> {
     }
     if (fastenerSuperclass !== fastenerClass) {
       this.classMap[fastenerName] = fastenerClass;
+      this.slotMap[fastenerName] = fastenerSlot;
       if (fastenerSuperclass === void 0) {
         this.slots.push(fastenerSlot);
       }
