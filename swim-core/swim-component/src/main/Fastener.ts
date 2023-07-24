@@ -76,7 +76,12 @@ export interface FastenerClass<F extends Fastener<any, any, any> = Fastener<any,
 
   define<F2 extends F>(className: PropertyKey, template: FastenerTemplate<F2>, extendsClass?: FastenerClass<F>): FastenerClass<F2>;
 
-  dummy<F2 extends F>(): F2;
+  /**
+   * Dummy getter function that always throws an exception. Used as a stand-in
+   * for decorated fastener getters, whose implementation is injected by the
+   * decorator.
+   */
+  getter<F2 extends F>(): F2;
 
   /** @internal */
   decorate<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: undefined, context: ClassFieldDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never, value?: F2) => F2;
@@ -942,8 +947,8 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     return baseClass.extend(className, template);
   },
 
-  dummy<F2 extends F>(): F2 {
-    throw new Error("dummy fastener");
+  getter<F2 extends F>(): F2 {
+    throw new Error("missing decorator");
   },
 
   decorate<F2 extends F>(baseClass: FastenerClass<any>, template: FastenerTemplate<F2>, target: ((this: F2 extends Fastener<infer R, any, any> ? R : never) => F2) | undefined, context: ClassFieldDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2> | ClassGetterDecoratorContext<F2 extends Fastener<infer R, any, any> ? R : never, F2>): (this: F2 extends Fastener<infer R, any, any> ? R : never, value?: F2) => F2 {
@@ -1055,7 +1060,7 @@ export const Fastener = (<R, O, I extends any[], F extends Fastener<any, any, an
     }
 
     Object.defineProperty(this.prototype, name, {
-      get: Fastener.dummy,
+      get: Fastener.getter,
       enumerable: true,
       configurable: true,
     });
