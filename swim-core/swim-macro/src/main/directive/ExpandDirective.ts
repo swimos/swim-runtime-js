@@ -38,7 +38,7 @@ export class ExpandDirective extends Directive {
     if (model instanceof Record && model.fieldCount !== 0) {
       const scope = Record.create(model.fieldCount);
       const content = Record.create(model.valueCount);
-      for (let i = 0, n = model.length; i < n; i += 1) {
+      for (let i = 0; i < model.length; i += 1) {
         const item = model.getItem(i);
         if (item instanceof Slot) {
           scope.item(item);
@@ -47,7 +47,7 @@ export class ExpandDirective extends Directive {
         }
       }
       if (params instanceof Record) {
-        for (let i = 0, n = params.length; i < n; i += 1) {
+        for (let i = 0; i < params.length; i += 1) {
           scope.item(params.getItem(i));
         }
       } else if (params.isDistinct()) {

@@ -89,7 +89,7 @@ export class R2Group<S extends R2Shape = R2Shape> extends R2Shape implements Equ
       let xMax = -Infinity;
       let yMax = -Infinity;
       const shapes = this.shapes;
-      for (let i = 0, n = shapes.length; i < n; i += 1) {
+      for (let i = 0; i < shapes.length; i += 1) {
         const shape = shapes[i]!;
         xMin = Math.min(xMin, shape.xMin);
         yMin = Math.min(yMin, shape.yMin);

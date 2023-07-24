@@ -101,7 +101,7 @@ export class ProcessorContext {
       this.interpreter.pushScope(scope);
       const n = model.length;
       const record = Record.create(n);
-      for (let i = 0, n = model.length; i < n; i += 1) {
+      for (let i = 0; i < n; i += 1) {
         let item = model.getItem(i);
         item = this.evaluate(item);
         if (item.isDefined()) {

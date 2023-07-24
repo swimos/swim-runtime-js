@@ -131,7 +131,7 @@ export class Opt implements Equals, Debug {
       output = output.write(46/*'.'*/).write("desc").write(40/*'('*/).debug(this.desc).write(41/*')'*/);
     }
     const args = this.args;
-    for (let argIndex = 0, argCount = args.length; argIndex < argCount; argIndex += 1) {
+    for (let argIndex = 0; argIndex < args.length; argIndex += 1) {
       const arg = args[argIndex]!;
       output = output.write(46/*'.'*/).write("arg").write(40/*'('*/).debug(arg).write(41/*')'*/);
     }

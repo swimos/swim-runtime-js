@@ -238,7 +238,7 @@ export class GeoSpline extends GeoCurve implements Debug {
       let lngMax = -Infinity;
       let latMax = -Infinity;
       const curves = this.curves;
-      for (let i = 0, n = curves.length; i < n; i += 1) {
+      for (let i = 0; i < curves.length; i += 1) {
         const curve = curves[i]!;
         lngMin = Math.min(lngMin, curve.lngMin);
         latMin = Math.min(latMin, curve.latMin);
@@ -278,7 +278,7 @@ export class GeoSpline extends GeoCurve implements Debug {
   override forEachCoordRest<R, S>(callback: (this: S, lng: number, lat: number) => R | void, thisArg: S): R | undefined;
   override forEachCoordRest<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void, thisArg?: S): R | undefined {
     const curves = this.curves;
-    for (let i = 0, n = curves.length; i < n; i += 1) {
+    for (let i = 0; i < curves.length; i += 1) {
       const curve = curves[i]!;
       const result = curve.forEachCoordRest(callback, thisArg);
       if (result !== void 0) {

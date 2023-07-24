@@ -75,7 +75,7 @@ export class RecordMap extends Record {
 
   override isConstant(): boolean {
     const array = this.array;
-    for (let i = 0, n = this.length; i < n; i += 1) {
+    for (let i = 0; i < this.length; i += 1) {
       if (!array![i]!.isConstant()) {
         return false;
       }
@@ -99,7 +99,7 @@ export class RecordMap extends Record {
     let record: Record | undefined;
     let modified = false;
     const array = this.array!;
-    for (let i = 0, n = this.length; i < n; i += 1) {
+    for (let i = 0; i < this.length; i += 1) {
       const item = array[i];
       if (item instanceof Attr) {
         modified = true;
@@ -395,7 +395,7 @@ export class RecordMap extends Record {
   /** @internal */
   updateMutable(key: Value, newValue: Value): void {
     const array = this.array!;
-    for (let i = 0, n = this.length; i < n; i += 1) {
+    for (let i = 0; i < this.length; i += 1) {
       const item = array[i];
       if (item instanceof Field && item.key.equals(key)) {
         array[i] = item.updatedValue(newValue);
@@ -490,7 +490,7 @@ export class RecordMap extends Record {
   /** @internal */
   updateAttrMutable(key: Text, newValue: Value): void {
     const array = this.array!;
-    for (let i = 0, n = this.length; i < n; i += 1) {
+    for (let i = 0; i < this.length; i += 1) {
       const item = array[i];
       if (item instanceof Field && item.key.equals(key)) {
         array[i] = new Attr(key, newValue);
@@ -585,7 +585,7 @@ export class RecordMap extends Record {
   /** @internal */
   updateSlotMutable(key: Value, newValue: Value): void {
     const array = this.array!;
-    for (let i = 0, n = this.length; i < n; i += 1) {
+    for (let i = 0; i < this.length; i += 1) {
       const item = array[i];
       if (item instanceof Field && item.key.equals(key)) {
         array[i] = new Slot(key, newValue);
@@ -977,7 +977,7 @@ export class RecordMap extends Record {
   override branch(): RecordMap {
     if ((this.flags & (Record.AliasedFlag | Record.ImmutableFlag)) === 0) {
       const array = this.array!;
-      for (let i = 0, n = this.length; i < n; i += 1) {
+      for (let i = 0; i < this.length; i += 1) {
         array[i]!.alias();
       }
     }
@@ -1001,7 +1001,7 @@ export class RecordMap extends Record {
     }
     (this as Mutable<this>).flags |= Record.ImmutableFlag;
     const array = this.array!;
-    for (let i = 0, n = this.length; i < n; i += 1) {
+    for (let i = 0; i < this.length; i += 1) {
       array[i]!.commit();
     }
     return this;
@@ -1013,7 +1013,7 @@ export class RecordMap extends Record {
     if (n !== 0 && table === null) {
       table = new Array(Record.expand(Math.max(n, n * 10 / 7)));
       const array = this.array!;
-      for (let i = 0, m = this.length; i < m; i += 1) {
+      for (let i = 0; i < this.length; i += 1) {
         const item = array[i];
         if (item instanceof Field) {
           RecordMap.put(table, item);
@@ -1107,7 +1107,7 @@ export class RecordMap extends Record {
   override forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void, thisArg: S): T | undefined;
   override forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void, thisArg?: S): T | undefined {
     const array = this.array!;
-    for (let i = 0, n = this.length; i < n; i += 1) {
+    for (let i = 0; i < this.length; i += 1) {
       const result = callback.call(thisArg, array[i]!, i);
       if (result !== void 0) {
         return result;

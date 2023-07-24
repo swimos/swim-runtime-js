@@ -37,7 +37,7 @@ export class CssConverter extends Converter {
     if (stylesheet.tag !== void 0) {
       output = this.writeBlock(output, stylesheet);
     } else {
-      for (let i = 0, n = stylesheet.length; i < n; i += 1) {
+      for (let i = 0; i < stylesheet.length; i += 1) {
         const item = stylesheet.getItem(i);
         if (item instanceof Record) {
           output = this.writeBlock(output, item);
@@ -67,7 +67,7 @@ export class CssConverter extends Converter {
     let inRule = false;
     let isEmpty = true;
     if (declarations instanceof Record) {
-      for (let i = 0, n = declarations.length; i < n; i += 1) {
+      for (let i = 0; i < declarations.length; i += 1) {
         const declaration = declarations.getItem(i);
         const head = declaration.head();
         if (head instanceof Attr) {
@@ -209,7 +209,7 @@ export class CssConverter extends Converter {
     } else if (tag === "not") {
       output = this.writeMediaNot(output, mediaExpression.tail().branch());
     } else {
-      for (let i = 0, n = mediaExpression.length; i < n; i += 1) {
+      for (let i = 0; i < mediaExpression.length; i += 1) {
         const mediaQuery = mediaExpression.getItem(i);
         if (i !== 0) {
           output = output.write(44/*','*/);
@@ -235,7 +235,7 @@ export class CssConverter extends Converter {
   }
 
   writeMediaAnd<O>(output: Output<O>, mediaQuery: Record): Output<O> {
-    for (let i = 0, n = mediaQuery.length; i < n; i += 1) {
+    for (let i = 0; i < mediaQuery.length; i += 1) {
       const medium = mediaQuery.getItem(i);
       if (i !== 0) {
         output = output.write(32/*' '*/);
@@ -292,7 +292,7 @@ export class CssConverter extends Converter {
 
   writeSelectors<O>(output: Output<O>, selectors: Value): Output<O> {
     if (selectors instanceof Record) {
-      for (let i = 0, n = selectors.length; i < n; i += 1) {
+      for (let i = 0; i < selectors.length; i += 1) {
         const selector = selectors.getItem(i);
         if (i !== 0) {
           output = output.write(44/*','*/);
@@ -312,7 +312,7 @@ export class CssConverter extends Converter {
   }
 
   writeDeclarations<O>(output: Output<O>, declarations: Record): Output<O> {
-    for (let i = 0, n = declarations.length; i < n; i += 1) {
+    for (let i = 0; i < declarations.length; i += 1) {
       const declaration = declarations.getItem(i);
       if (declaration instanceof Slot) {
         output = this.writeDeclaration(output, declaration.key, declaration.value);

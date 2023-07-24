@@ -197,7 +197,7 @@ export class R2Path extends R2Shape implements Debug {
       let xMax = -Infinity;
       let yMax = -Infinity;
       const splines = this.splines;
-      for (let i = 0, n = splines.length; i < n; i += 1) {
+      for (let i = 0; i < splines.length; i += 1) {
         const spline = splines[i]!;
         xMin = Math.min(xMin, spline.xMin);
         yMin = Math.min(yMin, spline.yMin);
@@ -212,14 +212,14 @@ export class R2Path extends R2Shape implements Debug {
 
   draw(context: R2PathContext): void {
     const splines = this.splines;
-    for (let i = 0, n = splines.length; i < n; i += 1) {
+    for (let i = 0; i < splines.length; i += 1) {
       splines[i]!.draw(context);
     }
   }
 
   transformDraw(context: R2PathContext, f: R2Function): void {
     const splines = this.splines;
-    for (let i = 0, n = splines.length; i < n; i += 1) {
+    for (let i = 0; i < splines.length; i += 1) {
       splines[i]!.transformDraw(context, f);
     }
   }

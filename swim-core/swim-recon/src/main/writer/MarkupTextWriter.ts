@@ -40,7 +40,7 @@ export class MarkupTextWriter extends Writer {
 
   static sizeOf(text: string): number {
     let size = 0;
-    for (let i = 0, n = text.length; i < n; i = Strings.offsetByCodePoints(text, i, 1)) {
+    for (let i = 0; i < text.length; i = Strings.offsetByCodePoints(text, i, 1)) {
       let c = text.codePointAt(i);
       if (c === void 0) {
         c = text.charCodeAt(i);

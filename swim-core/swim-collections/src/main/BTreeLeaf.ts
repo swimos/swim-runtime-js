@@ -237,7 +237,7 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
     }
     const slots = this.slots;
     let fold = identity;
-    for (let i = 0, n = slots.length; i < n; i += 1) {
+    for (let i = 0; i < slots.length; i += 1) {
       fold = accumulator(fold, slots[i]![1]);
     }
     return new BTreeLeaf<K, V, U>(slots, fold);
@@ -246,7 +246,7 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
   override forEach<T, S>(callback: (this: S, value: V, key: K, tree: BTree<K, V, U>) => T | void,
                          thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const slots = this.slots;
-    for (let i = 0, n = slots.length; i < n; i += 1) {
+    for (let i = 0; i < slots.length; i += 1) {
       const slot = slots[i]!;
       const result = callback.call(thisArg, slot[1], slot[0], tree);
       if (result !== void 0) {
@@ -259,7 +259,7 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
   override forEachKey<T, S>(callback: (this: S, key: K, tree: BTree<K, V, U>) => T | void,
                             thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const slots = this.slots;
-    for (let i = 0, n = slots.length; i < n; i += 1) {
+    for (let i = 0; i < slots.length; i += 1) {
       const slot = slots[i]!;
       const result = callback.call(thisArg, slot[0], tree);
       if (result !== void 0) {
@@ -272,7 +272,7 @@ export class BTreeLeaf<K, V, U> extends BTreePage<K, V, U> {
   override forEachValue<T, S>(callback: (this: S, value: V, tree: BTree<K, V, U>) => T | void,
                               thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const slots = this.slots;
-    for (let i = 0, n = slots.length; i < n; i += 1) {
+    for (let i = 0; i < slots.length; i += 1) {
       const slot = slots[i]!;
       const result = callback.call(thisArg, slot[1], tree);
       if (result !== void 0) {

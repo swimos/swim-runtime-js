@@ -156,7 +156,7 @@ export const Arrays = {
   hash(x: ArrayLike<unknown> | null | undefined): number {
     if (typeof x === "object" && x !== null) {
       let code = 0;
-      for (let i = 0, n = x.length; i < n; i += 1) {
+      for (let i = 0; i < x.length; i += 1) {
         code = Murmur3.mix(code, Values.hash(x[i]));
       }
       return Murmur3.mash(code);

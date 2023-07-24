@@ -106,7 +106,7 @@ export class Cmd implements Equals, Debug {
 
   getOpt(name: string): Opt {
     const opts = this.opts;
-    for (let i = 0, n = opts.length; i < n; i += 1) {
+    for (let i = 0; i < opts.length; i += 1) {
       const opt = opts[i]!;
       if (name === opt.name) {
         return opt;

@@ -289,7 +289,7 @@ export abstract class Item implements Interpolate<Item>, HashCode, Equivalent, C
   concat(...items: ItemLike[]): Record {
     const record = Record.create();
     record.push(this);
-    for (let i = 0, n = items.length; i < n; i += 1) {
+    for (let i = 0; i < items.length; i += 1) {
       Item.fromLike(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });

@@ -48,7 +48,7 @@ export class RecordMapView extends Record {
 
   override isArray(): boolean {
     const array = this.record.array;
-    for (let i = this.lower, n = this.upper; i < n; i += 1) {
+    for (let i = this.lower; i < this.upper; i += 1) {
       if (array![i] instanceof Field) {
         return false;
       }
@@ -58,7 +58,7 @@ export class RecordMapView extends Record {
 
   override isObject(): boolean {
     const array = this.record.array;
-    for (let i = this.lower, n = this.upper; i < n; i += 1) {
+    for (let i = this.lower; i < this.upper; i += 1) {
       if (array![i] instanceof Value) {
         return false;
       }
@@ -75,7 +75,7 @@ export class RecordMapView extends Record {
   override get valueCount(): number {
     let k = 0;
     const array = this.record.array;
-    for (let i = this.lower, n = this.upper; i < n; i += 1) {
+    for (let i = this.lower; i < this.upper; i += 1) {
       if (array![i] instanceof Value) {
         k += 1;
       }
@@ -85,7 +85,7 @@ export class RecordMapView extends Record {
 
   override isConstant(): boolean {
     const array = this.record.array;
-    for (let i = this.lower, n = this.upper; i < n; i += 1) {
+    for (let i = this.lower; i < this.upper; i += 1) {
       if (!array![i]!.isConstant()) {
         return false;
       }
@@ -109,7 +109,7 @@ export class RecordMapView extends Record {
     let record: Record | undefined;
     let modified = false;
     const array = this.record.array;
-    for (let i = this.lower, n = this.upper; i < n; i += 1) {
+    for (let i = this.lower; i < this.upper; i += 1) {
       const item = array![i];
       if (item instanceof Attr) {
         modified = true;
@@ -587,7 +587,7 @@ export class RecordMapView extends Record {
   override forEach<T, S>(callback: (this: S, item: Item, index: number) => T | void, thisArg?: S): T | undefined;
   override forEach<T, S>(callback: (this: S | undefined, item: Item, index: number) => T | void, thisArg?: S): T | undefined {
     const array = this.record.array;
-    for (let i = this.lower, n = this.upper; i < n; i += 1) {
+    for (let i = this.lower; i < this.upper; i += 1) {
       const result = callback.call(thisArg, array![i]!, i);
       if (result !== void 0) {
         return result;
@@ -600,7 +600,7 @@ Object.defineProperty(RecordMapView.prototype, "fieldCount", {
   get(this: RecordMapView): number {
     const array = this.record.array;
     let k = 0;
-    for (let i = this.lower, n = this.upper; i < n; i += 1) {
+    for (let i = this.lower; i < this.upper; i += 1) {
       if (array![i] instanceof Field) {
         k += 1;
       }

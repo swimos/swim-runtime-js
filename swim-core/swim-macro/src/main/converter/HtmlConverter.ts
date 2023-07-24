@@ -34,7 +34,7 @@ export class HtmlConverter extends Converter {
     if (document.tag !== void 0) {
       output = this.writeElement(output, document);
     } else {
-      for (let i = 0, n = document.length; i < n; i += 1) {
+      for (let i = 0; i < document.length; i += 1) {
         const node = document.getItem(i);
         if (node instanceof Record) {
           const tag = node.tag;
@@ -73,7 +73,7 @@ export class HtmlConverter extends Converter {
   }
 
   writeFragment<O>(output: Output<O>, fragment: Record): Output<O> {
-    for (let i = 0, n = fragment.length; i < n; i += 1) {
+    for (let i = 0; i < fragment.length; i += 1) {
       const node = fragment.getItem(i);
       if (node instanceof Record) {
         const tag = node.tag;
@@ -116,7 +116,7 @@ export class HtmlConverter extends Converter {
   }
 
   protected writeAttributes<O>(output: Output<O>, attributes: Record): Output<O> {
-    for (let i = 0, n = attributes.length; i < n; i += 1) {
+    for (let i = 0; i < attributes.length; i += 1) {
       const attribute = attributes.getItem(i);
       if (attribute instanceof Slot) {
         output = this.writeAttribute(output, attribute);
@@ -139,7 +139,7 @@ export class HtmlConverter extends Converter {
 
   protected writeAttributeValue<O>(output: Output<O>, attributeValue: string): Output<O> {
     output = output.write(34/*'"'*/);
-    for (let i = 0, n = attributeValue.length; i < n; i += 1) {
+    for (let i = 0; i < attributeValue.length; i += 1) {
       const c = attributeValue.charCodeAt(i);
       if (c === 34/*'"'*/) {
         output = output.write("&quot;");
@@ -181,7 +181,7 @@ export class HtmlConverter extends Converter {
   }
 
   writeText<O>(output: Output<O>, text: string): Output<O> {
-    for (let i = 0, n = text.length; i < n; i += 1) {
+    for (let i = 0; i < text.length; i += 1) {
       const c = text.charCodeAt(i);
       if (c === 60/*'<'*/) {
         output = output.write("&lt;");

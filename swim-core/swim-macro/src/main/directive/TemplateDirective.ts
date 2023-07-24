@@ -46,7 +46,7 @@ export class TemplateDirective extends Directive {
     if (model instanceof Record && model.fieldCount !== 0) {
       const params = Record.create(model.fieldCount);
       const content = Record.create(model.valueCount);
-      for (let i = 0, n = model.length; i < n; i += 1) {
+      for (let i = 0; i < model.length; i += 1) {
         const item = model.getItem(i);
         if (item instanceof Slot) {
           params.item(item);

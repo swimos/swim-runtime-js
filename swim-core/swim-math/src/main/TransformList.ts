@@ -57,7 +57,7 @@ export class TransformList extends Transform {
   override transform(x: Transform | number, y?: number): Transform | R2Point {
     if (arguments.length === 2) {
       const transforms = this.transforms;
-      for (let i = 0, n = transforms.length; i < n; i += 1) {
+      for (let i = 0; i < transforms.length; i += 1) {
         const transform = transforms[i]!;
         const xi = transform.transformX(x as number, y!);
         const yi = transform.transformY(x as number, y!);
@@ -75,7 +75,7 @@ export class TransformList extends Transform {
 
   override transformX(x: number, y: number): number {
     const transforms = this.transforms;
-    for (let i = 0, n = transforms.length; i < n; i += 1) {
+    for (let i = 0; i < transforms.length; i += 1) {
       const transform = transforms[i]!;
       const xi = transform.transformX(x, y);
       const yi = transform.transformY(x, y);
@@ -87,7 +87,7 @@ export class TransformList extends Transform {
 
   override transformY(x: number, y: number): number {
     const transforms = this.transforms;
-    for (let i = 0, n = transforms.length; i < n; i += 1) {
+    for (let i = 0; i < transforms.length; i += 1) {
       const transform = transforms[i]!;
       const xi = transform.transformX(x, y);
       const yi = transform.transformY(x, y);
@@ -110,7 +110,7 @@ export class TransformList extends Transform {
   override toAffine(): AffineTransform {
     let matrix = AffineTransform.identity();
     const transforms = this.transforms;
-    for (let i = 0, n = transforms.length; i < n; i += 1) {
+    for (let i = 0; i < transforms.length; i += 1) {
       matrix = matrix.multiply(transforms[i]!.toAffine());
     }
     return matrix;
@@ -130,7 +130,7 @@ export class TransformList extends Transform {
     const transforms = this.transforms;
     const n = transforms.length;
     const components = new Array<CSSTransformComponent>(n);
-    for (let i = 0, n = transforms.length; i < n; i += 1) {
+    for (let i = 0; i < transforms.length; i += 1) {
       const transform = transforms[i]!;
       const component = transform.toCssTransformComponent();
       if (component === null) {
@@ -212,7 +212,7 @@ export class TransformList extends Transform {
   override hashCode(): number {
     let hashValue = Constructors.hash(TransformList);
     const transforms = this.transforms;
-    for (let i = 0, n = transforms.length; i < n; i += 1) {
+    for (let i = 0; i < transforms.length; i += 1) {
       hashValue = Murmur3.mix(hashValue, transforms[i]!.hashCode());
     }
     return Murmur3.mash(hashValue);

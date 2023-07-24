@@ -522,7 +522,7 @@ export abstract class Record extends Value implements Builder<Item, Record> {
 
   override concat(...items: ItemLike[]): Record {
     const record = this.isMutable() ? this : this.branch();
-    for (let i = 0, n = items.length; i < n; i += 1) {
+    for (let i = 0; i < items.length; i += 1) {
       Item.fromLike(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });

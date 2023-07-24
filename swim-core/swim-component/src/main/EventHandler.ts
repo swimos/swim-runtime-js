@@ -227,7 +227,7 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
     if (typeof eventType === "string") {
       this.attachEvent(target, eventType);
     } else if (eventType !== void 0) {
-      for (let i = 0, n = eventType.length; i < n; i += 1) {
+      for (let i = 0; i < eventType.length; i += 1) {
         this.attachEvent(target, eventType[i]!);
       }
     }
@@ -244,7 +244,7 @@ export const EventHandler = (<R, T, F extends EventHandler<any, any>>() => Faste
     if (typeof eventType === "string") {
       this.detachEvent(target, eventType);
     } else if (eventType !== void 0) {
-      for (let i = 0, n = eventType.length; i < n; i += 1) {
+      for (let i = 0; i < eventType.length; i += 1) {
         this.detachEvent(target, eventType[i]!);
       }
     }

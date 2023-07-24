@@ -221,7 +221,7 @@ export class GeoPath extends GeoShape implements Debug {
       let lngMax = -Infinity;
       let latMax = -Infinity;
       const splines = this.splines;
-      for (let i = 0, n = splines.length; i < n; i += 1) {
+      for (let i = 0; i < splines.length; i += 1) {
         const spline = splines[i]!;
         lngMin = Math.min(lngMin, spline.lngMin);
         latMin = Math.min(latMin, spline.latMin);
@@ -253,7 +253,7 @@ export class GeoPath extends GeoShape implements Debug {
   forEachCoord<R, S>(callback: (this: S, lng: number, lat: number) => R | void, thisArg: S): R | undefined;
   forEachCoord<R, S>(callback: (this: S | undefined, lng: number, lat: number) => R | void, thisArg?: S): R | undefined {
     const splines = this.splines;
-    for (let i = 0, n = splines.length; i < n; i += 1) {
+    for (let i = 0; i < splines.length; i += 1) {
       const spline = splines[i]!;
       const result = spline.forEachCoord(callback, thisArg);
       if (result !== void 0) {

@@ -189,7 +189,7 @@ export const Piecewise = (function (_super: typeof Mapping) {
   Piecewise.prototype.toString = function <X, Y>(this: Piecewise<X, Y>): string {
     let s = "Piecewise(";
     const intervals = this.intervals;
-    for (let i = 0, n = intervals.length; i < n; i += 1) {
+    for (let i = 0; i < intervals.length; i += 1) {
       const interval = intervals[i]!;
       if (i !== 0) {
         s += ", ";

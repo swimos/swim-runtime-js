@@ -76,7 +76,7 @@ export class ConstraintGroup {
   /** @internal */
   enableConstraints(): void {
     const constraints = this.constraints;
-    for (let i = 0, n = constraints.length ; i < n; i += 1) {
+    for (let i = 0; i < constraints.length; i += 1) {
       constraints[i]!.constrain(true);
     }
   }
@@ -84,7 +84,7 @@ export class ConstraintGroup {
   /** @internal */
   disableConstraints(): void {
     const constraints = this.constraints;
-    for (let i = 0, n = constraints.length ; i < n; i += 1) {
+    for (let i = 0; i < constraints.length; i += 1) {
       constraints[i]!.constrain(false);
     }
   }

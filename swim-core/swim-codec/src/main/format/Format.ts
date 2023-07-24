@@ -337,7 +337,7 @@ export const Format = (function () {
   Format.trimTrailingZeros = function (s: string): string {
     let i0 = -1;
     let i1: number | undefined;
-    for (let i = 1, n = s.length; i < n; i += 1) {
+    for (let i = 1; i < s.length; i += 1) {
       const c = s.charCodeAt(i);
       if (c === 46/*'.'*/) {
         i0 = i; // candidate start of trailing zeros

@@ -93,7 +93,7 @@ export class Absent extends Value {
 
   override concat(...items: ItemLike[]): Record {
     const record = Record.create();
-    for (let i = 0, n = items.length; i < n; i += 1) {
+    for (let i = 0; i < items.length; i += 1) {
       Item.fromLike(items[i]).forEach(function (item: Item): void {
         record.push(item);
       });

@@ -41,7 +41,7 @@ export class StringWriter extends Writer {
   static sizeOf(string: string): number {
     let size = 0;
     size += 1; // '"';
-    for (let i = 0, n = string.length; i < n; i = Strings.offsetByCodePoints(string, i, 1)) {
+    for (let i = 0; i < string.length; i = Strings.offsetByCodePoints(string, i, 1)) {
       let c = string.codePointAt(i);
       if (c === void 0) {
         c = string.charCodeAt(i);

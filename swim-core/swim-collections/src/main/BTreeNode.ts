@@ -79,7 +79,7 @@ export class BTreeNode<K, V, U> extends BTreePage<K, V, U> {
 
   override getEntry(x: number): [K, V] | undefined {
     const pages = this.pages;
-    for (let i = 0, n = pages.length; i < n; i += 1) {
+    for (let i = 0; i < pages.length; i += 1) {
       const page = pages[i]!;
       if (x < page.size) {
         return page.getEntry(x);
@@ -497,7 +497,7 @@ export class BTreeNode<K, V, U> extends BTreePage<K, V, U> {
   override forEach<T, S>(callback: (this: S, value: V, key: K, tree: BTree<K, V, U>) => T | void,
                          thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const pages = this.pages;
-    for (let i = 0, n = pages.length; i < n; i += 1) {
+    for (let i = 0; i < pages.length; i += 1) {
       const result = pages[i]!.forEach(callback, thisArg, tree);
       if (result !== void 0) {
         return result;
@@ -509,7 +509,7 @@ export class BTreeNode<K, V, U> extends BTreePage<K, V, U> {
   override forEachKey<T, S>(callback: (this: S, key: K, tree: BTree<K, V, U>) => T | void,
                             thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const pages = this.pages;
-    for (let i = 0, n = pages.length; i < n; i += 1) {
+    for (let i = 0; i < pages.length; i += 1) {
       const result = pages[i]!.forEachKey(callback, thisArg, tree);
       if (result !== void 0) {
         return result;
@@ -521,7 +521,7 @@ export class BTreeNode<K, V, U> extends BTreePage<K, V, U> {
   override forEachValue<T, S>(callback: (this: S, value: V, tree: BTree<K, V, U>) => T | void,
                               thisArg: S, tree: BTree<K, V, U>): T | undefined {
     const pages = this.pages;
-    for (let i = 0, n = pages.length; i < n; i += 1) {
+    for (let i = 0; i < pages.length; i += 1) {
       const result = pages[i]!.forEachValue(callback, thisArg, tree);
       if (result !== void 0) {
         return result;

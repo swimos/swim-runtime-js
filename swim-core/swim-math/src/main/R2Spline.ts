@@ -200,7 +200,7 @@ export class R2Spline extends R2Curve implements Debug {
       let xMax = -Infinity;
       let yMax = -Infinity;
       const curves = this.curves;
-      for (let i = 0, n = curves.length; i < n; i += 1) {
+      for (let i = 0; i < curves.length; i += 1) {
         const curve = curves[i]!;
         xMin = Math.min(xMin, curve.xMin);
         yMin = Math.min(yMin, curve.yMin);

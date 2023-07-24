@@ -108,7 +108,7 @@ export const Utf8 = (function () {
       }
     } else if (typeof u === "string") {
       let size = 0;
-      for (let i = 0, n = u.length; i < n; i = Strings.offsetByCodePoints(u, i, 1)) {
+      for (let i = 0; i < u.length; i = Strings.offsetByCodePoints(u, i, 1)) {
         size += Utf8.sizeOf(u.charCodeAt(i), errorMode);
       }
       return size;
