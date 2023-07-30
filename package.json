@@ -7,24 +7,25 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-runtime.js",
-  "module": "./dist/swim-runtime.mjs",
+  "types": "./dist/swim-runtime.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-runtime.mjs",
-      "require": "./dist/swim-runtime.js",
+      "import": "./dist/swim-runtime.js",
       "types": "./dist/swim-runtime.d.ts"
     }
   },
-  "types": "./dist/swim-runtime.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
     "@swim/core": "4.0.0-dev.20220527.3",
-    "@swim/host": "4.0.0-dev.20220527.3"
+    "@swim/host": "4.0.0-dev.20220527.3",
+    "tslib": "2"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "7.35",
+    "@microsoft/api-extractor": "7.36",
+    "@rollup/plugin-commonjs": "25",
     "@rollup/plugin-node-resolve": "15",
     "@rollup/plugin-terser": "0.4",
     "@types/eslint": "8",
@@ -32,15 +33,14 @@
     "@types/prismjs": "1",
     "@types/w3c-css-typed-object-model-level-1": "20180410",
     "@types/ws": "8",
-    "@typescript-eslint/eslint-plugin": "5",
-    "@typescript-eslint/parser": "5",
+    "@typescript-eslint/eslint-plugin": "6",
+    "@typescript-eslint/parser": "6",
     "chokidar": "3",
     "eslint": "8",
     "prismjs": "1.29",
-    "rollup": "2.79",
+    "rollup": "3.27",
     "rollup-plugin-sourcemaps": "0.6",
     "terser": ">= 5.17",
-    "tslib": "2",
     "typedoc": "0.24",
     "typescript": "5.1",
     "ws": "8"

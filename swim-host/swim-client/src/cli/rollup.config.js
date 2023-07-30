@@ -3,62 +3,46 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import terser from "@rollup/plugin-terser";
 
-const script = "swim-client";
-
-const external = [
-  "@swim/util",
-  "@swim/codec",
-  "@swim/component",
-  "@swim/args",
-  "@swim/collections",
-  "@swim/structure",
-  "@swim/recon",
-  "@swim/uri",
-  "@swim/warp",
-  "@swim/client",
-];
-
-const beautify = terser({
-  compress: false,
-  mangle: false,
-  output: {
-    preamble: "#!/usr/bin/env node",
-    shebang: true,
-    beautify: true,
-    comments: false,
-    indent_level: 2,
-  },
-});
-
-function makeExecutable() {
-  return {
-    name: "make-executable",
-    writeBundle(options, bundle) {
-      let {mode} = FS.statSync(options.file);
-      mode |= 0o111; // executable mode
-      FS.chmodSync(options.file, mode);
-    },
-  };
-}
-
 export default {
   input: "../../lib/cli/index.js",
   output: {
-    file: `../../dist/${script}-cli.cjs`,
-    format: "cjs",
+    file: "../../dist/swim-client-cli.js",
+    format: "esm",
     generatedCode: {
       preset: "es2015",
       constBindings: true,
     },
     sourcemap: true,
     interop: "esModule",
-    plugins: [beautify],
+    plugins: [
+      terser({
+        compress: false,
+        mangle: false,
+        output: {
+          preamble: "#!/usr/bin/env node",
+          shebang: true,
+          beautify: true,
+          comments: false,
+          indent_level: 2,
+        },
+      }),
+    ],
   },
-  external: external.concat("tslib", "ws"),
+  external: [
+    /^@swim\//,
+    "tslib",
+  ],
   plugins: [
     nodeResolve(),
     sourcemaps(),
-    makeExecutable(),
+    {
+      name: "make-executable",
+      writeBundle(options, bundle) {
+        let {mode} = FS.statSync(options.file);
+        mode |= 0o111; // executable mode
+        FS.chmodSync(options.file, mode);
+      },
+    },
   ],
   onwarn(warning, warn) {
     if (warning.code === "CIRCULAR_DEPENDENCY") return;

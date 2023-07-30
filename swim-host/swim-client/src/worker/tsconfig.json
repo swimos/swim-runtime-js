@@ -11,7 +11,7 @@
     "incremental": true,
     "lib": ["WebWorker"],
     "module": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmitHelpers": true,
     "noEmitOnError": true,
     "noImplicitAny": true,

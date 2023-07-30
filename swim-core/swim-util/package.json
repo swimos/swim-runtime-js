@@ -7,18 +7,20 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-util.js",
-  "module": "./dist/swim-util.mjs",
+  "types": "./dist/swim-util.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-util.mjs",
-      "require": "./dist/swim-util.js",
+      "import": "./dist/swim-util.js",
       "types": "./dist/swim-util.d.ts"
     }
   },
-  "types": "./dist/swim-util.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
+  "dependencies": {
+    "tslib": "2"
+  },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",
     "main:bundle": "cd src/main && rollup -c",
@@ -28,7 +30,7 @@
     "test:build": "npm run test:compile && npm run test:bundle",
     "compile": "npm run main:compile",
     "build": "npm run main:build",
-    "test": "npx swim-unit -m dist/swim-util-test.mjs",
+    "test": "npx swim-unit -m dist/swim-util-test.js",
     "clean": "rm -rf lib dist"
   }
 }

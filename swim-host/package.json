@@ -7,16 +7,15 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-host.js",
-  "module": "./dist/swim-host.mjs",
+  "types": "./dist/swim-host.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-host.mjs",
-      "require": "./dist/swim-host.js",
+      "import": "./dist/swim-host.js",
       "types": "./dist/swim-host.d.ts"
     }
   },
-  "types": "./dist/swim-host.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
@@ -30,6 +29,7 @@
     "@swim/core": "4.0.0-dev.20220527.3",
     "@swim/warp": "4.0.0-dev.20220527.3",
     "@swim/client": "4.0.0-dev.20220527.3",
+    "tslib": "2",
     "ws": "8"
   },
   "devDependencies": {
@@ -40,19 +40,18 @@
     "@swim/args": "4.0.0-dev.20220527.3",
     "@swim/unit": "4.0.0-dev.20220527.3",
     "@swim/build": "4.0.0-dev.20220527.3",
-    "@microsoft/api-extractor": "7.35",
+    "@microsoft/api-extractor": "7.36",
     "@rollup/plugin-node-resolve": "15",
     "@rollup/plugin-terser": "0.4",
     "@types/eslint": "8",
     "@types/node": "20",
     "@types/ws": "8",
-    "@typescript-eslint/eslint-plugin": "5",
-    "@typescript-eslint/parser": "5",
+    "@typescript-eslint/eslint-plugin": "6",
+    "@typescript-eslint/parser": "6",
     "eslint": "8",
-    "rollup": "2.79",
+    "rollup": "3.27",
     "rollup-plugin-sourcemaps": "0.6",
     "terser": ">= 5.17",
-    "tslib": "2",
     "typedoc": "0.24",
     "typescript": "5.1",
     "ws": "8"

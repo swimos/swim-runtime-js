@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as ws from "ws";
+import * as WS from "ws";
 import type {Class} from "@swim/util";
 import {Lazy} from "@swim/util";
 import type {Observer} from "@swim/util";
@@ -177,7 +177,7 @@ export class WarpClient extends WarpScope {
   readonly unlinkDelay!: Property<this, number>;
 
   @Property({
-    value: typeof WebSocket !== "undefined" ? WebSocket : ws.WebSocket as typeof WebSocket,
+    value: typeof WebSocket !== "undefined" ? WebSocket : WS.WebSocket as typeof WebSocket,
     equalValues(newValue: typeof WebSocket, oldValue: typeof WebSocket): boolean {
       return newValue === oldValue;
     },

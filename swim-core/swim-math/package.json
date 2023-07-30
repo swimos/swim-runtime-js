@@ -7,23 +7,23 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-math.js",
-  "module": "./dist/swim-math.mjs",
+  "types": "./dist/swim-math.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-math.mjs",
-      "require": "./dist/swim-math.js",
+      "import": "./dist/swim-math.js",
       "types": "./dist/swim-math.d.ts"
     }
   },
-  "types": "./dist/swim-math.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
     "@swim/util": "4.0.0-dev.20220527.3",
     "@swim/codec": "4.0.0-dev.20220527.3",
     "@swim/structure": "4.0.0-dev.20220527.3",
-    "@types/w3c-css-typed-object-model-level-1": ">= 20180410"
+    "@types/w3c-css-typed-object-model-level-1": ">= 20180410",
+    "tslib": "2"
   },
   "devDependencies": {
     "@types/w3c-css-typed-object-model-level-1": "20180410"
@@ -37,7 +37,7 @@
     "test:build": "npm run test:compile && npm run test:bundle",
     "compile": "npm run main:compile",
     "build": "npm run main:build",
-    "test": "npx swim-unit -m dist/swim-math-test.mjs",
+    "test": "npx swim-unit -m dist/swim-math-test.js",
     "clean": "rm -rf lib dist"
   }
 }

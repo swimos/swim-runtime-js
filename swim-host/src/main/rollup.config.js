@@ -1,42 +1,25 @@
 import nodeResolve from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import terser from "@rollup/plugin-terser";
-import * as pkg from "../../package.json";
+//import pkg from "../../package.json" assert {type: "json"};
+import {createRequire} from "node:module";
+const require = createRequire(import.meta.url);
+const pkg = createRequire(import.meta.url)("../../package.json");
 
-const script = "swim-host";
-
-const external = [
+const swimCore = [
   "@swim/util",
   "@swim/codec",
   "@swim/component",
   "@swim/collections",
+  "@swim/constraint",
   "@swim/structure",
   "@swim/recon",
   "@swim/uri",
+  "@swim/math",
+  "@swim/geo",
+  "@swim/time",
   "@swim/core",
 ];
-
-const globals = Object.fromEntries(external.map(name => [name, "swim"]));
-
-const paths = Object.fromEntries(external.map(name => [name, "@swim/core"]));
-
-const beautify = terser({
-  compress: false,
-  mangle: false,
-  output: {
-    preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
-    beautify: true,
-    comments: false,
-    indent_level: 2,
-  },
-});
-
-const minify = terser({
-  output: {
-    preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
-    comments: false,
-  },
-});
 
 function shimImport(importId, code) {
   if (code === void 0) {
@@ -70,20 +53,36 @@ export default [
   {
     input: "../../lib/main/index.js",
     output: {
-      file: `../../dist/${script}.mjs`,
+      file: "../../dist/swim-host.js",
       format: "esm",
-      paths: paths,
+      paths: {
+        ...Object.fromEntries(swimCore.map(name => [name, "@swim/core"])),
+      },
       freeze: false,
       generatedCode: {
         preset: "es2015",
         constBindings: true,
       },
       sourcemap: true,
-      plugins: [beautify],
+      plugins: [
+        terser({
+          compress: false,
+          mangle: false,
+          output: {
+            preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
+            beautify: true,
+            comments: false,
+            indent_level: 2,
+          },
+        }),
+      ],
     },
-    external: external.concat("tslib"),
+    external: [
+      ...swimCore,
+      "tslib",
+      "ws",
+    ],
     plugins: [
-      shimImport("ws", "export const WebSocket = void 0"),
       nodeResolve(),
       sourcemaps(),
     ],
@@ -96,14 +95,16 @@ export default [
     input: "../../lib/main/index.js",
     output: [
       {
-        file: `../../dist/${script}.js`,
+        file: "../../dist/umd/swim-host.js",
         name: "swim",
         format: "umd",
         globals: {
-          ...globals,
+          ...Object.fromEntries(swimCore.map(name => [name, "swim"])),
           ws: "ws",
         },
-        paths: paths,
+        paths: {
+          ...Object.fromEntries(swimCore.map(name => [name, "@swim/core"])),
+        },
         generatedCode: {
           preset: "es2015",
           constBindings: true,
@@ -111,17 +112,30 @@ export default [
         sourcemap: true,
         interop: "esModule",
         extend: true,
-        plugins: [beautify],
+        plugins: [
+          terser({
+            compress: false,
+            mangle: false,
+            output: {
+              preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
+              beautify: true,
+              comments: false,
+              indent_level: 2,
+            },
+          }),
+        ],
       },
       {
-        file: `../../dist/${script}.min.js`,
+        file: "../../dist/umd/swim-host.min.js",
         name: "swim",
         format: "umd",
         globals: {
-          ...globals,
+          ...Object.fromEntries(swimCore.map(name => [name, "swim"])),
           ws: "ws",
         },
-        paths: paths,
+        paths: {
+          ...Object.fromEntries(swimCore.map(name => [name, "@swim/core"]))
+        },
         generatedCode: {
           preset: "es2015",
           constBindings: true,
@@ -129,11 +143,21 @@ export default [
         sourcemap: true,
         interop: "esModule",
         extend: true,
-        plugins: [minify],
+        plugins: [
+          terser({
+            output: {
+              preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
+              comments: false,
+            },
+          }),
+        ],
       },
     ],
-    external: external.concat("ws"),
+    external: [
+      ...swimCore,
+    ],
     plugins: [
+      shimImport("ws", "export const WebSocket = void 0"),
       nodeResolve(),
       sourcemaps(),
     ],

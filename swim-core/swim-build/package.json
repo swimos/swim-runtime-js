@@ -7,25 +7,25 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
-  "main": "./dist/swim-build.cjs",
-  "module": "./dist/swim-build.mjs",
+  "type": "module",
+  "main": "./dist/swim-build.js",
+  "types": "./dist/swim-build.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-build.mjs",
-      "require": "./dist/swim-build.cjs",
+      "import": "./dist/swim-build.js",
       "types": "./dist/swim-build.d.ts"
     }
   },
-  "types": "./dist/swim-build.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
-    "chokidar": "3",
     "@swim/util": "4.0.0-dev.20220527.3",
     "@swim/codec": "4.0.0-dev.20220527.3",
     "@swim/component": "4.0.0-dev.20220527.3",
     "@swim/sys": "4.0.0-dev.20220527.3",
-    "@swim/args": "4.0.0-dev.20220527.3"
+    "@swim/args": "4.0.0-dev.20220527.3",
+    "chokidar": "3",
+    "tslib": "2"
   },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",
@@ -36,10 +36,10 @@
     "cli:build": "npm run cli:compile && npm run cli:bundle",
     "compile": "npm run main:compile && npm run cli:compile",
     "build": "npm run main:build && npm run cli:build",
-    "cli": "node dist/swim-build-cli.cjs",
+    "cli": "node dist/swim-build-cli.js",
     "clean": "rm -rf lib dist"
   },
   "bin": {
-    "swim-build": "./dist/swim-build-cli.cjs"
+    "swim-build": "./dist/swim-build-cli.js"
   }
 }

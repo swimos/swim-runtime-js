@@ -1,84 +1,45 @@
 import nodeResolve from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import terser from "@rollup/plugin-terser";
-import * as pkg from "../../package.json";
+//import pkg from "../../package.json" assert {type: "json"};
+import {createRequire} from "node:module";
+const require = createRequire(import.meta.url);
+const pkg = createRequire(import.meta.url)("../../package.json");
 
-const script = "swim-client";
-
-const external = [
-  "@swim/util",
-  "@swim/codec",
-  "@swim/component",
-  "@swim/collections",
-  "@swim/structure",
-  "@swim/recon",
-  "@swim/uri",
-  "@swim/warp",
-];
-
-const globals = Object.fromEntries(external.map(name => [name, "swim"]));
-
-const beautify = terser({
-  compress: false,
-  mangle: false,
+export default {
+  input: "../../lib/worker/index.js",
   output: {
-    preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
-    beautify: true,
-    comments: false,
-    indent_level: 2,
-  },
-});
-
-export default [
-  {
-    input: "../../lib/worker/index.js",
-    output: {
-      file: `../../dist/${script}-worker.mjs`,
-      format: "esm",
-      generatedCode: {
-        preset: "es2015",
-        constBindings: true,
-      },
-      sourcemap: true,
-      plugins: [beautify],
+    file: "../../dist/swim-client-worker.js",
+    format: "esm",
+    generatedCode: {
+      preset: "es2015",
+      constBindings: true,
     },
-    external: external.concat("tslib", "ws"),
+    sourcemap: true,
     plugins: [
-      nodeResolve(),
-      sourcemaps(),
+      terser({
+        compress: false,
+        mangle: false,
+        output: {
+          preamble: `// ${pkg.name}/worker v${pkg.version} (c) ${pkg.copyright}`,
+          beautify: true,
+          comments: false,
+          indent_level: 2,
+        },
+      }),
     ],
-    onwarn(warning, warn) {
-      if (warning.code === "CIRCULAR_DEPENDENCY") return;
-      warn(warning);
-    },
   },
-  {
-    input: "../../lib/worker/index.js",
-    output: {
-      file: `../../dist/${script}-worker.js`,
-      name: "swim",
-      format: "umd",
-      globals: {
-        ...globals,
-        ws: "ws",
-      },
-      generatedCode: {
-        preset: "es2015",
-        constBindings: true,
-      },
-      sourcemap: true,
-      interop: "esModule",
-      extend: true,
-      plugins: [beautify],
-    },
-    external: external.concat("ws"),
-    plugins: [
-      nodeResolve(),
-      sourcemaps(),
-    ],
-    onwarn(warning, warn) {
-      if (warning.code === "CIRCULAR_DEPENDENCY") return;
-      warn(warning);
-    },
+  external: [
+    /^@swim\//,
+    "tslib",
+    "ws",
+  ],
+  plugins: [
+    nodeResolve(),
+    sourcemaps(),
+  ],
+  onwarn(warning, warn) {
+    if (warning.code === "CIRCULAR_DEPENDENCY") return;
+    warn(warning);
   },
-];
+};

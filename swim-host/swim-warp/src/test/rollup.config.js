@@ -2,42 +2,32 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import terser from "@rollup/plugin-terser";
 
-const script = "swim-warp";
-
-const external = [
-  "@swim/util",
-  "@swim/codec",
-  "@swim/args",
-  "@swim/unit",
-  "@swim/structure",
-  "@swim/recon",
-  "@swim/uri",
-  "@swim/warp",
-];
-
-const beautify = terser({
-  compress: false,
-  mangle: false,
-  output: {
-    beautify: true,
-    comments: false,
-    indent_level: 2,
-  },
-});
-
 export default {
   input: "../../lib/test/index.js",
   output: {
-    file: `../../dist/${script}-test.mjs`,
+    file: "../../dist/swim-warp-test.js",
     format: "esm",
     generatedCode: {
       preset: "es2015",
       constBindings: true,
     },
     sourcemap: true,
-    plugins: [beautify],
+    plugins: [
+      terser({
+        compress: false,
+        mangle: false,
+        output: {
+          beautify: true,
+          comments: false,
+          indent_level: 2,
+        },
+      }),
+    ],
   },
-  external: external.concat("tslib"),
+  external: [
+    /^@swim\//,
+    "tslib",
+  ],
   plugins: [
     nodeResolve(),
     sourcemaps(),

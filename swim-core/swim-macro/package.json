@@ -7,16 +7,15 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-macro.js",
-  "module": "./dist/swim-macro.mjs",
+  "types": "./dist/swim-macro.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-macro.mjs",
-      "require": "./dist/swim-macro.js",
+      "import": "./dist/swim-macro.js",
       "types": "./dist/swim-macro.d.ts"
     }
   },
-  "types": "./dist/swim-macro.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
@@ -24,14 +23,15 @@
     "@swim/codec": "4.0.0-dev.20220527.3",
     "@swim/args": "4.0.0-dev.20220527.3",
     "@swim/structure": "4.0.0-dev.20220527.3",
-    "@swim/recon": "4.0.0-dev.20220527.3"
+    "@swim/recon": "4.0.0-dev.20220527.3",
+    "tslib": "2"
   },
   "devDependencies": {
     "@types/prismjs": "1",
     "prismjs": "1.29"
   },
   "bin": {
-    "swim-macro": "./dist/swim-macro-cli.cjs"
+    "swim-macro": "./dist/swim-macro-cli.js"
   },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",
@@ -45,8 +45,8 @@
     "test:build": "npm run test:compile && npm run test:bundle",
     "compile": "npm run main:compile && npm run cli:compile",
     "build": "npm run main:build && npm run cli:build",
-    "test": "node dist/swim-macro-test.cjs",
-    "cli": "node dist/swim-macro-cli.cjs",
+    "test": "node dist/swim-macro-test.js",
+    "cli": "node dist/swim-macro-cli.js",
     "clean": "rm -rf lib dist"
   }
 }

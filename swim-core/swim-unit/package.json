@@ -7,12 +7,11 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-unit.js",
-  "module": "./dist/swim-unit.mjs",
   "exports": {
     ".": {
-      "import": "./dist/swim-unit.mjs",
-      "require": "./dist/swim-unit.js",
+      "import": "./dist/swim-unit.js",
       "types": "./dist/swim-unit.d.ts"
     }
   },
@@ -21,7 +20,8 @@
   "sideEffects": false,
   "dependencies": {
     "@swim/util": "4.0.0-dev.20220527.3",
-    "@swim/codec": "4.0.0-dev.20220527.3"
+    "@swim/codec": "4.0.0-dev.20220527.3",
+    "tslib": "2"
   },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",
@@ -32,10 +32,10 @@
     "cli:build": "npm run cli:compile && npm run cli:bundle",
     "compile": "npm run main:compile && npm run cli:compile",
     "build": "npm run main:build && npm run cli:build",
-    "cli": "node dist/swim-unit-cli.mjs",
+    "cli": "node dist/swim-unit-cli.js",
     "clean": "rm -rf lib dist"
   },
   "bin": {
-    "swim-unit": "./dist/swim-unit-cli.mjs"
+    "swim-unit": "./dist/swim-unit-cli.js"
   }
 }

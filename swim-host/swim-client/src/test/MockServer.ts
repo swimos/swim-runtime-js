@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as http from "http";
-import * as ws from "ws";
+import * as HTTP from "http";
+import * as WS from "ws";
 import type {Mutable} from "@swim/util";
 import type {UriLike} from "@swim/uri";
 import {Uri} from "@swim/uri";
@@ -40,13 +40,13 @@ export class MockServer {
   readonly client: WarpClient;
 
   /** @internal */
-  readonly httpServer: http.Server | null;
+  readonly httpServer: HTTP.Server | null;
 
   /** @internal */
-  readonly wsServer: ws.WebSocketServer | null;
+  readonly wsServer: WS.WebSocketServer | null;
 
   /** @internal */
-  readonly socket: ws.WebSocket | null;
+  readonly socket: WS.WebSocket | null;
 
   resolve(relative: UriLike): Uri {
     relative = Uri.fromLike(relative);
@@ -72,11 +72,11 @@ export class MockServer {
                     resolve: (result?: T) => void,
                     reject: (reason?: unknown) => void) => void): Promise<T | void> {
     return new Promise((resolve: (result?: T) => void, reject: (reason?: unknown) => void): void => {
-      const httpServer = http.createServer();
+      const httpServer = HTTP.createServer();
       (this as Mutable<this>).httpServer = httpServer;
       httpServer.listen(this.hostUri.portNumber, (): void => {
         try {
-          const wsServer = new ws.WebSocketServer({port: void 0, server: httpServer});
+          const wsServer = new WS.WebSocketServer({port: void 0, server: httpServer});
           (this as Mutable<this>).wsServer = wsServer;
           wsServer.on("connection", this.onOpen);
           this.client.mount();
@@ -126,14 +126,14 @@ export class MockServer {
     }
   }
 
-  onOpen(socket: ws.WebSocket): void {
+  onOpen(socket: WS.WebSocket): void {
     socket.onmessage = this.onMessage;
     socket.onclose = this.onClose;
     socket.onerror = this.onError;
     (this as Mutable<this>).socket = socket;
   }
 
-  onMessage(message: { data: ws.Data; type: string; target: ws.WebSocket }): void {
+  onMessage(message: { data: WS.Data; type: string; target: WS.WebSocket }): void {
     const data = message.data;
     if (typeof data === "string") {
       const envelope = Envelope.parseRecon(data);

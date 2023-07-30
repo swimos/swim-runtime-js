@@ -7,21 +7,21 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-args.js",
-  "module": "./dist/swim-args.mjs",
+  "types": "./dist/swim-args.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-args.mjs",
-      "require": "./dist/swim-args.js",
+      "import": "./dist/swim-args.js",
       "types": "./dist/swim-args.d.ts"
     }
   },
-  "types": "./dist/swim-args.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
     "@swim/util": "4.0.0-dev.20220527.3",
-    "@swim/codec": "4.0.0-dev.20220527.3"
+    "@swim/codec": "4.0.0-dev.20220527.3",
+    "tslib": "2"
   },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",
@@ -32,7 +32,7 @@
     "test:build": "npm run test:compile && npm run test:bundle",
     "compile": "npm run main:compile",
     "build": "npm run main:build",
-    "test": "npx swim-unit -m dist/swim-args-test.mjs",
+    "test": "npx swim-unit -m dist/swim-args-test.js",
     "clean": "rm -rf lib dist"
   }
 }

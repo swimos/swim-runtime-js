@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import * as Path from "path";
-import * as ts from "typescript";
+import ts from "typescript";
 import type {MutableDictionary} from "@swim/util";
 import {Severity} from "@swim/util";
 import {Input} from "@swim/codec";

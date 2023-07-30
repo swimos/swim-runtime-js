@@ -7,26 +7,23 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-client.js",
-  "module": "./dist/swim-client.mjs",
+  "types": "./dist/swim-client.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-client.mjs",
-      "require": "./dist/swim-client.js",
+      "import": "./dist/swim-client.js",
       "types": "./dist/swim-client.d.ts"
     },
     "./worker": {
-      "import": "./dist/swim-client-worker.mjs",
-      "require": "./dist/swim-client-worker.js",
+      "import": "./dist/swim-client-worker.js",
       "types": "./dist/swim-client-worker.d.ts"
     },
     "./webworker": {
-      "import": "./dist/swim-client-webworker.min.mjs",
-      "require": "./dist/swim-client-webworker.min.js",
+      "import": "./dist/swim-client-webworker.min.js",
       "types": "./dist/swim-client-webworker.d.ts"
     }
   },
-  "types": "./dist/swim-client.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "keywords": [
@@ -48,13 +45,14 @@
     "@swim/recon": "4.0.0-dev.20220527.3",
     "@swim/uri": "4.0.0-dev.20220527.3",
     "@swim/warp": "4.0.0-dev.20220527.3",
+    "tslib": "2",
     "ws": "8"
   },
   "devDependencies": {
     "@types/ws": "8"
   },
   "bin": {
-    "swim-client": "./dist/swim-client-cli.cjs"
+    "swim-client": "./dist/swim-client-cli.js"
   },
   "scripts": {
     "worker:compile": "tsc -b src/worker && api-extractor run -l -c src/worker/api-extractor.json",
@@ -74,8 +72,8 @@
     "test:build": "npm run test:compile && npm run test:bundle",
     "compile": "npm run main:compile && npm run cli:compile",
     "build": "npm run worker:build && npm run webworker:build && npm run main:build && npm run cli:build",
-    "test": "npx swim-unit -m dist/swim-client-test.mjs",
-    "cli": "node dist/swim-client-cli.cjs",
+    "test": "npx swim-unit -m dist/swim-client-test.js",
+    "cli": "node dist/swim-client-cli.js",
     "clean": "rm -rf lib dist"
   }
 }

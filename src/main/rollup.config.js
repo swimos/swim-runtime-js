@@ -1,34 +1,10 @@
 import nodeResolve from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import terser from "@rollup/plugin-terser";
-import * as pkg from "../../package.json";
-
-const script = "swim-runtime";
-
-const external = [
-];
-
-const globals = Object.fromEntries(external.map(name => [name, "swim"]));
-
-const paths = {};
-
-const beautify = terser({
-  compress: false,
-  mangle: false,
-  output: {
-    preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
-    beautify: true,
-    comments: false,
-    indent_level: 2,
-  },
-});
-
-const minify = terser({
-  output: {
-    preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
-    comments: false,
-  },
-});
+//import pkg from "../../package.json" assert {type: "json"};
+import {createRequire} from "node:module";
+const require = createRequire(import.meta.url);
+const pkg = createRequire(import.meta.url)("../../package.json");
 
 function shimImport(importId, code) {
   if (code === void 0) {
@@ -62,21 +38,34 @@ export default [
   {
     input: "../../lib/main/index.js",
     output: {
-      file: `../../dist/${script}.mjs`,
+      file: "../../dist/swim-runtime.js",
       format: "esm",
-      paths: paths,
+      paths: {},
       freeze: false,
       generatedCode: {
         preset: "es2015",
         constBindings: true,
       },
       sourcemap: true,
-      plugins: [beautify],
+      plugins: [
+        terser({
+          compress: false,
+          mangle: false,
+          output: {
+            preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
+            beautify: true,
+            comments: false,
+            indent_level: 2,
+          },
+        }),
+      ],
     },
-    external: external.concat("tslib"),
+    external: [
+      "os",
+      "tslib",
+      "ws",
+    ],
     plugins: [
-      shimImport("os", "export const EOL = \"\\n\""),
-      shimImport("ws", "export const WebSocket = void 0"),
       nodeResolve(),
       sourcemaps(),
     ],
@@ -89,15 +78,14 @@ export default [
     input: "../../lib/main/index.js",
     output: [
       {
-        file: `../../dist/${script}.js`,
+        file: "../../dist/umd/swim-runtime.js",
         name: "swim",
         format: "umd",
         globals: {
-          ...globals,
           os: "os",
           ws: "ws",
         },
-        paths: paths,
+        paths: {},
         generatedCode: {
           preset: "es2015",
           constBindings: true,
@@ -105,18 +93,28 @@ export default [
         sourcemap: true,
         interop: "esModule",
         extend: true,
-        plugins: [beautify],
+        plugins: [
+          terser({
+            compress: false,
+            mangle: false,
+            output: {
+              preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
+              beautify: true,
+              comments: false,
+              indent_level: 2,
+            },
+          }),
+        ],
       },
       {
-        file: `../../dist/${script}.min.js`,
+        file: "../../dist/umd/swim-runtime.min.js",
         name: "swim",
         format: "umd",
         globals: {
-          ...globals,
           os: "os",
           ws: "ws",
         },
-        paths: paths,
+        paths: {},
         generatedCode: {
           preset: "es2015",
           constBindings: true,
@@ -124,11 +122,20 @@ export default [
         sourcemap: true,
         interop: "esModule",
         extend: true,
-        plugins: [minify],
+        plugins: [
+          terser({
+            output: {
+              preamble: `// ${pkg.name} v${pkg.version} (c) ${pkg.copyright}`,
+              comments: false,
+            },
+          }),
+        ],
       },
     ],
-    external: external.concat("os", "ws"),
+    external: [],
     plugins: [
+      shimImport("os", "export const EOL = \"\\n\""),
+      shimImport("ws", "export const WebSocket = void 0"),
       nodeResolve(),
       sourcemaps(),
     ],

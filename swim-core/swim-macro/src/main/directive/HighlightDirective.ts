@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {createRequire} from "node:module";
 import type * as Prism from "prismjs";
 import {Item} from "@swim/structure";
 import {Attr} from "@swim/structure";
@@ -43,7 +44,8 @@ export class HighlightDirective extends Directive {
 
   protected loadLanguage(language: string): Prism.Grammar | null {
     let grammar: Prism.Grammar | null | undefined = this.prism.languages[language];
-    if (grammar === void 0 && typeof require === "function") {
+    if (grammar === void 0 && typeof createRequire === "function") {
+      const require = createRequire(import.meta.url);
       require("prismjs/components/prism-" + language);
       grammar = this.prism.languages[language];
     }

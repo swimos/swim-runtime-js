@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as os from "os";
+import * as OS from "os";
 import type {OutputSettingsLike} from "../output/OutputSettings";
 import type {Output} from "../output/Output";
 import type {Display} from "./Display";
@@ -128,7 +128,7 @@ export const Format = (function () {
   };
 
   Object.defineProperty(Format, "lineSeparator", {
-    value: typeof os !== "undefined" && typeof os.EOL === "string" ? os.EOL : "\n",
+    value: typeof OS !== "undefined" && typeof OS.EOL === "string" ? OS.EOL : "\n",
     enumerable: true,
     configurable: true,
   });

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as ws from "ws";
+import * as WS from "ws";
 import type {Mutable} from "@swim/util";
 import type {ValueLike} from "@swim/structure";
 import {Value} from "@swim/structure";
@@ -246,6 +246,6 @@ export class WarpSocketHostWorker {
 }
 if (typeof WebSocket !== "undefined") {
   WarpSocketHostWorker.WebSocket = WebSocket;
-} else if (typeof ws !== "undefined" && ws.WebSocket !== void 0) {
-  WarpSocketHostWorker.WebSocket = ws.WebSocket as unknown as typeof WebSocket | null;
+} else if (typeof WS !== "undefined" && WS.WebSocket !== void 0) {
+  WarpSocketHostWorker.WebSocket = WS.WebSocket as unknown as typeof WebSocket | null;
 }

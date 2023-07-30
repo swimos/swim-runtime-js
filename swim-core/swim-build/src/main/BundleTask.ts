@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as Path from "path";
 import * as rollup from "rollup";
+import {loadConfigFile} from "rollup/loadConfigFile";
 import {FileRef} from "@swim/sys";
 import {TaskStatus} from "./Task";
 import {LibraryTask} from "./LibraryTask";
@@ -38,14 +38,12 @@ export class BundleTask extends LibraryTask {
     getBaseDir(): string | undefined {
       return this.owner.baseDir.value;
     },
-    async readFile(path: string): Promise<rollup.RollupOptions[] | null> {
-      let rollupConfig: rollup.RollupOptions[] | rollup.RollupOptions = await BundleTask.importScript(path);
-      if (!Array.isArray(rollupConfig)) {
-        rollupConfig = [rollupConfig];
-      }
-      return rollupConfig;
+    async readFile(path: string): Promise<rollup.MergedRollupOptions[] | null> {
+      const {options, warnings} = await loadConfigFile(path, {});
+      warnings.flush();
+      return options;
     },
-    willSetValue(path: string, rollupConfig: rollup.RollupOptions[] | null): void {
+    willSetValue(path: string, rollupConfig: rollup.MergedRollupOptions[] | null): void {
       if (rollupConfig === null) {
         return;
       }
@@ -56,7 +54,7 @@ export class BundleTask extends LibraryTask {
       }
     },
   })
-  readonly rollupConfig!: FileRef<this, rollup.RollupOptions[] | null>;
+  readonly rollupConfig!: FileRef<this, rollup.MergedRollupOptions[] | null>;
 
   override async exec(): Promise<TaskStatus> {
     const rollupConfig = await this.rollupConfig.getOrLoadIfExists(null);
@@ -104,40 +102,5 @@ export class BundleTask extends LibraryTask {
     } finally {
       process.chdir(cwd);
     }
-  }
-
-  static async importScript(scriptFile: string): Promise<any> {
-    const bundle = await rollup.rollup({
-      input: scriptFile,
-      external(id: string): boolean {
-        return id[0] !== "." && !Path.isAbsolute(id) || id.slice(-5, id.length) === ".json";
-      },
-      onwarn(warning: rollup.RollupWarning, warn: rollup.WarningHandler): void {
-        if (warning.code === "MIXED_EXPORTS") {
-          return; // suppress
-        }
-        warn(warning);
-      },
-    });
-
-    const {output} = await bundle.generate({
-      format: "cjs",
-      exports: "default",
-    });
-
-    // temporarily override require to inject config script
-    const defaultLoader = require.extensions[".js"];
-    require.extensions[".js"] = function (module: NodeModule, fileName: string): void {
-      if (fileName === scriptFile) {
-        (module as { _compile?: any })._compile(output[0].code, fileName);
-      } else {
-        defaultLoader(module, fileName);
-      }
-    };
-
-    delete require.cache[scriptFile];
-    const config = require(scriptFile);
-    require.extensions[".js"] = defaultLoader;
-    return config;
   }
 }

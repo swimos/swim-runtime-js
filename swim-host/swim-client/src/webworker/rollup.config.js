@@ -2,27 +2,10 @@ import * as FS from "fs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import terser from "@rollup/plugin-terser";
-import * as pkg from "../../package.json";
-
-const script = "swim-client";
-
-const beautify = terser({
-  compress: false,
-  mangle: false,
-  output: {
-    preamble: `// ${pkg.name}/webworker v${pkg.version} (c) ${pkg.copyright}`,
-    beautify: true,
-    comments: false,
-    indent_level: 2,
-  },
-});
-
-const minify = terser({
-  output: {
-    preamble: `// ${pkg.name}/webworker v${pkg.version} (c) ${pkg.copyright}`,
-    comments: false,
-  },
-});
+//import pkg from "../../package.json" assert {type: "json"};
+import {createRequire} from "node:module";
+const require = createRequire(import.meta.url);
+const pkg = createRequire(import.meta.url)("../../package.json");
 
 function shimImport(importId, code) {
   if (code === void 0) {
@@ -81,7 +64,7 @@ export default [
     input: "../../lib/webworker/index.js",
     output: [
       {
-        file: `../../lib/webworker/webworker.mjs`,
+        file: "../../lib/webworker/webworker.js",
         format: "iife",
         generatedCode: {
           preset: "es2015",
@@ -90,12 +73,21 @@ export default [
         sourcemap: "inline",
         interop: "esModule",
         plugins: [
-          beautify,
+          terser({
+            compress: false,
+            mangle: false,
+            output: {
+              preamble: `// ${pkg.name}/webworker v${pkg.version} (c) ${pkg.copyright}`,
+              beautify: true,
+              comments: false,
+              indent_level: 2,
+            },
+          }),
           exportAsString(),
         ],
       },
       {
-        file: `../../lib/webworker/webworker.min.mjs`,
+        file: "../../lib/webworker/webworker.min.js",
         format: "iife",
         generatedCode: {
           preset: "es2015",
@@ -103,7 +95,12 @@ export default [
         },
         interop: "esModule",
         plugins: [
-          minify,
+          terser({
+            output: {
+              preamble: `// ${pkg.name}/webworker v${pkg.version} (c) ${pkg.copyright}`,
+              comments: false,
+            },
+          }),
           exportAsString(),
         ],
       },
@@ -120,58 +117,48 @@ export default [
     },
   },
   {
-    input: `../../lib/webworker/webworker.mjs`,
-    output: [
-      {
-        file: `../../dist/${script}-webworker.mjs`,
-        format: "esm",
-        generatedCode: {
-          preset: "es2015",
-          constBindings: true,
-        },
-        plugins: [beautify],
+    input: "../../lib/webworker/webworker.js",
+    output: {
+      file: "../../dist/swim-client-webworker.js",
+      format: "esm",
+      generatedCode: {
+        preset: "es2015",
+        constBindings: true,
       },
-      {
-        file: `../../dist/${script}-webworker.js`,
-        name: "swim.WarpWorkerHost.webworker",
-        format: "umd",
-        generatedCode: {
-          preset: "es2015",
-          constBindings: true,
-        },
-        interop: "esModule",
-        extend: true,
-        plugins: [beautify],
-      },
-    ],
+      plugins: [
+        terser({
+          compress: false,
+          mangle: false,
+          output: {
+            preamble: `// ${pkg.name}/webworker v${pkg.version} (c) ${pkg.copyright}`,
+            beautify: true,
+            comments: false,
+            indent_level: 2,
+          },
+        }),
+      ],
+    },
     plugins: [
-      copyFile("index.d.ts", `../../dist/${script}-webworker.d.ts`),
+      copyFile("index.d.ts", "../../dist/swim-client-webworker.d.ts"),
     ],
   },
   {
-    input: `../../lib/webworker/webworker.min.mjs`,
-    output: [
-      {
-        file: `../../dist/${script}-webworker.min.mjs`,
-        format: "esm",
-        generatedCode: {
-          preset: "es2015",
-          constBindings: true,
-        },
-        plugins: [minify],
+    input: "../../lib/webworker/webworker.min.js",
+    output: {
+      file: "../../dist/swim-client-webworker.min.js",
+      format: "esm",
+      generatedCode: {
+        preset: "es2015",
+        constBindings: true,
       },
-      {
-        file: `../../dist/${script}-webworker.min.js`,
-        name: "swim.WarpWorkerHost.webworker",
-        format: "umd",
-        generatedCode: {
-          preset: "es2015",
-          constBindings: true,
-        },
-        interop: "esModule",
-        extend: true,
-        plugins: [minify],
-      },
-    ],
+      plugins: [
+        terser({
+          output: {
+            preamble: `// ${pkg.name}/webworker v${pkg.version} (c) ${pkg.copyright}`,
+            comments: false,
+          },
+        }),
+      ],
+    },
   },
 ];

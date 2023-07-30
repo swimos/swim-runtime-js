@@ -7,22 +7,22 @@
   "copyright": "2015-2023 Swim.inc",
   "license": "Apache-2.0",
   "repository": "https://github.com/swimos/swim.git",
+  "type": "module",
   "main": "./dist/swim-time.js",
-  "module": "./dist/swim-time.mjs",
+  "types": "./dist/swim-time.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/swim-time.mjs",
-      "require": "./dist/swim-time.js",
+      "import": "./dist/swim-time.js",
       "types": "./dist/swim-time.d.ts"
     }
   },
-  "types": "./dist/swim-time.d.ts",
   "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
     "@swim/util": "4.0.0-dev.20220527.3",
     "@swim/codec": "4.0.0-dev.20220527.3",
-    "@swim/structure": "4.0.0-dev.20220527.3"
+    "@swim/structure": "4.0.0-dev.20220527.3",
+    "tslib": "2"
   },
   "scripts": {
     "main:compile": "tsc -b src/main && api-extractor run -l -c src/main/api-extractor.json",
@@ -33,7 +33,7 @@
     "test:build": "npm run test:compile && npm run test:bundle",
     "compile": "npm run main:compile",
     "build": "npm run main:build",
-    "test": "npx swim-unit -m dist/swim-time-test.mjs",
+    "test": "npx swim-unit -m dist/swim-time-test.js",
     "clean": "rm -rf lib dist"
   }
 }
