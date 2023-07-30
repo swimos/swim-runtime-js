@@ -1,0 +1,22 @@
+{
+  "out": "lib/doc",
+  "categorizeByGroup": false,
+  "excludeInternal": true,
+  "entryPointStrategy": "packages",
+  "entryPoints": [
+    "swim-core/swim-util",
+    "swim-core/swim-codec",
+    "swim-core/swim-component",
+    "swim-core/swim-collections",
+    "swim-core/swim-constraint",
+    "swim-core/swim-structure",
+    "swim-core/swim-recon",
+    "swim-core/swim-uri",
+    "swim-core/swim-math",
+    "swim-core/swim-geo",
+    "swim-core/swim-time",
+
+    "swim-host/swim-warp",
+    "swim-host/swim-client"
+  ]
+}

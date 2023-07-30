@@ -16,7 +16,6 @@
       "types": "./dist/swim-macro.d.ts"
     }
   },
-  "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
     "@swim/util": "4.0.0-dev.20220527.3",

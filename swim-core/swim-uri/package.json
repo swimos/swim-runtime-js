@@ -16,7 +16,6 @@
       "types": "./dist/swim-uri.d.ts"
     }
   },
-  "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "keywords": [
     "parser",

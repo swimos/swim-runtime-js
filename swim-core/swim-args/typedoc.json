@@ -1,0 +1,8 @@
+{
+  "out": "lib/doc",
+  "categorizeByGroup": false,
+  "excludeInternal": true,
+  "entryPoints": [
+    "./src/main/index.ts"
+  ]
+}

@@ -16,7 +16,6 @@
       "types": "./dist/swim-util.d.ts"
     }
   },
-  "typedocMain": "./src/main/index.ts",
   "sideEffects": false,
   "dependencies": {
     "tslib": "2"

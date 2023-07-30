@@ -12,3 +12,4 @@ src/
 swim-*/
 tsconfig.json
 tsdoc.json
+typedoc.json
