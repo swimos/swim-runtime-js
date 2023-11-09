@@ -1,5 +1,3 @@
-import java.util.regex.Pattern
-
 pipeline {
     options {
         timeout(time: 1, unit: 'HOURS')
@@ -35,7 +33,7 @@ pipeline {
 
                     def matcher = (packageVersion =~ /^(\d+)\.(\d+)\.(\d+)/)
 
-                    if(!matcher) {
+                    if (!matcher) {
                         fail("Could not determine the version from ${packageVersion}")
                     }
                     echo matcher.toString()
@@ -50,45 +48,56 @@ pipeline {
             }
         }
 
+        stage('generate-version-dev') {
+            when {
+                anyOf {
+                    branch pattern: "^\\d+.\\d+.\\d+", comparator: "REGEXP";
+                    branch 'jenkins'
+                }
+            }
+            steps {
+                script {
+                    def now = new Date()
+                    def timestamp = now.format("yyMMddHHmmss", TimeZone.getTimeZone('UTC'))
+                    version = "${version_major}.${version_minor}.${version_revision}-dev.${timestamp}"
+                }
+            }
+        }
+
+        stage('generate-version-prod') {
+            when {
+                branch 'main';
+            }
+            steps {
+                script {
+                    version = ""
+                }
+            }
+        }
+
         stage('modify-version') {
             when {
                 anyOf {
                     branch 'main';
+                    branch 'jenkins';
                     branch pattern: "^\\d+.\\d+.\\d+", comparator: "REGEXP"
                 }
             }
             steps {
                 script {
                     def packageContents = readJSON file: 'package.json'
-                    def packageVersion = packageContents['version']
-                    def versionRegex = ~"^(\\d+)\\.(\\d+)\\.(\\d+)"
+                    packageContents['version'] = version
 
-                    def matcher = (packageVersion =~ /^(\d+)\.(\d+)\.(\d+)/)
-
-                    if(!matcher) {
-                        fail("Could not determine the version from ${packageVersion}")
-                    }
-                    echo matcher.toString()
-
-
-                    def major = Integer.parseInt(matcher[0][1])
-                    def minor = Integer.parseInt(matcher[0][2])
-                    def revision = Integer.parseInt(matcher[0][3])
-
-                    echo "${major}.${minor}.${revision}"
-
-
-
+                    writeJSON file: 'package.json', json: packageContents
+                    archiveArtifacts artifacts: 'package.json'
                 }
             }
-
-
-
         }
 
         stage('build') {
             steps {
                 container('node') {
+                    sh 'npm config set progress false'
                     sh 'npm config set color false'
                     sh 'npm install'
                     sh 'npm run bootstrap'
