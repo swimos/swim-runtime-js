@@ -96,7 +96,7 @@ color=never
                 script {
                     def packageContents = readJSON file: 'package.json'
                     packageContents['version'] = version
-                    echo version.getClass()
+                    echo version.getClass().toString()
 
                     writeJSON file: 'package.json', json: packageContents, pretty: 4
                     archiveArtifacts artifacts: 'package.json'
