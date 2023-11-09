@@ -94,6 +94,8 @@ color=never
             }
             steps {
                 script {
+
+
                     def packageFiles = findFiles glob: '**/package.json'
                     packageFiles.each { packageFile ->
                         def packageContents = readJSON file: "${packageFile}"
@@ -107,10 +109,24 @@ color=never
                                 dependencyUpdates.put(entry.key, version)
                             }
                         }
-
+                        
                         if (dependencyUpdates) {
                             dependencies.putAll(dependencyUpdates)
                         }
+
+                        def devDependencies = packageContents['devDependencies']
+                        def devDependencyUpdates = [:]
+
+                        devDependencies.each { entry ->
+                            if (entry.value == originalVersion) {
+                                devDependencyUpdates.put(entry.key, version)
+                            }
+                        }
+
+                        if (devDependencyUpdates) {
+                            devDependencies.putAll(devDependencyUpdates)
+                        }
+                        
 
                         writeJSON file: "${packageFile}", json: packageContents, pretty: 4
                         archiveArtifacts artifacts: "${packageFile}"
