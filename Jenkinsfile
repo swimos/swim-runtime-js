@@ -52,7 +52,7 @@ pipeline {
             when {
                 anyOf {
                     branch pattern: "^\\d+.\\d+.\\d+", comparator: "REGEXP";
-                    branch 'jenkins'
+                    branch pattern: "PR-\\d+", comparator: "REGEXP"
                 }
             }
             steps {
@@ -79,8 +79,8 @@ pipeline {
             when {
                 anyOf {
                     branch 'main';
-                    branch 'jenkins';
-                    branch pattern: "^\\d+.\\d+.\\d+", comparator: "REGEXP"
+                    branch pattern: "^\\d+.\\d+.\\d+", comparator: "REGEXP";
+                    branch pattern: "PR-\\d+", comparator: "REGEXP"
                 }
             }
             steps {
