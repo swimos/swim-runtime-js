@@ -96,7 +96,6 @@ color=never
                 script {
                     def packageContents = readJSON file: 'package.json'
                     packageContents.version = version as String
-                    echo version.getClass().toString()
 
                     def dependencies = packageContents['dependencies']
                     def dependencyUpdates = [:]
@@ -125,6 +124,9 @@ color=never
                     sh 'npm install'
                     sh 'npm run bootstrap'
                     sh 'npx swim-build'
+                    archiveArtifacts artifacts: "swim-core/**/dist/**/*.*"
+                    archiveArtifacts artifacts: "swim-host/**/dist/**/*.*"
+                    archiveArtifacts artifacts: "dist/**/*.*"
                 }
             }
         }
