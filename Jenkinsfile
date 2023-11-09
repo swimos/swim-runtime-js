@@ -15,30 +15,12 @@ pipeline {
             image: node:20
             command:
             - cat
-            tty: true
-            env:
-            - name: NPM_CONFIG_PROGRESS 
-              value: "false"
-            - name: NPM_CONFIG_SPIN 
-              value: "false"                             
+            tty: true                           
         '''
         }
     }
 
     stages {
-        stage('configure-npm') {
-            steps {
-                container('node') {
-                    script {
-                        def npmrc = """
-progress=false
-color=never
-"""
-                        writeFile file: '.npmrc', text: npmrc
-                    }
-                }
-            }
-        }
         stage('read-version') {
             steps {
                 script {
