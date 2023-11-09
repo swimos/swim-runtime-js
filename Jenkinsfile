@@ -106,8 +106,6 @@ color=never
         stage('build') {
             steps {
                 container('node') {
-                    sh 'npm config set progress false'
-                    sh 'npm config set color false'
                     sh 'npm install'
                     sh 'npm run bootstrap'
                     sh 'npx swim-build'
