@@ -1,3 +1,5 @@
+import java.util.regex.Pattern
+
 pipeline {
     options {
         timeout(time: 1, unit: 'HOURS')
@@ -26,10 +28,31 @@ pipeline {
 
     stages {
         stage('version') {
+//            when {
+//                anyOf {
+//                    branch 'main';
+//                    branch pattern: "^\\d+.\\d+.\\d+", comparator: "REGEXP"
+//                }
+//            }
             steps {
                 script {
-                    def packageVersion = readJSON file: 'package.json'
-                    echo packageVersion['version']
+                    def packageContents = readJSON file: 'package.json'
+                    def packageVersion = packageContents['version']
+                    def versionRegex = ~"^(\\d+)\\.(\\d+)\\.(\\d+)"
+
+                    def matcher =~ versionRegex
+
+                    if(!matcher.find()) {
+                        fail("Could not determine the version from ${packageVersion}")
+                    }
+                    def major = Integer.parseInt(matcher[1])
+                    def minor = Integer.parseInt(matcher[1])
+                    def revision = Integer.parseInt(matcher[1])
+
+                    echo "${major}.${minor}.${revision}"
+
+
+
                 }
             }
 
