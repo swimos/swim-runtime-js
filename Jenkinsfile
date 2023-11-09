@@ -40,7 +40,7 @@ pipeline {
                     def packageVersion = packageContents['version']
                     def versionRegex = ~"^(\\d+)\\.(\\d+)\\.(\\d+)"
 
-                    def matcher =~ /^(\d+)\.(\d+)\.(\d+)/
+                    def matcher = (packageVersion =~ /^(\d+)\.(\d+)\.(\d+)/)
 
                     if(!matcher) {
                         fail("Could not determine the version from ${packageVersion}")
