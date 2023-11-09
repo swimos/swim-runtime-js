@@ -114,7 +114,7 @@ color=never
                     writeJSON file: 'package.json', json: packageContents, pretty: 4
                     archiveArtifacts artifacts: 'package.json'
                     writeFile file: 'version.txt', text: version
-                    archiveArtifacts artifacts: 'version.json'
+                    archiveArtifacts artifacts: 'version.txt'
                 }
             }
         }
