@@ -26,14 +26,15 @@ pipeline {
 
     stages {
         stage('build') {
-            container('node') {
-                sh 'npm config set color false'
-                sh 'npm install'
-                sh 'npm run bootstrap'
-                sh 'npx swim-build'
+            steps {
+                container('node') {
+                    sh 'npm config set color false'
+                    sh 'npm install'
+                    sh 'npm run bootstrap'
+                    sh 'npx swim-build'
+                }
             }
         }
-
     }
 }
 
