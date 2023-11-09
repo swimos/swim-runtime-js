@@ -96,7 +96,7 @@ color=never
                 script {
                     def packageFiles = findFiles glob: '**/package.json'
                     packageFiles.each { packageFile ->
-                        def packageContents = readJSON file: packageFile
+                        def packageContents = readJSON file: "${packageFile}"
                         packageContents.version = version as String
 
                         def dependencies = packageContents['dependencies']
@@ -112,8 +112,8 @@ color=never
                             dependencies.putAll(dependencyUpdates)
                         }
 
-                        writeJSON file: packageFile, json: packageContents, pretty: 4
-                        archiveArtifacts artifacts: packageFile
+                        writeJSON file: "${packageFile}", json: packageContents, pretty: 4
+                        archiveArtifacts artifacts: "${packageFile}"
                     }
 
                     writeFile file: 'version.txt', text: version
