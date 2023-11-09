@@ -51,7 +51,7 @@ color=never
                     version_minor = Integer.parseInt(matcher[0][2])
                     version_revision = Integer.parseInt(matcher[0][3])
 
-                    echo "${version_major}.${version_minor}.${version_revision}"
+                    echo "Version read ${version_major}.${version_minor}.${version_revision}"
                 }
             }
         }
@@ -95,7 +95,7 @@ color=never
             steps {
                 script {
                     def packageContents = readJSON file: 'package.json'
-                    packageContents['version'] = version
+                    packageContents.version = version as String // Whoever came up with Groovy strings is an ass.
                     echo version.getClass().toString()
 
                     writeJSON file: 'package.json', json: packageContents, pretty: 4
