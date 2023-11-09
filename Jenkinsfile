@@ -102,12 +102,12 @@ color=never
                     def dependencyUpdates = [:]
 
                     dependencies.each {
-                        if entry.value == originalVersion {
+                        if (entry.value == originalVersion) {
                             dependencyUpdates.put(entry.key, version)
                         }
                     }
 
-                    if dependencyUpdates {
+                    if (dependencyUpdates) {
                         dependencies.putAll(dependencyUpdates)
                     }
 
