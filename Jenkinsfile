@@ -42,12 +42,15 @@ pipeline {
 
                     def matcher =~ versionRegex
 
-                    if(!matcher.find()) {
+                    if(!matcher) {
                         fail("Could not determine the version from ${packageVersion}")
                     }
+
+
+
                     def major = Integer.parseInt(matcher[1])
-                    def minor = Integer.parseInt(matcher[1])
-                    def revision = Integer.parseInt(matcher[1])
+                    def minor = Integer.parseInt(matcher[2])
+                    def revision = Integer.parseInt(matcher[3])
 
                     echo "${major}.${minor}.${revision}"
 
