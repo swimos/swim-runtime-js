@@ -20,11 +20,20 @@ pipeline {
         }
     }
 
-    environment {
-        NO_COLOR = "false"
-    }
-
     stages {
+        stage('configure-npm') {
+            steps {
+                container('node') {
+                    script {
+                        def npmrc = """
+progress=false
+color=never
+"""
+                        writeFile file: '.npmrc', text: npmrc
+                    }
+                }
+            }
+        }
         stage('read-version') {
             steps {
                 script {
