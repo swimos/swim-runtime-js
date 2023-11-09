@@ -99,8 +99,6 @@ color=never
             }
             steps {
                 script {
-
-
                     def packageFiles = findFiles glob: '**/package.json'
                     packageFiles.each { packageFile ->
                         def packageContents = readJSON file: "${packageFile}"
@@ -152,6 +150,22 @@ color=never
                     archiveArtifacts artifacts: "swim-core/**/dist/**/*.*"
                     archiveArtifacts artifacts: "swim-host/**/dist/**/*.*"
                     archiveArtifacts artifacts: "dist/**/*.*"
+                }
+            }
+        }
+
+        stage('test') {
+            steps {
+                container('node') {
+                    sh 'npx swim-build test'
+                }
+            }
+        }
+
+        stage('publish') {
+            steps {
+                container('node') {
+                    sh 'npx swim-build publish'
                 }
             }
         }
