@@ -15,7 +15,12 @@ pipeline {
             image: node:20
             command:
             - cat
-            tty: true                 
+            tty: true
+            env:
+            - name: NPM_CONFIG_PROGRESS 
+              value: "false"
+            - name: NPM_CONFIG_SPIN 
+              value: "false"                             
         '''
         }
     }
