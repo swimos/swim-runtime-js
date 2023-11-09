@@ -45,7 +45,6 @@ color=never
                     if (!matcher) {
                         fail("Could not determine the version from ${packageVersion}")
                     }
-                    echo matcher.toString()
 
                     //def means local variable. Removing means global.
                     version_major = Integer.parseInt(matcher[0][1])
@@ -98,7 +97,7 @@ color=never
                     def packageContents = readJSON file: 'package.json'
                     packageContents['version'] = version
 
-                    writeJSON file: 'package.json', json: packageContents
+                    writeJSON file: 'package.json', json: packageContents, pretty: 4
                     archiveArtifacts artifacts: 'package.json'
                 }
             }
