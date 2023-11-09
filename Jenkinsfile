@@ -38,12 +38,12 @@ color=never
             steps {
                 script {
                     def packageContents = readJSON file: 'package.json'
-                    def packageVersion = packageContents['version']
+                    originalVersion = packageContents['version']
 
-                    def matcher = (packageVersion =~ /^(\d+)\.(\d+)\.(\d+)/)
+                    def matcher = (originalVersion =~ /^(\d+)\.(\d+)\.(\d+)/)
 
                     if (!matcher) {
-                        fail("Could not determine the version from ${packageVersion}")
+                        fail("Could not determine the version from ${originalVersion}")
                     }
 
                     //def means local variable. Removing means global.
@@ -67,7 +67,7 @@ color=never
                 script {
                     def now = new Date()
                     def timestamp = now.format("yyMMddHHmmss", TimeZone.getTimeZone('UTC'))
-                    version = "${version_major}.${version_minor}.${version_revision}-dev.${timestamp}"
+                    version = "${version_major}.${version_minor}.${version_revision}-dev.${timestamp}" as String // Whoever came up with Groovy strings is an ass.
                     echo "Setting version to '${version}'"
                 }
             }
@@ -95,8 +95,21 @@ color=never
             steps {
                 script {
                     def packageContents = readJSON file: 'package.json'
-                    packageContents.version = version as String // Whoever came up with Groovy strings is an ass.
+                    packageContents.version = version as String
                     echo version.getClass().toString()
+
+                    def dependencies = packageContents['dependencies']
+                    def dependencyUpdates = [:]
+
+                    dependencies.each {
+                        if entry.value == originalVersion {
+                            dependencyUpdates.put(entry.key, version)
+                        }
+                    }
+
+                    if dependencyUpdates {
+                        dependencies.putAll(dependencyUpdates)
+                    }
 
                     writeJSON file: 'package.json', json: packageContents, pretty: 4
                     archiveArtifacts artifacts: 'package.json'
