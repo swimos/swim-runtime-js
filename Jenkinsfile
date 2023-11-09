@@ -45,7 +45,7 @@ pipeline {
                     if(!matcher) {
                         fail("Could not determine the version from ${packageVersion}")
                     }
-
+                    echo matcher.toString()
 
 
                     def major = Integer.parseInt(matcher[1])
