@@ -69,6 +69,7 @@ color=never
                     def now = new Date()
                     def timestamp = now.format("yyMMddHHmmss", TimeZone.getTimeZone('UTC'))
                     version = "${version_major}.${version_minor}.${version_revision}-dev.${timestamp}"
+                    echo "Setting version to '${version}'"
                 }
             }
         }
