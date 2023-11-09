@@ -25,6 +25,16 @@ pipeline {
     }
 
     stages {
+        stage('version') {
+            steps {
+                def packageVersion = readJSON file: 'package.json'
+                echo packageVersion['version']
+            }
+
+
+
+        }
+
         stage('build') {
             steps {
                 container('node') {
